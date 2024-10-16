@@ -27,11 +27,11 @@ set(SOURCE_FILES
     ${CHESS_PIECE_DIR}/Queen.cpp
     ${CHESS_PIECE_DIR}/King.cpp
 
-    #${SOURCE_DIR}/ChessBoard.cpp
+    ${SOURCE_DIR}/ChessBoard.cpp
 )
 
 set(HEADER_FILES
-    #${CHESS_PIECE_DIR}/PieceType.h
+    ${CHESS_PIECE_DIR}/PieceType.h
     ${CHESS_PIECE_DIR}/ChessPiece.h
     ${CHESS_PIECE_DIR}/Pawn.h
     ${CHESS_PIECE_DIR}/Knight.h
@@ -40,7 +40,7 @@ set(HEADER_FILES
     ${CHESS_PIECE_DIR}/Queen.h
     ${CHESS_PIECE_DIR}/King.h
 
-    #${SOURCE_DIR}/ChessBoard.h
+    ${SOURCE_DIR}/ChessBoard.h
 )
 
 
