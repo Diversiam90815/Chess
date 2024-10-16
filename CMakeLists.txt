@@ -14,7 +14,9 @@ set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 set(CHESS_PIECE_DIR ${SOURCE_DIR}/ChessPiece)
 
 # Include directories
-include_directories(${HEADER_DIR})
+include_directories(    ${CHESS_PIECE_DIR}
+                        ${SOURCE_DIR}
+)
 
 
 set(SOURCE_FILES
