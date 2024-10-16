@@ -11,36 +11,38 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Define source and header directories
 set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
-set(HEADER_DIR ${PROJECT_SOURCE_DIR}/include)
+set(CHESS_PIECE_DIR ${SOURCE_DIR}/ChessPiece)
 
 # Include directories
 include_directories(${HEADER_DIR})
 
-# Collect all source files
+
 set(SOURCE_FILES
     ${SOURCE_DIR}/main.cpp
-    #${SOURCE_DIR}/ChessPiece.cpp
-    #${SOURCE_DIR}/Pawn.cpp
-    #${SOURCE_DIR}/Knight.cpp
-    #${SOURCE_DIR}/Bishop.cpp
-    #${SOURCE_DIR}/Rook.cpp
-    #${SOURCE_DIR}/Queen.cpp
-    #${SOURCE_DIR}/King.cpp
+    ${CHESS_PIECE_DIR}/ChessPiece.cpp
+    ${CHESS_PIECE_DIR}/Pawn.cpp
+    ${CHESS_PIECE_DIR}/Knight.cpp
+    ${CHESS_PIECE_DIR}/Bishop.cpp
+    ${CHESS_PIECE_DIR}/Rook.cpp
+    ${CHESS_PIECE_DIR}/Queen.cpp
+    ${CHESS_PIECE_DIR}/King.cpp
+
     #${SOURCE_DIR}/ChessBoard.cpp
 )
 
-# Collect all header files (optional, for IDEs)
 set(HEADER_FILES
-    #${HEADER_DIR}/PieceType.h
-    #${HEADER_DIR}/ChessPiece.h
-    #${HEADER_DIR}/Pawn.h
-    #${HEADER_DIR}/Knight.h
-    #${HEADER_DIR}/Bishop.h
-    #${HEADER_DIR}/Rook.h
-    #${HEADER_DIR}/Queen.h
-    #${HEADER_DIR}/King.h
-    #${HEADER_DIR}/ChessBoard.h
+    #${CHESS_PIECE_DIR}/PieceType.h
+    ${CHESS_PIECE_DIR}/ChessPiece.h
+    ${CHESS_PIECE_DIR}/Pawn.h
+    ${CHESS_PIECE_DIR}/Knight.h
+    ${CHESS_PIECE_DIR}/Bishop.h
+    ${CHESS_PIECE_DIR}/Rook.h
+    ${CHESS_PIECE_DIR}/Queen.h
+    ${CHESS_PIECE_DIR}/King.h
+
+    #${SOURCE_DIR}/ChessBoard.h
 )
+
 
 # Group source and header files (optional, for IDEs)
 source_group("Source Files" FILES ${SOURCE_FILES})
