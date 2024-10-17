@@ -21,7 +21,7 @@ include_directories(    ${CHESS_PIECE_DIR}
 
 set(SOURCE_FILES
     ${SOURCE_DIR}/main.cpp
-    ${CHESS_PIECE_DIR}/ChessPiece.cpp
+
     ${CHESS_PIECE_DIR}/Pawn.cpp
     ${CHESS_PIECE_DIR}/Knight.cpp
     ${CHESS_PIECE_DIR}/Bishop.cpp
@@ -36,7 +36,6 @@ set(SOURCE_FILES
 )
 
 set(HEADER_FILES
-    ${CHESS_PIECE_DIR}/PieceType.h
     ${CHESS_PIECE_DIR}/ChessPiece.h
     ${CHESS_PIECE_DIR}/Pawn.h
     ${CHESS_PIECE_DIR}/Knight.h

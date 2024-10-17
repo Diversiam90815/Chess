@@ -10,22 +10,22 @@ bool King::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board
 	int dy = abs(toY - fromY);
 
 	// Standard one-square move
-	if ((dx <= 1 && dy <= 1) && !(dx == 0 && dy == 0))
+	if (dx == 1 || dy == 1)
 	{
 		auto targetPiece = board.getPiece(toX, toY);
 		if (targetPiece == nullptr || targetPiece->getColor() != color)
 		{
-			// Additional checks for moving into check should be implemented
 			return true;
 		}
 	}
 
-	// Castling (simplified)
+	// Castling
 	if (!hasMoved && dy == 0 && dx == 2)
 	{
 		// Kingside or Queenside castling
 		int			rookX = (toX > fromX) ? 7 : 0;
 		auto rook  = board.getPiece(rookX, fromY);
+
 		if (rook != nullptr && rook->getType() == PieceType::Rook && !rook->getHasMoved() && rook->getColor() == color)
 		{
 			// Check if squares between king and rook are empty
@@ -37,7 +37,6 @@ bool King::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board
 					return false;
 				}
 			}
-			// Additional checks for check should be added
 			return true;
 		}
 	}
@@ -70,13 +69,12 @@ std::vector<std::pair<int, int>> King::getPossibleMoves(int x, int y, ChessBoard
 			auto targetPiece = board.getPiece(newX, newY);
 			if (targetPiece == nullptr || targetPiece->getColor() != color)
 			{
-				// Additional checks for moving into check should be implemented
 				moves.emplace_back(newX, newY);
 			}
 		}
 	}
 
-	// Castling moves (simplified)
+	// Castling moves
 	if (!hasMoved)
 	{
 		// Kingside castling

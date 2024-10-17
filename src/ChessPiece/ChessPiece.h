@@ -1,11 +1,30 @@
 
 #pragma once
 
-#include "PieceType.h"
 #include <vector>
 #include <utility>
 
 class ChessBoard;
+
+
+enum class PieceType
+{
+	None,
+	Pawn,
+	Knight,
+	Bishop,
+	Rook,
+	Queen,
+	King
+};
+
+enum class PieceColor
+{
+	None,
+	White,
+	Black
+};
+
 
 class ChessPiece
 {

@@ -29,11 +29,11 @@ bool Pawn::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board
 		{
 			return true;
 		}
-		// Handle en passant here if necessary
 	}
 
 	return false;
 }
+
 
 std::vector<std::pair<int, int>> Pawn::getPossibleMoves(int x, int y, ChessBoard &board) const
 {
@@ -58,12 +58,11 @@ std::vector<std::pair<int, int>> Pawn::getPossibleMoves(int x, int y, ChessBoard
 	{
 		moves.emplace_back(x - 1, y + direction);
 	}
+	
 	if (x < 7 && board.getPiece(x + 1, y + direction) != nullptr && board.getPiece(x + 1, y + direction)->getColor() != color)
 	{
 		moves.emplace_back(x + 1, y + direction);
 	}
-
-	// Add en passant moves if implemented
 
 	return moves;
 }

@@ -33,6 +33,7 @@ bool Queen::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &boar
 	return false;
 }
 
+
 std::vector<std::pair<int, int>> Queen::getPossibleMoves(int x, int y, ChessBoard &board) const
 {
 	std::vector<std::pair<int, int>> moves;

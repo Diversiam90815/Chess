@@ -30,6 +30,7 @@ bool Rook::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board
 	return false;
 }
 
+
 std::vector<std::pair<int, int>> Rook::getPossibleMoves(int x, int y, ChessBoard &board) const
 {
 	std::vector<std::pair<int, int>> moves;

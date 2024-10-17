@@ -1,7 +1,6 @@
 
 #pragma once
-#include "PieceType.h"
-
+#include "ChessPiece.h"
 
 struct Move
 {

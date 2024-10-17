@@ -14,10 +14,12 @@ bool Bishop::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &boa
 	{
 		int stepX = (toX - fromX) / dx;
 		int stepY = (toY - fromY) / dy;
+
 		for (int i = 1; i < dx; ++i)
 		{
 			int x = fromX + i * stepX;
 			int y = fromY + i * stepY;
+
 			if (!board.isEmpty(x, y))
 			{
 				return false; // Path is blocked
@@ -31,6 +33,7 @@ bool Bishop::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &boa
 	}
 	return false;
 }
+
 
 std::vector<std::pair<int, int>> Bishop::getPossibleMoves(int x, int y, ChessBoard &board) const
 {
