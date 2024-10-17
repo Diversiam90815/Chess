@@ -3,9 +3,16 @@
 
 struct Player
 {
+	Player()
+	{
+	}
+
 	Player(PieceColor color) : playerColor(color)
 	{
 	}
+
+	~Player() = default;
+
 
 	bool isOnTurn() const
 	{
