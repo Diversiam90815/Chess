@@ -1,6 +1,5 @@
 
 #include "Bishop.h"
-
 #include "ChessBoard.h"
 #include <cmath>
 
