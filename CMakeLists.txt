@@ -19,21 +19,6 @@ include_directories(    ${CHESS_PIECE_DIR}
 )
 
 
-set(SOURCE_FILES
-    ${SOURCE_DIR}/main.cpp
-
-    ${CHESS_PIECE_DIR}/Pawn.cpp
-    ${CHESS_PIECE_DIR}/Knight.cpp
-    ${CHESS_PIECE_DIR}/Bishop.cpp
-    ${CHESS_PIECE_DIR}/Rook.cpp
-    ${CHESS_PIECE_DIR}/Queen.cpp
-    ${CHESS_PIECE_DIR}/King.cpp
-
-    ${SOURCE_DIR}/ChessBoard.cpp
-
-    ${SOURCE_DIR}/MovementManager.cpp
-
-)
 
 set(HEADER_FILES
     ${CHESS_PIECE_DIR}/ChessPiece.h
@@ -48,9 +33,29 @@ set(HEADER_FILES
     
     ${SOURCE_DIR}/Move.h
     ${SOURCE_DIR}/MovementManager.h
+    
+    ${SOURCE_DIR}/GameManager.h
 
+    ${SOURCE_DIR}/Player.h
 )
 
+set(SOURCE_FILES
+    ${SOURCE_DIR}/main.cpp
+
+    ${CHESS_PIECE_DIR}/Pawn.cpp
+    ${CHESS_PIECE_DIR}/Knight.cpp
+    ${CHESS_PIECE_DIR}/Bishop.cpp
+    ${CHESS_PIECE_DIR}/Rook.cpp
+    ${CHESS_PIECE_DIR}/Queen.cpp
+    ${CHESS_PIECE_DIR}/King.cpp
+
+    ${SOURCE_DIR}/ChessBoard.cpp
+
+    ${SOURCE_DIR}/MovementManager.cpp
+
+    ${SOURCE_DIR}/GameManager.cpp
+
+)
 
 # Group source and header files (optional, for IDEs)
 source_group("Source Files" FILES ${SOURCE_FILES})
