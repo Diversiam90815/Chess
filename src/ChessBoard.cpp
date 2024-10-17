@@ -1,90 +1,83 @@
 
 #include "ChessBoard.h"
-#include "Pawn.h"
-#include "Knight.h"
-#include "Bishop.h"
-#include "Rook.h"
-#include "Queen.h"
-#include "King.h"
-#include <iostream>
+
+#include "ChessPiece.h"
+
 
 
 ChessBoard::ChessBoard()
 {
-	// Initialize all board positions to nullptr
-	for (auto &row : board)
+	squares.resize(8);
+	for (int y = 0; y < 8; ++y)
 	{
-		row.fill(nullptr);
+		for (int x = 0; x < 8; ++x)
+		{
+			squares[y].emplace_back(x, y);
+		}
 	}
-	initializeBoard();
 }
 
 
 ChessBoard::~ChessBoard()
 {
-	// Clean up dynamically allocated pieces
-	for (auto &row : board)
-	{
-		for (auto &piece : row)
-		{
-			piece.reset();
-			piece = nullptr;
-		}
-	}
 }
 
 
-std::shared_ptr<ChessPiece> ChessBoard::getPiece(int x, int y) const
+Square & ChessBoard::getSquare(int x, int y)
 {
-	if (x < 0 || x > 7 || y < 0 || y > 7)
-		return nullptr;
-
-	return board[y][x];
+	return squares[y][x];
 }
 
 
 void ChessBoard::setPiece(int x, int y, std::shared_ptr<ChessPiece> piece)
 {
-	if (x < 0 || x > 7 || y < 0 || y > 7)
-		return;
-
-	board[y][x] = piece;
+	squares[y][x].piece = piece;
 }
 
 
-bool ChessBoard::isEmpty(int x, int y) const
+
+std::shared_ptr<ChessPiece> ChessBoard::getPiece(int x, int y)
 {
-	return getPiece(x, y) == nullptr;
+	return squares[y][y].piece;
+}
+
+
+void ChessBoard::removePiece(int x, int y)
+{
+	squares[y][x].piece = nullptr;
 }
 
 
 bool ChessBoard::movePiece(int fromX, int fromY, int toX, int toY)
 {
-	std::shared_ptr<ChessPiece> piece = getPiece(fromX, fromY);
-	if (piece != nullptr && piece->isValidMove(fromX, fromY, toX, toY, *this))
-	{
-		std::shared_ptr<ChessPiece> targetPiece = getPiece(toX, toY);
-		if (targetPiece != nullptr)
-		{
-			targetPiece.reset(); // Capture the piece
-		}
-		setPiece(toX, toY, piece);
-		setPiece(fromX, fromY, nullptr);
-		piece->setHasMoved(true);
-		return true;
-	}
-	return false;
+	auto piece = getPiece(fromX, fromY);
+	if (!piece)
+		return false;
+
+	removePiece(fromX, fromY);
+	setPiece(toX, toY, piece);
+	piece->setHasMoved(true);
+	return true;
 }
 
 
-bool ChessBoard::isValidMove(int fromX, int fromY, int toX, int toY) const
+bool ChessBoard::isEmpty(int x, int y) const
 {
-	std::shared_ptr<ChessPiece> piece = getPiece(fromX, fromY);
-	if (piece != nullptr)
-	{
-		return piece->isValidMove(fromX, fromY, toX, toY, *this);
-	}
-	return false;
+	return squares[y][x].piece == nullptr;
+}
+
+
+const Move *ChessBoard::getLastMove()
+{
+	if (moveHistory.empty())
+		return nullptr;
+	return &moveHistory.back();
+}
+
+
+void ChessBoard::addMoveToHistory(const Move &move)
+{
+	moveHistory.push_back(move);
 }
 
 

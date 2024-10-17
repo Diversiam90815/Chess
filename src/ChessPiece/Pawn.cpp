@@ -4,7 +4,7 @@
 #include "ChessBoard.h"
 
 
-bool Pawn::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard &board) const
+bool Pawn::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const
 {
 	int direction = (color == PieceColor::White) ? 1 : -1;
 	int startRow  = (color == PieceColor::White) ? 1 : 6;
@@ -24,7 +24,7 @@ bool Pawn::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard 
 	// Capture move
 	if (abs(toX - fromX) == 1 && toY - fromY == direction)
 	{
-		ChessPiece *targetPiece = board.getPiece(toX, toY);
+		auto targetPiece = board.getPiece(toX, toY);
 		if (targetPiece != nullptr && targetPiece->getColor() != color)
 		{
 			return true;
@@ -35,7 +35,7 @@ bool Pawn::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard 
 	return false;
 }
 
-std::vector<std::pair<int, int>> Pawn::getPossibleMoves(int x, int y, const ChessBoard &board) const
+std::vector<std::pair<int, int>> Pawn::getPossibleMoves(int x, int y, ChessBoard &board) const
 {
 	std::vector<std::pair<int, int>> moves;
 	int								 direction = (color == PieceColor::White) ? 1 : -1;

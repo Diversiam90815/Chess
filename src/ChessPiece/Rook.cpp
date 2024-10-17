@@ -4,7 +4,7 @@
 #include <cmath>
 
 
-bool Rook::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard &board) const
+bool Rook::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const
 {
 	if ((fromX == toX || fromY == toY) && !(fromX == toX && fromY == toY))
 	{
@@ -21,7 +21,7 @@ bool Rook::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard 
 			x += dx;
 			y += dy;
 		}
-		ChessPiece *targetPiece = board.getPiece(toX, toY);
+		auto targetPiece = board.getPiece(toX, toY);
 		if (targetPiece == nullptr || targetPiece->getColor() != color)
 		{
 			return true;
@@ -30,7 +30,7 @@ bool Rook::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard 
 	return false;
 }
 
-std::vector<std::pair<int, int>> Rook::getPossibleMoves(int x, int y, const ChessBoard &board) const
+std::vector<std::pair<int, int>> Rook::getPossibleMoves(int x, int y, ChessBoard &board) const
 {
 	std::vector<std::pair<int, int>> moves;
 

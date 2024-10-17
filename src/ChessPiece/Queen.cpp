@@ -4,7 +4,7 @@
 #include <cmath>
 
 
-bool Queen::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard &board) const
+bool Queen::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const
 {
 	int dx = abs(toX - fromX);
 	int dy = abs(toY - fromY);
@@ -24,7 +24,7 @@ bool Queen::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard
 			x += stepX;
 			y += stepY;
 		}
-		ChessPiece *targetPiece = board.getPiece(toX, toY);
+		auto targetPiece = board.getPiece(toX, toY);
 		if (targetPiece == nullptr || targetPiece->getColor() != color)
 		{
 			return true;
@@ -33,7 +33,7 @@ bool Queen::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard
 	return false;
 }
 
-std::vector<std::pair<int, int>> Queen::getPossibleMoves(int x, int y, const ChessBoard &board) const
+std::vector<std::pair<int, int>> Queen::getPossibleMoves(int x, int y, ChessBoard &board) const
 {
 	std::vector<std::pair<int, int>> moves;
 

@@ -4,7 +4,7 @@
 #include <cmath>
 
 
-bool King::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard &board) const
+bool King::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const
 {
 	int dx = abs(toX - fromX);
 	int dy = abs(toY - fromY);
@@ -12,7 +12,7 @@ bool King::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard 
 	// Standard one-square move
 	if ((dx <= 1 && dy <= 1) && !(dx == 0 && dy == 0))
 	{
-		ChessPiece *targetPiece = board.getPiece(toX, toY);
+		auto targetPiece = board.getPiece(toX, toY);
 		if (targetPiece == nullptr || targetPiece->getColor() != color)
 		{
 			// Additional checks for moving into check should be implemented
@@ -25,7 +25,7 @@ bool King::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard 
 	{
 		// Kingside or Queenside castling
 		int			rookX = (toX > fromX) ? 7 : 0;
-		ChessPiece *rook  = board.getPiece(rookX, fromY);
+		auto rook  = board.getPiece(rookX, fromY);
 		if (rook != nullptr && rook->getType() == PieceType::Rook && !rook->getHasMoved() && rook->getColor() == color)
 		{
 			// Check if squares between king and rook are empty
@@ -45,7 +45,8 @@ bool King::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard 
 	return false;
 }
 
-std::vector<std::pair<int, int>> King::getPossibleMoves(int x, int y, const ChessBoard &board) const
+
+std::vector<std::pair<int, int>> King::getPossibleMoves(int x, int y, ChessBoard &board) const
 {
 	std::vector<std::pair<int, int>> moves;
 
@@ -66,7 +67,7 @@ std::vector<std::pair<int, int>> King::getPossibleMoves(int x, int y, const Ches
 		int newY = y + offset[1];
 		if (newX >= 0 && newX <= 7 && newY >= 0 && newY <= 7)
 		{
-			ChessPiece *targetPiece = board.getPiece(newX, newY);
+			auto targetPiece = board.getPiece(newX, newY);
 			if (targetPiece == nullptr || targetPiece->getColor() != color)
 			{
 				// Additional checks for moving into check should be implemented
@@ -81,7 +82,7 @@ std::vector<std::pair<int, int>> King::getPossibleMoves(int x, int y, const Ches
 		// Kingside castling
 		if (board.isEmpty(x + 1, y) && board.isEmpty(x + 2, y))
 		{
-			ChessPiece *rook = board.getPiece(7, y);
+			auto rook = board.getPiece(7, y);
 			if (rook != nullptr && rook->getType() == PieceType::Rook && !rook->getHasMoved() && rook->getColor() == color)
 			{
 				moves.emplace_back(x + 2, y);
@@ -90,7 +91,7 @@ std::vector<std::pair<int, int>> King::getPossibleMoves(int x, int y, const Ches
 		// Queenside castling
 		if (board.isEmpty(x - 1, y) && board.isEmpty(x - 2, y) && board.isEmpty(x - 3, y))
 		{
-			ChessPiece *rook = board.getPiece(0, y);
+			auto rook = board.getPiece(0, y);
 			if (rook != nullptr && rook->getType() == PieceType::Rook && !rook->getHasMoved() && rook->getColor() == color)
 			{
 				moves.emplace_back(x - 2, y);

@@ -1,9 +1,11 @@
+
 #include "Bishop.h"
 
 #include "ChessBoard.h"
 #include <cmath>
 
-bool Bishop::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoard &board) const
+
+bool Bishop::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const
 {
 	int dx = abs(toX - fromX);
 	int dy = abs(toY - fromY);
@@ -21,7 +23,7 @@ bool Bishop::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoar
 				return false; // Path is blocked
 			}
 		}
-		ChessPiece *targetPiece = board.getPiece(toX, toY);
+		auto targetPiece = board.getPiece(toX, toY);
 		if (targetPiece == nullptr || targetPiece->getColor() != color)
 		{
 			return true;
@@ -30,7 +32,7 @@ bool Bishop::isValidMove(int fromX, int fromY, int toX, int toY, const ChessBoar
 	return false;
 }
 
-std::vector<std::pair<int, int>> Bishop::getPossibleMoves(int x, int y, const ChessBoard &board) const
+std::vector<std::pair<int, int>> Bishop::getPossibleMoves(int x, int y, ChessBoard &board) const
 {
 	std::vector<std::pair<int, int>> moves;
 
