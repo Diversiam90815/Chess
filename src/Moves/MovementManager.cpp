@@ -1,3 +1,13 @@
+/*
+  ==============================================================================
+
+	Class:          MovementManager
+
+	Description:    Manages and executes valid moves in chess
+
+  ==============================================================================
+*/
+
 
 #include "MovementManager.h"
 #include <algorithm>

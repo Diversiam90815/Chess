@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+	Class:          Bishop
+
+	Description:    Bishop class inheriting from ChessPiece
+
+  ==============================================================================
+*/
 
 #include "Bishop.h"
 #include "ChessBoard.h"

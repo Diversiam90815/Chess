@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+	Class:          King
+
+	Description:    King class inheriting from ChessPiece
+
+  ==============================================================================
+*/
 
 #include "King.h"
 #include "ChessBoard.h"

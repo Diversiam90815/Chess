@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+	Class:          Knight
+
+	Description:    Knight class inheriting from ChessPiece
+
+  ==============================================================================
+*/
 
 #pragma once
 #include "ChessPiece.h"

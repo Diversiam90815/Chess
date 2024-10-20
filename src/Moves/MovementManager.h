@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+	Class:          MovementManager
+
+	Description:    Manages and executes valid moves in chess
+
+  ==============================================================================
+*/
 
 #pragma once
 #include "ChessBoard.h"

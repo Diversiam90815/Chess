@@ -1,4 +1,12 @@
+/*
+  ==============================================================================
 
+	Class:          Pawn
+
+	Description:    Pawn class inheriting from ChessPiece
+
+  ==============================================================================
+*/
 
 #include "Pawn.h"
 #include "ChessBoard.h"

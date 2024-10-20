@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+	Class:          Queen
+
+	Description:    Queen class inheriting from ChessPiece
+
+  ==============================================================================
+*/
 
 #include "Queen.h"
 #include "ChessBoard.h"

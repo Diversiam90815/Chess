@@ -1,3 +1,13 @@
+/*
+  ==============================================================================
+
+	Class:          Move
+
+	Description:    Storing information classifying a move in chess
+
+  ==============================================================================
+*/
+
 
 #pragma once
 #include "ChessPiece.h"

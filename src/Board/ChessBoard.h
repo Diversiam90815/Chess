@@ -1,3 +1,12 @@
+/*
+  ==============================================================================
+
+	Class:          ChessBoard
+
+	Description:    Class charecterizing a virtual chess board
+
+  ==============================================================================
+*/
 
 #pragma once
 #include <array>
