@@ -31,56 +31,70 @@ include_directories(    ${PIECE_DIR}
 )
 
 
-
-set(HEADER_FILES
+set(PIECE_FILES
     ${PIECE_DIR}/ChessPiece.h
     ${PIECE_DIR}/Pawn.h
+    ${PIECE_DIR}/Pawn.cpp
     ${PIECE_DIR}/Knight.h
+    ${PIECE_DIR}/Knight.cpp
     ${PIECE_DIR}/Bishop.h
+    ${PIECE_DIR}/Bishop.cpp
     ${PIECE_DIR}/Rook.h
+    ${PIECE_DIR}/Rook.cpp
     ${PIECE_DIR}/Queen.h
+    ${PIECE_DIR}/Queen.cpp
     ${PIECE_DIR}/King.h
+    ${PIECE_DIR}/King.cpp
+)
 
+
+set(BOARD_FILES
     ${BOARD_DIR}/ChessBoard.h
-    
-    ${MOVE_DIR}/Move.h
-    ${MOVE_DIR}/MovementManager.h
-    ${MOVE_DIR}/MoveHelper.h
-    
-    ${CONFIG_DIR}/GameManager.h
+    ${BOARD_DIR}/ChessBoard.cpp
+)
 
+    
+set(MOVE_FILES
+    ${MOVE_DIR}/Move.h
+    ${MOVE_DIR}/MoveHelper.h
+    ${MOVE_DIR}/MoveHelper.cpp
+    ${MOVE_DIR}/MovementManager.h
+    ${MOVE_DIR}/MovementManager.cpp
+)
+
+
+set(CONFIG_FILES
+    ${CONFIG_DIR}/GameManager.h
+    ${CONFIG_DIR}/GameManager.cpp
+)    
+
+
+set(PLAYER_FILES
     ${PLAYER_DIR}/Player.h
 )
 
-set(SOURCE_FILES
+
+set(ALL_FILES
+    ${PIECE_FILES}
+    ${BOARD_FILES}
+    ${MOVE_FILES}
+    ${CONFIG_FILES}
+    ${PLAYER_FILES}
     ${SOURCE_DIR}/main.cpp
-
-    ${PIECE_DIR}/Pawn.cpp
-    ${PIECE_DIR}/Knight.cpp
-    ${PIECE_DIR}/Bishop.cpp
-    ${PIECE_DIR}/Rook.cpp
-    ${PIECE_DIR}/Queen.cpp
-    ${PIECE_DIR}/King.cpp
-
-    ${BOARD_DIR}/ChessBoard.cpp
-
-    ${MOVE_DIR}/MovementManager.cpp
-    ${MOVE_DIR}/MoveHelper.cpp
-
-    ${CONFIG_DIR}/GameManager.cpp
-
 )
 
 
 # Group source and header files (optional, for IDEs)
-source_group("Source Files" FILES ${SOURCE_FILES})
-source_group("Header Files" FILES ${HEADER_FILES})
+source_group("Pieces" FILES ${PIECE_FILES})
+source_group("Board" FILES ${BOARD_FILES})
+source_group("Moves" FILES ${MOVE_FILES})
+source_group("Configuration" FILES ${CONFIG_FILES})
+source_group("Player" FILES ${PLAYER_FILES})
 
 
 # Create the executable target
 add_executable(${PROJECT_NAME}
-    ${SOURCE_FILES}
-    ${HEADER_FILES} # Optional
+    ${ALL_FILES}
 )
 
 # Set output properties
