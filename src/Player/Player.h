@@ -14,35 +14,33 @@
 #include "ChessPiece.h"
 
 
-struct Player
+class Player
 {
-	Player()
-	{
-	}
+public:
+	Player();
 
-	Player(PieceColor color) : playerColor(color)
-	{
-	}
+	Player(PieceColor color);
 
-	~Player() = default;
+	~Player();
 
 
-	bool isOnTurn() const
-	{
-		return isCurrentTurn;
-	}
+	bool isOnTurn() const;
 
-	void setOnTurn(bool value)
-	{
-		if(isCurrentTurn != value)
-		{
-			isCurrentTurn = value;
-		}
-	}
+	void setOnTurn(bool value);
 
+	int	 getScore() const;
+	void setScore(int value);
 
-	PieceColor				playerColor = PieceColor::None;
-	std::vector<ChessPiece> capturedPieces;
-	bool					isCurrentTurn = false;
-	int						score		  = 0;
+	PieceColor getPlayerColor() const;
+	void	   setPlayerColor(PieceColor value);
+
+private:
+
+	PieceColor				mPlayerColor = PieceColor::None;
+
+	std::vector<ChessPiece> mCapturedPieces;
+
+	bool					mIsCurrentTurn = false;
+
+	int						mScore		  = 0;
 };

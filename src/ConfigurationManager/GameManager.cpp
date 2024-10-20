@@ -23,19 +23,26 @@ GameManager::~GameManager()
 
 void GameManager::init()
 {
-	whitePlayer.playerColor = PieceColor::White;
-	blackPlayer.playerColor = PieceColor::Black;
+	mWhitePlayer.setPlayerColor(PieceColor::White);
+	mBlackPlayer.setPlayerColor(PieceColor::Black);
+
+	mWhitePlayer.setOnTurn(true);
 }
 
 
 void GameManager::switchTurns()
 {
-	if (whitePlayer.isOnTurn())
+	if (mWhitePlayer.isOnTurn())
 	{
-		whitePlayer.setOnTurn(false);
-		blackPlayer.setOnTurn(true);
+		mWhitePlayer.setOnTurn(false);
+		mBlackPlayer.setOnTurn(true);
 		return;
 	}
-	blackPlayer.setOnTurn(false);
-	whitePlayer.setOnTurn(true);
+	mBlackPlayer.setOnTurn(false);
+	mWhitePlayer.setOnTurn(true);
+}
+
+
+void GameManager::adaptScore()
+{
 }

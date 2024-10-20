@@ -25,8 +25,11 @@ public:
 
 	void switchTurns();
 
+	void adaptScore();
+	
+
 private:
 
-	Player whitePlayer;
-	Player blackPlayer;
+	Player mWhitePlayer;
+	Player mBlackPlayer;
 };

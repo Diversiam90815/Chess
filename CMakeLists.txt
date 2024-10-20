@@ -71,6 +71,7 @@ set(CONFIG_FILES
 
 set(PLAYER_FILES
     ${PLAYER_DIR}/Player.h
+    ${PLAYER_DIR}/Player.cpp
 )
 
 
