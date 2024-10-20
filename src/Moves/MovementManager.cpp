@@ -21,12 +21,12 @@ MovementManager::MovementManager(ChessBoard &board) : board(board)
 bool MovementManager::isValidMove(const Move &move, PieceColor playerColor)
 {
 	// Basic validations
-	if (move.fromX < 0 || move.fromX > 7 || move.fromY < 0 || move.fromY > 7 || move.toX < 0 || move.toX > 7 || move.toY < 0 || move.toY > 7)
+	if (move.X < 0 || move.X > 7 || move.Y < 0 || move.Y > 7 || move.toX < 0 || move.toX > 7 || move.toY < 0 || move.toY > 7)
 	{
 		return false;
 	}
 
-	auto piece = board.getPiece(move.fromX, move.fromY);
+	auto piece = board.getPiece(move.X, move.Y);
 	if (!piece || piece->getColor() != playerColor)
 	{
 		return false;
@@ -39,7 +39,7 @@ bool MovementManager::isValidMove(const Move &move, PieceColor playerColor)
 	}
 
 	// Piece-specific move validation
-	if (!piece->isValidMove(move.fromX, move.fromY, move.toX, move.toY, board))
+	if (!piece->isValidMove(move.X, move.Y, move.toX, move.toY, board))
 	{
 		return false;
 	}
@@ -72,7 +72,7 @@ bool MovementManager::isValidMove(const Move &move, PieceColor playerColor)
 
 bool MovementManager::executeMove(const Move &move)
 {
-	auto piece = board.getPiece(move.fromX, move.fromY);
+	auto piece = board.getPiece(move.Y, move.X);
 	if (!piece)
 		return false;
 
@@ -89,7 +89,7 @@ bool MovementManager::executeMove(const Move &move)
 	{
 		// Regular move
 		board.setPiece(move.toX, move.toY, piece);
-		board.setPiece(move.fromX, move.fromY, nullptr);
+		board.setPiece(move.X, move.Y, nullptr);
 		if (move.capturedPiece != PieceType::None)
 		{
 			// Capture the piece (already removed from the board)
@@ -159,17 +159,17 @@ bool MovementManager::isSquareUnderAttack(int x, int y, PieceColor color)
 bool MovementManager::wouldKingBeInCheckAfterMove(const Move &move, PieceColor color)
 {
 	// Save current state
-	auto piece		 = board.getPiece(move.fromX, move.fromY);
+	auto piece		 = board.getPiece(move.X, move.Y);
 	auto targetPiece = board.getPiece(move.toX, move.toY);
 
 	// Make the move
 	board.setPiece(move.toX, move.toY, piece);
-	board.setPiece(move.fromX, move.fromY, nullptr);
+	board.setPiece(move.X, move.Y, nullptr);
 
 	bool inCheck = isKingInCheck(color);
 
 	// Undo the move
-	board.setPiece(move.fromX, move.fromY, piece);
+	board.setPiece(move.X, move.Y, piece);
 	board.setPiece(move.toX, move.toY, targetPiece);
 
 	return inCheck;
@@ -178,11 +178,11 @@ bool MovementManager::wouldKingBeInCheckAfterMove(const Move &move, PieceColor c
 
 bool MovementManager::isCastlingMove(const Move &move, PieceColor color)
 {
-	auto piece = board.getPiece(move.fromX, move.fromY);
+	auto piece = board.getPiece(move.X, move.Y);
 	if (piece && piece->getType() == PieceType::King)
 	{
-		int dx = move.toX - move.fromX;
-		if (abs(dx) == 2 && move.fromY == move.toY)
+		int dx = move.toX - move.X;
+		if (abs(dx) == 2 && move.Y == move.toY)
 		{
 			return true;
 		}
@@ -193,22 +193,22 @@ bool MovementManager::isCastlingMove(const Move &move, PieceColor color)
 
 bool MovementManager::validateCastling(const Move &move, PieceColor color)
 {
-	auto king = board.getPiece(move.fromX, move.fromY);
+	auto king = board.getPiece(move.X, move.Y);
 	if (!king || king->getHasMoved())
 		return false;
 
-	int	 rookX = (move.toX > move.fromX) ? 7 : 0;
-	auto rook  = board.getPiece(rookX, move.fromY);
+	int	 rookX = (move.toX > move.X) ? 7 : 0;
+	auto rook  = board.getPiece(rookX, move.Y);
 	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != color || rook->getHasMoved())
 	{
 		return false;
 	}
 
 	// Check path between king and rook
-	int direction = (move.toX > move.fromX) ? 1 : -1;
-	for (int x = move.fromX + direction; x != rookX; x += direction)
+	int direction = (move.toX > move.X) ? 1 : -1;
+	for (int x = move.X + direction; x != rookX; x += direction)
 	{
-		if (board.getPiece(x, move.fromY))
+		if (board.getPiece(x, move.Y))
 		{
 			return false; // Path is not clear
 		}
@@ -218,9 +218,9 @@ bool MovementManager::validateCastling(const Move &move, PieceColor color)
 	if (isKingInCheck(color))
 		return false;
 
-	for (int x = move.fromX; x != move.toX + direction; x += direction)
+	for (int x = move.X; x != move.toX + direction; x += direction)
 	{
-		if (isSquareUnderAttack(x, move.fromY, color))
+		if (isSquareUnderAttack(x, move.Y, color))
 		{
 			return false; // Square is under attack
 		}
@@ -232,20 +232,20 @@ bool MovementManager::validateCastling(const Move &move, PieceColor color)
 
 void MovementManager::performCastling(const Move &move)
 {
-	int	 direction = (move.toX > move.fromX) ? 1 : -1;
+	int	 direction = (move.toX > move.X) ? 1 : -1;
 	int	 rookFromX = (direction == 1) ? 7 : 0;
-	int	 rookToX   = move.fromX + direction;
+	int	 rookToX   = move.X + direction;
 
-	auto king	   = board.getPiece(move.fromX, move.fromY);
-	auto rook	   = board.getPiece(rookFromX, move.fromY);
+	auto king	   = board.getPiece(move.X, move.Y);
+	auto rook	   = board.getPiece(rookFromX, move.Y);
 
 	// Move king
 	board.setPiece(move.toX, move.toY, king);
-	board.setPiece(move.fromX, move.fromY, nullptr);
+	board.setPiece(move.X, move.Y, nullptr);
 
 	// Move rook
-	board.setPiece(rookToX, move.fromY, rook);
-	board.setPiece(rookFromX, move.fromY, nullptr);
+	board.setPiece(rookToX, move.Y, rook);
+	board.setPiece(rookFromX, move.Y, nullptr);
 
 	// Update moved status
 	king->setHasMoved(true);
@@ -255,11 +255,11 @@ void MovementManager::performCastling(const Move &move)
 
 bool MovementManager::isEnPassantMove(const Move &move, PieceColor color)
 {
-	auto piece = board.getPiece(move.fromX, move.fromY);
+	auto piece = board.getPiece(move.X, move.Y);
 	if (piece && piece->getType() == PieceType::Pawn)
 	{
-		int dy = move.toY - move.fromY;
-		int dx = move.toX - move.fromX;
+		int dy = move.toY - move.Y;
+		int dx = move.toX - move.X;
 		if (abs(dx) == 1 && dy == ((color == PieceColor::White) ? 1 : -1))
 		{
 			if (!board.getPiece(move.toX, move.toY))
@@ -283,10 +283,10 @@ bool MovementManager::validateEnPassant(const Move &move, PieceColor color)
 	if (!lastMovedPiece || lastMovedPiece->getType() != PieceType::Pawn)
 		return false;
 
-	if (abs(lastMove->fromY - lastMove->toY) != 2)
+	if (abs(lastMove->Y - lastMove->toY) != 2)
 		return false;
 
-	if (lastMove->toX != move.toX || lastMove->toY != move.fromY)
+	if (lastMove->toX != move.toX || lastMove->toY != move.Y)
 		return false;
 
 	return true;
@@ -295,12 +295,12 @@ bool MovementManager::validateEnPassant(const Move &move, PieceColor color)
 
 void MovementManager::performEnPassant(const Move &move)
 {
-	auto pawn = board.getPiece(move.fromX, move.fromY);
+	auto pawn = board.getPiece(move.X, move.Y);
 	board.setPiece(move.toX, move.toY, pawn);
-	board.setPiece(move.fromX, move.fromY, nullptr);
+	board.setPiece(move.X, move.Y, nullptr);
 
 	// Remove the captured pawn
-	int capturedPawnY = move.fromY;
+	int capturedPawnY = move.Y;
 	board.setPiece(move.toX, capturedPawnY, nullptr);
 
 	pawn->setHasMoved(true);
