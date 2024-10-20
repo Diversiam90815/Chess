@@ -27,6 +27,7 @@ enum class PieceType
 	King
 };
 
+
 enum class PieceColor
 {
 	None,

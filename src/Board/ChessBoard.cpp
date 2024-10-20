@@ -8,10 +8,9 @@
   ==============================================================================
 */
 
+
 #include "ChessBoard.h"
-
 #include "ChessPiece.h"
-
 
 
 ChessBoard::ChessBoard()

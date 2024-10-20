@@ -3,7 +3,7 @@
 
 	Class:          MoveHelper
 
-	Description:    Helper class for gener
+	Description:    Helper class for generating general moves in chess
 
   ==============================================================================
 */

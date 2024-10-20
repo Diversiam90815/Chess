@@ -10,7 +10,9 @@
 
 
 #pragma once
+
 #include "ChessPiece.h"
+
 
 struct Move
 {
