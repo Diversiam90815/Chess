@@ -14,12 +14,19 @@
 #include "ChessPiece.h"
 
 
+struct Position
+{
+	int x = 0;
+	int y = 0;
+};
+
+
 struct Move
 {
 	Move()
 	{
 	}
-	
+
 	Move(int x, int y) : X(x), Y(y)
 	{
 	}
@@ -31,15 +38,16 @@ struct Move
 	}
 
 
-	int		  X			= 0;
-	int		  Y			= 0;
-	int		  toX			= 0;
-	int		  toY			= 0;
+	int		  X				  = 0;
+	int		  Y				  = 0;
+	int		  toX			  = 0;
+	int		  toY			  = 0;
 
-	PieceType movedPiece	= PieceType::None;
-	PieceType capturedPiece = PieceType::None;
-	PieceType promotionType = PieceType::None;
+	PieceType movedPiece	  = PieceType::None;
+	PieceType capturedPiece	  = PieceType::None;
+	PieceType promotionType	  = PieceType::None;
 
-	bool	  isCastling	= false;
-	bool	  isEnPassant	= false;
+	bool	  isCastling	  = false;
+	bool	  isEnPassant	  = false;
+	bool	  canCapturePiece = false;
 };

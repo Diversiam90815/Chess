@@ -34,6 +34,7 @@ public:
 	PieceColor getPlayerColor() const;
 	void	   setPlayerColor(PieceColor value);
 
+
 private:
 
 	PieceColor				mPlayerColor = PieceColor::None;
