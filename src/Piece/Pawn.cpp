@@ -13,34 +13,9 @@
 #include "ChessBoard.h"
 
 
-bool Pawn::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const
+int Pawn::getPieceValue() const
 {
-	int direction = (color == PieceColor::White) ? 1 : -1;
-	int startRow  = (color == PieceColor::White) ? 1 : 6;
-
-	// Standard move
-	if (fromX == toX && toY - fromY == direction && board.getPiece(toX, toY) == nullptr)
-	{
-		return true;
-	}
-
-	// Double move from starting position
-	if (fromX == toX && fromY == startRow && toY - fromY == 2 * direction && board.getPiece(toX, toY) == nullptr && board.getPiece(toX, fromY + direction) == nullptr)
-	{
-		return true;
-	}
-
-	// Capture move
-	if (abs(toX - fromX) == 1 && toY - fromY == direction)
-	{
-		auto targetPiece = board.getPiece(toX, toY);
-		if (targetPiece != nullptr && targetPiece->getColor() != color)
-		{
-			return true;
-		}
-	}
-
-	return false;
+	return pawnValue;
 }
 
 

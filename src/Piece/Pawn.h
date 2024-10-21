@@ -12,6 +12,7 @@
 #pragma once
 
 #include "ChessPiece.h"
+#include "Parameters.h"
 
 
 class Pawn : public ChessPiece
@@ -21,7 +22,8 @@ public:
 	{
 	}
 
-	bool							 isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const override;
+
+	int								 getPieceValue() const override;
 
 	std::vector<std::pair<int, int>> getPossibleMoves(int x, int y, ChessBoard &board) const override;
 };

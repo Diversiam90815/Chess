@@ -14,33 +14,10 @@
 #include <cmath>
 
 
-bool Bishop::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const
+
+int Bishop::getPieceValue() const
 {
-	int dx = abs(toX - fromX);
-	int dy = abs(toY - fromY);
-
-	if (dx == dy && dx != 0)
-	{
-		int stepX = (toX - fromX) / dx;
-		int stepY = (toY - fromY) / dy;
-
-		for (int i = 1; i < dx; ++i)
-		{
-			int x = fromX + i * stepX;
-			int y = fromY + i * stepY;
-
-			if (!board.isEmpty(x, y))
-			{
-				return false; // Path is blocked
-			}
-		}
-		auto targetPiece = board.getPiece(toX, toY);
-		if (targetPiece == nullptr || targetPiece->getColor() != color)
-		{
-			return true;
-		}
-	}
-	return false;
+	return bishopValue;
 }
 
 

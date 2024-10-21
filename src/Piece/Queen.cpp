@@ -14,33 +14,9 @@
 #include <cmath>
 
 
-bool Queen::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const
+int Queen::getPieceValue() const
 {
-	int dx = abs(toX - fromX);
-	int dy = abs(toY - fromY);
-
-	if ((dx == dy && dx != 0) || (fromX == toX && dy != 0) || (fromY == toY && dx != 0))
-	{
-		int stepX = (toX - fromX) != 0 ? (toX - fromX) / (dx ? dx : 1) : 0;
-		int stepY = (toY - fromY) != 0 ? (toY - fromY) / (dy ? dy : 1) : 0;
-		int x	  = fromX + stepX;
-		int y	  = fromY + stepY;
-		while (x != toX || y != toY)
-		{
-			if (!board.isEmpty(x, y))
-			{
-				return false; // Path is blocked
-			}
-			x += stepX;
-			y += stepY;
-		}
-		auto targetPiece = board.getPiece(toX, toY);
-		if (targetPiece == nullptr || targetPiece->getColor() != color)
-		{
-			return true;
-		}
-	}
-	return false;
+	return queenValue;
 }
 
 

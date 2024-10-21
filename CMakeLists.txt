@@ -18,6 +18,7 @@ set(CONFIG_DIR ${SOURCE_DIR}/ConfigurationManager)
 set(BOARD_DIR ${SOURCE_DIR}/Board)
 set(PLAYER_DIR ${SOURCE_DIR}/Player)
 set(API_DIR ${SOURCE_DIR}/API)
+set(MISC_DIR ${SOURCE_DIR}/Miscellaneous)
 
 
 # Include directories
@@ -27,6 +28,7 @@ include_directories(    ${PIECE_DIR}
                         ${BOARD_DIR}
                         ${PLAYER_DIR}
                         ${API_DIR}
+                        ${MISC_DIR}
                         ${SOURCE_DIR}
 )
 
@@ -74,6 +76,10 @@ set(PLAYER_FILES
     ${PLAYER_DIR}/Player.cpp
 )
 
+set(MISC_FILES
+    ${MISC_DIR}/Parameters.h
+)
+
 
 set(ALL_FILES
     ${PIECE_FILES}
@@ -81,6 +87,7 @@ set(ALL_FILES
     ${MOVE_FILES}
     ${CONFIG_FILES}
     ${PLAYER_FILES}
+    ${MISC_FILES}
     ${SOURCE_DIR}/main.cpp
 )
 
@@ -91,6 +98,7 @@ source_group("Board" FILES ${BOARD_FILES})
 source_group("Moves" FILES ${MOVE_FILES})
 source_group("Configuration" FILES ${CONFIG_FILES})
 source_group("Player" FILES ${PLAYER_FILES})
+source_group("Miscellaneous" FILES ${MISC_FILES})
 
 
 # Create the executable target

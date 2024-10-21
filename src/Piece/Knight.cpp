@@ -14,20 +14,9 @@
 #include <cmath>
 
 
-bool Knight::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const
+int Knight::getPieceValue() const
 {
-	int dx = abs(toX - fromX);
-	int dy = abs(toY - fromY);
-
-	if ((dx == 2 && dy == 1) || (dx == 1 && dy == 2))
-	{
-		auto targetPiece = board.getPiece(toX, toY);
-		if (targetPiece == nullptr || targetPiece->getColor() != color)
-		{
-			return true;
-		}
-	}
-	return false;
+	return knightValue;
 }
 
 

@@ -14,44 +14,10 @@
 #include <cmath>
 
 
-bool King::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const
+
+int King::getPieceValue() const
 {
-	int dx = abs(toX - fromX);
-	int dy = abs(toY - fromY);
-
-	// Standard one-square move
-	if (dx == 1 || dy == 1)
-	{
-		auto targetPiece = board.getPiece(toX, toY);
-		if (targetPiece == nullptr || targetPiece->getColor() != color)
-		{
-			return true;
-		}
-	}
-
-	// Castling
-	if (!hasMoved && dy == 0 && dx == 2)
-	{
-		// Kingside or Queenside castling
-		int			rookX = (toX > fromX) ? 7 : 0;
-		auto rook  = board.getPiece(rookX, fromY);
-
-		if (rook != nullptr && rook->getType() == PieceType::Rook && !rook->getHasMoved() && rook->getColor() == color)
-		{
-			// Check if squares between king and rook are empty
-			int step = (toX > fromX) ? 1 : -1;
-			for (int x = fromX + step; x != rookX; x += step)
-			{
-				if (!board.isEmpty(x, fromY))
-				{
-					return false;
-				}
-			}
-			return true;
-		}
-	}
-
-	return false;
+	return kingValue;
 }
 
 

@@ -14,30 +14,9 @@
 #include <cmath>
 
 
-bool Rook::isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const
+int Rook::getPieceValue() const
 {
-	if ((fromX == toX || fromY == toY) && !(fromX == toX && fromY == toY))
-	{
-		int dx = (toX - fromX) != 0 ? (toX - fromX) / abs(toX - fromX) : 0;
-		int dy = (toY - fromY) != 0 ? (toY - fromY) / abs(toY - fromY) : 0;
-		int x  = fromX + dx;
-		int y  = fromY + dy;
-		while (x != toX || y != toY)
-		{
-			if (!board.isEmpty(x, y))
-			{
-				return false; // Path is blocked
-			}
-			x += dx;
-			y += dy;
-		}
-		auto targetPiece = board.getPiece(toX, toY);
-		if (targetPiece == nullptr || targetPiece->getColor() != color)
-		{
-			return true;
-		}
-	}
-	return false;
+	return rookValue;
 }
 
 

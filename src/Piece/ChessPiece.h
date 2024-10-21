@@ -68,15 +68,15 @@ public:
 	}
 
 
-	virtual bool							 isValidMove(int fromX, int fromY, int toX, int toY, ChessBoard &board) const = 0;
+	virtual int								 getPieceValue() const									 = 0;
 
-	virtual std::vector<std::pair<int, int>> getPossibleMoves(int x, int y, ChessBoard &board) const						= 0;
+	virtual std::vector<std::pair<int, int>> getPossibleMoves(int x, int y, ChessBoard &board) const = 0;
 
 
 protected:
 	PieceType  type;
 
 	PieceColor color;
-	
+
 	bool	   hasMoved;
 };
