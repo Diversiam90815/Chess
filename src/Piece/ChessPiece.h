@@ -12,13 +12,15 @@
 
 #include <vector>
 #include <utility>
+#include "Move.h"
+
 
 class ChessBoard;
 
 
-enum class PieceType
+enum PieceType
 {
-	None,
+	DefaultType,
 	Pawn,
 	Knight,
 	Bishop,
@@ -28,9 +30,9 @@ enum class PieceType
 };
 
 
-enum class PieceColor
+enum PieceColor
 {
-	None,
+	NoColor,
 	White,
 	Black
 };
@@ -68,9 +70,9 @@ public:
 	}
 
 
-	virtual int								 getPieceValue() const									 = 0;
+	virtual int				  getPieceValue() const									  = 0;
 
-	virtual std::vector<std::pair<int, int>> getPossibleMoves(int x, int y, ChessBoard &board) const = 0;
+	virtual std::vector<Move> getPossibleMoves(const Position &pos, ChessBoard &board) const = 0;
 
 
 protected:

@@ -37,31 +37,27 @@ public:
 	~MoveHelper();
 
 
-	bool			  checkAvailableMoves(PieceType piece);
+	bool			  checkAvailableMoves(const Position &position, ChessBoard &board, const PieceColor color, const PieceType piece, bool hasMoved = false);
 
 	std::vector<Move> getAvailableMoves();
 
 
 private:
-	bool checkPawnForwardMovement(const Position &position, ChessBoard &board, const Player &player, bool hasMoved);
+	bool checkPawnMovement(const Position &position, ChessBoard &board, const PieceColor color, bool hasMoved);
 
-	bool checkPawnCaptureMovement(const Position &position, ChessBoard &board, const Player &player);
+	bool checkPawnCaptureMovement(const Position &position, ChessBoard &board, const PieceColor color);
 
-	bool checkDiagonalMoves(const Position &position, ChessBoard &board, const Player &player);
+	bool checkDiagonalMoves(const Position &position, ChessBoard &board, const PieceColor color);
 
-	bool checkAdjacentMoves(const Position &position, ChessBoard &board, const Player &player);
+	bool checkAdjacentMoves(const Position &position, ChessBoard &board, const PieceColor color);
 
-	bool checkLinearForwardMove(const Position &position, ChessBoard &board, const Player &player);
+	bool checkLShapedMoves(const Position &position, ChessBoard &board, const PieceColor color);
 
-	bool checkPawnCaptureMoves(const Position &position, ChessBoard &board, const Player &player);
-
-	bool checkLShapedMoves(const Position &position, ChessBoard &board, const Player &player);
-
-	bool checkFileMoves(const Position &position, ChessBoard &board, const Player &player);
+	bool checkFileMoves(const Position &position, ChessBoard &board, const PieceColor color);
 
 
 	template <std::size_t N>
-	bool checkMovesInDirection(const Position &position, ChessBoard &board, const Player &player, const std::array<std::pair<int, int>, N> &directions, bool oneStep);
+	bool checkMovesInDirection(const Position &position, ChessBoard &board, const PieceColor color, const std::array<std::pair<int, int>, N> &directions, bool oneStep);
 
 
 

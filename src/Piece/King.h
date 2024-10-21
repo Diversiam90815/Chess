@@ -12,6 +12,8 @@
 #pragma once
 
 #include "ChessPiece.h"
+#include "Parameters.h"
+#include "MoveHelper.h"
 
 
 class King : public ChessPiece
@@ -23,6 +25,6 @@ public:
 
 	int								 getPieceValue() const override;
 
-	std::vector<std::pair<int, int>> getPossibleMoves(int x, int y, ChessBoard &board) const override;
+	std::vector<Move>				 getPossibleMoves(const Position &pos, ChessBoard &board) const override;
 
 };
