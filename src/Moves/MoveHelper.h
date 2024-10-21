@@ -43,6 +43,10 @@ public:
 
 
 private:
+	bool checkPawnForwardMovement(const Position &position, ChessBoard &board, const Player &player, bool hasMoved);
+
+	bool checkPawnCaptureMovement(const Position &position, ChessBoard &board, const Player &player);
+
 	bool checkDiagonalMoves(const Position &position, ChessBoard &board, const Player &player);
 
 	bool checkAdjacentMoves(const Position &position, ChessBoard &board, const Player &player);
@@ -70,14 +74,9 @@ private:
 	void addToAvailableMoves(Move &move);
 
 
-	std::array<std::pair<int, int>, 2> whitePawnMoveDirections	  = {{{0, 1}, {0, 2}}};
+	std::array<std::pair<int, int>, 2> mPawnMoveDirections		  = {{{0, 1}, {0, 2}}};
 
-	std::array<std::pair<int, int>, 2> whitePawnCaptureDirections = {{{1, 1}, {-1, 1}}};
-
-	std::array<std::pair<int, int>, 2> blackPawnMoveDirections	  = {{{0, -1}, {0, -2}}};
-
-	std::array<std::pair<int, int>, 2> blackPawnCaptureDirections = {{{1, -1}, {-1, -1}}};
-
+	std::array<std::pair<int, int>, 2> mPawnCaptureDirections	  = {{{1, 1}, {-1, 1}}};
 
 
 	std::array<std::pair<int, int>, 8> mAdjacentPositions		  = {{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}}};

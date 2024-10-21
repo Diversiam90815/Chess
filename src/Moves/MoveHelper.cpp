@@ -34,7 +34,67 @@ std::vector<Move> MoveHelper::getAvailableMoves()
 }
 
 
-bool MoveHelper::checkDiagonalMoves(const Position &position, ChessBoard &board, const Player& player)
+bool MoveHelper::checkPawnForwardMovement(const Position &position, ChessBoard &board, const Player &player, bool hasMoved)
+{
+	int colorFactor = (player.getPlayerColor() == PieceColor::White) ? 1 : -1;
+
+	int newX = position.x + mPawnMoveDirections[0].first;
+	int newY = position.y + mPawnMoveDirections[0].second * colorFactor;
+
+	if (checkForBorders(newX, newY) && board.isEmpty(newX, newY))
+	{
+		Move move;
+		move.X = newX;
+		move.Y = newY;
+		addToAvailableMoves(move);
+
+		// If it's the pawn's first move, check for the two-step option
+		if (!hasMoved)
+		{
+			newX = position.x + mPawnMoveDirections[1].first;
+			newY = position.y + mPawnMoveDirections[1].second * colorFactor;
+			
+			if (checkForBorders(newX, newY) && board.isEmpty(newX, newY))
+			{
+				move.X = newX;
+				move.Y = newY;
+				addToAvailableMoves(move);
+			}
+		}
+	}
+
+	return mPossibleMovesAndCaptures.empty();
+}
+
+
+bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &board, const Player &player)
+{
+	int colorFactor = (player.getPlayerColor() == PieceColor::White) ? 1 : -1;
+
+	for (const auto &dir : mPawnCaptureDirections)
+	{
+		int newX = position.x + dir.first;
+		int newY = position.y + dir.second * colorFactor;
+
+		if (checkForBorders(newX, newY) && !board.isEmpty(newX, newY))
+		{
+			const auto piece = board.getPiece(newX, newY);
+			if (piece->getColor() != player.getPlayerColor())
+			{
+				Move move;
+				move.X				 = newX;
+				move.Y				 = newY;
+				move.canCapturePiece = true;
+				addToAvailableMoves(move);
+			}
+		}
+	}
+
+	return mPossibleMovesAndCaptures.empty();
+}
+
+
+bool MoveHelper::checkDiagonalMoves(const Position &position, ChessBoard &board, const Player &player)
 {
 	return checkMovesInDirection(position, board, player, mDiagonalDirections, false);
 }
@@ -122,7 +182,7 @@ bool MoveHelper::checkForBorders(const int x, const int y)
 
 bool MoveHelper::checkIfPositionAlreadyExists(const int x, const int y)
 {
-	for (const auto& pos : mPossibleMovesAndCaptures)
+	for (const auto &pos : mPossibleMovesAndCaptures)
 	{
 		if (pos.X == x && pos.Y == y)
 		{
