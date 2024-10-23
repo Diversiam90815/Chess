@@ -12,6 +12,7 @@
 #pragma once
 
 #include "ChessPiece.h"
+#include "Parameters.h"
 
 
 class Player
@@ -37,7 +38,7 @@ public:
 
 private:
 
-	PieceColor				mPlayerColor = PieceColor::None;
+	PieceColor				mPlayerColor = PieceColor::NoColor;
 
 	std::vector<ChessPiece> mCapturedPieces;
 

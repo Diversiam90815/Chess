@@ -19,7 +19,7 @@ int Bishop::getPieceValue() const
 }
 
 
-std::vector<Move> Bishop::getPossibleMoves(const Position &pos, ChessBoard &board) const
+std::vector<PossibleMove> Bishop::getPossibleMoves(const Position &pos, ChessBoard &board) const
 {
 	MoveHelper helper;
 	PieceColor color = getColor();

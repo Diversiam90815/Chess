@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "ChessPiece.h"
+#include "Parameters.h"
 
 
 struct Position
@@ -45,16 +45,22 @@ struct Move
 	}
 
 
-	int		  X				  = 0;
-	int		  Y				  = 0;
-	int		  toX			  = 0;
-	int		  toY			  = 0;
+	int		  X				= 0;
+	int		  Y				= 0;
+	int		  toX			= 0;
+	int		  toY			= 0;
 
-	PieceType movedPiece	  = PieceType::DefaultType;
-	PieceType capturedPiece	  = PieceType::DefaultType;
-	PieceType promotionType	  = PieceType::DefaultType;
+	PieceType movedPiece	= PieceType::DefaultType;
+	PieceType capturedPiece = PieceType::DefaultType;
+	PieceType promotionType = PieceType::DefaultType;
 
-	bool	  isCastling	  = false;
-	bool	  isEnPassant	  = false;
-	bool	  canCapturePiece = false;
+	bool	  isCastling	= false;
+	bool	  isEnPassant	= false;
+};
+
+
+struct PossibleMove
+{
+	Position pos;
+	bool	 canCapturePiece = false;
 };

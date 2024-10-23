@@ -19,7 +19,7 @@ int Rook::getPieceValue() const
 }
 
 
-std::vector<Move> Rook::getPossibleMoves(const Position &pos, ChessBoard &board) const
+std::vector<PossibleMove> Rook::getPossibleMoves(const Position &pos, ChessBoard &board) const
 {
 	MoveHelper helper;
 	PieceColor color = getColor();

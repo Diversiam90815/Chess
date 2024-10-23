@@ -19,7 +19,7 @@ int King::getPieceValue() const
 }
 
 
-std::vector<Move> King::getPossibleMoves(const Position &pos, ChessBoard &board) const
+std::vector<PossibleMove> King::getPossibleMoves(const Position &pos, ChessBoard &board) const
 {
 	MoveHelper helper;
 	PieceColor color = getColor();

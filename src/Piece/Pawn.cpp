@@ -19,7 +19,7 @@ int Pawn::getPieceValue() const
 }
 
 
-std::vector<Move> Pawn::getPossibleMoves(const Position &pos, ChessBoard &board) const
+std::vector<PossibleMove> Pawn::getPossibleMoves(const Position &pos, ChessBoard &board) const
 {
 	MoveHelper helper;
 	bool	   hasMoved = getHasMoved();

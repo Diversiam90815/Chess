@@ -13,29 +13,29 @@
 #include <vector>
 #include <utility>
 #include "Move.h"
-
+#include "Parameters.h"
 
 class ChessBoard;
 
-
-enum PieceType
-{
-	DefaultType,
-	Pawn,
-	Knight,
-	Bishop,
-	Rook,
-	Queen,
-	King
-};
-
-
-enum PieceColor
-{
-	NoColor,
-	White,
-	Black
-};
+//
+// enum PieceType
+//{
+//	DefaultType,
+//	Pawn,
+//	Knight,
+//	Bishop,
+//	Rook,
+//	Queen,
+//	King
+//};
+//
+//
+// enum PieceColor
+//{
+//	NoColor,
+//	White,
+//	Black
+//};
 
 
 class ChessPiece
@@ -70,9 +70,9 @@ public:
 	}
 
 
-	virtual int				  getPieceValue() const									  = 0;
+	virtual int						  getPieceValue() const											 = 0;
 
-	virtual std::vector<Move> getPossibleMoves(const Position &pos, ChessBoard &board) const = 0;
+	virtual std::vector<PossibleMove> getPossibleMoves(const Position &pos, ChessBoard &board) const = 0;
 
 
 protected:

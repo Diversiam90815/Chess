@@ -39,7 +39,7 @@ public:
 
 	bool			  checkAvailableMoves(const Position &position, ChessBoard &board, const PieceColor color, const PieceType piece, bool hasMoved = false);
 
-	std::vector<Move> getAvailableMoves();
+	std::vector<PossibleMove> getAvailableMoves();
 
 
 private:
@@ -65,9 +65,9 @@ private:
 	bool checkForBorders(const int x, const int y);
 
 	// Returns true if the position already exists (might happen if we stack movement algorithms)
-	bool checkIfPositionAlreadyExists(const int x, const int y);
+	bool checkIfPositionAlreadyExists(const Position pos);
 
-	void addToAvailableMoves(Move &move);
+	void addToAvailableMoves(PossibleMove &move);
 
 
 	std::array<std::pair<int, int>, 2> mPawnMoveDirections		  = {{{0, 1}, {0, 2}}};
@@ -84,5 +84,5 @@ private:
 	std::array<std::pair<int, int>, 4> mFileDirections			  = {{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}};
 
 
-	std::vector<Move>				   mPossibleMovesAndCaptures;
+	std::vector<PossibleMove>		   mPossibleMovesAndCaptures;
 };

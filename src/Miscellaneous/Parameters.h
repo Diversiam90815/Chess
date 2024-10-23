@@ -21,3 +21,24 @@ constexpr int knightValue = 3;
 constexpr int rookValue	  = 5;
 constexpr int bishopValue = 3;
 constexpr int queenValue  = 9;
+
+
+
+enum class PieceType
+{
+	DefaultType,
+	Pawn,
+	Knight,
+	Bishop,
+	Rook,
+	Queen,
+	King
+};
+
+
+enum class PieceColor
+{
+	NoColor,
+	White,
+	Black
+};
