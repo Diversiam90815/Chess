@@ -14,13 +14,14 @@
 
 
 
-MovementManager::MovementManager(ChessBoard &board) : board(board)
+MovementManager::MovementManager(std::shared_ptr<ChessBoard> board) : board(board)
 {
 }
 
+
 std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &position)
 {
-	auto piece	= board.getPiece(position);
+	auto piece	= board->getPiece(position);
 	auto player = piece->getColor();
 
 	if (mAllLegalMovesForCurrentRound.size() == 0)
@@ -38,11 +39,11 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 
 bool MovementManager::calculateAllLegalBasicMoves(PieceColor playerColor)
 {
-	auto playerPieces = board.getPiecesFromPlayer(playerColor);
+	auto playerPieces = board->getPiecesFromPlayer(playerColor);
 
 	for (const auto &[startPosition, piece] : playerPieces)
 	{
-		auto					  possibleMoves = piece->getPossibleMoves(startPosition, board);
+		auto					  possibleMoves = piece->getPossibleMoves(startPosition, *board);
 
 		std::vector<PossibleMove> validMoves;
 		validMoves.reserve(possibleMoves.size()); // Reserve space to avoid reallocations
@@ -69,14 +70,15 @@ bool MovementManager::calculateAllLegalBasicMoves(PieceColor playerColor)
 
 bool MovementManager::executeMove(Move &move)
 {
-	board.movePiece(move.startingPosition, move.endingPosition);
+	bool result = board->movePiece(move.startingPosition, move.endingPosition);
 	addMoveToHistory(move);
+	return result;
 }
 
 
 bool MovementManager::validateMove(Move &move, PieceColor playerColor)
 {
-	auto kingPosition = board.getKingsPosition(playerColor);
+	auto kingPosition = board->getKingsPosition(playerColor);
 
 	if (isKingInCheck(kingPosition, playerColor) && move.startingPosition != kingPosition)
 		return false;
@@ -108,14 +110,14 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PieceColor playerC
 	bool	 kingInCheck	= false;
 
 	// 1.
-	auto	 movingPiece	= board.getPiece(move.startingPosition);
-	auto	 capturingPiece = board.getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
+	auto	 movingPiece	= board->getPiece(move.startingPosition);
+	auto	 capturingPiece = board->getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
 
-	Position kingPosition	= board.getKingsPosition(playerColor);
+	Position kingPosition	= board->getKingsPosition(playerColor);
 
 	// 2
-	board.setPiece(move.startingPosition, movingPiece);
-	board.removePiece(move.endingPosition);
+	board->setPiece(move.startingPosition, movingPiece);
+	board->removePiece(move.endingPosition);
 
 	// 3
 	if (movingPiece->getType() == PieceType::King)
@@ -128,8 +130,8 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PieceColor playerC
 
 
 	// 5.
-	board.setPiece(move.startingPosition, movingPiece);
-	board.setPiece(move.endingPosition, capturingPiece); // This could be nullptr if there was no captured piece
+	board->setPiece(move.startingPosition, movingPiece);
+	board->setPiece(move.endingPosition, capturingPiece); // This could be nullptr if there was no captured piece
 
 
 	return kingInCheck;
@@ -139,12 +141,12 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PieceColor playerC
 bool MovementManager::isSquareAttacked(const Position &square, PieceColor attackerColor)
 {
 	// Iterate over all opponent pieces
-	auto opponentPieces = board.getPiecesFromPlayer(attackerColor);
+	auto opponentPieces = board->getPiecesFromPlayer(attackerColor);
 
 	for (const auto &[pos, piece] : opponentPieces)
 	{
 		// Get possible moves for the opponent's piece
-		auto moves = piece->getPossibleMoves(pos, board);
+		auto moves = piece->getPossibleMoves(pos, *board);
 
 		for (const auto &move : moves)
 		{
@@ -178,12 +180,14 @@ std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position 
 		queensideCastling.end	= Position{kingPosition.x - 2, kingPosition.y};
 		castlingMoves.push_back(queensideCastling);
 	}
+
+	return castlingMoves;
 }
 
 
 bool MovementManager::canCastle(const Position &kingposition, PieceColor player, bool kingside)
 {
-	auto king	   = board.getPiece(kingposition);
+	auto king	   = board->getPiece(kingposition);
 	int	 direction = kingside ? +1 : -1; // Determine the direction of castling
 
 	if (king->getHasMoved())
@@ -196,7 +200,7 @@ bool MovementManager::canCastle(const Position &kingposition, PieceColor player,
 	// Determine the rook's position based on the direction
 	int		 rookX = (direction == 1) ? 7 : 0; // 7 for kingside (h-file), 0 for queenside (a-file)
 	Position rookPosition{rookX, y};
-	auto	 rook = board.getPiece(rookPosition);
+	auto	 rook = board->getPiece(rookPosition);
 
 	// Check if the rook exists, is of the correct type, color, and has not moved
 	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->getHasMoved())
@@ -206,7 +210,7 @@ bool MovementManager::canCastle(const Position &kingposition, PieceColor player,
 	for (int x = kingX + direction; x != rookX; x += direction)
 	{
 		Position pos{x, y};
-		if (!board.isEmpty(pos))
+		if (!board->isEmpty(pos))
 			return false;
 	}
 

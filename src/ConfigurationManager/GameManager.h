@@ -26,10 +26,12 @@ public:
 	void switchTurns();
 
 	void adaptScore();
-	
+
 
 private:
+	Player							 mWhitePlayer;
+	Player							 mBlackPlayer;
 
-	Player mWhitePlayer;
-	Player mBlackPlayer;
+	std::unique_ptr<MovementManager> mMovementManager;
+	std::shared_ptr<ChessBoard>		 mChessBoard;
 };

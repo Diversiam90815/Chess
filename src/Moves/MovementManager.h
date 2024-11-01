@@ -20,7 +20,10 @@
 class MovementManager
 {
 public:
-	MovementManager(ChessBoard &board);
+	MovementManager(std::shared_ptr<ChessBoard> board);
+
+	~MovementManager() = default;
+
 
 	std::vector<PossibleMove> getMovesForPosition(Position &position);
 
@@ -49,7 +52,7 @@ private:
 	void													addMoveToHistory(Move &move);
 
 
-	ChessBoard											   &board;
+	std::shared_ptr<ChessBoard>								board;
 
 	std::unordered_map<Position, std::vector<PossibleMove>> mAllLegalMovesForCurrentRound;
 

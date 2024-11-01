@@ -23,6 +23,12 @@ GameManager::~GameManager()
 
 void GameManager::init()
 {
+	mChessBoard = std::make_shared<ChessBoard>();
+	mChessBoard
+		->initializeBoard();
+
+	mMovementManager = std::make_unique<MovementManager>(mChessBoard);
+
 	mWhitePlayer.setPlayerColor(PieceColor::White);
 	mBlackPlayer.setPlayerColor(PieceColor::Black);
 

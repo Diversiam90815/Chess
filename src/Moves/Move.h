@@ -42,6 +42,22 @@ struct hash<Position>
 } // namespace std
 
 
+
+struct PossibleMove
+{
+	Position start;
+	Position end;
+	bool	 canCapturePiece = false;
+
+
+	bool	 operator==(PossibleMove &other)
+	{
+		return this->start == other.start && this->end == other.end;
+	}
+};
+
+
+
 struct Move
 {
 	Move()
@@ -84,19 +100,5 @@ struct Move
 	bool operator==(const Move &other) const
 	{
 		return this->number == other.number;
-	}
-};
-
-
-struct PossibleMove
-{
-	Position start;
-	Position end;
-	bool	 canCapturePiece = false;
-
-
-	bool	 operator==(PossibleMove &other)
-	{
-		return this->start == other.start && this->end == other.end;
 	}
 };
