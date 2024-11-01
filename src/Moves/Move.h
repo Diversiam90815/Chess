@@ -27,28 +27,19 @@ struct Move
 	{
 	}
 
-	Move(int x, int y) : X(x), Y(y)
-	{
-	}
-
-	Move(int	   fx,
-		 int	   fy,
-		 int	   tx,
-		 int	   ty,
+	Move(Position  start,
+		 Position  end,
 		 PieceType moved,
 		 PieceType captured	 = PieceType::DefaultType,
 		 bool	   castling	 = false,
 		 bool	   enPassant = false,
 		 PieceType promotion = PieceType::DefaultType)
-		: X(fx), Y(fy), toX(tx), toY(ty), movedPiece(moved), capturedPiece(captured), isCastling(castling), isEnPassant(enPassant), promotionType(promotion)
+		: startingPosition(start), endingPosition(end), movedPiece(moved), capturedPiece(captured), isCastling(castling), isEnPassant(enPassant), promotionType(promotion)
 	{
 	}
 
-
-	int		  X				= 0;
-	int		  Y				= 0;
-	int		  toX			= 0;
-	int		  toY			= 0;
+	Position  startingPosition;
+	Position  endingPosition;
 
 	PieceType movedPiece	= PieceType::DefaultType;
 	PieceType capturedPiece = PieceType::DefaultType;
