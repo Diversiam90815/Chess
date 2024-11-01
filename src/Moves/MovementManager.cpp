@@ -13,19 +13,53 @@
 #include <algorithm>
 
 
+
 MovementManager::MovementManager(ChessBoard &board) : board(board)
 {
 }
 
 
-std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
+std::unordered_map<Position, std::vector<PossibleMove>> MovementManager::getAllPossibleMoves(PieceColor playerColor)
 {
-	
-	return std::vector<PossibleMove>();
+	std::unordered_map<Position, std::vector<PossibleMove>> allPossibleMoves;
+
+	auto													playerPieces = board.getPiecesFromPlayer(playerColor);
+
+	for (const auto &[startPosition, piece] : playerPieces)
+	{
+		auto					  possibleMoves = piece->getPossibleMoves(startPosition, board);
+
+		std::vector<PossibleMove> validMoves;
+		validMoves.reserve(possibleMoves.size()); // Reserve space to avoid reallocations
+
+		for (const auto &possibleMove : possibleMoves)
+		{
+			Move testMove(possibleMove.start, possibleMove.end, piece->getType());
+
+			// Validate the move
+			if (!wouldKingBeInCheckAfterMove(testMove, playerColor))
+			{
+				validMoves.push_back(possibleMove);
+			}
+		}
+
+		if (!validMoves.empty())
+		{
+			allPossibleMoves.emplace(startPosition, std::move(validMoves));
+		}
+	}
+	return allPossibleMoves;
 }
 
 
-//bool MovementManager::isValidMove(const Move &move, PieceColor playerColor)
+bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor)
+{
+	return false;
+}
+
+
+
+// bool MovementManager::isValidMove(const Move &move, PieceColor playerColor)
 //{
 //	//// Basic validations
 //	//if (move.X < 0 || move.X > 7 || move.Y < 0 || move.Y > 7 || move.toX < 0 || move.toX > 7 || move.toY < 0 || move.toY > 7)
@@ -74,10 +108,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//}
 //
 //	return true;
-//}
+// }
 //
 //
-//bool MovementManager::executeMove(const Move &move)
+// bool MovementManager::executeMove(const Move &move)
 //{
 //	//auto piece = board.getPiece(move.Y, move.X);
 //	//if (!piece)
@@ -113,10 +147,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//}
 //
 //	return true;
-//}
+// }
 //
 //
-//bool MovementManager::isKingInCheck(PieceColor color)
+// bool MovementManager::isKingInCheck(PieceColor color)
 //{
 //	//// Find the king's position
 //	//int kingX = -1, kingY = -1;
@@ -140,10 +174,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //
 //	//return isSquareUnderAttack(kingX, kingY, color);
 //	return false;
-//}
+// }
 //
 //
-//bool MovementManager::isSquareUnderAttack(int x, int y, PieceColor color)
+// bool MovementManager::isSquareUnderAttack(int x, int y, PieceColor color)
 //{
 //	//PieceColor opponentColor = (color == PieceColor::White) ? PieceColor::Black : PieceColor::White;
 //	//for (int y1 = 0; y1 < 8; ++y1)
@@ -161,10 +195,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//	}
 //	//}
 //	return false;
-//}
+// }
 //
 //
-//bool MovementManager::wouldKingBeInCheckAfterMove(const Move &move, PieceColor color)
+// bool MovementManager::wouldKingBeInCheckAfterMove(const Move &move, PieceColor color)
 //{
 //	//// Save current state
 //	//auto piece		 = board.getPiece(move.X, move.Y);
@@ -182,10 +216,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //
 //	//return inCheck;
 //	return false;
-//}
+// }
 //
 //
-//bool MovementManager::isCastlingMove(const Move &move, PieceColor color)
+// bool MovementManager::isCastlingMove(const Move &move, PieceColor color)
 //{
 //	//auto piece = board.getPiece(move.X, move.Y);
 //	//if (piece && piece->getType() == PieceType::King)
@@ -197,10 +231,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//	}
 //	//}
 //	return false;
-//}
+// }
 //
 //
-//bool MovementManager::validateCastling(const Move &move, PieceColor color)
+// bool MovementManager::validateCastling(const Move &move, PieceColor color)
 //{
 //	//auto king = board.getPiece(move.X, move.Y);
 //	//if (!king || king->getHasMoved())
@@ -236,10 +270,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//}
 //
 //	return true;
-//}
+// }
 //
 //
-//void MovementManager::performCastling(const Move &move)
+// void MovementManager::performCastling(const Move &move)
 //{
 //	//int	 direction = (move.toX > move.X) ? 1 : -1;
 //	//int	 rookFromX = (direction == 1) ? 7 : 0;
@@ -259,10 +293,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//// Update moved status
 //	//king->setHasMoved(true);
 //	//rook->setHasMoved(true);
-//}
+// }
 //
 //
-//bool MovementManager::isEnPassantMove(const Move &move, PieceColor color)
+// bool MovementManager::isEnPassantMove(const Move &move, PieceColor color)
 //{
 //	//auto piece = board.getPiece(move.X, move.Y);
 //	//if (piece && piece->getType() == PieceType::Pawn)
@@ -278,10 +312,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//	}
 //	//}
 //	return false;
-//}
+// }
 //
 //
-//bool MovementManager::validateEnPassant(const Move &move, PieceColor color)
+// bool MovementManager::validateEnPassant(const Move &move, PieceColor color)
 //{
 //	//// The last move must be a pawn moving two squares forward to the adjacent file
 //	//auto lastMove = board.getLastMove();
@@ -299,10 +333,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//	return false;
 //
 //	return true;
-//}
+// }
 //
 //
-//void MovementManager::performEnPassant(const Move &move)
+// void MovementManager::performEnPassant(const Move &move)
 //{
 //	//auto pawn = board.getPiece(move.X, move.Y);
 //	//board.setPiece(move.toX, move.toY, pawn);
@@ -313,10 +347,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//board.setPiece(move.toX, capturedPawnY, nullptr);
 //
 //	//pawn->setHasMoved(true);
-//}
+// }
 //
 //
-//void MovementManager::promotePawn(int x, int y, PieceColor color, PieceType promotionType)
+// void MovementManager::promotePawn(int x, int y, PieceColor color, PieceType promotionType)
 //{
 //	//switch (promotionType)
 //	//{
@@ -348,10 +382,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//	board.setPiece(x, y, std::make_shared<Queen>(color));
 //	//	break;
 //	//}
-//}
+// }
 //
 //
-//bool MovementManager::isCheckmate(PieceColor color)
+// bool MovementManager::isCheckmate(PieceColor color)
 //{
 //	//if (!isKingInCheck(color))
 //	//	return false;
@@ -377,10 +411,10 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//	}
 //	//}
 //	return true; // No valid moves, player is checkmated
-//}
+// }
 //
 //
-//bool MovementManager::isStalemate(PieceColor color)
+// bool MovementManager::isStalemate(PieceColor color)
 //{
 //	//if (isKingInCheck(color))
 //	//	return false;
@@ -406,4 +440,4 @@ std::vector<PossibleMove> MovementManager::getAllPossibleMoves()
 //	//	}
 //	//}
 //	return true; // No valid moves, player is stalemated
-//}
+// }

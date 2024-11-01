@@ -45,25 +45,27 @@ public:
 	~ChessBoard();
 
 
-	void						initializeBoard();
+	void														  initializeBoard();
 
-	Square					   &getSquare(Position pos);
+	Square														 &getSquare(Position pos);
 
-	void						setPiece(Position pos, std::shared_ptr<ChessPiece> piece);
+	void														  setPiece(Position pos, std::shared_ptr<ChessPiece> piece);
 
-	void						setPiece(int x, int y, std::shared_ptr<ChessPiece> piece);
+	void														  setPiece(int x, int y, std::shared_ptr<ChessPiece> piece);
 
-	std::shared_ptr<ChessPiece> getPiece(Position pos);
+	std::vector<std::pair<Position, std::shared_ptr<ChessPiece>>> getPiecesFromPlayer(PieceColor playerColor);
 
-	void						removePiece(Position pos);
+	std::shared_ptr<ChessPiece>									  getPiece(Position pos);
 
-	bool						movePiece(Position start, Position end);
+	void														  removePiece(Position pos);
 
-	bool						isEmpty(Position pos) const;
+	bool														  movePiece(Position start, Position end);
 
-	const Move				   *getLastMove();
+	bool														  isEmpty(Position pos) const;
 
-	void						addMoveToHistory(const Move &move);
+	const Move													 *getLastMove();
+
+	void														  addMoveToHistory(const Move &move);
 
 
 private:

@@ -13,6 +13,8 @@
 
 #include "ChessBoard.h"
 #include "Move.h"
+#include <set>
+#include <unordered_map>
 
 
 class MovementManager
@@ -27,10 +29,12 @@ public:
 	//bool isCheckmate(PieceColor color);
 	//bool isStalemate(PieceColor color);
 
-	std::vector<PossibleMove> getAllPossibleMoves();
+	std::unordered_map<Position, std::vector<PossibleMove>> getAllPossibleMoves(PieceColor playerColor);
 
 private:
 	ChessBoard &board;
+
+	bool		wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor);
 
 	//bool		wouldKingBeInCheckAfterMove(const Move &move, PieceColor color);
 	//bool		isSquareUnderAttack(int x, int y, PieceColor color);

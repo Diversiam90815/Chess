@@ -49,6 +49,27 @@ void ChessBoard::setPiece(int x, int y, std::shared_ptr<ChessPiece> piece)
 }
 
 
+std::vector<std::pair<Position, std::shared_ptr<ChessPiece>>> ChessBoard::getPiecesFromPlayer(PieceColor playerColor)
+{
+	std::vector<std::pair<Position, std::shared_ptr<ChessPiece>>> playerPieces;
+
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			Position pos{x, y};
+			auto	 piece = getPiece(pos);
+			if (piece && piece->getColor() == playerColor)
+			{
+				playerPieces.emplace_back(pos, piece);
+			}
+		}
+	}
+
+	return playerPieces;
+}
+
+
 std::shared_ptr<ChessPiece> ChessBoard::getPiece(Position pos)
 {
 	return squares[pos.y][pos.x].piece;

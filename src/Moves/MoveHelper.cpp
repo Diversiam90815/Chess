@@ -92,19 +92,22 @@ bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, 
 	if (checkForBorders(newX, newY) && board.isEmpty(newPosition))
 	{
 		PossibleMove move;
-		move.pos = newPosition;
+		move.start = position;
+
+		move.end   = newPosition;
 		addToAvailableMoves(move);
 
 		// If it's the pawn's first move, check for the two-step option
 		if (!hasMoved)
 		{
-			newX = position.x + mPawnMoveDirections[1].first;
-			newY = position.y + mPawnMoveDirections[1].second * colorFactor;
+			newX		= position.x + mPawnMoveDirections[1].first;
+			newY		= position.y + mPawnMoveDirections[1].second * colorFactor;
+
+			newPosition = {newX, newY};
 
 			if (checkForBorders(newX, newY) && board.isEmpty(newPosition))
 			{
-				move.pos.x = newX;
-				move.pos.y = newY;
+				move.end = newPosition;
 				addToAvailableMoves(move);
 			}
 		}
@@ -131,7 +134,8 @@ bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &
 			if (piece->getColor() != color)
 			{
 				PossibleMove move;
-				move.pos			 = newPosition;
+				move.start			 = position;
+				move.end			 = newPosition;
 				move.canCapturePiece = true;
 				addToAvailableMoves(move);
 			}
@@ -181,14 +185,16 @@ bool MoveHelper::checkMovesInDirection(const Position &position, ChessBoard &boa
 			PossibleMove move;
 			if (board.isEmpty(newPostion))
 			{
-				move.pos = newPostion;
+				move.start = position;
+				move.end   = newPostion;
 				addToAvailableMoves(move);
 			}
 			else
 			{
 				if (board.getPiece(newPostion)->getColor() != color)
 				{
-					move.pos			 = newPostion;
+					move.start			 = position;
+					move.end			 = newPostion;
 					move.canCapturePiece = true;
 					addToAvailableMoves(move);
 					break;
@@ -219,7 +225,7 @@ bool MoveHelper::checkIfPositionAlreadyExists(const Position pos)
 {
 	for (const auto &possibleMove : mPossibleMovesAndCaptures)
 	{
-		if (possibleMove.pos.x == pos.x && possibleMove.pos.y == pos.y)
+		if (possibleMove.end.x == pos.x && possibleMove.end.y == pos.y)
 		{
 			return true;
 		}
@@ -230,7 +236,7 @@ bool MoveHelper::checkIfPositionAlreadyExists(const Position pos)
 
 void MoveHelper::addToAvailableMoves(PossibleMove &move)
 {
-	if (!checkIfPositionAlreadyExists(move.pos))
+	if (!checkIfPositionAlreadyExists(move.end))
 	{
 		mPossibleMovesAndCaptures.push_back(move);
 	}
