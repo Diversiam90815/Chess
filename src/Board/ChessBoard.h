@@ -25,9 +25,16 @@
 
 struct Square
 {
-	int							x;
-	int							y;
+	Position					pos;
 	std::shared_ptr<ChessPiece> piece;
+
+	Square(int x, int y) : pos{x, y}, piece(nullptr)
+	{
+	}
+
+	Square() : pos{0, 0}, piece(nullptr)
+	{
+	}
 };
 
 
@@ -40,17 +47,19 @@ public:
 
 	void						initializeBoard();
 
-	Square					   &getSquare(int x, int y);
+	Square					   &getSquare(Position pos);
+
+	void						setPiece(Position pos, std::shared_ptr<ChessPiece> piece);
 
 	void						setPiece(int x, int y, std::shared_ptr<ChessPiece> piece);
 
-	std::shared_ptr<ChessPiece> getPiece(int x, int y);
+	std::shared_ptr<ChessPiece> getPiece(Position pos);
 
-	void						removePiece(int x, int y);
+	void						removePiece(Position pos);
 
-	bool						movePiece(int fromX, int fromY, int toX, int toY);
+	bool						movePiece(Position start, Position end);
 
-	bool						isEmpty(int x, int y) const;
+	bool						isEmpty(Position pos) const;
 
 	const Move				   *getLastMove();
 

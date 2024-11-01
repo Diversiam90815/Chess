@@ -37,7 +37,7 @@ public:
 	~MoveHelper();
 
 
-	bool			  checkAvailableMoves(const Position &position, ChessBoard &board, const PieceColor color, const PieceType piece, bool hasMoved = false);
+	bool					  checkAvailableMoves(const Position &position, ChessBoard &board, const PieceColor color, const PieceType piece, bool hasMoved = false);
 
 	std::vector<PossibleMove> getAvailableMoves();
 
@@ -70,18 +70,18 @@ private:
 	void addToAvailableMoves(PossibleMove &move);
 
 
-	std::array<std::pair<int, int>, 2> mPawnMoveDirections		  = {{{0, 1}, {0, 2}}};
+	std::array<std::pair<int, int>, 2> mPawnMoveDirections	  = {{{0, 1}, {0, 2}}};
 
-	std::array<std::pair<int, int>, 2> mPawnCaptureDirections	  = {{{1, 1}, {-1, 1}}};
+	std::array<std::pair<int, int>, 2> mPawnCaptureDirections = {{{1, 1}, {-1, 1}}};
 
 
-	std::array<std::pair<int, int>, 8> mAdjacentPositions		  = {{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}}};
+	std::array<std::pair<int, int>, 8> mAdjacentPositions	  = {{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}}};
 
-	std::array<std::pair<int, int>, 4> mDiagonalDirections		  = {{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}}};
+	std::array<std::pair<int, int>, 4> mDiagonalDirections	  = {{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}}};
 
-	std::array<std::pair<int, int>, 8> mLShapedDirections		  = {{{1, 2}, {2, 1}, {-1, 2}, {-2, 1}, {1, -2}, {2, -1}, {-1, -2}, {-2, -1}}};
+	std::array<std::pair<int, int>, 8> mLShapedDirections	  = {{{1, 2}, {2, 1}, {-1, 2}, {-2, 1}, {1, -2}, {2, -1}, {-1, -2}, {-2, -1}}};
 
-	std::array<std::pair<int, int>, 4> mFileDirections			  = {{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}};
+	std::array<std::pair<int, int>, 4> mFileDirections		  = {{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}};
 
 
 	std::vector<PossibleMove>		   mPossibleMovesAndCaptures;

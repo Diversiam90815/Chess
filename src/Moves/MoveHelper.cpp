@@ -70,7 +70,7 @@ bool MoveHelper::checkAvailableMoves(const Position &position, ChessBoard &board
 	default: break;
 	}
 
-	return movesAdded;		// maybe need to be changed
+	return movesAdded; // maybe need to be changed
 }
 
 
@@ -82,16 +82,17 @@ std::vector<PossibleMove> MoveHelper::getAvailableMoves()
 
 bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, const PieceColor color, bool hasMoved)
 {
-	int colorFactor = (color == PieceColor::White) ? 1 : -1;
+	int		 colorFactor = (color == PieceColor::White) ? 1 : -1;
 
-	int newX		= position.x + mPawnMoveDirections[0].first;
-	int newY		= position.y + mPawnMoveDirections[0].second * colorFactor;
+	int		 newX		 = position.x + mPawnMoveDirections[0].first;
+	int		 newY		 = position.y + mPawnMoveDirections[0].second * colorFactor;
 
-	if (checkForBorders(newX, newY) && board.isEmpty(newX, newY))
+	Position newPosition = {newX, newY};
+
+	if (checkForBorders(newX, newY) && board.isEmpty(newPosition))
 	{
 		PossibleMove move;
-		move.pos.x = newX;
-		move.pos.y = newY;
+		move.pos = newPosition;
 		addToAvailableMoves(move);
 
 		// If it's the pawn's first move, check for the two-step option
@@ -100,7 +101,7 @@ bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, 
 			newX = position.x + mPawnMoveDirections[1].first;
 			newY = position.y + mPawnMoveDirections[1].second * colorFactor;
 
-			if (checkForBorders(newX, newY) && board.isEmpty(newX, newY))
+			if (checkForBorders(newX, newY) && board.isEmpty(newPosition))
 			{
 				move.pos.x = newX;
 				move.pos.y = newY;
@@ -119,17 +120,18 @@ bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &
 
 	for (const auto &dir : mPawnCaptureDirections)
 	{
-		int newX = position.x + dir.first;
-		int newY = position.y + dir.second * colorFactor;
+		int		 newX		 = position.x + dir.first;
+		int		 newY		 = position.y + dir.second * colorFactor;
 
-		if (checkForBorders(newX, newY) && !board.isEmpty(newX, newY))
+		Position newPosition = {newX, newY};
+
+		if (checkForBorders(newX, newY) && !board.isEmpty(newPosition))
 		{
-			const auto piece = board.getPiece(newX, newY);
+			const auto piece = board.getPiece(newPosition);
 			if (piece->getColor() != color)
 			{
 				PossibleMove move;
-				move.pos.x			 = newX;
-				move.pos.y			 = newY;
+				move.pos			 = newPosition;
 				move.canCapturePiece = true;
 				addToAvailableMoves(move);
 			}
@@ -169,25 +171,24 @@ bool MoveHelper::checkMovesInDirection(const Position &position, ChessBoard &boa
 {
 	for (const auto &dir : directions)
 	{
-		int newX = position.x + dir.first;
-		int newY = position.y + dir.second;
+		int		 newX		= position.x + dir.first;
+		int		 newY		= position.y + dir.second;
+
+		Position newPostion = {newX, newY};
 
 		while (checkForBorders(newX, newY))
 		{
 			PossibleMove move;
-
-			if (board.isEmpty(newX, newY))
+			if (board.isEmpty(newPostion))
 			{
-				move.pos.x = newX;
-				move.pos.y = newY;
+				move.pos = newPostion;
 				addToAvailableMoves(move);
 			}
 			else
 			{
-				if (board.getPiece(newX, newY)->getColor() != color)
+				if (board.getPiece(newPostion)->getColor() != color)
 				{
-					move.pos.x			 = newX;
-					move.pos.y			 = newY;
+					move.pos			 = newPostion;
 					move.canCapturePiece = true;
 					addToAvailableMoves(move);
 					break;
@@ -210,7 +211,7 @@ bool MoveHelper::checkMovesInDirection(const Position &position, ChessBoard &boa
 
 bool MoveHelper::checkForBorders(const int x, const int y)
 {
-	return (x >= 0 && x <= 7 && y >= 0 && y <= 7);
+	return (x >= 1 && x <= BOARD_SIZE && y >= 1 && y <= BOARD_SIZE);
 }
 
 

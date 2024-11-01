@@ -15,10 +15,10 @@
 
 ChessBoard::ChessBoard()
 {
-	squares.resize(8);
-	for (int y = 0; y < 8; ++y)
+	squares.resize(BOARD_SIZE);
+	for (int y = 0; y < BOARD_SIZE; ++y)
 	{
-		for (int x = 0; x < 8; ++x)
+		for (int x = 0; x < BOARD_SIZE; ++x)
 		{
 			squares[y].emplace_back(x, y);
 		}
@@ -31,9 +31,15 @@ ChessBoard::~ChessBoard()
 }
 
 
-Square & ChessBoard::getSquare(int x, int y)
+Square &ChessBoard::getSquare(Position pos)
 {
-	return squares[y][x];
+	return squares[pos.y][pos.x];
+}
+
+
+void ChessBoard::setPiece(Position pos, std::shared_ptr<ChessPiece> piece)
+{
+	squares[pos.y][pos.x].piece = piece;
 }
 
 
@@ -43,35 +49,34 @@ void ChessBoard::setPiece(int x, int y, std::shared_ptr<ChessPiece> piece)
 }
 
 
-
-std::shared_ptr<ChessPiece> ChessBoard::getPiece(int x, int y)
+std::shared_ptr<ChessPiece> ChessBoard::getPiece(Position pos)
 {
-	return squares[y][y].piece;
+	return squares[pos.y][pos.x].piece;
 }
 
 
-void ChessBoard::removePiece(int x, int y)
+void ChessBoard::removePiece(Position pos)
 {
-	squares[y][x].piece = nullptr;
+	squares[pos.y][pos.x].piece = nullptr;
 }
 
 
-bool ChessBoard::movePiece(int fromX, int fromY, int toX, int toY)
+bool ChessBoard::movePiece(Position start, Position end)
 {
-	auto piece = getPiece(fromX, fromY);
+	auto piece = getPiece(start);
 	if (!piece)
 		return false;
 
-	removePiece(fromX, fromY);
-	setPiece(toX, toY, piece);
+	removePiece(start);
+	setPiece(end, piece);
 	piece->setHasMoved(true);
 	return true;
 }
 
 
-bool ChessBoard::isEmpty(int x, int y) const
+bool ChessBoard::isEmpty(Position pos) const
 {
-	return squares[y][x].piece == nullptr;
+	return squares[pos.y][pos.x].piece == nullptr;
 }
 
 
@@ -100,7 +105,7 @@ void ChessBoard::initializeBoard()
 	setPiece(5, 0, std::make_shared<Bishop>(PieceColor::White));
 	setPiece(6, 0, std::make_shared<Knight>(PieceColor::White));
 	setPiece(7, 0, std::make_shared<Rook>(PieceColor::White));
-	for (int x = 0; x < 8; ++x)
+	for (int x = 0; x < BOARD_SIZE; ++x)
 	{
 		setPiece(x, 1, std::make_shared<Pawn>(PieceColor::White));
 	}
@@ -114,7 +119,7 @@ void ChessBoard::initializeBoard()
 	setPiece(5, 7, std::make_shared<Bishop>(PieceColor::Black));
 	setPiece(6, 7, std::make_shared<Knight>(PieceColor::Black));
 	setPiece(7, 7, std::make_shared<Rook>(PieceColor::Black));
-	for (int x = 0; x < 8; ++x)
+	for (int x = 0; x < BOARD_SIZE; ++x)
 	{
 		setPiece(x, 6, std::make_shared<Pawn>(PieceColor::Black));
 	}

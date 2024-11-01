@@ -22,6 +22,7 @@ constexpr int rookValue	  = 5;
 constexpr int bishopValue = 3;
 constexpr int queenValue  = 9;
 
+constexpr int BOARD_SIZE  = 8;
 
 
 enum class PieceType
