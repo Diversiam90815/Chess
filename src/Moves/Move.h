@@ -48,6 +48,10 @@ struct Move
 	{
 	}
 
+	Move(PossibleMove &possibleMove) : startingPosition(possibleMove.start), endingPosition(possibleMove.end)
+	{
+	}
+
 	Move(Position  start,
 		 Position  end,
 		 PieceType moved,
@@ -68,6 +72,19 @@ struct Move
 
 	bool	  isCastling	= false;
 	bool	  isEnPassant	= false;
+
+	int		  number		= 0; // Storing the current number of this move. Each move saved should increment this number!
+
+
+	bool	  operator<(const Move &other) const
+	{
+		return this->number < other.number;
+	}
+
+	bool operator==(const Move &other) const
+	{
+		return this->number == other.number;
+	}
 };
 
 
@@ -76,6 +93,7 @@ struct PossibleMove
 	Position start;
 	Position end;
 	bool	 canCapturePiece = false;
+
 
 	bool	 operator==(PossibleMove &other)
 	{

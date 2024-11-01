@@ -18,12 +18,27 @@ MovementManager::MovementManager(ChessBoard &board) : board(board)
 {
 }
 
-
-std::unordered_map<Position, std::vector<PossibleMove>> MovementManager::getAllPossibleMoves(PieceColor playerColor)
+std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &position)
 {
-	std::unordered_map<Position, std::vector<PossibleMove>> allPossibleMoves;
+	auto piece	= board.getPiece(position);
+	auto player = piece->getColor();
 
-	auto													playerPieces = board.getPiecesFromPlayer(playerColor);
+	if (mAllLegalMovesForCurrentRound.size() == 0)
+		calculateAllLegalBasicMoves(player);
+
+	if (piece->getType() == PieceType::King)
+	{
+		generateCastlingMoves(position, player);
+	}
+
+	auto &possibleMoves = mAllLegalMovesForCurrentRound[position];
+	return possibleMoves;
+}
+
+
+bool MovementManager::calculateAllLegalBasicMoves(PieceColor playerColor)
+{
+	auto playerPieces = board.getPiecesFromPlayer(playerColor);
 
 	for (const auto &[startPosition, piece] : playerPieces)
 	{
@@ -45,10 +60,16 @@ std::unordered_map<Position, std::vector<PossibleMove>> MovementManager::getAllP
 
 		if (!validMoves.empty())
 		{
-			allPossibleMoves.emplace(startPosition, std::move(validMoves));
+			mAllLegalMovesForCurrentRound.emplace(startPosition, std::move(validMoves));
 		}
 	}
-	return allPossibleMoves;
+	return mAllLegalMovesForCurrentRound.size() != 0;
+}
+
+
+bool MovementManager::executeMove(const Move &move)
+{
+	return false;
 }
 
 
@@ -56,10 +77,10 @@ bool MovementManager::validateMove(Move &move, PieceColor playerColor)
 {
 	auto kingPosition = board.getKingsPosition(playerColor);
 
-	if (isKingInCheck(kingPosition,playerColor) && move.startingPosition != kingPosition)
+	if (isKingInCheck(kingPosition, playerColor) && move.startingPosition != kingPosition)
 		return false;
 
-	if(wouldKingBeInCheckAfterMove(move, playerColor))
+	if (wouldKingBeInCheckAfterMove(move, playerColor))
 		return false;
 }
 
@@ -136,3 +157,118 @@ bool MovementManager::isSquareAttacked(const Position &square, PieceColor attack
 	return false;
 }
 
+std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position &kingPosition, PieceColor player)
+{
+	std::vector<PossibleMove> castlingMoves;
+	castlingMoves.reserve(2 * sizeof(castlingMoves)); // There are max. of 2 moves of castling
+
+	if (canCastleKingside(kingPosition, player))
+	{
+		PossibleMove kingsideCastling;
+		kingsideCastling.start = kingPosition;
+		kingsideCastling.end   = Position{kingPosition.x + 2, kingPosition.y};
+		castlingMoves.push_back(kingsideCastling);
+	}
+
+	if (canCastleQueenside(kingPosition, player))
+	{
+		PossibleMove queensideCastling;
+		queensideCastling.start = kingPosition;
+		queensideCastling.end	= Position{kingPosition.x - 2, kingPosition.y};
+		castlingMoves.push_back(queensideCastling);
+	}
+}
+
+
+bool MovementManager::canCastleKingside(const Position &kingsPosition, PieceColor player)
+{
+	auto king = board.getPiece(kingsPosition);
+
+	if (king->getHasMoved())
+		return false;
+
+	// Check if rook has moved
+	int		 y	   = kingsPosition.y; // King's row
+	int		 kingX = kingsPosition.x;
+
+	int		 rookX = 7;				  // King's side rook is at x = 7 (h-file)
+	Position rookPosition{rookX, y};
+	auto	 rook = board.getPiece(rookPosition);
+
+	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->getHasMoved())
+		return false;
+
+	// Check if way is free
+	for (int x = kingX + 1; x < rookX; ++x)
+	{
+		Position pos{x, y};
+		if (!board.isEmpty(pos))
+			return false;
+	}
+
+	// Check if way is under attack
+	std::vector<Position> positionsToCheck = {{kingX + 1, y}, {kingX + 2, y}};
+	for (const auto &pos : positionsToCheck)
+	{
+		Move testMove(kingsPosition, pos, PieceType::King);
+		if (wouldKingBeInCheckAfterMove(testMove, player))
+			return false;
+	}
+
+	return false;
+}
+
+
+bool MovementManager::canCastleQueenside(const Position &kingsPosition, PieceColor player)
+{
+	auto king = board.getPiece(kingsPosition);
+
+	if (king->getHasMoved())
+		return false;
+
+	// Check if rook has moved
+	int		 y	   = kingsPosition.y; // King's row
+	int		 kingX = kingsPosition.x;
+
+	int		 rookX = 0;				  // King's side rook is at x = 0 (a-file)
+	Position rookPosition{rookX, y};
+	auto	 rook = board.getPiece(rookPosition);
+
+	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->getHasMoved())
+		return false;
+
+	// Check if way is free
+	for (int x = kingX - 1; x > rookX; --x)
+	{
+		Position pos{x, y};
+		if (!board.isEmpty(pos))
+			return false;
+	}
+
+	// Check if way is under attack
+	std::vector<Position> positionsToCheck = {{kingX - 1, y}, {kingX - 2, y}};
+	for (const auto &pos : positionsToCheck)
+	{
+		Move testMove(kingsPosition, pos, PieceType::King);
+		if (wouldKingBeInCheckAfterMove(testMove, player))
+			return false;
+	}
+
+	return false;
+}
+
+
+const Move *MovementManager::getLastMove()
+{
+	if (mMoveHistory.empty())
+		return nullptr;
+
+	return &(*mMoveHistory.rbegin());
+}
+
+
+void MovementManager::addMoveToHistory(Move &move)
+{
+	move.number = mMoveHistory.size() + 1; // Set the move number based on history size
+	mMoveHistory.insert(move);
+}

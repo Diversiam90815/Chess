@@ -22,17 +22,37 @@ class MovementManager
 public:
 	MovementManager(ChessBoard &board);
 
-	std::unordered_map<Position, std::vector<PossibleMove>> getAllPossibleMoves(PieceColor playerColor);
+	std::vector<PossibleMove> getMovesForPosition(Position &position);
+
+	bool					  calculateAllLegalBasicMoves(PieceColor playerColor);
+
+	bool					  executeMove(const Move &move);
 
 private:
-	bool		validateMove(Move &move, PieceColor playerColor);
+	bool													validateMove(Move &move, PieceColor playerColor);
 
-	bool		isKingInCheck(Position &ourKing, PieceColor playerColor);
+	bool													isKingInCheck(Position &ourKing, PieceColor playerColor);
 
-	bool		wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor);
+	bool													wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor);
 
-	bool		isSquareAttacked(const Position &square, PieceColor attackerColor);
+	bool													isSquareAttacked(const Position &square, PieceColor attackerColor);
 
 
-	ChessBoard &board;
+	std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PieceColor player);
+
+	bool													canCastleKingside(const Position &kingsPosition, PieceColor player);
+
+	bool													canCastleQueenside(const Position &kingsPosition, PieceColor player);
+
+
+	const Move											   *getLastMove();
+
+	void													addMoveToHistory(Move &move);
+
+
+	ChessBoard											   &board;
+
+	std::unordered_map<Position, std::vector<PossibleMove>> mAllLegalMovesForCurrentRound;
+
+	std::set<Move>											mMoveHistory;
 };

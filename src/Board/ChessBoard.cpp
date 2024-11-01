@@ -13,6 +13,7 @@
 #include "ChessPiece.h"
 
 
+
 ChessBoard::ChessBoard()
 {
 	squares.resize(BOARD_SIZE);
@@ -49,9 +50,10 @@ void ChessBoard::setPiece(int x, int y, std::shared_ptr<ChessPiece> piece)
 }
 
 
-std::vector<std::pair<Position, std::shared_ptr<ChessPiece>>> ChessBoard::getPiecesFromPlayer(PieceColor playerColor)
+std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PieceColor playerColor)
 {
-	std::vector<std::pair<Position, std::shared_ptr<ChessPiece>>> playerPieces;
+	std::vector<PlayerPiece> playerPieces;
+	playerPieces.reserve(PLAYER_PIECES_NUM * sizeof(PlayerPiece));
 
 	for (int y = 0; y < BOARD_SIZE; ++y)
 	{
@@ -98,20 +100,6 @@ bool ChessBoard::movePiece(Position start, Position end)
 bool ChessBoard::isEmpty(Position pos) const
 {
 	return squares[pos.y][pos.x].piece == nullptr;
-}
-
-
-const Move *ChessBoard::getLastMove()
-{
-	if (moveHistory.empty())
-		return nullptr;
-	return &moveHistory.back();
-}
-
-
-void ChessBoard::addMoveToHistory(const Move &move)
-{
-	moveHistory.push_back(move);
 }
 
 
