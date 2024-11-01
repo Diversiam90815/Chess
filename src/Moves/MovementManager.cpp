@@ -37,7 +37,7 @@ std::unordered_map<Position, std::vector<PossibleMove>> MovementManager::getAllP
 			Move testMove(possibleMove.start, possibleMove.end, piece->getType());
 
 			// Validate the move
-			if (!wouldKingBeInCheckAfterMove(testMove, playerColor))
+			if (!validateMove(testMove, playerColor))
 			{
 				validMoves.push_back(possibleMove);
 			}
@@ -49,6 +49,25 @@ std::unordered_map<Position, std::vector<PossibleMove>> MovementManager::getAllP
 		}
 	}
 	return allPossibleMoves;
+}
+
+
+bool MovementManager::validateMove(Move &move, PieceColor playerColor)
+{
+	auto kingPosition = board.getKingsPosition(playerColor);
+
+	if (isKingInCheck(kingPosition,playerColor) && move.startingPosition != kingPosition)
+		return false;
+
+	if(wouldKingBeInCheckAfterMove(move, playerColor))
+		return false;
+}
+
+
+bool MovementManager::isKingInCheck(Position &ourKing, PieceColor playerColor)
+{
+	PieceColor opponentColor = playerColor == PieceColor::White ? PieceColor::Black : PieceColor::White;
+	return isSquareAttacked(ourKing, opponentColor);
 }
 
 

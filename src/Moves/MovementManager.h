@@ -25,10 +25,14 @@ public:
 	std::unordered_map<Position, std::vector<PossibleMove>> getAllPossibleMoves(PieceColor playerColor);
 
 private:
-	ChessBoard &board;
+	bool		validateMove(Move &move, PieceColor playerColor);
+
+	bool		isKingInCheck(Position &ourKing, PieceColor playerColor);
 
 	bool		wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor);
-	
+
 	bool		isSquareAttacked(const Position &square, PieceColor attackerColor);
 
+
+	ChessBoard &board;
 };
