@@ -26,7 +26,8 @@ public:
 
 	bool					  calculateAllLegalBasicMoves(PieceColor playerColor);
 
-	bool					  executeMove(const Move &move);
+	bool					  executeMove(Move &move);
+
 
 private:
 	bool													validateMove(Move &move, PieceColor playerColor);
@@ -40,9 +41,7 @@ private:
 
 	std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PieceColor player);
 
-	bool													canCastleKingside(const Position &kingsPosition, PieceColor player);
-
-	bool													canCastleQueenside(const Position &kingsPosition, PieceColor player);
+	bool													canCastle(const Position &kingposition, PieceColor player, bool kingside);
 
 
 	const Move											   *getLastMove();

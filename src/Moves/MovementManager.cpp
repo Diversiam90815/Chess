@@ -67,9 +67,10 @@ bool MovementManager::calculateAllLegalBasicMoves(PieceColor playerColor)
 }
 
 
-bool MovementManager::executeMove(const Move &move)
+bool MovementManager::executeMove(Move &move)
 {
-	return false;
+	board.movePiece(move.startingPosition, move.endingPosition);
+	addMoveToHistory(move);
 }
 
 
@@ -162,7 +163,7 @@ std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position 
 	std::vector<PossibleMove> castlingMoves;
 	castlingMoves.reserve(2 * sizeof(castlingMoves)); // There are max. of 2 moves of castling
 
-	if (canCastleKingside(kingPosition, player))
+	if (canCastle(kingPosition, player, true))
 	{
 		PossibleMove kingsideCastling;
 		kingsideCastling.start = kingPosition;
@@ -170,7 +171,7 @@ std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position 
 		castlingMoves.push_back(kingsideCastling);
 	}
 
-	if (canCastleQueenside(kingPosition, player))
+	if (canCastle(kingPosition, player, false))
 	{
 		PossibleMove queensideCastling;
 		queensideCastling.start = kingPosition;
@@ -180,26 +181,29 @@ std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position 
 }
 
 
-bool MovementManager::canCastleKingside(const Position &kingsPosition, PieceColor player)
+bool MovementManager::canCastle(const Position &kingposition, PieceColor player, bool kingside)
 {
-	auto king = board.getPiece(kingsPosition);
+	auto king	   = board.getPiece(kingposition);
+	int	 direction = kingside ? +1 : -1; // Determine the direction of castling
 
 	if (king->getHasMoved())
 		return false;
 
-	// Check if rook has moved
-	int		 y	   = kingsPosition.y; // King's row
-	int		 kingX = kingsPosition.x;
+	// Define the y-coordinate and king's x-coordinate
+	int		 y	   = kingposition.y;
+	int		 kingX = kingposition.x;
 
-	int		 rookX = 7;				  // King's side rook is at x = 7 (h-file)
+	// Determine the rook's position based on the direction
+	int		 rookX = (direction == 1) ? 7 : 0; // 7 for kingside (h-file), 0 for queenside (a-file)
 	Position rookPosition{rookX, y};
 	auto	 rook = board.getPiece(rookPosition);
 
+	// Check if the rook exists, is of the correct type, color, and has not moved
 	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->getHasMoved())
 		return false;
 
 	// Check if way is free
-	for (int x = kingX + 1; x < rookX; ++x)
+	for (int x = kingX + direction; x != rookX; x += direction)
 	{
 		Position pos{x, y};
 		if (!board.isEmpty(pos))
@@ -207,54 +211,15 @@ bool MovementManager::canCastleKingside(const Position &kingsPosition, PieceColo
 	}
 
 	// Check if way is under attack
-	std::vector<Position> positionsToCheck = {{kingX + 1, y}, {kingX + 2, y}};
+	std::vector<Position> positionsToCheck = {{kingX + direction, y}, {kingX + 2 * direction, y}};
 	for (const auto &pos : positionsToCheck)
 	{
-		Move testMove(kingsPosition, pos, PieceType::King);
+		Move testMove(kingposition, pos, PieceType::King);
 		if (wouldKingBeInCheckAfterMove(testMove, player))
 			return false;
 	}
 
-	return false;
-}
-
-
-bool MovementManager::canCastleQueenside(const Position &kingsPosition, PieceColor player)
-{
-	auto king = board.getPiece(kingsPosition);
-
-	if (king->getHasMoved())
-		return false;
-
-	// Check if rook has moved
-	int		 y	   = kingsPosition.y; // King's row
-	int		 kingX = kingsPosition.x;
-
-	int		 rookX = 0;				  // King's side rook is at x = 0 (a-file)
-	Position rookPosition{rookX, y};
-	auto	 rook = board.getPiece(rookPosition);
-
-	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->getHasMoved())
-		return false;
-
-	// Check if way is free
-	for (int x = kingX - 1; x > rookX; --x)
-	{
-		Position pos{x, y};
-		if (!board.isEmpty(pos))
-			return false;
-	}
-
-	// Check if way is under attack
-	std::vector<Position> positionsToCheck = {{kingX - 1, y}, {kingX - 2, y}};
-	for (const auto &pos : positionsToCheck)
-	{
-		Move testMove(kingsPosition, pos, PieceType::King);
-		if (wouldKingBeInCheckAfterMove(testMove, player))
-			return false;
-	}
-
-	return false;
+	return true;
 }
 
 
