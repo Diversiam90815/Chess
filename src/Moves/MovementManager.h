@@ -35,6 +35,9 @@ private:
 	ChessBoard &board;
 
 	bool		wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor);
+	
+	bool		isSquareAttacked(const Position &square, PieceColor attackerColor);
+
 
 	//bool		wouldKingBeInCheckAfterMove(const Move &move, PieceColor color);
 	//bool		isSquareUnderAttack(int x, int y, PieceColor color);

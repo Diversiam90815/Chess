@@ -68,8 +68,14 @@ public:
 	void														  addMoveToHistory(const Move &move);
 
 
+	void														  updateKingsPosition(Position &pos, PieceColor player);
+	Position													  getKingsPosition(PieceColor player) const;
+
 private:
 	std::vector<std::vector<Square>> squares;
 
 	std::vector<Move>				 moveHistory;
+
+	Position						 mWhiteKingPosition;
+	Position						 mBlackKingPosition;
 };

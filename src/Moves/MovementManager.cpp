@@ -54,6 +54,66 @@ std::unordered_map<Position, std::vector<PossibleMove>> MovementManager::getAllP
 
 bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor)
 {
+	/*
+	 *  ToDo's:
+	 *	1. Save the current state
+	 *	2. Simulate the move
+	 *	3. Update King's position if if this is the king
+	 *	4. Check if King is under attack (isSquareUnderAttack)
+	 *	5. Revert the move
+	 *	6. Update Kings position back if necessary
+	 */
+
+	bool	 kingInCheck	= false;
+
+	// 1.
+	auto	 movingPiece	= board.getPiece(move.startingPosition);
+	auto	 capturingPiece = board.getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
+
+	Position kingPosition	= board.getKingsPosition(playerColor);
+
+	// 2
+	board.setPiece(move.startingPosition, movingPiece);
+	board.removePiece(move.endingPosition);
+
+	// 3
+	if (movingPiece->getType() == PieceType::King)
+	{
+		kingPosition = move.endingPosition;
+	}
+
+	// 4.
+	kingInCheck = isSquareAttacked(kingPosition, playerColor == PieceColor::White ? PieceColor::Black : PieceColor::White);
+
+
+	// 5.
+	board.setPiece(move.startingPosition, movingPiece);
+	board.setPiece(move.endingPosition, capturingPiece); // This could be nullptr if there was no captured piece
+
+
+	return kingInCheck;
+}
+
+
+bool MovementManager::isSquareAttacked(const Position &square, PieceColor attackerColor)
+{
+	// Iterate over all opponent pieces
+	auto opponentPieces = board.getPiecesFromPlayer(attackerColor);
+
+	for (const auto &[pos, piece] : opponentPieces)
+	{
+		// Get possible moves for the opponent's piece
+		auto moves = piece->getPossibleMoves(pos, board);
+
+		for (const auto &move : moves)
+		{
+			if (move.end == square)
+			{
+				return true;
+			}
+		}
+	}
+
 	return false;
 }
 

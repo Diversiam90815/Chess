@@ -115,6 +115,18 @@ void ChessBoard::addMoveToHistory(const Move &move)
 }
 
 
+void ChessBoard::updateKingsPosition(Position &pos, PieceColor player)
+{
+	player == PieceColor::White ? mWhiteKingPosition = pos : mBlackKingPosition = pos;
+}
+
+
+Position ChessBoard::getKingsPosition(PieceColor player) const
+{
+	return player == PieceColor::White ? mWhiteKingPosition : mBlackKingPosition;
+}
+
+
 void ChessBoard::initializeBoard()
 {
 	// Place pieces for White
