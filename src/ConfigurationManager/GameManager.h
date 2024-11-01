@@ -23,12 +23,15 @@ public:
 
 	void init();
 
-	void switchTurns();
-
-	void adaptScore();
+	void executeMove(PossibleMove &move);
 
 
 private:
+
+	void							 switchTurns();
+
+	PieceColor						 mCurrentPlayer;
+
 	Player							 mWhitePlayer;
 	Player							 mBlackPlayer;
 

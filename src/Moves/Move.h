@@ -57,7 +57,6 @@ struct PossibleMove
 };
 
 
-
 struct Move
 {
 	Move()

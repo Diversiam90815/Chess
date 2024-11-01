@@ -29,7 +29,7 @@ public:
 
 	bool					  calculateAllLegalBasicMoves(PieceColor playerColor);
 
-	bool					  executeMove(Move &move);
+	Move					  executeMove(PossibleMove &executedMove);
 
 
 private:

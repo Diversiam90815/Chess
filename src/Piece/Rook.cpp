@@ -13,12 +13,6 @@
 #include "ChessBoard.h"
 
 
-int Rook::getPieceValue() const
-{
-	return rookValue;
-}
-
-
 std::vector<PossibleMove> Rook::getPossibleMoves(const Position &pos, ChessBoard &board) const
 {
 	MoveHelper helper;

@@ -68,11 +68,29 @@ bool MovementManager::calculateAllLegalBasicMoves(PieceColor playerColor)
 }
 
 
-bool MovementManager::executeMove(Move &move)
+Move MovementManager::executeMove(PossibleMove &possibleMove)
 {
-	bool result = board->movePiece(move.startingPosition, move.endingPosition);
-	addMoveToHistory(move);
-	return result;
+	// Store positions in Move from executed PossibleMove
+	Move executedMove		= Move(possibleMove);
+
+	// Store the moved piece type
+	auto movedPiece			= board->getPiece(possibleMove.start)->getType();
+	executedMove.movedPiece = movedPiece;
+
+	// Store if this move captured another piece
+	if (possibleMove.canCapturePiece)
+	{
+		auto capturedPiece		   = board->getPiece(possibleMove.end)->getType();
+		executedMove.capturedPiece = capturedPiece;
+	}
+
+	// Still need to check for Promotion, Castling, EnPassant!!
+
+	bool result = board->movePiece(possibleMove.start, possibleMove.end);
+
+
+	addMoveToHistory(executedMove);
+	return executedMove;
 }
 
 

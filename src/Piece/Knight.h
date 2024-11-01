@@ -24,8 +24,6 @@ public:
 	{
 	}
 
-	int								 getPieceValue() const override;
-
 	std::vector<PossibleMove>		 getPossibleMoves(const Position &pos, ChessBoard &board) const override;
 	
 };
