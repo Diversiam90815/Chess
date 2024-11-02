@@ -87,7 +87,10 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 
 	// Store the moved piece type
 	auto movedPiece			= board->getPiece(possibleMove.start)->getType();
+	auto player				= board->getPiece(possibleMove.start)->getColor();
+
 	executedMove.movedPiece = movedPiece;
+	executedMove.player		= player;
 
 	// Store if this move captured another piece
 	bool capturedPiece		= possibleMove.type == MoveType::Capture;
@@ -97,13 +100,23 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 		executedMove.capturedPiece = capturedPiece;
 	}
 
-	// Move piece on the board
-	bool result				   = board->movePiece(possibleMove.start, possibleMove.end);
 
+	if (possibleMove.type == MoveType::EnPassant)
+	{
+		executeEnPassantMove(possibleMove, player);
+	}
+	else if (possibleMove.type == MoveType::CastlingKingside || possibleMove.type == MoveType::CastlingQueenside)
+	{
+		executeCastlingMove(possibleMove);
+	}
+	else if (possibleMove.type == MoveType::Normal)
+	{
+		bool result = board->movePiece(possibleMove.start, possibleMove.end);
+	}
 
 	// Increment or reset the halfMoveClock
 
-	int	 previousHalfMoveClock = 0;
+	int previousHalfMoveClock = 0;
 
 	if (!mMoveHistory.empty())
 	{
@@ -211,8 +224,30 @@ bool MovementManager::isSquareAttacked(const Position &square, PieceColor attack
 
 bool MovementManager::executeCastlingMove(PossibleMove &move)
 {
-	return false;
+	Position kingStart = move.start;
+	Position kingEnd;
+	Position rookStart;
+	Position rookEnd;
+
+	if (move.type == MoveType::CastlingKingside)
+	{
+		kingEnd	  = Position(kingStart.x + 2, kingStart.y); // King moves two squares right
+		rookStart = Position(kingStart.x + 3, kingStart.y); // Rook's original position
+		rookEnd	  = Position(kingStart.x + 1, kingStart.y); // Rook moves to the square left of the king
+	}
+	else if (move.type == MoveType::CastlingQueenside)
+	{
+		kingEnd	  = Position(kingStart.x - 2, kingStart.y); // King moves two squares left
+		rookStart = Position(kingStart.x - 4, kingStart.y); // Rook's original position
+		rookEnd	  = Position(kingStart.x - 1, kingStart.y); // Rook moves to the square right of the king
+	}
+
+	board->movePiece(kingStart, kingEnd);
+	board->movePiece(rookStart, rookEnd);
+
+	return true;
 }
+
 
 std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position &kingPosition, PieceColor player)
 {
@@ -283,9 +318,22 @@ bool MovementManager::canCastle(const Position &kingposition, PieceColor player,
 }
 
 
-bool MovementManager::executeEnPassantMove(PossibleMove &move)
+bool MovementManager::executeEnPassantMove(PossibleMove &move, PieceColor player)
 {
-	return false;
+	Position capturedPawnPosition;
+	if (player == PieceColor::White)
+	{
+		capturedPawnPosition = Position(move.end.x, move.end.y - 1);
+	}
+	else
+	{
+		capturedPawnPosition = Position(move.end.x, move.end.y + 1);
+	}
+
+	board->movePiece(move.start, move.end);
+	board->removePiece(capturedPawnPosition);
+
+	return true;
 }
 
 

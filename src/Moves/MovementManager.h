@@ -58,7 +58,7 @@ private:
 	bool													canCastle(const Position &kingposition, PieceColor player, bool kingside);
 
 
-	bool													executeEnPassantMove(PossibleMove &move);
+	bool													executeEnPassantMove(PossibleMove &move, PieceColor player);
 
 	PossibleMove											generateEnPassantMove(const Position &position, PieceColor player);
 
