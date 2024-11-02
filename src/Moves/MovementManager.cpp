@@ -27,12 +27,24 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 	if (mAllLegalMovesForCurrentRound.size() == 0)
 		calculateAllLegalBasicMoves(player);
 
+	auto &possibleMoves = mAllLegalMovesForCurrentRound[position];
+
+	// Add special moves available for this position to the possibleMoves
 	if (piece->getType() == PieceType::King)
 	{
-		generateCastlingMoves(position, player);
+		auto castlingMoves = generateCastlingMoves(position, player);
+		for (auto &move : castlingMoves)
+		{
+			possibleMoves.push_back(move);
+		}
 	}
 
-	auto &possibleMoves = mAllLegalMovesForCurrentRound[position];
+	if (piece->getType() == PieceType::Pawn)
+	{
+		auto enPasssantMove = generateEnPassantMove(position, player);
+		possibleMoves.push_back(enPasssantMove);
+	}
+
 	return possibleMoves;
 }
 
@@ -78,16 +90,34 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 	executedMove.movedPiece = movedPiece;
 
 	// Store if this move captured another piece
-	if (possibleMove.canCapturePiece)
+	bool capturedPiece		= possibleMove.type == MoveType::Capture;
+	if (capturedPiece)
 	{
 		auto capturedPiece		   = board->getPiece(possibleMove.end)->getType();
 		executedMove.capturedPiece = capturedPiece;
 	}
 
-	// Still need to check for Promotion, Castling, EnPassant!!
+	// Move piece on the board
+	bool result				   = board->movePiece(possibleMove.start, possibleMove.end);
 
-	bool result = board->movePiece(possibleMove.start, possibleMove.end);
 
+	// Increment or reset the halfMoveClock
+
+	int	 previousHalfMoveClock = 0;
+
+	if (!mMoveHistory.empty())
+	{
+		previousHalfMoveClock = getLastMove()->halfMoveClock;
+	}
+
+	if (movedPiece != PieceType::Pawn && !capturedPiece)
+	{
+		executedMove.halfMoveClock = previousHalfMoveClock + 1;
+	}
+	else
+	{
+		executedMove.halfMoveClock = 0;
+	}
 
 	addMoveToHistory(executedMove);
 	return executedMove;
@@ -178,6 +208,12 @@ bool MovementManager::isSquareAttacked(const Position &square, PieceColor attack
 	return false;
 }
 
+
+bool MovementManager::executeCastlingMove(PossibleMove &move)
+{
+	return false;
+}
+
 std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position &kingPosition, PieceColor player)
 {
 	std::vector<PossibleMove> castlingMoves;
@@ -188,6 +224,7 @@ std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position 
 		PossibleMove kingsideCastling;
 		kingsideCastling.start = kingPosition;
 		kingsideCastling.end   = Position{kingPosition.x + 2, kingPosition.y};
+		kingsideCastling.type  = MoveType::CastlingKingside;
 		castlingMoves.push_back(kingsideCastling);
 	}
 
@@ -196,6 +233,7 @@ std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position 
 		PossibleMove queensideCastling;
 		queensideCastling.start = kingPosition;
 		queensideCastling.end	= Position{kingPosition.x - 2, kingPosition.y};
+		queensideCastling.type	= MoveType::CastlingQueenside;
 		castlingMoves.push_back(queensideCastling);
 	}
 
@@ -240,6 +278,76 @@ bool MovementManager::canCastle(const Position &kingposition, PieceColor player,
 		if (wouldKingBeInCheckAfterMove(testMove, player))
 			return false;
 	}
+
+	return true;
+}
+
+
+bool MovementManager::executeEnPassantMove(PossibleMove &move)
+{
+	return false;
+}
+
+
+PossibleMove MovementManager::generateEnPassantMove(const Position &position, PieceColor player)
+{
+	if (!canEnPassant(position, player))
+		return PossibleMove();
+
+	auto	 lastMove = getLastMove();
+
+	// Calculate target position
+	Position targetPosition;
+	if (player == PieceColor::White)
+	{
+		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y + 1);
+	}
+	else
+	{
+		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y - 1);
+	}
+
+	PossibleMove enPassantMove;
+	enPassantMove.start = position;
+	enPassantMove.end	= targetPosition;
+	enPassantMove.type	= MoveType::EnPassant;
+
+	return enPassantMove;
+}
+
+
+bool MovementManager::canEnPassant(const Position &position, PieceColor player)
+{
+	auto lastMove = getLastMove();
+
+	if (!lastMove)
+		return false;
+
+	// Ensure if the last move was a pawn double push
+	bool lastMoveWasPawnDoublePush = lastMove->type == MoveType::DoublePawnPush;
+	if (!lastMoveWasPawnDoublePush)
+		return false;
+
+	// Ensure the last move was made by the opponent
+	if (lastMove->player == player)
+		return false;
+
+	// Ensure that the position match
+	Position lastMoveEndPosition	 = lastMove->endingPosition;
+
+	// Check if both pawns are on the same file
+	bool	 bothPiecesOnTheSameFile = (lastMoveEndPosition.x == position.x);
+	if (!bothPiecesOnTheSameFile)
+		return false;
+
+	// Ensure both pawns are adjacent ranks
+	bool bothPiecesNextToEachOther = (std::abs(lastMoveEndPosition.y - position.y) == 1);
+	if (!bothPiecesNextToEachOther)
+		return false;
+
+	// Ensure the capturing pawn is on the correct rank for en passant
+	if ((player == PieceColor::White && position.y != 5) || (player == PieceColor::Black && position.y != 4))
+		return false;
 
 	return true;
 }

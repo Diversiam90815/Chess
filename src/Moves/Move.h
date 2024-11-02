@@ -15,6 +15,20 @@
 #include <functional>
 
 
+enum class MoveType
+{
+	Normal = 1,
+	DoublePawnPush,
+	PawnPromotion,
+	Check,
+	Checkmate,
+	Capture,
+	EnPassant,
+	CastlingQueenside,
+	CastlingKingside
+};
+
+
 struct Position
 {
 	int	 x = 0;
@@ -47,8 +61,7 @@ struct PossibleMove
 {
 	Position start;
 	Position end;
-	bool	 canCapturePiece = false;
-
+	MoveType type = MoveType::Normal;
 
 	bool	 operator==(PossibleMove &other)
 	{
@@ -63,35 +76,31 @@ struct Move
 	{
 	}
 
-	Move(PossibleMove &possibleMove) : startingPosition(possibleMove.start), endingPosition(possibleMove.end)
+	Move(PossibleMove &possibleMove) : startingPosition(possibleMove.start), endingPosition(possibleMove.end), type(possibleMove.type)
 	{
 	}
 
-	Move(Position  start,
-		 Position  end,
-		 PieceType moved,
-		 PieceType captured	 = PieceType::DefaultType,
-		 bool	   castling	 = false,
-		 bool	   enPassant = false,
-		 PieceType promotion = PieceType::DefaultType)
-		: startingPosition(start), endingPosition(end), movedPiece(moved), capturedPiece(captured), isCastling(castling), isEnPassant(enPassant), promotionType(promotion)
+	Move(Position start, Position end, PieceType moved, PieceType captured = PieceType::DefaultType, MoveType type = MoveType::Normal, PieceType promotion = PieceType::DefaultType)
+		: startingPosition(start), endingPosition(end), movedPiece(moved), capturedPiece(captured), type(type), promotionType(promotion)
 	{
 	}
 
-	Position  startingPosition;
-	Position  endingPosition;
+	Position   startingPosition;
+	Position   endingPosition;
 
-	PieceType movedPiece	= PieceType::DefaultType;
-	PieceType capturedPiece = PieceType::DefaultType;
-	PieceType promotionType = PieceType::DefaultType;
+	PieceType  movedPiece	 = PieceType::DefaultType;
+	PieceType  capturedPiece = PieceType::DefaultType;
+	PieceType  promotionType = PieceType::DefaultType;
+	PieceColor player		 = PieceColor::NoColor;
 
-	bool	  isCastling	= false;
-	bool	  isEnPassant	= false;
+	MoveType   type			 = MoveType::Normal;
 
-	int		  number		= 0; // Storing the current number of this move. Each move saved should increment this number!
+	int		   number		 = 0; // Storing the current number of this move. Each move saved should increment this number!
+
+	int halfMoveClock = 0;		// Incrememted with every move that is not a capture or pawn move (detect draw if halfMoveClock is 100)
 
 
-	bool	  operator<(const Move &other) const
+	bool	   operator<(const Move &other) const
 	{
 		return this->number < other.number;
 	}

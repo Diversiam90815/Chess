@@ -93,7 +93,6 @@ bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, 
 	{
 		PossibleMove move;
 		move.start = position;
-
 		move.end   = newPosition;
 		addToAvailableMoves(move);
 
@@ -107,7 +106,8 @@ bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, 
 
 			if (checkForBorders(newX, newY) && board.isEmpty(newPosition))
 			{
-				move.end = newPosition;
+				move.end  = newPosition;
+				move.type = MoveType::DoublePawnPush;
 				addToAvailableMoves(move);
 			}
 		}
@@ -134,9 +134,9 @@ bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &
 			if (piece->getColor() != color)
 			{
 				PossibleMove move;
-				move.start			 = position;
-				move.end			 = newPosition;
-				move.canCapturePiece = true;
+				move.start = position;
+				move.end   = newPosition;
+				move.type  = MoveType::Capture;
 				addToAvailableMoves(move);
 			}
 		}
@@ -193,9 +193,9 @@ bool MoveHelper::checkMovesInDirection(const Position &position, ChessBoard &boa
 			{
 				if (board.getPiece(newPostion)->getColor() != color)
 				{
-					move.start			 = position;
-					move.end			 = newPostion;
-					move.canCapturePiece = true;
+					move.start = position;
+					move.end   = newPostion;
+					move.type  = MoveType::Capture;
 					addToAvailableMoves(move);
 					break;
 				}

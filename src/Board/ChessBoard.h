@@ -69,6 +69,7 @@ public:
 
 	Position					getKingsPosition(PieceColor player) const;
 
+
 private:
 	std::vector<std::vector<Square>> squares;
 

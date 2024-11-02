@@ -16,6 +16,15 @@
 #include <set>
 #include <unordered_map>
 
+/*
+Handling moves still need to be implemented:
+	- Stalemate
+	- Checkmate
+	- Check
+	- EnPassant
+	- PawnPromotion
+*/
+
 
 class MovementManager
 {
@@ -42,9 +51,18 @@ private:
 	bool													isSquareAttacked(const Position &square, PieceColor attackerColor);
 
 
+	bool													executeCastlingMove(PossibleMove &move);
+
 	std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PieceColor player);
 
 	bool													canCastle(const Position &kingposition, PieceColor player, bool kingside);
+
+
+	bool													executeEnPassantMove(PossibleMove &move);
+
+	PossibleMove											generateEnPassantMove(const Position &position, PieceColor player);
+
+	bool													canEnPassant(const Position &position, PieceColor player);
 
 
 	const Move											   *getLastMove();
