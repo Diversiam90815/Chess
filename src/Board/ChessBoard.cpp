@@ -44,12 +44,6 @@ void ChessBoard::setPiece(Position pos, std::shared_ptr<ChessPiece> piece)
 }
 
 
-// void ChessBoard::setPiece(int x, int y, std::shared_ptr<ChessPiece> piece)
-//{
-//	squares[y][x].piece = piece;
-// }
-
-
 std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PieceColor playerColor)
 {
 	std::vector<PlayerPiece> playerPieces;
@@ -72,7 +66,7 @@ std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PieceColor playerColor)
 }
 
 
-std::shared_ptr<ChessPiece> ChessBoard::getPiece(Position pos)
+std::shared_ptr<ChessPiece>& ChessBoard::getPiece(Position pos)
 {
 	return squares[pos.y][pos.x].piece;
 }

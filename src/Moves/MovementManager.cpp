@@ -85,17 +85,21 @@ bool MovementManager::calculateAllLegalBasicMoves(PieceColor playerColor)
 Move MovementManager::executeMove(PossibleMove &possibleMove)
 {
 	// Store positions in Move from executed PossibleMove
-	Move executedMove		= Move(possibleMove);
+	Move  executedMove		= Move(possibleMove);
 
 	// Store the moved piece type
-	auto movedPiece			= mChessBoard->getPiece(possibleMove.start)->getType();
-	auto player				= mChessBoard->getPiece(possibleMove.start)->getColor();
+	auto &movedPiece		= mChessBoard->getPiece(possibleMove.start);
+	auto  movedPieceType	= movedPiece->getType();
+	auto  player			= mChessBoard->getPiece(possibleMove.start)->getColor();
 
-	executedMove.movedPiece = movedPiece;
+	executedMove.movedPiece = movedPieceType;
 	executedMove.player		= player;
 
+	// Set hasMoved of piece
+	movedPiece->setHasMoved(true);
+
 	// Store if this move captured another piece
-	bool capturedPiece		= possibleMove.type == MoveType::Capture;
+	bool capturedPiece = possibleMove.type == MoveType::Capture;
 	if (capturedPiece)
 	{
 		auto capturedPiece		   = mChessBoard->getPiece(possibleMove.end)->getType();
@@ -125,7 +129,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 		previousHalfMoveClock = getLastMove()->halfMoveClock;
 	}
 
-	if (movedPiece != PieceType::Pawn && !capturedPiece)
+	if (movedPieceType != PieceType::Pawn && !capturedPiece)
 	{
 		executedMove.halfMoveClock = previousHalfMoveClock + 1;
 	}
