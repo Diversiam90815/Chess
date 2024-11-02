@@ -74,4 +74,7 @@ private:
 	std::set<Move>											mMoveHistory;
 
 	std::unique_ptr<ChessBoard>								mChessBoard;
+
+
+	friend class GameManager;
 };

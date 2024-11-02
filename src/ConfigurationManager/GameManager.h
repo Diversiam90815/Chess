@@ -35,5 +35,4 @@ private:
 	Player							 mBlackPlayer;
 
 	std::unique_ptr<MovementManager> mMovementManager;
-
 };
