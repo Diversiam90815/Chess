@@ -21,7 +21,6 @@ Handling moves still need to be implemented:
 	- Stalemate
 	- Checkmate
 	- Check
-	- EnPassant
 	- PawnPromotion
 */
 
@@ -29,7 +28,7 @@ Handling moves still need to be implemented:
 class MovementManager
 {
 public:
-	MovementManager(std::shared_ptr<ChessBoard> board);
+	MovementManager();
 
 	~MovementManager() = default;
 
@@ -70,9 +69,9 @@ private:
 	void													addMoveToHistory(Move &move);
 
 
-	std::shared_ptr<ChessBoard>								board;
-
 	std::unordered_map<Position, std::vector<PossibleMove>> mAllLegalMovesForCurrentRound;
 
 	std::set<Move>											mMoveHistory;
+
+	std::unique_ptr<ChessBoard>								mChessBoard;
 };

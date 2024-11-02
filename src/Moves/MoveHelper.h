@@ -19,16 +19,6 @@
 #include "Player.h"
 
 
-enum MoveType
-{
-	Diagonal = 1,  // Bishop, Queen
-	LinearForward, // Pawns moving
-	Adjacent,	   // King moving one step in any direction
-	File,		   // Rook, Queen moving along vertical lines (files)
-	LShaped		   // Knight's jump
-};
-
-
 class MoveHelper
 {
 public:

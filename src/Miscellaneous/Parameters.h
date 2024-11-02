@@ -45,3 +45,17 @@ enum class PieceColor
 	White,
 	Black
 };
+
+
+enum class MoveType
+{
+	Normal = 1,
+	DoublePawnPush,
+	PawnPromotion,
+	Check,
+	Checkmate,
+	Capture,
+	EnPassant,
+	CastlingQueenside,
+	CastlingKingside
+};

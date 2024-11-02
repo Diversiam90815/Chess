@@ -53,7 +53,7 @@ public:
 
 	void						setPiece(Position pos, std::shared_ptr<ChessPiece> piece);
 
-	void						setPiece(int x, int y, std::shared_ptr<ChessPiece> piece);
+	// void						setPiece(int x, int y, std::shared_ptr<ChessPiece> piece);
 
 	std::vector<PlayerPiece>	getPiecesFromPlayer(PieceColor playerColor);
 

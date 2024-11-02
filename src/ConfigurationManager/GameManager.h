@@ -27,7 +27,6 @@ public:
 
 
 private:
-
 	void							 switchTurns();
 
 	PieceColor						 mCurrentPlayer;
@@ -36,5 +35,5 @@ private:
 	Player							 mBlackPlayer;
 
 	std::unique_ptr<MovementManager> mMovementManager;
-	std::shared_ptr<ChessBoard>		 mChessBoard;
+
 };

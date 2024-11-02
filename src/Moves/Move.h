@@ -15,20 +15,6 @@
 #include <functional>
 
 
-enum class MoveType
-{
-	Normal = 1,
-	DoublePawnPush,
-	PawnPromotion,
-	Check,
-	Checkmate,
-	Capture,
-	EnPassant,
-	CastlingQueenside,
-	CastlingKingside
-};
-
-
 struct Position
 {
 	int	 x = 0;
@@ -97,7 +83,7 @@ struct Move
 
 	int		   number		 = 0; // Storing the current number of this move. Each move saved should increment this number!
 
-	int halfMoveClock = 0;		// Incrememted with every move that is not a capture or pawn move (detect draw if halfMoveClock is 100)
+	int		   halfMoveClock = 0; // Incrememted with every move that is not a capture or pawn move (detect draw if halfMoveClock is 100)
 
 
 	bool	   operator<(const Move &other) const

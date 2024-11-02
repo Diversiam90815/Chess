@@ -14,14 +14,16 @@
 
 
 
-MovementManager::MovementManager(std::shared_ptr<ChessBoard> board) : board(board)
+MovementManager::MovementManager()
 {
+	mChessBoard = std::make_unique<ChessBoard>();
+	mChessBoard->initializeBoard();
 }
 
 
 std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &position)
 {
-	auto piece	= board->getPiece(position);
+	auto piece	= mChessBoard->getPiece(position);
 	auto player = piece->getColor();
 
 	if (mAllLegalMovesForCurrentRound.size() == 0)
@@ -51,11 +53,11 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 
 bool MovementManager::calculateAllLegalBasicMoves(PieceColor playerColor)
 {
-	auto playerPieces = board->getPiecesFromPlayer(playerColor);
+	auto playerPieces = mChessBoard->getPiecesFromPlayer(playerColor);
 
 	for (const auto &[startPosition, piece] : playerPieces)
 	{
-		auto					  possibleMoves = piece->getPossibleMoves(startPosition, *board);
+		auto					  possibleMoves = piece->getPossibleMoves(startPosition, *mChessBoard);
 
 		std::vector<PossibleMove> validMoves;
 		validMoves.reserve(possibleMoves.size()); // Reserve space to avoid reallocations
@@ -86,8 +88,8 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 	Move executedMove		= Move(possibleMove);
 
 	// Store the moved piece type
-	auto movedPiece			= board->getPiece(possibleMove.start)->getType();
-	auto player				= board->getPiece(possibleMove.start)->getColor();
+	auto movedPiece			= mChessBoard->getPiece(possibleMove.start)->getType();
+	auto player				= mChessBoard->getPiece(possibleMove.start)->getColor();
 
 	executedMove.movedPiece = movedPiece;
 	executedMove.player		= player;
@@ -96,7 +98,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 	bool capturedPiece		= possibleMove.type == MoveType::Capture;
 	if (capturedPiece)
 	{
-		auto capturedPiece		   = board->getPiece(possibleMove.end)->getType();
+		auto capturedPiece		   = mChessBoard->getPiece(possibleMove.end)->getType();
 		executedMove.capturedPiece = capturedPiece;
 	}
 
@@ -111,7 +113,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 	}
 	else if (possibleMove.type == MoveType::Normal)
 	{
-		bool result = board->movePiece(possibleMove.start, possibleMove.end);
+		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
 	}
 
 	// Increment or reset the halfMoveClock
@@ -139,7 +141,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 
 bool MovementManager::validateMove(Move &move, PieceColor playerColor)
 {
-	auto kingPosition = board->getKingsPosition(playerColor);
+	auto kingPosition = mChessBoard->getKingsPosition(playerColor);
 
 	if (isKingInCheck(kingPosition, playerColor) && move.startingPosition != kingPosition)
 		return false;
@@ -158,42 +160,38 @@ bool MovementManager::isKingInCheck(Position &ourKing, PieceColor playerColor)
 
 bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor)
 {
-	/*
-	 *  ToDo's:
-	 *	1. Save the current state
-	 *	2. Simulate the move
-	 *	3. Update King's position if if this is the king
-	 *	4. Check if King is under attack (isSquareUnderAttack)
-	 *	5. Revert the move
-	 *	6. Update Kings position back if necessary
-	 */
-
 	bool	 kingInCheck	= false;
 
-	// 1.
-	auto	 movingPiece	= board->getPiece(move.startingPosition);
-	auto	 capturingPiece = board->getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
+	// Save the current state
+	auto	 movingPiece	= mChessBoard->getPiece(move.startingPosition);
+	auto	 capturingPiece = mChessBoard->getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
 
-	Position kingPosition	= board->getKingsPosition(playerColor);
+	Position kingPosition	= mChessBoard->getKingsPosition(playerColor);
 
-	// 2
-	board->setPiece(move.startingPosition, movingPiece);
-	board->removePiece(move.endingPosition);
+	// Simulate the move
+	mChessBoard->setPiece(move.startingPosition, movingPiece);
+	mChessBoard->removePiece(move.endingPosition);
 
-	// 3
-	if (movingPiece->getType() == PieceType::King)
+	// Update King's position if if this is the king
+	bool isKing = movingPiece->getType() == PieceType::King;
+	if (isKing)
 	{
 		kingPosition = move.endingPosition;
 	}
 
-	// 4.
+	// Check if King is under attack (isSquareUnderAttack)
 	kingInCheck = isSquareAttacked(kingPosition, playerColor == PieceColor::White ? PieceColor::Black : PieceColor::White);
 
 
-	// 5.
-	board->setPiece(move.startingPosition, movingPiece);
-	board->setPiece(move.endingPosition, capturingPiece); // This could be nullptr if there was no captured piece
+	// Revert the move
+	mChessBoard->setPiece(move.startingPosition, movingPiece);
+	mChessBoard->setPiece(move.endingPosition, capturingPiece); // This could be nullptr if there was no captured piece
 
+	// Update Kings position back if necessary
+	if (isKing)
+	{
+		kingPosition = move.startingPosition;
+	}
 
 	return kingInCheck;
 }
@@ -202,12 +200,12 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PieceColor playerC
 bool MovementManager::isSquareAttacked(const Position &square, PieceColor attackerColor)
 {
 	// Iterate over all opponent pieces
-	auto opponentPieces = board->getPiecesFromPlayer(attackerColor);
+	auto opponentPieces = mChessBoard->getPiecesFromPlayer(attackerColor);
 
 	for (const auto &[pos, piece] : opponentPieces)
 	{
 		// Get possible moves for the opponent's piece
-		auto moves = piece->getPossibleMoves(pos, *board);
+		auto moves = piece->getPossibleMoves(pos, *mChessBoard);
 
 		for (const auto &move : moves)
 		{
@@ -242,8 +240,8 @@ bool MovementManager::executeCastlingMove(PossibleMove &move)
 		rookEnd	  = Position(kingStart.x - 1, kingStart.y); // Rook moves to the square right of the king
 	}
 
-	board->movePiece(kingStart, kingEnd);
-	board->movePiece(rookStart, rookEnd);
+	mChessBoard->movePiece(kingStart, kingEnd);
+	mChessBoard->movePiece(rookStart, rookEnd);
 
 	return true;
 }
@@ -278,7 +276,7 @@ std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position 
 
 bool MovementManager::canCastle(const Position &kingposition, PieceColor player, bool kingside)
 {
-	auto king	   = board->getPiece(kingposition);
+	auto king	   = mChessBoard->getPiece(kingposition);
 	int	 direction = kingside ? +1 : -1; // Determine the direction of castling
 
 	if (king->getHasMoved())
@@ -291,9 +289,8 @@ bool MovementManager::canCastle(const Position &kingposition, PieceColor player,
 	// Determine the rook's position based on the direction
 	int		 rookX = (direction == 1) ? 7 : 0; // 7 for kingside (h-file), 0 for queenside (a-file)
 	Position rookPosition{rookX, y};
-	auto	 rook = board->getPiece(rookPosition);
+	auto	 rook = mChessBoard->getPiece(rookPosition);
 
-	// Check if the rook exists, is of the correct type, color, and has not moved
 	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->getHasMoved())
 		return false;
 
@@ -301,7 +298,7 @@ bool MovementManager::canCastle(const Position &kingposition, PieceColor player,
 	for (int x = kingX + direction; x != rookX; x += direction)
 	{
 		Position pos{x, y};
-		if (!board->isEmpty(pos))
+		if (!mChessBoard->isEmpty(pos))
 			return false;
 	}
 
@@ -330,8 +327,8 @@ bool MovementManager::executeEnPassantMove(PossibleMove &move, PieceColor player
 		capturedPawnPosition = Position(move.end.x, move.end.y + 1);
 	}
 
-	board->movePiece(move.start, move.end);
-	board->removePiece(capturedPawnPosition);
+	mChessBoard->movePiece(move.start, move.end);
+	mChessBoard->removePiece(capturedPawnPosition);
 
 	return true;
 }
