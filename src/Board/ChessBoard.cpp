@@ -54,7 +54,7 @@ std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PlayerColor playerColor
 		for (int x = 0; x < BOARD_SIZE; ++x)
 		{
 			Position pos{x, y};
-			auto	 piece = getPiece(pos);
+			auto	&piece = getPiece(pos);
 			if (piece && piece->getColor() == playerColor)
 			{
 				playerPieces.emplace_back(pos, piece);
@@ -66,7 +66,7 @@ std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PlayerColor playerColor
 }
 
 
-std::shared_ptr<ChessPiece>& ChessBoard::getPiece(Position pos)
+std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos)
 {
 	return squares[pos.y][pos.x].piece;
 }
@@ -80,7 +80,7 @@ void ChessBoard::removePiece(Position pos)
 
 bool ChessBoard::movePiece(Position start, Position end)
 {
-	auto piece = getPiece(start);
+	auto &piece = getPiece(start);
 	if (!piece)
 		return false;
 

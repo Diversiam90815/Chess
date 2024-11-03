@@ -17,26 +17,6 @@
 
 class ChessBoard;
 
-//
-// enum PieceType
-//{
-//	DefaultType,
-//	Pawn,
-//	Knight,
-//	Bishop,
-//	Rook,
-//	Queen,
-//	King
-//};
-//
-//
-// enum PlayerColor
-//{
-//	NoColor,
-//	White,
-//	Black
-//};
-
 
 class ChessPiece
 {
@@ -74,9 +54,9 @@ public:
 
 
 protected:
-	PieceType  type;
+	PieceType	type;
 
 	PlayerColor color;
 
-	bool	   hasMoved;
+	bool		hasMoved;
 };

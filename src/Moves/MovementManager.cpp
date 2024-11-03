@@ -21,8 +21,8 @@ MovementManager::MovementManager()
 
 std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &position)
 {
-	auto piece	= mChessBoard->getPiece(position);
-	auto player = piece->getColor();
+	auto &piece	 = mChessBoard->getPiece(position);
+	auto  player = piece->getColor();
 
 	if (mAllLegalMovesForCurrentRound.size() == 0)
 		calculateAllLegalBasicMoves(player);
@@ -217,8 +217,8 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor player
 	bool	 kingInCheck	= false;
 
 	// Save the current state
-	auto	 movingPiece	= mChessBoard->getPiece(move.startingPosition);
-	auto	 capturingPiece = mChessBoard->getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
+	auto	&movingPiece	= mChessBoard->getPiece(move.startingPosition);
+	auto	&capturingPiece = mChessBoard->getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
 
 	Position kingPosition	= mChessBoard->getKingsPosition(playerColor);
 
@@ -330,8 +330,8 @@ std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position 
 
 bool MovementManager::canCastle(const Position &kingposition, PlayerColor player, bool kingside)
 {
-	auto king	   = mChessBoard->getPiece(kingposition);
-	int	 direction = kingside ? +1 : -1; // Determine the direction of castling
+	auto &king		= mChessBoard->getPiece(kingposition);
+	int	  direction = kingside ? +1 : -1; // Determine the direction of castling
 
 	if (king->getHasMoved())
 		return false;
@@ -343,7 +343,7 @@ bool MovementManager::canCastle(const Position &kingposition, PlayerColor player
 	// Determine the rook's position based on the direction
 	int		 rookX = (direction == 1) ? 7 : 0; // 7 for kingside (h-file), 0 for queenside (a-file)
 	Position rookPosition{rookX, y};
-	auto	 rook = mChessBoard->getPiece(rookPosition);
+	auto	&rook = mChessBoard->getPiece(rookPosition);
 
 	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->getHasMoved())
 		return false;

@@ -95,7 +95,7 @@ bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, 
 		move.start = position;
 		move.end   = newPosition;
 
-        if ((color == PlayerColor::White && newY == 8) || (color == PlayerColor::Black && newY == 1))
+		if ((color == PlayerColor::White && newY == 8) || (color == PlayerColor::Black && newY == 1))
 		{
 			move.type = MoveType::PawnPromotion;
 		}
@@ -136,7 +136,7 @@ bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &
 
 		if (checkForBorders(newX, newY) && !board.isEmpty(newPosition))
 		{
-			const auto piece = board.getPiece(newPosition);
+			const auto &piece = board.getPiece(newPosition);
 			if (piece->getColor() != color)
 			{
 				PossibleMove move;
