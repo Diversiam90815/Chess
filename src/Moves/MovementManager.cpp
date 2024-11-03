@@ -155,6 +155,8 @@ bool MovementManager::validateMove(Move &move, PieceColor playerColor)
 
 	if (wouldKingBeInCheckAfterMove(move, playerColor))
 		return false;
+
+	return true;
 }
 
 
