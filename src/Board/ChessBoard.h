@@ -22,12 +22,21 @@
 #include "Queen.h"
 #include "King.h"
 
+using PlayerPiece = std::pair<Position, std::shared_ptr<ChessPiece>>;
+
 
 struct Square
 {
-	int							x;
-	int							y;
+	Position					pos;
 	std::shared_ptr<ChessPiece> piece;
+
+	Square(int x, int y) : pos{x, y}, piece(nullptr)
+	{
+	}
+
+	Square() : pos{0, 0}, piece(nullptr)
+	{
+	}
 };
 
 
@@ -38,27 +47,31 @@ public:
 	~ChessBoard();
 
 
-	void						initializeBoard();
+	void						 initializeBoard();
 
-	Square					   &getSquare(int x, int y);
+	Square						&getSquare(Position pos);
 
-	void						setPiece(int x, int y, std::shared_ptr<ChessPiece> piece);
+	void						 setPiece(Position pos, std::shared_ptr<ChessPiece> piece);
 
-	std::shared_ptr<ChessPiece> getPiece(int x, int y);
+	std::vector<PlayerPiece>	 getPiecesFromPlayer(PieceColor playerColor);
 
-	void						removePiece(int x, int y);
+	std::shared_ptr<ChessPiece> &getPiece(Position pos);
 
-	bool						movePiece(int fromX, int fromY, int toX, int toY);
+	void						 removePiece(Position pos);
 
-	bool						isEmpty(int x, int y) const;
+	bool						 movePiece(Position start, Position end);
 
-	const Move				   *getLastMove();
+	bool						 isEmpty(Position pos) const;
 
-	void						addMoveToHistory(const Move &move);
+	void						 updateKingsPosition(Position &pos, PieceColor player);
+
+	Position					 getKingsPosition(PieceColor player) const;
 
 
 private:
 	std::vector<std::vector<Square>> squares;
 
-	std::vector<Move>				 moveHistory;
+	Position						 mWhiteKingPosition;
+
+	Position						 mBlackKingPosition;
 };

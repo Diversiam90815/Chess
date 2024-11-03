@@ -13,12 +13,6 @@
 #include "ChessBoard.h"
 
 
-int Queen::getPieceValue() const
-{
-	return queenValue;
-}
-
-
 std::vector<PossibleMove> Queen::getPossibleMoves(const Position &pos, ChessBoard &board) const
 {
 	MoveHelper helper;

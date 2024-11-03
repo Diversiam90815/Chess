@@ -8,38 +8,71 @@
   ==============================================================================
 */
 
-
 #pragma once
 
 #include "ChessBoard.h"
 #include "Move.h"
+#include <set>
+#include <unordered_map>
 
 
 class MovementManager
 {
 public:
-	MovementManager(ChessBoard &board);
+	MovementManager();
 
-	bool isValidMove(const Move &move, PieceColor playerColor);
-	bool executeMove(const Move &move);
+	~MovementManager() = default;
 
-	bool isKingInCheck(PieceColor color);
-	bool isCheckmate(PieceColor color);
-	bool isStalemate(PieceColor color);
+
+	std::vector<PossibleMove> getMovesForPosition(Position &position);
+
+	bool					  calculateAllLegalBasicMoves(PieceColor playerColor);
+
+	Move					  executeMove(PossibleMove &executedMove, PieceType pawnPromotion = PieceType::DefaultType);
+
 
 private:
-	ChessBoard &board;
+	bool													validateMove(Move &move, PieceColor playerColor);
 
-	bool		wouldKingBeInCheckAfterMove(const Move &move, PieceColor color);
-	bool		isSquareUnderAttack(int x, int y, PieceColor color);
+	bool													isKingInCheck(Position &ourKing, PieceColor playerColor);
 
-	bool		isCastlingMove(const Move &move, PieceColor color);
-	bool		validateCastling(const Move &move, PieceColor color);
-	void		performCastling(const Move &move);
+	bool													isCheckmate(PieceColor player);
 
-	bool		isEnPassantMove(const Move &move, PieceColor color);
-	bool		validateEnPassant(const Move &move, PieceColor color);
-	void		performEnPassant(const Move &move);
+	bool													isStalemate(PieceColor player);
 
-	void		promotePawn(int x, int y, PieceColor color, PieceType promotionType);
+	bool													wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor);
+
+	bool													isSquareAttacked(const Position &square, PieceColor attackerColor);
+
+
+	bool													executeCastlingMove(PossibleMove &move);
+
+	std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PieceColor player);
+
+	bool													canCastle(const Position &kingposition, PieceColor player, bool kingside);
+
+
+	bool													executeEnPassantMove(PossibleMove &move, PieceColor player);
+
+	PossibleMove											generateEnPassantMove(const Position &position, PieceColor player);
+
+	bool													canEnPassant(const Position &position, PieceColor player);
+
+
+	bool													executePawnPromotion(const PossibleMove &move, PieceType promotedType);
+
+
+	const Move											   *getLastMove();
+
+	void													addMoveToHistory(Move &move);
+
+
+	std::unordered_map<Position, std::vector<PossibleMove>> mAllLegalMovesForCurrentRound;
+
+	std::set<Move>											mMoveHistory;
+
+	std::unique_ptr<ChessBoard>								mChessBoard;
+
+
+	friend class GameManager;
 };

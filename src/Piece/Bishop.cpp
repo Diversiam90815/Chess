@@ -13,12 +13,6 @@
 #include "ChessBoard.h"
 
 
-int Bishop::getPieceValue() const
-{
-	return bishopValue;
-}
-
-
 std::vector<PossibleMove> Bishop::getPossibleMoves(const Position &pos, ChessBoard &board) const
 {
 	MoveHelper helper;

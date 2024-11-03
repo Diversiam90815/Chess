@@ -70,8 +70,6 @@ public:
 	}
 
 
-	virtual int						  getPieceValue() const											 = 0;
-
 	virtual std::vector<PossibleMove> getPossibleMoves(const Position &pos, ChessBoard &board) const = 0;
 
 

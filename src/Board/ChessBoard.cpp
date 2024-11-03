@@ -13,12 +13,13 @@
 #include "ChessPiece.h"
 
 
+
 ChessBoard::ChessBoard()
 {
-	squares.resize(8);
-	for (int y = 0; y < 8; ++y)
+	squares.resize(BOARD_SIZE);
+	for (int y = 0; y < BOARD_SIZE; ++y)
 	{
-		for (int x = 0; x < 8; ++x)
+		for (int x = 0; x < BOARD_SIZE; ++x)
 		{
 			squares[y].emplace_back(x, y);
 		}
@@ -31,91 +32,110 @@ ChessBoard::~ChessBoard()
 }
 
 
-Square & ChessBoard::getSquare(int x, int y)
+Square &ChessBoard::getSquare(Position pos)
 {
-	return squares[y][x];
+	return squares[pos.y][pos.x];
 }
 
 
-void ChessBoard::setPiece(int x, int y, std::shared_ptr<ChessPiece> piece)
+void ChessBoard::setPiece(Position pos, std::shared_ptr<ChessPiece> piece)
 {
-	squares[y][x].piece = piece;
+	squares[pos.y][pos.x].piece = piece;
 }
 
 
-
-std::shared_ptr<ChessPiece> ChessBoard::getPiece(int x, int y)
+std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PieceColor playerColor)
 {
-	return squares[y][y].piece;
+	std::vector<PlayerPiece> playerPieces;
+	playerPieces.reserve(PLAYER_PIECES_NUM * sizeof(PlayerPiece));
+
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			Position pos{x, y};
+			auto	 piece = getPiece(pos);
+			if (piece && piece->getColor() == playerColor)
+			{
+				playerPieces.emplace_back(pos, piece);
+			}
+		}
+	}
+
+	return playerPieces;
 }
 
 
-void ChessBoard::removePiece(int x, int y)
+std::shared_ptr<ChessPiece>& ChessBoard::getPiece(Position pos)
 {
-	squares[y][x].piece = nullptr;
+	return squares[pos.y][pos.x].piece;
 }
 
 
-bool ChessBoard::movePiece(int fromX, int fromY, int toX, int toY)
+void ChessBoard::removePiece(Position pos)
 {
-	auto piece = getPiece(fromX, fromY);
+	squares[pos.y][pos.x].piece = nullptr;
+}
+
+
+bool ChessBoard::movePiece(Position start, Position end)
+{
+	auto piece = getPiece(start);
 	if (!piece)
 		return false;
 
-	removePiece(fromX, fromY);
-	setPiece(toX, toY, piece);
+	removePiece(start);
+	setPiece(end, piece);
 	piece->setHasMoved(true);
 	return true;
 }
 
 
-bool ChessBoard::isEmpty(int x, int y) const
+bool ChessBoard::isEmpty(Position pos) const
 {
-	return squares[y][x].piece == nullptr;
+	return squares[pos.y][pos.x].piece == nullptr;
 }
 
 
-const Move *ChessBoard::getLastMove()
+void ChessBoard::updateKingsPosition(Position &pos, PieceColor player)
 {
-	if (moveHistory.empty())
-		return nullptr;
-	return &moveHistory.back();
+	player == PieceColor::White ? mWhiteKingPosition = pos : mBlackKingPosition = pos;
 }
 
 
-void ChessBoard::addMoveToHistory(const Move &move)
+Position ChessBoard::getKingsPosition(PieceColor player) const
 {
-	moveHistory.push_back(move);
+	return player == PieceColor::White ? mWhiteKingPosition : mBlackKingPosition;
 }
 
 
 void ChessBoard::initializeBoard()
 {
 	// Place pieces for White
-	setPiece(0, 0, std::make_shared<Rook>(PieceColor::White));
-	setPiece(1, 0, std::make_shared<Knight>(PieceColor::White));
-	setPiece(2, 0, std::make_shared<Bishop>(PieceColor::White));
-	setPiece(3, 0, std::make_shared<Queen>(PieceColor::White));
-	setPiece(4, 0, std::make_shared<King>(PieceColor::White));
-	setPiece(5, 0, std::make_shared<Bishop>(PieceColor::White));
-	setPiece(6, 0, std::make_shared<Knight>(PieceColor::White));
-	setPiece(7, 0, std::make_shared<Rook>(PieceColor::White));
-	for (int x = 0; x < 8; ++x)
+	setPiece(Position(0, 0), std::make_shared<Rook>(PieceColor::White));
+	setPiece(Position(1, 0), std::make_shared<Knight>(PieceColor::White));
+	setPiece(Position(2, 0), std::make_shared<Bishop>(PieceColor::White));
+	setPiece(Position(3, 0), std::make_shared<Queen>(PieceColor::White));
+	setPiece(Position(4, 0), std::make_shared<King>(PieceColor::White));
+	setPiece(Position(5, 0), std::make_shared<Bishop>(PieceColor::White));
+	setPiece(Position(6, 0), std::make_shared<Knight>(PieceColor::White));
+	setPiece(Position(7, 0), std::make_shared<Rook>(PieceColor::White));
+	for (int x = 0; x < BOARD_SIZE; ++x)
 	{
-		setPiece(x, 1, std::make_shared<Pawn>(PieceColor::White));
+		setPiece(Position(x, 1), std::make_shared<Pawn>(PieceColor::White));
 	}
 
 	// Place pieces for Black
-	setPiece(0, 7, std::make_shared<Rook>(PieceColor::Black));
-	setPiece(1, 7, std::make_shared<Knight>(PieceColor::Black));
-	setPiece(2, 7, std::make_shared<Bishop>(PieceColor::Black));
-	setPiece(3, 7, std::make_shared<Queen>(PieceColor::Black));
-	setPiece(4, 7, std::make_shared<King>(PieceColor::Black));
-	setPiece(5, 7, std::make_shared<Bishop>(PieceColor::Black));
-	setPiece(6, 7, std::make_shared<Knight>(PieceColor::Black));
-	setPiece(7, 7, std::make_shared<Rook>(PieceColor::Black));
-	for (int x = 0; x < 8; ++x)
+	setPiece(Position(0, 7), std::make_shared<Rook>(PieceColor::Black));
+	setPiece(Position(1, 7), std::make_shared<Knight>(PieceColor::Black));
+	setPiece(Position(2, 7), std::make_shared<Bishop>(PieceColor::Black));
+	setPiece(Position(3, 7), std::make_shared<Queen>(PieceColor::Black));
+	setPiece(Position(4, 7), std::make_shared<King>(PieceColor::Black));
+	setPiece(Position(5, 7), std::make_shared<Bishop>(PieceColor::Black));
+	setPiece(Position(6, 7), std::make_shared<Knight>(PieceColor::Black));
+	setPiece(Position(7, 7), std::make_shared<Rook>(PieceColor::Black));
+	for (int x = 0; x < BOARD_SIZE; ++x)
 	{
-		setPiece(x, 6, std::make_shared<Pawn>(PieceColor::Black));
+		setPiece(Position(x, 6), std::make_shared<Pawn>(PieceColor::Black));
 	}
 }

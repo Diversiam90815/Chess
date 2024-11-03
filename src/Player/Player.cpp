@@ -70,3 +70,35 @@ void Player::setPlayerColor(PieceColor value)
 		mPlayerColor = value;
 	}
 }
+
+
+void Player::addCapturedPiece(const PieceType piece)
+{
+	mCapturedPieces.push_back(piece);
+}
+
+
+void Player::updateScore()
+{
+	int score = 0;
+	for (auto piece : mCapturedPieces)
+	{
+		score += getPieceValue(piece);
+	}
+	setScore(score);
+}
+
+
+constexpr int Player::getPieceValue(PieceType piece)
+{
+	switch (piece)
+	{
+	case PieceType::Pawn: return pawnValue;
+	case PieceType::Knight: return knightValue;
+	case PieceType::Bishop: return bishopValue;
+	case PieceType::Rook: return rookValue;
+	case PieceType::Queen: return queenValue;
+	case PieceType::King: return kingValue;
+	default: return 0;
+	}
+}

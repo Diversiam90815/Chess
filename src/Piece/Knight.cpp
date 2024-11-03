@@ -13,12 +13,6 @@
 #include "ChessBoard.h"
 
 
-int Knight::getPieceValue() const
-{
-	return knightValue;
-}
-
-
 std::vector<PossibleMove> Knight::getPossibleMoves(const Position &pos, ChessBoard &board) const
 {
 	MoveHelper helper;

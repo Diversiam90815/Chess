@@ -13,11 +13,6 @@
 #include "ChessBoard.h"
 
 
-int Pawn::getPieceValue() const
-{
-	return pawnValue;
-}
-
 
 std::vector<PossibleMove> Pawn::getPossibleMoves(const Position &pos, ChessBoard &board) const
 {

@@ -25,24 +25,28 @@ public:
 	~Player();
 
 
-	bool isOnTurn() const;
+	bool		  isOnTurn() const;
+	void		  setOnTurn(bool value);
 
-	void setOnTurn(bool value);
+	int			  getScore() const;
+	void		  setScore(int value);
 
-	int	 getScore() const;
-	void setScore(int value);
+	PieceColor	  getPlayerColor() const;
+	void		  setPlayerColor(PieceColor value);
 
-	PieceColor getPlayerColor() const;
-	void	   setPlayerColor(PieceColor value);
 
+	void		  addCapturedPiece(const PieceType piece);
+
+	void		  updateScore();
+
+	constexpr int getPieceValue(PieceType piece);
 
 private:
+	PieceColor			   mPlayerColor = PieceColor::NoColor;
 
-	PieceColor				mPlayerColor = PieceColor::NoColor;
+	std::vector<PieceType> mCapturedPieces;
 
-	std::vector<ChessPiece> mCapturedPieces;
+	bool				   mIsCurrentTurn = false;
 
-	bool					mIsCurrentTurn = false;
-
-	int						mScore		  = 0;
+	int					   mScore		  = 0;
 };

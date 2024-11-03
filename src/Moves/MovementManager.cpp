@@ -8,395 +8,516 @@
   ==============================================================================
 */
 
-
 #include "MovementManager.h"
 #include <algorithm>
 
 
-MovementManager::MovementManager(ChessBoard &board) : board(board)
+MovementManager::MovementManager()
 {
+	mChessBoard = std::make_unique<ChessBoard>();
+	mChessBoard->initializeBoard();
 }
 
 
-bool MovementManager::isValidMove(const Move &move, PieceColor playerColor)
+std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &position)
 {
-	//// Basic validations
-	//if (move.X < 0 || move.X > 7 || move.Y < 0 || move.Y > 7 || move.toX < 0 || move.toX > 7 || move.toY < 0 || move.toY > 7)
-	//{
-	//	return false;
-	//}
+	auto piece	= mChessBoard->getPiece(position);
+	auto player = piece->getColor();
 
-	//auto piece = board.getPiece(move.X, move.Y);
-	//if (!piece || piece->getColor() != playerColor)
-	//{
-	//	return false;
-	//}
+	if (mAllLegalMovesForCurrentRound.size() == 0)
+		calculateAllLegalBasicMoves(player);
 
-	//auto targetPiece = board.getPiece(move.toX, move.toY);
-	//if (targetPiece && targetPiece->getColor() == playerColor)
-	//{
-	//	return false; // Cannot capture own piece
-	//}
+	auto &possibleMoves = mAllLegalMovesForCurrentRound[position];
 
-	//// Piece-specific move validation
-	//if (!piece->isValidMove(move.X, move.Y, move.toX, move.toY, board))
-	//{
-	//	return false;
-	//}
+	// Add special moves available for this position to the possibleMoves
+	if (piece->getType() == PieceType::King)
+	{
+		auto castlingMoves = generateCastlingMoves(position, player);
+		for (auto &move : castlingMoves)
+		{
+			possibleMoves.push_back(move);
+		}
+	}
 
-	//// Handle special moves
-	//if (isCastlingMove(move, playerColor))
-	//{
-	//	if (!validateCastling(move, playerColor))
-	//	{
-	//		return false;
-	//	}
-	//}
-	//else if (isEnPassantMove(move, playerColor))
-	//{
-	//	if (!validateEnPassant(move, playerColor))
-	//	{
-	//		return false;
-	//	}
-	//}
+	if (piece->getType() == PieceType::Pawn)
+	{
+		auto enPasssantMove = generateEnPassantMove(position, player);
+		possibleMoves.push_back(enPasssantMove);
+	}
 
-	//// Simulate the move and check for king safety
-	//if (wouldKingBeInCheckAfterMove(move, playerColor))
-	//{
-	//	return false;
-	//}
+	return possibleMoves;
+}
+
+
+bool MovementManager::calculateAllLegalBasicMoves(PieceColor playerColor)
+{
+	auto playerPieces = mChessBoard->getPiecesFromPlayer(playerColor);
+
+	for (const auto &[startPosition, piece] : playerPieces)
+	{
+		auto					  possibleMoves = piece->getPossibleMoves(startPosition, *mChessBoard);
+
+		std::vector<PossibleMove> validMoves;
+		validMoves.reserve(possibleMoves.size()); // Reserve space to avoid reallocations
+
+		for (const auto &possibleMove : possibleMoves)
+		{
+			Move testMove(possibleMove.start, possibleMove.end, piece->getType());
+
+			// Validate the move
+			if (!validateMove(testMove, playerColor))
+			{
+				validMoves.push_back(possibleMove);
+			}
+		}
+
+		if (!validMoves.empty())
+		{
+			mAllLegalMovesForCurrentRound.emplace(startPosition, std::move(validMoves));
+		}
+	}
+	return mAllLegalMovesForCurrentRound.size() != 0;
+}
+
+
+Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnPromotion)
+{
+	// Store positions in Move from executed PossibleMove
+	Move  executedMove		= Move(possibleMove);
+
+	// Store the moved piece type
+	auto &movedPiece		= mChessBoard->getPiece(possibleMove.start);
+	auto  movedPieceType	= movedPiece->getType();
+	auto  player			= mChessBoard->getPiece(possibleMove.start)->getColor();
+
+	executedMove.movedPiece = movedPieceType;
+	executedMove.player		= player;
+
+	// Set hasMoved of piece
+	movedPiece->setHasMoved(true);
+
+	// Store if this move captured another piece
+	bool capturedPiece = possibleMove.type == MoveType::Capture;
+	if (capturedPiece)
+	{
+		auto capturedPiece		   = mChessBoard->getPiece(possibleMove.end)->getType();
+		executedMove.capturedPiece = capturedPiece;
+	}
+
+	if (possibleMove.type == MoveType::EnPassant)
+	{
+		executeEnPassantMove(possibleMove, player);
+	}
+	else if (possibleMove.type == MoveType::CastlingKingside || possibleMove.type == MoveType::CastlingQueenside)
+	{
+		executeCastlingMove(possibleMove);
+	}
+	else if (possibleMove.type == MoveType::Normal)
+	{
+		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
+	}
+	else if (possibleMove.type == MoveType::PawnPromotion)
+	{
+		executePawnPromotion(possibleMove, pawnPromotion);
+		executedMove.promotionType = pawnPromotion;
+	}
+
+
+	// Increment or reset the halfMoveClock
+
+	int previousHalfMoveClock = 0;
+
+	if (!mMoveHistory.empty())
+	{
+		previousHalfMoveClock = getLastMove()->halfMoveClock;
+	}
+
+	if (movedPieceType != PieceType::Pawn && !capturedPiece)
+	{
+		executedMove.halfMoveClock = previousHalfMoveClock + 1;
+	}
+	else
+	{
+		executedMove.halfMoveClock = 0;
+	}
+
+	addMoveToHistory(executedMove);
+	return executedMove;
+}
+
+
+bool MovementManager::validateMove(Move &move, PieceColor playerColor)
+{
+	auto kingPosition = mChessBoard->getKingsPosition(playerColor);
+
+	if (isKingInCheck(kingPosition, playerColor) && move.startingPosition != kingPosition)
+		return false;
+
+	if (wouldKingBeInCheckAfterMove(move, playerColor))
+		return false;
+}
+
+
+bool MovementManager::isKingInCheck(Position &ourKing, PieceColor playerColor)
+{
+	PieceColor opponentColor = playerColor == PieceColor::White ? PieceColor::Black : PieceColor::White;
+	return isSquareAttacked(ourKing, opponentColor);
+}
+
+
+bool MovementManager::isCheckmate(PieceColor player)
+{
+	Position kingPosition = mChessBoard->getKingsPosition(player);
+	if (!isKingInCheck(kingPosition, player))
+		return false; // If the king is not in check, it's not checkmate
+
+	// If the king is in check, check if there are any moves that can escape check
+	auto playerPieces = mChessBoard->getPiecesFromPlayer(player);
+	for (const auto &[startPosition, piece] : playerPieces)
+	{
+		auto possibleMoves = piece->getPossibleMoves(startPosition, *mChessBoard);
+
+		for (const auto &move : possibleMoves)
+		{
+			Move testMove(startPosition, move.end, piece->getType());
+
+			if (!wouldKingBeInCheckAfterMove(testMove, player))
+			{
+				return false; // If there's a legal move that stops check, it's not checkmate
+			}
+		}
+	}
+
+	// No legal move can stop the check; it's checkmate
+	return true;
+}
+
+
+bool MovementManager::isStalemate(PieceColor player)
+{
+	Position kingPosition = mChessBoard->getKingsPosition(player);
+	if (isKingInCheck(kingPosition, player))
+		return false;
+
+	if (!calculateAllLegalBasicMoves(player))
+	{
+		// If no legal moves are available and king is not in check, it's stalemate
+		return true;
+	}
+
+	// Legal moves are available, so it's not stalemate
+	return false;
+}
+
+
+bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor)
+{
+	bool	 kingInCheck	= false;
+
+	// Save the current state
+	auto	 movingPiece	= mChessBoard->getPiece(move.startingPosition);
+	auto	 capturingPiece = mChessBoard->getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
+
+	Position kingPosition	= mChessBoard->getKingsPosition(playerColor);
+
+	// Simulate the move
+	mChessBoard->setPiece(move.startingPosition, movingPiece);
+	mChessBoard->removePiece(move.endingPosition);
+
+	// Update King's position if if this is the king
+	bool isKing = movingPiece->getType() == PieceType::King;
+	if (isKing)
+	{
+		kingPosition = move.endingPosition;
+	}
+
+	// Check if King is under attack (isSquareUnderAttack)
+	kingInCheck = isSquareAttacked(kingPosition, playerColor == PieceColor::White ? PieceColor::Black : PieceColor::White);
+
+
+	// Revert the move
+	mChessBoard->setPiece(move.startingPosition, movingPiece);
+	mChessBoard->setPiece(move.endingPosition, capturingPiece); // This could be nullptr if there was no captured piece
+
+	// Update Kings position back if necessary
+	if (isKing)
+	{
+		kingPosition = move.startingPosition;
+	}
+
+	return kingInCheck;
+}
+
+
+bool MovementManager::isSquareAttacked(const Position &square, PieceColor attackerColor)
+{
+	// Iterate over all opponent pieces
+	auto opponentPieces = mChessBoard->getPiecesFromPlayer(attackerColor);
+
+	for (const auto &[pos, piece] : opponentPieces)
+	{
+		// Get possible moves for the opponent's piece
+		auto moves = piece->getPossibleMoves(pos, *mChessBoard);
+
+		for (const auto &move : moves)
+		{
+			if (move.end == square)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+bool MovementManager::executeCastlingMove(PossibleMove &move)
+{
+	Position kingStart = move.start;
+	Position kingEnd;
+	Position rookStart;
+	Position rookEnd;
+
+	if (move.type == MoveType::CastlingKingside)
+	{
+		kingEnd	  = Position(kingStart.x + 2, kingStart.y); // King moves two squares right
+		rookStart = Position(kingStart.x + 3, kingStart.y); // Rook's original position
+		rookEnd	  = Position(kingStart.x + 1, kingStart.y); // Rook moves to the square left of the king
+	}
+	else if (move.type == MoveType::CastlingQueenside)
+	{
+		kingEnd	  = Position(kingStart.x - 2, kingStart.y); // King moves two squares left
+		rookStart = Position(kingStart.x - 4, kingStart.y); // Rook's original position
+		rookEnd	  = Position(kingStart.x - 1, kingStart.y); // Rook moves to the square right of the king
+	}
+
+	mChessBoard->movePiece(kingStart, kingEnd);
+	mChessBoard->movePiece(rookStart, rookEnd);
 
 	return true;
 }
 
 
-bool MovementManager::executeMove(const Move &move)
+std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position &kingPosition, PieceColor player)
 {
-	//auto piece = board.getPiece(move.Y, move.X);
-	//if (!piece)
-	//	return false;
+	std::vector<PossibleMove> castlingMoves;
+	castlingMoves.reserve(2 * sizeof(castlingMoves)); // There are max. of 2 moves of castling
 
-	//// Handle special moves
-	//if (move.isCastling)
-	//{
-	//	performCastling(move);
-	//}
-	//else if (move.isEnPassant)
-	//{
-	//	performEnPassant(move);
-	//}
-	//else
-	//{
-	//	// Regular move
-	//	board.setPiece(move.toX, move.toY, piece);
-	//	board.setPiece(move.X, move.Y, nullptr);
-	//	if (move.capturedPiece != PieceType::DefaultType)
-	//	{
-	//		// Capture the piece (already removed from the board)
-	//	}
-	//}
+	if (canCastle(kingPosition, player, true))
+	{
+		PossibleMove kingsideCastling;
+		kingsideCastling.start = kingPosition;
+		kingsideCastling.end   = Position{kingPosition.x + 2, kingPosition.y};
+		kingsideCastling.type  = MoveType::CastlingKingside;
+		castlingMoves.push_back(kingsideCastling);
+	}
 
-	//// Update piece state
-	//piece->setHasMoved(true);
+	if (canCastle(kingPosition, player, false))
+	{
+		PossibleMove queensideCastling;
+		queensideCastling.start = kingPosition;
+		queensideCastling.end	= Position{kingPosition.x - 2, kingPosition.y};
+		queensideCastling.type	= MoveType::CastlingQueenside;
+		castlingMoves.push_back(queensideCastling);
+	}
 
-	//// Handle pawn promotion
-	//if (piece->getType() == PieceType::Pawn && (move.toY == 0 || move.toY == 7))
-	//{
-	//	promotePawn(move.toX, move.toY, piece->getColor(), move.promotionType);
-	//}
+	return castlingMoves;
+}
+
+
+bool MovementManager::canCastle(const Position &kingposition, PieceColor player, bool kingside)
+{
+	auto king	   = mChessBoard->getPiece(kingposition);
+	int	 direction = kingside ? +1 : -1; // Determine the direction of castling
+
+	if (king->getHasMoved())
+		return false;
+
+	// Define the y-coordinate and king's x-coordinate
+	int		 y	   = kingposition.y;
+	int		 kingX = kingposition.x;
+
+	// Determine the rook's position based on the direction
+	int		 rookX = (direction == 1) ? 7 : 0; // 7 for kingside (h-file), 0 for queenside (a-file)
+	Position rookPosition{rookX, y};
+	auto	 rook = mChessBoard->getPiece(rookPosition);
+
+	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->getHasMoved())
+		return false;
+
+	// Check if way is free
+	for (int x = kingX + direction; x != rookX; x += direction)
+	{
+		Position pos{x, y};
+		if (!mChessBoard->isEmpty(pos))
+			return false;
+	}
+
+	// Check if way is under attack
+	std::vector<Position> positionsToCheck = {{kingX + direction, y}, {kingX + 2 * direction, y}};
+	for (const auto &pos : positionsToCheck)
+	{
+		Move testMove(kingposition, pos, PieceType::King);
+		if (wouldKingBeInCheckAfterMove(testMove, player))
+			return false;
+	}
 
 	return true;
 }
 
 
-bool MovementManager::isKingInCheck(PieceColor color)
+bool MovementManager::executeEnPassantMove(PossibleMove &move, PieceColor player)
 {
-	//// Find the king's position
-	//int kingX = -1, kingY = -1;
-	//for (int y = 0; y < 8; ++y)
-	//{
-	//	for (int x = 0; x < 8; ++x)
-	//	{
-	//		auto piece = board.getPiece(x, y);
-	//		if (piece && piece->getType() == PieceType::King && piece->getColor() == color)
-	//		{
-	//			kingX = x;
-	//			kingY = y;
-	//			break;
-	//		}
-	//	}
-	//	if (kingX != -1)
-	//		break;
-	//}
-	//if (kingX == -1)
-	//	return true; // King not found
+	Position capturedPawnPosition;
+	if (player == PieceColor::White)
+	{
+		capturedPawnPosition = Position(move.end.x, move.end.y - 1);
+	}
+	else
+	{
+		capturedPawnPosition = Position(move.end.x, move.end.y + 1);
+	}
 
-	//return isSquareUnderAttack(kingX, kingY, color);
-	return false;
-}
-
-
-bool MovementManager::isSquareUnderAttack(int x, int y, PieceColor color)
-{
-	//PieceColor opponentColor = (color == PieceColor::White) ? PieceColor::Black : PieceColor::White;
-	//for (int y1 = 0; y1 < 8; ++y1)
-	//{
-	//	for (int x1 = 0; x1 < 8; ++x1)
-	//	{
-	//		auto piece = board.getPiece(x1, y1);
-	//		if (piece && piece->getColor() == opponentColor)
-	//		{
-	//			if (piece->isValidMove(x1, y1, x, y, board))
-	//			{
-	//				return true;
-	//			}
-	//		}
-	//	}
-	//}
-	return false;
-}
-
-
-bool MovementManager::wouldKingBeInCheckAfterMove(const Move &move, PieceColor color)
-{
-	//// Save current state
-	//auto piece		 = board.getPiece(move.X, move.Y);
-	//auto targetPiece = board.getPiece(move.toX, move.toY);
-
-	//// Make the move
-	//board.setPiece(move.toX, move.toY, piece);
-	//board.setPiece(move.X, move.Y, nullptr);
-
-	//bool inCheck = isKingInCheck(color);
-
-	//// Undo the move
-	//board.setPiece(move.X, move.Y, piece);
-	//board.setPiece(move.toX, move.toY, targetPiece);
-
-	//return inCheck;
-	return false;
-}
-
-
-bool MovementManager::isCastlingMove(const Move &move, PieceColor color)
-{
-	//auto piece = board.getPiece(move.X, move.Y);
-	//if (piece && piece->getType() == PieceType::King)
-	//{
-	//	int dx = move.toX - move.X;
-	//	if (abs(dx) == 2 && move.Y == move.toY)
-	//	{
-	//		return true;
-	//	}
-	//}
-	return false;
-}
-
-
-bool MovementManager::validateCastling(const Move &move, PieceColor color)
-{
-	//auto king = board.getPiece(move.X, move.Y);
-	//if (!king || king->getHasMoved())
-	//	return false;
-
-	//int	 rookX = (move.toX > move.X) ? 7 : 0;
-	//auto rook  = board.getPiece(rookX, move.Y);
-	//if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != color || rook->getHasMoved())
-	//{
-	//	return false;
-	//}
-
-	//// Check path between king and rook
-	//int direction = (move.toX > move.X) ? 1 : -1;
-	//for (int x = move.X + direction; x != rookX; x += direction)
-	//{
-	//	if (board.getPiece(x, move.Y))
-	//	{
-	//		return false; // Path is not clear
-	//	}
-	//}
-
-	//// Check that king is not in check and doesn't pass through or end in check
-	//if (isKingInCheck(color))
-	//	return false;
-
-	//for (int x = move.X; x != move.toX + direction; x += direction)
-	//{
-	//	if (isSquareUnderAttack(x, move.Y, color))
-	//	{
-	//		return false; // Square is under attack
-	//	}
-	//}
+	mChessBoard->movePiece(move.start, move.end);
+	mChessBoard->removePiece(capturedPawnPosition);
 
 	return true;
 }
 
 
-void MovementManager::performCastling(const Move &move)
+PossibleMove MovementManager::generateEnPassantMove(const Position &position, PieceColor player)
 {
-	//int	 direction = (move.toX > move.X) ? 1 : -1;
-	//int	 rookFromX = (direction == 1) ? 7 : 0;
-	//int	 rookToX   = move.X + direction;
+	if (!canEnPassant(position, player))
+		return PossibleMove();
 
-	//auto king	   = board.getPiece(move.X, move.Y);
-	//auto rook	   = board.getPiece(rookFromX, move.Y);
+	auto	 lastMove = getLastMove();
 
-	//// Move king
-	//board.setPiece(move.toX, move.toY, king);
-	//board.setPiece(move.X, move.Y, nullptr);
+	// Calculate target position
+	Position targetPosition;
+	if (player == PieceColor::White)
+	{
+		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y + 1);
+	}
+	else
+	{
+		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y - 1);
+	}
 
-	//// Move rook
-	//board.setPiece(rookToX, move.Y, rook);
-	//board.setPiece(rookFromX, move.Y, nullptr);
+	PossibleMove enPassantMove;
+	enPassantMove.start = position;
+	enPassantMove.end	= targetPosition;
+	enPassantMove.type	= MoveType::EnPassant;
 
-	//// Update moved status
-	//king->setHasMoved(true);
-	//rook->setHasMoved(true);
+	return enPassantMove;
 }
 
 
-bool MovementManager::isEnPassantMove(const Move &move, PieceColor color)
+bool MovementManager::canEnPassant(const Position &position, PieceColor player)
 {
-	//auto piece = board.getPiece(move.X, move.Y);
-	//if (piece && piece->getType() == PieceType::Pawn)
-	//{
-	//	int dy = move.toY - move.Y;
-	//	int dx = move.toX - move.X;
-	//	if (abs(dx) == 1 && dy == ((color == PieceColor::White) ? 1 : -1))
-	//	{
-	//		if (!board.getPiece(move.toX, move.toY))
-	//		{
-	//			return true;
-	//		}
-	//	}
-	//}
-	return false;
-}
+	auto lastMove = getLastMove();
 
+	if (!lastMove)
+		return false;
 
-bool MovementManager::validateEnPassant(const Move &move, PieceColor color)
-{
-	//// The last move must be a pawn moving two squares forward to the adjacent file
-	//auto lastMove = board.getLastMove();
-	//if (!lastMove)
-	//	return false;
+	// Ensure if the last move was a pawn double push
+	bool lastMoveWasPawnDoublePush = lastMove->type == MoveType::DoublePawnPush;
+	if (!lastMoveWasPawnDoublePush)
+		return false;
 
-	//auto lastMovedPiece = board.getPiece(lastMove->toX, lastMove->toY);
-	//if (!lastMovedPiece || lastMovedPiece->getType() != PieceType::Pawn)
-	//	return false;
+	// Ensure the last move was made by the opponent
+	if (lastMove->player == player)
+		return false;
 
-	//if (abs(lastMove->Y - lastMove->toY) != 2)
-	//	return false;
+	// Ensure that the position match
+	Position lastMoveEndPosition	 = lastMove->endingPosition;
 
-	//if (lastMove->toX != move.toX || lastMove->toY != move.Y)
-	//	return false;
+	// Check if both pawns are on the same file
+	bool	 bothPiecesOnTheSameFile = (lastMoveEndPosition.x == position.x);
+	if (!bothPiecesOnTheSameFile)
+		return false;
+
+	// Ensure both pawns are adjacent ranks
+	bool bothPiecesNextToEachOther = (std::abs(lastMoveEndPosition.y - position.y) == 1);
+	if (!bothPiecesNextToEachOther)
+		return false;
+
+	// Ensure the capturing pawn is on the correct rank for en passant
+	if ((player == PieceColor::White && position.y != 5) || (player == PieceColor::Black && position.y != 4))
+		return false;
 
 	return true;
 }
 
 
-void MovementManager::performEnPassant(const Move &move)
+bool MovementManager::executePawnPromotion(const PossibleMove &move, PieceType promotedType)
 {
-	//auto pawn = board.getPiece(move.X, move.Y);
-	//board.setPiece(move.toX, move.toY, pawn);
-	//board.setPiece(move.X, move.Y, nullptr);
+	if (move.type != MoveType::PawnPromotion)
+		return false;
 
-	//// Remove the captured pawn
-	//int capturedPawnY = move.Y;
-	//board.setPiece(move.toX, capturedPawnY, nullptr);
+	// Validate promoted piece
+	if ((promotedType != PieceType::Queen) && (promotedType != PieceType::Rook) && (promotedType != PieceType::Knight) && (promotedType != PieceType::Bishop))
+	{
+		return false;
+	}
 
-	//pawn->setHasMoved(true);
+	// Get Pawn position and remove it
+	auto &pawn = mChessBoard->getPiece(move.start);
+	mChessBoard->removePiece(move.start);
+
+	// Place promoted piece
+	std::shared_ptr<ChessPiece> promotedPiece = nullptr;
+	PieceColor					player		  = pawn->getColor();
+
+	switch (promotedType)
+	{
+	case PieceType::Queen:
+	{
+		promotedPiece = std::make_shared<Queen>(player);
+		break;
+	}
+
+	case PieceType::Rook:
+	{
+		promotedPiece = std::make_shared<Rook>(player);
+		break;
+	}
+
+	case PieceType::Knight:
+	{
+		promotedPiece = std::make_shared<Knight>(player);
+		break;
+	}
+
+	case PieceType::Bishop:
+	{
+		promotedPiece = std::make_shared<Bishop>(player);
+		break;
+	}
+
+	default: break;
+	}
+
+	if (promotedPiece)
+	{
+		mChessBoard->setPiece(move.start, promotedPiece);
+		return true;
+	}
+	return false;
 }
 
 
-void MovementManager::promotePawn(int x, int y, PieceColor color, PieceType promotionType)
+const Move *MovementManager::getLastMove()
 {
-	//switch (promotionType)
-	//{
-	//case PieceType::Queen:
-	//{
-	//	board.setPiece(x, y, std::make_shared<Queen>(color));
-	//	break;
-	//}
+	if (mMoveHistory.empty())
+		return nullptr;
 
-	//case PieceType::Rook:
-	//{
-	//	board.setPiece(x, y, std::make_shared<Rook>(color));
-	//	break;
-	//}
-
-	//case PieceType::Bishop:
-	//{
-	//	board.setPiece(x, y, std::make_shared<Bishop>(color));
-	//	break;
-	//}
-
-	//case PieceType::Knight:
-	//{
-	//	board.setPiece(x, y, std::make_shared<Knight>(color));
-	//	break;
-	//}
-
-	//default:
-	//	board.setPiece(x, y, std::make_shared<Queen>(color));
-	//	break;
-	//}
+	return &(*mMoveHistory.rbegin());
 }
 
 
-bool MovementManager::isCheckmate(PieceColor color)
+void MovementManager::addMoveToHistory(Move &move)
 {
-	//if (!isKingInCheck(color))
-	//	return false;
-
-	//// Generate all legal moves
-	//for (int y = 0; y < 8; ++y)
-	//{
-	//	for (int x = 0; x < 8; ++x)
-	//	{
-	//		auto piece = board.getPiece(x, y);
-	//		if (piece && piece->getColor() == color)
-	//		{
-	//			auto moves = piece->getPossibleMoves(x, y, board);
-	//			for (auto &movePos : moves)
-	//			{
-	//				Move testMove(x, y, movePos.first, movePos.second, piece->getType());
-	//				if (isValidMove(testMove, color))
-	//				{
-	//					return false; // At least one valid move exists
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-	return true; // No valid moves, player is checkmated
-}
-
-
-bool MovementManager::isStalemate(PieceColor color)
-{
-	//if (isKingInCheck(color))
-	//	return false;
-
-	//// Generate all legal moves
-	//for (int y = 0; y < 8; ++y)
-	//{
-	//	for (int x = 0; x < 8; ++x)
-	//	{
-	//		auto piece = board.getPiece(x, y);
-	//		if (piece && piece->getColor() == color)
-	//		{
-	//			auto moves = piece->getPossibleMoves(x, y, board);
-	//			for (auto &movePos : moves)
-	//			{
-	//				Move testMove(x, y, movePos.first, movePos.second, piece->getType());
-	//				if (isValidMove(testMove, color))
-	//				{
-	//					return false; // At least one valid move exists
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-	return true; // No valid moves, player is stalemated
+	move.number = mMoveHistory.size() + 1; // Set the move number based on history size
+	mMoveHistory.insert(move);
 }

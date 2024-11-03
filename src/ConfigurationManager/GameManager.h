@@ -23,13 +23,16 @@ public:
 
 	void init();
 
-	void switchTurns();
+	void executeMove(PossibleMove &move);
 
-	void adaptScore();
-	
 
 private:
+	void							 switchTurns();
 
-	Player mWhitePlayer;
-	Player mBlackPlayer;
+	PieceColor						 mCurrentPlayer;
+
+	Player							 mWhitePlayer;
+	Player							 mBlackPlayer;
+
+	std::unique_ptr<MovementManager> mMovementManager;
 };

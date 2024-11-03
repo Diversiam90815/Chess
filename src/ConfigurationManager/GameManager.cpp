@@ -23,26 +23,48 @@ GameManager::~GameManager()
 
 void GameManager::init()
 {
+	mMovementManager = std::make_unique<MovementManager>();
+
 	mWhitePlayer.setPlayerColor(PieceColor::White);
 	mBlackPlayer.setPlayerColor(PieceColor::Black);
 
 	mWhitePlayer.setOnTurn(true);
+	mCurrentPlayer = PieceColor::White;
 }
 
 
 void GameManager::switchTurns()
 {
-	if (mWhitePlayer.isOnTurn())
+	if (mCurrentPlayer == PieceColor::White)
 	{
 		mWhitePlayer.setOnTurn(false);
 		mBlackPlayer.setOnTurn(true);
+		mCurrentPlayer = PieceColor::Black;
 		return;
 	}
 	mBlackPlayer.setOnTurn(false);
 	mWhitePlayer.setOnTurn(true);
+	mCurrentPlayer = PieceColor::White;
 }
 
 
-void GameManager::adaptScore()
+void GameManager::executeMove(PossibleMove &move)
 {
+	Move executedMove = mMovementManager->executeMove(move);
+
+	if (executedMove.capturedPiece != PieceType::DefaultType)
+	{
+		if (mCurrentPlayer == PieceColor::White)
+		{
+			mWhitePlayer.addCapturedPiece(executedMove.capturedPiece);
+			mBlackPlayer.updateScore();
+		}
+		else
+		{
+			mBlackPlayer.addCapturedPiece(executedMove.capturedPiece);
+			mWhitePlayer.updateScore();
+		}
+	}
+
+	switchTurns();
 }
