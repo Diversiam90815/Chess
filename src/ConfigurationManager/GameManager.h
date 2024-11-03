@@ -28,6 +28,8 @@ public:
 	void	  setCurrentGameState(GameState state);
 	GameState getCurrentGameState() const;
 
+	void	  setCurrentMoveState(MoveState state);
+	MoveState getCurrentMoveState() const;
 
 private:
 	void							 switchTurns();

@@ -83,3 +83,18 @@ GameState GameManager::getCurrentGameState() const
 {
 	return mCurrentState;
 }
+
+
+void GameManager::setCurrentMoveState(MoveState state)
+{
+	if (mCurrentMoveState != state)
+	{
+		mCurrentMoveState = state;
+	}
+}
+
+
+MoveState GameManager::getCurrentMoveState() const
+{
+	return mCurrentMoveState;
+}
