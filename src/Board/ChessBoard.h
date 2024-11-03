@@ -67,11 +67,13 @@ public:
 
 	Position					 getKingsPosition(PlayerColor player) const;
 
+	void						 removeAllPiecesFromBoard();
+
 
 private:
 	std::vector<std::vector<Square>> squares;
 
-	Position						 mWhiteKingPosition;
+	Position						 mWhiteKingPosition = Position{-1, -1};
 
-	Position						 mBlackKingPosition;
+	Position						 mBlackKingPosition = Position{-1, -1};
 };

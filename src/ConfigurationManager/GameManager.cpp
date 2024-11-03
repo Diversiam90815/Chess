@@ -102,6 +102,21 @@ MoveState GameManager::getCurrentMoveState() const
 }
 
 
+void GameManager::resetGame()
+{
+	mMovementManager->mChessBoard->removeAllPiecesFromBoard();
+	mMovementManager->mChessBoard->initializeBoard();
+
+	mWhitePlayer.reset();
+	mBlackPlayer.reset();
+
+	mCurrentPlayer = PlayerColor::White;
+
+	setCurrentGameState(GameState::Init);
+	setCurrentMoveState(MoveState::NoMove);
+}
+
+
 void GameManager::handleMoveStateChanges(PossibleMove &move)
 {
 	switch (mCurrentMoveState)

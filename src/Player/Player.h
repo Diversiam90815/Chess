@@ -41,6 +41,8 @@ public:
 
 	constexpr int getPieceValue(PieceType piece);
 
+	void		  reset();
+
 private:
 	PlayerColor			   mPlayerColor = PlayerColor::NoColor;
 

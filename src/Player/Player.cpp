@@ -102,3 +102,11 @@ constexpr int Player::getPieceValue(PieceType piece)
 	default: return 0;
 	}
 }
+
+
+void Player::reset()
+{
+	setScore(0);
+	mCapturedPieces.clear();
+	setOnTurn(false);
+}

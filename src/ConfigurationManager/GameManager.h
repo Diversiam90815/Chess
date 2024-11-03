@@ -31,7 +31,8 @@ public:
 	void	  setCurrentMoveState(MoveState state);
 	MoveState getCurrentMoveState() const;
 
-
+	void							 resetGame();
+	
 private:
 	void							 switchTurns();
 

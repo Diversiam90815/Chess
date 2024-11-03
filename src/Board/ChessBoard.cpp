@@ -109,6 +109,21 @@ Position ChessBoard::getKingsPosition(PlayerColor player) const
 }
 
 
+void ChessBoard::removeAllPiecesFromBoard()
+{
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			squares[y][x].piece = nullptr;
+		}
+	}
+
+	mWhiteKingPosition = Position{-1, -1}; // invalid position
+	mBlackKingPosition = Position{-1, -1}; // invalid position
+}
+
+
 void ChessBoard::initializeBoard()
 {
 	// Place pieces for White
@@ -138,4 +153,8 @@ void ChessBoard::initializeBoard()
 	{
 		setPiece(Position(x, 6), std::make_shared<Pawn>(PlayerColor::Black));
 	}
+
+	// Update King's Position
+	mWhiteKingPosition = Position(4, 0);
+	mBlackKingPosition = Position(4, 7);
 }
