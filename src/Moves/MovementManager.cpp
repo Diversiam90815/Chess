@@ -120,6 +120,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
 	}
 
+
 	// Increment or reset the halfMoveClock
 
 	int previousHalfMoveClock = 0;
@@ -159,6 +160,51 @@ bool MovementManager::isKingInCheck(Position &ourKing, PieceColor playerColor)
 {
 	PieceColor opponentColor = playerColor == PieceColor::White ? PieceColor::Black : PieceColor::White;
 	return isSquareAttacked(ourKing, opponentColor);
+}
+
+
+bool MovementManager::isCheckmate(PieceColor player)
+{
+	Position kingPosition = mChessBoard->getKingsPosition(player);
+	if (!isKingInCheck(kingPosition, player))
+		return false; // If the king is not in check, it's not checkmate
+
+	// If the king is in check, check if there are any moves that can escape check
+	auto playerPieces = mChessBoard->getPiecesFromPlayer(player);
+	for (const auto &[startPosition, piece] : playerPieces)
+	{
+		auto possibleMoves = piece->getPossibleMoves(startPosition, *mChessBoard);
+
+		for (const auto &move : possibleMoves)
+		{
+			Move testMove(startPosition, move.end, piece->getType());
+
+			if (!wouldKingBeInCheckAfterMove(testMove, player))
+			{
+				return false; // If there's a legal move that stops check, it's not checkmate
+			}
+		}
+	}
+
+	// No legal move can stop the check; it's checkmate
+	return true;
+}
+
+
+bool MovementManager::isStalemate(PieceColor player)
+{
+	Position kingPosition = mChessBoard->getKingsPosition(player);
+	if (isKingInCheck(kingPosition, player))
+		return false;
+
+	if (!calculateAllLegalBasicMoves(player))
+	{
+		// If no legal moves are available and king is not in check, it's stalemate
+		return true;
+	}
+
+	// Legal moves are available, so it's not stalemate
+	return false;
 }
 
 

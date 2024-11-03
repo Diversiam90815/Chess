@@ -41,9 +41,14 @@ public:
 
 
 private:
+
 	bool													validateMove(Move &move, PieceColor playerColor);
 
 	bool													isKingInCheck(Position &ourKing, PieceColor playerColor);
+
+	bool													isCheckmate(PieceColor player);
+
+	bool													isStalemate(PieceColor player);
 
 	bool													wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor);
 
