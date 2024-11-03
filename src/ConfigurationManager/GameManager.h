@@ -21,9 +21,12 @@ public:
 	GameManager();
 	~GameManager();
 
-	void init();
+	void	  init();
 
-	void executeMove(PossibleMove &move);
+	void	  executeMove(PossibleMove &move);
+
+	void	  setCurrentGameState(GameState state);
+	GameState getCurrentGameState() const;
 
 
 private:
@@ -33,6 +36,8 @@ private:
 
 	Player							 mWhitePlayer;
 	Player							 mBlackPlayer;
+
+	GameState						 mCurrentState;
 
 	std::unique_ptr<MovementManager> mMovementManager;
 };

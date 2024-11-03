@@ -59,3 +59,12 @@ enum class MoveType
 	CastlingQueenside,
 	CastlingKingside
 };
+
+
+enum class GameState
+{
+	Check = 1,
+	Checkmate,
+	Stalemate,
+	Draw
+};

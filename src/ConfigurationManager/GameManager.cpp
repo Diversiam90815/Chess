@@ -68,3 +68,18 @@ void GameManager::executeMove(PossibleMove &move)
 
 	switchTurns();
 }
+
+
+void GameManager::setCurrentGameState(GameState state)
+{
+	if (mCurrentState != state)
+	{
+		mCurrentState = state;
+	}
+}
+
+
+GameState GameManager::getCurrentGameState() const
+{
+	return mCurrentState;
+}
