@@ -38,6 +38,7 @@ private:
 	Player							 mBlackPlayer;
 
 	GameState						 mCurrentState;
+	MoveState						 mCurrentMoveState;
 
 	std::unique_ptr<MovementManager> mMovementManager;
 };

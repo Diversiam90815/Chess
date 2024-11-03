@@ -9,7 +9,6 @@
 */
 
 #pragma once
-#include <map>
 
 
 //============================================================
@@ -63,8 +62,17 @@ enum class MoveType
 
 enum class GameState
 {
-	Check = 1,
+	OnGoing = 1,
+	Paused,
 	Checkmate,
 	Stalemate,
 	Draw
+};
+
+
+enum class MoveState
+{
+	NoMove = 1,
+	InitiateMove,
+	ExecuteMove
 };
