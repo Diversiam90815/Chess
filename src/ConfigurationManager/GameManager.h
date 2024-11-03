@@ -31,8 +31,14 @@ public:
 	void	  setCurrentMoveState(MoveState state);
 	MoveState getCurrentMoveState() const;
 
+
+
 private:
 	void							 switchTurns();
+
+	void							 handleMoveStateChanges(PossibleMove &move);
+
+	void							 checkForEndGameConditions();
 
 	PieceColor						 mCurrentPlayer;
 

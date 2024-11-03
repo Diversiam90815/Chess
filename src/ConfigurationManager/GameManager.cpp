@@ -35,6 +35,8 @@ void GameManager::init()
 
 void GameManager::switchTurns()
 {
+	setCurrentMoveState(MoveState::NoMove);
+
 	if (mCurrentPlayer == PieceColor::White)
 	{
 		mWhitePlayer.setOnTurn(false);
@@ -97,4 +99,49 @@ void GameManager::setCurrentMoveState(MoveState state)
 MoveState GameManager::getCurrentMoveState() const
 {
 	return mCurrentMoveState;
+}
+
+
+void GameManager::handleMoveStateChanges(PossibleMove &move)
+{
+	switch (mCurrentMoveState)
+	{
+	case (MoveState::NoMove):
+	{
+		mMovementManager->calculateAllLegalBasicMoves(mCurrentPlayer);
+		break;
+	}
+
+	case (MoveState::InitiateMove):
+	{
+		auto possibleMoves = mMovementManager->getMovesForPosition(move.start);
+		// delegate possible moves to UI
+		break;
+	}
+
+	case (MoveState::ExecuteMove):
+	{
+		executeMove(move);
+		checkForEndGameConditions();
+		switchTurns();
+		break;
+	}
+	}
+}
+
+
+void GameManager::checkForEndGameConditions()
+{
+	if (mMovementManager->isCheckmate(mCurrentPlayer))
+	{
+		setCurrentGameState(GameState::Checkmate);
+	}
+	else if (mMovementManager->isStalemate(mCurrentPlayer))
+	{
+		setCurrentGameState(GameState::Stalemate);
+	}
+	else
+	{
+		setCurrentGameState(GameState::OnGoing);
+	}
 }
