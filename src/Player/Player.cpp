@@ -17,7 +17,7 @@ Player::Player()
 }
 
 
-Player::Player(PieceColor color) : mPlayerColor(color)
+Player::Player(PlayerColor color) : mPlayerColor(color)
 {
 }
 
@@ -57,13 +57,13 @@ void Player::setScore(int value)
 }
 
 
-PieceColor Player::getPlayerColor() const
+PlayerColor Player::getPlayerColor() const
 {
 	return mPlayerColor;
 }
 
 
-void Player::setPlayerColor(PieceColor value)
+void Player::setPlayerColor(PlayerColor value)
 {
 	if (mPlayerColor != value)
 	{

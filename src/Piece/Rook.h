@@ -19,7 +19,7 @@
 class Rook : public ChessPiece
 {
 public:
-	Rook(PieceColor color) : ChessPiece(PieceType::Rook, color)
+	Rook(PlayerColor color) : ChessPiece(PieceType::Rook, color)
 	{
 	}
 

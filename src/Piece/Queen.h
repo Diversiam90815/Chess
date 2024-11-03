@@ -19,7 +19,7 @@
 class Queen : public ChessPiece
 {
 public:
-	Queen(PieceColor color) : ChessPiece(PieceType::Queen, color)
+	Queen(PlayerColor color) : ChessPiece(PieceType::Queen, color)
 	{
 	}
 

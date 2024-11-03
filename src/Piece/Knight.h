@@ -20,7 +20,7 @@ class Knight : public ChessPiece
 {
 public:
 
-	Knight(PieceColor color) : ChessPiece(PieceType::Knight, color)
+	Knight(PlayerColor color) : ChessPiece(PieceType::Knight, color)
 	{
 	}
 

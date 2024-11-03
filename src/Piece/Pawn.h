@@ -19,7 +19,7 @@
 class Pawn : public ChessPiece
 {
 public:
-	Pawn(PieceColor color) : ChessPiece(PieceType::Pawn, color)
+	Pawn(PlayerColor color) : ChessPiece(PieceType::Pawn, color)
 	{
 	}
 

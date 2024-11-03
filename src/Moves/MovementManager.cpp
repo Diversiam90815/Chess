@@ -49,7 +49,7 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 }
 
 
-bool MovementManager::calculateAllLegalBasicMoves(PieceColor playerColor)
+bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
 {
 	auto playerPieces = mChessBoard->getPiecesFromPlayer(playerColor);
 
@@ -146,7 +146,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 }
 
 
-bool MovementManager::validateMove(Move &move, PieceColor playerColor)
+bool MovementManager::validateMove(Move &move, PlayerColor playerColor)
 {
 	auto kingPosition = mChessBoard->getKingsPosition(playerColor);
 
@@ -160,14 +160,14 @@ bool MovementManager::validateMove(Move &move, PieceColor playerColor)
 }
 
 
-bool MovementManager::isKingInCheck(Position &ourKing, PieceColor playerColor)
+bool MovementManager::isKingInCheck(Position &ourKing, PlayerColor playerColor)
 {
-	PieceColor opponentColor = playerColor == PieceColor::White ? PieceColor::Black : PieceColor::White;
+	PlayerColor opponentColor = playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
 	return isSquareAttacked(ourKing, opponentColor);
 }
 
 
-bool MovementManager::isCheckmate(PieceColor player)
+bool MovementManager::isCheckmate(PlayerColor player)
 {
 	Position kingPosition = mChessBoard->getKingsPosition(player);
 	if (!isKingInCheck(kingPosition, player))
@@ -195,7 +195,7 @@ bool MovementManager::isCheckmate(PieceColor player)
 }
 
 
-bool MovementManager::isStalemate(PieceColor player)
+bool MovementManager::isStalemate(PlayerColor player)
 {
 	Position kingPosition = mChessBoard->getKingsPosition(player);
 	if (isKingInCheck(kingPosition, player))
@@ -212,7 +212,7 @@ bool MovementManager::isStalemate(PieceColor player)
 }
 
 
-bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor)
+bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor)
 {
 	bool	 kingInCheck	= false;
 
@@ -234,7 +234,7 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PieceColor playerC
 	}
 
 	// Check if King is under attack (isSquareUnderAttack)
-	kingInCheck = isSquareAttacked(kingPosition, playerColor == PieceColor::White ? PieceColor::Black : PieceColor::White);
+	kingInCheck = isSquareAttacked(kingPosition, playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White);
 
 
 	// Revert the move
@@ -251,7 +251,7 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PieceColor playerC
 }
 
 
-bool MovementManager::isSquareAttacked(const Position &square, PieceColor attackerColor)
+bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attackerColor)
 {
 	// Iterate over all opponent pieces
 	auto opponentPieces = mChessBoard->getPiecesFromPlayer(attackerColor);
@@ -301,7 +301,7 @@ bool MovementManager::executeCastlingMove(PossibleMove &move)
 }
 
 
-std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position &kingPosition, PieceColor player)
+std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position &kingPosition, PlayerColor player)
 {
 	std::vector<PossibleMove> castlingMoves;
 	castlingMoves.reserve(2 * sizeof(castlingMoves)); // There are max. of 2 moves of castling
@@ -328,7 +328,7 @@ std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position 
 }
 
 
-bool MovementManager::canCastle(const Position &kingposition, PieceColor player, bool kingside)
+bool MovementManager::canCastle(const Position &kingposition, PlayerColor player, bool kingside)
 {
 	auto king	   = mChessBoard->getPiece(kingposition);
 	int	 direction = kingside ? +1 : -1; // Determine the direction of castling
@@ -369,10 +369,10 @@ bool MovementManager::canCastle(const Position &kingposition, PieceColor player,
 }
 
 
-bool MovementManager::executeEnPassantMove(PossibleMove &move, PieceColor player)
+bool MovementManager::executeEnPassantMove(PossibleMove &move, PlayerColor player)
 {
 	Position capturedPawnPosition;
-	if (player == PieceColor::White)
+	if (player == PlayerColor::White)
 	{
 		capturedPawnPosition = Position(move.end.x, move.end.y - 1);
 	}
@@ -388,7 +388,7 @@ bool MovementManager::executeEnPassantMove(PossibleMove &move, PieceColor player
 }
 
 
-PossibleMove MovementManager::generateEnPassantMove(const Position &position, PieceColor player)
+PossibleMove MovementManager::generateEnPassantMove(const Position &position, PlayerColor player)
 {
 	if (!canEnPassant(position, player))
 		return PossibleMove();
@@ -397,7 +397,7 @@ PossibleMove MovementManager::generateEnPassantMove(const Position &position, Pi
 
 	// Calculate target position
 	Position targetPosition;
-	if (player == PieceColor::White)
+	if (player == PlayerColor::White)
 	{
 		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y + 1);
 	}
@@ -415,7 +415,7 @@ PossibleMove MovementManager::generateEnPassantMove(const Position &position, Pi
 }
 
 
-bool MovementManager::canEnPassant(const Position &position, PieceColor player)
+bool MovementManager::canEnPassant(const Position &position, PlayerColor player)
 {
 	auto lastMove = getLastMove();
 
@@ -445,7 +445,7 @@ bool MovementManager::canEnPassant(const Position &position, PieceColor player)
 		return false;
 
 	// Ensure the capturing pawn is on the correct rank for en passant
-	if ((player == PieceColor::White && position.y != 5) || (player == PieceColor::Black && position.y != 4))
+	if ((player == PlayerColor::White && position.y != 5) || (player == PlayerColor::Black && position.y != 4))
 		return false;
 
 	return true;
@@ -469,7 +469,7 @@ bool MovementManager::executePawnPromotion(const PossibleMove &move, PieceType p
 
 	// Place promoted piece
 	std::shared_ptr<ChessPiece> promotedPiece = nullptr;
-	PieceColor					player		  = pawn->getColor();
+	PlayerColor					player		  = pawn->getColor();
 
 	switch (promotedType)
 	{

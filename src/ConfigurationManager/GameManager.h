@@ -40,7 +40,7 @@ private:
 
 	void							 checkForEndGameConditions();
 
-	PieceColor						 mCurrentPlayer;
+	PlayerColor						 mCurrentPlayer;
 
 	Player							 mWhitePlayer;
 	Player							 mBlackPlayer;

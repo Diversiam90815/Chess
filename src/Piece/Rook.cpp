@@ -16,7 +16,7 @@
 std::vector<PossibleMove> Rook::getPossibleMoves(const Position &pos, ChessBoard &board) const
 {
 	MoveHelper helper;
-	PieceColor color = getColor();
+	PlayerColor color = getColor();
 	helper.checkAvailableMoves(pos, board, color, PieceType::Rook);
 	auto moves = helper.getAvailableMoves();
 	return moves;

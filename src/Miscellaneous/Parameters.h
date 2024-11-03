@@ -38,7 +38,7 @@ enum class PieceType
 };
 
 
-enum class PieceColor
+enum class PlayerColor
 {
 	NoColor,
 	White,

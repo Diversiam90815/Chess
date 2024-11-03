@@ -19,7 +19,7 @@
 class Bishop : public ChessPiece
 {
 public:
-	Bishop(PieceColor color) : ChessPiece(PieceType::Bishop, color)
+	Bishop(PlayerColor color) : ChessPiece(PieceType::Bishop, color)
 	{
 	}
 

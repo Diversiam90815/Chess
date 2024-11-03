@@ -20,7 +20,7 @@ class Player
 public:
 	Player();
 
-	Player(PieceColor color);
+	Player(PlayerColor color);
 
 	~Player();
 
@@ -31,8 +31,8 @@ public:
 	int			  getScore() const;
 	void		  setScore(int value);
 
-	PieceColor	  getPlayerColor() const;
-	void		  setPlayerColor(PieceColor value);
+	PlayerColor	  getPlayerColor() const;
+	void		  setPlayerColor(PlayerColor value);
 
 
 	void		  addCapturedPiece(const PieceType piece);
@@ -42,7 +42,7 @@ public:
 	constexpr int getPieceValue(PieceType piece);
 
 private:
-	PieceColor			   mPlayerColor = PieceColor::NoColor;
+	PlayerColor			   mPlayerColor = PlayerColor::NoColor;
 
 	std::vector<PieceType> mCapturedPieces;
 

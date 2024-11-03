@@ -77,7 +77,7 @@ struct Move
 	PieceType  movedPiece	 = PieceType::DefaultType;
 	PieceType  capturedPiece = PieceType::DefaultType;
 	PieceType  promotionType = PieceType::DefaultType;
-	PieceColor player		 = PieceColor::NoColor;
+	PlayerColor player		 = PlayerColor::NoColor;
 
 	MoveType   type			 = MoveType::Normal;
 
