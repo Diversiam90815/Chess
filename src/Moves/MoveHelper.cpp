@@ -94,6 +94,12 @@ bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, 
 		PossibleMove move;
 		move.start = position;
 		move.end   = newPosition;
+
+        if ((color == PieceColor::White && newY == 8) || (color == PieceColor::Black && newY == 1))
+		{
+			move.type = MoveType::PawnPromotion;
+		}
+
 		addToAvailableMoves(move);
 
 		// If it's the pawn's first move, check for the two-step option

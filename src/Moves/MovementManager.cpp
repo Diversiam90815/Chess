@@ -8,10 +8,8 @@
   ==============================================================================
 */
 
-
 #include "MovementManager.h"
 #include <algorithm>
-
 
 
 MovementManager::MovementManager()
@@ -82,7 +80,7 @@ bool MovementManager::calculateAllLegalBasicMoves(PieceColor playerColor)
 }
 
 
-Move MovementManager::executeMove(PossibleMove &possibleMove)
+Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnPromotion)
 {
 	// Store positions in Move from executed PossibleMove
 	Move  executedMove		= Move(possibleMove);
@@ -106,7 +104,6 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 		executedMove.capturedPiece = capturedPiece;
 	}
 
-
 	if (possibleMove.type == MoveType::EnPassant)
 	{
 		executeEnPassantMove(possibleMove, player);
@@ -118,6 +115,11 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 	else if (possibleMove.type == MoveType::Normal)
 	{
 		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
+	}
+	else if (possibleMove.type == MoveType::PawnPromotion)
+	{
+		executePawnPromotion(possibleMove, pawnPromotion);
+		executedMove.promotionType = pawnPromotion;
 	}
 
 
@@ -445,6 +447,63 @@ bool MovementManager::canEnPassant(const Position &position, PieceColor player)
 		return false;
 
 	return true;
+}
+
+
+bool MovementManager::executePawnPromotion(const PossibleMove &move, PieceType promotedType)
+{
+	if (move.type != MoveType::PawnPromotion)
+		return false;
+
+	// Validate promoted piece
+	if ((promotedType != PieceType::Queen) && (promotedType != PieceType::Rook) && (promotedType != PieceType::Knight) && (promotedType != PieceType::Bishop))
+	{
+		return false;
+	}
+
+	// Get Pawn position and remove it
+	auto &pawn = mChessBoard->getPiece(move.start);
+	mChessBoard->removePiece(move.start);
+
+	// Place promoted piece
+	std::shared_ptr<ChessPiece> promotedPiece = nullptr;
+	PieceColor					player		  = pawn->getColor();
+
+	switch (promotedType)
+	{
+	case PieceType::Queen:
+	{
+		promotedPiece = std::make_shared<Queen>(player);
+		break;
+	}
+
+	case PieceType::Rook:
+	{
+		promotedPiece = std::make_shared<Rook>(player);
+		break;
+	}
+
+	case PieceType::Knight:
+	{
+		promotedPiece = std::make_shared<Knight>(player);
+		break;
+	}
+
+	case PieceType::Bishop:
+	{
+		promotedPiece = std::make_shared<Bishop>(player);
+		break;
+	}
+
+	default: break;
+	}
+
+	if (promotedPiece)
+	{
+		mChessBoard->setPiece(move.start, promotedPiece);
+		return true;
+	}
+	return false;
 }
 
 

@@ -8,21 +8,12 @@
   ==============================================================================
 */
 
-
 #pragma once
 
 #include "ChessBoard.h"
 #include "Move.h"
 #include <set>
 #include <unordered_map>
-
-/*
-Handling moves still need to be implemented:
-	- Stalemate
-	- Checkmate
-	- Check
-	- PawnPromotion
-*/
 
 
 class MovementManager
@@ -37,11 +28,10 @@ public:
 
 	bool					  calculateAllLegalBasicMoves(PieceColor playerColor);
 
-	Move					  executeMove(PossibleMove &executedMove);
+	Move					  executeMove(PossibleMove &executedMove, PieceType pawnPromotion = PieceType::DefaultType);
 
 
 private:
-
 	bool													validateMove(Move &move, PieceColor playerColor);
 
 	bool													isKingInCheck(Position &ourKing, PieceColor playerColor);
@@ -67,6 +57,9 @@ private:
 	PossibleMove											generateEnPassantMove(const Position &position, PieceColor player);
 
 	bool													canEnPassant(const Position &position, PieceColor player);
+
+
+	bool													executePawnPromotion(const PossibleMove &move, PieceType promotedType);
 
 
 	const Move											   *getLastMove();
