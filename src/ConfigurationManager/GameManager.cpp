@@ -126,6 +126,7 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 		switchTurns();
 		break;
 	}
+	default: break;
 	}
 }
 

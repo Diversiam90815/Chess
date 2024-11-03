@@ -62,7 +62,8 @@ enum class MoveType
 
 enum class GameState
 {
-	OnGoing = 1,
+	Init = 1,
+	OnGoing,
 	Paused,
 	Checkmate,
 	Stalemate,

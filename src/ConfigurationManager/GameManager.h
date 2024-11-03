@@ -32,7 +32,6 @@ public:
 	MoveState getCurrentMoveState() const;
 
 
-
 private:
 	void							 switchTurns();
 
@@ -40,13 +39,13 @@ private:
 
 	void							 checkForEndGameConditions();
 
-	PlayerColor						 mCurrentPlayer;
 
 	Player							 mWhitePlayer;
 	Player							 mBlackPlayer;
 
-	GameState						 mCurrentState;
-	MoveState						 mCurrentMoveState;
+	PlayerColor						 mCurrentPlayer	   = PlayerColor::NoColor;
+	GameState						 mCurrentState	   = GameState::Init;
+	MoveState						 mCurrentMoveState = MoveState::NoMove;
 
 	std::unique_ptr<MovementManager> mMovementManager;
 };
