@@ -11,8 +11,11 @@
 
 #pragma once
 
-#include "Parameters.h"
+#include <string>
 #include <functional>
+
+#include "Parameters.h"
+#include "MoveType.h"
 
 
 struct Position
@@ -49,27 +52,22 @@ struct PossibleMove
 	Position end;
 	MoveType type = MoveType::Normal;
 
-	bool	 operator==(PossibleMove &other)
+	bool	 operator==(const PossibleMove &other) const
 	{
 		return this->start == other.start && this->end == other.end;
 	}
 };
 
 
-struct Move
+class Move
 {
-	Move()
-	{
-	}
+public:
+	Move();
 
-	Move(PossibleMove &possibleMove) : startingPosition(possibleMove.start), endingPosition(possibleMove.end), type(possibleMove.type)
-	{
-	}
+	Move(PossibleMove &possibleMove);
 
-	Move(Position start, Position end, PieceType moved, PieceType captured = PieceType::DefaultType, MoveType type = MoveType::Normal, PieceType promotion = PieceType::DefaultType)
-		: startingPosition(start), endingPosition(end), movedPiece(moved), capturedPiece(captured), type(type), promotionType(promotion)
-	{
-	}
+	Move(
+		Position start, Position end, PieceType moved, PieceType captured = PieceType::DefaultType, MoveType type = MoveType::Normal, PieceType promotion = PieceType::DefaultType);
 
 	Position	startingPosition;
 	Position	endingPosition;
@@ -80,6 +78,8 @@ struct Move
 	PlayerColor player		  = PlayerColor::NoColor;
 
 	MoveType	type		  = MoveType::Normal;
+
+	std::string notation	  = "";
 
 	int			number		  = 0; // Storing the current number of this move. Each move saved should increment this number!
 

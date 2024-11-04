@@ -10,10 +10,12 @@
 
 #pragma once
 
-#include "ChessBoard.h"
-#include "Move.h"
 #include <set>
 #include <unordered_map>
+
+#include "ChessBoard.h"
+#include "Move.h"
+#include "MoveNotationHelper.h"
 
 
 class MovementManager
@@ -73,6 +75,7 @@ private:
 
 	std::unique_ptr<ChessBoard>								mChessBoard;
 
+	std::unique_ptr<MoveNotationHelper>						mMoveNotation;
 
 	friend class GameManager;
 };
