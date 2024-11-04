@@ -25,6 +25,7 @@ public:
 
 	~MovementManager() = default;
 
+	void					  init();
 
 	std::vector<PossibleMove> getMovesForPosition(Position &position);
 
@@ -34,6 +35,7 @@ public:
 
 
 private:
+
 	bool													validateMove(Move &move, PlayerColor playerColor);
 
 	bool													isKingInCheck(Position &ourKing, PlayerColor playerColor);

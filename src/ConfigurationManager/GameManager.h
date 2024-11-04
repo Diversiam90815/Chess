@@ -19,8 +19,12 @@
 class GameManager
 {
 public:
-	GameManager();
-	~GameManager();
+	~GameManager() = default;
+
+
+	static GameManager		  *GetInstance();
+	static void				   ReleaseInstance();
+
 
 	void					   init();
 
@@ -41,6 +45,9 @@ public:
 	void					   clearState();
 
 private:
+	GameManager();
+
+
 	void							 switchTurns();
 
 	void							 handleMoveStateChanges(PossibleMove &move);

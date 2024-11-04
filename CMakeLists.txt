@@ -33,6 +33,13 @@ include_directories(    ${PIECE_DIR}
 )
 
 
+set(API_FILES
+    ${API_DIR}/ChessLogicAPI.h
+    ${API_DIR}/ChessLogicAPI.cpp
+    ${API_DIR}/ChessLogicAPIDefines.h
+)
+
+
 set(PIECE_FILES
     ${PIECE_DIR}/ChessPiece.h
     ${PIECE_DIR}/Pawn.h
@@ -86,6 +93,7 @@ set(MISC_FILES
 
 
 set(ALL_FILES
+    ${API_FILES}
     ${PIECE_FILES}
     ${BOARD_FILES}
     ${MOVE_FILES}
@@ -97,6 +105,7 @@ set(ALL_FILES
 
 
 # Group source and header files (optional, for IDEs)
+source_group("API" FILES ${API_FILES})
 source_group("Pieces" FILES ${PIECE_FILES})
 source_group("Board" FILES ${BOARD_FILES})
 source_group("Moves" FILES ${MOVE_FILES})

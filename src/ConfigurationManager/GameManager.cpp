@@ -16,14 +16,31 @@ GameManager::GameManager()
 }
 
 
-GameManager::~GameManager()
+GameManager *GameManager::GetInstance()
 {
+	static GameManager *sInstance = nullptr;
+	if (nullptr == sInstance)
+	{
+		sInstance = new GameManager();
+	}
+	return sInstance;
+}
+
+
+void GameManager::ReleaseInstance()
+{
+	GameManager *sInstance = GetInstance();
+	if (sInstance)
+	{
+		delete sInstance;
+	}
 }
 
 
 void GameManager::init()
 {
 	mMovementManager = std::make_unique<MovementManager>();
+	mMovementManager->init();
 
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
