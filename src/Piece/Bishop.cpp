@@ -16,7 +16,7 @@
 std::vector<PossibleMove> Bishop::getPossibleMoves(const Position &pos, ChessBoard &board) const
 {
 	MoveHelper helper;
-	PieceColor color = getColor();
+	PlayerColor color = getColor();
 	helper.checkAvailableMoves(pos, board, color, PieceType::Bishop);
 	auto moves = helper.getAvailableMoves();
 	return moves;

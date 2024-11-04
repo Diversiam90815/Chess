@@ -17,7 +17,7 @@ Player::Player()
 }
 
 
-Player::Player(PieceColor color) : mPlayerColor(color)
+Player::Player(PlayerColor color) : mPlayerColor(color)
 {
 }
 
@@ -57,13 +57,13 @@ void Player::setScore(int value)
 }
 
 
-PieceColor Player::getPlayerColor() const
+PlayerColor Player::getPlayerColor() const
 {
 	return mPlayerColor;
 }
 
 
-void Player::setPlayerColor(PieceColor value)
+void Player::setPlayerColor(PlayerColor value)
 {
 	if (mPlayerColor != value)
 	{
@@ -101,4 +101,12 @@ constexpr int Player::getPieceValue(PieceType piece)
 	case PieceType::King: return kingValue;
 	default: return 0;
 	}
+}
+
+
+void Player::reset()
+{
+	setScore(0);
+	mCapturedPieces.clear();
+	setOnTurn(false);
 }

@@ -22,7 +22,7 @@ MoveHelper::~MoveHelper()
 }
 
 
-bool MoveHelper::checkAvailableMoves(const Position &position, ChessBoard &board, const PieceColor color, PieceType piece, bool hasMoved)
+bool MoveHelper::checkAvailableMoves(const Position &position, ChessBoard &board, const PlayerColor color, PieceType piece, bool hasMoved)
 {
 	bool movesAdded = true;
 
@@ -80,9 +80,9 @@ std::vector<PossibleMove> MoveHelper::getAvailableMoves()
 }
 
 
-bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, const PieceColor color, bool hasMoved)
+bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, const PlayerColor color, bool hasMoved)
 {
-	int		 colorFactor = (color == PieceColor::White) ? 1 : -1;
+	int		 colorFactor = (color == PlayerColor::White) ? 1 : -1;
 
 	int		 newX		 = position.x + mPawnMoveDirections[0].first;
 	int		 newY		 = position.y + mPawnMoveDirections[0].second * colorFactor;
@@ -95,7 +95,7 @@ bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, 
 		move.start = position;
 		move.end   = newPosition;
 
-        if ((color == PieceColor::White && newY == 8) || (color == PieceColor::Black && newY == 1))
+		if ((color == PlayerColor::White && newY == 8) || (color == PlayerColor::Black && newY == 1))
 		{
 			move.type = MoveType::PawnPromotion;
 		}
@@ -123,9 +123,9 @@ bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, 
 }
 
 
-bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &board, const PieceColor color)
+bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &board, const PlayerColor color)
 {
-	int colorFactor = (color == PieceColor::White) ? 1 : -1;
+	int colorFactor = (color == PlayerColor::White) ? 1 : -1;
 
 	for (const auto &dir : mPawnCaptureDirections)
 	{
@@ -136,7 +136,7 @@ bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &
 
 		if (checkForBorders(newX, newY) && !board.isEmpty(newPosition))
 		{
-			const auto piece = board.getPiece(newPosition);
+			const auto &piece = board.getPiece(newPosition);
 			if (piece->getColor() != color)
 			{
 				PossibleMove move;
@@ -152,32 +152,32 @@ bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &
 }
 
 
-bool MoveHelper::checkDiagonalMoves(const Position &position, ChessBoard &board, const PieceColor color)
+bool MoveHelper::checkDiagonalMoves(const Position &position, ChessBoard &board, const PlayerColor color)
 {
 	return checkMovesInDirection(position, board, color, mDiagonalDirections, false);
 }
 
 
-bool MoveHelper::checkAdjacentMoves(const Position &position, ChessBoard &board, const PieceColor color)
+bool MoveHelper::checkAdjacentMoves(const Position &position, ChessBoard &board, const PlayerColor color)
 {
 	return checkMovesInDirection(position, board, color, mAdjacentPositions, true);
 }
 
 
-bool MoveHelper::checkLShapedMoves(const Position &position, ChessBoard &board, const PieceColor color)
+bool MoveHelper::checkLShapedMoves(const Position &position, ChessBoard &board, const PlayerColor color)
 {
 	return checkMovesInDirection(position, board, color, mLShapedDirections, true);
 }
 
 
-bool MoveHelper::checkFileMoves(const Position &position, ChessBoard &board, const PieceColor color)
+bool MoveHelper::checkFileMoves(const Position &position, ChessBoard &board, const PlayerColor color)
 {
 	return checkMovesInDirection(position, board, color, mFileDirections, false);
 }
 
 
 template <std::size_t N>
-bool MoveHelper::checkMovesInDirection(const Position &position, ChessBoard &board, const PieceColor color, const std::array<std::pair<int, int>, N> &directions, bool oneStep)
+bool MoveHelper::checkMovesInDirection(const Position &position, ChessBoard &board, const PlayerColor color, const std::array<std::pair<int, int>, N> &directions, bool oneStep)
 {
 	for (const auto &dir : directions)
 	{

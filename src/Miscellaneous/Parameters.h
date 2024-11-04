@@ -9,7 +9,6 @@
 */
 
 #pragma once
-#include <map>
 
 
 //============================================================
@@ -39,7 +38,7 @@ enum class PieceType
 };
 
 
-enum class PieceColor
+enum class PlayerColor
 {
 	NoColor,
 	White,
@@ -58,4 +57,23 @@ enum class MoveType
 	EnPassant,
 	CastlingQueenside,
 	CastlingKingside
+};
+
+
+enum class GameState
+{
+	Init = 1,
+	OnGoing,
+	Paused,
+	Checkmate,
+	Stalemate,
+	Draw
+};
+
+
+enum class MoveState
+{
+	NoMove = 1,
+	InitiateMove,
+	ExecuteMove
 };

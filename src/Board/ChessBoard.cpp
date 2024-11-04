@@ -44,7 +44,7 @@ void ChessBoard::setPiece(Position pos, std::shared_ptr<ChessPiece> piece)
 }
 
 
-std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PieceColor playerColor)
+std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PlayerColor playerColor)
 {
 	std::vector<PlayerPiece> playerPieces;
 	playerPieces.reserve(PLAYER_PIECES_NUM * sizeof(PlayerPiece));
@@ -54,7 +54,7 @@ std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PieceColor playerColor)
 		for (int x = 0; x < BOARD_SIZE; ++x)
 		{
 			Position pos{x, y};
-			auto	 piece = getPiece(pos);
+			auto	&piece = getPiece(pos);
 			if (piece && piece->getColor() == playerColor)
 			{
 				playerPieces.emplace_back(pos, piece);
@@ -66,7 +66,7 @@ std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PieceColor playerColor)
 }
 
 
-std::shared_ptr<ChessPiece>& ChessBoard::getPiece(Position pos)
+std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos)
 {
 	return squares[pos.y][pos.x].piece;
 }
@@ -80,7 +80,7 @@ void ChessBoard::removePiece(Position pos)
 
 bool ChessBoard::movePiece(Position start, Position end)
 {
-	auto piece = getPiece(start);
+	auto &piece = getPiece(start);
 	if (!piece)
 		return false;
 
@@ -97,45 +97,64 @@ bool ChessBoard::isEmpty(Position pos) const
 }
 
 
-void ChessBoard::updateKingsPosition(Position &pos, PieceColor player)
+void ChessBoard::updateKingsPosition(Position &pos, PlayerColor player)
 {
-	player == PieceColor::White ? mWhiteKingPosition = pos : mBlackKingPosition = pos;
+	player == PlayerColor::White ? mWhiteKingPosition = pos : mBlackKingPosition = pos;
 }
 
 
-Position ChessBoard::getKingsPosition(PieceColor player) const
+Position ChessBoard::getKingsPosition(PlayerColor player) const
 {
-	return player == PieceColor::White ? mWhiteKingPosition : mBlackKingPosition;
+	return player == PlayerColor::White ? mWhiteKingPosition : mBlackKingPosition;
+}
+
+
+void ChessBoard::removeAllPiecesFromBoard()
+{
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			squares[y][x].piece = nullptr;
+		}
+	}
+
+	mWhiteKingPosition = Position{-1, -1}; // invalid position
+	mBlackKingPosition = Position{-1, -1}; // invalid position
 }
 
 
 void ChessBoard::initializeBoard()
 {
 	// Place pieces for White
-	setPiece(Position(0, 0), std::make_shared<Rook>(PieceColor::White));
-	setPiece(Position(1, 0), std::make_shared<Knight>(PieceColor::White));
-	setPiece(Position(2, 0), std::make_shared<Bishop>(PieceColor::White));
-	setPiece(Position(3, 0), std::make_shared<Queen>(PieceColor::White));
-	setPiece(Position(4, 0), std::make_shared<King>(PieceColor::White));
-	setPiece(Position(5, 0), std::make_shared<Bishop>(PieceColor::White));
-	setPiece(Position(6, 0), std::make_shared<Knight>(PieceColor::White));
-	setPiece(Position(7, 0), std::make_shared<Rook>(PieceColor::White));
+	setPiece(Position(0, 0), std::make_shared<Rook>(PlayerColor::White));
+	setPiece(Position(1, 0), std::make_shared<Knight>(PlayerColor::White));
+	setPiece(Position(2, 0), std::make_shared<Bishop>(PlayerColor::White));
+	setPiece(Position(3, 0), std::make_shared<Queen>(PlayerColor::White));
+	setPiece(Position(4, 0), std::make_shared<King>(PlayerColor::White));
+	setPiece(Position(5, 0), std::make_shared<Bishop>(PlayerColor::White));
+	setPiece(Position(6, 0), std::make_shared<Knight>(PlayerColor::White));
+	setPiece(Position(7, 0), std::make_shared<Rook>(PlayerColor::White));
 	for (int x = 0; x < BOARD_SIZE; ++x)
 	{
-		setPiece(Position(x, 1), std::make_shared<Pawn>(PieceColor::White));
+		setPiece(Position(x, 1), std::make_shared<Pawn>(PlayerColor::White));
 	}
 
 	// Place pieces for Black
-	setPiece(Position(0, 7), std::make_shared<Rook>(PieceColor::Black));
-	setPiece(Position(1, 7), std::make_shared<Knight>(PieceColor::Black));
-	setPiece(Position(2, 7), std::make_shared<Bishop>(PieceColor::Black));
-	setPiece(Position(3, 7), std::make_shared<Queen>(PieceColor::Black));
-	setPiece(Position(4, 7), std::make_shared<King>(PieceColor::Black));
-	setPiece(Position(5, 7), std::make_shared<Bishop>(PieceColor::Black));
-	setPiece(Position(6, 7), std::make_shared<Knight>(PieceColor::Black));
-	setPiece(Position(7, 7), std::make_shared<Rook>(PieceColor::Black));
+	setPiece(Position(0, 7), std::make_shared<Rook>(PlayerColor::Black));
+	setPiece(Position(1, 7), std::make_shared<Knight>(PlayerColor::Black));
+	setPiece(Position(2, 7), std::make_shared<Bishop>(PlayerColor::Black));
+	setPiece(Position(3, 7), std::make_shared<Queen>(PlayerColor::Black));
+	setPiece(Position(4, 7), std::make_shared<King>(PlayerColor::Black));
+	setPiece(Position(5, 7), std::make_shared<Bishop>(PlayerColor::Black));
+	setPiece(Position(6, 7), std::make_shared<Knight>(PlayerColor::Black));
+	setPiece(Position(7, 7), std::make_shared<Rook>(PlayerColor::Black));
 	for (int x = 0; x < BOARD_SIZE; ++x)
 	{
-		setPiece(Position(x, 6), std::make_shared<Pawn>(PieceColor::Black));
+		setPiece(Position(x, 6), std::make_shared<Pawn>(PlayerColor::Black));
 	}
+
+	// Update King's Position
+	mWhiteKingPosition = Position(4, 0);
+	mBlackKingPosition = Position(4, 7);
 }

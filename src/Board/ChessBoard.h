@@ -53,7 +53,7 @@ public:
 
 	void						 setPiece(Position pos, std::shared_ptr<ChessPiece> piece);
 
-	std::vector<PlayerPiece>	 getPiecesFromPlayer(PieceColor playerColor);
+	std::vector<PlayerPiece>	 getPiecesFromPlayer(PlayerColor playerColor);
 
 	std::shared_ptr<ChessPiece> &getPiece(Position pos);
 
@@ -63,15 +63,17 @@ public:
 
 	bool						 isEmpty(Position pos) const;
 
-	void						 updateKingsPosition(Position &pos, PieceColor player);
+	void						 updateKingsPosition(Position &pos, PlayerColor player);
 
-	Position					 getKingsPosition(PieceColor player) const;
+	Position					 getKingsPosition(PlayerColor player) const;
+
+	void						 removeAllPiecesFromBoard();
 
 
 private:
 	std::vector<std::vector<Square>> squares;
 
-	Position						 mWhiteKingPosition;
+	Position						 mWhiteKingPosition = Position{-1, -1};
 
-	Position						 mBlackKingPosition;
+	Position						 mBlackKingPosition = Position{-1, -1};
 };

@@ -19,7 +19,7 @@
 class King : public ChessPiece
 {
 public:
-	King(PieceColor color) : ChessPiece(PieceType::King, color)
+	King(PlayerColor color) : ChessPiece(PieceType::King, color)
 	{
 	}
 

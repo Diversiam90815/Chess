@@ -18,7 +18,7 @@ std::vector<PossibleMove> Pawn::getPossibleMoves(const Position &pos, ChessBoard
 {
 	MoveHelper helper;
 	bool	   hasMoved = getHasMoved();
-	PieceColor color	= getColor();
+	PlayerColor color	= getColor();
 	helper.checkAvailableMoves(pos, board, color, PieceType::Pawn, hasMoved);
 	auto moves = helper.getAvailableMoves();
 	return moves;

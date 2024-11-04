@@ -17,31 +17,11 @@
 
 class ChessBoard;
 
-//
-// enum PieceType
-//{
-//	DefaultType,
-//	Pawn,
-//	Knight,
-//	Bishop,
-//	Rook,
-//	Queen,
-//	King
-//};
-//
-//
-// enum PieceColor
-//{
-//	NoColor,
-//	White,
-//	Black
-//};
-
 
 class ChessPiece
 {
 public:
-	ChessPiece(PieceType type, PieceColor color) : type(type), color(color), hasMoved(false)
+	ChessPiece(PieceType type, PlayerColor color) : type(type), color(color), hasMoved(false)
 	{
 	}
 
@@ -54,7 +34,7 @@ public:
 		return type;
 	}
 
-	PieceColor getColor() const
+	PlayerColor getColor() const
 	{
 		return color;
 	}
@@ -74,9 +54,9 @@ public:
 
 
 protected:
-	PieceType  type;
+	PieceType	type;
 
-	PieceColor color;
+	PlayerColor color;
 
-	bool	   hasMoved;
+	bool		hasMoved;
 };

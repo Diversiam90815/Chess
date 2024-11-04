@@ -71,22 +71,22 @@ struct Move
 	{
 	}
 
-	Position   startingPosition;
-	Position   endingPosition;
+	Position	startingPosition;
+	Position	endingPosition;
 
-	PieceType  movedPiece	 = PieceType::DefaultType;
-	PieceType  capturedPiece = PieceType::DefaultType;
-	PieceType  promotionType = PieceType::DefaultType;
-	PieceColor player		 = PieceColor::NoColor;
+	PieceType	movedPiece	  = PieceType::DefaultType;
+	PieceType	capturedPiece = PieceType::DefaultType;
+	PieceType	promotionType = PieceType::DefaultType;
+	PlayerColor player		  = PlayerColor::NoColor;
 
-	MoveType   type			 = MoveType::Normal;
+	MoveType	type		  = MoveType::Normal;
 
-	int		   number		 = 0; // Storing the current number of this move. Each move saved should increment this number!
+	int			number		  = 0; // Storing the current number of this move. Each move saved should increment this number!
 
-	int		   halfMoveClock = 0; // Incrememted with every move that is not a capture or pawn move (detect draw if halfMoveClock is 100)
+	int			halfMoveClock = 0; // Incrememted with every move that is not a capture or pawn move (detect draw if halfMoveClock is 100)
 
 
-	bool	   operator<(const Move &other) const
+	bool		operator<(const Move &other) const
 	{
 		return this->number < other.number;
 	}

@@ -26,37 +26,37 @@ public:
 
 	std::vector<PossibleMove> getMovesForPosition(Position &position);
 
-	bool					  calculateAllLegalBasicMoves(PieceColor playerColor);
+	bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
 
 	Move					  executeMove(PossibleMove &executedMove, PieceType pawnPromotion = PieceType::DefaultType);
 
 
 private:
-	bool													validateMove(Move &move, PieceColor playerColor);
+	bool													validateMove(Move &move, PlayerColor playerColor);
 
-	bool													isKingInCheck(Position &ourKing, PieceColor playerColor);
+	bool													isKingInCheck(Position &ourKing, PlayerColor playerColor);
 
-	bool													isCheckmate(PieceColor player);
+	bool													isCheckmate(PlayerColor player);
 
-	bool													isStalemate(PieceColor player);
+	bool													isStalemate(PlayerColor player);
 
-	bool													wouldKingBeInCheckAfterMove(Move &move, PieceColor playerColor);
+	bool													wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor);
 
-	bool													isSquareAttacked(const Position &square, PieceColor attackerColor);
+	bool													isSquareAttacked(const Position &square, PlayerColor attackerColor);
 
 
 	bool													executeCastlingMove(PossibleMove &move);
 
-	std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PieceColor player);
+	std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PlayerColor player);
 
-	bool													canCastle(const Position &kingposition, PieceColor player, bool kingside);
+	bool													canCastle(const Position &kingposition, PlayerColor player, bool kingside);
 
 
-	bool													executeEnPassantMove(PossibleMove &move, PieceColor player);
+	bool													executeEnPassantMove(PossibleMove &move, PlayerColor player);
 
-	PossibleMove											generateEnPassantMove(const Position &position, PieceColor player);
+	PossibleMove											generateEnPassantMove(const Position &position, PlayerColor player);
 
-	bool													canEnPassant(const Position &position, PieceColor player);
+	bool													canEnPassant(const Position &position, PlayerColor player);
 
 
 	bool													executePawnPromotion(const PossibleMove &move, PieceType promotedType);

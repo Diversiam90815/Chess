@@ -27,27 +27,27 @@ public:
 	~MoveHelper();
 
 
-	bool					  checkAvailableMoves(const Position &position, ChessBoard &board, const PieceColor color, const PieceType piece, bool hasMoved = false);
+	bool					  checkAvailableMoves(const Position &position, ChessBoard &board, const PlayerColor color, const PieceType piece, bool hasMoved = false);
 
 	std::vector<PossibleMove> getAvailableMoves();
 
 
 private:
-	bool checkPawnMovement(const Position &position, ChessBoard &board, const PieceColor color, bool hasMoved);
+	bool checkPawnMovement(const Position &position, ChessBoard &board, const PlayerColor color, bool hasMoved);
 
-	bool checkPawnCaptureMovement(const Position &position, ChessBoard &board, const PieceColor color);
+	bool checkPawnCaptureMovement(const Position &position, ChessBoard &board, const PlayerColor color);
 
-	bool checkDiagonalMoves(const Position &position, ChessBoard &board, const PieceColor color);
+	bool checkDiagonalMoves(const Position &position, ChessBoard &board, const PlayerColor color);
 
-	bool checkAdjacentMoves(const Position &position, ChessBoard &board, const PieceColor color);
+	bool checkAdjacentMoves(const Position &position, ChessBoard &board, const PlayerColor color);
 
-	bool checkLShapedMoves(const Position &position, ChessBoard &board, const PieceColor color);
+	bool checkLShapedMoves(const Position &position, ChessBoard &board, const PlayerColor color);
 
-	bool checkFileMoves(const Position &position, ChessBoard &board, const PieceColor color);
+	bool checkFileMoves(const Position &position, ChessBoard &board, const PlayerColor color);
 
 
 	template <std::size_t N>
-	bool checkMovesInDirection(const Position &position, ChessBoard &board, const PieceColor color, const std::array<std::pair<int, int>, N> &directions, bool oneStep);
+	bool checkMovesInDirection(const Position &position, ChessBoard &board, const PlayerColor color, const std::array<std::pair<int, int>, N> &directions, bool oneStep);
 
 
 
