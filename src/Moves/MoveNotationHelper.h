@@ -13,17 +13,25 @@
 #include <string>
 
 #include "Move.h"
-#include "ChessBoard.h"
-
+#include "MoveType.h"
 
 
 class MoveNotationHelper
 {
 public:
-	static std::string GenerateSAN(const Move& move)
-	{
-	
-	}
+	MoveNotationHelper();
+	~MoveNotationHelper();
 
-	
+	std::string generateStandartAlgebraicNotation(Move &move);
+
+private:
+	std::string castlingToSAN(Move &move);
+
+	std::string getPositionString(Position &pos);
+
+	char		getFileFromPosition(Position &pos);
+
+	char		getRankFromPosition(Position &pos);
+
+	char		getPieceType(PieceType type);
 };

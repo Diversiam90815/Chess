@@ -11,10 +11,11 @@
 
 #pragma once
 
-#include "Parameters.h"
+#include <string>
 #include <functional>
 
-class MoveNotationHelper;
+#include "Parameters.h"
+#include "MoveType.h"
 
 
 struct Position
@@ -51,7 +52,7 @@ struct PossibleMove
 	Position end;
 	MoveType type = MoveType::Normal;
 
-	bool	 operator==(PossibleMove &other)
+	bool	 operator==(const PossibleMove &other) const
 	{
 		return this->start == other.start && this->end == other.end;
 	}
@@ -77,6 +78,8 @@ public:
 	PlayerColor player		  = PlayerColor::NoColor;
 
 	MoveType	type		  = MoveType::Normal;
+
+	std::string notation	  = "";
 
 	int			number		  = 0; // Storing the current number of this move. Each move saved should increment this number!
 

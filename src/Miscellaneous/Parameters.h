@@ -46,20 +46,6 @@ enum class PlayerColor
 };
 
 
-enum class MoveType
-{
-	Normal = 1,
-	DoublePawnPush,
-	PawnPromotion,
-	Check,
-	Checkmate,
-	Capture,
-	EnPassant,
-	CastlingQueenside,
-	CastlingKingside
-};
-
-
 enum class GameState
 {
 	Init = 1,

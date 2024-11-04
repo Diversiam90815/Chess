@@ -16,6 +16,8 @@ MovementManager::MovementManager()
 {
 	mChessBoard = std::make_unique<ChessBoard>();
 	mChessBoard->initializeBoard();
+
+	mMoveNotation = std::make_unique<MoveNotationHelper>();
 }
 
 
@@ -97,29 +99,41 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	movedPiece->setHasMoved(true);
 
 	// Store if this move captured another piece
-	bool capturedPiece = possibleMove.type == MoveType::Capture;
+	bool capturedPiece = (possibleMove.type & MoveType::Capture) == MoveType::Capture;
 	if (capturedPiece)
 	{
 		auto capturedPiece		   = mChessBoard->getPiece(possibleMove.end)->getType();
 		executedMove.capturedPiece = capturedPiece;
 	}
 
-	if (possibleMove.type == MoveType::EnPassant)
+	if ((possibleMove.type & MoveType::EnPassant) == MoveType::EnPassant)
 	{
 		executeEnPassantMove(possibleMove, player);
 	}
-	else if (possibleMove.type == MoveType::CastlingKingside || possibleMove.type == MoveType::CastlingQueenside)
+	else if ((possibleMove.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (possibleMove.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
 	{
 		executeCastlingMove(possibleMove);
 	}
-	else if (possibleMove.type == MoveType::Normal)
+	else if ((possibleMove.type & MoveType::Normal) == MoveType::Normal)
 	{
 		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
 	}
-	else if (possibleMove.type == MoveType::PawnPromotion)
+	else if ((possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
 	{
 		executePawnPromotion(possibleMove, pawnPromotion);
 		executedMove.promotionType = pawnPromotion;
+	}
+
+	PlayerColor opponent	 = player == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
+	auto		opponentKing = mChessBoard->getKingsPosition(opponent);
+
+	if (isCheckmate(opponent))
+	{
+		executedMove.type |= MoveType::Checkmate;
+	}
+	else if (isKingInCheck(opponentKing, player))
+	{
+		executedMove.type |= MoveType::Check;
 	}
 
 
@@ -140,6 +154,8 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	{
 		executedMove.halfMoveClock = 0;
 	}
+
+	executedMove.notation = mMoveNotation->generateStandartAlgebraicNotation(executedMove);
 
 	addMoveToHistory(executedMove);
 	return executedMove;
@@ -281,13 +297,13 @@ bool MovementManager::executeCastlingMove(PossibleMove &move)
 	Position rookStart;
 	Position rookEnd;
 
-	if (move.type == MoveType::CastlingKingside)
+	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside)
 	{
 		kingEnd	  = Position(kingStart.x + 2, kingStart.y); // King moves two squares right
 		rookStart = Position(kingStart.x + 3, kingStart.y); // Rook's original position
 		rookEnd	  = Position(kingStart.x + 1, kingStart.y); // Rook moves to the square left of the king
 	}
-	else if (move.type == MoveType::CastlingQueenside)
+	else if ((move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
 	{
 		kingEnd	  = Position(kingStart.x - 2, kingStart.y); // King moves two squares left
 		rookStart = Position(kingStart.x - 4, kingStart.y); // Rook's original position
@@ -409,7 +425,7 @@ PossibleMove MovementManager::generateEnPassantMove(const Position &position, Pl
 	PossibleMove enPassantMove;
 	enPassantMove.start = position;
 	enPassantMove.end	= targetPosition;
-	enPassantMove.type	= MoveType::EnPassant;
+	enPassantMove.type	= MoveType::EnPassant | MoveType::Capture;
 
 	return enPassantMove;
 }
@@ -423,7 +439,7 @@ bool MovementManager::canEnPassant(const Position &position, PlayerColor player)
 		return false;
 
 	// Ensure if the last move was a pawn double push
-	bool lastMoveWasPawnDoublePush = lastMove->type == MoveType::DoublePawnPush;
+	bool lastMoveWasPawnDoublePush = (lastMove->type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush;
 	if (!lastMoveWasPawnDoublePush)
 		return false;
 
@@ -454,7 +470,7 @@ bool MovementManager::canEnPassant(const Position &position, PlayerColor player)
 
 bool MovementManager::executePawnPromotion(const PossibleMove &move, PieceType promotedType)
 {
-	if (move.type != MoveType::PawnPromotion)
+	if ((move.type & MoveType::PawnPromotion) != MoveType::PawnPromotion)
 		return false;
 
 	// Validate promoted piece

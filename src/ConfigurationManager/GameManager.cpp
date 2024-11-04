@@ -78,7 +78,6 @@ void GameManager::executeMove(PossibleMove &move)
 		}
 	}
 
-	// switchTurns();
 	checkForEndGameConditions();
 }
 
@@ -170,7 +169,6 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 	case (MoveState::ExecuteMove):
 	{
 		executeMove(move);
-		// checkForEndGameConditions();
 		break;
 	}
 	default: break;
@@ -180,19 +178,28 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 
 void GameManager::checkForEndGameConditions()
 {
-	if (mMovementManager->isCheckmate(mCurrentPlayer))
+	const Move *lastMove = mMovementManager->getLastMove();
+
+	if (lastMove)
 	{
-		setCurrentGameState(GameState::Checkmate);
-		endGame();
-	}
-	else if (mMovementManager->isStalemate(mCurrentPlayer))
-	{
-		setCurrentGameState(GameState::Stalemate);
-		endGame();
-	}
-	else
-	{
+		bool isCheckMate = (lastMove->type & MoveType::Checkmate) == MoveType::Checkmate;
+		if (isCheckMate)
+		{
+			setCurrentGameState(GameState::Checkmate);
+			endGame();
+			return;
+		}
+
+		bool isStaleMate = mMovementManager->isStalemate(mCurrentPlayer);
+		if (isStaleMate)
+		{
+			setCurrentGameState(GameState::Stalemate);
+			endGame();
+			return;
+		}
+
 		setCurrentGameState(GameState::OnGoing);
 		switchTurns();
 	}
+	setCurrentGameState(GameState::OnGoing);
 }
