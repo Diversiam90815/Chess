@@ -28,8 +28,18 @@ void GameManager::init()
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
 
-	mWhitePlayer.setOnTurn(true);
+	clearState();
+}
+
+
+void GameManager::clearState()
+{
 	mCurrentPlayer = PlayerColor::White;
+	mWhitePlayer.setOnTurn(true);
+
+	setCurrentGameState(GameState::Init);
+	setCurrentMoveState(MoveState::NoMove);
+	mAllMovesForPosition.clear();
 }
 
 
@@ -68,7 +78,8 @@ void GameManager::executeMove(PossibleMove &move)
 		}
 	}
 
-	switchTurns();
+	// switchTurns();
+	checkForEndGameConditions();
 }
 
 
@@ -110,10 +121,27 @@ void GameManager::resetGame()
 	mWhitePlayer.reset();
 	mBlackPlayer.reset();
 
-	mCurrentPlayer = PlayerColor::White;
+	clearState();
+}
 
-	setCurrentGameState(GameState::Init);
-	setCurrentMoveState(MoveState::NoMove);
+
+void GameManager::endGame() const
+{
+	auto winner = getWinner();
+	if (winner.has_value())
+	{
+		// winner is Winner (set delegate to UI)
+	}
+}
+
+
+std::optional<PlayerColor> GameManager::getWinner() const
+{
+	if (mCurrentState == GameState::Checkmate)
+		return mCurrentPlayer == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
+	else if (mCurrentState == GameState::Stalemate)
+		return std::nullopt; // Draw in case of stalemate
+	return std::nullopt;
 }
 
 
@@ -129,7 +157,12 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 
 	case (MoveState::InitiateMove):
 	{
+		mAllMovesForPosition.clear();
+
 		auto possibleMoves = mMovementManager->getMovesForPosition(move.start);
+
+		mAllMovesForPosition.reserve(possibleMoves.size());
+		mAllMovesForPosition = possibleMoves;
 		// delegate possible moves to UI
 		break;
 	}
@@ -137,8 +170,7 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 	case (MoveState::ExecuteMove):
 	{
 		executeMove(move);
-		checkForEndGameConditions();
-		switchTurns();
+		// checkForEndGameConditions();
 		break;
 	}
 	default: break;
@@ -151,13 +183,16 @@ void GameManager::checkForEndGameConditions()
 	if (mMovementManager->isCheckmate(mCurrentPlayer))
 	{
 		setCurrentGameState(GameState::Checkmate);
+		endGame();
 	}
 	else if (mMovementManager->isStalemate(mCurrentPlayer))
 	{
 		setCurrentGameState(GameState::Stalemate);
+		endGame();
 	}
 	else
 	{
 		setCurrentGameState(GameState::OnGoing);
+		switchTurns();
 	}
 }
