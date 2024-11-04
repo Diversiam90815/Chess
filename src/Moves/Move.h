@@ -14,6 +14,8 @@
 #include "Parameters.h"
 #include <functional>
 
+class MoveNotationHelper;
+
 
 struct Position
 {
@@ -56,20 +58,15 @@ struct PossibleMove
 };
 
 
-struct Move
+class Move
 {
-	Move()
-	{
-	}
+public:
+	Move();
 
-	Move(PossibleMove &possibleMove) : startingPosition(possibleMove.start), endingPosition(possibleMove.end), type(possibleMove.type)
-	{
-	}
+	Move(PossibleMove &possibleMove);
 
-	Move(Position start, Position end, PieceType moved, PieceType captured = PieceType::DefaultType, MoveType type = MoveType::Normal, PieceType promotion = PieceType::DefaultType)
-		: startingPosition(start), endingPosition(end), movedPiece(moved), capturedPiece(captured), type(type), promotionType(promotion)
-	{
-	}
+	Move(
+		Position start, Position end, PieceType moved, PieceType captured = PieceType::DefaultType, MoveType type = MoveType::Normal, PieceType promotion = PieceType::DefaultType);
 
 	Position	startingPosition;
 	Position	endingPosition;
