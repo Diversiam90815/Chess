@@ -67,6 +67,21 @@ void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 }
 
 
+PieceType GameManager::getCurrentPieceTypeAtPosition(const Position position)
+{
+	if (!mMovementManager)
+		return PieceType::DefaultType;
+
+	auto &chessPiece = mMovementManager->mChessBoard->getPiece(position);
+
+	if (chessPiece)
+	{
+		return chessPiece->getType();
+	}
+	return PieceType::DefaultType;
+}
+
+
 void GameManager::switchTurns()
 {
 	setCurrentMoveState(MoveState::NoMove);

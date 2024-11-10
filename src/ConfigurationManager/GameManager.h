@@ -46,9 +46,11 @@ public:
 
 	void					   clearState();
 
-
 	void					   setDelegate(PFN_CALLBACK pDelegate);
 
+	PieceType				   getCurrentPieceTypeAtPosition(const Position position);
+
+	std::unique_ptr<MovementManager> mMovementManager;
 
 private:
 	GameManager();
@@ -70,7 +72,6 @@ private:
 
 	std::vector<PossibleMove>		 mAllMovesForPosition;
 
-	std::unique_ptr<MovementManager> mMovementManager;
 
 	PFN_CALLBACK					 mDelegate;
 };

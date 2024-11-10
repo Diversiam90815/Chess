@@ -20,7 +20,7 @@ typedef void(CALLBACK *PFN_CALLBACK)(int messageId, void *pContext);
 #define MAX_STRING_LENGTH 250
 
 
-typedef struct PossibleMoveInstance
+typedef struct PositionInstance
 {
 	int x;
 	int y;
@@ -50,7 +50,7 @@ typedef struct PossibleMoveInstance
 } PossibleMoveInstance;
 
 
-typedef enum  PieceTypeInstance
+typedef enum PieceTypeInstance
 {
 	DefaultType,
 	Pawn,
@@ -59,4 +59,4 @@ typedef enum  PieceTypeInstance
 	Rook,
 	Queen,
 	King
-};
+} PieceTypeInstance;

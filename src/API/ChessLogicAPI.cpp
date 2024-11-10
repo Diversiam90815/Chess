@@ -18,7 +18,7 @@
 //=============================================
 
 
-PossibleMove MapPossibleMove(const PossibleMoveInstance &moveInstance)
+PossibleMove MapToPossibleMove(const PossibleMoveInstance &moveInstance)
 {
 	PossibleMove move;
 
@@ -32,13 +32,22 @@ PossibleMove MapPossibleMove(const PossibleMoveInstance &moveInstance)
 }
 
 
-Position MapPosition(const PositionInstance positionInstance)
+Position MapToPosition(const PositionInstance positionInstance)
 {
 	Position pos;
 
 	pos.x = positionInstance.x;
 	pos.y = positionInstance.y;
 
+	return pos;
+}
+
+
+PositionInstance MapToPositionInstance(Position position)
+{
+	PositionInstance pos;
+	pos.x = position.x;
+	pos.y = position.y;
 	return pos;
 }
 
@@ -68,14 +77,52 @@ CHESS_API void SetDelegate(PFN_CALLBACK pDelegate)
 }
 
 
-CHESS_API int GetNumPossibleMoves(PositionInstance pos)
+CHESS_API int GetNumPossibleMoves(PositionInstance positionInstance)
 {
-	return 0;
+	GameManager *manager  = GameManager::GetInstance();
+	Position	 pos	  = MapToPosition(positionInstance);
+
+	auto		 moves	  = manager->mMovementManager->getMovesForPosition(pos);
+	size_t		 numMoves = moves.size();
+	return numMoves;
 }
 
 
-CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance possibleMove)
+CHESS_API bool GetPossibleMoveAtIndex(int index, PositionInstance positionInstance, PossibleMoveInstance *possibleMoveInstance)
 {
+	GameManager *manager = GameManager::GetInstance();
+	Position	 pos	 = MapToPosition(positionInstance);
+
+	auto		 moves	 = manager->mMovementManager->getMovesForPosition(pos);
+
+	Position	 start{0, 0};
+	Position	 end{0, 0};
+	MoveType	 type	 = MoveType::None;
+
+	int			 counter = -1;
+
+	for (auto &move : moves)
+	{
+		counter++;
+		if (counter == index)
+		{
+			start = move.start;
+			end	  = move.end;
+			type  = move.type;
+			break;
+		}
+	}
+
+	if ((start != Position{0, 0}) && (end != Position{0, 0}) && ((type & MoveType::None) != MoveType::None))
+	{
+		PositionInstance startPos	= MapToPositionInstance(start);
+		PositionInstance endPos		= MapToPositionInstance(end);
+
+		possibleMoveInstance->start = startPos;
+		possibleMoveInstance->end	= endPos;
+		possibleMoveInstance->type	= static_cast<MoveTypeInstance>(type);
+		return true;
+	}
 	return false;
 }
 
@@ -83,7 +130,7 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance possibleMo
 CHESS_API void ExecuteMove(const PossibleMoveInstance &moveInstance)
 {
 	GameManager *manager = GameManager::GetInstance();
-	PossibleMove move	 = MapPossibleMove(moveInstance);
+	PossibleMove move	 = MapToPossibleMove(moveInstance);
 	manager->executeMove(move);
 }
 
@@ -109,7 +156,17 @@ CHESS_API void ResetGame()
 }
 
 
-CHESS_API bool GetPieceInPosition(PositionInstance pos, PieceTypeInstance piece)
+CHESS_API PieceTypeInstance GetPieceInPosition(PositionInstance posInstance)
 {
-	return false;
+	Position pos = MapToPosition(posInstance);
+
+	if (pos.x < 0 || pos.x >= BOARD_SIZE || pos.y < 0 || pos.y >= BOARD_SIZE)
+	{
+		return PieceTypeInstance::DefaultType;
+	}
+
+	GameManager *manager = GameManager::GetInstance();
+
+	PieceType	 type	 = manager->getCurrentPieceTypeAtPosition(pos);
+	return static_cast<PieceTypeInstance>(type);
 }

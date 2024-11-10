@@ -33,9 +33,7 @@ public:
 
 	Move					  executeMove(PossibleMove &executedMove, PieceType pawnPromotion = PieceType::DefaultType);
 
-
 private:
-
 	bool													validateMove(Move &move, PlayerColor playerColor);
 
 	bool													isKingInCheck(Position &ourKing, PlayerColor playerColor);

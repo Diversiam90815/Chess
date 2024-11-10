@@ -26,16 +26,16 @@ extern "C"
 	CHESS_API void SetDelegate(PFN_CALLBACK pDelegate);
 
 
-	CHESS_API int  GetNumPossibleMoves(PositionInstance pos);
+	CHESS_API int  GetNumPossibleMoves(PositionInstance positionInstance);
 
-	CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance possibleMove);
+	CHESS_API bool GetPossibleMoveAtIndex(int index, PositionInstance positionInstance, PossibleMoveInstance *possibleMoveInstance);
 
 	CHESS_API void ExecuteMove(const PossibleMoveInstance& moveInstance);
 
 
 	//CHESS_API bool GetChessBoard(ChessBoard &board);
 
-	CHESS_API bool GetPieceInPosition(PositionInstance pos, PieceTypeInstance piece);
+	CHESS_API PieceTypeInstance GetPieceInPosition(PositionInstance posInstance);
 
 
 	CHESS_API void StartGame();
