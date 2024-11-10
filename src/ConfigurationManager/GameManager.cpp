@@ -59,9 +59,11 @@ void GameManager::clearState()
 	mAllMovesForPosition.clear();
 }
 
+
 void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 {
-
+	mDelegate = pDelegate;
+	// Set further Delegates if needed
 }
 
 
