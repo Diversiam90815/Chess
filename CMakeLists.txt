@@ -86,7 +86,6 @@ set(ALL_FILES
     ${CONFIG_FILES}
     ${PLAYER_FILES}
     ${MISC_FILES}
-    ${SOURCE_DIR}/main.cpp
 )
 
 
@@ -101,7 +100,7 @@ source_group("Miscellaneous"    FILES ${MISC_FILES})
 
 
 # Create the executable target
-add_executable(${PROJECT_NAME}
+add_library(${PROJECT_NAME} SHARED
     ${ALL_FILES}
 )
 
