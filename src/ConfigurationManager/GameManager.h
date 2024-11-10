@@ -50,7 +50,8 @@ public:
 
 	PieceType				   getCurrentPieceTypeAtPosition(const Position position);
 
-	std::unique_ptr<MovementManager> mMovementManager;
+	std::vector<PossibleMove>  getPossibleMoveForPosition();
+
 
 private:
 	GameManager();
@@ -72,6 +73,7 @@ private:
 
 	std::vector<PossibleMove>		 mAllMovesForPosition;
 
+	std::unique_ptr<MovementManager> mMovementManager;
 
 	PFN_CALLBACK					 mDelegate;
 };

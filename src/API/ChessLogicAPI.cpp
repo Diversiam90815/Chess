@@ -77,23 +77,21 @@ CHESS_API void SetDelegate(PFN_CALLBACK pDelegate)
 }
 
 
-CHESS_API int GetNumPossibleMoves(PositionInstance positionInstance)
+CHESS_API int GetNumPossibleMoves()
 {
 	GameManager *manager  = GameManager::GetInstance();
-	Position	 pos	  = MapToPosition(positionInstance);
 
-	auto		 moves	  = manager->mMovementManager->getMovesForPosition(pos);
+	auto		 moves	  = manager->getPossibleMoveForPosition();
 	size_t		 numMoves = moves.size();
 	return numMoves;
 }
 
-
-CHESS_API bool GetPossibleMoveAtIndex(int index, PositionInstance positionInstance, PossibleMoveInstance *possibleMoveInstance)
+// Needs to be called when delegate message received that calculation of possible moves is done (GameManager.cpp l 211)
+CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleMoveInstance)
 {
 	GameManager *manager = GameManager::GetInstance();
-	Position	 pos	 = MapToPosition(positionInstance);
 
-	auto		 moves	 = manager->mMovementManager->getMovesForPosition(pos);
+	auto		 moves	 = manager->getPossibleMoveForPosition();
 
 	Position	 start{0, 0};
 	Position	 end{0, 0};

@@ -82,6 +82,12 @@ PieceType GameManager::getCurrentPieceTypeAtPosition(const Position position)
 }
 
 
+std::vector<PossibleMove> GameManager::getPossibleMoveForPosition()
+{
+	return mAllMovesForPosition;
+}
+
+
 void GameManager::switchTurns()
 {
 	setCurrentMoveState(MoveState::NoMove);
@@ -201,7 +207,9 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 
 		mAllMovesForPosition.reserve(possibleMoves.size());
 		mAllMovesForPosition = possibleMoves;
+
 		// delegate possible moves to UI
+
 		break;
 	}
 
