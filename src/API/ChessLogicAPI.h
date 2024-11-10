@@ -30,7 +30,7 @@ extern "C"
 
 	CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance possibleMove);
 
-	CHESS_API void ExecuteMove(PossibleMoveInstance& move);
+	CHESS_API void ExecuteMove(const PossibleMoveInstance& moveInstance);
 
 
 	//CHESS_API bool GetChessBoard(ChessBoard &board);

@@ -12,6 +12,42 @@
 #include "GameManager.h"
 
 
+
+//=============================================
+//			API Helper Functions
+//=============================================
+
+
+PossibleMove MapPossibleMove(const PossibleMoveInstance &moveInstance)
+{
+	PossibleMove move;
+
+	move.start.x = moveInstance.start.x;
+	move.start.y = moveInstance.start.y;
+	move.end.x	 = moveInstance.end.x;
+	move.end.y	 = moveInstance.end.y;
+	move.type	 = static_cast<MoveType>(moveInstance.type);
+
+	return move;
+}
+
+
+Position MapPosition(const PositionInstance positionInstance)
+{
+	Position pos;
+
+	pos.x = positionInstance.x;
+	pos.y = positionInstance.y;
+
+	return pos;
+}
+
+
+
+//=============================================
+//			CHESS API
+//=============================================
+
 CHESS_API void Init()
 {
 	GameManager *manager = GameManager::GetInstance();
@@ -27,8 +63,8 @@ CHESS_API void Deinit()
 
 CHESS_API void SetDelegate(PFN_CALLBACK pDelegate)
 {
-	GameManager *gameManger = GameManager::GetInstance();
-	gameManger->setDelegate(pDelegate);
+	GameManager *manager = GameManager::GetInstance();
+	manager->setDelegate(pDelegate);
 }
 
 
@@ -44,29 +80,32 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance possibleMo
 }
 
 
-CHESS_API void ExecuteMove(PossibleMoveInstance &move)
+CHESS_API void ExecuteMove(const PossibleMoveInstance &moveInstance)
 {
+	GameManager *manager = GameManager::GetInstance();
+	PossibleMove move	 = MapPossibleMove(moveInstance);
+	manager->executeMove(move);
 }
-
-//
-// CHESS_API bool GetChessBoard(ChessBoard &board)
-//{
-//	return false;
-//}
 
 
 CHESS_API void StartGame()
 {
+	GameManager *manager = GameManager::GetInstance();
+	manager->init();
 }
 
 
 CHESS_API void EndGame()
 {
+	GameManager *manager = GameManager::GetInstance();
+	manager->endGame();
 }
 
 
 CHESS_API void ResetGame()
 {
+	GameManager *manager = GameManager::GetInstance();
+	manager->resetGame();
 }
 
 
