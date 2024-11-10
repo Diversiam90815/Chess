@@ -11,6 +11,8 @@
 #pragma once
 #include "Windows.h"
 
+#include "Parameters.h"
+
 
 typedef void(CALLBACK *PFN_CALLBACK)(int messageId, void *pContext);
 

@@ -52,6 +52,7 @@ public:
 
 	std::vector<PossibleMove>  getPossibleMoveForPosition();
 
+	bool					   getBoardState(PieceType boardState[BOARD_SIZE][BOARD_SIZE]);
 
 private:
 	GameManager();

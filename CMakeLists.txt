@@ -91,13 +91,13 @@ set(ALL_FILES
 
 
 # Group source and header files (optional, for IDEs)
-source_group("API" FILES ${API_FILES})
-source_group("Pieces" FILES ${PIECE_FILES})
-source_group("Board" FILES ${BOARD_FILES})
-source_group("Moves" FILES ${MOVE_FILES})
-source_group("Configuration" FILES ${CONFIG_FILES})
-source_group("Player" FILES ${PLAYER_FILES})
-source_group("Miscellaneous" FILES ${MISC_FILES})
+source_group("API"              FILES ${API_FILES})
+source_group("Pieces"           FILES ${PIECE_FILES})
+source_group("Board"            FILES ${BOARD_FILES})
+source_group("Moves"            FILES ${MOVE_FILES})
+source_group("Configuration"    FILES ${CONFIG_FILES})
+source_group("Player"           FILES ${PLAYER_FILES})
+source_group("Miscellaneous"    FILES ${MISC_FILES})
 
 
 # Create the executable target

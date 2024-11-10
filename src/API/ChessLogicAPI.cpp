@@ -86,7 +86,8 @@ CHESS_API int GetNumPossibleMoves()
 	return numMoves;
 }
 
-// Needs to be called when delegate message received that calculation of possible moves is done (GameManager.cpp l 211)
+
+// Needs to be called when delegate message received that calculation of possible moves is done (GameManager.cpp l211)
 CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleMoveInstance)
 {
 	GameManager *manager = GameManager::GetInstance();
@@ -166,5 +167,32 @@ CHESS_API PieceTypeInstance GetPieceInPosition(PositionInstance posInstance)
 	GameManager *manager = GameManager::GetInstance();
 
 	PieceType	 type	 = manager->getCurrentPieceTypeAtPosition(pos);
-	return static_cast<PieceTypeInstance>(type);
+	return static_cast<PieceTypeInstance>(static_cast<int>(type));
+}
+
+
+CHESS_API bool GetBoardState(PieceTypeInstance boardState[BOARD_SIZE][BOARD_SIZE])
+{
+	if (!boardState)
+		return false;
+
+	GameManager *manager = GameManager::GetInstance();
+	if (!manager)
+		return false;
+
+	PieceType localBoardState[BOARD_SIZE][BOARD_SIZE];
+
+	bool	  result = manager->getBoardState(localBoardState);
+	if (!result)
+		return false;
+
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			boardState[y][x] = static_cast<PieceTypeInstance>(static_cast<int>(localBoardState[y][x]));
+		}
+	}
+
+	return true;
 }

@@ -88,6 +88,34 @@ std::vector<PossibleMove> GameManager::getPossibleMoveForPosition()
 }
 
 
+bool GameManager::getBoardState(PieceType boardState[BOARD_SIZE][BOARD_SIZE])
+{
+	if (!mMovementManager || !mMovementManager->mChessBoard)
+		return false;
+
+	auto &board = mMovementManager->mChessBoard;
+
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			Position pos   = {x, y};
+			auto	&piece = board->getPiece(pos);
+
+			if (piece)
+			{
+				boardState[y][x] = piece->getType();
+			}
+			else
+			{
+				boardState[y][x] = PieceType::DefaultType;
+			}
+		}
+	}
+	return true;
+}
+
+
 void GameManager::switchTurns()
 {
 	setCurrentMoveState(MoveState::NoMove);
