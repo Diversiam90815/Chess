@@ -137,3 +137,7 @@ MaxEmptyLinesToKeep: 3
 # SeparateDefinitionBlocks: True
 
 SortIncludes: Never 
+
+AlignAfterOpenBracket: BAS_Align
+
+AlignArrayOfStructures: AIAS_Left
