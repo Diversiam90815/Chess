@@ -59,6 +59,11 @@ void GameManager::clearState()
 	mAllMovesForPosition.clear();
 }
 
+void GameManager::setDelegate(PFN_CALLBACK pDelegate)
+{
+
+}
+
 
 void GameManager::switchTurns()
 {

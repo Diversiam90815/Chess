@@ -18,6 +18,7 @@
 #include "MoveType.h"
 
 
+
 struct Position
 {
 	int	 x = 0;

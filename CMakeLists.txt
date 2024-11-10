@@ -34,57 +34,43 @@ include_directories(    ${PIECE_DIR}
 
 
 set(API_FILES
-    ${API_DIR}/ChessLogicAPI.h
-    ${API_DIR}/ChessLogicAPI.cpp
+    ${API_DIR}/ChessLogicAPI.h    ${API_DIR}/ChessLogicAPI.cpp
     ${API_DIR}/ChessLogicAPIDefines.h
 )
 
 
 set(PIECE_FILES
     ${PIECE_DIR}/ChessPiece.h
-    ${PIECE_DIR}/Pawn.h
-    ${PIECE_DIR}/Pawn.cpp
-    ${PIECE_DIR}/Knight.h
-    ${PIECE_DIR}/Knight.cpp
-    ${PIECE_DIR}/Bishop.h
-    ${PIECE_DIR}/Bishop.cpp
-    ${PIECE_DIR}/Rook.h
-    ${PIECE_DIR}/Rook.cpp
-    ${PIECE_DIR}/Queen.h
-    ${PIECE_DIR}/Queen.cpp
-    ${PIECE_DIR}/King.h
-    ${PIECE_DIR}/King.cpp
+    ${PIECE_DIR}/Pawn.h         ${PIECE_DIR}/Pawn.cpp
+    ${PIECE_DIR}/Knight.h       ${PIECE_DIR}/Knight.cpp
+    ${PIECE_DIR}/Bishop.h       ${PIECE_DIR}/Bishop.cpp
+    ${PIECE_DIR}/Rook.h         ${PIECE_DIR}/Rook.cpp
+    ${PIECE_DIR}/Queen.h        ${PIECE_DIR}/Queen.cpp
+    ${PIECE_DIR}/King.h         ${PIECE_DIR}/King.cpp
 )
 
 
 set(BOARD_FILES
-    ${BOARD_DIR}/ChessBoard.h
-    ${BOARD_DIR}/ChessBoard.cpp
+    ${BOARD_DIR}/ChessBoard.h    ${BOARD_DIR}/ChessBoard.cpp
 )
 
     
 set(MOVE_FILES
-    ${MOVE_DIR}/Move.h
     ${MOVE_DIR}/MoveType.h
-    ${MOVE_DIR}/Move.cpp
-    ${MOVE_DIR}/MoveHelper.h
-    ${MOVE_DIR}/MoveHelper.cpp
-    ${MOVE_DIR}/MovementManager.h
-    ${MOVE_DIR}/MovementManager.cpp
-    ${MOVE_DIR}/MoveNotationHelper.h
-    ${MOVE_DIR}/MoveNotationHelper.cpp
+    ${MOVE_DIR}/Move.h                  ${MOVE_DIR}/Move.cpp
+    ${MOVE_DIR}/MoveHelper.h            ${MOVE_DIR}/MoveHelper.cpp
+    ${MOVE_DIR}/MovementManager.h       ${MOVE_DIR}/MovementManager.cpp
+    ${MOVE_DIR}/MoveNotationHelper.h    ${MOVE_DIR}/MoveNotationHelper.cpp
 )
 
 
 set(CONFIG_FILES
-    ${CONFIG_DIR}/GameManager.h
-    ${CONFIG_DIR}/GameManager.cpp
+    ${CONFIG_DIR}/GameManager.h    ${CONFIG_DIR}/GameManager.cpp
 )    
 
 
 set(PLAYER_FILES
-    ${PLAYER_DIR}/Player.h
-    ${PLAYER_DIR}/Player.cpp
+    ${PLAYER_DIR}/Player.h      ${PLAYER_DIR}/Player.cpp
 )
 
 set(MISC_FILES

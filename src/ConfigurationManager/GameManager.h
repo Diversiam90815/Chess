@@ -15,6 +15,8 @@
 #include "Player.h"
 #include <optional>
 
+#include "ChessLogicAPIDefines.h"
+
 
 class GameManager
 {
@@ -44,6 +46,10 @@ public:
 
 	void					   clearState();
 
+
+	void					   setDelegate(PFN_CALLBACK pDelegate);
+
+
 private:
 	GameManager();
 
@@ -65,4 +71,6 @@ private:
 	std::vector<PossibleMove>		 mAllMovesForPosition;
 
 	std::unique_ptr<MovementManager> mMovementManager;
+
+	PFN_CALLBACK					 mDelegate;
 };
