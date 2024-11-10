@@ -15,12 +15,18 @@
 #include "Player.h"
 #include <optional>
 
+#include "ChessLogicAPIDefines.h"
+
 
 class GameManager
 {
 public:
-	GameManager();
-	~GameManager();
+	~GameManager() = default;
+
+
+	static GameManager		  *GetInstance();
+	static void				   ReleaseInstance();
+
 
 	void					   init();
 
@@ -40,7 +46,18 @@ public:
 
 	void					   clearState();
 
+	void					   setDelegate(PFN_CALLBACK pDelegate);
+
+	PieceType				   getCurrentPieceTypeAtPosition(const Position position);
+
+	std::vector<PossibleMove>  getPossibleMoveForPosition();
+
+	bool					   getBoardState(PieceType boardState[BOARD_SIZE][BOARD_SIZE]);
+
 private:
+	GameManager();
+
+
 	void							 switchTurns();
 
 	void							 handleMoveStateChanges(PossibleMove &move);
@@ -58,4 +75,6 @@ private:
 	std::vector<PossibleMove>		 mAllMovesForPosition;
 
 	std::unique_ptr<MovementManager> mMovementManager;
+
+	PFN_CALLBACK					 mDelegate;
 };

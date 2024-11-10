@@ -14,6 +14,11 @@
 
 MovementManager::MovementManager()
 {
+}
+
+
+void MovementManager::init()
+{
 	mChessBoard = std::make_unique<ChessBoard>();
 	mChessBoard->initializeBoard();
 

@@ -16,14 +16,31 @@ GameManager::GameManager()
 }
 
 
-GameManager::~GameManager()
+GameManager *GameManager::GetInstance()
 {
+	static GameManager *sInstance = nullptr;
+	if (nullptr == sInstance)
+	{
+		sInstance = new GameManager();
+	}
+	return sInstance;
+}
+
+
+void GameManager::ReleaseInstance()
+{
+	GameManager *sInstance = GetInstance();
+	if (sInstance)
+	{
+		delete sInstance;
+	}
 }
 
 
 void GameManager::init()
 {
 	mMovementManager = std::make_unique<MovementManager>();
+	mMovementManager->init();
 
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
@@ -40,6 +57,62 @@ void GameManager::clearState()
 	setCurrentGameState(GameState::Init);
 	setCurrentMoveState(MoveState::NoMove);
 	mAllMovesForPosition.clear();
+}
+
+
+void GameManager::setDelegate(PFN_CALLBACK pDelegate)
+{
+	mDelegate = pDelegate;
+	// Set further Delegates if needed
+}
+
+
+PieceType GameManager::getCurrentPieceTypeAtPosition(const Position position)
+{
+	if (!mMovementManager)
+		return PieceType::DefaultType;
+
+	auto &chessPiece = mMovementManager->mChessBoard->getPiece(position);
+
+	if (chessPiece)
+	{
+		return chessPiece->getType();
+	}
+	return PieceType::DefaultType;
+}
+
+
+std::vector<PossibleMove> GameManager::getPossibleMoveForPosition()
+{
+	return mAllMovesForPosition;
+}
+
+
+bool GameManager::getBoardState(PieceType boardState[BOARD_SIZE][BOARD_SIZE])
+{
+	if (!mMovementManager || !mMovementManager->mChessBoard)
+		return false;
+
+	auto &board = mMovementManager->mChessBoard;
+
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			Position pos   = {x, y};
+			auto	&piece = board->getPiece(pos);
+
+			if (piece)
+			{
+				boardState[y][x] = piece->getType();
+			}
+			else
+			{
+				boardState[y][x] = PieceType::DefaultType;
+			}
+		}
+	}
+	return true;
 }
 
 
@@ -162,7 +235,9 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 
 		mAllMovesForPosition.reserve(possibleMoves.size());
 		mAllMovesForPosition = possibleMoves;
+
 		// delegate possible moves to UI
+
 		break;
 	}
 

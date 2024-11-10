@@ -25,13 +25,13 @@ public:
 
 	~MovementManager() = default;
 
+	void					  init();
 
 	std::vector<PossibleMove> getMovesForPosition(Position &position);
 
 	bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
 
 	Move					  executeMove(PossibleMove &executedMove, PieceType pawnPromotion = PieceType::DefaultType);
-
 
 private:
 	bool													validateMove(Move &move, PlayerColor playerColor);

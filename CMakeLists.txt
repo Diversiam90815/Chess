@@ -33,51 +33,44 @@ include_directories(    ${PIECE_DIR}
 )
 
 
+set(API_FILES
+    ${API_DIR}/ChessLogicAPI.h    ${API_DIR}/ChessLogicAPI.cpp
+    ${API_DIR}/ChessLogicAPIDefines.h
+)
+
+
 set(PIECE_FILES
     ${PIECE_DIR}/ChessPiece.h
-    ${PIECE_DIR}/Pawn.h
-    ${PIECE_DIR}/Pawn.cpp
-    ${PIECE_DIR}/Knight.h
-    ${PIECE_DIR}/Knight.cpp
-    ${PIECE_DIR}/Bishop.h
-    ${PIECE_DIR}/Bishop.cpp
-    ${PIECE_DIR}/Rook.h
-    ${PIECE_DIR}/Rook.cpp
-    ${PIECE_DIR}/Queen.h
-    ${PIECE_DIR}/Queen.cpp
-    ${PIECE_DIR}/King.h
-    ${PIECE_DIR}/King.cpp
+    ${PIECE_DIR}/Pawn.h         ${PIECE_DIR}/Pawn.cpp
+    ${PIECE_DIR}/Knight.h       ${PIECE_DIR}/Knight.cpp
+    ${PIECE_DIR}/Bishop.h       ${PIECE_DIR}/Bishop.cpp
+    ${PIECE_DIR}/Rook.h         ${PIECE_DIR}/Rook.cpp
+    ${PIECE_DIR}/Queen.h        ${PIECE_DIR}/Queen.cpp
+    ${PIECE_DIR}/King.h         ${PIECE_DIR}/King.cpp
 )
 
 
 set(BOARD_FILES
-    ${BOARD_DIR}/ChessBoard.h
-    ${BOARD_DIR}/ChessBoard.cpp
+    ${BOARD_DIR}/ChessBoard.h    ${BOARD_DIR}/ChessBoard.cpp
 )
 
     
 set(MOVE_FILES
-    ${MOVE_DIR}/Move.h
     ${MOVE_DIR}/MoveType.h
-    ${MOVE_DIR}/Move.cpp
-    ${MOVE_DIR}/MoveHelper.h
-    ${MOVE_DIR}/MoveHelper.cpp
-    ${MOVE_DIR}/MovementManager.h
-    ${MOVE_DIR}/MovementManager.cpp
-    ${MOVE_DIR}/MoveNotationHelper.h
-    ${MOVE_DIR}/MoveNotationHelper.cpp
+    ${MOVE_DIR}/Move.h                  ${MOVE_DIR}/Move.cpp
+    ${MOVE_DIR}/MoveHelper.h            ${MOVE_DIR}/MoveHelper.cpp
+    ${MOVE_DIR}/MovementManager.h       ${MOVE_DIR}/MovementManager.cpp
+    ${MOVE_DIR}/MoveNotationHelper.h    ${MOVE_DIR}/MoveNotationHelper.cpp
 )
 
 
 set(CONFIG_FILES
-    ${CONFIG_DIR}/GameManager.h
-    ${CONFIG_DIR}/GameManager.cpp
+    ${CONFIG_DIR}/GameManager.h    ${CONFIG_DIR}/GameManager.cpp
 )    
 
 
 set(PLAYER_FILES
-    ${PLAYER_DIR}/Player.h
-    ${PLAYER_DIR}/Player.cpp
+    ${PLAYER_DIR}/Player.h      ${PLAYER_DIR}/Player.cpp
 )
 
 set(MISC_FILES
@@ -86,27 +79,28 @@ set(MISC_FILES
 
 
 set(ALL_FILES
+    ${API_FILES}
     ${PIECE_FILES}
     ${BOARD_FILES}
     ${MOVE_FILES}
     ${CONFIG_FILES}
     ${PLAYER_FILES}
     ${MISC_FILES}
-    ${SOURCE_DIR}/main.cpp
 )
 
 
 # Group source and header files (optional, for IDEs)
-source_group("Pieces" FILES ${PIECE_FILES})
-source_group("Board" FILES ${BOARD_FILES})
-source_group("Moves" FILES ${MOVE_FILES})
-source_group("Configuration" FILES ${CONFIG_FILES})
-source_group("Player" FILES ${PLAYER_FILES})
-source_group("Miscellaneous" FILES ${MISC_FILES})
+source_group("API"              FILES ${API_FILES})
+source_group("Pieces"           FILES ${PIECE_FILES})
+source_group("Board"            FILES ${BOARD_FILES})
+source_group("Moves"            FILES ${MOVE_FILES})
+source_group("Configuration"    FILES ${CONFIG_FILES})
+source_group("Player"           FILES ${PLAYER_FILES})
+source_group("Miscellaneous"    FILES ${MISC_FILES})
 
 
 # Create the executable target
-add_executable(${PROJECT_NAME}
+add_library(${PROJECT_NAME} SHARED
     ${ALL_FILES}
 )
 
