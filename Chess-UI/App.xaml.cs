@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -42,6 +43,14 @@ namespace Chess_UI
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             m_window = new MainWindow();
+
+            ChessLogicAPI.Init();
+
+            m_window.Closed += (sender, args) =>
+            {
+                ChessLogicAPI.Deinit();
+            };
+
             m_window.Activate();
         }
 
