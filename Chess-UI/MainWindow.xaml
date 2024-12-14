@@ -36,6 +36,12 @@
             <StackPanel Name="StartGameButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="StartGameButton_Click">
                     <Image Source="Assets/Buttons/pawn.png" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Button.Resources>
+                        <ResourceDictionary>
+                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
+                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Transparent" />
+                        </ResourceDictionary>
+                    </Button.Resources>
                 </Button>
                 <TextBlock Text="Start Game" FontFamily="Instrument Serif" FontSize="20" Width="100" Foreground="#F5DFDF"/>
             </StackPanel>
@@ -43,6 +49,12 @@
             <StackPanel Name="SettingsButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="SettingsButton_Click">
                     <Image Source="Assets/Buttons/queen.png" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Button.Resources>
+                        <ResourceDictionary>
+                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
+                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Transparent" />
+                        </ResourceDictionary>
+                    </Button.Resources>
                 </Button>
                 <TextBlock Text="Settings" FontFamily="Instrument Serif" FontSize="20" Width="75" Foreground="#F5DFDF" />
             </StackPanel>
@@ -50,6 +62,12 @@
             <StackPanel Name="MultiplayerButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="MultiplayerButton_Click">
                     <Image Source="Assets/Buttons/rook.png" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Button.Resources>
+                        <ResourceDictionary>
+                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
+                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Transparent" />
+                        </ResourceDictionary>
+                    </Button.Resources>
                 </Button>
                 <TextBlock Text="Multiplayer" FontFamily="Instrument Serif" FontSize="20" Width="105" Foreground="#F5DFDF" />
             </StackPanel>
@@ -57,6 +75,12 @@
             <StackPanel Name="QuitButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="QuitButton_Click">
                     <Image Source="Assets/Buttons/horse.png" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Button.Resources>
+                        <ResourceDictionary>
+                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
+                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Transparent" />
+                        </ResourceDictionary>
+                    </Button.Resources>
                 </Button>
                 <TextBlock Text="Quit" FontFamily="Instrument Serif" FontSize="20" Width="45" Foreground="#F5DFDF" />
             </StackPanel>
