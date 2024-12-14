@@ -32,14 +32,17 @@ namespace Chess_UI
             DelegateMessage delegateMessage = (DelegateMessage)message;
             switch (delegateMessage)
             {
-                case DelegateMessage.NotYetImplemented:
+                case DelegateMessage.PlayerHasWon:
                     {
+                        
                         break;
                     }
 
                 default: break;
             }
         }
+
+        private void HandleWinner()
 
     }
 }

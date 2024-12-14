@@ -31,6 +31,9 @@ namespace Chess_UI
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetDelegate", CharSet = CharSet.Unicode)]
         public static extern void SetDelegate(APIDelegate pDelegate);
 
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetWindowScalingFactor", CharSet = CharSet.Unicode)]
+        public static extern float GetWindowScalingFactor(IntPtr hwnd);
+
         #endregion
 
 
@@ -84,7 +87,8 @@ namespace Chess_UI
 
         public enum DelegateMessage
         {
-            NotYetImplemented
+            PlayerHasWon = 1,
+            InitiateMove
         }
 
         #endregion
@@ -112,6 +116,22 @@ namespace Chess_UI
             King
         }
 
+        public enum PlayerColor
+        {
+            NoColor,
+            White,
+            Black
+        }
+
+        public enum GameState
+        {
+            Init = 1,
+            OnGoing,
+            Paused,
+            Checkmate,
+            Stalemate,
+            Draw
+        }
 
         [Flags]
         public enum MoveTypeInstance : int    // need to set it correctly
