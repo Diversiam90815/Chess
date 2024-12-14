@@ -19,7 +19,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="161"/>
                 <!-- Top Row Spacing -->
-                <RowDefinition Height="480"/>
+                <RowDefinition Height="316"/>
                 <!-- Buttons -->
                 <RowDefinition Height="*"/>
                 <!-- Bottom Row Spacing -->
@@ -37,7 +37,7 @@
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="StartGameButton_Click">
                     <Image Source="Assets/Buttons/pawn.png" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Button>
-                <TextBlock Text="Start Game" FontFamily="Instrument Serif" FontSize="20" Width="100" Foreground="#F5DFDF" />
+                <TextBlock Text="Start Game" FontFamily="Instrument Serif" FontSize="20" Width="100" Foreground="#F5DFDF"/>
             </StackPanel>
 
             <StackPanel Name="SettingsButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">

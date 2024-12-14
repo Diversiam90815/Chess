@@ -36,7 +36,7 @@ namespace Chess_UI
             mViewModel = new ViewModel(dispatcherQueue);
 
             Init();
-            SetWindowSize(765, 828); 
+            SetWindowSize(765, 828);
         }
 
 
@@ -56,28 +56,29 @@ namespace Chess_UI
             AppWindow.Resize(new(scaledHeight, scaledWidth));
         }
 
-        
+
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-
+            //Not yet implemented
         }
 
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-
+            //Not yet implemented
         }
 
 
         private void MultiplayerButton_Click(object sender, RoutedEventArgs e)
         {
-
+            //Not yet implemented
         }
 
 
         private void QuitButton_Click(object sender, RoutedEventArgs e)
         {
-
+            var app = Application.Current;
+            app.Exit();
         }
     }
 }
