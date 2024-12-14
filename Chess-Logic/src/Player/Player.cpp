@@ -48,11 +48,13 @@ Score Player::getScore() const
 }
 
 
-void Player::setScore(Score value)
+void Player::setScore(int value)
 {
-	if (mScore != value)
+	Score newScore = Score(this->getPlayerColor(), value);
+
+	if (mScore != newScore)
 	{
-		mScore = value;
+		mScore = newScore;
 
 		if (mDelegate)
 		{

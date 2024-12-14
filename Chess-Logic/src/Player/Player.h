@@ -19,6 +19,8 @@
 
 struct Score
 {
+	Score(PlayerColor player, int value) : player(player), score(value){};
+
 	PlayerColor player = PlayerColor::NoColor;
 	int			score  = 0;
 
@@ -43,7 +45,7 @@ public:
 	void		  setOnTurn(bool value);
 
 	Score		  getScore() const;
-	void		  setScore(Score value);
+	void		  setScore(int value);
 
 	PlayerColor	  getPlayerColor() const;
 	void		  setPlayerColor(PlayerColor value);
@@ -66,7 +68,7 @@ private:
 
 	bool				   mIsCurrentTurn = false;
 
-	Score				   mScore		  = 0;
+	Score				   mScore		  = Score(PlayerColor::NoColor, 0);
 
 	PFN_CALLBACK		   mDelegate	  = nullptr;
 };
