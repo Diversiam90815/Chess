@@ -82,6 +82,11 @@ namespace Chess_UI
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void APIDelegate(int message, IntPtr data);
 
+        public enum DelegateMessage
+        {
+            NotYetImplemented
+        }
+
         #endregion
 
 
