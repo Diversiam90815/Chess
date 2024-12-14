@@ -68,5 +68,6 @@ enum class MoveState
 enum delegateMessage
 {
 	playerHasWon = 1,
-	initiateMove
+	initiateMove,
+	playerScoreUpdated
 };

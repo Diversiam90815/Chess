@@ -14,6 +14,20 @@
 #include "ChessPiece.h"
 #include "Parameters.h"
 
+#include "ChessLogicAPIDefines.h"
+
+
+struct Score
+{
+	PlayerColor player = PlayerColor::NoColor;
+	int			score  = 0;
+
+	bool		operator==(Score other)
+	{
+		return this->score == other.score && this->player == other.player;
+	}
+};
+
 
 class Player
 {
@@ -28,8 +42,8 @@ public:
 	bool		  isOnTurn() const;
 	void		  setOnTurn(bool value);
 
-	int			  getScore() const;
-	void		  setScore(int value);
+	Score		  getScore() const;
+	void		  setScore(Score value);
 
 	PlayerColor	  getPlayerColor() const;
 	void		  setPlayerColor(PlayerColor value);
@@ -43,6 +57,8 @@ public:
 
 	void		  reset();
 
+	void		  setDelegate(PFN_CALLBACK pDelegate);
+
 private:
 	PlayerColor			   mPlayerColor = PlayerColor::NoColor;
 
@@ -50,5 +66,7 @@ private:
 
 	bool				   mIsCurrentTurn = false;
 
-	int					   mScore		  = 0;
+	Score				   mScore		  = 0;
+
+	PFN_CALLBACK		   mDelegate	  = nullptr;
 };

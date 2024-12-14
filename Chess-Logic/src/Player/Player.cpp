@@ -42,17 +42,22 @@ void Player::setOnTurn(bool value)
 }
 
 
-int Player::getScore() const
+Score Player::getScore() const
 {
 	return mScore;
 }
 
 
-void Player::setScore(int value)
+void Player::setScore(Score value)
 {
 	if (mScore != value)
 	{
 		mScore = value;
+
+		if (mDelegate)
+		{
+			mDelegate(delegateMessage::playerScoreUpdated, &mScore);
+		}
 	}
 }
 
@@ -109,4 +114,10 @@ void Player::reset()
 	setScore(0);
 	mCapturedPieces.clear();
 	setOnTurn(false);
+}
+
+
+void Player::setDelegate(PFN_CALLBACK pDelegate)
+{
+	mDelegate = pDelegate;
 }

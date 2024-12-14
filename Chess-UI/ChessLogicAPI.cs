@@ -88,7 +88,8 @@ namespace Chess_UI
         public enum DelegateMessage
         {
             PlayerHasWon = 1,
-            InitiateMove
+            InitiateMove,
+            PlayerScoreUpdate
         }
 
         #endregion
@@ -158,6 +159,13 @@ namespace Chess_UI
             public MoveTypeInstance type;
         }
 
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct Score
+        {
+            public PlayerColor player;
+            public int score;
+        }
 
 
         #endregion
