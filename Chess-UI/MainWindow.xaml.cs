@@ -36,7 +36,7 @@ namespace Chess_UI
             mViewModel = new ViewModel(dispatcherQueue);
 
             Init();
-            SetWindowSize(765, 828);
+            SetWindowSize(750, 800);
         }
 
 
