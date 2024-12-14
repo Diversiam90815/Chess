@@ -69,6 +69,7 @@ namespace Chess_UI
 
         }
 
+
         private void HandlePlayerScoreUpdate(IntPtr data)
         {
             Score score = (Score)Marshal.PtrToStructure(data, typeof(Score));
