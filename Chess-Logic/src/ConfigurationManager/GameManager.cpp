@@ -63,6 +63,9 @@ void GameManager::clearState()
 void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 {
 	mDelegate = pDelegate;
+	mWhitePlayer.setDelegate(pDelegate);
+	mBlackPlayer.setDelegate(pDelegate);
+
 	// Set further Delegates if needed
 }
 
@@ -200,9 +203,9 @@ void GameManager::resetGame()
 void GameManager::endGame() const
 {
 	auto winner = getWinner();
-	if (winner.has_value())
+	if (winner.has_value() && mDelegate)
 	{
-		// winner is Winner (set delegate to UI)
+		mDelegate(delegateMessage::playerHasWon, &winner);
 	}
 }
 
@@ -211,8 +214,10 @@ std::optional<PlayerColor> GameManager::getWinner() const
 {
 	if (mCurrentState == GameState::Checkmate)
 		return mCurrentPlayer == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
+
 	else if (mCurrentState == GameState::Stalemate)
 		return std::nullopt; // Draw in case of stalemate
+
 	return std::nullopt;
 }
 
@@ -236,7 +241,10 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 		mAllMovesForPosition.reserve(possibleMoves.size());
 		mAllMovesForPosition = possibleMoves;
 
-		// delegate possible moves to UI
+		if (mDelegate)
+		{
+			mDelegate(delegateMessage::initiateMove, 0);		// UI can now get all the moves for the piece
+		}
 
 		break;
 	}

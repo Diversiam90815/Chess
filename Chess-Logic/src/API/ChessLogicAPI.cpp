@@ -77,6 +77,14 @@ CHESS_API void SetDelegate(PFN_CALLBACK pDelegate)
 }
 
 
+CHESS_API float GetWindowScalingFactor(HWND hwnd)
+{
+	int	  dpi			= GetDpiForWindow(hwnd);
+	float scalingFactor = (float)dpi / 96;
+	return scalingFactor;
+}
+
+
 CHESS_API int GetNumPossibleMoves()
 {
 	GameManager *manager  = GameManager::GetInstance();
@@ -155,23 +163,25 @@ CHESS_API void ResetGame()
 }
 
 
-CHESS_API PieceTypeInstance GetPieceInPosition(PositionInstance posInstance)
+CHESS_API void GetPieceInPosition(PositionInstance posInstance, PieceTypeInstance *pieceTypeInstance)
 {
-	Position pos = MapToPosition(posInstance);
+	Position		  pos	= MapToPosition(posInstance);
+	PieceTypeInstance piece = PieceTypeInstance::DefaultType;
 
 	if (pos.x < 0 || pos.x >= BOARD_SIZE || pos.y < 0 || pos.y >= BOARD_SIZE)
 	{
-		return PieceTypeInstance::DefaultType;
+		*pieceTypeInstance = piece;
+		return;
 	}
 
 	GameManager *manager = GameManager::GetInstance();
 
 	PieceType	 type	 = manager->getCurrentPieceTypeAtPosition(pos);
-	return static_cast<PieceTypeInstance>(static_cast<int>(type));
+	*pieceTypeInstance	 = static_cast<PieceTypeInstance>(static_cast<int>(type));
 }
 
 
-CHESS_API bool GetBoardState(PieceTypeInstance boardState[BOARD_SIZE][BOARD_SIZE])
+CHESS_API bool GetBoardState(PieceTypeInstance *boardState)
 {
 	if (!boardState)
 		return false;
@@ -190,7 +200,8 @@ CHESS_API bool GetBoardState(PieceTypeInstance boardState[BOARD_SIZE][BOARD_SIZE
 	{
 		for (int x = 0; x < BOARD_SIZE; ++x)
 		{
-			boardState[y][x] = static_cast<PieceTypeInstance>(static_cast<int>(localBoardState[y][x]));
+			// Mapping 2D array to 1D
+			boardState[y * BOARD_SIZE + x] = static_cast<PieceTypeInstance>(static_cast<int>(localBoardState[y][x]));
 		}
 	}
 

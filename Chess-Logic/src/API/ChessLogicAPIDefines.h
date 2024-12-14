@@ -55,10 +55,10 @@ typedef struct PossibleMoveInstance
 typedef enum PieceTypeInstance
 {
 	DefaultType,
-	Pawn,
-	Knight,
-	Bishop,
-	Rook,
-	Queen,
-	King
+	PawnType,
+	KnightType,
+	BishopType,
+	RookType,
+	QueenType,
+	KingType
 } PieceTypeInstance;

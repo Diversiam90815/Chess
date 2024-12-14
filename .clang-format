@@ -138,6 +138,3 @@ MaxEmptyLinesToKeep: 3
 
 SortIncludes: Never 
 
-AlignAfterOpenBracket: BAS_Align
-
-AlignArrayOfStructures: AIAS_Left

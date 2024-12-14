@@ -63,3 +63,11 @@ enum class MoveState
 	InitiateMove,
 	ExecuteMove
 };
+
+
+enum delegateMessage
+{
+	playerHasWon = 1,
+	initiateMove,
+	playerScoreUpdated
+};
