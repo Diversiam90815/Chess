@@ -1,10 +1,21 @@
 {
   "profiles": {
     "Chess-UI (Package)": {
-      "commandName": "MsixPackage"
+      "commandName": "MsixPackage",
+      "nativeDebugging": false
+    },
+    "Chess-UI (Package, native)": {
+      "commandName": "MsixPackage",
+      "nativeDebugging": true
     },
     "Chess-UI (Unpackaged)": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "nativeDebugging": false
+    },
+    "Chess-UI (Unpackaged, native)": {
+      "commandName": "Project",
+      "nativeDebugging": true
     }
+
   }
 }
