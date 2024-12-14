@@ -77,6 +77,14 @@ CHESS_API void SetDelegate(PFN_CALLBACK pDelegate)
 }
 
 
+CHESS_API float GetWindowScalingFactor(HWND hwnd)
+{
+	int	  dpi			= GetDpiForWindow(hwnd);
+	float scalingFactor = (float)dpi / 96;
+	return scalingFactor;
+}
+
+
 CHESS_API int GetNumPossibleMoves()
 {
 	GameManager *manager  = GameManager::GetInstance();

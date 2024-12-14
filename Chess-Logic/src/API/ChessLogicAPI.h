@@ -27,6 +27,7 @@ extern "C"
 
 	CHESS_API void SetDelegate(PFN_CALLBACK pDelegate);
 
+	CHESS_API float  GetWindowScalingFactor(HWND hwnd);
 
 	CHESS_API int  GetNumPossibleMoves();
 
