@@ -43,7 +43,7 @@
 	<!-- Add the Chess Logic DLL library to project -->
 	<PropertyGroup>
 		<LocalChessLogicFiles>..\Chess-Logic\build\Release</LocalChessLogicFiles>
-		<LocalChessLogicFiles Condition="'${Configuration}' == 'Debug'">..\Chess-Logic\build\Debug</LocalChessLogicFiles>
+		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Debug'">..\Chess-Logic\build\Debug</LocalChessLogicFiles>
 	</PropertyGroup>
 
 	<ItemGroup>
