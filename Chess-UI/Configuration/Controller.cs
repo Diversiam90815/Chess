@@ -4,9 +4,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess_UI.ChessLogicAPI;
+using static Chess_UI.Configuration.ChessLogicAPI;
 
-namespace Chess_UI
+namespace Chess_UI.Configuration
 {
     public class Controller
     {
@@ -22,13 +22,13 @@ namespace Chess_UI
             if (mDelegate == null)
             {
                 mDelegate = new APIDelegate(DelegateHandler);
-                ChessLogicAPI.SetDelegate(mDelegate);
+                SetDelegate(mDelegate);
             }
 
 
         }
 
-        public void DelegateHandler(int message, IntPtr data)
+        public void DelegateHandler(int message, nint data)
         {
             DelegateMessage delegateMessage = (DelegateMessage)message;
             switch (delegateMessage)
@@ -55,7 +55,7 @@ namespace Chess_UI
         }
 
 
-        private void HandleWinner(IntPtr data)
+        private void HandleWinner(nint data)
         {
             int player = Marshal.ReadInt32(data);
             PlayerColor winner = (PlayerColor)player;
@@ -70,7 +70,7 @@ namespace Chess_UI
         }
 
 
-        private void HandlePlayerScoreUpdate(IntPtr data)
+        private void HandlePlayerScoreUpdate(nint data)
         {
             Score score = (Score)Marshal.PtrToStructure(data, typeof(Score));
 

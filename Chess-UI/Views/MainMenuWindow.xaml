@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window
-    x:Class="Chess_UI.MainWindow"
+    x:Class="Chess_UI.MainMenuWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Chess_UI"
@@ -10,7 +10,7 @@
     Title="Chess"
     >
 
-    <Grid>
+    <Grid x:Name="RootGrid">
         <Grid Name="BackgroundImage" VerticalAlignment="Top">
             <Image VerticalAlignment="Center" x:Name="MenuBackground" Source="/Assets/MenuBackground.png" Stretch="UniformToFill"/>
         </Grid>
@@ -35,7 +35,7 @@
 
             <StackPanel Name="StartGameButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="StartGameButton_Click">
-                    <Image Source="Assets/Buttons/pawn.png" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{x:Bind mViewModel.StartGameButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <Button.Resources>
                         <ResourceDictionary>
                             <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
@@ -48,7 +48,7 @@
 
             <StackPanel Name="SettingsButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="SettingsButton_Click">
-                    <Image Source="Assets/Buttons/queen.png" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{x:Bind mViewModel.SettingButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <Button.Resources>
                         <ResourceDictionary>
                             <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
@@ -61,7 +61,7 @@
 
             <StackPanel Name="MultiplayerButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="MultiplayerButton_Click">
-                    <Image Source="Assets/Buttons/rook.png" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{x:Bind mViewModel.MultiplayerButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <Button.Resources>
                         <ResourceDictionary>
                             <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
@@ -74,7 +74,7 @@
 
             <StackPanel Name="QuitButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="QuitButton_Click">
-                    <Image Source="Assets/Buttons/horse.png" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{x:Bind mViewModel.EndGameButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <Button.Resources>
                         <ResourceDictionary>
                             <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
