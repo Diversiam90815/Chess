@@ -206,6 +206,158 @@ namespace Chess_UI.ViewModels
 
 
 
+        private int blackCapturedPawns = 0;
+        public int BlackCapturedPawns
+        {
+            get => blackCapturedPawns;
+            set
+            {
+                if (blackCapturedPawns != value)
+                {
+                    blackCapturedPawns = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private int blackCapturedBishops = 0;
+        public int BlackCapturedBishops
+        {
+            get => blackCapturedBishops;
+            set
+            {
+                if (blackCapturedBishops != value)
+                {
+                    blackCapturedBishops = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private int blackCapturedKnights = 0;
+        public int BlackCapturedKnights
+        {
+            get => blackCapturedKnights;
+            set
+            {
+                if (blackCapturedKnights != value)
+                {
+                    blackCapturedKnights = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private int blackCapturedQueens = 0;
+        public int BlackCapturedQueens
+        {
+            get => blackCapturedQueens;
+            set
+            {
+                if (blackCapturedQueens != value)
+                {
+                    blackCapturedQueens = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private int blackCapturedRooks = 0;
+        public int BlackCapturedRooks
+        {
+            get => blackCapturedRooks;
+            set
+            {
+                if (blackCapturedRooks != value)
+                {
+                    blackCapturedRooks = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+
+
+        private int whiteCapturedPawns = 0;
+        public int WhiteCapturedPawns
+        {
+            get => whiteCapturedPawns;
+            set
+            {
+                if (whiteCapturedPawns != value)
+                {
+                    whiteCapturedPawns = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private int whiteCapturedBishops = 0;
+        public int WhiteCapturedBishops
+        {
+            get => whiteCapturedBishops;
+            set
+            {
+                if (whiteCapturedBishops != value)
+                {
+                    whiteCapturedBishops = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private int whiteCapturedKnights = 0;
+        public int WhiteCapturedKnights
+        {
+            get => whiteCapturedKnights;
+            set
+            {
+                if (whiteCapturedKnights != value)
+                {
+                    whiteCapturedKnights = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private int whiteCapturedQueens = 0;
+        public int WhiteCapturedQueens
+        {
+            get => whiteCapturedQueens;
+            set
+            {
+                if (whiteCapturedQueens != value)
+                {
+                    whiteCapturedQueens = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private int whiteCapturedRooks = 0;
+        public int WhiteCapturedRooks
+        {
+            get => whiteCapturedRooks;
+            set
+            {
+                if (whiteCapturedRooks != value)
+                {
+                    whiteCapturedRooks = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
 
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)

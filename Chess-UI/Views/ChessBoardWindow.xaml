@@ -17,7 +17,6 @@
                 <Grid.Background>
                     <ImageBrush ImageSource="{x:Bind ViewModel.BoardBackgroundImage, Mode=TwoWay}"/>
                 </Grid.Background>
-
             </Grid>
         </Viewbox>
 
@@ -50,11 +49,11 @@
                         </StackPanel>
 
                         <StackPanel Name="WNumCapturedPiece" Orientation="Vertical" HorizontalAlignment="Center">
-                            <TextBlock Text="x24" Height="20" Width="40" />
-                            <TextBlock Text="x23" Height="20" Width="40" />
-                            <TextBlock Text="x22" Height="20" Width="40" />
-                            <TextBlock Text="x21" Height="20" Width="40" />
-                            <TextBlock Text="x20" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.WhiteCapturedPawns, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.WhiteCapturedBishops, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.WhiteCapturedKnights, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.WhiteCapturedRooks, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.WhiteCapturedQueens, Mode=TwoWay}" Height="20" Width="40" />
                         </StackPanel>
                     </StackPanel>
 
@@ -68,11 +67,11 @@
                         </StackPanel>
 
                         <StackPanel Name="BNumCapturedPiece" Orientation="Vertical" HorizontalAlignment="Center">
-                            <TextBlock Text="x5" Height="20" Width="40" />
-                            <TextBlock Text="x5" Height="20" Width="40" />
-                            <TextBlock Text="x2" Height="20" Width="40" />
-                            <TextBlock Text="x1" Height="20" Width="40" />
-                            <TextBlock Text="x2" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.BlackCapturedPawns, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.BlackCapturedBishops, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.BlackCapturedKnights, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.BlackCapturedRooks, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.BlackCapturedQueens, Mode=TwoWay}" Height="20" Width="40" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>
