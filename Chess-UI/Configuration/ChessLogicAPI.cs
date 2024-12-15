@@ -96,7 +96,6 @@ namespace Chess_UI.Configuration
 
 
 
-
         #region Structures & Enums
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
