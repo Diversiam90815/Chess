@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI
+namespace Chess_UI.Configuration
 {
     public class ChessLogicAPI
     {
@@ -32,7 +32,7 @@ namespace Chess_UI
         public static extern void SetDelegate(APIDelegate pDelegate);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetWindowScalingFactor", CharSet = CharSet.Unicode)]
-        public static extern float GetWindowScalingFactor(IntPtr hwnd);
+        public static extern float GetWindowScalingFactor(nint hwnd);
 
         #endregion
 
@@ -83,7 +83,7 @@ namespace Chess_UI
         #region Delegate
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void APIDelegate(int message, IntPtr data);
+        public delegate void APIDelegate(int message, nint data);
 
         public enum DelegateMessage
         {

@@ -1,3 +1,5 @@
+using Chess_UI.Configuration;
+using Chess_UI.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -18,22 +20,24 @@ using Windows.Foundation.Collections;
 
 namespace Chess_UI
 {
-    public sealed partial class MainWindow : Window
+    public sealed partial class MainMenuWindow : Window
     {
-        private DispatcherQueue dispatcherQueue;
+        private DispatcherQueue mDispatcherQueue;
 
         private OverlappedPresenter mPresenter;
 
-        public ViewModel mViewModel { get; private set; }
+        public MainMenuViewModel mViewModel { get; private set; }
 
 
-        public MainWindow()
+        public MainMenuWindow()
         {
             this.InitializeComponent();
 
-            dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            mDispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-            mViewModel = new ViewModel(dispatcherQueue);
+            mViewModel = new MainMenuViewModel(mDispatcherQueue);
+
+            this.RootGrid.DataContext = mViewModel;
 
             Init();
             SetWindowSize(750, 800);
