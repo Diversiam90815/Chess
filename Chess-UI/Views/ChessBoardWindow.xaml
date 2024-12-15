@@ -86,27 +86,29 @@
                     <TextBlock Grid.Row="0" Text="Move History" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
 
                     <!-- Moves with Wrapping Columns -->
-                    <ItemsControl Grid.Row="1" x:Name="MovesColumns" ItemsSource="{x:Bind ViewModel.MoveColumns, Mode=OneWay}" Background="#1E1E21" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Vertical" Margin="5,0">
-                                    <!-- Each Column -->
-                                    <ItemsControl ItemsSource="{Binding}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding}" FontSize="16" Foreground="#E0E0E0" Margin="0,2"/>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                        <ItemsControl x:Name="MovesColumns" ItemsSource="{x:Bind ViewModel.MoveHistoryColumns, Mode=OneWay}" Background="#1E1E21" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Vertical" Margin="3,0">
+                                        <!-- Each Column -->
+                                        <ItemsControl ItemsSource="{Binding}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding}" FontSize="14" Foreground="#E0E0E0" Margin="0,2"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
                 </Grid>
 
 

@@ -1,6 +1,7 @@
 using Chess_UI.Configuration;
 using Chess_UI.ViewModels;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -26,6 +27,8 @@ namespace Chess_UI.Views
 
         private new readonly DispatcherQueue DispatcherQueue;
 
+        private OverlappedPresenter mPresenter;
+
 
         public ChessBoardWindow()
         {
@@ -35,6 +38,7 @@ namespace Chess_UI.Views
             ViewModel = new ChessBoardViewModel(DispatcherQueue);
             this.RootPanel.DataContext = ViewModel;
 
+            Init();
             SetWindowSize(1200, 900);
         }
 
@@ -48,29 +52,40 @@ namespace Chess_UI.Views
             AppWindow.Resize(new(scaledWidth, scaledHeight));
         }
 
+
+        private void Init()
+        {
+            mPresenter = AppWindow.Presenter as OverlappedPresenter;
+            mPresenter.IsResizable = false;
+        }
+
+
         private void SaveGame_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.AddMove("1. e4 e5");
-            ViewModel.AddMove("2. Nf3 Nc6"); 
+            ViewModel.AddMove("2. Nf3 Nc6");
             ViewModel.AddMove("3. e4 e5");
-            ViewModel.AddMove("4. Nf3 Nc6"); 
+            ViewModel.AddMove("4. Nf3 Nc6");
             ViewModel.AddMove("5. e4 e5");
-            ViewModel.AddMove("6. Nf3 Nc6"); 
         }
+
 
         private void UndoMove_Click(object sender, RoutedEventArgs e)
         {
+            ViewModel.AddMove("10. Nf3 Nc6");
 
         }
+
 
         private void ResetGame_Click(object sender, RoutedEventArgs e)
         {
 
         }
 
+
         private void EndGame_Click(object sender, RoutedEventArgs e)
         {
-
+            this.Close();
         }
     }
 }

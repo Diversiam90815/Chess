@@ -21,36 +21,35 @@ namespace Chess_UI.ViewModels
 
         private readonly DispatcherQueue DispatcherQueue;
 
-        private const int MovesPerColumn = 20;
+        private const int MovesMaxColumns = 3;
 
-        public ObservableCollection<ObservableCollection<string>> MoveColumns { get; } = new ObservableCollection<ObservableCollection<string>>();
+
+        public ObservableCollection<ObservableCollection<string>> MoveHistoryColumns { get; } = [];
 
 
         public ChessBoardViewModel(DispatcherQueue dispatcherQueue)
         {
             this.DispatcherQueue = dispatcherQueue;
-            MoveColumns.Add(new ObservableCollection<string>());
+
+            for (int i = 0; i < MovesMaxColumns; i++)
+            {
+                MoveHistoryColumns.Add([]);
+            }
         }
 
 
         public void AddMove(string move)
         {
-            var lastColumn = MoveColumns.Last();
-
-            if (lastColumn.Count >= MovesPerColumn)
-            {
-                lastColumn = new ObservableCollection<string>();
-                MoveColumns.Add(lastColumn);
-            }
-
-            lastColumn.Add(move);
+            // Find the column with the least number of moves
+            var minColumn = MoveHistoryColumns.OrderBy(col => col.Count).First();
+            minColumn.Add(move);
         }
 
 
         public void ClearMoveHistory()
         {
-            MoveColumns.Clear();
-            MoveColumns.Add(new ObservableCollection<string>());
+            MoveHistoryColumns.Clear();
+            MoveHistoryColumns.Add([]);
         }
 
 
@@ -68,7 +67,7 @@ namespace Chess_UI.ViewModels
             }
         }
 
-        private ImageSource capturedWhitePawnImage = GetCapturedPieceImage(PlayerColor.White,PieceTypeInstance.Pawn);
+        private ImageSource capturedWhitePawnImage = GetCapturedPieceImage(PlayerColor.White, PieceTypeInstance.Pawn);
         public ImageSource CapturedWhitePawnImage
         {
             get => capturedWhitePawnImage;
