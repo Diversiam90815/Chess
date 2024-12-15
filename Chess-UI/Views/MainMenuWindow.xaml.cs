@@ -29,9 +29,7 @@ namespace Chess_UI
 
         private ChessBoardWindow ChessBoardWindow;
 
-
         public MainMenuViewModel ViewModel { get; private set; }
-        public ChessBoardViewModel BoardViewModel { get; private set; }
 
 
         public MainMenuWindow()
@@ -41,13 +39,11 @@ namespace Chess_UI
             DispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
             ViewModel = new MainMenuViewModel(DispatcherQueue);
-            BoardViewModel = new ChessBoardViewModel(DispatcherQueue);
-
 
             this.RootGrid.DataContext = ViewModel;
 
             Init();
-            SetWindowSize(750, 800);
+            SetWindowSize(800, 750);
         }
 
 
@@ -64,13 +60,31 @@ namespace Chess_UI
             float scalingFactor = ChessLogicAPI.GetWindowScalingFactor(hwnd);
             int scaledWidth = (int)(width * scalingFactor);
             int scaledHeight = (int)(height * scalingFactor);
-            AppWindow.Resize(new(scaledHeight, scaledWidth));
+            AppWindow.Resize(new(scaledWidth, scaledHeight));
+        }
+
+
+        private void BoardWindowClosed(object sender, WindowEventArgs args)
+        {
+            ChessBoardWindow.Closed -= BoardWindowClosed;
+            ChessBoardWindow = null;
+            this.Activate();
         }
 
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-            //Not yet implemented
+            if (ChessBoardWindow == null)
+            {
+                ChessBoardWindow = new ChessBoardWindow();
+                ChessBoardWindow.Activate();
+                ChessBoardWindow.Closed += BoardWindowClosed;
+                this.AppWindow.Hide();
+            }
+            else
+            {
+                ChessBoardWindow.Activate();
+            }
         }
 
 
