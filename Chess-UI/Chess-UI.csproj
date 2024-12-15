@@ -58,10 +58,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Views\ChessBoardWindow.xaml" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <Page Update="Views\ChessBoardWindow.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>

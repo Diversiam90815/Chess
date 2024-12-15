@@ -7,24 +7,25 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Chess_UI.ViewModels
 {
     public class ChessBoardViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly DispatcherQueue dispatcherQueue;
+        private readonly DispatcherQueue DispatcherQueue;
 
         
         public ChessBoardViewModel(DispatcherQueue dispatcherQueue)
         {
-            this.dispatcherQueue = dispatcherQueue;
+            this.DispatcherQueue = dispatcherQueue;
         }
 
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            dispatcherQueue.TryEnqueue(() =>
+            DispatcherQueue.TryEnqueue(() =>
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             });

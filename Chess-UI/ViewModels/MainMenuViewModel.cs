@@ -9,13 +9,14 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Chess_UI.ViewModels
 {
     public class MainMenuViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly DispatcherQueue dispatcherQueue;
+        private readonly DispatcherQueue DispatcherQueue;
 
         private Controller mController;
 
@@ -23,7 +24,7 @@ namespace Chess_UI.ViewModels
         public MainMenuViewModel(DispatcherQueue dispatcher)
         {
             mController = new Controller();
-            dispatcherQueue = dispatcher;
+            DispatcherQueue = dispatcher;
         }
 
 
@@ -89,7 +90,7 @@ namespace Chess_UI.ViewModels
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            dispatcherQueue.TryEnqueue(() =>
+            DispatcherQueue.TryEnqueue(() =>
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             });

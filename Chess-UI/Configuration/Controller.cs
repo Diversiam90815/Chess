@@ -12,21 +12,22 @@ namespace Chess_UI.Configuration
     {
         public Controller()
         {
-
+            SetLogicAPIDelegate();
         }
 
-        static APIDelegate mDelegate = null;
+
+        static APIDelegate Delegate = null;
+
 
         private void SetLogicAPIDelegate()
         {
-            if (mDelegate == null)
+            if (Delegate == null)
             {
-                mDelegate = new APIDelegate(DelegateHandler);
-                SetDelegate(mDelegate);
+                Delegate = new APIDelegate(DelegateHandler);
+                SetDelegate(Delegate);
             }
-
-
         }
+
 
         public void DelegateHandler(int message, nint data)
         {
