@@ -160,6 +160,12 @@ void GameManager::executeMove(PossibleMove &move)
 			mWhitePlayer.updateScore();
 		}
 	}
+	
+	if (mDelegate)
+	{
+		const char* moveNotation = executedMove.notation.c_str();
+		mDelegate(delegateMessage::moveExecuted, &moveNotation);
+	}
 
 	checkForEndGameConditions();
 }

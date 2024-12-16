@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chess_UI.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -51,6 +52,11 @@ namespace Chess_UI.Configuration
                         HandlePlayerScoreUpdate(data);
                         break;
                     }
+                case DelegateMessage.MoveExecuted:
+                    {
+                        HandleExecutedMove(data);
+                        break;
+                    }
                 default: break;
             }
         }
@@ -81,5 +87,11 @@ namespace Chess_UI.Configuration
             // trigger event for score change
         }
 
+
+        private void HandleExecutedMove(nint data)
+        {
+            string moveNotation = (string)Marshal.PtrToStructure(data, typeof(string));
+            // callback
+        }
     }
 }

@@ -89,7 +89,8 @@ namespace Chess_UI.Configuration
         {
             PlayerHasWon = 1,
             InitiateMove,
-            PlayerScoreUpdate
+            PlayerScoreUpdate,
+            MoveExecuted
         }
 
         #endregion
@@ -134,7 +135,7 @@ namespace Chess_UI.Configuration
         }
 
         [Flags]
-        public enum MoveTypeInstance : int    // need to set it correctly
+        public enum MoveTypeInstance : int
         {
             MoveType_None = 0,
             MoveType_Normal = 1 << 0, // 1
