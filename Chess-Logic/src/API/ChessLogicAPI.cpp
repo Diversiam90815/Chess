@@ -181,7 +181,7 @@ CHESS_API void GetPieceInPosition(PositionInstance posInstance, PieceTypeInstanc
 }
 
 
-CHESS_API bool GetBoardState(PieceTypeInstance *boardState)
+CHESS_API bool GetBoardState(int *boardState)
 {
 	if (!boardState)
 		return false;
@@ -190,9 +190,10 @@ CHESS_API bool GetBoardState(PieceTypeInstance *boardState)
 	if (!manager)
 		return false;
 
-	PieceType localBoardState[BOARD_SIZE][BOARD_SIZE];
+	int	 localBoardState[BOARD_SIZE][BOARD_SIZE];
 
-	bool	  result = manager->getBoardState(localBoardState);
+	bool result = manager->getBoardState(localBoardState);
+
 	if (!result)
 		return false;
 
@@ -201,7 +202,7 @@ CHESS_API bool GetBoardState(PieceTypeInstance *boardState)
 		for (int x = 0; x < BOARD_SIZE; ++x)
 		{
 			// Mapping 2D array to 1D
-			boardState[y * BOARD_SIZE + x] = static_cast<PieceTypeInstance>(static_cast<int>(localBoardState[y][x]));
+			boardState[y * BOARD_SIZE + x] = static_cast<int>(localBoardState[y][x]);
 		}
 	}
 

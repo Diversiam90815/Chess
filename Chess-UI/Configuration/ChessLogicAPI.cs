@@ -15,7 +15,7 @@ namespace Chess_UI.Configuration
         #region Defines
 
         private const string LOGIC_API_PATH = @"ChessGame.dll";
-        private const int BOARD_SIZE = 8;
+        public const int BOARD_SIZE = 8;
 
         #endregion
 
@@ -57,7 +57,7 @@ namespace Chess_UI.Configuration
         public static extern void GetPieceInPosition(PositionInstance position, out PieceTypeInstance piece);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetBoardState", CharSet = CharSet.Unicode)]
-        public static extern bool GetBoardState(out PieceTypeInstance[] boardState);
+        public static extern bool GetBoardState(out int[] boardState);
 
         #endregion
 

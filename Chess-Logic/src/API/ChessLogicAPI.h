@@ -40,7 +40,7 @@ extern "C"
 
 	CHESS_API void	GetPieceInPosition(PositionInstance posInstance, PieceTypeInstance *pieceTypeInstance);
 
-	CHESS_API bool	GetBoardState(PieceTypeInstance *boardState);
+	CHESS_API bool	GetBoardState(int *boardState);
 
 
 	CHESS_API void	StartGame();
