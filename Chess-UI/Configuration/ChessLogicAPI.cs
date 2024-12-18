@@ -57,7 +57,7 @@ namespace Chess_UI.Configuration
         public static extern void GetPieceInPosition(PositionInstance position, out PieceTypeInstance piece);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetBoardState", CharSet = CharSet.Unicode)]
-        public static extern bool GetBoardState(out int[] boardState);
+        public static extern bool GetBoardState([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 64)] int[] boardState);
 
         #endregion
 
@@ -102,6 +102,12 @@ namespace Chess_UI.Configuration
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct PositionInstance
         {
+            public PositionInstance(int x, int y)
+            {
+                this.x = x;
+                this.y = y;
+            }
+
             public int x, y;
         }
 
@@ -117,12 +123,14 @@ namespace Chess_UI.Configuration
             King
         }
 
+
         public enum PlayerColor
         {
             NoColor,
             White,
             Black
         }
+
 
         public enum GameState
         {
@@ -133,6 +141,7 @@ namespace Chess_UI.Configuration
             Stalemate,
             Draw
         }
+
 
         [Flags]
         public enum MoveTypeInstance : int

@@ -11,6 +11,7 @@ namespace Chess_UI.Configuration
 {
     public class Controller
     {
+
         public Controller()
         {
             SetLogicAPIDelegate();
@@ -92,6 +93,15 @@ namespace Chess_UI.Configuration
         {
             string moveNotation = (string)Marshal.PtrToStructure(data, typeof(string));
             // callback
+        }
+
+
+        public int[] GetBoardStateFromNative()
+        {
+            int[] board = new int[64]; // pre-allocated array
+
+            ChessLogicAPI.GetBoardState(board);
+            return board;
         }
     }
 }

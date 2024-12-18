@@ -45,7 +45,8 @@ namespace Chess_UI.Configuration
         {PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Standard/BishopW.png") },
         {PieceTypeInstance.Queen, LoadImage("/Assets/Pieces/Standard/QueenW.png") },
         {PieceTypeInstance.Rook, LoadImage("/Assets/Pieces/Standard/RookW.png") },
-        {PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Standard/KnightW.png") }
+        {PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Standard/KnightW.png") },
+        {PieceTypeInstance.King, LoadImage("/Assets/Pieces/Standard/KingW.png") }
         };
 
         public static readonly Dictionary<PieceTypeInstance, ImageSource> CapturedBlackPiecesImages = new()
@@ -54,7 +55,8 @@ namespace Chess_UI.Configuration
         {PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Standard/BishopB.png") },
         {PieceTypeInstance.Queen, LoadImage("/Assets/Pieces/Standard/QueenB.png") },
         {PieceTypeInstance.Rook, LoadImage("/Assets/Pieces/Standard/RookB.png") },
-        {PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Standard/KnightB.png") }
+        {PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Standard/KnightB.png") },
+        {PieceTypeInstance.King, LoadImage("/Assets/Pieces/Standard/KingB.png") }
         };
 
 

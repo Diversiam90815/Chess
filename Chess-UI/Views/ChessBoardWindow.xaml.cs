@@ -19,6 +19,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 
 
+
 namespace Chess_UI.Views
 {
     public sealed partial class ChessBoardWindow : Window
@@ -30,12 +31,12 @@ namespace Chess_UI.Views
         private OverlappedPresenter mPresenter;
 
 
-        public ChessBoardWindow()
+        public ChessBoardWindow(Controller controller)
         {
             this.InitializeComponent();
             DispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-            ViewModel = new ChessBoardViewModel(DispatcherQueue);
+            ViewModel = new ChessBoardViewModel(DispatcherQueue, controller);
             this.RootPanel.DataContext = ViewModel;
 
             Init();
@@ -62,32 +63,36 @@ namespace Chess_UI.Views
 
         private void SaveGame_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.AddMove("1. e4 e5");
-            ViewModel.AddMove("2. Nf3 Nc6");
-            ViewModel.AddMove("3. e4 e5");
-            ViewModel.AddMove("4. Nf3 Nc6");
-            ViewModel.AddMove("5. e4 e5");
+            //ViewModel.AddMove("1. e4 e5");
         }
 
 
         private void UndoMove_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.AddMove("10. Nf3 Nc6");
-            ViewModel.WhiteCapturedKnights += 2;
-            ViewModel.WhiteCapturedPawns += 1;
+            //ViewModel.AddMove("10. Nf3 Nc6");
+            //ViewModel.WhiteCapturedKnights += 2;
+            //ViewModel.WhiteCapturedPawns += 1;
         }
 
 
         private void ResetGame_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.BlackCapturedPawns += 1;
-            ViewModel.BlackCapturedQueens += 1;
+            //ViewModel.BlackCapturedPawns += 1;
+            //ViewModel.BlackCapturedQueens += 1;
         }
 
 
         private void EndGame_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+
+        private void ChessPiece_Clicked(object sender, TappedRoutedEventArgs e)
+        {
+            var grid = sender as FrameworkElement;
+            var square = grid.DataContext as Chess_UI.Configuration.BoardSquare;
+            // Handle the move
         }
     }
 }

@@ -23,17 +23,59 @@ namespace Chess_UI.ViewModels
 
         private const int MovesMaxColumns = 3;
 
+        private Controller Controller;
 
         public ObservableCollection<ObservableCollection<string>> MoveHistoryColumns { get; } = [];
 
+        public ObservableCollection<BoardSquare> Board { get; set; }
 
-        public ChessBoardViewModel(DispatcherQueue dispatcherQueue)
+
+        public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller)
         {
             this.DispatcherQueue = dispatcherQueue;
+            this.Controller = controller;
+
+            Board = new ObservableCollection<BoardSquare>();
+
+            for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
+            {
+                Board.Add(new());
+            }
 
             for (int i = 0; i < MovesMaxColumns; i++)
             {
                 MoveHistoryColumns.Add([]);
+            }
+
+            LoadBoardFromNative();
+
+        }
+
+
+        public void LoadBoardFromNative()
+        {
+            var boardState = Controller.GetBoardStateFromNative();
+
+            for (int i = 0; i < boardState.Length; i++)
+            {
+                int encoded = boardState[i];
+
+                // Decode color and piece
+                int colorVal = (encoded >> 4) & 0xF;    // top 8 bits
+                int pieceVal = encoded & 0xF;          // bottom 8 bits
+
+                // Compute x,y from the index
+                int x = i % BOARD_SIZE;
+                int y = i / BOARD_SIZE;
+
+                var square = new BoardSquare(
+                    x,
+                    y,
+                    (PieceTypeInstance)pieceVal,
+                    (PlayerColor)colorVal
+                );
+
+                Board[i] = square;
             }
         }
 

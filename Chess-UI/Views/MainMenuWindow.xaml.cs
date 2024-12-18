@@ -76,7 +76,7 @@ namespace Chess_UI
         {
             if (ChessBoardWindow == null)
             {
-                ChessBoardWindow = new ChessBoardWindow();
+                ChessBoardWindow = new ChessBoardWindow(this.ViewModel.Controller);
                 ChessBoardWindow.Activate();
                 ChessBoardWindow.Closed += BoardWindowClosed;
                 this.AppWindow.Hide();

@@ -18,12 +18,12 @@ namespace Chess_UI.ViewModels
 
         private readonly DispatcherQueue DispatcherQueue;
 
-        private Controller mController;
+        public Controller Controller;
 
 
         public MainMenuViewModel(DispatcherQueue dispatcher)
         {
-            mController = new Controller();
+            Controller = new Controller();
             DispatcherQueue = dispatcher;
         }
 
