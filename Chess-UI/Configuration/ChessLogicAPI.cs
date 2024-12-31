@@ -74,7 +74,7 @@ namespace Chess_UI.Configuration
         public static extern void ResetGame();
         
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ChangeMoveState", CharSet = CharSet.Unicode)]
-        public static extern void ChangeMoveState(MoveState state);
+        public static extern void ChangeMoveState(int state);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "HandleMoveStateChanged", CharSet = CharSet.Unicode)]
         public static extern void HandleMoveStateChanged(PossibleMoveInstance move);
