@@ -72,6 +72,13 @@ namespace Chess_UI.Configuration
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ResetGame", CharSet = CharSet.Unicode)]
         public static extern void ResetGame();
+        
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ChangeMoveState", CharSet = CharSet.Unicode)]
+        public static extern void ChangeMoveState(MoveState state);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "HandleMoveStateChanged", CharSet = CharSet.Unicode)]
+        public static extern void HandleMoveStateChanged(PossibleMoveInstance move);
+
 
         #endregion
 
@@ -140,6 +147,14 @@ namespace Chess_UI.Configuration
             Checkmate,
             Stalemate,
             Draw
+        }
+
+
+        public enum MoveState
+        {
+            NoMove = 1,
+            InitiateMove,
+            ExecuteMove
         }
 
 

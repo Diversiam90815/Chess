@@ -29,6 +29,29 @@ namespace Chess_UI.ViewModels
 
         public ObservableCollection<BoardSquare> Board { get; set; }
 
+        private MoveState currentMoveState = MoveState.NoMove;
+        public MoveState CurrentMoveState
+        {
+            get => currentMoveState;
+            set
+            {
+                if (value != currentMoveState)
+                {
+                    currentMoveState = value;
+                    ChessLogicAPI.ChangeMoveState(value);
+                }
+            }
+        }
+
+        private PossibleMoveInstance? currentPossibleMove = null;
+        public PossibleMoveInstance? CurrentPossibleMove
+        {
+            get => currentPossibleMove;
+            set
+            {
+                currentPossibleMove = value;
+            }
+        }
 
         public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller)
         {
@@ -93,6 +116,54 @@ namespace Chess_UI.ViewModels
             MoveHistoryColumns.Clear();
             MoveHistoryColumns.Add([]);
         }
+
+
+        public void HandleSquareClick(BoardSquare square)
+        {
+            switch (CurrentMoveState)
+            {
+                // The user is picking the start of a move
+                case MoveState.NoMove:
+                    {
+                        CurrentPossibleMove = new PossibleMoveInstance
+                        {
+                            start = square.pos
+                        };
+                        CurrentMoveState = MoveState.InitiateMove;
+
+                        ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+
+                        // The engine will calculate possible moves 
+                        // and eventually call back "delegateMessage::initiateMove"
+
+                        break;
+                    }
+
+                // The user is picking the end of a move
+                case MoveState.InitiateMove:
+                    {
+                        if (CurrentPossibleMove != null)
+                        {
+                            var move = CurrentPossibleMove.Value;
+                            move.end = square.pos;
+                            CurrentPossibleMove = move;
+
+                            CurrentMoveState = MoveState.ExecuteMove;
+                            // => triggers ChessLogicAPI.ChangeMoveState( the final move )
+                            // The engine executes the move, calls delegate "moveExecuted",
+                            // We'll get that event in the Controller.
+                        }
+                        break;
+                    }
+
+                default:
+                    // Possibly check for other states or do nothing
+                    break;
+            }
+        }
+
+
+
 
 
         private ImageSource boardBackgroundImage = GetImage(BoardBackground.Wood);

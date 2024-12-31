@@ -20,6 +20,7 @@ namespace Chess_UI.Configuration
 
         static APIDelegate Delegate = null;
 
+        public List<PossibleMoveInstance> PossibleMoves;
 
         private void SetLogicAPIDelegate()
         {
@@ -44,6 +45,7 @@ namespace Chess_UI.Configuration
 
                 case DelegateMessage.InitiateMove:
                     {
+                        // Engine has finished calculating possible moves
                         HandleInitiatedMove();
                         break;
                     }
@@ -55,6 +57,8 @@ namespace Chess_UI.Configuration
                     }
                 case DelegateMessage.MoveExecuted:
                     {
+                        // Move is completed, so we reload the board
+                        // And update move history
                         HandleExecutedMove(data);
                         break;
                     }
@@ -74,7 +78,17 @@ namespace Chess_UI.Configuration
 
         private void HandleInitiatedMove()
         {
+            PossibleMoves = new List<PossibleMoveInstance>();
+            PossibleMoves.Clear();
 
+            int numMoves = ChessLogicAPI.GetNumPossibleMoves();
+            for (int i = 0; i < numMoves; i++)
+            {
+                if (ChessLogicAPI.GetPossibleMoveAtIndex((uint)i, out var move))
+                {
+                    PossibleMoves.Add(move);
+                }
+            }
         }
 
 
@@ -93,6 +107,7 @@ namespace Chess_UI.Configuration
         {
             string moveNotation = (string)Marshal.PtrToStructure(data, typeof(string));
             // callback
+
         }
 
 

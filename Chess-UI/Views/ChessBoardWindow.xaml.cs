@@ -17,6 +17,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using static Chess_UI.Configuration.ChessLogicAPI;
 
 
 
@@ -91,8 +92,10 @@ namespace Chess_UI.Views
         private void ChessPiece_Clicked(object sender, TappedRoutedEventArgs e)
         {
             var grid = sender as FrameworkElement;
-            var square = grid.DataContext as Chess_UI.Configuration.BoardSquare;
+            var square = grid.DataContext as BoardSquare;
+
             // Handle the move
+            ViewModel.HandleSquareClick(square);
         }
     }
 }

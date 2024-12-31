@@ -54,13 +54,12 @@ public:
 
 	bool					   getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE]);
 
+	void					   handleMoveStateChanges(PossibleMove &move);
+
 private:
 	GameManager();
 
-
 	void							 switchTurns();
-
-	void							 handleMoveStateChanges(PossibleMove &move);
 
 	void							 checkForEndGameConditions();
 

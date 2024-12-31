@@ -71,6 +71,17 @@ namespace Chess_UI.Configuration
 
         public static ImageSource GetImage(BoardBackground background) => BoardBackgroundImages[background];
 
+        // Images for the chess pieces used on the board! (later need to be modified when adding settings)
+        public static ImageSource GetPieceImage(PlayerColor player, PieceTypeInstance pieceTypeInstance)
+        {
+            return player switch
+            {
+                PlayerColor.White => CapturedWhitePiecesImages[pieceTypeInstance],
+                PlayerColor.Black => CapturedBlackPiecesImages[pieceTypeInstance],
+                _ => null
+            };
+        }
+
         public static ImageSource GetCapturedPieceImage(PlayerColor player, PieceTypeInstance pieceTypeInstance)
         {
             return player switch

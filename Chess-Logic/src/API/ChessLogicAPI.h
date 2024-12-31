@@ -35,6 +35,9 @@ extern "C"
 
 	CHESS_API void	ExecuteMove(const PossibleMoveInstance &moveInstance);
 
+	CHESS_API void	ChangeMoveState(const MoveState &moveState);
+
+	CHESS_API void	HandleMoveStateChanged(const PossibleMoveInstance &moveInstance);
 
 	// CHESS_API bool GetChessBoard(ChessBoard &board);
 

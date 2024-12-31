@@ -40,7 +40,7 @@ namespace Chess_UI.Configuration
                 if (piece == PieceTypeInstance.DefaultType || colour == PlayerColor.NoColor)
                     return null;
 
-                return Images.GetCapturedPieceImage(colour, piece);
+                return Images.GetPieceImage(colour, piece);
             }
         }
     }

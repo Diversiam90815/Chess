@@ -142,6 +142,22 @@ CHESS_API void ExecuteMove(const PossibleMoveInstance &moveInstance)
 }
 
 
+CHESS_API void HandleMoveStateChanged(const PossibleMoveInstance &moveInstance)
+{
+	GameManager *manager = GameManager::GetInstance();
+	PossibleMove move	 = MapToPossibleMove(moveInstance);
+	manager->handleMoveStateChanges(move);
+}
+
+
+CHESS_API void ChangeMoveState(const MoveState &moveState)
+{
+	GameManager *manager = GameManager::GetInstance();
+	MoveState	 state	 = static_cast<MoveState>(moveState); // Causes error
+	manager->setCurrentMoveState(state);
+}
+
+
 CHESS_API void StartGame()
 {
 	GameManager *manager = GameManager::GetInstance();
