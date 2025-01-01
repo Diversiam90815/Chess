@@ -29,6 +29,10 @@ void MovementManager::init()
 std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &position)
 {
 	auto &piece	 = mChessBoard->getPiece(position);
+
+	if (!piece)
+		return {};
+
 	auto  player = piece->getColor();
 
 	if (mAllLegalMovesForCurrentRound.size() == 0)
