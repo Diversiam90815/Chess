@@ -223,7 +223,7 @@ bool MoveHelper::checkMovesInDirection(const Position &position, ChessBoard &boa
 
 bool MoveHelper::checkForBorders(const int x, const int y)
 {
-	return (x >= 1 && x <= BOARD_SIZE && y >= 1 && y <= BOARD_SIZE);
+	return (x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE);
 }
 
 

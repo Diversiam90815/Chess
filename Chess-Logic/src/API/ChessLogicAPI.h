@@ -35,7 +35,7 @@ extern "C"
 
 	CHESS_API void	ExecuteMove(const PossibleMoveInstance &moveInstance);
 
-	CHESS_API void	ChangeMoveState(const int &moveState);
+	CHESS_API void	ChangeMoveState(int moveState);
 
 	CHESS_API void	HandleMoveStateChanged(const PossibleMoveInstance &moveInstance);
 

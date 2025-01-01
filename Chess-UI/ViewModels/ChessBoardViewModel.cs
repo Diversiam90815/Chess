@@ -38,7 +38,8 @@ namespace Chess_UI.ViewModels
                 if (value != currentMoveState)
                 {
                     currentMoveState = value;
-                    ChessLogicAPI.ChangeMoveState((int)currentMoveState);
+                    int state = (int)currentMoveState;
+                    ChessLogicAPI.ChangeMoveState(state);
                 }
             }
         }

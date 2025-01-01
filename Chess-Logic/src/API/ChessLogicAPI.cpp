@@ -150,10 +150,11 @@ CHESS_API void HandleMoveStateChanged(const PossibleMoveInstance &moveInstance)
 }
 
 
-CHESS_API void ChangeMoveState(const int &moveState)
+CHESS_API void ChangeMoveState(int moveState)
 {
 	GameManager *manager = GameManager::GetInstance();
-	manager->setCurrentMoveState(static_cast<MoveState>(moveState));
+	MoveState	 state	 = (MoveState)moveState;
+	manager->setCurrentMoveState(state);
 }
 
 
