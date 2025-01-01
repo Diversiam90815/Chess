@@ -1,0 +1,4 @@
+[submodule "Chess-Logic/submodules/Logger"]
+	path = Chess-Logic/submodules/Logger
+	url = git@github.com:Diversiam90815/Logger.git
+	branch = main
