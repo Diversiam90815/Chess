@@ -9,6 +9,7 @@
 */
 
 #include "GameManager.h"
+#include <strsafe.h>
 
 
 GameManager::GameManager()
@@ -160,11 +161,22 @@ void GameManager::executeMove(PossibleMove &move)
 			mWhitePlayer.updateScore();
 		}
 	}
-	
+
 	if (mDelegate)
 	{
-		const char* moveNotation = executedMove.notation.c_str();
-		mDelegate(delegateMessage::moveExecuted, &moveNotation);
+		std::string moveNotation = executedMove.notation;
+		size_t		len			 = moveNotation.size();
+		size_t		bufferSize	 = (len + 1) * sizeof(char);
+		char	   *strCopy		 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
+
+		if (strCopy != nullptr)
+		{
+			HRESULT hr = StringCbCopyA(strCopy, bufferSize, moveNotation.c_str());
+			if (SUCCEEDED(hr))
+			{
+				mDelegate(delegateMessage::moveExecuted, strCopy);
+			}
+		}
 	}
 
 	checkForEndGameConditions();

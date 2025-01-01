@@ -22,6 +22,7 @@ namespace Chess_UI.Configuration
 
         public List<PossibleMoveInstance> PossibleMoves;
 
+
         private void SetLogicAPIDelegate()
         {
             if (Delegate == null)
@@ -105,8 +106,9 @@ namespace Chess_UI.Configuration
 
         private void HandleExecutedMove(nint data)
         {
-            string moveNotation = (string)Marshal.PtrToStructure(data, typeof(string));
-            // callback
+            string notation = Marshal.PtrToStringUTF8(data);
+
+            ExecutedMove?.Invoke(notation);
 
         }
 
@@ -118,5 +120,17 @@ namespace Chess_UI.Configuration
             ChessLogicAPI.GetBoardState(board);
             return board;
         }
+
+
+        #region ViewModel Delegates
+
+        // Define the delegate
+        public delegate void ExecutedMoveHandler(string moveNotation);
+
+        // define the event
+        public event ExecutedMoveHandler ExecutedMove;
+
+        #endregion
+
     }
 }
