@@ -72,7 +72,7 @@ bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
 			Move testMove(possibleMove.start, possibleMove.end, piece->getType());
 
 			// Validate the move
-			if (!validateMove(testMove, playerColor))
+			if (validateMove(testMove, playerColor))
 			{
 				validMoves.push_back(possibleMove);
 			}
