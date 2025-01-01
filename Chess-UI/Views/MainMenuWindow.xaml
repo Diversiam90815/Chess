@@ -35,7 +35,7 @@
 
             <StackPanel Name="StartGameButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="StartGameButton_Click">
-                    <Image Source="{x:Bind mViewModel.StartGameButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{x:Bind ViewModel.StartGameButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <Button.Resources>
                         <ResourceDictionary>
                             <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
@@ -48,7 +48,7 @@
 
             <StackPanel Name="SettingsButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="SettingsButton_Click">
-                    <Image Source="{x:Bind mViewModel.SettingButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{x:Bind ViewModel.SettingButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <Button.Resources>
                         <ResourceDictionary>
                             <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
@@ -61,7 +61,7 @@
 
             <StackPanel Name="MultiplayerButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="MultiplayerButton_Click">
-                    <Image Source="{x:Bind mViewModel.MultiplayerButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{x:Bind ViewModel.MultiplayerButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <Button.Resources>
                         <ResourceDictionary>
                             <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
@@ -74,7 +74,7 @@
 
             <StackPanel Name="QuitButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                 <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="QuitButton_Click">
-                    <Image Source="{x:Bind mViewModel.EndGameButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Image Source="{x:Bind ViewModel.EndGameButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <Button.Resources>
                         <ResourceDictionary>
                             <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />

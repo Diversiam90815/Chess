@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Chess_UI.Configuration
 {
@@ -15,7 +12,7 @@ namespace Chess_UI.Configuration
         #region Defines
 
         private const string LOGIC_API_PATH = @"ChessGame.dll";
-        private const int BOARD_SIZE = 8;
+        public const int BOARD_SIZE = 8;
 
         #endregion
 
@@ -57,7 +54,7 @@ namespace Chess_UI.Configuration
         public static extern void GetPieceInPosition(PositionInstance position, out PieceTypeInstance piece);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetBoardState", CharSet = CharSet.Unicode)]
-        public static extern bool GetBoardState(out PieceTypeInstance[] boardState);
+        public static extern bool GetBoardState([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 64)] int[] boardState);
 
         #endregion
 
@@ -72,6 +69,13 @@ namespace Chess_UI.Configuration
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ResetGame", CharSet = CharSet.Unicode)]
         public static extern void ResetGame();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ChangeMoveState", CharSet = CharSet.Unicode)]
+        public static extern void ChangeMoveState(int state);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "HandleMoveStateChanged", CharSet = CharSet.Unicode)]
+        public static extern void HandleMoveStateChanged(PossibleMoveInstance move);
+
 
         #endregion
 
@@ -89,11 +93,11 @@ namespace Chess_UI.Configuration
         {
             PlayerHasWon = 1,
             InitiateMove,
-            PlayerScoreUpdate
+            PlayerScoreUpdate,
+            MoveExecuted
         }
 
         #endregion
-
 
 
 
@@ -102,7 +106,51 @@ namespace Chess_UI.Configuration
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct PositionInstance
         {
-            public int x, y;
+            public PositionInstance(int x, int y)
+            {
+                this.x = x;
+                this.y = y;
+            }
+
+            public int x { get; set; }
+            public int y { get; set; }
+
+
+            public override bool Equals(object obj)
+            {
+                if (obj is PositionInstance)
+                {
+                    var other = (PositionInstance)obj;
+                    return (this.x == other.x) && (this.y == other.y);
+                }
+                return false;
+            }
+
+
+            public static bool operator ==(PositionInstance left, PositionInstance right)
+            {
+                if (ReferenceEquals(left, right))
+                {
+                    return true;
+                }
+
+                return left.Equals(right);
+            }
+
+
+            public static bool operator !=(PositionInstance left, PositionInstance right)
+            {
+                return !(left == right);
+            }
+
+
+            public override int GetHashCode()
+            {
+                int hashcode = 17;
+                hashcode = hashcode * 23 + x.GetHashCode();
+                hashcode = hashcode * 23 + y.GetHashCode();
+                return hashcode;
+            }
         }
 
 
@@ -117,12 +165,14 @@ namespace Chess_UI.Configuration
             King
         }
 
+
         public enum PlayerColor
         {
             NoColor,
             White,
             Black
         }
+
 
         public enum GameState
         {
@@ -134,8 +184,17 @@ namespace Chess_UI.Configuration
             Draw
         }
 
+
+        public enum MoveState
+        {
+            NoMove = 1,
+            InitiateMove,
+            ExecuteMove
+        }
+
+
         [Flags]
-        public enum MoveTypeInstance : int    // need to set it correctly
+        public enum MoveTypeInstance : int
         {
             MoveType_None = 0,
             MoveType_Normal = 1 << 0, // 1
@@ -157,6 +216,39 @@ namespace Chess_UI.Configuration
             public PositionInstance start;
             public PositionInstance end;
             public MoveTypeInstance type;
+
+            public override bool Equals(object obj)
+            {
+                if (obj is PossibleMoveInstance)
+                {
+                    var other = (PossibleMoveInstance)obj;
+                    return (start == other.start) && (end == other.end);
+                }
+                return false;
+            }
+
+
+            public static bool operator ==(PossibleMoveInstance left, PossibleMoveInstance right)
+            {
+                if (ReferenceEquals(left, right))
+                {
+                    return true;
+                }
+
+                return left.Equals(right);
+            }
+
+
+            public static bool operator !=(PossibleMoveInstance left, PossibleMoveInstance right)
+            {
+                return !left.Equals(right);
+            }
+
+
+            public override int GetHashCode()
+            {
+                return start.GetHashCode() ^ end.GetHashCode();
+            }
         }
 
 

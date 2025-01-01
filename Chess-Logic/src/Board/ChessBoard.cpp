@@ -84,9 +84,9 @@ bool ChessBoard::movePiece(Position start, Position end)
 	if (!piece)
 		return false;
 
-	removePiece(start);
 	setPiece(end, piece);
 	piece->setHasMoved(true);
+	removePiece(start);
 	return true;
 }
 

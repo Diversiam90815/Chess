@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chess_UI.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -10,23 +11,27 @@ namespace Chess_UI.Configuration
 {
     public class Controller
     {
+
         public Controller()
         {
-
+            SetLogicAPIDelegate();
         }
 
-        static APIDelegate mDelegate = null;
+
+        static APIDelegate Delegate = null;
+
+        public List<PossibleMoveInstance> PossibleMoves;
+
 
         private void SetLogicAPIDelegate()
         {
-            if (mDelegate == null)
+            if (Delegate == null)
             {
-                mDelegate = new APIDelegate(DelegateHandler);
-                SetDelegate(mDelegate);
+                Delegate = new APIDelegate(DelegateHandler);
+                SetDelegate(Delegate);
             }
-
-
         }
+
 
         public void DelegateHandler(int message, nint data)
         {
@@ -41,6 +46,7 @@ namespace Chess_UI.Configuration
 
                 case DelegateMessage.InitiateMove:
                     {
+                        // Engine has finished calculating possible moves
                         HandleInitiatedMove();
                         break;
                     }
@@ -48,6 +54,13 @@ namespace Chess_UI.Configuration
                 case DelegateMessage.PlayerScoreUpdate:
                     {
                         HandlePlayerScoreUpdate(data);
+                        break;
+                    }
+                case DelegateMessage.MoveExecuted:
+                    {
+                        // Move is completed, so we reload the board
+                        // And update move history
+                        HandleExecutedMove(data);
                         break;
                     }
                 default: break;
@@ -66,7 +79,17 @@ namespace Chess_UI.Configuration
 
         private void HandleInitiatedMove()
         {
+            PossibleMoves = new List<PossibleMoveInstance>();
+            PossibleMoves.Clear();
 
+            int numMoves = ChessLogicAPI.GetNumPossibleMoves();
+            for (int i = 0; i < numMoves; i++)
+            {
+                if (ChessLogicAPI.GetPossibleMoveAtIndex((uint)i, out var move))
+                {
+                    PossibleMoves.Add(move);
+                }
+            }
         }
 
 
@@ -79,6 +102,33 @@ namespace Chess_UI.Configuration
 
             // trigger event for score change
         }
+
+
+        private void HandleExecutedMove(nint data)
+        {
+            string notation = Marshal.PtrToStringUTF8(data);
+            ExecutedMove?.Invoke(notation);
+        }
+
+
+        public int[] GetBoardStateFromNative()
+        {
+            int[] board = new int[64]; // pre-allocated array
+
+            ChessLogicAPI.GetBoardState(board);
+            return board;
+        }
+
+
+        #region ViewModel Delegates
+
+        // Define the delegate
+        public delegate void ExecutedMoveHandler(string moveNotation);
+
+        // define the event
+        public event ExecutedMoveHandler ExecutedMove;
+
+        #endregion
 
     }
 }

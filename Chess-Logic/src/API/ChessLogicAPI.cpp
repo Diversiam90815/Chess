@@ -120,7 +120,7 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleM
 		}
 	}
 
-	if ((start != Position{0, 0}) && (end != Position{0, 0}) && ((type & MoveType::None) != MoveType::None))
+	if ((start != Position{0, 0}) && (end != Position{0, 0}) && (type != MoveType::None))
 	{
 		PositionInstance startPos	= MapToPositionInstance(start);
 		PositionInstance endPos		= MapToPositionInstance(end);
@@ -139,6 +139,22 @@ CHESS_API void ExecuteMove(const PossibleMoveInstance &moveInstance)
 	GameManager *manager = GameManager::GetInstance();
 	PossibleMove move	 = MapToPossibleMove(moveInstance);
 	manager->executeMove(move);
+}
+
+
+CHESS_API void HandleMoveStateChanged(const PossibleMoveInstance &moveInstance)
+{
+	GameManager *manager = GameManager::GetInstance();
+	PossibleMove move	 = MapToPossibleMove(moveInstance);
+	manager->handleMoveStateChanges(move);
+}
+
+
+CHESS_API void ChangeMoveState(int moveState)
+{
+	GameManager *manager = GameManager::GetInstance();
+	MoveState	 state	 = (MoveState)moveState;
+	manager->setCurrentMoveState(state);
 }
 
 
@@ -181,7 +197,7 @@ CHESS_API void GetPieceInPosition(PositionInstance posInstance, PieceTypeInstanc
 }
 
 
-CHESS_API bool GetBoardState(PieceTypeInstance *boardState)
+CHESS_API bool GetBoardState(int *boardState)
 {
 	if (!boardState)
 		return false;
@@ -190,9 +206,10 @@ CHESS_API bool GetBoardState(PieceTypeInstance *boardState)
 	if (!manager)
 		return false;
 
-	PieceType localBoardState[BOARD_SIZE][BOARD_SIZE];
+	int	 localBoardState[BOARD_SIZE][BOARD_SIZE];
 
-	bool	  result = manager->getBoardState(localBoardState);
+	bool result = manager->getBoardState(localBoardState);
+
 	if (!result)
 		return false;
 
@@ -201,7 +218,7 @@ CHESS_API bool GetBoardState(PieceTypeInstance *boardState)
 		for (int x = 0; x < BOARD_SIZE; ++x)
 		{
 			// Mapping 2D array to 1D
-			boardState[y * BOARD_SIZE + x] = static_cast<PieceTypeInstance>(static_cast<int>(localBoardState[y][x]));
+			boardState[y * BOARD_SIZE + x] = static_cast<int>(localBoardState[y][x]);
 		}
 	}
 

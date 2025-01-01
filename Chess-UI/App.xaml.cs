@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using Chess_UI.Configuration;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -42,18 +43,18 @@ namespace Chess_UI
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            m_window = new MainWindow();
+            MainMenu = new MainMenuWindow();
 
             ChessLogicAPI.Init();
 
-            m_window.Closed += (sender, args) =>
+            MainMenu.Closed += (sender, args) =>
             {
                 ChessLogicAPI.Deinit();
             };
 
-            m_window.Activate();
+            MainMenu.Activate();
         }
 
-        private Window m_window;
+        private Window MainMenu;
     }
 }

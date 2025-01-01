@@ -9,6 +9,7 @@
 */
 
 #include "GameManager.h"
+#include <strsafe.h>
 
 
 GameManager::GameManager()
@@ -91,7 +92,7 @@ std::vector<PossibleMove> GameManager::getPossibleMoveForPosition()
 }
 
 
-bool GameManager::getBoardState(PieceType boardState[BOARD_SIZE][BOARD_SIZE])
+bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 {
 	if (!mMovementManager || !mMovementManager->mChessBoard)
 		return false;
@@ -102,17 +103,23 @@ bool GameManager::getBoardState(PieceType boardState[BOARD_SIZE][BOARD_SIZE])
 	{
 		for (int x = 0; x < BOARD_SIZE; ++x)
 		{
-			Position pos   = {x, y};
-			auto	&piece = board->getPiece(pos);
+			Position pos	  = {x, y};
+			auto	&piece	  = board->getPiece(pos);
+
+			int		 colorVal = 0; // 0 = no color
+			int		 typeVal  = 0; // 0 = PieceType::DefaultType
 
 			if (piece)
 			{
-				boardState[y][x] = piece->getType();
+				colorVal = static_cast<int>(piece->getColor()) & 0xF;
+				typeVal	 = static_cast<int>(piece->getType()) & 0xF;
 			}
-			else
-			{
-				boardState[y][x] = PieceType::DefaultType;
-			}
+
+			// Pack color in high nibble, type in low nibble:
+			// bits [4..7] = color, bits [0..3] = piece type
+			int encoded		 = (colorVal << 4) | (typeVal & 0xF);
+
+			boardState[y][x] = encoded;
 		}
 	}
 	return true;
@@ -151,6 +158,23 @@ void GameManager::executeMove(PossibleMove &move)
 		{
 			mBlackPlayer.addCapturedPiece(executedMove.capturedPiece);
 			mWhitePlayer.updateScore();
+		}
+	}
+
+	if (mDelegate)
+	{
+		std::string moveNotation = executedMove.notation;
+		size_t		len			 = moveNotation.size();
+		size_t		bufferSize	 = (len + 1) * sizeof(char);
+		char	   *strCopy		 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
+
+		if (strCopy != nullptr)
+		{
+			HRESULT hr = StringCbCopyA(strCopy, bufferSize, moveNotation.c_str());
+			if (SUCCEEDED(hr))
+			{
+				mDelegate(delegateMessage::moveExecuted, strCopy);
+			}
 		}
 	}
 
@@ -243,7 +267,7 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 
 		if (mDelegate)
 		{
-			mDelegate(delegateMessage::initiateMove, 0);		// UI can now get all the moves for the piece
+			mDelegate(delegateMessage::initiateMove, 0); // UI can now get all the moves for the piece
 		}
 
 		break;

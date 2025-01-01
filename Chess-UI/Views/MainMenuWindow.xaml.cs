@@ -1,46 +1,37 @@
 using Chess_UI.Configuration;
 using Chess_UI.ViewModels;
+using Chess_UI.Views;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+
 
 
 namespace Chess_UI
 {
     public sealed partial class MainMenuWindow : Window
     {
-        private DispatcherQueue mDispatcherQueue;
+        private new readonly DispatcherQueue DispatcherQueue;
 
         private OverlappedPresenter mPresenter;
 
-        public MainMenuViewModel mViewModel { get; private set; }
+        private ChessBoardWindow ChessBoardWindow;
+
+        public MainMenuViewModel ViewModel { get; private set; }
 
 
         public MainMenuWindow()
         {
             this.InitializeComponent();
 
-            mDispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            DispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-            mViewModel = new MainMenuViewModel(mDispatcherQueue);
+            ViewModel = new MainMenuViewModel(DispatcherQueue);
 
-            this.RootGrid.DataContext = mViewModel;
+            this.RootGrid.DataContext = ViewModel;
 
             Init();
-            SetWindowSize(750, 800);
+            SetWindowSize(800, 750);
         }
 
 
@@ -57,13 +48,31 @@ namespace Chess_UI
             float scalingFactor = ChessLogicAPI.GetWindowScalingFactor(hwnd);
             int scaledWidth = (int)(width * scalingFactor);
             int scaledHeight = (int)(height * scalingFactor);
-            AppWindow.Resize(new(scaledHeight, scaledWidth));
+            AppWindow.Resize(new(scaledWidth, scaledHeight));
+        }
+
+
+        private void BoardWindowClosed(object sender, WindowEventArgs args)
+        {
+            ChessBoardWindow.Closed -= BoardWindowClosed;
+            ChessBoardWindow = null;
+            this.Activate();
         }
 
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-            //Not yet implemented
+            if (ChessBoardWindow == null)
+            {
+                ChessBoardWindow = new ChessBoardWindow(this.ViewModel.Controller);
+                ChessBoardWindow.Activate();
+                ChessBoardWindow.Closed += BoardWindowClosed;
+                this.AppWindow.Hide();
+            }
+            else
+            {
+                ChessBoardWindow.Activate();
+            }
         }
 
 
