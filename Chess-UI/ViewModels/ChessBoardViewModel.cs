@@ -150,7 +150,8 @@ namespace Chess_UI.ViewModels
                             CurrentPossibleMove = move;
 
                             CurrentMoveState = MoveState.ExecuteMove;
-                            // => triggers ChessLogicAPI.ChangeMoveState( the final move )
+                            ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+
                             // The engine executes the move, calls delegate "moveExecuted",
                             // We'll get that event in the Controller.
                         }
