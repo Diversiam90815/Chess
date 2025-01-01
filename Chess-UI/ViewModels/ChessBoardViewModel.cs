@@ -42,7 +42,7 @@ namespace Chess_UI.ViewModels
 
             for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
             {
-                Board.Add(new());
+                Board.Add(new(dispatcherQueue));
             }
 
             for (int i = 0; i < MovesMaxColumns; i++)
@@ -75,7 +75,8 @@ namespace Chess_UI.ViewModels
                     x,
                     y,
                     (PieceTypeInstance)pieceVal,
-                    (PlayerColor)colorVal
+                    (PlayerColor)colorVal,
+                    DispatcherQueue
                 );
 
                 Board[i] = square;
@@ -129,6 +130,7 @@ namespace Chess_UI.ViewModels
                         {
                             var move = CurrentPossibleMove.Value;
                             move.end = square.pos;
+                            move.type = MoveTypeInstance.MoveType_Normal;   // need to be set correctly (curently hardcoded)
                             CurrentPossibleMove = move;
 
                             if (CheckForValidMove())

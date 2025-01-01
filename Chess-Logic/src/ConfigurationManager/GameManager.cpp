@@ -119,7 +119,6 @@ bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 			// bits [4..7] = color, bits [0..3] = piece type
 			int encoded		 = (colorVal << 4) | (typeVal & 0xF);
 
-
 			boardState[y][x] = encoded;
 		}
 	}
