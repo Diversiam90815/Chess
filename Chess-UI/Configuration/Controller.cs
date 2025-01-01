@@ -107,9 +107,7 @@ namespace Chess_UI.Configuration
         private void HandleExecutedMove(nint data)
         {
             string notation = Marshal.PtrToStringUTF8(data);
-
             ExecutedMove?.Invoke(notation);
-
         }
 
 

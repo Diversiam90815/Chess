@@ -1,13 +1,9 @@
 ﻿using Chess_UI.Configuration;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using static Chess_UI.Configuration.Images;
 using static Chess_UI.Configuration.ChessLogicAPI;
 using System.Collections.ObjectModel;
@@ -51,7 +47,6 @@ namespace Chess_UI.ViewModels
             }
 
             LoadBoardFromNative();
-
         }
 
 
@@ -236,6 +231,8 @@ namespace Chess_UI.ViewModels
             }
         }
 
+        #region Captured Pieces
+
         #region Images Captured Pieces
 
         private ImageSource capturedWhitePawnImage = GetCapturedPieceImage(PlayerColor.White, PieceTypeInstance.Pawn);
@@ -376,6 +373,7 @@ namespace Chess_UI.ViewModels
         }
 
         #endregion
+
 
         #region Num Captured Pieces 
 
@@ -529,6 +527,9 @@ namespace Chess_UI.ViewModels
                 }
             }
         }
+
+        #endregion
+
 
         #endregion
 
