@@ -120,7 +120,7 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleM
 		}
 	}
 
-	if ((start != Position{0, 0}) && (end != Position{0, 0}) && ((type & MoveType::None) != MoveType::None))
+	if ((start != Position{0, 0}) && (end != Position{0, 0}) && (type != MoveType::None))
 	{
 		PositionInstance startPos	= MapToPositionInstance(start);
 		PositionInstance endPos		= MapToPositionInstance(end);

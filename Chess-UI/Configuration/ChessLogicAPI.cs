@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Chat;
 
 namespace Chess_UI.Configuration
 {
@@ -72,7 +74,7 @@ namespace Chess_UI.Configuration
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ResetGame", CharSet = CharSet.Unicode)]
         public static extern void ResetGame();
-        
+
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ChangeMoveState", CharSet = CharSet.Unicode)]
         public static extern void ChangeMoveState(int state);
 
@@ -115,7 +117,45 @@ namespace Chess_UI.Configuration
                 this.y = y;
             }
 
-            public int x, y;
+            public int x { get; set; }
+            public int y { get; set; }
+
+
+            public override bool Equals(object obj)
+            {
+                if (obj is PositionInstance)
+                {
+                    var other = (PositionInstance)obj;
+                    return (this.x == other.x) && (this.y == other.y);
+                }
+                return false;
+            }
+
+
+            public static bool operator ==(PositionInstance left, PositionInstance right)
+            {
+                if (ReferenceEquals(left, right))
+                {
+                    return true;
+                }
+
+                return left.Equals(right);
+            }
+
+
+            public static bool operator !=(PositionInstance left, PositionInstance right)
+            {
+                return !(left == right);
+            }
+
+
+            public override int GetHashCode()
+            {
+                int hashcode = 17;
+                hashcode = hashcode * 23 + x.GetHashCode();
+                hashcode = hashcode * 23 + y.GetHashCode();
+                return hashcode;
+            }
         }
 
 
@@ -181,6 +221,39 @@ namespace Chess_UI.Configuration
             public PositionInstance start;
             public PositionInstance end;
             public MoveTypeInstance type;
+
+            public override bool Equals(object obj)
+            {
+                if (obj is PossibleMoveInstance)
+                {
+                    var other = (PossibleMoveInstance)obj;
+                    return (start == other.start) && (end == other.end);
+                }
+                return false;
+            }
+
+
+            public static bool operator ==(PossibleMoveInstance left, PossibleMoveInstance right)
+            {
+                if (ReferenceEquals(left, right))
+                {
+                    return true;
+                }
+
+                return left.Equals(right);
+            }
+
+
+            public static bool operator !=(PossibleMoveInstance left, PossibleMoveInstance right)
+            {
+                return !left.Equals(right);
+            }
+
+
+            public override int GetHashCode()
+            {
+                return start.GetHashCode() ^ end.GetHashCode();
+            }
         }
 
 

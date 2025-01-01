@@ -131,8 +131,18 @@ namespace Chess_UI.ViewModels
                             move.end = square.pos;
                             CurrentPossibleMove = move;
 
-                            CurrentMoveState = MoveState.ExecuteMove;
-                            ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+                            if (CheckForValidMove())
+                            {
+                                CurrentMoveState = MoveState.ExecuteMove;
+                                ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+                            }
+                            else
+                            {
+                                // Reset the move
+                                CurrentMoveState = MoveState.NoMove;
+                                CurrentPossibleMove = null;
+                                HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+                            }
 
                             // The engine executes the move, calls delegate "moveExecuted",
                             // We'll get that event in the Controller.
@@ -144,6 +154,31 @@ namespace Chess_UI.ViewModels
                     // Possibly check for other states or do nothing
                     break;
             }
+        }
+
+
+        private bool CheckForValidMove()
+        {
+            if (!CurrentPossibleMove.HasValue)
+            {
+                return false;
+            }
+
+            var move = CurrentPossibleMove.Value;
+
+            // Check first if the move was aborted by selecting the same square again
+            if (move.start == move.end) return false;
+
+            // Check if it is a possible move
+            foreach (var possibleMoves in Controller.PossibleMoves)
+            {
+                if (move == possibleMoves)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
 
