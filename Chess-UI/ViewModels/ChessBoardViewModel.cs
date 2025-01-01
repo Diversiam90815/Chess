@@ -29,35 +29,14 @@ namespace Chess_UI.ViewModels
 
         public ObservableCollection<BoardSquare> Board { get; set; }
 
-        private MoveState currentMoveState = MoveState.NoMove;
-        public MoveState CurrentMoveState
-        {
-            get => currentMoveState;
-            set
-            {
-                if (value != currentMoveState)
-                {
-                    currentMoveState = value;
-                    int state = (int)currentMoveState;
-                    ChessLogicAPI.ChangeMoveState(state);
-                }
-            }
-        }
 
-        private PossibleMoveInstance? currentPossibleMove = null;
-        public PossibleMoveInstance? CurrentPossibleMove
-        {
-            get => currentPossibleMove;
-            set
-            {
-                currentPossibleMove = value;
-            }
-        }
 
         public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller)
         {
             this.DispatcherQueue = dispatcherQueue;
             this.Controller = controller;
+
+            Controller.ExecutedMove += HandleExecutedMove;
 
             Board = new ObservableCollection<BoardSquare>();
 
@@ -126,6 +105,9 @@ namespace Chess_UI.ViewModels
                 // The user is picking the start of a move
                 case MoveState.NoMove:
                     {
+                        if (square.piece == PieceTypeInstance.DefaultType)
+                            return;
+
                         CurrentPossibleMove = new PossibleMoveInstance
                         {
                             start = square.pos
@@ -165,7 +147,42 @@ namespace Chess_UI.ViewModels
         }
 
 
+        private void HandleExecutedMove(string moveNotation)
+        {
+            AddMove(moveNotation);
+            LoadBoardFromNative();
+            CurrentMoveState = MoveState.NoMove;
+        }
 
+
+        #region Current Move
+
+        private MoveState currentMoveState = MoveState.NoMove;
+        public MoveState CurrentMoveState
+        {
+            get => currentMoveState;
+            set
+            {
+                if (value != currentMoveState)
+                {
+                    currentMoveState = value;
+                    int state = (int)currentMoveState;
+                    ChessLogicAPI.ChangeMoveState(state);
+                }
+            }
+        }
+
+        private PossibleMoveInstance? currentPossibleMove = null;
+        public PossibleMoveInstance? CurrentPossibleMove
+        {
+            get => currentPossibleMove;
+            set
+            {
+                currentPossibleMove = value;
+            }
+        }
+
+        #endregion
 
 
         private ImageSource boardBackgroundImage = GetImage(BoardBackground.Wood);
@@ -181,6 +198,8 @@ namespace Chess_UI.ViewModels
                 }
             }
         }
+
+        #region Images Captured Pieces
 
         private ImageSource capturedWhitePawnImage = GetCapturedPieceImage(PlayerColor.White, PieceTypeInstance.Pawn);
         public ImageSource CapturedWhitePawnImage
@@ -319,7 +338,9 @@ namespace Chess_UI.ViewModels
             }
         }
 
+        #endregion
 
+        #region Num Captured Pieces 
 
         private int blackCapturedPawns = 0;
         public int BlackCapturedPawns
@@ -472,7 +493,7 @@ namespace Chess_UI.ViewModels
             }
         }
 
-
+        #endregion
 
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
