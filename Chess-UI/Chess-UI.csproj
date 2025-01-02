@@ -63,6 +63,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Chess-Logic\build\Chess-Logic.vcxproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Page Update="Views\ChessBoardWindow.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>
