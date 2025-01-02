@@ -18,6 +18,7 @@
 
 class LoggingHelper
 {
+public:
 	static std::string playerColourToString(PlayerColor player);
 	static std::string positionToString(Position pos);
 	static std::string pieceTypeToString(PieceType piece);

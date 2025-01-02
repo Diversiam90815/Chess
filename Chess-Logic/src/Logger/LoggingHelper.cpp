@@ -116,40 +116,36 @@ std::string LoggingHelper::moveTypeToString(MoveType type)
 
 void LoggingHelper::logMove(Move &move)
 {
-	LOG_INFO("----- Move Details -----");
+	LOG_INFO("----- Move Number {} -----", move.number);
 
-	LOG_INFO("Move Number: %d", move.number);
-	LOG_INFO("Player: %s", playerColourToString(move.player).c_str());
+	LOG_INFO("\tPlayer:\t\t{}", playerColourToString(move.player).c_str());
 
-	LOG_INFO("Starting Position:");
-	LOG_INFO("\n%s", positionToString(move.startingPosition).c_str());
+	LOG_INFO("\tStart:\t\t{}", positionToString(move.startingPosition).c_str());
+	LOG_INFO("\tEnd:\t\t{}", positionToString(move.endingPosition).c_str());
 
-	LOG_INFO("Ending Position:");
-	LOG_INFO("\n%s", positionToString(move.endingPosition).c_str());
-
-	LOG_INFO("Moved Piece: %s", pieceTypeToString(move.movedPiece).c_str());
+	LOG_INFO("\tMoved Piece:\t\t{}", pieceTypeToString(move.movedPiece).c_str());
 
 	if (move.capturedPiece != PieceType::DefaultType)
 	{
-		LOG_INFO("Captured Piece: %s", pieceTypeToString(move.capturedPiece).c_str());
+		LOG_INFO("\tCaptured Piece:\t\t{}", pieceTypeToString(move.capturedPiece).c_str());
 	}
 	else
 	{
-		LOG_INFO("Captured Piece: None");
+		LOG_INFO("\tCaptured Piece:\t\tNone");
 	}
 
 	if (move.promotionType != PieceType::DefaultType)
 	{
-		LOG_INFO("Promotion Type: %s", pieceTypeToString(move.promotionType).c_str());
+		LOG_INFO("\tPromotion Type:\t\t{}", pieceTypeToString(move.promotionType).c_str());
 	}
 	else
 	{
-		LOG_INFO("Promotion Type: None");
+		LOG_INFO("\tPromotion Type:\t\tNone");
 	}
 
-	LOG_INFO("Move Type: %s", moveTypeToString(move.type).c_str());
-	LOG_INFO("Notation: %s", move.notation.c_str());
-	LOG_INFO("Half Move Clock: %d", move.halfMoveClock);
+	LOG_INFO("\tMove Type:\t\t\t{}", moveTypeToString(move.type).c_str());
+	LOG_INFO("\tNotation:\t\t\t{}", move.notation.c_str());
+	LOG_INFO("\tHalf Move Clock:\t{}", move.halfMoveClock);
 
-	LOG_INFO("------------------------\n");
+	LOG_INFO("------------------------");
 }
