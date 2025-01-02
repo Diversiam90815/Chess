@@ -40,6 +40,8 @@ void GameManager::ReleaseInstance()
 
 void GameManager::init()
 {
+	mLog.initLogging();
+
 	mMovementManager = std::make_unique<MovementManager>();
 	mMovementManager->init();
 
@@ -47,6 +49,8 @@ void GameManager::init()
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
 
 	clearState();
+
+	LOG_INFO("GAME MANAGER INIT FINISHED");
 }
 
 

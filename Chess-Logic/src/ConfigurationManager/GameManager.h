@@ -17,6 +17,8 @@
 
 #include "ChessLogicAPIDefines.h"
 
+#include "Logging.h"
+
 
 class GameManager
 {
@@ -63,6 +65,8 @@ private:
 
 	void							 checkForEndGameConditions();
 
+
+	Logging							 mLog;
 
 	Player							 mWhitePlayer;
 	Player							 mBlackPlayer;
