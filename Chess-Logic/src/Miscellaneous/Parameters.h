@@ -80,3 +80,4 @@ enum delegateMessage
 //============================================================
 
 constexpr auto LoggingFolder = "Logs";
+constexpr auto LogFile		 = "Chess.log";
