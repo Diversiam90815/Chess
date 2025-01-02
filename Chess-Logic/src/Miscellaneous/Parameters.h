@@ -72,3 +72,11 @@ enum delegateMessage
 	playerScoreUpdated,
 	moveExecuted
 };
+
+
+
+//============================================================
+//			File Manager
+//============================================================
+
+constexpr auto LoggingFolder = "Logs";
