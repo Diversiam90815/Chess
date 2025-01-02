@@ -68,6 +68,8 @@ CHESS_API void Init()
 CHESS_API void Deinit()
 {
 	GameManager::ReleaseInstance();
+
+	FileManager::ReleaseInstance();
 }
 
 
