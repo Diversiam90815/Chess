@@ -10,6 +10,7 @@
 
 #include "ChessLogicAPI.h"
 #include "GameManager.h"
+#include "FileManager.h"
 
 
 
@@ -82,6 +83,13 @@ CHESS_API float GetWindowScalingFactor(HWND hwnd)
 	int	  dpi			= GetDpiForWindow(hwnd);
 	float scalingFactor = (float)dpi / 96;
 	return scalingFactor;
+}
+
+
+CHESS_API void SetUnvirtualizedAppDataPath(const char *appDataPath)
+{
+	FileManager *fmg = FileManager::GetInstance();
+	fmg->setAppDataPath(appDataPath);
 }
 
 

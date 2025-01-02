@@ -28,6 +28,8 @@ extern "C"
 
 	CHESS_API float GetWindowScalingFactor(HWND hwnd);
 
+	CHESS_API void	SetUnvirtualizedAppDataPath(const char* appDataPath);
+
 
 	CHESS_API int	GetNumPossibleMoves();
 
