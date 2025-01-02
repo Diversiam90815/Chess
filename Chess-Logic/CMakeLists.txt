@@ -11,14 +11,16 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 
 # Define source and header directories
-set(SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
-set(PIECE_DIR ${SOURCE_DIR}/Piece)
-set(MOVE_DIR ${SOURCE_DIR}/Moves)
-set(CONFIG_DIR ${SOURCE_DIR}/ConfigurationManager)
-set(BOARD_DIR ${SOURCE_DIR}/Board)
-set(PLAYER_DIR ${SOURCE_DIR}/Player)
-set(API_DIR ${SOURCE_DIR}/API)
-set(MISC_DIR ${SOURCE_DIR}/Miscellaneous)
+set(SOURCE_DIR          ${PROJECT_SOURCE_DIR}/src)
+set(PIECE_DIR           ${SOURCE_DIR}/Piece)
+set(MOVE_DIR            ${SOURCE_DIR}/Moves)
+set(CONFIG_DIR          ${SOURCE_DIR}/ConfigurationManager)
+set(BOARD_DIR           ${SOURCE_DIR}/Board)
+set(PLAYER_DIR          ${SOURCE_DIR}/Player)
+set(API_DIR             ${SOURCE_DIR}/API)
+set(MISC_DIR            ${SOURCE_DIR}/Miscellaneous)
+set(LOGGER_DIR          ${SOURCE_DIR}/Logger)
+set(FILEMANAGER_DIR     ${SOURCE_DIR}/FileManager)
 
 
 # Include directories
@@ -29,6 +31,8 @@ include_directories(    ${PIECE_DIR}
                         ${PLAYER_DIR}
                         ${API_DIR}
                         ${MISC_DIR}
+                        ${LOGGER_DIR}
+                        ${FILEMANAGER_DIR}
                         ${SOURCE_DIR}
 )
 
@@ -77,6 +81,13 @@ set(MISC_FILES
     ${MISC_DIR}/Parameters.h
 )
 
+set(LOGGER_FILES
+    ${LOGGER_DIR}/Logger.h    ${LOGGER_DIR}/Logger.cpp
+)
+
+set(FILEMANAGER_FILES
+    ${FILEMANAGER_DIR}/FileManager.h    ${FILEMANAGER_DIR}/FileManager.cpp
+)
 
 set(ALL_FILES
     ${API_FILES}
@@ -86,6 +97,8 @@ set(ALL_FILES
     ${CONFIG_FILES}
     ${PLAYER_FILES}
     ${MISC_FILES}
+    ${LOGGER_FILES}
+    ${FILEMANAGER_FILES}
 )
 
 
@@ -97,6 +110,8 @@ source_group("Moves"            FILES ${MOVE_FILES})
 source_group("Configuration"    FILES ${CONFIG_FILES})
 source_group("Player"           FILES ${PLAYER_FILES})
 source_group("Miscellaneous"    FILES ${MISC_FILES})
+source_group("Logger"           FILES ${LOGGER_FILES})
+source_group("FileManager"      FILES ${FILEMANAGER_FILES})
 
 
 # Create the executable target
