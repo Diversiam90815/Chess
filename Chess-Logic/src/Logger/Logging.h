@@ -16,6 +16,7 @@
 #include <string>
 
 #include "FileManager.h"
+#include "LoggingHelper.h"
 
 
 class Logging

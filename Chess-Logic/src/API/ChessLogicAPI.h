@@ -41,7 +41,6 @@ extern "C"
 
 	CHESS_API void	HandleMoveStateChanged(const PossibleMoveInstance &moveInstance);
 
-	// CHESS_API bool GetChessBoard(ChessBoard &board);
 
 	CHESS_API void	GetPieceInPosition(PositionInstance posInstance, PieceTypeInstance *pieceTypeInstance);
 

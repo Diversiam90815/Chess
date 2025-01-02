@@ -79,5 +79,5 @@ private:
 
 	std::unique_ptr<MovementManager> mMovementManager;
 
-	PFN_CALLBACK					 mDelegate;
+	PFN_CALLBACK					 mDelegate = nullptr;
 };

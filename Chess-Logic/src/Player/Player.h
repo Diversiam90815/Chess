@@ -13,6 +13,7 @@
 
 #include "ChessPiece.h"
 #include "Parameters.h"
+#include "Logging.h"
 
 #include "ChessLogicAPIDefines.h"
 

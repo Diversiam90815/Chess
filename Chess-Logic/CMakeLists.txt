@@ -102,7 +102,8 @@ set(MISC_FILES
 )
 
 set(LOGGER_FILES
-    ${LOGGER_DIR}/Logging.h    ${LOGGER_DIR}/Logging.cpp
+    ${LOGGER_DIR}/Logging.h             ${LOGGER_DIR}/Logging.cpp
+    ${LOGGER_DIR}/LoggingHelper.h       ${LOGGER_DIR}/LoggingHelper.cpp
 )
 
 set(FILEMANAGER_FILES

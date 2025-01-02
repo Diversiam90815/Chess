@@ -49,8 +49,6 @@ void GameManager::init()
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
 
 	clearState();
-
-	LOG_INFO("GAME MANAGER INIT FINISHED");
 }
 
 
@@ -150,7 +148,8 @@ void GameManager::switchTurns()
 void GameManager::executeMove(PossibleMove &move)
 {
 	Move executedMove = mMovementManager->executeMove(move);
-
+	LOG_INFO("Executed move : {}", executedMove.notation.c_str());
+	
 	if (executedMove.capturedPiece != PieceType::DefaultType)
 	{
 		if (mCurrentPlayer == PlayerColor::White)
