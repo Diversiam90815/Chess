@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using static Chess_UI.Configuration.Images;
 using static Chess_UI.Configuration.ChessLogicAPI;
 using System.Collections.ObjectModel;
+using System;
 
 
 namespace Chess_UI.ViewModels
@@ -125,7 +126,7 @@ namespace Chess_UI.ViewModels
                         {
                             var move = CurrentPossibleMove.Value;
                             move.end = square.pos;
-                            move.type = MoveTypeInstance.MoveType_Normal;   // need to be set correctly (curently hardcoded)
+                            move.type = CheckForMoveType();
                             CurrentPossibleMove = move;
 
                             if (CheckForValidMove())
@@ -176,6 +177,13 @@ namespace Chess_UI.ViewModels
             }
 
             return false;
+        }
+
+
+        private MoveTypeInstance CheckForMoveType()
+        {
+            return MoveTypeInstance.MoveType_Normal;
+            
         }
 
 

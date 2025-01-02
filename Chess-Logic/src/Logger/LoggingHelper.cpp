@@ -143,8 +143,8 @@ void LoggingHelper::logMove(Move &move)
 		LOG_INFO("\tPromotion Type:\t\tNone");
 	}
 
-	LOG_INFO("\tMove Type:\t\t\t{}", moveTypeToString(move.type).c_str());
-	LOG_INFO("\tNotation:\t\t\t{}", move.notation.c_str());
+	LOG_INFO("\tMove Type:\t\t{}", moveTypeToString(move.type).c_str());
+	LOG_INFO("\tNotation:\t\t{}", move.notation.c_str());
 	LOG_INFO("\tHalf Move Clock:\t{}", move.halfMoveClock);
 
 	LOG_INFO("------------------------");
