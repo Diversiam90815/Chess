@@ -51,6 +51,7 @@ private:
 	bool													wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor);
 
 	bool													isSquareAttacked(const Position &square, PlayerColor attackerColor);
+	bool													isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard& chessboard);
 
 
 	bool													executeCastlingMove(PossibleMove &move);

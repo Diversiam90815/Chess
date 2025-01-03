@@ -120,8 +120,9 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	bool capturedPiece = (possibleMove.type & MoveType::Capture) == MoveType::Capture;
 	if (capturedPiece)
 	{
-		auto capturedPiece		   = mChessBoard->getPiece(possibleMove.end)->getType();
-		executedMove.capturedPiece = capturedPiece;
+		auto pieceCaptured		   = mChessBoard->getPiece(possibleMove.end)->getType();
+		executedMove.capturedPiece = pieceCaptured;
+		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
 	}
 
 	if ((possibleMove.type & MoveType::EnPassant) == MoveType::EnPassant)
@@ -132,7 +133,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	{
 		executeCastlingMove(possibleMove);
 	}
-	else if ((possibleMove.type & MoveType::Normal) == MoveType::Normal)
+	else if ((possibleMove.type & MoveType::Normal) == MoveType::Normal || (possibleMove.type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush)
 	{
 		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
 	}
@@ -210,6 +211,7 @@ bool MovementManager::isKingInCheck(Position &ourKing, PlayerColor playerColor)
 bool MovementManager::isCheckmate(PlayerColor player)
 {
 	Position kingPosition = mChessBoard->getKingsPosition(player);
+
 	if (!isKingInCheck(kingPosition, player))
 		return false; // If the king is not in check, it's not checkmate
 
@@ -254,17 +256,21 @@ bool MovementManager::isStalemate(PlayerColor player)
 
 bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor)
 {
-	bool	 kingInCheck	= false;
+	bool	   kingInCheck	  = false;
+
+	// Make a local copy of the board
+	ChessBoard boardCopy	  = *mChessBoard; // uses your ChessBoard(const ChessBoard&) constructor
+
 
 	// Save the current state
-	auto	&movingPiece	= mChessBoard->getPiece(move.startingPosition);
-	auto	&capturingPiece = mChessBoard->getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
+	auto	  &movingPiece	  = boardCopy.getPiece(move.startingPosition);
+	auto	  &capturingPiece = boardCopy.getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
 
-	Position kingPosition	= mChessBoard->getKingsPosition(playerColor);
+	Position   kingPosition	  = boardCopy.getKingsPosition(playerColor);
 
 	// Simulate the move
-	mChessBoard->setPiece(move.startingPosition, movingPiece);
-	mChessBoard->removePiece(move.endingPosition);
+	boardCopy.setPiece(move.startingPosition, movingPiece);
+	boardCopy.removePiece(move.endingPosition);
 
 	// Update King's position if if this is the king
 	bool isKing = movingPiece->getType() == PieceType::King;
@@ -274,12 +280,7 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor player
 	}
 
 	// Check if King is under attack (isSquareUnderAttack)
-	kingInCheck = isSquareAttacked(kingPosition, playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White);
-
-
-	// Revert the move
-	mChessBoard->setPiece(move.startingPosition, movingPiece);
-	mChessBoard->setPiece(move.endingPosition, capturingPiece); // This could be nullptr if there was no captured piece
+	kingInCheck = isSquareAttacked(kingPosition, playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White, boardCopy);
 
 	// Update Kings position back if necessary
 	if (isKing)
@@ -300,6 +301,29 @@ bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attac
 	{
 		// Get possible moves for the opponent's piece
 		auto moves = piece->getPossibleMoves(pos, *mChessBoard);
+
+		for (const auto &move : moves)
+		{
+			if (move.end == square)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard &chessboard)
+{
+	// Iterate over all opponent pieces
+	auto opponentPieces = chessboard.getPiecesFromPlayer(attackerColor);
+
+	for (const auto &[pos, piece] : opponentPieces)
+	{
+		// Get possible moves for the opponent's piece
+		auto moves = piece->getPossibleMoves(pos, chessboard);
 
 		for (const auto &move : moves)
 		{

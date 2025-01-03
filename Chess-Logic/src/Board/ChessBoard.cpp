@@ -26,6 +26,24 @@ ChessBoard::ChessBoard()
 	}
 }
 
+ChessBoard::ChessBoard(const ChessBoard &other)
+{
+	squares.resize(BOARD_SIZE);
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		squares[y].resize(BOARD_SIZE);
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			// Copy over the Square data
+			squares[y][x] = other.squares[y][x];
+		}
+	}
+
+	// Also copy king positions
+	mWhiteKingPosition = other.mWhiteKingPosition;
+	mBlackKingPosition = other.mBlackKingPosition;
+}
+
 
 ChessBoard::~ChessBoard()
 {
@@ -74,6 +92,7 @@ std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos)
 
 void ChessBoard::removePiece(Position pos)
 {
+	LOG_INFO("removePiece called at x={}, y={}", pos.x, pos.y);
 	squares[pos.y][pos.x].piece = nullptr;
 }
 

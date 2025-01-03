@@ -44,6 +44,7 @@ class ChessBoard
 {
 public:
 	ChessBoard();
+	ChessBoard(const ChessBoard& other);
 	~ChessBoard();
 
 
