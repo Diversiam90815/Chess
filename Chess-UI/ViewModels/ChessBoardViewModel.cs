@@ -65,16 +65,16 @@ namespace Chess_UI.ViewModels
                 int pieceVal = encoded & 0xF;          // bottom 8 bits
 
                 // Compute x,y from the index
-                //int x = i % BOARD_SIZE;
-                //int y = i / BOARD_SIZE;
+                int x = i % BOARD_SIZE;
+                int y = i / BOARD_SIZE;
 
-                int rowFromTop = i / 8;
-                int col = i % 8;
-                int rowFromBottom = 7 - rowFromTop;
+                //int rowFromTop = i / 8;
+                //int col = i % 8;
+                //int rowFromBottom = 7 - rowFromTop;
 
                 var square = new BoardSquare(
-                    col,
-                    rowFromBottom,
+                    x,
+                    y,
                     (PieceTypeInstance)pieceVal,
                     (PlayerColor)colorVal,
                     DispatcherQueue
@@ -102,10 +102,10 @@ namespace Chess_UI.ViewModels
 
         public void HandleSquareClick(BoardSquare square)
         {
-            // The BoardSquare stores the UI-based (col, rowFromBottom).
-            // We need to convert that back to engine coords, i.e. rowFromTop = 7 - rowFromBottom.
-            int engineX = square.pos.x;
-            int engineY = 7 - square.pos.y;  // flip it back
+            //// The BoardSquare stores the UI-based (col, rowFromBottom).
+            //// We need to convert that back to engine coords, i.e. rowFromTop = 7 - rowFromBottom.
+            //int engineX = square.pos.x;
+            //int engineY = 7 - square.pos.y;  // flip it back
 
             Logger.LogInfo(string.Format("Square X{0}-Y{1} clicked!", square.pos.x, square.pos.y));
 
@@ -121,7 +121,8 @@ namespace Chess_UI.ViewModels
 
                         CurrentPossibleMove = new PossibleMoveInstance
                         {
-                            start = new PositionInstance(engineX, engineY)
+                            //start = new PositionInstance(engineX, engineY)
+                            start = square.pos
                         };
                         CurrentMoveState = MoveState.InitiateMove;
 
@@ -141,7 +142,8 @@ namespace Chess_UI.ViewModels
                         if (CurrentPossibleMove != null)
                         {
                             var move = CurrentPossibleMove.Value;
-                            move.end = new PositionInstance(engineX, engineY);
+                            //move.end = new PositionInstance(engineX, engineY);
+                            move.end = square.pos;
                             move.type = CheckForMoveType();
                             CurrentPossibleMove = move;
 
