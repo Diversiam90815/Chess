@@ -35,6 +35,7 @@ namespace Chess_UI.ViewModels
             this.Controller = controller;
 
             Controller.ExecutedMove += HandleExecutedMove;
+            Controller.PossibleMovesCalculated += HighlightPossibleMoves;
 
             Board = new ObservableCollection<BoardSquare>();
 
@@ -64,23 +65,31 @@ namespace Chess_UI.ViewModels
                 int colorVal = (encoded >> 4) & 0xF;    // top 8 bits
                 int pieceVal = encoded & 0xF;          // bottom 8 bits
 
-                // Compute x,y from the index
-                int x = i % BOARD_SIZE;
-                int y = i / BOARD_SIZE;
+                //// Compute x,y from the index
+                //int x = i % BOARD_SIZE;
+                //int y = i / BOARD_SIZE;
 
-                //int rowFromTop = i / 8;
-                //int col = i % 8;
-                //int rowFromBottom = 7 - rowFromTop;
+                // The engine’s row=0 is bottom, row=7 is top,
+                // but the default i/8 loop is top..down. So flip:
+                int rowFromTop = i / BOARD_SIZE;   // 0..7 (top..bottom)
+                int col = i % BOARD_SIZE;
+                int rowUI = 7 - rowFromTop;   // invert the row
+
 
                 var square = new BoardSquare(
-                    x,
-                    y,
+                    x: col,
+                    y: rowUI,
                     (PieceTypeInstance)pieceVal,
                     (PlayerColor)colorVal,
                     DispatcherQueue
                 );
 
-                Board[i] = square;
+                // Now compute where in Board[] it should go
+                // so that rowUI=7 is stored first (top row) and rowUI=0 last (bottom row).
+                int index = (7 - rowUI) * BOARD_SIZE + col;
+                Board[index] = square;
+
+                //Board[i] = square;
             }
         }
 
@@ -102,12 +111,10 @@ namespace Chess_UI.ViewModels
 
         public void HandleSquareClick(BoardSquare square)
         {
-            //// The BoardSquare stores the UI-based (col, rowFromBottom).
-            //// We need to convert that back to engine coords, i.e. rowFromTop = 7 - rowFromBottom.
-            //int engineX = square.pos.x;
-            //int engineY = 7 - square.pos.y;  // flip it back
+            int engineX = square.pos.x;
+            int engineY = 7 - square.pos.y; // invert back
 
-            Logger.LogInfo(string.Format("Square X{0}-Y{1} clicked!", square.pos.x, square.pos.y));
+            Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{engineX}-Y{engineY}!");
 
             switch (CurrentMoveState)
             {
@@ -121,8 +128,8 @@ namespace Chess_UI.ViewModels
 
                         CurrentPossibleMove = new PossibleMoveInstance
                         {
-                            //start = new PositionInstance(engineX, engineY)
-                            start = square.pos
+                            start = new PositionInstance(engineX, engineY)
+                            //start = square.pos
                         };
                         CurrentMoveState = MoveState.InitiateMove;
 
@@ -142,9 +149,8 @@ namespace Chess_UI.ViewModels
                         if (CurrentPossibleMove != null)
                         {
                             var move = CurrentPossibleMove.Value;
-                            //move.end = new PositionInstance(engineX, engineY);
-                            move.end = square.pos;
-                            move.type = CheckForMoveType();
+                            move.end = new PositionInstance(engineX, engineY);
+                            //move.end = square.pos;
                             CurrentPossibleMove = move;
 
                             if (CheckForValidMove())
@@ -173,9 +179,33 @@ namespace Chess_UI.ViewModels
                         break;
                     }
 
-                default:
-                    // Possibly check for other states or do nothing
-                    break;
+                default: break;
+            }
+        }
+
+
+        public void HighlightPossibleMoves()
+        {
+            // First, reset everyone's IsHighlighted to false:
+            foreach (var square in Board)
+            {
+                square.IsHighlighted = false;
+            }
+
+            // Then for each possible move, find the matching BoardSquare
+            foreach (var pm in Controller.PossibleMoves)
+            {
+                var targetX = pm.end.x;
+                var targetY = pm.end.y;
+                // Remember we invert row with (7 - rowUI) in your code, so be consistent.
+
+                int index = targetY * 8 + targetX;             // Must be 0 <= x_eng,y_eng < 8
+                BoardSquare square = Board[index];
+
+                if (square != null)
+                {
+                    square.IsHighlighted = true;
+                }
             }
         }
 
@@ -203,19 +233,18 @@ namespace Chess_UI.ViewModels
                 if (move == possibleMoves)
                 {
                     Logger.LogInfo("The move seems to be valid!");
+
+                    // Update the CurrentPossibleMove so that its .type is set to the correct value
+                    var temp = move;
+                    temp.type = possibleMoves.type;   // <-- Retrieve the correct move type here
+                    CurrentPossibleMove = temp;
+
                     return true;
                 }
             }
             Logger.LogWarning("The move could not be found within the PossibleMoves");
             Logger.LogWarning(string.Format("Move is from Start X{0}-Y{1} to End X{2}-Y{3}", move.start.x.ToString(), move.start.y.ToString(), move.end.x.ToString(), move.end.y.ToString()));
             return false;
-        }
-
-
-        private MoveTypeInstance CheckForMoveType()
-        {
-            return MoveTypeInstance.MoveType_Normal;
-
         }
 
 

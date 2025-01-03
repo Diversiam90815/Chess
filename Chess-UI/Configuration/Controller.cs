@@ -92,6 +92,7 @@ namespace Chess_UI.Configuration
                     PossibleMoves.Add(move);
                 }
             }
+            PossibleMovesCalculated?.Invoke();
         }
 
 
@@ -127,9 +128,11 @@ namespace Chess_UI.Configuration
 
         // Define the delegate
         public delegate void ExecutedMoveHandler(string moveNotation);
+        public delegate void PossibleMovesCalculatedHandler();
 
         // define the event
         public event ExecutedMoveHandler ExecutedMove;
+        public event PossibleMovesCalculatedHandler PossibleMovesCalculated;
 
         #endregion
 

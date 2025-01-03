@@ -78,6 +78,32 @@ namespace Chess_UI.Configuration
             }
         }
 
+        private bool isHighlighted;
+        public bool IsHighlighted
+        {
+            get => isHighlighted;
+            set
+            {
+                if (isHighlighted != value)
+                {
+                    isHighlighted = value;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(BackgroundBrush)); // if you choose a computed brush
+                }
+            }
+        }
+
+        public Brush BackgroundBrush
+        {
+            get
+            {
+                // Return a special color if IsHighlighted, otherwise transparent
+                return IsHighlighted
+                    ? new SolidColorBrush(Windows.UI.Color.FromArgb(128, 173, 216, 230)) // a light blue-ish
+                    : new SolidColorBrush(Windows.UI.Color.FromArgb(0,0,0,0));
+            }
+        }
+
         public ImageSource PieceImage
         {
             get
