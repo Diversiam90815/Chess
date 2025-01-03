@@ -232,5 +232,6 @@ CHESS_API bool GetBoardState(int *boardState)
 		}
 	}
 
+	LoggingHelper::logBoardState(boardState);
 	return true;
 }

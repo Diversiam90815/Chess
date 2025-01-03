@@ -146,7 +146,7 @@ void GameManager::switchTurns()
 void GameManager::executeMove(PossibleMove &move)
 {
 	Move executedMove = mMovementManager->executeMove(move);
-	LOG_INFO("Executed move : {}", executedMove.notation.c_str());
+
 	LoggingHelper::logMove(executedMove);
 
 	if (executedMove.capturedPiece != PieceType::DefaultType)

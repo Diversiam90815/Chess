@@ -27,5 +27,11 @@ public:
 	static std::string moveStateToString(MoveState state);
 	static std::string moveTypeToString(MoveType type);
 
+	static std::string boardStateToString(const int *boardState);
+
 	static void		   logMove(Move &move);
+	static void		   logBoardState(const int *boardState);
+
+private:
+	static char encodeToChar(int encoded);
 };

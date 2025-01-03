@@ -114,6 +114,48 @@ std::string LoggingHelper::moveTypeToString(MoveType type)
 }
 
 
+std::string LoggingHelper::boardStateToString(const int *boardState)
+{
+	const int		   BOARD_SIZE = 8; // Assuming standard chess board size
+
+	std::ostringstream oss;
+
+	// Column labels
+	oss << "  ";
+	for (char col = 'a'; col < 'a' + BOARD_SIZE; ++col)
+	{
+		oss << " " << col;
+	}
+	oss << "\n";
+
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		// Row label (8 to 1)
+		oss << (BOARD_SIZE - y) << " ";
+
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			// Access the 1D array as 2D
+			int	 encoded = boardState[y * BOARD_SIZE + x];
+			char piece	 = encodeToChar(encoded);
+			oss << " " << piece;
+		}
+
+		oss << " " << (BOARD_SIZE - y) << "\n";
+	}
+
+	// Column labels at the bottom
+	oss << "  ";
+	for (char col = 'a'; col < 'a' + BOARD_SIZE; ++col)
+	{
+		oss << " " << col;
+	}
+	oss << "\n";
+
+	return oss.str();
+}
+
+
 void LoggingHelper::logMove(Move &move)
 {
 	LOG_INFO("----- Move Number {} -----", move.number);
@@ -148,4 +190,56 @@ void LoggingHelper::logMove(Move &move)
 	LOG_INFO("\tHalf Move Clock:\t{}", move.halfMoveClock);
 
 	LOG_INFO("------------------------");
+}
+
+
+void LoggingHelper::logBoardState(const int *boardState)
+{
+	std::string boardStateString = boardStateToString(boardState);
+	LOG_INFO("\n{}", boardStateString.c_str());
+}
+
+
+// Helper method to map encoded board values to characters
+char LoggingHelper::encodeToChar(int encoded)
+{
+	// Extract color and type from the encoded integer
+	int	 colorVal  = (encoded >> 4) & 0xF; // High nibble
+	int	 typeVal   = encoded & 0xF;		   // Low nibble
+
+	// Map PieceType to characters
+	char pieceChar = '.';
+
+	switch (static_cast<PieceType>(typeVal))
+	{
+	case PieceType::DefaultType: pieceChar = '.'; break;
+	case PieceType::Pawn: pieceChar = 'P'; break;
+	case PieceType::Knight: pieceChar = 'N'; break;
+	case PieceType::Bishop: pieceChar = 'B'; break;
+	case PieceType::Rook: pieceChar = 'R'; break;
+	case PieceType::Queen: pieceChar = 'Q'; break;
+	case PieceType::King: pieceChar = 'K'; break;
+	default:
+		pieceChar = '?'; // Unknown piece type
+		break;
+	}
+
+	// Apply color
+	if (colorVal == static_cast<int>(PlayerColor::White))
+	{
+		// Uppercase for White
+		// pieceChar is already uppercase
+	}
+	else if (colorVal == static_cast<int>(PlayerColor::Black))
+	{
+		// Lowercase for Black
+		pieceChar = tolower(pieceChar);
+	}
+	else
+	{
+		// No color or unknown
+		pieceChar = '.';
+	}
+
+	return pieceChar;
 }
