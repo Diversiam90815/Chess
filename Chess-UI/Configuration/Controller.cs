@@ -79,6 +79,8 @@ namespace Chess_UI.Configuration
 
         private void HandleInitiatedMove()
         {
+            Logger.LogInfo("Due to delegate message initiateMove we start getting the moves!");
+
             PossibleMoves = new List<PossibleMoveInstance>();
             PossibleMoves.Clear();
 
@@ -106,6 +108,7 @@ namespace Chess_UI.Configuration
 
         private void HandleExecutedMove(nint data)
         {
+            Logger.LogInfo("Due to delegate message moveExecuted, we react to the execution of the move and start updating the board!");
             string notation = Marshal.PtrToStringUTF8(data);
             ExecutedMove?.Invoke(notation);
         }

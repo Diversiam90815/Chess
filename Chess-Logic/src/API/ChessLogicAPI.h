@@ -28,6 +28,8 @@ extern "C"
 
 	CHESS_API float GetWindowScalingFactor(HWND hwnd);
 
+	CHESS_API void	SetUnvirtualizedAppDataPath(const char* appDataPath);
+
 
 	CHESS_API int	GetNumPossibleMoves();
 
@@ -39,7 +41,6 @@ extern "C"
 
 	CHESS_API void	HandleMoveStateChanged(const PossibleMoveInstance &moveInstance);
 
-	// CHESS_API bool GetChessBoard(ChessBoard &board);
 
 	CHESS_API void	GetPieceInPosition(PositionInstance posInstance, PieceTypeInstance *pieceTypeInstance);
 
@@ -51,6 +52,13 @@ extern "C"
 	CHESS_API void	EndGame();
 
 	CHESS_API void	ResetGame();
+
+
+	CHESS_API void LogInfoWithCaller(const char* message, const char* method, const char* className, const int lineNumber);
+
+	CHESS_API void LogErrorWithCaller(const char* message, const char* method, const char* className, const int lineNumber);
+
+	CHESS_API void LogWarningWithCaller(const char* message, const char* method, const char* className, const int lineNumber);
 
 
 #ifdef __cplusplus

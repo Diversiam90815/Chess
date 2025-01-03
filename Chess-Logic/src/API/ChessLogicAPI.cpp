@@ -10,6 +10,7 @@
 
 #include "ChessLogicAPI.h"
 #include "GameManager.h"
+#include "FileManager.h"
 
 
 
@@ -67,6 +68,8 @@ CHESS_API void Init()
 CHESS_API void Deinit()
 {
 	GameManager::ReleaseInstance();
+
+	FileManager::ReleaseInstance();
 }
 
 
@@ -82,6 +85,13 @@ CHESS_API float GetWindowScalingFactor(HWND hwnd)
 	int	  dpi			= GetDpiForWindow(hwnd);
 	float scalingFactor = (float)dpi / 96;
 	return scalingFactor;
+}
+
+
+CHESS_API void SetUnvirtualizedAppDataPath(const char *appDataPath)
+{
+	FileManager *fmg = FileManager::GetInstance();
+	fmg->setAppDataPath(appDataPath);
 }
 
 
@@ -179,6 +189,7 @@ CHESS_API void ResetGame()
 }
 
 
+
 CHESS_API void GetPieceInPosition(PositionInstance posInstance, PieceTypeInstance *pieceTypeInstance)
 {
 	Position		  pos	= MapToPosition(posInstance);
@@ -222,5 +233,27 @@ CHESS_API bool GetBoardState(int *boardState)
 		}
 	}
 
+	LoggingHelper::logBoardState(boardState);
 	return true;
+}
+
+
+CHESS_API void LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
+{
+	spdlog::source_loc loc(className, lineNumber, method);
+	logging::log(LogLevel::Info, loc, message);
+}
+
+
+CHESS_API void LogErrorWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
+{
+	spdlog::source_loc loc(className, lineNumber, method);
+	logging::log(LogLevel::Error, loc, message);
+}
+
+
+CHESS_API void LogWarningWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
+{
+	spdlog::source_loc loc(className, lineNumber, method);
+	logging::log(LogLevel::Warn, loc, message);
 }

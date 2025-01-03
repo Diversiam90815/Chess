@@ -28,15 +28,18 @@ void MovementManager::init()
 
 std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &position)
 {
-	auto &piece	 = mChessBoard->getPiece(position);
+	auto &piece = mChessBoard->getPiece(position);
 
 	if (!piece)
 		return {};
 
-	auto  player = piece->getColor();
+	auto player = piece->getColor();
 
 	if (mAllLegalMovesForCurrentRound.size() == 0)
+	{
+		LOG_INFO("All Legel Moves are empty, so we start calculating for Player {}!", LoggingHelper::playerColourToString(player).c_str());
 		calculateAllLegalBasicMoves(player);
+	}
 
 	auto &possibleMoves = mAllLegalMovesForCurrentRound[position];
 
@@ -56,6 +59,7 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 		possibleMoves.push_back(enPasssantMove);
 	}
 
+	LOG_INFO("Position {} has {} possible moves!", LoggingHelper::positionToString(position).c_str(), possibleMoves.size());
 	return possibleMoves;
 }
 
@@ -87,7 +91,12 @@ bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
 			mAllLegalMovesForCurrentRound.emplace(startPosition, std::move(validMoves));
 		}
 	}
-	return mAllLegalMovesForCurrentRound.size() != 0;
+
+	size_t numMoves = mAllLegalMovesForCurrentRound.size();
+
+	LOG_INFO("Calculating all moves finished, with {} moves!", numMoves);
+
+	return numMoves != 0;
 }
 
 
@@ -176,10 +185,16 @@ bool MovementManager::validateMove(Move &move, PlayerColor playerColor)
 	auto kingPosition = mChessBoard->getKingsPosition(playerColor);
 
 	if (isKingInCheck(kingPosition, playerColor) && move.startingPosition != kingPosition)
+	{
+		LOG_INFO("Move could not be validated, since the king is in check!");
 		return false;
+	}
 
 	if (wouldKingBeInCheckAfterMove(move, playerColor))
+	{
+		LOG_INFO("Move could not be validated, since the king would be in check after this move!");
 		return false;
+	}
 
 	return true;
 }

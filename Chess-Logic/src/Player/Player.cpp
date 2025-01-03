@@ -93,6 +93,8 @@ void Player::updateScore()
 		score += getPieceValue(piece);
 	}
 	setScore(score);
+
+	LOG_INFO("Updated Score for {} : {}", LoggingHelper::playerColourToString(mPlayerColor).c_str(), score);
 }
 
 

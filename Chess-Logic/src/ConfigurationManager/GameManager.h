@@ -17,6 +17,8 @@
 
 #include "ChessLogicAPIDefines.h"
 
+#include "Logging.h"
+
 
 class GameManager
 {
@@ -64,6 +66,8 @@ private:
 	void							 checkForEndGameConditions();
 
 
+	Logging							 mLog;
+
 	Player							 mWhitePlayer;
 	Player							 mBlackPlayer;
 
@@ -75,5 +79,5 @@ private:
 
 	std::unique_ptr<MovementManager> mMovementManager;
 
-	PFN_CALLBACK					 mDelegate;
+	PFN_CALLBACK					 mDelegate = nullptr;
 };

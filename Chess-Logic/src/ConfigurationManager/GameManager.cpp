@@ -40,6 +40,8 @@ void GameManager::ReleaseInstance()
 
 void GameManager::init()
 {
+	mLog.initLogging();
+
 	mMovementManager = std::make_unique<MovementManager>();
 	mMovementManager->init();
 
@@ -66,8 +68,6 @@ void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 	mDelegate = pDelegate;
 	mWhitePlayer.setDelegate(pDelegate);
 	mBlackPlayer.setDelegate(pDelegate);
-
-	// Set further Delegates if needed
 }
 
 
@@ -140,12 +140,16 @@ void GameManager::switchTurns()
 	mBlackPlayer.setOnTurn(false);
 	mWhitePlayer.setOnTurn(true);
 	mCurrentPlayer = PlayerColor::White;
+
+	LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(mCurrentPlayer).c_str());
 }
 
 
 void GameManager::executeMove(PossibleMove &move)
 {
 	Move executedMove = mMovementManager->executeMove(move);
+
+	LoggingHelper::logMove(executedMove);
 
 	if (executedMove.capturedPiece != PieceType::DefaultType)
 	{
@@ -252,12 +256,15 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 	{
 	case (MoveState::NoMove):
 	{
+		LOG_INFO("Move State is NoMove -> We start calculating this players possible moves!");
 		mMovementManager->calculateAllLegalBasicMoves(mCurrentPlayer);
 		break;
 	}
 
 	case (MoveState::InitiateMove):
 	{
+		LOG_INFO("We started to initate a move with starting position {}", LoggingHelper::positionToString(move.start).c_str());
+
 		mAllMovesForPosition.clear();
 
 		auto possibleMoves = mMovementManager->getMovesForPosition(move.start);
@@ -270,11 +277,14 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 			mDelegate(delegateMessage::initiateMove, 0); // UI can now get all the moves for the piece
 		}
 
+		LOG_INFO("Number of possible moves for the current position is {}", mAllMovesForPosition.size());
+
 		break;
 	}
 
 	case (MoveState::ExecuteMove):
 	{
+		LOG_INFO("Executing the move now!");
 		executeMove(move);
 		break;
 	}
@@ -292,6 +302,7 @@ void GameManager::checkForEndGameConditions()
 		bool isCheckMate = (lastMove->type & MoveType::Checkmate) == MoveType::Checkmate;
 		if (isCheckMate)
 		{
+			LOG_INFO("Detected a Checkmate!");
 			setCurrentGameState(GameState::Checkmate);
 			endGame();
 			return;
@@ -300,13 +311,17 @@ void GameManager::checkForEndGameConditions()
 		bool isStaleMate = mMovementManager->isStalemate(mCurrentPlayer);
 		if (isStaleMate)
 		{
+			LOG_INFO("Detected a Stalemate");
 			setCurrentGameState(GameState::Stalemate);
 			endGame();
 			return;
 		}
 
+		LOG_INFO("Game is still on-going. We switch player's turns!");
 		setCurrentGameState(GameState::OnGoing);
 		switchTurns();
 	}
+
+	LOG_WARNING("Couldn't find the last move! Game is still on-going");
 	setCurrentGameState(GameState::OnGoing);
 }

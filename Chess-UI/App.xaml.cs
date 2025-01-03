@@ -45,6 +45,8 @@ namespace Chess_UI
         {
             MainMenu = new MainMenuWindow();
 
+            ChessLogicAPI.SetUnvirtualizedAppDataPath(Project.AppDataDirectory);
+
             ChessLogicAPI.Init();
 
             MainMenu.Closed += (sender, args) =>
@@ -53,6 +55,8 @@ namespace Chess_UI
             };
 
             MainMenu.Activate();
+
+            Logger.LogInfo("App initialized!");
         }
 
         private Window MainMenu;
