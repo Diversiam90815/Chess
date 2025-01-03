@@ -84,6 +84,21 @@ namespace Chess_UI.Configuration
         #endregion
 
 
+        #region Logging
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "LogInfoWithCaller", CharSet = CharSet.Unicode)]
+        public static extern void LogInfoWithCaller([In()][MarshalAs(UnmanagedType.LPStr)] string message, [In()][MarshalAs(UnmanagedType.LPStr)] string functionName, [In()][MarshalAs(UnmanagedType.LPStr)] string className, int lineNumber);
+        
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "LogErrorWithCaller", CharSet = CharSet.Unicode)]
+        public static extern void LogErrorWithCaller([In()][MarshalAs(UnmanagedType.LPStr)] string message, [In()][MarshalAs(UnmanagedType.LPStr)] string functionName, [In()][MarshalAs(UnmanagedType.LPStr)] string className, int lineNumber);
+        
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "LogWarningWithCaller", CharSet = CharSet.Unicode)]
+        public static extern void LogWarningWithCaller([In()][MarshalAs(UnmanagedType.LPStr)] string message, [In()][MarshalAs(UnmanagedType.LPStr)] string functionName, [In()][MarshalAs(UnmanagedType.LPStr)] string className, int lineNumber);
+
+
+        #endregion
+
+
         #endregion
 
 

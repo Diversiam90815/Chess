@@ -54,6 +54,13 @@ extern "C"
 	CHESS_API void	ResetGame();
 
 
+	CHESS_API void LogInfoWithCaller(const char* message, const char* method, const char* className, const int lineNumber);
+
+	CHESS_API void LogErrorWithCaller(const char* message, const char* method, const char* className, const int lineNumber);
+
+	CHESS_API void LogWarningWithCaller(const char* message, const char* method, const char* className, const int lineNumber);
+
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus
