@@ -24,53 +24,52 @@ MoveHelper::~MoveHelper()
 
 bool MoveHelper::checkAvailableMoves(const Position &position, ChessBoard &board, const PlayerColor color, PieceType piece, bool hasMoved)
 {
-	bool movesAdded = true;
 
 	switch (piece)
 	{
 	case (PieceType::Pawn):
 	{
-		movesAdded &= checkPawnMovement(position, board, color, hasMoved);
-		movesAdded &= checkPawnCaptureMovement(position, board, color);
+		checkPawnMovement(position, board, color, hasMoved);
+		checkPawnCaptureMovement(position, board, color);
 		break;
 	}
 
 	case (PieceType::Knight):
 	{
-		movesAdded &= checkLShapedMoves(position, board, color);
+		checkLShapedMoves(position, board, color);
 		break;
 	}
 
 	case (PieceType::Bishop):
 	{
-		movesAdded &= checkDiagonalMoves(position, board, color);
+		checkDiagonalMoves(position, board, color);
 		break;
 	}
 
 	case (PieceType::Rook):
 	{
-		movesAdded &= checkFileMoves(position, board, color);
+		checkFileMoves(position, board, color);
 		break;
 	}
 
 	case (PieceType::Queen):
 	{
-		movesAdded &= checkDiagonalMoves(position, board, color);
-		movesAdded &= checkAdjacentMoves(position, board, color);
-		movesAdded &= checkFileMoves(position, board, color);
+		checkDiagonalMoves(position, board, color);
+		checkAdjacentMoves(position, board, color);
+		checkFileMoves(position, board, color);
 		break;
 	}
 
 	case (PieceType::King):
 	{
-		movesAdded &= checkAdjacentMoves(position, board, color);
+		checkAdjacentMoves(position, board, color);
 		break;
 	}
 
 	default: break;
 	}
 
-	return movesAdded; // maybe need to be changed
+	return mPossibleMovesAndCaptures.size() != 0; // maybe need to be changed
 }
 
 

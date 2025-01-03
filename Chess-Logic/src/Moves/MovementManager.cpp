@@ -35,10 +35,13 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 
 	auto player = piece->getColor();
 
-	if (mAllLegalMovesForCurrentRound.size() == 0)
+	//if (mAllLegalMovesForCurrentRound.size() == 0)
 	{
 		LOG_INFO("All Legel Moves are empty, so we start calculating for Player {}!", LoggingHelper::playerColourToString(player).c_str());
 		calculateAllLegalBasicMoves(player);
+		/*
+			Changes in the board will not be updated in the legal moves correctly!!
+		*/
 	}
 
 	auto &possibleMoves = mAllLegalMovesForCurrentRound[position];
