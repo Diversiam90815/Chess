@@ -55,6 +55,8 @@ namespace Chess_UI
             };
 
             MainMenu.Activate();
+
+            Logger.LogInfo("App initialized!");
         }
 
         private Window MainMenu;

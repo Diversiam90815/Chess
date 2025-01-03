@@ -8,6 +8,7 @@ using static Chess_UI.Configuration.Images;
 using static Chess_UI.Configuration.ChessLogicAPI;
 using System.Collections.ObjectModel;
 using System;
+using Microsoft.UI.Composition.Interactions;
 
 
 namespace Chess_UI.ViewModels
@@ -64,12 +65,16 @@ namespace Chess_UI.ViewModels
                 int pieceVal = encoded & 0xF;          // bottom 8 bits
 
                 // Compute x,y from the index
-                int x = i % BOARD_SIZE;
-                int y = i / BOARD_SIZE;
+                //int x = i % BOARD_SIZE;
+                //int y = i / BOARD_SIZE;
+
+                int rowFromTop = i / 8;
+                int col = i % 8;
+                int rowFromBottom = 7 - rowFromTop;
 
                 var square = new BoardSquare(
-                    x,
-                    y,
+                    col,
+                    rowFromBottom,
                     (PieceTypeInstance)pieceVal,
                     (PlayerColor)colorVal,
                     DispatcherQueue
@@ -97,17 +102,26 @@ namespace Chess_UI.ViewModels
 
         public void HandleSquareClick(BoardSquare square)
         {
+            // The BoardSquare stores the UI-based (col, rowFromBottom).
+            // We need to convert that back to engine coords, i.e. rowFromTop = 7 - rowFromBottom.
+            int engineX = square.pos.x;
+            int engineY = 7 - square.pos.y;  // flip it back
+
+            Logger.LogInfo(string.Format("Square X{0}-Y{1} clicked!", square.pos.x, square.pos.y));
+
             switch (CurrentMoveState)
             {
                 // The user is picking the start of a move
                 case MoveState.NoMove:
                     {
+                        Logger.LogInfo("Move State is NoMove and we start to initialize the move now!");
+
                         if (square.piece == PieceTypeInstance.DefaultType)
                             return;
 
                         CurrentPossibleMove = new PossibleMoveInstance
                         {
-                            start = square.pos
+                            start = new PositionInstance(engineX, engineY)
                         };
                         CurrentMoveState = MoveState.InitiateMove;
 
@@ -122,21 +136,26 @@ namespace Chess_UI.ViewModels
                 // The user is picking the end of a move
                 case MoveState.InitiateMove:
                     {
+                        Logger.LogInfo("Move has already been initiated, and we start validating the move now!");
+
                         if (CurrentPossibleMove != null)
                         {
                             var move = CurrentPossibleMove.Value;
-                            move.end = square.pos;
+                            move.end = new PositionInstance(engineX, engineY);
                             move.type = CheckForMoveType();
                             CurrentPossibleMove = move;
 
                             if (CheckForValidMove())
                             {
+                                Logger.LogInfo("The move has been validated, so we start the execution now!");
+
                                 CurrentMoveState = MoveState.ExecuteMove;
                                 ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
                             }
                             else
                             {
-                                // Reset the move
+                                Logger.LogWarning("Since the move could not been validated, we reset the move now!");
+
                                 CurrentMoveState = MoveState.NoMove;
                                 CurrentPossibleMove = null;
                                 HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
@@ -144,6 +163,10 @@ namespace Chess_UI.ViewModels
 
                             // The engine executes the move, calls delegate "moveExecuted",
                             // We'll get that event in the Controller.
+                        }
+                        else
+                        {
+                            Logger.LogError("CurrentPossible move is null!");
                         }
                         break;
                     }
@@ -159,23 +182,30 @@ namespace Chess_UI.ViewModels
         {
             if (!CurrentPossibleMove.HasValue)
             {
+                Logger.LogError("CurrentPossibleMove.HasValue has returned false!");
                 return false;
             }
 
             var move = CurrentPossibleMove.Value;
 
             // Check first if the move was aborted by selecting the same square again
-            if (move.start == move.end) return false;
+            if (move.start == move.end)
+            {
+                Logger.LogInfo("Move has been cancelled since Start and End are the same square. The user has thus terminated the move!");
+                return false;
+            }
 
             // Check if it is a possible move
             foreach (var possibleMoves in Controller.PossibleMoves)
             {
                 if (move == possibleMoves)
                 {
+                    Logger.LogInfo("The move seems to be valid!");
                     return true;
                 }
             }
-
+            Logger.LogWarning("The move could not be found within the PossibleMoves");
+            Logger.LogWarning(string.Format("Move is from Start X{0}-Y{1} to End X{2}-Y{3}", move.start.x.ToString(), move.start.y.ToString(), move.end.x.ToString(), move.end.y.ToString()));
             return false;
         }
 
@@ -183,7 +213,7 @@ namespace Chess_UI.ViewModels
         private MoveTypeInstance CheckForMoveType()
         {
             return MoveTypeInstance.MoveType_Normal;
-            
+
         }
 
 
@@ -238,6 +268,7 @@ namespace Chess_UI.ViewModels
                 }
             }
         }
+
 
         #region Captured Pieces
 

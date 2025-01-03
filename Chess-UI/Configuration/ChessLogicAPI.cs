@@ -135,7 +135,7 @@ namespace Chess_UI.Configuration
             public int y { get; set; }
 
 
-            public override bool Equals(object obj)
+            public override readonly bool Equals(object obj)
             {
                 if (obj is PositionInstance)
                 {
@@ -148,7 +148,7 @@ namespace Chess_UI.Configuration
 
             public static bool operator ==(PositionInstance left, PositionInstance right)
             {
-                if (ReferenceEquals(left, right))
+                if (Equals(left, right))
                 {
                     return true;
                 }
@@ -236,7 +236,7 @@ namespace Chess_UI.Configuration
             public PositionInstance end;
             public MoveTypeInstance type;
 
-            public override bool Equals(object obj)
+            public override readonly bool Equals(object obj)
             {
                 if (obj is PossibleMoveInstance)
                 {
@@ -249,7 +249,7 @@ namespace Chess_UI.Configuration
 
             public static bool operator ==(PossibleMoveInstance left, PossibleMoveInstance right)
             {
-                if (ReferenceEquals(left, right))
+                if (Equals(left, right))
                 {
                     return true;
                 }
