@@ -33,5 +33,6 @@ public:
 	static void		   logBoardState(const int *boardState);
 
 private:
+	// Helper method to map encoded board values to characters
 	static char encodeToChar(int encoded);
 };

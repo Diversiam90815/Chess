@@ -94,7 +94,7 @@ void Player::updateScore()
 	}
 	setScore(score);
 
-	LOG_INFO("Updated Score : {}", score);
+	LOG_INFO("Updated Score for {} : {}", LoggingHelper::playerColourToString(mPlayerColor).c_str(), score);
 }
 
 

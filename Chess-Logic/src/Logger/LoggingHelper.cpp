@@ -116,8 +116,6 @@ std::string LoggingHelper::moveTypeToString(MoveType type)
 
 std::string LoggingHelper::boardStateToString(const int *boardState)
 {
-	const int		   BOARD_SIZE = 8; // Assuming standard chess board size
-
 	std::ostringstream oss;
 
 	// Column labels
@@ -200,10 +198,8 @@ void LoggingHelper::logBoardState(const int *boardState)
 }
 
 
-// Helper method to map encoded board values to characters
 char LoggingHelper::encodeToChar(int encoded)
 {
-	// Extract color and type from the encoded integer
 	int	 colorVal  = (encoded >> 4) & 0xF; // High nibble
 	int	 typeVal   = encoded & 0xF;		   // Low nibble
 
@@ -224,21 +220,10 @@ char LoggingHelper::encodeToChar(int encoded)
 		break;
 	}
 
-	// Apply color
-	if (colorVal == static_cast<int>(PlayerColor::White))
+	// Apply color -> Uppercase for White, Lowercase for Black (pieceChar is already uppercase)
+	if (colorVal == static_cast<int>(PlayerColor::Black))
 	{
-		// Uppercase for White
-		// pieceChar is already uppercase
-	}
-	else if (colorVal == static_cast<int>(PlayerColor::Black))
-	{
-		// Lowercase for Black
 		pieceChar = tolower(pieceChar);
-	}
-	else
-	{
-		// No color or unknown
-		pieceChar = '.';
 	}
 
 	return pieceChar;
