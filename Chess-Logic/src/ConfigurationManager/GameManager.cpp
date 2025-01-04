@@ -143,12 +143,13 @@ void GameManager::switchTurns()
 		mCurrentPlayer = PlayerColor::Black;
 		return;
 	}
+
 	mBlackPlayer.setOnTurn(false);
 	mWhitePlayer.setOnTurn(true);
 	mCurrentPlayer = PlayerColor::White;
 
-	mMovementManager->calculateAllLegalBasicMoves(mCurrentPlayer);
-	mMovesGeneratedForCurrentTurn = true;
+	//mMovementManager->calculateAllLegalBasicMoves(mCurrentPlayer);
+	//mMovesGeneratedForCurrentTurn = true;
 
 	LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(mCurrentPlayer).c_str());
 }

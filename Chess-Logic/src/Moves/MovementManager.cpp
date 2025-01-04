@@ -147,6 +147,12 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	// Set hasMoved of piece
 	movedPiece->setHasMoved(true);
 
+	// Update king's position in the chessboard
+	if (movedPiece->getType() == PieceType::King)
+	{
+		mChessBoard->updateKingsPosition(executedMove.endingPosition, movedPiece->getColor());
+	}
+
 	// Store if this move captured another piece
 	bool capturedPiece = (possibleMove.type & MoveType::Capture) == MoveType::Capture;
 	if (capturedPiece)
@@ -155,6 +161,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 		executedMove.capturedPiece = pieceCaptured;
 		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
 	}
+
 
 	if ((possibleMove.type & MoveType::EnPassant) == MoveType::EnPassant)
 	{
