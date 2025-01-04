@@ -44,7 +44,7 @@ class ChessBoard
 {
 public:
 	ChessBoard();
-	ChessBoard(const ChessBoard& other);
+	ChessBoard(const ChessBoard &other);
 	~ChessBoard();
 
 
@@ -77,4 +77,6 @@ private:
 	Position						 mWhiteKingPosition = Position{-1, -1};
 
 	Position						 mBlackKingPosition = Position{-1, -1};
+
+	bool							 mInitialized		= false;
 };

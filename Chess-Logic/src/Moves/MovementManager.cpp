@@ -21,7 +21,7 @@ MovementManager::MovementManager()
 void MovementManager::init()
 {
 	mChessBoard = std::make_unique<ChessBoard>();
-	mChessBoard->initializeBoard();
+	//mChessBoard->initializeBoard();
 
 	mMoveNotation = std::make_unique<MoveNotationHelper>();
 }
@@ -35,15 +35,6 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 		return {};
 
 	auto player = piece->getColor();
-
-	//// if (mAllLegalMovesForCurrentRound.size() == 0)
-	//{
-	//	//LOG_INFO("All Legel Moves are empty, so we start calculating for Player {}!", LoggingHelper::playerColourToString(player).c_str());
-	//	//calculateAllLegalBasicMoves(player);
-	//	/*
-	//		Changes in the board will not be updated in the legal moves correctly!!
-	//	*/
-	//}
 
 	std::vector<PossibleMove> possibleMoves;
 
@@ -229,12 +220,6 @@ void MovementManager::loadMoveToMap(Position pos, std::vector<PossibleMove> move
 bool MovementManager::validateMove(Move &move, PlayerColor playerColor)
 {
 	auto kingPosition = mChessBoard->getKingsPosition(playerColor);
-
-	// if (isKingInCheck(kingPosition, playerColor) && move.startingPosition != kingPosition)
-	//{
-	//	LOG_INFO("Move could not be validated, since the king is in check!");
-	//	return false;
-	// }
 
 	//  Still in check after the move? -> Invalid
 	if (wouldKingBeInCheckAfterMove(move, playerColor))

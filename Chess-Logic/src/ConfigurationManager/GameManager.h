@@ -32,6 +32,8 @@ public:
 
 	void					   init();
 
+	void					   startGame();
+
 	void					   executeMove(PossibleMove &move);
 
 	void					   setCurrentGameState(GameState state);
@@ -57,6 +59,9 @@ public:
 	bool					   getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE]);
 
 	void					   handleMoveStateChanges(PossibleMove &move);
+
+	void					   setCurrentPlayer(PlayerColor player);
+	PlayerColor				   getCurrentPlayer() const;
 
 private:
 	GameManager();
