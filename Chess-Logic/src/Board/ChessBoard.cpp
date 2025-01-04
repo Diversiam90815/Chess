@@ -92,7 +92,7 @@ std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos)
 
 void ChessBoard::removePiece(Position pos)
 {
-	LOG_INFO("removePiece called at x={}, y={}", pos.x, pos.y);
+	LOG_DEBUG("removePiece called at x={}, y={}", pos.x, pos.y);
 	squares[pos.y][pos.x].piece = nullptr;
 }
 
