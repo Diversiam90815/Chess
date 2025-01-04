@@ -28,7 +28,6 @@ namespace Chess_UI.ViewModels
         public ObservableCollection<BoardSquare> Board { get; set; }
 
 
-
         public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller)
         {
 
@@ -88,6 +87,16 @@ namespace Chess_UI.ViewModels
                 int index = (7 - rowUI) * BOARD_SIZE + col;
                 Board[index] = square;
             }
+        }
+
+
+        public void ResetGame()
+        {
+            ChessLogicAPI.ResetGame();
+            ChessLogicAPI.StartGame();
+
+            ClearMoveHistory();
+            LoadBoardFromNative();
         }
 
 
