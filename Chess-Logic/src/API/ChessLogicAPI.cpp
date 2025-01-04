@@ -171,7 +171,7 @@ CHESS_API void ChangeMoveState(int moveState)
 CHESS_API void StartGame()
 {
 	GameManager *manager = GameManager::GetInstance();
-	manager->init();
+	manager->startGame();
 }
 
 

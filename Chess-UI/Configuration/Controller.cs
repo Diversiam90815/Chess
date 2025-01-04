@@ -63,6 +63,11 @@ namespace Chess_UI.Configuration
                         HandleExecutedMove(data);
                         break;
                     }
+                case DelegateMessage.PlayerChanged:
+                    {
+                        HandlePlayerChanged(data);
+                        break;
+                    }
                 default: break;
             }
         }
@@ -115,6 +120,15 @@ namespace Chess_UI.Configuration
         }
 
 
+        private void HandlePlayerChanged(nint data)
+        {
+            Logger.LogInfo("Due to delegate message PlayerChanged, we react to setting the current player.");
+            int iPlayer = Marshal.ReadInt32(data);
+            PlayerColor player = (PlayerColor)iPlayer;
+            PlayerChanged?.Invoke(player);
+        }
+
+
         public int[] GetBoardStateFromNative()
         {
             int[] board = new int[64]; // pre-allocated array
@@ -129,10 +143,12 @@ namespace Chess_UI.Configuration
         // Define the delegate
         public delegate void ExecutedMoveHandler(string moveNotation);
         public delegate void PossibleMovesCalculatedHandler();
+        public delegate void PlayerChangedHandler(PlayerColor player);
 
         // define the event
         public event ExecutedMoveHandler ExecutedMove;
         public event PossibleMovesCalculatedHandler PossibleMovesCalculated;
+        public event PlayerChangedHandler PlayerChanged;
 
         #endregion
 

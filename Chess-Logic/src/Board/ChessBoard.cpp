@@ -145,6 +145,11 @@ void ChessBoard::removeAllPiecesFromBoard()
 
 void ChessBoard::initializeBoard()
 {
+	if (!mInitialized)
+	{
+		removeAllPiecesFromBoard();
+	}
+
 	// Place pieces for White
 	setPiece(Position(0, 0), std::make_shared<Rook>(PlayerColor::White));
 	setPiece(Position(1, 0), std::make_shared<Knight>(PlayerColor::White));
@@ -176,4 +181,6 @@ void ChessBoard::initializeBoard()
 	// Update King's Position
 	mWhiteKingPosition = Position(4, 0);
 	mBlackKingPosition = Position(4, 7);
+
+	mInitialized = true;
 }

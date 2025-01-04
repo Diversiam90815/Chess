@@ -70,7 +70,8 @@ enum delegateMessage
 	playerHasWon = 1,
 	initiateMove,
 	playerScoreUpdated,
-	moveExecuted
+	moveExecuted,
+	playerChanged
 };
 
 

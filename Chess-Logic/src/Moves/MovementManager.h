@@ -12,6 +12,7 @@
 
 #include <set>
 #include <unordered_map>
+#include <mutex>
 
 #include "ChessBoard.h"
 #include "Move.h"
@@ -40,6 +41,8 @@ public:
 	Move					  executeMove(PossibleMove &executedMove, PieceType pawnPromotion = PieceType::DefaultType);
 
 private:
+	void													loadMoveToMap(Position pos, std::vector<PossibleMove> moves);
+
 	bool													validateMove(Move &move, PlayerColor playerColor);
 
 	bool													isKingInCheck(Position &ourKing, PlayerColor playerColor);
@@ -51,7 +54,7 @@ private:
 	bool													wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor);
 
 	bool													isSquareAttacked(const Position &square, PlayerColor attackerColor);
-	bool													isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard& chessboard);
+	bool													isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard &chessboard);
 
 
 	bool													executeCastlingMove(PossibleMove &move);
@@ -83,6 +86,8 @@ private:
 	std::unique_ptr<ChessBoard>								mChessBoard;
 
 	std::unique_ptr<MoveNotationHelper>						mMoveNotation;
+
+	std::mutex												mMoveMutex;
 
 	friend class GameManager;
 };

@@ -113,7 +113,8 @@ namespace Chess_UI.Configuration
             PlayerHasWon = 1,
             InitiateMove,
             PlayerScoreUpdate,
-            MoveExecuted
+            MoveExecuted,
+            PlayerChanged
         }
 
         #endregion

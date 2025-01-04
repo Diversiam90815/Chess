@@ -31,11 +31,15 @@ namespace Chess_UI.ViewModels
 
         public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller)
         {
+
             this.DispatcherQueue = dispatcherQueue;
             this.Controller = controller;
 
             Controller.ExecutedMove += HandleExecutedMove;
             Controller.PossibleMovesCalculated += HighlightPossibleMoves;
+            Controller.PlayerChanged += HandlePlayerChanged;
+
+            ChessLogicAPI.StartGame();
 
             Board = new ObservableCollection<BoardSquare>();
 
@@ -65,10 +69,6 @@ namespace Chess_UI.ViewModels
                 int colorVal = (encoded >> 4) & 0xF;    // top 8 bits
                 int pieceVal = encoded & 0xF;          // bottom 8 bits
 
-                //// Compute x,y from the index
-                //int x = i % BOARD_SIZE;
-                //int y = i / BOARD_SIZE;
-
                 // The engine’s row=0 is bottom, row=7 is top,
                 // but the default i/8 loop is top..down. So flip:
                 int rowFromTop = i / BOARD_SIZE;   // 0..7 (top..bottom)
@@ -84,12 +84,9 @@ namespace Chess_UI.ViewModels
                     DispatcherQueue
                 );
 
-                // Now compute where in Board[] it should go
-                // so that rowUI=7 is stored first (top row) and rowUI=0 last (bottom row).
+                // Now compute where in Board[] it should go, so that rowUI=7 is stored first and rowUI=0 last row
                 int index = (7 - rowUI) * BOARD_SIZE + col;
                 Board[index] = square;
-
-                //Board[i] = square;
             }
         }
 
@@ -186,26 +183,31 @@ namespace Chess_UI.ViewModels
 
         public void HighlightPossibleMoves()
         {
-            // First, reset everyone's IsHighlighted to false:
-            foreach (var square in Board)
-            {
-                square.IsHighlighted = false;
-            }
+            ResetHighlightsOnBoard();
 
             // Then for each possible move, find the matching BoardSquare
             foreach (var pm in Controller.PossibleMoves)
             {
+                // Remember we invert row with (7 - rowUI) in your code, so be consistent.
                 var targetX = pm.end.x;
                 var targetY = pm.end.y;
-                // Remember we invert row with (7 - rowUI) in your code, so be consistent.
 
-                int index = targetY * 8 + targetX;             // Must be 0 <= x_eng,y_eng < 8
+                int index = targetY * 8 + targetX;
                 BoardSquare square = Board[index];
 
                 if (square != null)
                 {
                     square.IsHighlighted = true;
                 }
+            }
+        }
+
+
+        public void ResetHighlightsOnBoard()
+        {
+            foreach (var square in Board)
+            {
+                square.IsHighlighted = false;
             }
         }
 
@@ -223,6 +225,7 @@ namespace Chess_UI.ViewModels
             // Check first if the move was aborted by selecting the same square again
             if (move.start == move.end)
             {
+                ResetHighlightsOnBoard();
                 Logger.LogInfo("Move has been cancelled since Start and End are the same square. The user has thus terminated the move!");
                 return false;
             }
@@ -236,14 +239,16 @@ namespace Chess_UI.ViewModels
 
                     // Update the CurrentPossibleMove so that its .type is set to the correct value
                     var temp = move;
-                    temp.type = possibleMoves.type;   // <-- Retrieve the correct move type here
+                    temp.type = possibleMoves.type;
                     CurrentPossibleMove = temp;
 
                     return true;
                 }
             }
+
             Logger.LogWarning("The move could not be found within the PossibleMoves");
-            Logger.LogWarning(string.Format("Move is from Start X{0}-Y{1} to End X{2}-Y{3}", move.start.x.ToString(), move.start.y.ToString(), move.end.x.ToString(), move.end.y.ToString()));
+            Logger.LogWarning($"Move is from Start X{move.start.x}-Y{move.start.y} to End X{move.end.x}-Y{move.end.y}");
+
             return false;
         }
 
@@ -253,6 +258,15 @@ namespace Chess_UI.ViewModels
             AddMove(moveNotation);
             LoadBoardFromNative();
             CurrentMoveState = MoveState.NoMove;
+        }
+
+
+        private void HandlePlayerChanged(PlayerColor player)
+        {
+            CurrentPlayer = player;
+
+            // Call HandleMoveStateChanged in order to trigger the move calculation
+            HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
         }
 
 
@@ -284,6 +298,20 @@ namespace Chess_UI.ViewModels
         }
 
         #endregion
+
+
+        private PlayerColor currentPlayer;
+        public PlayerColor CurrentPlayer
+        {
+            get => currentPlayer;
+            set
+            {
+                if (value != currentPlayer)
+                {
+                    currentPlayer = value;
+                }
+            }
+        }
 
 
         private ImageSource boardBackgroundImage = GetImage(BoardBackground.Wood);

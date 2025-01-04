@@ -32,6 +32,8 @@ public:
 
 	void					   init();
 
+	void					   startGame();
+
 	void					   executeMove(PossibleMove &move);
 
 	void					   setCurrentGameState(GameState state);
@@ -58,6 +60,9 @@ public:
 
 	void					   handleMoveStateChanges(PossibleMove &move);
 
+	void					   setCurrentPlayer(PlayerColor player);
+	PlayerColor				   getCurrentPlayer() const;
+
 private:
 	GameManager();
 
@@ -67,6 +72,8 @@ private:
 
 
 	Logging							 mLog;
+
+	bool							 mMovesGeneratedForCurrentTurn = false;
 
 	Player							 mWhitePlayer;
 	Player							 mBlackPlayer;

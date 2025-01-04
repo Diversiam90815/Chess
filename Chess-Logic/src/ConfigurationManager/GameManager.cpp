@@ -52,14 +52,23 @@ void GameManager::init()
 }
 
 
+void GameManager::startGame()
+{
+	clearState();
+
+	mMovementManager->mChessBoard->initializeBoard();	// Reset the board
+	setCurrentPlayer(PlayerColor::White);  // Setting the player at the end, since this will trigger the move calculation
+}
+
+
 void GameManager::clearState()
 {
-	mCurrentPlayer = PlayerColor::White;
 	mWhitePlayer.setOnTurn(true);
 
 	setCurrentGameState(GameState::Init);
 	setCurrentMoveState(MoveState::NoMove);
 	mAllMovesForPosition.clear();
+	mMovesGeneratedForCurrentTurn = false; // Reset flag
 }
 
 
@@ -129,19 +138,23 @@ bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 void GameManager::switchTurns()
 {
 	setCurrentMoveState(MoveState::NoMove);
+	mMovesGeneratedForCurrentTurn = false; // Reset flag for the new turn
 
-	if (mCurrentPlayer == PlayerColor::White)
+	if (getCurrentPlayer() == PlayerColor::White)
 	{
 		mWhitePlayer.setOnTurn(false);
 		mBlackPlayer.setOnTurn(true);
-		mCurrentPlayer = PlayerColor::Black;
+		setCurrentPlayer(PlayerColor::Black);
+		LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
+
 		return;
 	}
+
 	mBlackPlayer.setOnTurn(false);
 	mWhitePlayer.setOnTurn(true);
-	mCurrentPlayer = PlayerColor::White;
+	setCurrentPlayer(PlayerColor::White);
 
-	LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(mCurrentPlayer).c_str());
+	LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
 }
 
 
@@ -153,7 +166,7 @@ void GameManager::executeMove(PossibleMove &move)
 
 	if (executedMove.capturedPiece != PieceType::DefaultType)
 	{
-		if (mCurrentPlayer == PlayerColor::White)
+		if (getCurrentPlayer() == PlayerColor::White)
 		{
 			mWhitePlayer.addCapturedPiece(executedMove.capturedPiece);
 			mBlackPlayer.updateScore();
@@ -241,7 +254,7 @@ void GameManager::endGame() const
 std::optional<PlayerColor> GameManager::getWinner() const
 {
 	if (mCurrentState == GameState::Checkmate)
-		return mCurrentPlayer == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
+		return getCurrentPlayer() == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
 
 	else if (mCurrentState == GameState::Stalemate)
 		return std::nullopt; // Draw in case of stalemate
@@ -256,8 +269,12 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 	{
 	case (MoveState::NoMove):
 	{
-		LOG_INFO("Move State is NoMove -> We start calculating this players possible moves!");
-		mMovementManager->calculateAllLegalBasicMoves(mCurrentPlayer);
+		if (!mMovesGeneratedForCurrentTurn)
+		{
+			LOG_INFO("Move State is NoMove -> We start calculating this player's possible moves!");
+			mMovementManager->calculateAllLegalBasicMoves(getCurrentPlayer());
+			mMovesGeneratedForCurrentTurn = true;
+		}
 		break;
 	}
 
@@ -293,6 +310,27 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 }
 
 
+void GameManager::setCurrentPlayer(PlayerColor player)
+{
+	if (mCurrentPlayer != player)
+	{
+		mCurrentPlayer = player;
+
+		if (mDelegate)
+		{
+			int currentPlayer = (int)mCurrentPlayer;
+			mDelegate(delegateMessage::playerChanged, &currentPlayer);
+		}
+	}
+}
+
+
+PlayerColor GameManager::getCurrentPlayer() const
+{
+	return mCurrentPlayer;
+}
+
+
 void GameManager::checkForEndGameConditions()
 {
 	const Move *lastMove = mMovementManager->getLastMove();
@@ -308,7 +346,7 @@ void GameManager::checkForEndGameConditions()
 			return;
 		}
 
-		bool isStaleMate = mMovementManager->isStalemate(mCurrentPlayer);
+		bool isStaleMate = mMovementManager->isStalemate(getCurrentPlayer());
 		if (isStaleMate)
 		{
 			LOG_INFO("Detected a Stalemate");
@@ -320,6 +358,7 @@ void GameManager::checkForEndGameConditions()
 		LOG_INFO("Game is still on-going. We switch player's turns!");
 		setCurrentGameState(GameState::OnGoing);
 		switchTurns();
+		return;
 	}
 
 	LOG_WARNING("Couldn't find the last move! Game is still on-going");
