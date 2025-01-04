@@ -29,6 +29,8 @@ void Logging::initLogging()
 	auto		 logPath = fmg->getLoggingPath();
 	auto		 log	 = logPath / LogFile;
 
+	logging::setLoggerName(mLoggerName);
+
 	logging::addMSVCOutput().checkForPresentDebugger(true).setLevel(LogLevel::Debug).setMaxSkipDuration(std::chrono::microseconds(mSlowLogTimeMS));
 
 	logging::addFileOutput()
