@@ -93,9 +93,13 @@ namespace Chess_UI.ViewModels
         public void ResetGame()
         {
             ChessLogicAPI.ResetGame();
-            ChessLogicAPI.StartGame();
-
             ClearMoveHistory();
+        }
+
+
+        public void StartGame()
+        {
+            ChessLogicAPI.StartGame();
             LoadBoardFromNative();
         }
 

@@ -81,7 +81,7 @@ std::vector<PossibleMove> MoveHelper::getAvailableMoves()
 
 bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, const PlayerColor color, bool hasMoved)
 {
-	int		 colorFactor = (color == PlayerColor::White) ? 1 : -1;
+	int		 colorFactor = (color == PlayerColor::White) ? -1 : +1;
 
 	int		 newX		 = position.x + mPawnMoveDirections[0].first;
 	int		 newY		 = position.y + mPawnMoveDirections[0].second * colorFactor;
@@ -124,7 +124,7 @@ bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, 
 
 bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &board, const PlayerColor color)
 {
-	int colorFactor = (color == PlayerColor::White) ? 1 : -1;
+	int colorFactor = (color == PlayerColor::White) ? -1 : +1;
 
 	for (const auto &dir : mPawnCaptureDirections)
 	{
