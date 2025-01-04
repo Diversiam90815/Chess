@@ -10,6 +10,7 @@
 
 #include "MovementManager.h"
 #include <algorithm>
+#include <future>
 
 
 MovementManager::MovementManager()
@@ -35,7 +36,7 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 
 	auto player = piece->getColor();
 
-	//if (mAllLegalMovesForCurrentRound.size() == 0)
+	// if (mAllLegalMovesForCurrentRound.size() == 0)
 	{
 		LOG_INFO("All Legel Moves are empty, so we start calculating for Player {}!", LoggingHelper::playerColourToString(player).c_str());
 		calculateAllLegalBasicMoves(player);
@@ -71,35 +72,62 @@ bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
 {
 	auto playerPieces = mChessBoard->getPiecesFromPlayer(playerColor);
 
+	// Clear the previous round’s legal-moves map
+	mAllLegalMovesForCurrentRound.clear();
+
+	// Container to hold futures for each piece's move generation
+	std::vector<std::future<std::pair<Position, std::vector<PossibleMove>>>> futures;
+	futures.reserve(playerPieces.size());
+
+	// Launch async task
 	for (const auto &[startPosition, piece] : playerPieces)
 	{
-		auto					  possibleMoves = piece->getPossibleMoves(startPosition, *mChessBoard);
+		futures.push_back(std::async(std::launch::async,
+									 [this, playerColor, startPosition, piece]() -> std::pair<Position, std::vector<PossibleMove>>
+									 {
+										 // 1) Generate all pseudo-legal moves for this piece
+										 auto					   possibleMoves = piece->getPossibleMoves(startPosition, *mChessBoard);
 
-		std::vector<PossibleMove> validMoves;
-		validMoves.reserve(possibleMoves.size()); // Reserve space to avoid reallocations
+										 // 2) Validate them (i.e., filter out moves that leave the king in check)
+										 std::vector<PossibleMove> validMoves;
+										 validMoves.reserve(possibleMoves.size());
 
-		for (const auto &possibleMove : possibleMoves)
+										 for (const auto &pm : possibleMoves)
+										 {
+											 Move testMove(pm.start, pm.end, piece->getType());
+											 if (validateMove(testMove, playerColor))
+											 {
+												 validMoves.push_back(pm);
+											 }
+										 }
+
+										 return {startPosition, std::move(validMoves)};
+									 }));
+	}
+
+	size_t totalValidMoves = 0;
+
+	for (auto &fut : futures)
+	{
+		auto  result = fut.get();
+		auto &pos	 = result.first;
+		auto &moves	 = result.second;
+
+		if (!moves.empty())
 		{
-			Move testMove(possibleMove.start, possibleMove.end, piece->getType());
-
-			// Validate the move
-			if (validateMove(testMove, playerColor))
-			{
-				validMoves.push_back(possibleMove);
-			}
-		}
-
-		if (!validMoves.empty())
-		{
-			mAllLegalMovesForCurrentRound.emplace(startPosition, std::move(validMoves));
+			mAllLegalMovesForCurrentRound.emplace(pos, std::move(moves));
 		}
 	}
 
-	size_t numMoves = mAllLegalMovesForCurrentRound.size();
+	// Count how many positions have non-empty moves
+	for (auto &kv : mAllLegalMovesForCurrentRound)
+	{
+		totalValidMoves += kv.second.size();
+	}
 
-	LOG_INFO("Calculating all moves finished, with {} moves!", numMoves);
+	LOG_INFO("Calculating all moves finished, with {} moves!", totalValidMoves);
 
-	return numMoves != 0;
+	return totalValidMoves != 0;
 }
 
 
