@@ -68,6 +68,8 @@ private:
 
 	Logging							 mLog;
 
+	bool							 mMovesGeneratedForCurrentTurn = false;
+
 	Player							 mWhitePlayer;
 	Player							 mBlackPlayer;
 

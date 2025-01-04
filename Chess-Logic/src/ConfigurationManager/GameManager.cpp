@@ -49,6 +49,10 @@ void GameManager::init()
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
 
 	clearState();
+
+	LOG_INFO("We start calculating the moves for the current player, which is {}", LoggingHelper::playerColourToString(mCurrentPlayer).c_str());
+	mMovementManager->calculateAllLegalBasicMoves(mCurrentPlayer);
+	mMovesGeneratedForCurrentTurn = true;
 }
 
 
@@ -60,6 +64,7 @@ void GameManager::clearState()
 	setCurrentGameState(GameState::Init);
 	setCurrentMoveState(MoveState::NoMove);
 	mAllMovesForPosition.clear();
+	mMovesGeneratedForCurrentTurn = false; // Reset flag
 }
 
 
@@ -129,6 +134,7 @@ bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 void GameManager::switchTurns()
 {
 	setCurrentMoveState(MoveState::NoMove);
+	mMovesGeneratedForCurrentTurn = false; // Reset flag for the new turn
 
 	if (mCurrentPlayer == PlayerColor::White)
 	{
@@ -140,6 +146,9 @@ void GameManager::switchTurns()
 	mBlackPlayer.setOnTurn(false);
 	mWhitePlayer.setOnTurn(true);
 	mCurrentPlayer = PlayerColor::White;
+
+	mMovementManager->calculateAllLegalBasicMoves(mCurrentPlayer);
+	mMovesGeneratedForCurrentTurn = true;
 
 	LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(mCurrentPlayer).c_str());
 }
@@ -256,8 +265,12 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 	{
 	case (MoveState::NoMove):
 	{
-		LOG_INFO("Move State is NoMove -> We start calculating this players possible moves!");
-		mMovementManager->calculateAllLegalBasicMoves(mCurrentPlayer);
+		if (!mMovesGeneratedForCurrentTurn)
+		{
+			LOG_INFO("Move State is NoMove -> We start calculating this player's possible moves!");
+			mMovementManager->calculateAllLegalBasicMoves(mCurrentPlayer);
+			mMovesGeneratedForCurrentTurn = true;
+		}
 		break;
 	}
 

@@ -36,16 +36,21 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 
 	auto player = piece->getColor();
 
-	// if (mAllLegalMovesForCurrentRound.size() == 0)
-	{
-		LOG_INFO("All Legel Moves are empty, so we start calculating for Player {}!", LoggingHelper::playerColourToString(player).c_str());
-		calculateAllLegalBasicMoves(player);
-		/*
-			Changes in the board will not be updated in the legal moves correctly!!
-		*/
-	}
+	//// if (mAllLegalMovesForCurrentRound.size() == 0)
+	//{
+	//	//LOG_INFO("All Legel Moves are empty, so we start calculating for Player {}!", LoggingHelper::playerColourToString(player).c_str());
+	//	//calculateAllLegalBasicMoves(player);
+	//	/*
+	//		Changes in the board will not be updated in the legal moves correctly!!
+	//	*/
+	//}
 
-	auto &possibleMoves = mAllLegalMovesForCurrentRound[position];
+	std::vector<PossibleMove> possibleMoves;
+
+	{
+		std::lock_guard<std::mutex> lock(mMoveMutex);
+		possibleMoves = mAllLegalMovesForCurrentRound[position];
+	}
 
 	// Add special moves available for this position to the possibleMoves
 	if (piece->getType() == PieceType::King)
@@ -85,10 +90,10 @@ bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
 		futures.push_back(std::async(std::launch::async,
 									 [this, playerColor, startPosition, piece]() -> std::pair<Position, std::vector<PossibleMove>>
 									 {
-										 // 1) Generate all pseudo-legal moves for this piece
+										 // Generate all pseudo-legal moves for this piece
 										 auto					   possibleMoves = piece->getPossibleMoves(startPosition, *mChessBoard);
 
-										 // 2) Validate them (i.e., filter out moves that leave the king in check)
+										 // Validate them (i.e., filter out moves that leave the king in check)
 										 std::vector<PossibleMove> validMoves;
 										 validMoves.reserve(possibleMoves.size());
 
@@ -112,17 +117,12 @@ bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
 		auto  result = fut.get();
 		auto &pos	 = result.first;
 		auto &moves	 = result.second;
+		totalValidMoves += moves.size();
 
 		if (!moves.empty())
 		{
-			mAllLegalMovesForCurrentRound.emplace(pos, std::move(moves));
+			loadMoveToMap(pos, moves);
 		}
-	}
-
-	// Count how many positions have non-empty moves
-	for (auto &kv : mAllLegalMovesForCurrentRound)
-	{
-		totalValidMoves += kv.second.size();
 	}
 
 	LOG_INFO("Calculating all moves finished, with {} moves!", totalValidMoves);
@@ -212,16 +212,24 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 }
 
 
+void MovementManager::loadMoveToMap(Position pos, std::vector<PossibleMove> moves)
+{
+	std::lock_guard<std::mutex> lock(mMoveMutex);
+	mAllLegalMovesForCurrentRound.emplace(pos, std::move(moves));
+}
+
+
 bool MovementManager::validateMove(Move &move, PlayerColor playerColor)
 {
 	auto kingPosition = mChessBoard->getKingsPosition(playerColor);
 
-	if (isKingInCheck(kingPosition, playerColor) && move.startingPosition != kingPosition)
-	{
-		LOG_INFO("Move could not be validated, since the king is in check!");
-		return false;
-	}
+	// if (isKingInCheck(kingPosition, playerColor) && move.startingPosition != kingPosition)
+	//{
+	//	LOG_INFO("Move could not be validated, since the king is in check!");
+	//	return false;
+	// }
 
+	//  Still in check after the move? -> Invalid
 	if (wouldKingBeInCheckAfterMove(move, playerColor))
 	{
 		LOG_INFO("Move could not be validated, since the king would be in check after this move!");
@@ -290,34 +298,46 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor player
 	bool	   kingInCheck	  = false;
 
 	// Make a local copy of the board
-	ChessBoard boardCopy	  = *mChessBoard; // uses your ChessBoard(const ChessBoard&) constructor
-
+	ChessBoard boardCopy	  = *mChessBoard; // copies the chessboard to a local copy
 
 	// Save the current state
 	auto	  &movingPiece	  = boardCopy.getPiece(move.startingPosition);
 	auto	  &capturingPiece = boardCopy.getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
+	bool	   isKing		  = movingPiece->getType() == PieceType::King;
 
-	Position   kingPosition	  = boardCopy.getKingsPosition(playerColor);
+	LOG_DEBUG("Simulating move: {} -> {} with piece {}", LoggingHelper::positionToString(move.startingPosition).c_str(),
+			  LoggingHelper::positionToString(move.endingPosition).c_str(), LoggingHelper::pieceTypeToString(movingPiece->getType()).c_str());
+
+	if (capturingPiece)
+	{
+		LOG_DEBUG("After placing, occupant of endSquare = {}", LoggingHelper::pieceTypeToString(capturingPiece->getType()).c_str());
+	}
+
 
 	// Simulate the move
-	boardCopy.setPiece(move.startingPosition, movingPiece);
-	boardCopy.removePiece(move.endingPosition);
+	boardCopy.removePiece(move.startingPosition);		  // Remove piece from old position
+	boardCopy.setPiece(move.endingPosition, movingPiece); // Place it at new position
 
 	// Update King's position if if this is the king
-	bool isKing = movingPiece->getType() == PieceType::King;
+	Position kingPosition = boardCopy.getKingsPosition(playerColor);
 	if (isKing)
 	{
 		kingPosition = move.endingPosition;
 	}
 
 	// Check if King is under attack (isSquareUnderAttack)
-	kingInCheck = isSquareAttacked(kingPosition, playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White, boardCopy);
+	PlayerColor opponentColor = (playerColor == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
+	kingInCheck				  = isSquareAttacked(kingPosition, opponentColor, boardCopy);
+
 
 	// Update Kings position back if necessary
 	if (isKing)
 	{
 		kingPosition = move.startingPosition;
 	}
+
+	LOG_DEBUG("King is at {}", LoggingHelper::positionToString(kingPosition).c_str());
+	LOG_DEBUG("isSquareAttacked(...) = {}", kingInCheck ? "true" : "false");
 
 	return kingInCheck;
 }
