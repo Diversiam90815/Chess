@@ -114,7 +114,8 @@ namespace Chess_UI.Configuration
             InitiateMove,
             PlayerScoreUpdate,
             MoveExecuted,
-            PlayerChanged
+            PlayerChanged,
+            GameStateChanged
         }
 
         #endregion

@@ -20,9 +20,7 @@ MovementManager::MovementManager()
 
 void MovementManager::init()
 {
-	mChessBoard = std::make_unique<ChessBoard>();
-	//mChessBoard->initializeBoard();
-
+	mChessBoard	  = std::make_unique<ChessBoard>();
 	mMoveNotation = std::make_unique<MoveNotationHelper>();
 }
 
@@ -34,7 +32,7 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 	if (!piece)
 		return {};
 
-	auto player = piece->getColor();
+	auto					  player = piece->getColor();
 
 	std::vector<PossibleMove> possibleMoves;
 
@@ -69,7 +67,10 @@ bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
 	auto playerPieces = mChessBoard->getPiecesFromPlayer(playerColor);
 
 	// Clear the previous round’s legal-moves map
-	mAllLegalMovesForCurrentRound.clear();
+	{
+		std::lock_guard<std::mutex> lock(mMoveMutex);
+		mAllLegalMovesForCurrentRound.clear();
+	}
 
 	// Container to hold futures for each piece's move generation
 	std::vector<std::future<std::pair<Position, std::vector<PossibleMove>>>> futures;
@@ -135,10 +136,8 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	executedMove.movedPiece = movedPieceType;
 	executedMove.player		= player;
 
-	// Set hasMoved of piece
 	movedPiece->setHasMoved(true);
 
-	// Update king's position in the chessboard
 	if (movedPiece->getType() == PieceType::King)
 	{
 		mChessBoard->updateKingsPosition(executedMove.endingPosition, movedPiece->getColor());
@@ -305,7 +304,6 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor player
 		LOG_DEBUG("After placing, occupant of endSquare = {}", LoggingHelper::pieceTypeToString(capturingPiece->getType()).c_str());
 	}
 
-
 	// Simulate the move
 	boardCopy.removePiece(move.startingPosition);		  // Remove piece from old position
 	boardCopy.setPiece(move.endingPosition, movingPiece); // Place it at new position
@@ -320,7 +318,6 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor player
 	// Check if King is under attack (isSquareUnderAttack)
 	PlayerColor opponentColor = (playerColor == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
 	kingInCheck				  = isSquareAttacked(kingPosition, opponentColor, boardCopy);
-
 
 	// Update Kings position back if necessary
 	if (isKing)

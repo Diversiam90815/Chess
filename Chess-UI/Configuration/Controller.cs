@@ -59,13 +59,18 @@ namespace Chess_UI.Configuration
                 case DelegateMessage.MoveExecuted:
                     {
                         // Move is completed, so we reload the board
-                        // And update move history
+                        // And update move history (put the move history into an other delelate message later!)
                         HandleExecutedMove(data);
                         break;
                     }
                 case DelegateMessage.PlayerChanged:
                     {
                         HandlePlayerChanged(data);
+                        break;
+                    }
+                case DelegateMessage.GameStateChanged:
+                    {
+                        HandleGameStateChanges(data);
                         break;
                     }
                 default: break;
@@ -98,6 +103,14 @@ namespace Chess_UI.Configuration
                 }
             }
             PossibleMovesCalculated?.Invoke();
+        }
+
+
+        private void HandleGameStateChanges(nint data)
+        {
+            int iState = Marshal.ReadInt32(data);
+            GameState state = (GameState)iState;
+            GameStateChanged?.Invoke(state);
         }
 
 
@@ -144,11 +157,13 @@ namespace Chess_UI.Configuration
         public delegate void ExecutedMoveHandler(string moveNotation);
         public delegate void PossibleMovesCalculatedHandler();
         public delegate void PlayerChangedHandler(PlayerColor player);
+        public delegate void GameStateChangedHandler(GameState state);
 
         // define the event
         public event ExecutedMoveHandler ExecutedMove;
         public event PossibleMovesCalculatedHandler PossibleMovesCalculated;
         public event PlayerChangedHandler PlayerChanged;
+        public event GameStateChangedHandler GameStateChanged;
 
         #endregion
 

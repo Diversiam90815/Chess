@@ -56,8 +56,8 @@ void GameManager::startGame()
 {
 	clearState();
 
-	mMovementManager->mChessBoard->initializeBoard();	// Reset the board
-	setCurrentPlayer(PlayerColor::White);  // Setting the player at the end, since this will trigger the move calculation
+	mMovementManager->mChessBoard->initializeBoard(); // Reset the board
+	setCurrentPlayer(PlayerColor::White);			  // Setting the player at the end, since this will trigger the move calculation
 }
 
 
@@ -204,6 +204,10 @@ void GameManager::setCurrentGameState(GameState state)
 	if (mCurrentState != state)
 	{
 		mCurrentState = state;
+		if (mDelegate)
+		{
+			mDelegate(delegateMessage::gameStateChanged, &mCurrentState);
+		}
 	}
 }
 

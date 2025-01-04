@@ -37,6 +37,7 @@ namespace Chess_UI.ViewModels
             Controller.ExecutedMove += HandleExecutedMove;
             Controller.PossibleMovesCalculated += HighlightPossibleMoves;
             Controller.PlayerChanged += HandlePlayerChanged;
+            Controller.GameStateChanged += HandleGameStateChanged;
 
             ChessLogicAPI.StartGame();
 
@@ -280,6 +281,25 @@ namespace Chess_UI.ViewModels
 
             // Call HandleMoveStateChanged in order to trigger the move calculation
             HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+        }
+
+
+        private void HandleGameStateChanged(GameState state)
+        {
+            switch (state)
+            {
+                case GameState.Checkmate:
+                    {
+                        // Handle Checkmate
+                        break;
+                    }
+                case GameState.Stalemate:
+                    {
+                        // Handle stale mate
+                        break;
+                    }
+                default: break;
+            }
         }
 
 

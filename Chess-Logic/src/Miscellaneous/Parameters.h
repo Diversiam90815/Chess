@@ -71,7 +71,8 @@ enum delegateMessage
 	initiateMove,
 	playerScoreUpdated,
 	moveExecuted,
-	playerChanged
+	playerChanged,
+	gameStateChanged
 };
 
 
