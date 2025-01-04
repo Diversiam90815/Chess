@@ -320,6 +320,7 @@ void GameManager::checkForEndGameConditions()
 		LOG_INFO("Game is still on-going. We switch player's turns!");
 		setCurrentGameState(GameState::OnGoing);
 		switchTurns();
+		return;
 	}
 
 	LOG_WARNING("Couldn't find the last move! Game is still on-going");
