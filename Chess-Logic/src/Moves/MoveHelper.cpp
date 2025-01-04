@@ -180,13 +180,14 @@ bool MoveHelper::checkMovesInDirection(const Position &position, ChessBoard &boa
 {
 	for (const auto &dir : directions)
 	{
-		int		 newX		= position.x + dir.first;
-		int		 newY		= position.y + dir.second;
+		int newX = position.x + dir.first;
+		int newY = position.y + dir.second;
 
-		Position newPostion = {newX, newY};
 
 		while (checkForBorders(newX, newY))
 		{
+			Position	 newPostion = {newX, newY};
+
 			PossibleMove move;
 			if (board.isEmpty(newPostion))
 			{
@@ -204,6 +205,8 @@ bool MoveHelper::checkMovesInDirection(const Position &position, ChessBoard &boa
 					addToAvailableMoves(move);
 					break;
 				}
+				// If it's our own piece or we captured an opponent, either way we stop going further
+				break;
 			}
 
 			if (oneStep)
