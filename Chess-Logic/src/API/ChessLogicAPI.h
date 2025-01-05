@@ -53,6 +53,8 @@ extern "C"
 
 	CHESS_API void	ResetGame();
 
+	CHESS_API void	UndoMove();
+
 
 	CHESS_API void LogInfoWithCaller(const char* message, const char* method, const char* className, const int lineNumber);
 
