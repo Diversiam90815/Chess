@@ -26,7 +26,7 @@ namespace Chess_UI.Views
             this.RootPanel.DataContext = ViewModel;
 
             Init();
-            SetWindowSize(1200, 900);
+            SetWindowSize(1100, 800);
         }
 
 
@@ -44,12 +44,6 @@ namespace Chess_UI.Views
         {
             mPresenter = AppWindow.Presenter as OverlappedPresenter;
             mPresenter.IsResizable = false;
-        }
-
-
-        private void SaveGame_Click(object sender, RoutedEventArgs e)
-        {
-            //ViewModel.AddMove("1. e4 e5");
         }
 
 
