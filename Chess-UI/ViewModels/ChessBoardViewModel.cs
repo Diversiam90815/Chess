@@ -38,6 +38,7 @@ namespace Chess_UI.ViewModels
             Controller.PossibleMovesCalculated += HighlightPossibleMoves;
             Controller.PlayerChanged += HandlePlayerChanged;
             Controller.GameStateChanged += HandleGameStateChanged;
+            Controller.MoveHistoryUpdated += HandleMoveHistoryUpdated;
 
             ChessLogicAPI.StartGame();
 
@@ -50,7 +51,7 @@ namespace Chess_UI.ViewModels
 
             for (int i = 0; i < MovesMaxColumns; i++)
             {
-                MoveHistoryColumns.Add([]);
+                MoveHistoryColumns.Add(new ObservableCollection<string>());
             }
 
             LoadBoardFromNative();
@@ -116,7 +117,10 @@ namespace Chess_UI.ViewModels
         public void ClearMoveHistory()
         {
             MoveHistoryColumns.Clear();
-            MoveHistoryColumns.Add([]);
+            for (int i = 0; i < MovesMaxColumns; i++)
+            {
+                MoveHistoryColumns.Add(new ObservableCollection<string>());
+            }
         }
 
 
@@ -226,6 +230,20 @@ namespace Chess_UI.ViewModels
         }
 
 
+        public void UndoLastMove()
+        {
+            //ChessLogicAPI.UndoMove();
+            //LoadBoardFromNative();
+
+            //// Reload Move History
+            //ClearMoveHistory();
+            //foreach (var move in Controller.GetMoveHistory())
+            //{
+            //    AddMove(move);
+            //}
+        }
+
+
         private bool CheckForValidMove()
         {
             if (!CurrentPossibleMove.HasValue)
@@ -269,7 +287,7 @@ namespace Chess_UI.ViewModels
 
         private void HandleExecutedMove(string moveNotation)
         {
-            AddMove(moveNotation);
+            //AddMove(moveNotation);
             LoadBoardFromNative();
             CurrentMoveState = MoveState.NoMove;
         }
@@ -299,6 +317,17 @@ namespace Chess_UI.ViewModels
                         break;
                     }
                 default: break;
+            }
+        }
+
+
+        private void HandleMoveHistoryUpdated()
+        {
+            ClearMoveHistory();
+
+            foreach (var moveNotation in Controller.MoveHistory)
+            {
+                AddMove(moveNotation);
             }
         }
 

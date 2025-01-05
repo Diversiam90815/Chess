@@ -353,7 +353,7 @@ bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attac
 
 		for (const auto &move : moves)
 		{
-			if (move.end == square)
+			if (move.end == square && (move.type & MoveType::Capture) == MoveType::Capture)
 			{
 				return true;
 			}
@@ -376,8 +376,9 @@ bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attac
 
 		for (const auto &move : moves)
 		{
-			if (move.end == square)
+			if (move.end == square && (move.type & MoveType::Capture) == MoveType::Capture)
 			{
+				LOG_DEBUG("Square ({}, {}) is attacked by {} at ({}, {})", square.x, square.y, LoggingHelper::pieceTypeToString(piece->getType()).c_str(), pos.x, pos.y);
 				return true;
 			}
 		}

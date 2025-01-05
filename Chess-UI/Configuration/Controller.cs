@@ -22,6 +22,8 @@ namespace Chess_UI.Configuration
 
         public List<PossibleMoveInstance> PossibleMoves;
 
+        public List<string> MoveHistory = new();
+
 
         private void SetLogicAPIDelegate()
         {
@@ -129,6 +131,10 @@ namespace Chess_UI.Configuration
         {
             Logger.LogInfo("Due to delegate message moveExecuted, we react to the execution of the move and start updating the board!");
             string notation = Marshal.PtrToStringUTF8(data);
+            MoveHistory.Add(notation);
+
+            MoveHistoryUpdated?.Invoke();
+
             ExecutedMove?.Invoke(notation);
         }
 
@@ -158,12 +164,14 @@ namespace Chess_UI.Configuration
         public delegate void PossibleMovesCalculatedHandler();
         public delegate void PlayerChangedHandler(PlayerColor player);
         public delegate void GameStateChangedHandler(GameState state);
+        public delegate void MoveHistoryUpdatedHandler();
 
         // define the event
         public event ExecutedMoveHandler ExecutedMove;
         public event PossibleMovesCalculatedHandler PossibleMovesCalculated;
         public event PlayerChangedHandler PlayerChanged;
         public event GameStateChangedHandler GameStateChanged;
+        public event MoveHistoryUpdatedHandler MoveHistoryUpdated;
 
         #endregion
 

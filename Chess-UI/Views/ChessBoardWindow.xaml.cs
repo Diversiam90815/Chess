@@ -49,9 +49,7 @@ namespace Chess_UI.Views
 
         private void UndoMove_Click(object sender, RoutedEventArgs e)
         {
-            //ViewModel.AddMove("10. Nf3 Nc6");
-            //ViewModel.WhiteCapturedKnights += 2;
-            //ViewModel.WhiteCapturedPawns += 1;
+            ViewModel.UndoLastMove();
         }
 
 
