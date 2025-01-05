@@ -519,17 +519,17 @@ PossibleMove MovementManager::generateEnPassantMove(const Position &position, Pl
 	Position targetPosition;
 	if (player == PlayerColor::White)
 	{
-		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y + 1);
+		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y - 1);
 	}
 	else
 	{
-		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y - 1);
+		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y + 1);
 	}
 
 	PossibleMove enPassantMove;
 	enPassantMove.start = position;
 	enPassantMove.end	= targetPosition;
-	enPassantMove.type	= MoveType::EnPassant | MoveType::Capture;
+	enPassantMove.type	= MoveType::EnPassant;
 
 	return enPassantMove;
 }
@@ -552,20 +552,20 @@ bool MovementManager::canEnPassant(const Position &position, PlayerColor player)
 		return false;
 
 	// Ensure that the position match
-	Position lastMoveEndPosition	 = lastMove->endingPosition;
+	Position lastMoveEndPosition = lastMove->endingPosition;
 
-	// Check if both pawns are on the same file
-	bool	 bothPiecesOnTheSameFile = (lastMoveEndPosition.x == position.x);
-	if (!bothPiecesOnTheSameFile)
+	// Check if the last moved pawn is on the same rank as the capturing pawn
+	bool	 sameRank			 = (lastMoveEndPosition.y == position.y);
+	if (!sameRank)
 		return false;
 
 	// Ensure both pawns are adjacent ranks
-	bool bothPiecesNextToEachOther = (std::abs(lastMoveEndPosition.y - position.y) == 1);
+	bool bothPiecesNextToEachOther = (std::abs(lastMoveEndPosition.x - position.x) == 1);
 	if (!bothPiecesNextToEachOther)
 		return false;
 
 	// Ensure the capturing pawn is on the correct rank for en passant
-	if ((player == PlayerColor::White && position.y != 5) || (player == PlayerColor::Black && position.y != 4))
+	if ((player == PlayerColor::White && position.y != 3) || (player == PlayerColor::Black && position.y != 4))
 		return false;
 
 	return true;
