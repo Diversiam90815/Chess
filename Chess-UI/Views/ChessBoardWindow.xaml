@@ -109,7 +109,7 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Vertical" Margin="3,0">
+                                    <StackPanel Orientation="Vertical" Margin="15,0">
                                         <!-- Each Column -->
                                         <ItemsControl ItemsSource="{Binding}">
                                             <ItemsControl.ItemTemplate>

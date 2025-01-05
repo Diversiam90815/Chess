@@ -36,6 +36,8 @@ public:
 
 	void					   executeMove(PossibleMove &move);
 
+	void					   undoMove();
+
 	void					   setCurrentGameState(GameState state);
 	GameState				   getCurrentGameState() const;
 

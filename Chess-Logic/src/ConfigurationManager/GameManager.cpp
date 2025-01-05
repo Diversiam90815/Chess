@@ -199,6 +199,30 @@ void GameManager::executeMove(PossibleMove &move)
 }
 
 
+void GameManager::undoMove()
+{
+	const Move *lastMove = mMovementManager->getLastMove();
+	if (!lastMove)
+	{
+		LOG_WARNING("No moves found to undo!");
+		return;
+	}
+
+	mMovementManager->mChessBoard->movePiece(lastMove->endingPosition, lastMove->startingPosition);
+
+	if (lastMove->capturedPiece != PieceType::DefaultType)
+	{
+		mMovementManager->mChessBoard->setPiece(
+			lastMove->endingPosition, std::make_shared<ChessPiece>(lastMove->capturedPiece, lastMove->player == PlayerColor::White ? PlayerColor::Black : PlayerColor::White));
+	}
+
+	// Update Game State
+	mMovementManager->removeLastMove();
+	switchTurns();
+	LOG_INFO("Move undone: {}", lastMove->notation.c_str());
+}
+
+
 void GameManager::setCurrentGameState(GameState state)
 {
 	if (mCurrentState != state)

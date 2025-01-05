@@ -209,6 +209,15 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 }
 
 
+void MovementManager::removeLastMove()
+{
+	if (!mMoveHistory.empty())
+	{
+		mMoveHistory.erase(std::prev(mMoveHistory.end()));
+	}
+}
+
+
 void MovementManager::loadMoveToMap(Position pos, std::vector<PossibleMove> moves)
 {
 	std::lock_guard<std::mutex> lock(mMoveMutex);

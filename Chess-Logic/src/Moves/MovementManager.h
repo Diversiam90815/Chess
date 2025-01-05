@@ -40,6 +40,8 @@ public:
 
 	Move					  executeMove(PossibleMove &executedMove, PieceType pawnPromotion = PieceType::DefaultType);
 
+	void					  removeLastMove();
+
 private:
 	void													loadMoveToMap(Position pos, std::vector<PossibleMove> moves);
 
