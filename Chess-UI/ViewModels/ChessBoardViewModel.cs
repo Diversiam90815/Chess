@@ -9,6 +9,9 @@ using static Chess_UI.Configuration.ChessLogicAPI;
 using System.Collections.ObjectModel;
 using System;
 using Microsoft.UI.Composition.Interactions;
+using Windows.UI.Popups;
+using Microsoft.UI.Xaml;
+using System.Threading.Tasks;
 
 
 namespace Chess_UI.ViewModels
@@ -27,17 +30,19 @@ namespace Chess_UI.ViewModels
 
         public ObservableCollection<BoardSquare> Board { get; set; }
 
+        public event Func<GameState, Task> ShowGameStateDialogRequested;
 
 
         public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller)
         {
-
             this.DispatcherQueue = dispatcherQueue;
             this.Controller = controller;
 
             Controller.ExecutedMove += HandleExecutedMove;
             Controller.PossibleMovesCalculated += HighlightPossibleMoves;
             Controller.PlayerChanged += HandlePlayerChanged;
+            Controller.GameStateChanged += HandleGameStateChanged;
+            Controller.MoveHistoryUpdated += HandleMoveHistoryUpdated;
 
             ChessLogicAPI.StartGame();
 
@@ -50,7 +55,7 @@ namespace Chess_UI.ViewModels
 
             for (int i = 0; i < MovesMaxColumns; i++)
             {
-                MoveHistoryColumns.Add([]);
+                MoveHistoryColumns.Add(new ObservableCollection<string>());
             }
 
             LoadBoardFromNative();
@@ -91,6 +96,20 @@ namespace Chess_UI.ViewModels
         }
 
 
+        public void ResetGame()
+        {
+            ChessLogicAPI.ResetGame();
+            ClearMoveHistory();
+        }
+
+
+        public void StartGame()
+        {
+            ChessLogicAPI.StartGame();
+            LoadBoardFromNative();
+        }
+
+
         public void AddMove(string move)
         {
             // Find the column with the least number of moves
@@ -102,7 +121,10 @@ namespace Chess_UI.ViewModels
         public void ClearMoveHistory()
         {
             MoveHistoryColumns.Clear();
-            MoveHistoryColumns.Add([]);
+            for (int i = 0; i < MovesMaxColumns; i++)
+            {
+                MoveHistoryColumns.Add(new ObservableCollection<string>());
+            }
         }
 
 
@@ -212,6 +234,15 @@ namespace Chess_UI.ViewModels
         }
 
 
+        public void UndoLastMove()
+        {
+            ChessLogicAPI.UndoMove();
+            LoadBoardFromNative();
+            Controller.MoveHistory.Remove(Controller.MoveHistory.LastOrDefault());
+            HandleMoveHistoryUpdated();
+        }
+
+
         private bool CheckForValidMove()
         {
             if (!CurrentPossibleMove.HasValue)
@@ -253,9 +284,8 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private void HandleExecutedMove(string moveNotation)
+        private void HandleExecutedMove()
         {
-            AddMove(moveNotation);
             LoadBoardFromNative();
             CurrentMoveState = MoveState.NoMove;
         }
@@ -267,6 +297,29 @@ namespace Chess_UI.ViewModels
 
             // Call HandleMoveStateChanged in order to trigger the move calculation
             HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+        }
+
+
+        private void HandleGameStateChanged(GameState state)
+        {
+            DispatcherQueue.TryEnqueue(async () =>
+            {
+                if (ShowGameStateDialogRequested != null)
+                {
+                    await ShowGameStateDialogRequested.Invoke(state);
+                }
+            });
+        }
+
+
+        private void HandleMoveHistoryUpdated()
+        {
+            ClearMoveHistory();
+
+            foreach (var moveNotation in Controller.MoveHistory)
+            {
+                AddMove(moveNotation);
+            }
         }
 
 

@@ -189,6 +189,12 @@ CHESS_API void ResetGame()
 }
 
 
+CHESS_API void UndoMove()
+{
+	GameManager::GetInstance()->undoMove();
+}
+
+
 
 CHESS_API void GetPieceInPosition(PositionInstance posInstance, PieceTypeInstance *pieceTypeInstance)
 {

@@ -11,6 +11,7 @@
 #include "MovementManager.h"
 #include <algorithm>
 #include <future>
+#include <strsafe.h>
 
 
 MovementManager::MovementManager()
@@ -20,9 +21,7 @@ MovementManager::MovementManager()
 
 void MovementManager::init()
 {
-	mChessBoard = std::make_unique<ChessBoard>();
-	//mChessBoard->initializeBoard();
-
+	mChessBoard	  = std::make_unique<ChessBoard>();
 	mMoveNotation = std::make_unique<MoveNotationHelper>();
 }
 
@@ -34,7 +33,7 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 	if (!piece)
 		return {};
 
-	auto player = piece->getColor();
+	auto					  player = piece->getColor();
 
 	std::vector<PossibleMove> possibleMoves;
 
@@ -69,7 +68,10 @@ bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
 	auto playerPieces = mChessBoard->getPiecesFromPlayer(playerColor);
 
 	// Clear the previous round’s legal-moves map
-	mAllLegalMovesForCurrentRound.clear();
+	{
+		std::lock_guard<std::mutex> lock(mMoveMutex);
+		mAllLegalMovesForCurrentRound.clear();
+	}
 
 	// Container to hold futures for each piece's move generation
 	std::vector<std::future<std::pair<Position, std::vector<PossibleMove>>>> futures;
@@ -135,10 +137,8 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	executedMove.movedPiece = movedPieceType;
 	executedMove.player		= player;
 
-	// Set hasMoved of piece
-	movedPiece->setHasMoved(true);
+	movedPiece->increaseMoveCounter();
 
-	// Update king's position in the chessboard
 	if (movedPiece->getType() == PieceType::King)
 	{
 		mChessBoard->updateKingsPosition(executedMove.endingPosition, movedPiece->getColor());
@@ -207,6 +207,21 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 
 	addMoveToHistory(executedMove);
 	return executedMove;
+}
+
+
+void MovementManager::removeLastMove()
+{
+	if (!mMoveHistory.empty())
+	{
+		mMoveHistory.erase(std::prev(mMoveHistory.end()));
+	}
+}
+
+
+void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
+{
+	mDelegate = pDelegate;
 }
 
 
@@ -287,15 +302,16 @@ bool MovementManager::isStalemate(PlayerColor player)
 
 bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor)
 {
-	bool	   kingInCheck	  = false;
+	bool		kingInCheck	   = false;
 
 	// Make a local copy of the board
-	ChessBoard boardCopy	  = *mChessBoard; // copies the chessboard to a local copy
+	ChessBoard	boardCopy	   = *mChessBoard; // copies the chessboard to a local copy
 
 	// Save the current state
-	auto	  &movingPiece	  = boardCopy.getPiece(move.startingPosition);
-	auto	  &capturingPiece = boardCopy.getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
-	bool	   isKing		  = movingPiece->getType() == PieceType::King;
+	auto	   &movingPiece	   = boardCopy.getPiece(move.startingPosition);
+	auto	   &capturingPiece = boardCopy.getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
+	bool		isKing		   = movingPiece->getType() == PieceType::King;
+	PlayerColor opponentColour = playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
 
 	LOG_DEBUG("Simulating move: {} -> {} with piece {}", LoggingHelper::positionToString(move.startingPosition).c_str(),
 			  LoggingHelper::positionToString(move.endingPosition).c_str(), LoggingHelper::pieceTypeToString(movingPiece->getType()).c_str());
@@ -305,10 +321,8 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor player
 		LOG_DEBUG("After placing, occupant of endSquare = {}", LoggingHelper::pieceTypeToString(capturingPiece->getType()).c_str());
 	}
 
-
 	// Simulate the move
-	boardCopy.removePiece(move.startingPosition);		  // Remove piece from old position
-	boardCopy.setPiece(move.endingPosition, movingPiece); // Place it at new position
+	boardCopy.movePiece(move.startingPosition, move.endingPosition);
 
 	// Update King's position if if this is the king
 	Position kingPosition = boardCopy.getKingsPosition(playerColor);
@@ -320,13 +334,6 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor player
 	// Check if King is under attack (isSquareUnderAttack)
 	PlayerColor opponentColor = (playerColor == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
 	kingInCheck				  = isSquareAttacked(kingPosition, opponentColor, boardCopy);
-
-
-	// Update Kings position back if necessary
-	if (isKing)
-	{
-		kingPosition = move.startingPosition;
-	}
 
 	LOG_DEBUG("King is at {}", LoggingHelper::positionToString(kingPosition).c_str());
 	LOG_DEBUG("isSquareAttacked(...) = {}", kingInCheck ? "true" : "false");
@@ -363,6 +370,9 @@ bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attac
 	// Iterate over all opponent pieces
 	auto opponentPieces = chessboard.getPiecesFromPlayer(attackerColor);
 
+	// Recalculate the moves so we have an updated state of the possible moves in order to check if the square is under attack
+	// calculateAllLegalBasicMoves(attackerColor);
+
 	for (const auto &[pos, piece] : opponentPieces)
 	{
 		// Get possible moves for the opponent's piece
@@ -372,9 +382,12 @@ bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attac
 		{
 			if (move.end == square)
 			{
+				LOG_DEBUG("Square ({}, {}) is attacked by {} at ({}, {})", square.x, square.y, LoggingHelper::pieceTypeToString(piece->getType()).c_str(), pos.x, pos.y);
 				return true;
 			}
 		}
+
+		// Need to check extra for possible pawn movement captures ( they do not appear here, since they are not valid if the square was left empty)
 	}
 
 	return false;
@@ -440,7 +453,7 @@ bool MovementManager::canCastle(const Position &kingposition, PlayerColor player
 	auto &king		= mChessBoard->getPiece(kingposition);
 	int	  direction = kingside ? +1 : -1; // Determine the direction of castling
 
-	if (king->getHasMoved())
+	if (king->hasMoved())
 		return false;
 
 	// Define the y-coordinate and king's x-coordinate
@@ -452,7 +465,7 @@ bool MovementManager::canCastle(const Position &kingposition, PlayerColor player
 	Position rookPosition{rookX, y};
 	auto	&rook = mChessBoard->getPiece(rookPosition);
 
-	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->getHasMoved())
+	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->hasMoved())
 		return false;
 
 	// Check if way is free
@@ -578,34 +591,7 @@ bool MovementManager::executePawnPromotion(const PossibleMove &move, PieceType p
 	std::shared_ptr<ChessPiece> promotedPiece = nullptr;
 	PlayerColor					player		  = pawn->getColor();
 
-	switch (promotedType)
-	{
-	case PieceType::Queen:
-	{
-		promotedPiece = std::make_shared<Queen>(player);
-		break;
-	}
-
-	case PieceType::Rook:
-	{
-		promotedPiece = std::make_shared<Rook>(player);
-		break;
-	}
-
-	case PieceType::Knight:
-	{
-		promotedPiece = std::make_shared<Knight>(player);
-		break;
-	}
-
-	case PieceType::Bishop:
-	{
-		promotedPiece = std::make_shared<Bishop>(player);
-		break;
-	}
-
-	default: break;
-	}
+	promotedPiece							  = ChessPiece::CreatePiece(promotedType, player);
 
 	if (promotedPiece)
 	{
@@ -629,4 +615,21 @@ void MovementManager::addMoveToHistory(Move &move)
 {
 	move.number = mMoveHistory.size() + 1; // Set the move number based on history size
 	mMoveHistory.insert(move);
+
+	if (mDelegate)
+	{
+		std::string moveNotation = move.notation;
+		size_t		len			 = moveNotation.size();
+		size_t		bufferSize	 = (len + 1) * sizeof(char);
+		char	   *strCopy		 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
+
+		if (strCopy != nullptr)
+		{
+			HRESULT hr = StringCbCopyA(strCopy, bufferSize, moveNotation.c_str());
+			if (SUCCEEDED(hr))
+			{
+				mDelegate(delegateMessage::moveHistoryAdded, strCopy);
+			}
+		}
+	}
 }

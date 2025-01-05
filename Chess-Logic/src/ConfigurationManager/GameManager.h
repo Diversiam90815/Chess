@@ -36,6 +36,8 @@ public:
 
 	void					   executeMove(PossibleMove &move);
 
+	void					   undoMove();
+
 	void					   setCurrentGameState(GameState state);
 	GameState				   getCurrentGameState() const;
 
@@ -69,7 +71,6 @@ private:
 	void							 switchTurns();
 
 	void							 checkForEndGameConditions();
-
 
 	Logging							 mLog;
 

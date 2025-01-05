@@ -11,7 +11,7 @@
     Title="Chess"
     >
 
-    <StackPanel x:Name="RootPanel" Orientation="Horizontal" MinHeight="700" MinWidth="800" Background="#0B0B0D">
+    <StackPanel x:Name="RootPanel" Orientation="Horizontal" Background="#0B0B0D">
 
         <Grid x:Name="BoardGrid" Height="600" Width="600" HorizontalAlignment="Left" Margin="30">
             <Grid.Background>
@@ -91,16 +91,16 @@
                     </StackPanel>
                 </Grid>
 
-                <Grid x:Name="MoveHistory" VerticalAlignment="Center" Width="250" Height="250" Background="#1E1E21" CornerRadius="8" Margin="20,10,20,45" HorizontalAlignment="Center">
+                <Grid x:Name="MoveHistory" VerticalAlignment="Center" Width="250" Height="220" Background="#1E1E21" CornerRadius="8" Margin="20,10,20,45" HorizontalAlignment="Center">
                     <Grid.RowDefinitions>
                         <RowDefinition x:Name="Title" Height="40"/>
-                        <RowDefinition x:Name="Moves" Height="210"/>
+                        <RowDefinition x:Name="Moves" Height="165"/>
                     </Grid.RowDefinitions>
 
                     <TextBlock Grid.Row="0" Text="Move History" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
 
                     <!-- Moves with Wrapping Columns -->
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <ScrollViewer Grid.Row="1" Margin="8,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                         <ItemsControl x:Name="MovesColumns" ItemsSource="{x:Bind ViewModel.MoveHistoryColumns, Mode=OneWay}" Background="#1E1E21" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -109,7 +109,7 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Vertical" Margin="3,0">
+                                    <StackPanel Orientation="Vertical" Margin="15,0">
                                         <!-- Each Column -->
                                         <ItemsControl ItemsSource="{Binding}">
                                             <ItemsControl.ItemTemplate>
@@ -126,20 +126,17 @@
                 </Grid>
 
 
-                <Grid x:Name="Buttons" Width="230" Height="400" VerticalAlignment="Bottom" HorizontalAlignment="Center" >
+                <Grid x:Name="Buttons" Width="230" Height="200" VerticalAlignment="Bottom" HorizontalAlignment="Center" >
                     <Grid.RowDefinitions>
-                        <RowDefinition x:Name="SaveGameBtn" Height="62"/>
-                        <RowDefinition x:Name="Spacing1" Height="20"/>
-                        <RowDefinition x:Name="UndoMoveBtn" Height="62"/>
+                        <RowDefinition x:Name="UndoMoveBtn" Height="50"/>
                         <RowDefinition x:Name="Spacing2" Height="20"/>
-                        <RowDefinition x:Name="ResetGameBtn" Height="62"/>
+                        <RowDefinition x:Name="ResetGameBtn" Height="50"/>
                         <RowDefinition x:Name="Spacing3" Height="20"/>
-                        <RowDefinition x:Name="EndGameBtn" Height="62"/>
+                        <RowDefinition x:Name="EndGameBtn" Height="50"/>
                     </Grid.RowDefinitions>
-                    <Button x:Name="SaveGame" Content="Save Game" Click="SaveGame_Click" Width="230" Height="62" Grid.Row="0"/>
-                    <Button x:Name="UndoMove" Content="Undo Move" Click="UndoMove_Click" Width="230" Height="62" Grid.Row="2"/>
-                    <Button x:Name="ResetGame" Content="Reset Game" Click="ResetGame_Click" Width="230" Height="62" Grid.Row="4"/>
-                    <Button x:Name="EndGame" Content="End Game" Click="EndGame_Click" Width="230" Height="62" Grid.Row="6"/>
+                    <Button x:Name="UndoMove" Content="Undo Move" Click="UndoMove_Click" Width="230" Height="50" Grid.Row="0"/>
+                    <Button x:Name="ResetGame" Content="Reset Game" Click="ResetGame_Click" Width="230" Height="50" Grid.Row="2"/>
+                    <Button x:Name="EndGame" Content="End Game" Click="EndGame_Click" Width="230" Height="50" Grid.Row="4"/>
                 </Grid>
 
             </StackPanel>

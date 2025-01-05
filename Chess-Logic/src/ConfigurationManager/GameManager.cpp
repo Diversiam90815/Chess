@@ -9,7 +9,7 @@
 */
 
 #include "GameManager.h"
-#include <strsafe.h>
+// #include <strsafe.h>
 
 
 GameManager::GameManager()
@@ -43,6 +43,12 @@ void GameManager::init()
 	mLog.initLogging();
 
 	mMovementManager = std::make_unique<MovementManager>();
+
+	if (mDelegate)
+	{
+		mMovementManager->setDelegate(mDelegate);
+	}
+
 	mMovementManager->init();
 
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
@@ -56,8 +62,8 @@ void GameManager::startGame()
 {
 	clearState();
 
-	mMovementManager->mChessBoard->initializeBoard();	// Reset the board
-	setCurrentPlayer(PlayerColor::White);  // Setting the player at the end, since this will trigger the move calculation
+	mMovementManager->mChessBoard->initializeBoard(); // Reset the board
+	setCurrentPlayer(PlayerColor::White);			  // Setting the player at the end, since this will trigger the move calculation
 }
 
 
@@ -77,6 +83,10 @@ void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 	mDelegate = pDelegate;
 	mWhitePlayer.setDelegate(pDelegate);
 	mBlackPlayer.setDelegate(pDelegate);
+	if (mMovementManager)
+	{
+		mMovementManager->setDelegate(pDelegate);
+	}
 }
 
 
@@ -180,22 +190,40 @@ void GameManager::executeMove(PossibleMove &move)
 
 	if (mDelegate)
 	{
-		std::string moveNotation = executedMove.notation;
-		size_t		len			 = moveNotation.size();
-		size_t		bufferSize	 = (len + 1) * sizeof(char);
-		char	   *strCopy		 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
-
-		if (strCopy != nullptr)
-		{
-			HRESULT hr = StringCbCopyA(strCopy, bufferSize, moveNotation.c_str());
-			if (SUCCEEDED(hr))
-			{
-				mDelegate(delegateMessage::moveExecuted, strCopy);
-			}
-		}
+		mDelegate(delegateMessage::moveExecuted, 0);
 	}
 
 	checkForEndGameConditions();
+}
+
+
+void GameManager::undoMove()
+{
+	const Move *lastMove = mMovementManager->getLastMove();
+	if (!lastMove)
+	{
+		LOG_WARNING("No moves found to undo!");
+		return;
+	}
+
+	mMovementManager->mChessBoard->movePiece(lastMove->endingPosition, lastMove->startingPosition);
+
+	if (lastMove->capturedPiece != PieceType::DefaultType)
+	{
+		PlayerColor capturedColor  = (lastMove->player == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
+		auto		pieceToRestore = ChessPiece::CreatePiece(lastMove->capturedPiece, capturedColor);
+
+		if (pieceToRestore)
+		{
+			mMovementManager->mChessBoard->setPiece(lastMove->endingPosition, pieceToRestore);
+		}
+	}
+
+	auto &piece = mMovementManager->mChessBoard->getPiece(lastMove->startingPosition);
+	piece->decreaseMoveCounter();
+
+	mMovementManager->removeLastMove();
+	switchTurns();
 }
 
 
@@ -204,6 +232,10 @@ void GameManager::setCurrentGameState(GameState state)
 	if (mCurrentState != state)
 	{
 		mCurrentState = state;
+		if (mDelegate)
+		{
+			mDelegate(delegateMessage::gameStateChanged, &mCurrentState);
+		}
 	}
 }
 

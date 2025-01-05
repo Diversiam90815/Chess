@@ -31,7 +31,6 @@ void Logging::initLogging()
 
 	logging::setLoggerName(mLoggerName);
 
-	logging::addMSVCOutput().checkForPresentDebugger(true).setLevel(LogLevel::Debug).setMaxSkipDuration(std::chrono::microseconds(mSlowLogTimeMS));
 
 	logging::addFileOutput()
 		.setFilename(log.string())
@@ -40,4 +39,6 @@ void Logging::initLogging()
 		.setMaxFiles(10)
 		.setMaxSkipDuration(std::chrono::microseconds(mSlowLogTimeMS))
 		.setRotateOnSession(true);
+
+	logging::addMSVCOutput().checkForPresentDebugger(true).setLevel(LogLevel::Debug).setMaxSkipDuration(std::chrono::microseconds(mSlowLogTimeMS));
 }
