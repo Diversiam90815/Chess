@@ -137,7 +137,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	executedMove.movedPiece = movedPieceType;
 	executedMove.player		= player;
 
-	movedPiece->setHasMoved(true);
+	//movedPiece->increaseMoveCounter();
 
 	if (movedPiece->getType() == PieceType::King)
 	{
@@ -454,7 +454,7 @@ bool MovementManager::canCastle(const Position &kingposition, PlayerColor player
 	auto &king		= mChessBoard->getPiece(kingposition);
 	int	  direction = kingside ? +1 : -1; // Determine the direction of castling
 
-	if (king->getHasMoved())
+	if (king->hasMoved())
 		return false;
 
 	// Define the y-coordinate and king's x-coordinate
@@ -466,7 +466,7 @@ bool MovementManager::canCastle(const Position &kingposition, PlayerColor player
 	Position rookPosition{rookX, y};
 	auto	&rook = mChessBoard->getPiece(rookPosition);
 
-	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->getHasMoved())
+	if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->hasMoved())
 		return false;
 
 	// Check if way is free

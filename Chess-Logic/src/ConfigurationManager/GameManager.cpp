@@ -219,12 +219,11 @@ void GameManager::undoMove()
 		}
 	}
 
-	//mMovementManager->mChessBoard->getPiece(lastMove->startingPosition)->setHasMoved(false);		// Needs to be rechecked! Has moved will not be a bool, but an int counter
+	auto &piece = mMovementManager->mChessBoard->getPiece(lastMove->startingPosition);
+	piece->decreaseMoveCounter();
 
-	// Update Game State
 	mMovementManager->removeLastMove();
 	switchTurns();
-	// LOG_INFO("Move undone: {}", lastMove->notation.c_str());
 }
 
 

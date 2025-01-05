@@ -23,7 +23,7 @@ class ChessBoard;
 class ChessPiece
 {
 public:
-	ChessPiece(PieceType type, PlayerColor color) : type(type), color(color), hasMoved(false)
+	ChessPiece(PieceType type, PlayerColor color) : type(type), color(color)
 	{
 	}
 
@@ -41,20 +41,25 @@ public:
 		return color;
 	}
 
-	bool getHasMoved() const
+	bool hasMoved() const
 	{
-		return hasMoved;
+		return moveCounter != 0;
 	}
 
-	void setHasMoved(bool moved)
+	void increaseMoveCounter()
 	{
-		hasMoved = moved;
+		moveCounter++;
+	}
+
+	void decreaseMoveCounter()
+	{
+		moveCounter--;
 	}
 
 	static std::shared_ptr<ChessPiece> CreatePiece(PieceType type, PlayerColor color);
 
 
-	virtual std::vector<PossibleMove> getPossibleMoves(const Position &pos, ChessBoard &board) const = 0;
+	virtual std::vector<PossibleMove>  getPossibleMoves(const Position &pos, ChessBoard &board) const = 0;
 
 
 protected:
@@ -62,5 +67,5 @@ protected:
 
 	PlayerColor color;
 
-	bool		hasMoved;
+	int			moveCounter{0};
 };

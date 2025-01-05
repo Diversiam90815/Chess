@@ -104,7 +104,7 @@ bool ChessBoard::movePiece(Position start, Position end)
 		return false;
 
 	setPiece(end, piece);
-	piece->setHasMoved(true);
+	piece->increaseMoveCounter();
 	removePiece(start);
 	return true;
 }
