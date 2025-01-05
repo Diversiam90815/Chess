@@ -30,7 +30,6 @@ namespace Chess_UI.ViewModels
 
         public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller)
         {
-
             this.DispatcherQueue = dispatcherQueue;
             this.Controller = controller;
 
@@ -285,7 +284,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private void HandleExecutedMove(string moveNotation)
+        private void HandleExecutedMove()
         {
             //AddMove(moveNotation);
             LoadBoardFromNative();

@@ -14,6 +14,7 @@
 #include <unordered_map>
 #include <mutex>
 
+#include "ChessLogicAPIDefines.h"
 #include "ChessBoard.h"
 #include "Move.h"
 #include "MoveNotationHelper.h"
@@ -41,6 +42,8 @@ public:
 	Move					  executeMove(PossibleMove &executedMove, PieceType pawnPromotion = PieceType::DefaultType);
 
 	void					  removeLastMove();
+
+	void					  setDelegate(PFN_CALLBACK pDelegate);
 
 private:
 	void													loadMoveToMap(Position pos, std::vector<PossibleMove> moves);
@@ -90,6 +93,8 @@ private:
 	std::unique_ptr<MoveNotationHelper>						mMoveNotation;
 
 	std::mutex												mMoveMutex;
+
+	PFN_CALLBACK											mDelegate = nullptr;
 
 	friend class GameManager;
 };

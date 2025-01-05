@@ -11,6 +11,7 @@
 #include "MovementManager.h"
 #include <algorithm>
 #include <future>
+#include <strsafe.h>
 
 
 MovementManager::MovementManager()
@@ -215,6 +216,12 @@ void MovementManager::removeLastMove()
 	{
 		mMoveHistory.erase(std::prev(mMoveHistory.end()));
 	}
+}
+
+
+void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
+{
+	mDelegate = pDelegate;
 }
 
 
@@ -636,4 +643,21 @@ void MovementManager::addMoveToHistory(Move &move)
 {
 	move.number = mMoveHistory.size() + 1; // Set the move number based on history size
 	mMoveHistory.insert(move);
+
+	if (mDelegate)
+	{
+		std::string moveNotation = move.notation;
+		size_t		len			 = moveNotation.size();
+		size_t		bufferSize	 = (len + 1) * sizeof(char);
+		char	   *strCopy		 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
+
+		if (strCopy != nullptr)
+		{
+			HRESULT hr = StringCbCopyA(strCopy, bufferSize, moveNotation.c_str());
+			if (SUCCEEDED(hr))
+			{
+				mDelegate(delegateMessage::moveHistoryAdded, strCopy);
+			}
+		}
+	}
 }

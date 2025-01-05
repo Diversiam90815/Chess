@@ -72,7 +72,6 @@ private:
 
 	void							 checkForEndGameConditions();
 
-
 	Logging							 mLog;
 
 	bool							 mMovesGeneratedForCurrentTurn = false;

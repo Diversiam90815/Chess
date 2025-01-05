@@ -9,7 +9,7 @@
 */
 
 #include "GameManager.h"
-#include <strsafe.h>
+// #include <strsafe.h>
 
 
 GameManager::GameManager()
@@ -43,6 +43,12 @@ void GameManager::init()
 	mLog.initLogging();
 
 	mMovementManager = std::make_unique<MovementManager>();
+	
+	if (mDelegate)
+	{
+		mMovementManager->setDelegate(mDelegate);
+	}
+
 	mMovementManager->init();
 
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
@@ -77,6 +83,10 @@ void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 	mDelegate = pDelegate;
 	mWhitePlayer.setDelegate(pDelegate);
 	mBlackPlayer.setDelegate(pDelegate);
+	if (mMovementManager)
+	{
+		mMovementManager->setDelegate(pDelegate);
+	}
 }
 
 
@@ -180,19 +190,21 @@ void GameManager::executeMove(PossibleMove &move)
 
 	if (mDelegate)
 	{
-		std::string moveNotation = executedMove.notation;
-		size_t		len			 = moveNotation.size();
-		size_t		bufferSize	 = (len + 1) * sizeof(char);
-		char	   *strCopy		 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
+		mDelegate(delegateMessage::moveExecuted, 0);
 
-		if (strCopy != nullptr)
-		{
-			HRESULT hr = StringCbCopyA(strCopy, bufferSize, moveNotation.c_str());
-			if (SUCCEEDED(hr))
-			{
-				mDelegate(delegateMessage::moveExecuted, strCopy);
-			}
-		}
+		// std::string moveNotation = executedMove.notation;
+		// size_t		len			 = moveNotation.size();
+		// size_t		bufferSize	 = (len + 1) * sizeof(char);
+		// char	   *strCopy		 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
+
+		// if (strCopy != nullptr)
+		//{
+		//	HRESULT hr = StringCbCopyA(strCopy, bufferSize, moveNotation.c_str());
+		//	if (SUCCEEDED(hr))
+		//	{
+		//		mDelegate(delegateMessage::moveExecuted, strCopy);
+		//	}
+		// }
 	}
 
 	checkForEndGameConditions();

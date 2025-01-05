@@ -45,14 +45,12 @@ namespace Chess_UI.Configuration
                         HandleWinner(data);
                         break;
                     }
-
                 case DelegateMessage.InitiateMove:
                     {
                         // Engine has finished calculating possible moves
                         HandleInitiatedMove();
                         break;
                     }
-
                 case DelegateMessage.PlayerScoreUpdate:
                     {
                         HandlePlayerScoreUpdate(data);
@@ -62,7 +60,7 @@ namespace Chess_UI.Configuration
                     {
                         // Move is completed, so we reload the board
                         // And update move history (put the move history into an other delelate message later!)
-                        HandleExecutedMove(data);
+                        HandleExecutedMove();
                         break;
                     }
                 case DelegateMessage.PlayerChanged:
@@ -73,6 +71,11 @@ namespace Chess_UI.Configuration
                 case DelegateMessage.GameStateChanged:
                     {
                         HandleGameStateChanges(data);
+                        break;
+                    }
+                case DelegateMessage.MoveHistoryAdded:
+                    {
+                        HandleMoveNotationAdded(data);
                         break;
                     }
                 default: break;
@@ -127,15 +130,23 @@ namespace Chess_UI.Configuration
         }
 
 
-        private void HandleExecutedMove(nint data)
+        private void HandleExecutedMove()
         {
             Logger.LogInfo("Due to delegate message moveExecuted, we react to the execution of the move and start updating the board!");
+            //string notation = Marshal.PtrToStringUTF8(data);
+            //MoveHistory.Add(notation);
+
+            //MoveHistoryUpdated?.Invoke();
+
+            ExecutedMove?.Invoke();
+        }
+
+
+        private void HandleMoveNotationAdded(nint data)
+        {
             string notation = Marshal.PtrToStringUTF8(data);
             MoveHistory.Add(notation);
-
             MoveHistoryUpdated?.Invoke();
-
-            ExecutedMove?.Invoke(notation);
         }
 
 
@@ -160,7 +171,7 @@ namespace Chess_UI.Configuration
         #region ViewModel Delegates
 
         // Define the delegate
-        public delegate void ExecutedMoveHandler(string moveNotation);
+        public delegate void ExecutedMoveHandler();
         public delegate void PossibleMovesCalculatedHandler();
         public delegate void PlayerChangedHandler(PlayerColor player);
         public delegate void GameStateChangedHandler(GameState state);
