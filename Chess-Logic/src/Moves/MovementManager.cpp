@@ -148,9 +148,17 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	bool capturedPiece = (possibleMove.type & MoveType::Capture) == MoveType::Capture;
 	if (capturedPiece)
 	{
-		auto pieceCaptured		   = mChessBoard->getPiece(possibleMove.end)->getType();
-		executedMove.capturedPiece = pieceCaptured;
-		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
+		auto &pieceCaptured = mChessBoard->getPiece(possibleMove.end);
+		if (pieceCaptured)
+		{
+			auto capturedPieceType	   = pieceCaptured->getType();
+			executedMove.capturedPiece = capturedPieceType;
+			mChessBoard->movePiece(possibleMove.start, possibleMove.end);
+		}
+		else
+		{
+			// check for enpassant capture
+		}
 	}
 
 
@@ -529,7 +537,7 @@ PossibleMove MovementManager::generateEnPassantMove(const Position &position, Pl
 	PossibleMove enPassantMove;
 	enPassantMove.start = position;
 	enPassantMove.end	= targetPosition;
-	enPassantMove.type	= MoveType::EnPassant;
+	enPassantMove.type	= MoveType::EnPassant | MoveType::Capture;
 
 	return enPassantMove;
 }

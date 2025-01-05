@@ -50,6 +50,12 @@ std::string MoveNotationHelper::generateStandartAlgebraicNotation(Move &move)
 		// Append the destination square
 		notation += getPositionString(move.endingPosition);
 
+		// Handle En Passant
+		if ((move.type & MoveType::EnPassant) == MoveType::EnPassant)
+		{
+			notation += " e.p.";
+		}
+
 		// Handle promotion
 		if ((move.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
 		{
