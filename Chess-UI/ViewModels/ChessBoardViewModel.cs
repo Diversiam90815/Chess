@@ -11,6 +11,7 @@ using System;
 using Microsoft.UI.Composition.Interactions;
 using Windows.UI.Popups;
 using Microsoft.UI.Xaml;
+using System.Threading.Tasks;
 
 
 namespace Chess_UI.ViewModels
@@ -28,6 +29,8 @@ namespace Chess_UI.ViewModels
         public ObservableCollection<ObservableCollection<string>> MoveHistoryColumns { get; } = [];
 
         public ObservableCollection<BoardSquare> Board { get; set; }
+
+        public event Func<GameState, Task> ShowGameStateDialogRequested;
 
 
         public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller)
@@ -297,28 +300,15 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private async void HandleGameStateChanged(GameState state)
+        private void HandleGameStateChanged(GameState state)
         {
-            switch (state)
+            DispatcherQueue.TryEnqueue(async () =>
             {
-                case GameState.Checkmate:
-                    {
-                        // Handle Checkmate (currently just a blueprint)
-                        var messageDialog = new MessageDialog("Checkmate");
-                        messageDialog.Commands.Add(new UICommand("New Game", new UICommandInvokedHandler(this.CommandInvokedHandler)));
-                        messageDialog.Commands.Add(new UICommand("Close", new UICommandInvokedHandler(this.CommandInvokedHandler)));
-                        messageDialog.DefaultCommandIndex = 0;  // Default behaviour
-                        messageDialog.CancelCommandIndex = 1;   // Invoked when escape is pressed
-                        await messageDialog.ShowAsync();
-                        break;
-                    }
-                case GameState.Stalemate:
-                    {
-                        // Handle stale mate
-                        break;
-                    }
-                default: break;
-            }
+                if (ShowGameStateDialogRequested != null)
+                {
+                    await ShowGameStateDialogRequested.Invoke(state);
+                }
+            });
         }
 
 
@@ -694,19 +684,6 @@ namespace Chess_UI.ViewModels
 
         #endregion
 
-
-        private void CommandInvokedHandler(IUICommand command)
-        {
-            if (command.Label == "New Game")
-            {
-                ResetGame();
-            }
-            else if (command.Label == "Close")
-            {
-                ResetGame();
-                Window.Current.Close();
-            }
-        }
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {

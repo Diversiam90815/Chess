@@ -137,7 +137,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	executedMove.movedPiece = movedPieceType;
 	executedMove.player		= player;
 
-	//movedPiece->increaseMoveCounter();
+	movedPiece->increaseMoveCounter();
 
 	if (movedPiece->getType() == PieceType::King)
 	{
@@ -302,15 +302,16 @@ bool MovementManager::isStalemate(PlayerColor player)
 
 bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor)
 {
-	bool	   kingInCheck	  = false;
+	bool		kingInCheck	   = false;
 
 	// Make a local copy of the board
-	ChessBoard boardCopy	  = *mChessBoard; // copies the chessboard to a local copy
+	ChessBoard	boardCopy	   = *mChessBoard; // copies the chessboard to a local copy
 
 	// Save the current state
-	auto	  &movingPiece	  = boardCopy.getPiece(move.startingPosition);
-	auto	  &capturingPiece = boardCopy.getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
-	bool	   isKing		  = movingPiece->getType() == PieceType::King;
+	auto	   &movingPiece	   = boardCopy.getPiece(move.startingPosition);
+	auto	   &capturingPiece = boardCopy.getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
+	bool		isKing		   = movingPiece->getType() == PieceType::King;
+	PlayerColor opponentColour = playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
 
 	LOG_DEBUG("Simulating move: {} -> {} with piece {}", LoggingHelper::positionToString(move.startingPosition).c_str(),
 			  LoggingHelper::positionToString(move.endingPosition).c_str(), LoggingHelper::pieceTypeToString(movingPiece->getType()).c_str());
@@ -321,8 +322,7 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor player
 	}
 
 	// Simulate the move
-	boardCopy.removePiece(move.startingPosition);		  // Remove piece from old position
-	boardCopy.setPiece(move.endingPosition, movingPiece); // Place it at new position
+	boardCopy.movePiece(move.startingPosition, move.endingPosition);
 
 	// Update King's position if if this is the king
 	Position kingPosition = boardCopy.getKingsPosition(playerColor);
@@ -334,12 +334,6 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor player
 	// Check if King is under attack (isSquareUnderAttack)
 	PlayerColor opponentColor = (playerColor == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
 	kingInCheck				  = isSquareAttacked(kingPosition, opponentColor, boardCopy);
-
-	// Update Kings position back if necessary
-	if (isKing)
-	{
-		kingPosition = move.startingPosition;
-	}
 
 	LOG_DEBUG("King is at {}", LoggingHelper::positionToString(kingPosition).c_str());
 	LOG_DEBUG("isSquareAttacked(...) = {}", kingInCheck ? "true" : "false");
@@ -360,7 +354,7 @@ bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attac
 
 		for (const auto &move : moves)
 		{
-			if (move.end == square && (move.type & MoveType::Capture) == MoveType::Capture)
+			if (move.end == square)
 			{
 				return true;
 			}
@@ -376,6 +370,9 @@ bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attac
 	// Iterate over all opponent pieces
 	auto opponentPieces = chessboard.getPiecesFromPlayer(attackerColor);
 
+	// Recalculate the moves so we have an updated state of the possible moves in order to check if the square is under attack
+	// calculateAllLegalBasicMoves(attackerColor);
+
 	for (const auto &[pos, piece] : opponentPieces)
 	{
 		// Get possible moves for the opponent's piece
@@ -383,12 +380,14 @@ bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attac
 
 		for (const auto &move : moves)
 		{
-			if (move.end == square && (move.type & MoveType::Capture) == MoveType::Capture)
+			if (move.end == square)
 			{
 				LOG_DEBUG("Square ({}, {}) is attacked by {} at ({}, {})", square.x, square.y, LoggingHelper::pieceTypeToString(piece->getType()).c_str(), pos.x, pos.y);
 				return true;
 			}
 		}
+
+		// Need to check extra for possible pawn movement captures ( they do not appear here, since they are not valid if the square was left empty)
 	}
 
 	return false;

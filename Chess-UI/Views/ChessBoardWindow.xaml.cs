@@ -3,7 +3,11 @@ using Chess_UI.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using static Chess_UI.Configuration.ChessLogicAPI;
+using System.Threading.Tasks;
+using System;
 
 
 namespace Chess_UI.Views
@@ -24,6 +28,8 @@ namespace Chess_UI.Views
 
             ViewModel = new ChessBoardViewModel(DispatcherQueue, controller);
             this.RootPanel.DataContext = ViewModel;
+
+            ViewModel.ShowGameStateDialogRequested += OnShowGameStateDialogRequested;
 
             Init();
             SetWindowSize(1100, 800);
@@ -74,6 +80,44 @@ namespace Chess_UI.Views
 
             // Handle the move
             ViewModel.HandleSquareClick(square);
+        }
+
+
+        private async Task OnShowGameStateDialogRequested(GameState state)
+        {
+            switch (state)
+            {
+                case GameState.Checkmate:
+                    var dialog = new ContentDialog
+                    {
+                        Title = "Checkmate",
+                        Content = "You have been checkmated!",
+                        PrimaryButtonText = "New Game",
+                        CloseButtonText = "Close",
+                        XamlRoot = this.Content.XamlRoot
+                    };
+
+                    var result = await dialog.ShowAsync();
+
+                    if (result == ContentDialogResult.Primary)
+                    {
+                        ViewModel.ResetGame();
+                        ViewModel.StartGame();
+                    }
+                    else
+                    {
+                        ViewModel.ResetGame();
+                        this.Close();
+                    }
+                    break;
+
+                case GameState.Stalemate:
+                    // Handle stalemate 
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }

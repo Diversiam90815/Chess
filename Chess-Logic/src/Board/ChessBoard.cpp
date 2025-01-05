@@ -8,10 +8,8 @@
   ==============================================================================
 */
 
-
 #include "ChessBoard.h"
 #include "ChessPiece.h"
-
 
 
 ChessBoard::ChessBoard()
@@ -104,7 +102,6 @@ bool ChessBoard::movePiece(Position start, Position end)
 		return false;
 
 	setPiece(end, piece);
-	piece->increaseMoveCounter();
 	removePiece(start);
 	return true;
 }
@@ -182,5 +179,5 @@ void ChessBoard::initializeBoard()
 	mWhiteKingPosition = Position(4, 7);
 	mBlackKingPosition = Position(4, 0);
 
-	mInitialized = true;
+	mInitialized	   = true;
 }

@@ -67,5 +67,5 @@ protected:
 
 	PlayerColor color;
 
-	int			moveCounter{0};
+	int			moveCounter = 0;
 };
