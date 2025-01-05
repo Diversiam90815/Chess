@@ -12,6 +12,8 @@
 
 #include <vector>
 #include <utility>
+#include <memory>
+
 #include "Move.h"
 #include "Parameters.h"
 
@@ -48,6 +50,8 @@ public:
 	{
 		hasMoved = moved;
 	}
+
+	static std::shared_ptr<ChessPiece> CreatePiece(PieceType type, PlayerColor color);
 
 
 	virtual std::vector<PossibleMove> getPossibleMoves(const Position &pos, ChessBoard &board) const = 0;

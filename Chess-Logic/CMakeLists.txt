@@ -68,7 +68,7 @@ set(API_FILES
 )
 
 set(PIECE_FILES
-    ${PIECE_DIR}/ChessPiece.h
+    ${PIECE_DIR}/ChessPiece.h   ${PIECE_DIR}/ChessPiece.cpp
     ${PIECE_DIR}/Pawn.h         ${PIECE_DIR}/Pawn.cpp
     ${PIECE_DIR}/Knight.h       ${PIECE_DIR}/Knight.cpp
     ${PIECE_DIR}/Bishop.h       ${PIECE_DIR}/Bishop.cpp

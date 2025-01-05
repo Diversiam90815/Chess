@@ -212,8 +212,13 @@ void GameManager::undoMove()
 
 	if (lastMove->capturedPiece != PieceType::DefaultType)
 	{
-		mMovementManager->mChessBoard->setPiece(
-			lastMove->endingPosition, std::make_shared<ChessPiece>(lastMove->capturedPiece, lastMove->player == PlayerColor::White ? PlayerColor::Black : PlayerColor::White));
+		PlayerColor capturedColor  = (lastMove->player == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
+		auto		pieceToRestore = ChessPiece::CreatePiece(lastMove->capturedPiece, capturedColor);
+
+		if (pieceToRestore)
+		{
+			mMovementManager->mChessBoard->setPiece(lastMove->endingPosition, pieceToRestore);
+		}
 	}
 
 	// Update Game State
