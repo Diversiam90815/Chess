@@ -9,6 +9,8 @@ using static Chess_UI.Configuration.ChessLogicAPI;
 using System.Collections.ObjectModel;
 using System;
 using Microsoft.UI.Composition.Interactions;
+using Windows.UI.Popups;
+using Microsoft.UI.Xaml;
 
 
 namespace Chess_UI.ViewModels
@@ -295,13 +297,19 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private void HandleGameStateChanged(GameState state)
+        private async void HandleGameStateChanged(GameState state)
         {
             switch (state)
             {
                 case GameState.Checkmate:
                     {
-                        // Handle Checkmate
+                        // Handle Checkmate (currently just a blueprint)
+                        var messageDialog = new MessageDialog("Checkmate");
+                        messageDialog.Commands.Add(new UICommand("New Game", new UICommandInvokedHandler(this.CommandInvokedHandler)));
+                        messageDialog.Commands.Add(new UICommand("Close", new UICommandInvokedHandler(this.CommandInvokedHandler)));
+                        messageDialog.DefaultCommandIndex = 0;  // Default behaviour
+                        messageDialog.CancelCommandIndex = 1;   // Invoked when escape is pressed
+                        await messageDialog.ShowAsync();
                         break;
                     }
                 case GameState.Stalemate:
@@ -686,6 +694,19 @@ namespace Chess_UI.ViewModels
 
         #endregion
 
+
+        private void CommandInvokedHandler(IUICommand command)
+        {
+            if (command.Label == "New Game")
+            {
+                ResetGame();
+            }
+            else if (command.Label == "Close")
+            {
+                ResetGame();
+                Window.Current.Close();
+            }
+        }
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
