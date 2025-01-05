@@ -43,7 +43,7 @@ void GameManager::init()
 	mLog.initLogging();
 
 	mMovementManager = std::make_unique<MovementManager>();
-	
+
 	if (mDelegate)
 	{
 		mMovementManager->setDelegate(mDelegate);
@@ -191,20 +191,6 @@ void GameManager::executeMove(PossibleMove &move)
 	if (mDelegate)
 	{
 		mDelegate(delegateMessage::moveExecuted, 0);
-
-		// std::string moveNotation = executedMove.notation;
-		// size_t		len			 = moveNotation.size();
-		// size_t		bufferSize	 = (len + 1) * sizeof(char);
-		// char	   *strCopy		 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
-
-		// if (strCopy != nullptr)
-		//{
-		//	HRESULT hr = StringCbCopyA(strCopy, bufferSize, moveNotation.c_str());
-		//	if (SUCCEEDED(hr))
-		//	{
-		//		mDelegate(delegateMessage::moveExecuted, strCopy);
-		//	}
-		// }
 	}
 
 	checkForEndGameConditions();
@@ -233,10 +219,12 @@ void GameManager::undoMove()
 		}
 	}
 
+	//mMovementManager->mChessBoard->getPiece(lastMove->startingPosition)->setHasMoved(false);		// Needs to be rechecked! Has moved will not be a bool, but an int counter
+
 	// Update Game State
 	mMovementManager->removeLastMove();
 	switchTurns();
-	LOG_INFO("Move undone: {}", lastMove->notation.c_str());
+	// LOG_INFO("Move undone: {}", lastMove->notation.c_str());
 }
 
 

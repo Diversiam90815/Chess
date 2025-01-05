@@ -592,34 +592,7 @@ bool MovementManager::executePawnPromotion(const PossibleMove &move, PieceType p
 	std::shared_ptr<ChessPiece> promotedPiece = nullptr;
 	PlayerColor					player		  = pawn->getColor();
 
-	switch (promotedType)
-	{
-	case PieceType::Queen:
-	{
-		promotedPiece = std::make_shared<Queen>(player);
-		break;
-	}
-
-	case PieceType::Rook:
-	{
-		promotedPiece = std::make_shared<Rook>(player);
-		break;
-	}
-
-	case PieceType::Knight:
-	{
-		promotedPiece = std::make_shared<Knight>(player);
-		break;
-	}
-
-	case PieceType::Bishop:
-	{
-		promotedPiece = std::make_shared<Bishop>(player);
-		break;
-	}
-
-	default: break;
-	}
+	promotedPiece							  = ChessPiece::CreatePiece(promotedType, player);
 
 	if (promotedPiece)
 	{

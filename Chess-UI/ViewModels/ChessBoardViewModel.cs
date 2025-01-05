@@ -231,15 +231,10 @@ namespace Chess_UI.ViewModels
 
         public void UndoLastMove()
         {
-            //ChessLogicAPI.UndoMove();
-            //LoadBoardFromNative();
-
-            //// Reload Move History
-            //ClearMoveHistory();
-            //foreach (var move in Controller.GetMoveHistory())
-            //{
-            //    AddMove(move);
-            //}
+            ChessLogicAPI.UndoMove();
+            LoadBoardFromNative();
+            Controller.MoveHistory.Remove(Controller.MoveHistory.LastOrDefault());
+            HandleMoveHistoryUpdated();
         }
 
 
@@ -286,7 +281,6 @@ namespace Chess_UI.ViewModels
 
         private void HandleExecutedMove()
         {
-            //AddMove(moveNotation);
             LoadBoardFromNative();
             CurrentMoveState = MoveState.NoMove;
         }

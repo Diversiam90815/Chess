@@ -133,11 +133,6 @@ namespace Chess_UI.Configuration
         private void HandleExecutedMove()
         {
             Logger.LogInfo("Due to delegate message moveExecuted, we react to the execution of the move and start updating the board!");
-            //string notation = Marshal.PtrToStringUTF8(data);
-            //MoveHistory.Add(notation);
-
-            //MoveHistoryUpdated?.Invoke();
-
             ExecutedMove?.Invoke();
         }
 
