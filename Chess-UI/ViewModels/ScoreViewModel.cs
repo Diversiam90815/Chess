@@ -13,7 +13,7 @@ namespace Chess_UI.ViewModels
     public class ScoreViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
-        
+
         private readonly DispatcherQueue DispatcherQueue;
 
         private Controller Controller;
@@ -50,7 +50,14 @@ namespace Chess_UI.ViewModels
             int value = score.score;
             PlayerColor player = score.player;
 
-
+            if (player == PlayerColor.White)
+            {
+                WhiteScoreValue = value;
+            }
+            else if (player == PlayerColor.Black)
+            {
+                BlackScoreValue = value;
+            }
         }
 
 
@@ -374,6 +381,39 @@ namespace Chess_UI.ViewModels
                 if (whiteCapturedPieces[PieceTypeInstance.Rook] != value)
                 {
                     whiteCapturedPieces[PieceTypeInstance.Rook] = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Score Values
+
+        private int whiteScoreValue = 0;
+        public int WhiteScoreValue
+        {
+            get => whiteScoreValue;
+            set
+            {
+                if (whiteScoreValue != value)
+                {
+                    whiteScoreValue = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private int blackScoreValue = 0;
+        public int BlackScoreValue
+        {
+            get => blackScoreValue;
+            set
+            {
+                if (blackScoreValue != value)
+                {
+                    blackScoreValue = value;
                     OnPropertyChanged();
                 }
             }

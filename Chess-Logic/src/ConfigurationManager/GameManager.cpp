@@ -175,12 +175,12 @@ void GameManager::executeMove(PossibleMove &move)
 		if (getCurrentPlayer() == PlayerColor::White)
 		{
 			mWhitePlayer.addCapturedPiece(executedMove.capturedPiece);
-			mBlackPlayer.updateScore();
+			mWhitePlayer.updateScore();
 		}
 		else
 		{
 			mBlackPlayer.addCapturedPiece(executedMove.capturedPiece);
-			mWhitePlayer.updateScore();
+			mBlackPlayer.updateScore();
 		}
 	}
 

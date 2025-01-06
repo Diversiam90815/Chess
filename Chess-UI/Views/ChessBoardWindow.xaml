@@ -51,8 +51,16 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Score" FontSize="24" Foreground="#E0E0E0" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="White" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Black" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+
+                    <StackPanel Name="WhiteScoreValue" Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock Text="White" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                        <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteScoreValue, Mode=TwoWay}" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Right" Margin="8,0,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Name="BlackScoreValue" Grid.Row="1" Grid.Column="1"  Orientation="Horizontal">
+                        <TextBlock Text="Black" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                        <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackScoreValue, Mode=TwoWay}" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Right" Margin="8,0,0,0"/>
+                    </StackPanel>
 
                     <StackPanel Name="WhiteCapturedPieces" Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
                         <StackPanel Name="WCapturedPiecesImages" Orientation="Vertical" HorizontalAlignment="Left">
