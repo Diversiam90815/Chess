@@ -42,10 +42,4 @@ void Logging::initLogging()
 		.setRotateOnSession(true);
 
 	logging::addMSVCOutput().checkForPresentDebugger(true).setLevel(LogLevel::Debug).setMaxSkipDuration(std::chrono::microseconds(mSlowLogTimeMS));
-
-	auto logger = logging::getOrCreateLogger();
-	for (const auto &sink : logger->sinks())
-	{
-		LOG_INFO("Sink Type {}, Level {}", typeid(*sink).name(), spdlog::level::to_string_view(sink->level()).data());
-	}
 }
