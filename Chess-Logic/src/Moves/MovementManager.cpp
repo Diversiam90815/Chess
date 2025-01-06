@@ -124,7 +124,7 @@ bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
 }
 
 
-Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnPromotion)
+Move MovementManager::executeMove(PossibleMove &possibleMove)
 {
 	// Store positions in Move from executed PossibleMove
 	Move  executedMove		= Move(possibleMove);
@@ -148,28 +148,36 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	bool capturedPiece = (possibleMove.type & MoveType::Capture) == MoveType::Capture;
 	if (capturedPiece)
 	{
-		auto pieceCaptured		   = mChessBoard->getPiece(possibleMove.end)->getType();
-		executedMove.capturedPiece = pieceCaptured;
-		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
+		auto &pieceCaptured = mChessBoard->getPiece(possibleMove.end);
+		if (pieceCaptured)
+		{
+			auto capturedPieceType	   = pieceCaptured->getType();
+			executedMove.capturedPiece = capturedPieceType;
+			mChessBoard->movePiece(possibleMove.start, possibleMove.end);
+		}
 	}
 
 
 	if ((possibleMove.type & MoveType::EnPassant) == MoveType::EnPassant)
 	{
-		executeEnPassantMove(possibleMove, player);
+		bool result = executeEnPassantMove(possibleMove, player);
+		if (result)
+		{
+			executedMove.capturedPiece = PieceType::Pawn;
+		}
 	}
-	else if ((possibleMove.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (possibleMove.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
+	if ((possibleMove.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (possibleMove.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
 	{
 		executeCastlingMove(possibleMove);
 	}
-	else if ((possibleMove.type & MoveType::Normal) == MoveType::Normal || (possibleMove.type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush)
+	if ((possibleMove.type & MoveType::Normal) == MoveType::Normal || (possibleMove.type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush)
 	{
 		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
 	}
-	else if ((possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
+	if ((possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
 	{
-		executePawnPromotion(possibleMove, pawnPromotion);
-		executedMove.promotionType = pawnPromotion;
+		executePawnPromotion(possibleMove);
+		executedMove.promotionType = possibleMove.promotionPiece;
 	}
 
 	PlayerColor opponent	 = player == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
@@ -203,7 +211,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 		executedMove.halfMoveClock = 0;
 	}
 
-	executedMove.notation = mMoveNotation->generateStandartAlgebraicNotation(executedMove);
+	executedMove.notation = mMoveNotation->generateStandardAlgebraicNotation(executedMove);
 
 	addMoveToHistory(executedMove);
 	return executedMove;
@@ -494,11 +502,11 @@ bool MovementManager::executeEnPassantMove(PossibleMove &move, PlayerColor playe
 	Position capturedPawnPosition;
 	if (player == PlayerColor::White)
 	{
-		capturedPawnPosition = Position(move.end.x, move.end.y - 1);
+		capturedPawnPosition = Position(move.end.x, move.end.y + 1);
 	}
 	else
 	{
-		capturedPawnPosition = Position(move.end.x, move.end.y + 1);
+		capturedPawnPosition = Position(move.end.x, move.end.y - 1);
 	}
 
 	mChessBoard->movePiece(move.start, move.end);
@@ -519,11 +527,11 @@ PossibleMove MovementManager::generateEnPassantMove(const Position &position, Pl
 	Position targetPosition;
 	if (player == PlayerColor::White)
 	{
-		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y + 1);
+		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y - 1);
 	}
 	else
 	{
-		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y - 1);
+		targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y + 1);
 	}
 
 	PossibleMove enPassantMove;
@@ -552,50 +560,53 @@ bool MovementManager::canEnPassant(const Position &position, PlayerColor player)
 		return false;
 
 	// Ensure that the position match
-	Position lastMoveEndPosition	 = lastMove->endingPosition;
+	Position lastMoveEndPosition = lastMove->endingPosition;
 
-	// Check if both pawns are on the same file
-	bool	 bothPiecesOnTheSameFile = (lastMoveEndPosition.x == position.x);
-	if (!bothPiecesOnTheSameFile)
+	// Check if the last moved pawn is on the same rank as the capturing pawn
+	bool	 sameRank			 = (lastMoveEndPosition.y == position.y);
+	if (!sameRank)
 		return false;
 
 	// Ensure both pawns are adjacent ranks
-	bool bothPiecesNextToEachOther = (std::abs(lastMoveEndPosition.y - position.y) == 1);
+	bool bothPiecesNextToEachOther = (std::abs(lastMoveEndPosition.x - position.x) == 1);
 	if (!bothPiecesNextToEachOther)
 		return false;
 
 	// Ensure the capturing pawn is on the correct rank for en passant
-	if ((player == PlayerColor::White && position.y != 5) || (player == PlayerColor::Black && position.y != 4))
+	if ((player == PlayerColor::White && position.y != 3) || (player == PlayerColor::Black && position.y != 4))
 		return false;
 
 	return true;
 }
 
 
-bool MovementManager::executePawnPromotion(const PossibleMove &move, PieceType promotedType)
+bool MovementManager::executePawnPromotion(const PossibleMove &move)
 {
 	if ((move.type & MoveType::PawnPromotion) != MoveType::PawnPromotion)
 		return false;
 
+	PieceType promotedPieceType = move.promotionPiece;
+
 	// Validate promoted piece
-	if ((promotedType != PieceType::Queen) && (promotedType != PieceType::Rook) && (promotedType != PieceType::Knight) && (promotedType != PieceType::Bishop))
+	if ((promotedPieceType != PieceType::Queen) && (promotedPieceType != PieceType::Rook) && (promotedPieceType != PieceType::Knight) && (promotedPieceType != PieceType::Bishop))
 	{
 		return false;
 	}
 
 	// Get Pawn position and remove it
-	auto &pawn = mChessBoard->getPiece(move.start);
+	auto	   &pawn   = mChessBoard->getPiece(move.start);
+	PlayerColor player = pawn->getColor();
+
 	mChessBoard->removePiece(move.start);
 
 	// Place promoted piece
 	std::shared_ptr<ChessPiece> promotedPiece = nullptr;
-	PlayerColor					player		  = pawn->getColor();
 
-	promotedPiece							  = ChessPiece::CreatePiece(promotedType, player);
+	promotedPiece							  = ChessPiece::CreatePiece(promotedPieceType, player);
 
 	if (promotedPiece)
 	{
-		mChessBoard->setPiece(move.start, promotedPiece);
+		mChessBoard->setPiece(move.end, promotedPiece);
 		return true;
 	}
 	return false;
@@ -618,14 +629,14 @@ void MovementManager::addMoveToHistory(Move &move)
 
 	if (mDelegate)
 	{
-		std::string moveNotation = move.notation;
-		size_t		len			 = moveNotation.size();
+		std::string numberedNotation = std::to_string(move.number) + ". " + move.notation;
+		size_t		len				 = numberedNotation.size();
 		size_t		bufferSize	 = (len + 1) * sizeof(char);
 		char	   *strCopy		 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
 
 		if (strCopy != nullptr)
 		{
-			HRESULT hr = StringCbCopyA(strCopy, bufferSize, moveNotation.c_str());
+			HRESULT hr = StringCbCopyA(strCopy, bufferSize, numberedNotation.c_str());
 			if (SUCCEEDED(hr))
 			{
 				mDelegate(delegateMessage::moveHistoryAdded, strCopy);

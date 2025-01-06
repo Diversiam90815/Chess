@@ -23,11 +23,12 @@ PossibleMove MapToPossibleMove(const PossibleMoveInstance &moveInstance)
 {
 	PossibleMove move;
 
-	move.start.x = moveInstance.start.x;
-	move.start.y = moveInstance.start.y;
-	move.end.x	 = moveInstance.end.x;
-	move.end.y	 = moveInstance.end.y;
-	move.type	 = static_cast<MoveType>(moveInstance.type);
+	move.start.x		= moveInstance.start.x;
+	move.start.y		= moveInstance.start.y;
+	move.end.x			= moveInstance.end.x;
+	move.end.y			= moveInstance.end.y;
+	move.type			= static_cast<MoveType>(moveInstance.type);
+	move.promotionPiece = static_cast<PieceType>(moveInstance.promotionPiece);
 
 	return move;
 }

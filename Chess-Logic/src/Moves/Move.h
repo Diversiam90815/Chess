@@ -49,11 +49,12 @@ struct hash<Position>
 
 struct PossibleMove
 {
-	Position start;
-	Position end;
-	MoveType type = MoveType::Normal;
+	Position  start;
+	Position  end;
+	MoveType  type			 = MoveType::Normal;
+	PieceType promotionPiece = PieceType::DefaultType;
 
-	bool	 operator==(const PossibleMove &other) const
+	bool	  operator==(const PossibleMove &other) const
 	{
 		return this->start == other.start && this->end == other.end;
 	}

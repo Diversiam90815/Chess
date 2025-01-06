@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Input;
 using static Chess_UI.Configuration.ChessLogicAPI;
 using System.Threading.Tasks;
 using System;
+using Microsoft.UI.Xaml.Media;
 
 
 namespace Chess_UI.Views
@@ -20,6 +21,8 @@ namespace Chess_UI.Views
 
         private OverlappedPresenter mPresenter;
 
+        private PieceTypeInstance? ViewModelSelectedPiece { get; set; }
+
 
         public ChessBoardWindow(Controller controller)
         {
@@ -30,6 +33,7 @@ namespace Chess_UI.Views
             this.RootPanel.DataContext = ViewModel;
 
             ViewModel.ShowGameStateDialogRequested += OnShowGameStateDialogRequested;
+            ViewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
 
             Init();
             SetWindowSize(1100, 800);
@@ -119,5 +123,77 @@ namespace Chess_UI.Views
                     break;
             }
         }
+
+
+        private async Task<PieceTypeInstance?> OnShowPawnPromotionPieces()
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Pawn Promotion",
+                XamlRoot = this.Content.XamlRoot
+            };
+
+            // Customize the dialog to include all four options
+            // Since ContentDialog has limited buttons, we'll use a custom Content
+            var stackPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            PlayerColor currentPlayer = ViewModel.CurrentPlayer;
+
+            // Helper method to create a button with an image
+            Button CreatePieceButton(PieceTypeInstance pieceType)
+            {
+                var button = new Button
+                {
+                    Tag = pieceType,
+                    Margin = new Thickness(5),
+                    Padding = new Thickness(0),
+                    Width = 80,
+                    Height = 80
+                };
+
+                var image = new Image
+                {
+                    Source = Images.GetPieceImage(currentPlayer, pieceType),
+                    Stretch = Stretch.Uniform
+                };
+
+                button.Content = image;
+
+                button.Click += (s, e) =>
+                {
+                    dialog.Hide();
+                    ViewModelSelectedPiece = pieceType;
+                };
+
+                return button;
+            }
+
+            // Create buttons for each promotion option
+            var queenButton = CreatePieceButton(PieceTypeInstance.Queen);
+            var rookButton = CreatePieceButton(PieceTypeInstance.Rook);
+            var bishopButton = CreatePieceButton(PieceTypeInstance.Bishop);
+            var knightButton = CreatePieceButton(PieceTypeInstance.Knight);
+
+            stackPanel.Children.Add(queenButton);
+            stackPanel.Children.Add(rookButton);
+            stackPanel.Children.Add(bishopButton);
+            stackPanel.Children.Add(knightButton);
+
+            dialog.Content = stackPanel;
+
+            ViewModelSelectedPiece = null;
+
+            // Show the dialog and wait for it to close
+            var result = await dialog.ShowAsync();
+
+            // Check if the user selected a piece
+            return ViewModelSelectedPiece;
+        }
+
     }
 }

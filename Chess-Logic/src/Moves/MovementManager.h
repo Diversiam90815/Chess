@@ -39,7 +39,7 @@ public:
 
 	bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
 
-	Move					  executeMove(PossibleMove &executedMove, PieceType pawnPromotion = PieceType::DefaultType);
+	Move					  executeMove(PossibleMove &executedMove);
 
 	void					  removeLastMove();
 
@@ -76,7 +76,7 @@ private:
 	bool													canEnPassant(const Position &position, PlayerColor player);
 
 
-	bool													executePawnPromotion(const PossibleMove &move, PieceType promotedType);
+	bool													executePawnPromotion(const PossibleMove &move);
 
 
 	const Move											   *getLastMove();

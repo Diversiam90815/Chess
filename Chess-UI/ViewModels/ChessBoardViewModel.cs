@@ -32,6 +32,8 @@ namespace Chess_UI.ViewModels
 
         public event Func<GameState, Task> ShowGameStateDialogRequested;
 
+        public event Func<Task<PieceTypeInstance?>> ShowPawnPromotionDialogRequested;
+
 
         public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller)
         {
@@ -128,7 +130,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        public void HandleSquareClick(BoardSquare square)
+        public async void HandleSquareClick(BoardSquare square)
         {
             int engineX = square.pos.x;
             int engineY = 7 - square.pos.y; // invert back
@@ -148,7 +150,6 @@ namespace Chess_UI.ViewModels
                         CurrentPossibleMove = new PossibleMoveInstance
                         {
                             start = new PositionInstance(engineX, engineY)
-                            //start = square.pos
                         };
                         CurrentMoveState = MoveState.InitiateMove;
 
@@ -169,15 +170,38 @@ namespace Chess_UI.ViewModels
                         {
                             var move = CurrentPossibleMove.Value;
                             move.end = new PositionInstance(engineX, engineY);
-                            //move.end = square.pos;
                             CurrentPossibleMove = move;
 
                             if (CheckForValidMove())
                             {
                                 Logger.LogInfo("The move has been validated, so we start the execution now!");
 
-                                CurrentMoveState = MoveState.ExecuteMove;
-                                ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+                                //Checking for a pawn promotion
+                                if (CurrentPossibleMove.Value.type == MoveTypeInstance.MoveType_PawnPromotion)
+                                {
+                                    // Await user's promotion piece selection
+                                    var promotionPiece = await RequestPawnPromotionAsync();
+
+                                    if (promotionPiece.HasValue)
+                                    {
+                                        CurrentPossibleMove = CurrentPossibleMove.Value with { promotionPiece = promotionPiece.Value };
+                                        CurrentMoveState = MoveState.ExecuteMove;
+                                        ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+                                    }
+                                    else
+                                    {
+                                        // User canceled promotion
+                                        ResetHighlightsOnBoard();
+                                        CurrentMoveState = MoveState.NoMove;
+                                        CurrentPossibleMove = null;
+                                        HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+                                    }
+                                }
+                                else
+                                {
+                                    CurrentMoveState = MoveState.ExecuteMove;
+                                    ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+                                }
                             }
                             else
                             {
@@ -281,6 +305,16 @@ namespace Chess_UI.ViewModels
             Logger.LogWarning($"Move is from Start X{move.start.x}-Y{move.start.y} to End X{move.end.x}-Y{move.end.y}");
 
             return false;
+        }
+
+
+        private Task<PieceTypeInstance?> RequestPawnPromotionAsync()
+        {
+            if (ShowPawnPromotionDialogRequested != null)
+            {
+                return ShowPawnPromotionDialogRequested.Invoke();
+            }
+            return null;
         }
 
 

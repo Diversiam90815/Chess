@@ -21,7 +21,7 @@ MoveNotationHelper::~MoveNotationHelper()
 }
 
 
-std::string MoveNotationHelper::generateStandartAlgebraicNotation(Move &move)
+std::string MoveNotationHelper::generateStandardAlgebraicNotation(Move &move)
 {
 	// Handle castling
 	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
@@ -49,6 +49,12 @@ std::string MoveNotationHelper::generateStandartAlgebraicNotation(Move &move)
 		}
 		// Append the destination square
 		notation += getPositionString(move.endingPosition);
+
+		// Handle En Passant
+		if ((move.type & MoveType::EnPassant) == MoveType::EnPassant)
+		{
+			notation += " e.p.";
+		}
 
 		// Handle promotion
 		if ((move.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
@@ -119,7 +125,7 @@ char MoveNotationHelper::getFileFromPosition(Position &pos)
 
 char MoveNotationHelper::getRankFromPosition(Position &pos)
 {
-	return '1' + pos.y;
+	return '8' - pos.y;
 }
 
 
