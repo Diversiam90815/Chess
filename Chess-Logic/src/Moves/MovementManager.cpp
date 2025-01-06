@@ -124,7 +124,7 @@ bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
 }
 
 
-Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnPromotion)
+Move MovementManager::executeMove(PossibleMove &possibleMove)
 {
 	// Store positions in Move from executed PossibleMove
 	Move  executedMove		= Move(possibleMove);
@@ -176,8 +176,8 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 	}
 	if ((possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
 	{
-		executePawnPromotion(possibleMove, pawnPromotion);
-		executedMove.promotionType = pawnPromotion;
+		executePawnPromotion(possibleMove);
+		executedMove.promotionType = possibleMove.promotionPiece;
 	}
 
 	PlayerColor opponent	 = player == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
@@ -580,30 +580,33 @@ bool MovementManager::canEnPassant(const Position &position, PlayerColor player)
 }
 
 
-bool MovementManager::executePawnPromotion(const PossibleMove &move, PieceType promotedType)
+bool MovementManager::executePawnPromotion(const PossibleMove &move)
 {
 	if ((move.type & MoveType::PawnPromotion) != MoveType::PawnPromotion)
 		return false;
 
+	PieceType promotedPieceType = move.promotionPiece;
+
 	// Validate promoted piece
-	if ((promotedType != PieceType::Queen) && (promotedType != PieceType::Rook) && (promotedType != PieceType::Knight) && (promotedType != PieceType::Bishop))
+	if ((promotedPieceType != PieceType::Queen) && (promotedPieceType != PieceType::Rook) && (promotedPieceType != PieceType::Knight) && (promotedPieceType != PieceType::Bishop))
 	{
 		return false;
 	}
 
 	// Get Pawn position and remove it
-	auto &pawn = mChessBoard->getPiece(move.start);
+	auto	   &pawn   = mChessBoard->getPiece(move.start);
+	PlayerColor player = pawn->getColor();
+
 	mChessBoard->removePiece(move.start);
 
 	// Place promoted piece
 	std::shared_ptr<ChessPiece> promotedPiece = nullptr;
-	PlayerColor					player		  = pawn->getColor();
 
-	promotedPiece							  = ChessPiece::CreatePiece(promotedType, player);
+	promotedPiece							  = ChessPiece::CreatePiece(promotedPieceType, player);
 
 	if (promotedPiece)
 	{
-		mChessBoard->setPiece(move.start, promotedPiece);
+		mChessBoard->setPiece(move.end, promotedPiece);
 		return true;
 	}
 	return false;

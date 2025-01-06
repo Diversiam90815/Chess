@@ -44,14 +44,6 @@ typedef enum MoveTypeInstance
 } MoveTypeInstance;
 
 
-typedef struct PossibleMoveInstance
-{
-	PositionInstance start;
-	PositionInstance end;
-	MoveTypeInstance type;
-} PossibleMoveInstance;
-
-
 typedef enum PieceTypeInstance
 {
 	DefaultType,
@@ -62,3 +54,12 @@ typedef enum PieceTypeInstance
 	QueenType,
 	KingType
 } PieceTypeInstance;
+
+
+typedef struct PossibleMoveInstance
+{
+	PositionInstance  start;
+	PositionInstance  end;
+	MoveTypeInstance  type;
+	PieceTypeInstance promotionPiece;
+} PossibleMoveInstance;

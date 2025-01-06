@@ -241,7 +241,7 @@ namespace Chess_UI.Configuration
             public PositionInstance start;
             public PositionInstance end;
             public MoveTypeInstance type;
-            public PieceTypeInstance? promotionPiece;
+            public PieceTypeInstance promotionPiece;
 
             public override readonly bool Equals(object obj)
             {
