@@ -10,6 +10,7 @@
 
 
 #include "Logging.h"
+#include <iostream>
 
 
 Logging::Logging()
@@ -35,10 +36,16 @@ void Logging::initLogging()
 	logging::addFileOutput()
 		.setFilename(log.string())
 		.setLevel(LogLevel::Info)
-		.setMaxFiles(10_MB)
+		.setMaxFileSize(10_MB)
 		.setMaxFiles(10)
 		.setMaxSkipDuration(std::chrono::microseconds(mSlowLogTimeMS))
 		.setRotateOnSession(true);
 
 	logging::addMSVCOutput().checkForPresentDebugger(true).setLevel(LogLevel::Debug).setMaxSkipDuration(std::chrono::microseconds(mSlowLogTimeMS));
+
+	auto logger = logging::getOrCreateLogger();
+	for (const auto &sink : logger->sinks())
+	{
+		LOG_INFO("Sink Type {}, Level {}", typeid(*sink).name(), spdlog::level::to_string_view(sink->level()).data());
+	}
 }
