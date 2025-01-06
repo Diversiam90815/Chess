@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Input;
 using static Chess_UI.Configuration.ChessLogicAPI;
 using System.Threading.Tasks;
 using System;
+using Microsoft.UI.Xaml.Media;
 
 
 namespace Chess_UI.Views
@@ -129,7 +130,6 @@ namespace Chess_UI.Views
             var dialog = new ContentDialog
             {
                 Title = "Pawn Promotion",
-                Content = "Choose the piece you want to promote your pawn to:",
                 XamlRoot = this.Content.XamlRoot
             };
 
@@ -142,37 +142,42 @@ namespace Chess_UI.Views
                 VerticalAlignment = VerticalAlignment.Center
             };
 
-            var queenButton = new Button
-            {
-                Content = "Queen",
-                Tag = PieceTypeInstance.Queen,
-                Margin = new Thickness(5)
-            };
-            queenButton.Click += (s, e) => { dialog.Hide(); ViewModelSelectedPiece = PieceTypeInstance.Queen; };
+            PlayerColor currentPlayer = ViewModel.CurrentPlayer;
 
-            var rookButton = new Button
+            // Helper method to create a button with an image
+            Button CreatePieceButton(PieceTypeInstance pieceType)
             {
-                Content = "Rook",
-                Tag = PieceTypeInstance.Rook,
-                Margin = new Thickness(5)
-            };
-            rookButton.Click += (s, e) => { dialog.Hide(); ViewModelSelectedPiece = PieceTypeInstance.Rook; };
+                var button = new Button
+                {
+                    Tag = pieceType,
+                    Margin = new Thickness(5),
+                    Padding = new Thickness(0),
+                    Width = 80,
+                    Height = 80
+                };
 
-            var bishopButton = new Button
-            {
-                Content = "Bishop",
-                Tag = PieceTypeInstance.Bishop,
-                Margin = new Thickness(5)
-            };
-            bishopButton.Click += (s, e) => { dialog.Hide(); ViewModelSelectedPiece = PieceTypeInstance.Bishop; };
+                var image = new Image
+                {
+                    Source = Images.GetPieceImage(currentPlayer, pieceType),
+                    Stretch = Stretch.Uniform
+                };
 
-            var knightButton = new Button
-            {
-                Content = "Knight",
-                Tag = PieceTypeInstance.Knight,
-                Margin = new Thickness(5)
-            };
-            knightButton.Click += (s, e) => { dialog.Hide(); ViewModelSelectedPiece = PieceTypeInstance.Knight; };
+                button.Content = image;
+
+                button.Click += (s, e) =>
+                {
+                    dialog.Hide();
+                    ViewModelSelectedPiece = pieceType;
+                };
+
+                return button;
+            }
+
+            // Create buttons for each promotion option
+            var queenButton = CreatePieceButton(PieceTypeInstance.Queen);
+            var rookButton = CreatePieceButton(PieceTypeInstance.Rook);
+            var bishopButton = CreatePieceButton(PieceTypeInstance.Bishop);
+            var knightButton = CreatePieceButton(PieceTypeInstance.Knight);
 
             stackPanel.Children.Add(queenButton);
             stackPanel.Children.Add(rookButton);
