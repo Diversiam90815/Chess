@@ -27,21 +27,6 @@ Player::~Player()
 }
 
 
-bool Player::isOnTurn() const
-{
-	return mIsCurrentTurn;
-}
-
-
-void Player::setOnTurn(bool value)
-{
-	if (mIsCurrentTurn != value)
-	{
-		mIsCurrentTurn = value;
-	}
-}
-
-
 Score Player::getScore() const
 {
 	return mScore;
@@ -82,6 +67,14 @@ void Player::setPlayerColor(PlayerColor value)
 void Player::addCapturedPiece(const PieceType piece)
 {
 	mCapturedPieces.push_back(piece);
+
+	if (mDelegate)
+	{
+		PlayerCapturedPiece event{};
+		event.playerColor = getPlayerColor();
+		event.pieceType	  = piece;
+		mDelegate(delegateMessage::playerCapturedPiece, &event);
+	}
 }
 
 
@@ -117,7 +110,6 @@ void Player::reset()
 {
 	setScore(0);
 	mCapturedPieces.clear();
-	setOnTurn(false);
 }
 
 

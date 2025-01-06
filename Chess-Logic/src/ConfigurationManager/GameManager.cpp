@@ -69,7 +69,7 @@ void GameManager::startGame()
 
 void GameManager::clearState()
 {
-	mWhitePlayer.setOnTurn(true);
+	setCurrentPlayer(PlayerColor::White);
 
 	setCurrentGameState(GameState::Init);
 	setCurrentMoveState(MoveState::NoMove);
@@ -152,16 +152,12 @@ void GameManager::switchTurns()
 
 	if (getCurrentPlayer() == PlayerColor::White)
 	{
-		mWhitePlayer.setOnTurn(false);
-		mBlackPlayer.setOnTurn(true);
 		setCurrentPlayer(PlayerColor::Black);
 		LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
 
 		return;
 	}
 
-	mBlackPlayer.setOnTurn(false);
-	mWhitePlayer.setOnTurn(true);
 	setCurrentPlayer(PlayerColor::White);
 
 	LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());

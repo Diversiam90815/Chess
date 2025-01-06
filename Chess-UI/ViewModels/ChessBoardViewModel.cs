@@ -40,11 +40,13 @@ namespace Chess_UI.ViewModels
             this.DispatcherQueue = dispatcherQueue;
             this.Controller = controller;
 
-            Controller.ExecutedMove += HandleExecutedMove;
-            Controller.PossibleMovesCalculated += HighlightPossibleMoves;
-            Controller.PlayerChanged += HandlePlayerChanged;
-            Controller.GameStateChanged += HandleGameStateChanged;
-            Controller.MoveHistoryUpdated += HandleMoveHistoryUpdated;
+            Controller.ExecutedMove += OnExecutedMove;
+            Controller.PossibleMovesCalculated += OnHighlightPossibleMoves;
+            Controller.PlayerChanged += OnHandlePlayerChanged;
+            Controller.GameStateChanged += OnHandleGameStateChanged;
+            Controller.MoveHistoryUpdated += OnHandleMoveHistoryUpdated;
+            Controller.PlayerCapturedPieceEvent += OnPlayerCapturedPiece;
+            Controller.PlayerScoreUpdated += OnPlayerScoreUpdated;
 
             ChessLogicAPI.StartGame();
 
@@ -227,7 +229,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        public void HighlightPossibleMoves()
+        public void OnHighlightPossibleMoves()
         {
             ResetHighlightsOnBoard();
 
@@ -248,6 +250,81 @@ namespace Chess_UI.ViewModels
             }
         }
 
+        public void OnPlayerScoreUpdated(Score score)
+        {
+            int value = score.score;
+            PlayerColor player = score.player;
+
+
+        }
+
+
+        public void OnPlayerCapturedPiece(PlayerCapturedPiece piece)
+        {
+            PlayerColor player = piece.playerColor;
+            PieceTypeInstance type = piece.pieceType;
+
+            if (player == PlayerColor.White)
+            {
+                IncrementWhiteCapturedPiece(type);
+            }
+            else if (player == PlayerColor.Black)
+            {
+                IncrementBlackCapturedPiece(type);
+            }
+        }
+
+
+        private void IncrementWhiteCapturedPiece(PieceTypeInstance pieceType)
+        {
+            switch (pieceType)
+            {
+                case PieceTypeInstance.Pawn:
+                    WhiteCapturedPawns++;
+                    break;
+                case PieceTypeInstance.Bishop:
+                    WhiteCapturedBishops++;
+                    break;
+                case PieceTypeInstance.Knight:
+                    WhiteCapturedKnights++;
+                    break;
+                case PieceTypeInstance.Rook:
+                    WhiteCapturedRooks++;
+                    break;
+                case PieceTypeInstance.Queen:
+                    WhiteCapturedQueens++;
+                    break;
+                default:
+                    Logger.LogWarning($"Unhandled white piece type: {pieceType}");
+                    break;
+            }
+        }
+
+
+        private void IncrementBlackCapturedPiece(PieceTypeInstance pieceType)
+        {
+            switch (pieceType)
+            {
+                case PieceTypeInstance.Pawn:
+                    BlackCapturedPawns++;
+                    break;
+                case PieceTypeInstance.Bishop:
+                    BlackCapturedBishops++;
+                    break;
+                case PieceTypeInstance.Knight:
+                    BlackCapturedKnights++;
+                    break;
+                case PieceTypeInstance.Rook:
+                    BlackCapturedRooks++;
+                    break;
+                case PieceTypeInstance.Queen:
+                    BlackCapturedQueens++;
+                    break;
+                default:
+                    Logger.LogWarning($"Unhandled black piece type: {pieceType}");
+                    break;
+            }
+        }
 
         public void ResetHighlightsOnBoard()
         {
@@ -263,7 +340,7 @@ namespace Chess_UI.ViewModels
             ChessLogicAPI.UndoMove();
             LoadBoardFromNative();
             Controller.MoveHistory.Remove(Controller.MoveHistory.LastOrDefault());
-            HandleMoveHistoryUpdated();
+            OnHandleMoveHistoryUpdated();
         }
 
 
@@ -318,14 +395,14 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private void HandleExecutedMove()
+        private void OnExecutedMove()
         {
             LoadBoardFromNative();
             CurrentMoveState = MoveState.NoMove;
         }
 
 
-        private void HandlePlayerChanged(PlayerColor player)
+        private void OnHandlePlayerChanged(PlayerColor player)
         {
             CurrentPlayer = player;
 
@@ -334,7 +411,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private void HandleGameStateChanged(GameState state)
+        private void OnHandleGameStateChanged(GameState state)
         {
             DispatcherQueue.TryEnqueue(async () =>
             {
@@ -346,7 +423,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private void HandleMoveHistoryUpdated()
+        private void OnHandleMoveHistoryUpdated()
         {
             ClearMoveHistory();
 
