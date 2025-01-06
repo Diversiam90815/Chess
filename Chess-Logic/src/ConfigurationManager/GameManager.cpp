@@ -54,7 +54,7 @@ void GameManager::init()
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
 
-	clearState();
+	//clearState();
 }
 
 

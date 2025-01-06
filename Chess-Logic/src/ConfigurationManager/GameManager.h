@@ -80,7 +80,9 @@ private:
 	Player							 mBlackPlayer;
 
 	PlayerColor						 mCurrentPlayer	   = PlayerColor::NoColor;
+
 	GameState						 mCurrentState	   = GameState::Init;
+
 	MoveState						 mCurrentMoveState = MoveState::NoMove;
 
 	std::vector<PossibleMove>		 mAllMovesForPosition;
