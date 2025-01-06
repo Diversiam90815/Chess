@@ -155,16 +155,16 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 			executedMove.capturedPiece = capturedPieceType;
 			mChessBoard->movePiece(possibleMove.start, possibleMove.end);
 		}
-		else
-		{
-			// check for enpassant capture
-		}
 	}
 
 
 	if ((possibleMove.type & MoveType::EnPassant) == MoveType::EnPassant)
 	{
-		executeEnPassantMove(possibleMove, player);
+		bool result = executeEnPassantMove(possibleMove, player);
+		if (result)
+		{
+			executedMove.capturedPiece = PieceType::Pawn;
+		}
 	}
 	else if ((possibleMove.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (possibleMove.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
 	{
@@ -502,11 +502,11 @@ bool MovementManager::executeEnPassantMove(PossibleMove &move, PlayerColor playe
 	Position capturedPawnPosition;
 	if (player == PlayerColor::White)
 	{
-		capturedPawnPosition = Position(move.end.x, move.end.y - 1);
+		capturedPawnPosition = Position(move.end.x, move.end.y + 1);
 	}
 	else
 	{
-		capturedPawnPosition = Position(move.end.x, move.end.y + 1);
+		capturedPawnPosition = Position(move.end.x, move.end.y - 1);
 	}
 
 	mChessBoard->movePiece(move.start, move.end);
