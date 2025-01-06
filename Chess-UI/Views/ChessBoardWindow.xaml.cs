@@ -19,7 +19,7 @@ namespace Chess_UI.Views
 
         private new readonly DispatcherQueue DispatcherQueue;
 
-        private OverlappedPresenter mPresenter;
+        private OverlappedPresenter Presenter;
 
         private PieceTypeInstance? ViewModelSelectedPiece { get; set; }
 
@@ -52,8 +52,8 @@ namespace Chess_UI.Views
 
         private void Init()
         {
-            mPresenter = AppWindow.Presenter as OverlappedPresenter;
-            mPresenter.IsResizable = false;
+            Presenter = AppWindow.Presenter as OverlappedPresenter;
+            Presenter.IsResizable = false;
         }
 
 
