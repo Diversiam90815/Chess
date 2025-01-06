@@ -54,7 +54,7 @@ void GameManager::init()
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
 
-	clearState();
+	//clearState();
 }
 
 
@@ -69,7 +69,7 @@ void GameManager::startGame()
 
 void GameManager::clearState()
 {
-	mWhitePlayer.setOnTurn(true);
+	setCurrentPlayer(PlayerColor::White);
 
 	setCurrentGameState(GameState::Init);
 	setCurrentMoveState(MoveState::NoMove);
@@ -152,16 +152,12 @@ void GameManager::switchTurns()
 
 	if (getCurrentPlayer() == PlayerColor::White)
 	{
-		mWhitePlayer.setOnTurn(false);
-		mBlackPlayer.setOnTurn(true);
 		setCurrentPlayer(PlayerColor::Black);
 		LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
 
 		return;
 	}
 
-	mBlackPlayer.setOnTurn(false);
-	mWhitePlayer.setOnTurn(true);
 	setCurrentPlayer(PlayerColor::White);
 
 	LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
@@ -179,12 +175,12 @@ void GameManager::executeMove(PossibleMove &move)
 		if (getCurrentPlayer() == PlayerColor::White)
 		{
 			mWhitePlayer.addCapturedPiece(executedMove.capturedPiece);
-			mBlackPlayer.updateScore();
+			mWhitePlayer.updateScore();
 		}
 		else
 		{
 			mBlackPlayer.addCapturedPiece(executedMove.capturedPiece);
-			mWhitePlayer.updateScore();
+			mBlackPlayer.updateScore();
 		}
 	}
 
@@ -216,6 +212,15 @@ void GameManager::undoMove()
 		if (pieceToRestore)
 		{
 			mMovementManager->mChessBoard->setPiece(lastMove->endingPosition, pieceToRestore);
+		}
+
+		if (lastMove->player == PlayerColor::White)
+		{
+			mWhitePlayer.removeLastCapturedPiece();
+		}
+		else if (lastMove->player == PlayerColor::Black)
+		{
+			mBlackPlayer.removeLastCapturedPiece();
 		}
 	}
 

@@ -51,42 +51,50 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Score" FontSize="24" Foreground="#E0E0E0" HorizontalAlignment="Center"/>
-                    <TextBlock Grid.Row="1" Grid.Column="0" Text="White" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
-                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Black" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+
+                    <StackPanel Name="WhiteScoreValue" Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock Text="White" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                        <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteScoreValue, Mode=TwoWay}" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Right" Margin="8,0,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Name="BlackScoreValue" Grid.Row="1" Grid.Column="1"  Orientation="Horizontal">
+                        <TextBlock Text="Black" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                        <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackScoreValue, Mode=TwoWay}" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Right" Margin="8,0,0,0"/>
+                    </StackPanel>
 
                     <StackPanel Name="WhiteCapturedPieces" Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
                         <StackPanel Name="WCapturedPiecesImages" Orientation="Vertical" HorizontalAlignment="Left">
-                            <Image Source="{x:Bind ViewModel.CapturedBlackPawnImage}" Width="20" Height="20"/>
-                            <Image Source="{x:Bind ViewModel.CapturedBlackBishopImage}" Width="20" Height="20"/>
-                            <Image Source="{x:Bind ViewModel.CapturedBlackKnightImage}" Width="20" Height="20"/>
-                            <Image Source="{x:Bind ViewModel.CapturedBlackRookImage}" Width="20" Height="20"/>
-                            <Image Source="{x:Bind ViewModel.CapturedBlackQueenImage}" Width="20" Height="20"/>
+                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedBlackPawnImage}" Width="20" Height="20"/>
+                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedBlackBishopImage}" Width="20" Height="20"/>
+                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedBlackKnightImage}" Width="20" Height="20"/>
+                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedBlackRookImage}" Width="20" Height="20"/>
+                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedBlackQueenImage}" Width="20" Height="20"/>
                         </StackPanel>
 
                         <StackPanel Name="WNumCapturedPiece" Orientation="Vertical" HorizontalAlignment="Center">
-                            <TextBlock Text="{x:Bind ViewModel.WhiteCapturedPawns, Mode=TwoWay}" Height="20" Width="40" />
-                            <TextBlock Text="{x:Bind ViewModel.WhiteCapturedBishops, Mode=TwoWay}" Height="20" Width="40" />
-                            <TextBlock Text="{x:Bind ViewModel.WhiteCapturedKnights, Mode=TwoWay}" Height="20" Width="40" />
-                            <TextBlock Text="{x:Bind ViewModel.WhiteCapturedRooks, Mode=TwoWay}" Height="20" Width="40" />
-                            <TextBlock Text="{x:Bind ViewModel.WhiteCapturedQueens, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteCapturedPawn, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteCapturedBishop, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteCapturedKnight, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteCapturedRook, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteCapturedQueen, Mode=TwoWay}" Height="20" Width="40" />
                         </StackPanel>
                     </StackPanel>
 
                     <StackPanel Name="BlackCapturedPieces" Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
                         <StackPanel Name="BCapturedPiecesImages" Orientation="Vertical" HorizontalAlignment="Left">
-                            <Image Source="{x:Bind ViewModel.CapturedWhitePawnImage}" Width="20" Height="20"/>
-                            <Image Source="{x:Bind ViewModel.CapturedWhiteBishopImage}" Width="20" Height="20"/>
-                            <Image Source="{x:Bind ViewModel.CapturedWhiteKnightImage}" Width="20" Height="20"/>
-                            <Image Source="{x:Bind ViewModel.CapturedWhiteRookImage}" Width="20" Height="20"/>
-                            <Image Source="{x:Bind ViewModel.CapturedWhiteQueenImage}" Width="20" Height="20"/>
+                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedWhitePawnImage}" Width="20" Height="20"/>
+                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedWhiteBishopImage}" Width="20" Height="20"/>
+                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedWhiteKnightImage}" Width="20" Height="20"/>
+                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedWhiteRookImage}" Width="20" Height="20"/>
+                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedWhiteQueenImage}" Width="20" Height="20"/>
                         </StackPanel>
 
                         <StackPanel Name="BNumCapturedPiece" Orientation="Vertical" HorizontalAlignment="Center">
-                            <TextBlock Text="{x:Bind ViewModel.BlackCapturedPawns, Mode=TwoWay}" Height="20" Width="40" />
-                            <TextBlock Text="{x:Bind ViewModel.BlackCapturedBishops, Mode=TwoWay}" Height="20" Width="40" />
-                            <TextBlock Text="{x:Bind ViewModel.BlackCapturedKnights, Mode=TwoWay}" Height="20" Width="40" />
-                            <TextBlock Text="{x:Bind ViewModel.BlackCapturedRooks, Mode=TwoWay}" Height="20" Width="40" />
-                            <TextBlock Text="{x:Bind ViewModel.BlackCapturedQueens, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackCapturedPawn, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackCapturedBishop, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackCapturedKnight, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackCapturedRook, Mode=TwoWay}" Height="20" Width="40" />
+                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackCapturedQueen, Mode=TwoWay}" Height="20" Width="40" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>

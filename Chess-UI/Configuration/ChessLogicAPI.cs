@@ -116,6 +116,7 @@ namespace Chess_UI.Configuration
             PlayerHasWon = 1,
             InitiateMove,
             PlayerScoreUpdate,
+            PlayerCapturedPiece,
             MoveExecuted,
             PlayerChanged,
             GameStateChanged,
@@ -278,12 +279,21 @@ namespace Chess_UI.Configuration
         }
 
 
-        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        [StructLayout(LayoutKind.Sequential)]
         public struct Score
         {
             public PlayerColor player;
             public int score;
         }
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct PlayerCapturedPiece
+        {
+            public PlayerColor playerColor;
+            public PieceTypeInstance pieceType;
+            public bool captured;
+        };
 
 
         #endregion

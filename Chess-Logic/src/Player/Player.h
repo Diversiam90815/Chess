@@ -31,6 +31,13 @@ struct Score
 	}
 };
 
+struct PlayerCapturedPiece
+{
+	PlayerColor playerColor;
+	PieceType	pieceType;
+	bool captured;	// False if we undo the move and remove a piece
+};
+
 
 class Player
 {
@@ -42,9 +49,6 @@ public:
 	~Player();
 
 
-	bool		  isOnTurn() const;
-	void		  setOnTurn(bool value);
-
 	Score		  getScore() const;
 	void		  setScore(int value);
 
@@ -53,6 +57,7 @@ public:
 
 
 	void		  addCapturedPiece(const PieceType piece);
+	void		  removeLastCapturedPiece();
 
 	void		  updateScore();
 

@@ -78,6 +78,12 @@ namespace Chess_UI.Configuration
                         HandleMoveNotationAdded(data);
                         break;
                     }
+                case DelegateMessage.PlayerCapturedPiece:
+                    {
+                        HandlePlayerCapturedPiece(data);
+                        break;
+                    }
+
                 default: break;
             }
         }
@@ -89,6 +95,13 @@ namespace Chess_UI.Configuration
             PlayerColor winner = (PlayerColor)player;
 
             // set winner through event trigger
+        }
+
+
+        private void HandlePlayerCapturedPiece(nint data)
+        {
+            PlayerCapturedPiece capturedEvent = (PlayerCapturedPiece)Marshal.PtrToStructure(data, typeof(PlayerCapturedPiece));
+            PlayerCapturedPieceEvent?.Invoke(capturedEvent);
         }
 
 
@@ -122,11 +135,7 @@ namespace Chess_UI.Configuration
         private void HandlePlayerScoreUpdate(nint data)
         {
             Score score = (Score)Marshal.PtrToStructure(data, typeof(Score));
-
-            PlayerColor player = score.player;
-            int scoreValue = score.score;
-
-            // trigger event for score change
+            PlayerScoreUpdated?.Invoke(score);
         }
 
 
@@ -171,6 +180,8 @@ namespace Chess_UI.Configuration
         public delegate void PlayerChangedHandler(PlayerColor player);
         public delegate void GameStateChangedHandler(GameState state);
         public delegate void MoveHistoryUpdatedHandler();
+        public delegate void PlayerCaputeredPieceHandler(PlayerCapturedPiece capturedPiece);
+        public delegate void PlayerScoreUpdatedHandler(Score score);
 
         // define the event
         public event ExecutedMoveHandler ExecutedMove;
@@ -178,7 +189,8 @@ namespace Chess_UI.Configuration
         public event PlayerChangedHandler PlayerChanged;
         public event GameStateChangedHandler GameStateChanged;
         public event MoveHistoryUpdatedHandler MoveHistoryUpdated;
-
+        public event PlayerCaputeredPieceHandler PlayerCapturedPieceEvent;
+        public event PlayerScoreUpdatedHandler PlayerScoreUpdated;
         #endregion
 
     }
