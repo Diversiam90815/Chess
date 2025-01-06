@@ -1,6 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
 <Project>
-  <!-- See https://aka.ms/dotnet/msbuild/customize for more details on customizing your build -->
+  
   <PropertyGroup>
-	  <Version>1.0.0.0</Version>
+	  <Version>1.0.0.184</Version>
   </PropertyGroup>
 </Project>
