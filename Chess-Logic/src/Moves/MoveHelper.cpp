@@ -94,7 +94,7 @@ bool MoveHelper::checkPawnMovement(const Position &position, ChessBoard &board, 
 		move.start = position;
 		move.end   = newPosition;
 
-		if ((color == PlayerColor::White && newY == 8) || (color == PlayerColor::Black && newY == 1))
+		if ((color == PlayerColor::White && newY == 0) || (color == PlayerColor::Black && newY == 7))
 		{
 			move.type = MoveType::PawnPromotion;
 		}
