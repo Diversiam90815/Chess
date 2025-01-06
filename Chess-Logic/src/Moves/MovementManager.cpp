@@ -166,15 +166,15 @@ Move MovementManager::executeMove(PossibleMove &possibleMove, PieceType pawnProm
 			executedMove.capturedPiece = PieceType::Pawn;
 		}
 	}
-	else if ((possibleMove.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (possibleMove.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
+	if ((possibleMove.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (possibleMove.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
 	{
 		executeCastlingMove(possibleMove);
 	}
-	else if ((possibleMove.type & MoveType::Normal) == MoveType::Normal || (possibleMove.type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush)
+	if ((possibleMove.type & MoveType::Normal) == MoveType::Normal || (possibleMove.type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush)
 	{
 		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
 	}
-	else if ((possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
+	if ((possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
 	{
 		executePawnPromotion(possibleMove, pawnPromotion);
 		executedMove.promotionType = pawnPromotion;

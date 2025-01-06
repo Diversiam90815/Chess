@@ -20,6 +20,8 @@ namespace Chess_UI.Views
 
         private OverlappedPresenter mPresenter;
 
+        private PieceTypeInstance? ViewModelSelectedPiece { get; set; }
+
 
         public ChessBoardWindow(Controller controller)
         {
@@ -30,6 +32,7 @@ namespace Chess_UI.Views
             this.RootPanel.DataContext = ViewModel;
 
             ViewModel.ShowGameStateDialogRequested += OnShowGameStateDialogRequested;
+            ViewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
 
             Init();
             SetWindowSize(1100, 800);
@@ -119,5 +122,73 @@ namespace Chess_UI.Views
                     break;
             }
         }
+
+
+        private async Task<PieceTypeInstance?> OnShowPawnPromotionPieces()
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Pawn Promotion",
+                Content = "Choose the piece you want to promote your pawn to:",
+                XamlRoot = this.Content.XamlRoot
+            };
+
+            // Customize the dialog to include all four options
+            // Since ContentDialog has limited buttons, we'll use a custom Content
+            var stackPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            var queenButton = new Button
+            {
+                Content = "Queen",
+                Tag = PieceTypeInstance.Queen,
+                Margin = new Thickness(5)
+            };
+            queenButton.Click += (s, e) => { dialog.Hide(); ViewModelSelectedPiece = PieceTypeInstance.Queen; };
+
+            var rookButton = new Button
+            {
+                Content = "Rook",
+                Tag = PieceTypeInstance.Rook,
+                Margin = new Thickness(5)
+            };
+            rookButton.Click += (s, e) => { dialog.Hide(); ViewModelSelectedPiece = PieceTypeInstance.Rook; };
+
+            var bishopButton = new Button
+            {
+                Content = "Bishop",
+                Tag = PieceTypeInstance.Bishop,
+                Margin = new Thickness(5)
+            };
+            bishopButton.Click += (s, e) => { dialog.Hide(); ViewModelSelectedPiece = PieceTypeInstance.Bishop; };
+
+            var knightButton = new Button
+            {
+                Content = "Knight",
+                Tag = PieceTypeInstance.Knight,
+                Margin = new Thickness(5)
+            };
+            knightButton.Click += (s, e) => { dialog.Hide(); ViewModelSelectedPiece = PieceTypeInstance.Knight; };
+
+            stackPanel.Children.Add(queenButton);
+            stackPanel.Children.Add(rookButton);
+            stackPanel.Children.Add(bishopButton);
+            stackPanel.Children.Add(knightButton);
+
+            dialog.Content = stackPanel;
+
+            ViewModelSelectedPiece = null;
+
+            // Show the dialog and wait for it to close
+            var result = await dialog.ShowAsync();
+
+            // Check if the user selected a piece
+            return ViewModelSelectedPiece;
+        }
+
     }
 }
