@@ -213,6 +213,15 @@ void GameManager::undoMove()
 		{
 			mMovementManager->mChessBoard->setPiece(lastMove->endingPosition, pieceToRestore);
 		}
+
+		if (lastMove->player == PlayerColor::White)
+		{
+			mWhitePlayer.removeLastCapturedPiece();
+		}
+		else if (lastMove->player == PlayerColor::Black)
+		{
+			mBlackPlayer.removeLastCapturedPiece();
+		}
 	}
 
 	auto &piece = mMovementManager->mChessBoard->getPiece(lastMove->startingPosition);

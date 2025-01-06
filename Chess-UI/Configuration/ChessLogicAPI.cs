@@ -292,6 +292,7 @@ namespace Chess_UI.Configuration
         {
             public PlayerColor playerColor;
             public PieceTypeInstance pieceType;
+            public bool captured;
         };
 
 

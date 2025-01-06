@@ -1,5 +1,6 @@
 ﻿using Chess_UI.Configuration;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -65,42 +66,49 @@ namespace Chess_UI.ViewModels
         {
             PlayerColor player = piece.playerColor;
             PieceTypeInstance type = piece.pieceType;
-
-            if (player == PlayerColor.White)
-            {
-                IncrementWhiteCapturedPiece(type);
-            }
-            else if (player == PlayerColor.Black)
-            {
-                IncrementBlackCapturedPiece(type);
-            }
+            bool captured = piece.captured;
+            AlterCapturedPieces(player, type, captured);
         }
 
 
-        private void IncrementWhiteCapturedPiece(PieceTypeInstance pieceType)
+        private void AlterCapturedPieces(PlayerColor player, PieceTypeInstance pieceType, bool captured)
         {
-            if (whiteCapturedPieces.TryGetValue(pieceType, out int value))
+            switch (player)
             {
-                whiteCapturedPieces[pieceType] = ++value;
-                OnPropertyChanged($"WhiteCaptured{pieceType}");
-            }
-            else
-            {
-                Logger.LogWarning($"Unhandled white piece type: {pieceType}");
-            }
-        }
+                case PlayerColor.White:
+                    {
+                        if (whiteCapturedPieces.TryGetValue(pieceType, out int value))
+                        {
+                            if (captured)
+                            {
+                                whiteCapturedPieces[pieceType] = ++value;
+                            }
+                            else
+                            {
+                                whiteCapturedPieces[pieceType] = --value;
+                            }
+                            OnPropertyChanged($"WhiteCaptured{pieceType}");
+                        }
+                        break;
+                    }
 
-
-        private void IncrementBlackCapturedPiece(PieceTypeInstance pieceType)
-        {
-            if (blackCapturedPieces.TryGetValue(pieceType, out int value))
-            {
-                blackCapturedPieces[pieceType] = ++value;
-                OnPropertyChanged($"BlackCaptured{pieceType}");
-            }
-            else
-            {
-                Logger.LogWarning($"Unhandled black piece type: {pieceType}");
+                case PlayerColor.Black:
+                    {
+                        if (blackCapturedPieces.TryGetValue(pieceType, out int value))
+                        {
+                            if (captured)
+                            {
+                                blackCapturedPieces[pieceType] = ++value;
+                            }
+                            else
+                            {
+                                blackCapturedPieces[pieceType] = --value;
+                            }
+                            OnPropertyChanged($"WhiteCaptured{pieceType}");
+                        }
+                        break;
+                    }
+                default: break;
             }
         }
 

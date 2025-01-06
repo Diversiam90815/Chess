@@ -73,6 +73,33 @@ void Player::addCapturedPiece(const PieceType piece)
 		PlayerCapturedPiece event{};
 		event.playerColor = getPlayerColor();
 		event.pieceType	  = piece;
+		event.captured	  = true; // We captured a piece
+		mDelegate(delegateMessage::playerCapturedPiece, &event);
+	}
+}
+
+
+void Player::removeLastCapturedPiece()
+{
+	if (mCapturedPieces.empty())
+	{
+		// Handle the case where there are no captured pieces to remove
+		LOG_WARNING("No captured pieces to remove.");
+		return;
+	}
+
+	// Retrieve and remove the last captured piece
+	PieceType lastCapture = mCapturedPieces.back();
+	mCapturedPieces.pop_back();
+
+	updateScore();
+
+	if (mDelegate)
+	{
+		PlayerCapturedPiece event{};
+		event.playerColor = getPlayerColor();
+		event.pieceType	  = lastCapture;
+		event.captured	  = false; // We undo a move, which was a capture
 		mDelegate(delegateMessage::playerCapturedPiece, &event);
 	}
 }
