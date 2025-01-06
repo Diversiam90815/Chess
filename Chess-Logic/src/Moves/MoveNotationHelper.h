@@ -22,7 +22,7 @@ public:
 	MoveNotationHelper();
 	~MoveNotationHelper();
 
-	std::string generateStandartAlgebraicNotation(Move &move);
+	std::string generateStandardAlgebraicNotation(Move &move);
 
 private:
 	std::string castlingToSAN(Move &move);

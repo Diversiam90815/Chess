@@ -211,7 +211,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 		executedMove.halfMoveClock = 0;
 	}
 
-	executedMove.notation = mMoveNotation->generateStandartAlgebraicNotation(executedMove);
+	executedMove.notation = mMoveNotation->generateStandardAlgebraicNotation(executedMove);
 
 	addMoveToHistory(executedMove);
 	return executedMove;
@@ -629,14 +629,14 @@ void MovementManager::addMoveToHistory(Move &move)
 
 	if (mDelegate)
 	{
-		std::string moveNotation = move.notation;
-		size_t		len			 = moveNotation.size();
+		std::string numberedNotation = std::to_string(move.number) + ". " + move.notation;
+		size_t		len				 = numberedNotation.size();
 		size_t		bufferSize	 = (len + 1) * sizeof(char);
 		char	   *strCopy		 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
 
 		if (strCopy != nullptr)
 		{
-			HRESULT hr = StringCbCopyA(strCopy, bufferSize, moveNotation.c_str());
+			HRESULT hr = StringCbCopyA(strCopy, bufferSize, numberedNotation.c_str());
 			if (SUCCEEDED(hr))
 			{
 				mDelegate(delegateMessage::moveHistoryAdded, strCopy);
