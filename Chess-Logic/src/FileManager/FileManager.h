@@ -11,9 +11,15 @@
 #pragma once
 
 #include <filesystem>
+#include <json.hpp>
+#include <fstream>
+
 #include "Parameters.h"
+#include "Logging.h"
+
 
 namespace fs = std::filesystem;
+using json	 = nlohmann::json;
 
 
 class FileManager
@@ -31,6 +37,11 @@ public:
 
 	// Path retrieval functions
 	fs::path			getLoggingPath();
+	fs::path			getSettingsPath();
+	fs::path			getUserSettingsPath();
+
+	std::string			readSettingFromFile(const std::string &setting);
+	bool				writeSettingToFile(const std::string &setting, const std::string &value);
 
 private:
 	FileManager() = default;

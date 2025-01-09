@@ -78,10 +78,19 @@ enum delegateMessage
 };
 
 
+enum SettingsType
+{
+	boardTheme,
+	piecesTheme
+};
+
 
 //============================================================
 //			File Manager
 //============================================================
 
-constexpr auto LoggingFolder = "Logs";
-constexpr auto LogFile		 = "Chess.log";
+constexpr auto LoggingFolder	= "Logs";
+constexpr auto LogFile			= "Chess.log";
+
+constexpr auto UserSettingsFile = "Config.json";
+constexpr auto SettingsFolder	= "Settings";
