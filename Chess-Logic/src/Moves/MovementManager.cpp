@@ -358,7 +358,7 @@ bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attac
 	for (const auto &[pos, piece] : opponentPieces)
 	{
 		// Get possible moves for the opponent's piece
-		auto moves = piece->getPossibleMoves(pos, *mChessBoard);
+		auto moves = piece->getPossibleMoves(pos, *mChessBoard, true); // Attack only since we need to differentiate attack and just move moves from pawns
 
 		for (const auto &move : moves)
 		{
@@ -378,13 +378,10 @@ bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attac
 	// Iterate over all opponent pieces
 	auto opponentPieces = chessboard.getPiecesFromPlayer(attackerColor);
 
-	// Recalculate the moves so we have an updated state of the possible moves in order to check if the square is under attack
-	// calculateAllLegalBasicMoves(attackerColor);
-
 	for (const auto &[pos, piece] : opponentPieces)
 	{
 		// Get possible moves for the opponent's piece
-		auto moves = piece->getPossibleMoves(pos, chessboard);
+		auto moves = piece->getPossibleMoves(pos, chessboard, true); // Attack only since we need to differentiate attack and just move moves from pawns
 
 		for (const auto &move : moves)
 		{
@@ -631,8 +628,8 @@ void MovementManager::addMoveToHistory(Move &move)
 	{
 		std::string numberedNotation = std::to_string(move.number) + ". " + move.notation;
 		size_t		len				 = numberedNotation.size();
-		size_t		bufferSize	 = (len + 1) * sizeof(char);
-		char	   *strCopy		 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
+		size_t		bufferSize		 = (len + 1) * sizeof(char);
+		char	   *strCopy			 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
 
 		if (strCopy != nullptr)
 		{
