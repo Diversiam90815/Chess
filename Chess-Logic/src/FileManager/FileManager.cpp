@@ -64,7 +64,6 @@ fs::path FileManager::getSettingsPath()
 fs::path FileManager::getUserSettingsPath()
 {
 	fs::path path = getSettingsPath() / UserSettingsFile;
-	createDirectoryIfNeeded(path);
 	return path;
 }
 

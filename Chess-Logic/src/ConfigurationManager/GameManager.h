@@ -18,6 +18,7 @@
 #include "ChessLogicAPIDefines.h"
 
 #include "Logging.h"
+#include "UserSettings.h"
 
 
 class GameManager
@@ -88,6 +89,8 @@ private:
 	std::vector<PossibleMove>		 mAllMovesForPosition;
 
 	std::unique_ptr<MovementManager> mMovementManager;
+
+	UserSettings					 mUserSettings;
 
 	PFN_CALLBACK					 mDelegate = nullptr;
 };

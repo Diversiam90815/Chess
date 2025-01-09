@@ -76,17 +76,23 @@ std::string UserSettings::readSetting(SettingsType setting)
 
 void UserSettings::initializeValues()
 {
+	mCurrentBoardTheme = readSetting(SettingsType::boardTheme);
+	mCurrentPieceTheme = readSetting(SettingsType::piecesTheme);
 }
 
 
 void UserSettings::initializeConfigFile()
 {
+	storeSetting(SettingsType::boardTheme, mCurrentBoardTheme);
+	storeSetting(SettingsType::piecesTheme, mCurrentPieceTheme);
 }
 
 
 bool UserSettings::doesConfigFileExist()
 {
-	return false;
+	FileManager *fmg			  = FileManager::GetInstance();
+	fs::path	 userSettingsPath = fmg->getUserSettingsPath();
+	return fs::exists(userSettingsPath);
 }
 
 
