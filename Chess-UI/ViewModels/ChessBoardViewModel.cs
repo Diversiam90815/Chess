@@ -1,11 +1,11 @@
-﻿using Chess_UI.Configuration;
+﻿using Chess_UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using static Chess_UI.Configuration.Images;
-using static Chess_UI.Configuration.ChessLogicAPI;
+using static Chess_UI.Services.Images;
+using static Chess_UI.Services.ChessLogicAPI;
 using System.Collections.ObjectModel;
 using System;
 using Microsoft.UI.Composition.Interactions;

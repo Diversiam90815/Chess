@@ -1,4 +1,4 @@
-using Chess_UI.Configuration;
+using Chess_UI.Services;
 using Chess_UI.ViewModels;
 using Chess_UI.Views;
 using Microsoft.UI.Dispatching;

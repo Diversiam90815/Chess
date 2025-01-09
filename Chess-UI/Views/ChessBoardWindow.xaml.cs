@@ -1,11 +1,11 @@
-using Chess_UI.Configuration;
+using Chess_UI.Services;
 using Chess_UI.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using static Chess_UI.Configuration.ChessLogicAPI;
+using static Chess_UI.Services.ChessLogicAPI;
 using System.Threading.Tasks;
 using System;
 using Microsoft.UI.Xaml.Media;

@@ -1,4 +1,4 @@
-﻿using Chess_UI.Configuration;
+﻿using Chess_UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;

@@ -1,12 +1,12 @@
-﻿using Chess_UI.Configuration;
+﻿using Chess_UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using static Chess_UI.Configuration.ChessLogicAPI;
-using static Chess_UI.Configuration.Images;
+using static Chess_UI.Services.ChessLogicAPI;
+using static Chess_UI.Services.Images;
 
 
 namespace Chess_UI.ViewModels

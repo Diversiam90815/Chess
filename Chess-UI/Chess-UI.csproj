@@ -63,7 +63,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Views\SettingsWindow.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <ProjectReference Include="..\Chess-Logic\build\Chess-Logic.vcxproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Views\SettingsWindow.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>

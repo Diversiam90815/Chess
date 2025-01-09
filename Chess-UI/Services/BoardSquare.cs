@@ -8,9 +8,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.System;
-using static Chess_UI.Configuration.ChessLogicAPI;
+using static Chess_UI.Services.ChessLogicAPI;
 
-namespace Chess_UI.Configuration
+namespace Chess_UI.Services
+
+
 {
     public class BoardSquare : INotifyPropertyChanged
     {

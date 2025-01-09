@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess_UI.Configuration.ChessLogicAPI;
+using static Chess_UI.Services.ChessLogicAPI;
 
 
-namespace Chess_UI.Configuration
+namespace Chess_UI.Services
 {
     public static class Images
     {
