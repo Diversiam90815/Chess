@@ -1,3 +1,4 @@
+using Chess_UI.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -23,6 +24,9 @@ namespace Chess_UI.Views
     /// </summary>
     public sealed partial class SettingsWindow : Window
     {
+
+        private SettingsViewModel ViewModel;
+
         public SettingsWindow()
         {
             this.InitializeComponent();

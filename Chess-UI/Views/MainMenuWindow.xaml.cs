@@ -19,6 +19,10 @@ namespace Chess_UI
 
         public MainMenuViewModel ViewModel { get; private set; }
 
+        public SettingsViewModel SettingsViewModel { get; private set; }
+
+        public SettingsWindow SettingsWindow;
+
 
         public MainMenuWindow()
         {
@@ -27,6 +31,7 @@ namespace Chess_UI
             DispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
             ViewModel = new MainMenuViewModel(DispatcherQueue);
+            SettingsViewModel = new SettingsViewModel(DispatcherQueue);
 
             this.RootGrid.DataContext = ViewModel;
 
@@ -60,6 +65,14 @@ namespace Chess_UI
         }
 
 
+        private void SettingsWindowClosed(object sender, WindowEventArgs args)
+        {
+            SettingsWindow.Closed -= BoardWindowClosed;
+            SettingsWindow = null;
+            this.Activate();
+        }
+
+
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
             if (ChessBoardWindow == null)
@@ -78,7 +91,17 @@ namespace Chess_UI
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            //Not yet implemented
+            if (SettingsWindow == null)
+            {
+                SettingsWindow = new SettingsWindow();
+                SettingsWindow.Activate();
+                SettingsWindow.Closed += SettingsWindowClosed;
+                this.AppWindow.Hide();
+            }
+            else
+            {
+                SettingsWindow.Activate();
+            }
         }
 
 

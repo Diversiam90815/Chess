@@ -20,6 +20,11 @@ namespace Chess_UI.ViewModels
         private Configuration Configuration;
 
 
+        public SettingsViewModel(DispatcherQueue dispatcherQueue)
+        {
+            this.DispatcherQueue = dispatcherQueue;
+        }
+
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             DispatcherQueue.TryEnqueue(() =>
