@@ -28,12 +28,49 @@ void UserSettings::init()
 
 void UserSettings::storeSetting(SettingsType setting, std::string value)
 {
+	switch (setting)
+	{
+	case (SettingsType::boardTheme):
+	{
+		LOG_INFO("Board theme setting set {}", value.c_str());
+		FileManager *fmg = FileManager::GetInstance();
+		fmg->writeSettingToFile(BoardTheme, value);
+		break;
+	}
+	case (SettingsType::piecesTheme):
+	{
+		LOG_INFO("Piece theme setting set {}", value.c_str());
+		FileManager *fmg = FileManager::GetInstance();
+		fmg->writeSettingToFile(PieceTheme, value);
+		break;
+	}
+	default: break;
+	}
 }
 
 
 std::string UserSettings::readSetting(SettingsType setting)
 {
-	return std::string();
+	std::string value = "";
+
+	switch (setting)
+	{
+	case (SettingsType::boardTheme):
+	{
+		FileManager *fmg = FileManager::GetInstance();
+		value			 = fmg->readSettingFromFile(BoardTheme);
+		LOG_INFO("Board theme read from file {}", value.c_str());
+		return value;
+	}
+	case (SettingsType::piecesTheme):
+	{
+		FileManager *fmg = FileManager::GetInstance();
+		value			 = fmg->readSettingFromFile(PieceTheme);
+		LOG_INFO("Piece theme read from file : {}", value.c_str());
+		return value;
+	}
+	default: break;
+	}
 }
 
 
