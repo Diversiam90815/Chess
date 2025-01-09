@@ -59,7 +59,7 @@ public:
 	static std::shared_ptr<ChessPiece> CreatePiece(PieceType type, PlayerColor color);
 
 
-	virtual std::vector<PossibleMove>  getPossibleMoves(const Position &pos, ChessBoard &board) const = 0;
+	virtual std::vector<PossibleMove>  getPossibleMoves(const Position &pos, ChessBoard &board, bool attackOnly = false) const = 0;
 
 
 protected:

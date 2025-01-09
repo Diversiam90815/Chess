@@ -22,13 +22,18 @@ MoveHelper::~MoveHelper()
 }
 
 
-bool MoveHelper::checkAvailableMoves(const Position &position, ChessBoard &board, const PlayerColor color, PieceType piece, bool hasMoved)
+bool MoveHelper::checkAvailableMoves(const Position &position, ChessBoard &board, const PlayerColor color, PieceType piece, bool hasMoved, bool attackOnly)
 {
 
 	switch (piece)
 	{
 	case (PieceType::Pawn):
 	{
+		if (attackOnly)
+		{
+			checkPawnCaptureMovement(position, board, color); // For possible check validation we need to differentiate the pawn's movements
+			break;
+		}
 		checkPawnMovement(position, board, color, hasMoved);
 		checkPawnCaptureMovement(position, board, color);
 		break;
