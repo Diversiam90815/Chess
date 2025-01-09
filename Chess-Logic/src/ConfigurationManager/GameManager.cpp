@@ -69,7 +69,7 @@ void GameManager::startGame()
 
 void GameManager::clearState()
 {
-	setCurrentPlayer(PlayerColor::White);
+	setCurrentPlayer(PlayerColor::NoColor);
 
 	setCurrentGameState(GameState::Init);
 	setCurrentMoveState(MoveState::NoMove);
