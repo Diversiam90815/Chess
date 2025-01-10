@@ -146,7 +146,13 @@ bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &
 				PossibleMove move;
 				move.start = position;
 				move.end   = newPosition;
-				move.type  = MoveType::Capture;
+				move.type = MoveType::Capture;
+
+				if ((color == PlayerColor::White && newY == 0) || (color == PlayerColor::Black && newY == 7))
+				{
+					move.type |= MoveType::PawnPromotion;
+				}
+
 				addToAvailableMoves(move);
 			}
 		}
@@ -238,7 +244,7 @@ bool MoveHelper::checkIfPositionAlreadyExists(const Position pos)
 {
 	for (const auto &possibleMove : mPossibleMovesAndCaptures)
 	{
-		if (possibleMove.end.x == pos.x && possibleMove.end.y == pos.y)
+		if (possibleMove.end == pos)
 		{
 			return true;
 		}
