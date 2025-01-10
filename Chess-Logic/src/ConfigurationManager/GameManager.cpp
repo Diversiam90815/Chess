@@ -367,6 +367,7 @@ PlayerColor GameManager::getCurrentPlayer() const
 }
 
 
+
 void GameManager::checkForEndGameConditions()
 {
 	const Move *lastMove = mMovementManager->getLastMove();

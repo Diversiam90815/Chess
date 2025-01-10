@@ -8,6 +8,8 @@
   ==============================================================================
 */
 
+#include <strsafe.h>
+
 #include "ChessLogicAPI.h"
 #include "GameManager.h"
 #include "FileManager.h"
@@ -19,7 +21,7 @@
 //=============================================
 
 
-PossibleMove MapToPossibleMove(const PossibleMoveInstance &moveInstance)
+static PossibleMove MapToPossibleMove(const PossibleMoveInstance &moveInstance)
 {
 	PossibleMove move;
 
@@ -34,7 +36,7 @@ PossibleMove MapToPossibleMove(const PossibleMoveInstance &moveInstance)
 }
 
 
-Position MapToPosition(const PositionInstance positionInstance)
+static Position MapToPosition(const PositionInstance positionInstance)
 {
 	Position pos;
 
@@ -45,7 +47,7 @@ Position MapToPosition(const PositionInstance positionInstance)
 }
 
 
-PositionInstance MapToPositionInstance(Position position)
+static PositionInstance MapToPositionInstance(Position position)
 {
 	PositionInstance pos;
 	pos.x = position.x;
@@ -53,6 +55,27 @@ PositionInstance MapToPositionInstance(Position position)
 	return pos;
 }
 
+
+static char *StringToCharPtr(std::string string)
+{
+	size_t len	   = string.length() + 1;
+
+	char  *charPtr = (char *)CoTaskMemAlloc(len);
+
+	if (charPtr == nullptr)
+		return nullptr;
+
+
+	HRESULT hr = StringCbCopy(charPtr, len, string.c_str());
+
+	if (FAILED(hr))
+	{
+		CoTaskMemFree(charPtr);
+		return nullptr;
+	}
+
+	return charPtr;
+}
 
 
 //=============================================
@@ -69,7 +92,6 @@ CHESS_API void Init()
 CHESS_API void Deinit()
 {
 	GameManager::ReleaseInstance();
-
 	FileManager::ReleaseInstance();
 }
 
@@ -263,4 +285,36 @@ CHESS_API void LogWarningWithCaller(const char *message, const char *method, con
 {
 	spdlog::source_loc loc(className, lineNumber, method);
 	logging::log(LogLevel::Warn, loc, message);
+}
+
+
+CHESS_API void SetCurrentBoardTheme(const char *theme)
+{
+	GameManager *manager = GameManager::GetInstance();
+	manager->setBoardTheme(theme);
+}
+
+
+CHESS_API char *GetCurrentBoardTheme()
+{
+	GameManager *manager  = GameManager::GetInstance();
+	std::string	 theme	  = manager->getBoardTheme();
+	char		*themeTmp = StringToCharPtr(theme);
+	return themeTmp;
+}
+
+
+CHESS_API void SetCurrentPieceTheme(const char *theme)
+{
+	GameManager *manager = GameManager::GetInstance();
+	manager->setPieceTheme(theme);
+}
+
+
+CHESS_API char *GetCurrentPieceTheme()
+{
+	GameManager *manager  = GameManager::GetInstance();
+	std::string	 theme	  = manager->getPieceTheme();
+	char		*themeTmp = StringToCharPtr(theme);
+	return themeTmp;
 }
