@@ -19,12 +19,14 @@ namespace Chess_UI.Services
 		{
 
 		}
- 
+
 		#endregion
 
 
 		#region User Config
 
 		#endregion
+
+
 	}
 }

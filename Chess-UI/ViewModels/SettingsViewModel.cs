@@ -19,6 +19,8 @@ namespace Chess_UI.ViewModels
 
         private Configuration Configuration;
 
+        private ThemeLoader ThemeLoader;
+
 
         public SettingsViewModel(DispatcherQueue dispatcherQueue)
         {
