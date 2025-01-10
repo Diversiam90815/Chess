@@ -31,7 +31,7 @@ namespace Chess_UI.Services
         private readonly string piecesPath = Path.Combine(baseDir, "Assets", "Pieces");
 
 
-        public List<BoardTheme> LoardBoardThemes()
+        public List<BoardTheme> LoadBoardThemes()
         {
             var boardThemes = new List<BoardTheme>();
             var boardFiles = Directory.GetFiles(boardsPath, "*.png");
