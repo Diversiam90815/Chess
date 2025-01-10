@@ -409,7 +409,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private ImageSource boardBackgroundImage = GetImage(BoardTheme.Wood);
+        private ImageSource boardBackgroundImage = GetImage(Images.BoardTheme.Wood);
         public ImageSource BoardBackgroundImage
         {
             get => boardBackgroundImage;

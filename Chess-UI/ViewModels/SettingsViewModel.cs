@@ -21,10 +21,17 @@ namespace Chess_UI.ViewModels
 
         private ThemeLoader ThemeLoader;
 
+        private List<BoardTheme> BoardThemes;
+
+        private List<PieceTheme> PieceThemes;
+
 
         public SettingsViewModel(DispatcherQueue dispatcherQueue)
         {
             this.DispatcherQueue = dispatcherQueue;
+            ThemeLoader = new();
+            PieceThemes = ThemeLoader.LoadPieceThemes();
+            BoardThemes = ThemeLoader.LoardBoardThemes();
         }
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Chess_UI.Services
 {
-
     public class BoardTheme
     {
         public string Name { get; set; }
@@ -24,10 +23,18 @@ namespace Chess_UI.Services
 
     public class ThemeLoader
     {
-        public List<BoardTheme> LoardBoardThemes(string boardsFolderPath)
+
+        private static readonly string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+
+        private readonly string boardsPath = Path.Combine(baseDir, "Assets", "Board");
+
+        private readonly string piecesPath = Path.Combine(baseDir, "Assets", "Pieces");
+
+
+        public List<BoardTheme> LoardBoardThemes()
         {
             var boardThemes = new List<BoardTheme>();
-            var boardFiles = Directory.GetFiles(boardsFolderPath, "*.png");
+            var boardFiles = Directory.GetFiles(boardsPath, "*.png");
 
             foreach (var boardFile in boardFiles)
             {
@@ -42,10 +49,10 @@ namespace Chess_UI.Services
         }
 
 
-        public List<PieceTheme> LoadPieceThemes(string pieceFolderPath)
+        public List<PieceTheme> LoadPieceThemes()
         {
             var pieceThemes = new List<PieceTheme>();
-            var themeDirectories = Directory.GetDirectories(pieceFolderPath);
+            var themeDirectories = Directory.GetDirectories(piecesPath);
 
             foreach (var themeDirectory in themeDirectories)
             {
