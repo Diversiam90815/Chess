@@ -1,4 +1,6 @@
+using Chess_UI.Services;
 using Chess_UI.ViewModels;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -24,12 +26,34 @@ namespace Chess_UI.Views
     /// </summary>
     public sealed partial class SettingsWindow : Window
     {
+        private OverlappedPresenter Presenter;
 
         private SettingsViewModel ViewModel;
+
 
         public SettingsWindow()
         {
             this.InitializeComponent();
+
+            Init();
+            SetWindowSize(430, 470);
+        }
+
+
+        private void SetWindowSize(double width, double height)
+        {
+            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+            float scalingFactor = ChessLogicAPI.GetWindowScalingFactor(hwnd);
+            int scaledWidth = (int)(width * scalingFactor);
+            int scaledHeight = (int)(height * scalingFactor);
+            AppWindow.Resize(new(scaledWidth, scaledHeight));
+        }
+
+
+        private void Init()
+        {
+            Presenter = AppWindow.Presenter as OverlappedPresenter;
+            Presenter.IsResizable = false;
         }
     }
 }

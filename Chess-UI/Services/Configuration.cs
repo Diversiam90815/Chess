@@ -6,27 +6,39 @@ using System.Threading.Tasks;
 
 namespace Chess_UI.Services
 {
-	public class Configuration
-	{
-		#region Configuration
+    public class Configuration
+    {
+        #region Configuration
 
-		public Configuration()
-		{
+        public Configuration()
+        {
 
-		}
+        }
 
-		public void Init()
-		{
+        public void Init()
+        {
 
-		}
+        }
 
-		#endregion
-
-
-		#region User Config
-
-		#endregion
+        #endregion
 
 
-	}
+        #region User Config
+
+        static public string CurrentPieceTheme
+        {
+            get => ChessLogicAPI.GetCurrentPieceTheme();
+            set => ChessLogicAPI.SetCurrentPieceTheme(value);
+        }
+
+        static public string CurrentBoardTheme
+        {
+            get => ChessLogicAPI.GetCurrentBoardTheme();
+            set => ChessLogicAPI.SetCurrentBoardTheme(value);
+        }
+
+        #endregion
+
+
+    }
 }

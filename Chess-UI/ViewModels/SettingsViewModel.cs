@@ -7,39 +7,85 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Chess_UI.Services;
+using System.Collections.ObjectModel;
 
 
 namespace Chess_UI.ViewModels
 {
-    public class SettingsViewModel : INotifyPropertyChanged
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
+	public class SettingsViewModel : INotifyPropertyChanged
+	{
+		public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly DispatcherQueue DispatcherQueue;
+		private readonly DispatcherQueue DispatcherQueue;
 
-        private Configuration Configuration;
+		private Configuration Configuration;
 
-        private ThemeLoader ThemeLoader;
+		private ThemeLoader ThemeLoader;
 
-        private List<BoardTheme> BoardThemes;
+		public ObservableCollection<BoardTheme> BoardThemes { get; private set; }
 
-        private List<PieceTheme> PieceThemes;
+		public ObservableCollection<PieceTheme> PieceThemes { get; private set; }
 
 
-        public SettingsViewModel(DispatcherQueue dispatcherQueue)
-        {
-            this.DispatcherQueue = dispatcherQueue;
-            ThemeLoader = new();
-            PieceThemes = ThemeLoader.LoadPieceThemes();
-            BoardThemes = ThemeLoader.LoardBoardThemes();
-        }
+		public SettingsViewModel(DispatcherQueue dispatcherQueue)
+		{
+			this.DispatcherQueue = dispatcherQueue;
+			ThemeLoader = new();
 
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-        {
-            DispatcherQueue.TryEnqueue(() =>
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-            });
-        }
-    }
+			BoardThemes = new ObservableCollection<BoardTheme>(ThemeLoader.LoadBoardThemes());
+			PieceThemes = new ObservableCollection<PieceTheme>(ThemeLoader.LoadPieceThemes());
+
+		}
+
+
+		private BoardTheme GetCurrentSelectedBoardTheme()
+		{
+			string currentThemeName = Configuration.CurrentBoardTheme;
+			BoardTheme theme = BoardThemes.FirstOrDefault(b => string.Equals(b.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
+			return theme;
+		}
+
+
+		private BoardTheme selectedBoardTheme;
+		public BoardTheme SelectedBoardTheme
+		{
+			get => selectedBoardTheme;
+			set
+			{
+				if (selectedBoardTheme != value)
+				{
+                    selectedBoardTheme = value;
+					if (value != null)
+						Configuration.CurrentBoardTheme = value.Name;
+					OnPropertyChanged();
+				}
+			}
+		}
+
+
+		private PieceTheme selectedPieceTheme;
+		public PieceTheme SelectedPieceTheme
+		{
+			get => selectedPieceTheme;
+			set
+			{
+				if (selectedPieceTheme != value)
+				{
+                    selectedPieceTheme = value;
+					if (value != null)
+						Configuration.CurrentPieceTheme = value.Name;
+					OnPropertyChanged();
+				}
+			}
+		}
+
+
+		protected void OnPropertyChanged([CallerMemberName] string name = null)
+		{
+			DispatcherQueue.TryEnqueue(() =>
+			{
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+			});
+		}
+	}
 }
