@@ -38,6 +38,10 @@ namespace Chess_UI.Services
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+
+        public Images.PieceTheme PieceTheme = Images.PieceTheme.Basic;
+
+
         private PositionInstance _pos;
         public PositionInstance pos
         {
@@ -102,7 +106,7 @@ namespace Chess_UI.Services
                 // Return a special color if IsHighlighted, otherwise transparent
                 return IsHighlighted
                     ? new SolidColorBrush(Windows.UI.Color.FromArgb(128, 173, 216, 230)) // a light blue-ish
-                    : new SolidColorBrush(Windows.UI.Color.FromArgb(0,0,0,0));
+                    : new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
             }
         }
 
@@ -113,7 +117,7 @@ namespace Chess_UI.Services
                 if (piece == PieceTypeInstance.DefaultType || colour == PlayerColor.NoColor)
                     return null;
 
-                return Images.GetPieceImage(colour, piece);
+                return Images.GetPieceImage(PieceTheme, colour, piece);
             }
         }
 

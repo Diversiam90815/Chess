@@ -20,15 +20,33 @@ namespace Chess_UI.Services
             EndGame
         }
 
-        public enum BoardBackground
+        public enum BoardTheme
         {
-            Wood = 1
+            Wood = 1,
+            Wood2 = 2,
+            Plain,
+            Plastic,
+            Marble,
+            Marble2,
+            Glass
+        }
+
+        public enum PieceTheme
+        {
+            Basic = 1,
+            Standart
         }
 
 
-        public static readonly Dictionary<BoardBackground, ImageSource> BoardBackgroundImages = new()
+        public static readonly Dictionary<BoardTheme, ImageSource> BoardBackgroundImages = new()
         {
-        {BoardBackground.Wood, LoadImage("/Assets/Board/wood.png") }
+        {BoardTheme.Wood, LoadImage("/Assets/Board/Wood.png") },
+        {BoardTheme.Wood2, LoadImage("/Assets/Board/Wood2.png") },
+        {BoardTheme.Plain, LoadImage("/Assets/Board/Plain.png") },
+        {BoardTheme.Plastic, LoadImage("/Assets/Board/Plastic.png") },
+        {BoardTheme.Marble, LoadImage("/Assets/Board/Marble.png") },
+        {BoardTheme.Marble2, LoadImage("/Assets/Board/Marble2.png") },
+        {BoardTheme.Glass, LoadImage("/Assets/Board/Glass.png") }
         };
 
         public static readonly Dictionary<MainMenuButton, ImageSource> MainMenutImages = new()
@@ -58,7 +76,62 @@ namespace Chess_UI.Services
         {PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Standard/KnightB.png") },
         {PieceTypeInstance.King, LoadImage("/Assets/Pieces/Standard/KingB.png") }
         };
+        
 
+        //public static readonly Dictionary<PieceTypeInstance, ImageSource> BasticPiecesWhite = new()
+        //{
+        //{PieceTypeInstance.Pawn, LoadImage("/Assets/Pieces/Basic/PawnW.png") },
+        //{PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Basic/BishopW.png") },
+        //{PieceTypeInstance.Queen, LoadImage("/Assets/Pieces/Basic/QueenW.png") },
+        //{PieceTypeInstance.Rook, LoadImage("/Assets/Pieces/Basic/RookW.png") },
+        //{PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Basic/KnightW.png") },
+        //{PieceTypeInstance.King, LoadImage("/Assets/Pieces/Basic/KingW.png") }
+        //};
+
+        //public static readonly Dictionary<PieceTypeInstance, ImageSource> BasicPiecesBlack = new()
+        //{
+        //{PieceTypeInstance.Pawn, LoadImage("/Assets/Pieces/Basic/PawnB.png") },
+        //{PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Basic/BishopB.png") },
+        //{PieceTypeInstance.Queen, LoadImage("/Assets/Pieces/Basic/QueenB.png") },
+        //{PieceTypeInstance.Rook, LoadImage("/Assets/Pieces/Basic/RookB.png") },
+        //{PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Basic/KnightB.png") },
+        //{PieceTypeInstance.King, LoadImage("/Assets/Pieces/Basic/KingB.png") }
+        //};
+
+        //public static readonly Dictionary<PieceTypeInstance, ImageSource> StandartWhitePieces = new()
+        //{
+        //{PieceTypeInstance.Pawn, LoadImage("/Assets/Pieces/Standard/PawnW.png") },
+        //{PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Standard/BishopW.png") },
+        //{PieceTypeInstance.Queen, LoadImage("/Assets/Pieces/Standard/QueenW.png") },
+        //{PieceTypeInstance.Rook, LoadImage("/Assets/Pieces/Standard/RookW.png") },
+        //{PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Standard/KnightW.png") },
+        //{PieceTypeInstance.King, LoadImage("/Assets/Pieces/Standard/KingW.png") }
+        //};
+
+        //public static readonly Dictionary<PieceTypeInstance, ImageSource> StandartBlackPieces = new()
+        //{
+        //{PieceTypeInstance.Pawn, LoadImage("/Assets/Pieces/Standard/PawnB.png") },
+        //{PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Standard/BishopB.png") },
+        //{PieceTypeInstance.Queen, LoadImage("/Assets/Pieces/Standard/QueenB.png") },
+        //{PieceTypeInstance.Rook, LoadImage("/Assets/Pieces/Standard/RookB.png") },
+        //{PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Standard/KnightB.png") },
+        //{PieceTypeInstance.King, LoadImage("/Assets/Pieces/Standard/KingB.png") }
+        //};
+
+
+        // Dynamic piece image loading based on theme, color, and type
+        public static ImageSource GetPieceImage(PieceTheme theme, PlayerColor color, PieceTypeInstance pieceType)
+        {
+            // Convert enum values to strings that match folder and file naming conventions
+            string themeName = theme.ToString();    // e.g., "Standard" or "Basic"
+            string colorSuffix = color == PlayerColor.White ? "W" : "B";
+            string pieceName = pieceType.ToString(); // e.g., "Pawn", "Bishop", etc.
+
+            // Construct the relative file path. Assumes folder structure: Assets/Pieces/{Theme}/
+            string relativePath = $"/Assets/Pieces/{themeName}/{pieceName}{colorSuffix}.png";
+
+            return LoadImage(relativePath);
+        }
 
 
         public static ImageSource LoadImage(string relativeFilePath)
@@ -69,18 +142,18 @@ namespace Chess_UI.Services
 
         public static ImageSource GetImage(MainMenuButton button) => MainMenutImages[button];
 
-        public static ImageSource GetImage(BoardBackground background) => BoardBackgroundImages[background];
+        public static ImageSource GetImage(BoardTheme background) => BoardBackgroundImages[background];
 
-        // Images for the chess pieces used on the board! (later need to be modified when adding settings)
-        public static ImageSource GetPieceImage(PlayerColor player, PieceTypeInstance pieceTypeInstance)
-        {
-            return player switch
-            {
-                PlayerColor.White => CapturedWhitePiecesImages[pieceTypeInstance],
-                PlayerColor.Black => CapturedBlackPiecesImages[pieceTypeInstance],
-                _ => null
-            };
-        }
+        //// Images for the chess pieces used on the board! (later need to be modified when adding settings)
+        //public static ImageSource GetPieceImage(PlayerColor player, PieceTypeInstance pieceTypeInstance)
+        //{
+        //    return player switch
+        //    {
+        //        PlayerColor.White => CapturedWhitePiecesImages[pieceTypeInstance],
+        //        PlayerColor.Black => CapturedBlackPiecesImages[pieceTypeInstance],
+        //        _ => null
+        //    };
+        //}
 
         public static ImageSource GetCapturedPieceImage(PlayerColor player, PieceTypeInstance pieceTypeInstance)
         {

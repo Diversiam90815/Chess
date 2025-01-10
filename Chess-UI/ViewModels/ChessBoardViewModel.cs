@@ -185,7 +185,7 @@ namespace Chess_UI.ViewModels
                                 Logger.LogInfo("The move has been validated, so we start the execution now!");
 
                                 //Checking for a pawn promotion
-                                if (CurrentPossibleMove.Value.type == MoveTypeInstance.MoveType_PawnPromotion)
+                                if ((CurrentPossibleMove.Value.type & MoveTypeInstance.MoveType_PawnPromotion) == MoveTypeInstance.MoveType_PawnPromotion)
                                 {
                                     // Await user's promotion piece selection
                                     var promotionPiece = await RequestPawnPromotionAsync();
@@ -409,7 +409,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private ImageSource boardBackgroundImage = GetImage(BoardBackground.Wood);
+        private ImageSource boardBackgroundImage = GetImage(BoardTheme.Wood);
         public ImageSource BoardBackgroundImage
         {
             get => boardBackgroundImage;

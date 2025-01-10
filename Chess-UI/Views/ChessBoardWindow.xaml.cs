@@ -158,7 +158,7 @@ namespace Chess_UI.Views
 
                 var image = new Image
                 {
-                    Source = Images.GetPieceImage(currentPlayer, pieceType),
+                    Source = Images.GetPieceImage(Images.PieceTheme.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
                     Stretch = Stretch.Uniform
                 };
 
