@@ -35,6 +35,7 @@ namespace Chess_UI.ViewModels
 			BoardThemes = new ObservableCollection<BoardTheme>(ThemeLoader.LoadBoardThemes());
 			PieceThemes = new ObservableCollection<PieceTheme>(ThemeLoader.LoadPieceThemes());
 
+			
 		}
 
 

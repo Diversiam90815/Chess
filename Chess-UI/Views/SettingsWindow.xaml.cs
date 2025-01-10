@@ -35,6 +35,9 @@ namespace Chess_UI.Views
         {
             this.InitializeComponent();
 
+            this.RootGrid.DataContext = ViewModel;
+
+
             Init();
             SetWindowSize(430, 470);
         }

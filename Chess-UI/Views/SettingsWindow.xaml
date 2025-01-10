@@ -10,7 +10,7 @@
 	Title="Settings"
 	>
 
-    <Grid Name="Rootgrid" Background="#0B0B0D">
+    <Grid Name="RootGrid" Background="#0B0B0D">
         <Grid Name="ThemeSettings">
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="Spacing" Height="30"/>
