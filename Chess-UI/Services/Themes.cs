@@ -45,7 +45,7 @@ namespace Chess_UI.Services
 		private static readonly Dictionary<string, Images.PieceTheme> PieceThemeMapping = new()
 		{
 			{ "Basic",    Images.PieceTheme.Basic },
-			{ "Standart", Images.PieceTheme.Standart }
+			{ "Standard", Images.PieceTheme.Standard }
 		};
 
 

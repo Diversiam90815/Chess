@@ -34,7 +34,7 @@ namespace Chess_UI.Services
         public enum PieceTheme
         {
             Basic = 1,
-            Standart
+            Standard
         }
 
 
