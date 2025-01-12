@@ -37,12 +37,14 @@ namespace Chess_UI.ViewModels
 
         public ScoreViewModel ScoreViewModel { get; }
 
+        private readonly ThemeManager themeManager;
 
 
-        public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller)
+        public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller, ThemeManager themeManager)
         {
             this.DispatcherQueue = dispatcherQueue;
             this.Controller = controller;
+            this.themeManager = themeManager;
 
             ScoreViewModel = new(DispatcherQueue, controller);
 
@@ -53,6 +55,7 @@ namespace Chess_UI.ViewModels
             Controller.MoveHistoryUpdated += OnHandleMoveHistoryUpdated;
             Controller.PlayerCapturedPieceEvent += ScoreViewModel.OnPlayerCapturedPiece;
             Controller.PlayerScoreUpdated += ScoreViewModel.OnPlayerScoreUpdated;
+            this.themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
             ChessLogicAPI.StartGame();
 
@@ -60,7 +63,7 @@ namespace Chess_UI.ViewModels
 
             for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
             {
-                Board.Add(new(dispatcherQueue));
+                Board.Add(new(dispatcherQueue, themeManager));
             }
 
             for (int i = 0; i < MovesMaxColumns; i++)
@@ -96,7 +99,8 @@ namespace Chess_UI.ViewModels
                     y: rowUI,
                     (PieceTypeInstance)pieceVal,
                     (PlayerColor)colorVal,
-                    DispatcherQueue
+                    DispatcherQueue,
+                    themeManager
                 );
 
                 // Now compute where in Board[] it should go, so that rowUI=7 is stored first and rowUI=0 last row
@@ -135,6 +139,21 @@ namespace Chess_UI.ViewModels
             {
                 MoveHistoryColumns.Add(new ObservableCollection<string>());
             }
+        }
+
+
+        private void OnThemeManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ThemeManager.CurrentBoardTheme))
+            {
+                UpdateBoardTheme(this.themeManager.CurrentBoardTheme);
+            }
+        }
+
+
+        private void UpdateBoardTheme(Services.BoardTheme boardTheme)
+        {
+            CurrentBoardTheme = boardTheme.BoardThemeID;
         }
 
 
@@ -409,17 +428,14 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private ImageSource boardBackgroundImage = GetImage(Images.BoardTheme.Wood);
+        public Images.BoardTheme CurrentBoardTheme = Images.BoardTheme.Wood;
+
+
         public ImageSource BoardBackgroundImage
         {
-            get => boardBackgroundImage;
-            set
+            get
             {
-                if (boardBackgroundImage != value)
-                {
-                    boardBackgroundImage = value;
-                    OnPropertyChanged();
-                }
+                return Images.GetImage(CurrentBoardTheme);
             }
         }
 

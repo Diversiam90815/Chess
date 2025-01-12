@@ -20,15 +20,18 @@ namespace Chess_UI.ViewModels
 
         private ThemeLoader ThemeLoader;
 
+        private readonly ThemeManager themeManager;
+
         public ObservableCollection<BoardTheme> BoardThemes { get; }
 
         public ObservableCollection<PieceTheme> PieceThemes { get; }
 
 
-        public SettingsViewModel(DispatcherQueue dispatcherQueue)
+        public SettingsViewModel(DispatcherQueue dispatcherQueue, ThemeManager themeManager)
         {
             this.DispatcherQueue = dispatcherQueue;
             ThemeLoader = new();
+            this.themeManager = themeManager;
 
             BoardThemes = new ObservableCollection<BoardTheme>(ThemeLoader.LoadBoardThemes());
             PieceThemes = new ObservableCollection<PieceTheme>(ThemeLoader.LoadPieceThemes());
@@ -66,6 +69,10 @@ namespace Chess_UI.ViewModels
                     if (value != null)
                         Configuration.CurrentBoardTheme = value.Name;
                     OnPropertyChanged();
+
+                    // Update ThemeManager’s board theme
+                    // This triggers property change events in the manager
+                    themeManager.CurrentBoardTheme = value;
                 }
             }
         }
@@ -83,6 +90,9 @@ namespace Chess_UI.ViewModels
                     if (value != null)
                         Configuration.CurrentPieceTheme = value.Name;
                     OnPropertyChanged();
+
+                    // Update ThemeManager’s piece theme
+                    themeManager.CurrentPieceTheme = value;
                 }
             }
         }

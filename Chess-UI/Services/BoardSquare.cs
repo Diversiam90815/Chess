@@ -11,35 +11,54 @@ using Windows.System;
 using static Chess_UI.Services.ChessLogicAPI;
 
 namespace Chess_UI.Services
-
-
 {
     public class BoardSquare : INotifyPropertyChanged
     {
-        public BoardSquare(Microsoft.UI.Dispatching.DispatcherQueue dispatcher)
+        private readonly Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public Images.PieceTheme PieceTheme = Images.PieceTheme.Basic;
+
+        private readonly ThemeManager ThemeManager;
+
+
+        public BoardSquare(Microsoft.UI.Dispatching.DispatcherQueue dispatcher, ThemeManager themeManager)
         {
             this.pos = new PositionInstance(0, 0);
             this.piece = PieceTypeInstance.DefaultType;
             this.colour = PlayerColor.NoColor;
 
             this.DispatcherQueue = dispatcher;
+            this.ThemeManager = themeManager;
+            this.ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
         }
 
-        public BoardSquare(int x, int y, PieceTypeInstance pieceTypeInstance, PlayerColor color, Microsoft.UI.Dispatching.DispatcherQueue dispatcher)
+        public BoardSquare(int x, int y, PieceTypeInstance pieceTypeInstance, PlayerColor color, Microsoft.UI.Dispatching.DispatcherQueue dispatcher, ThemeManager themeManager)
         {
             this.pos = new PositionInstance(x, y);
             this.piece = pieceTypeInstance;
             this.colour = color;
 
             this.DispatcherQueue = dispatcher;
+            this.ThemeManager = themeManager;
+            this.ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
         }
 
-        private readonly Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnThemeManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ThemeManager.CurrentPieceTheme))
+            {
+                UpdatePieceTheme(ThemeManager.CurrentPieceTheme);
+            }
+        }
 
 
-        public Images.PieceTheme PieceTheme = Images.PieceTheme.Basic;
+        private void UpdatePieceTheme(PieceTheme pieceTheme) 
+        {
+            this.PieceTheme = pieceTheme.PieceThemeID;
+        }
 
 
         private PositionInstance _pos;

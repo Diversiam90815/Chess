@@ -15,7 +15,7 @@
 
         <Grid x:Name="BoardGrid" Height="600" Width="600" HorizontalAlignment="Left" Margin="30">
             <Grid.Background>
-                <ImageBrush ImageSource="{x:Bind ViewModel.BoardBackgroundImage, Mode=TwoWay}"/>
+                <ImageBrush ImageSource="{x:Bind ViewModel.BoardBackgroundImage, Mode=OneWay}"/>
             </Grid.Background>
 
             <ItemsRepeater x:Name="ChessBoardRepeater" Height="600" Width="600" ItemsSource="{x:Bind ViewModel.Board, Mode=TwoWay}">

@@ -23,13 +23,16 @@ namespace Chess_UI.Views
 
         private PieceTypeInstance? ViewModelSelectedPiece { get; set; }
 
+        private readonly ThemeManager themeManager;
 
-        public ChessBoardWindow(Controller controller)
+
+        public ChessBoardWindow(ChessBoardViewModel viewModel, Controller controller, ThemeManager themeManager)
         {
             this.InitializeComponent();
             DispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-            ViewModel = new ChessBoardViewModel(DispatcherQueue, controller);
+            this.ViewModel = viewModel;
+            this.themeManager = themeManager;
             this.RootPanel.DataContext = ViewModel;
 
             ViewModel.ShowGameStateDialogRequested += OnShowGameStateDialogRequested;

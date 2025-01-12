@@ -78,47 +78,6 @@ namespace Chess_UI.Services
         };
         
 
-        //public static readonly Dictionary<PieceTypeInstance, ImageSource> BasticPiecesWhite = new()
-        //{
-        //{PieceTypeInstance.Pawn, LoadImage("/Assets/Pieces/Basic/PawnW.png") },
-        //{PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Basic/BishopW.png") },
-        //{PieceTypeInstance.Queen, LoadImage("/Assets/Pieces/Basic/QueenW.png") },
-        //{PieceTypeInstance.Rook, LoadImage("/Assets/Pieces/Basic/RookW.png") },
-        //{PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Basic/KnightW.png") },
-        //{PieceTypeInstance.King, LoadImage("/Assets/Pieces/Basic/KingW.png") }
-        //};
-
-        //public static readonly Dictionary<PieceTypeInstance, ImageSource> BasicPiecesBlack = new()
-        //{
-        //{PieceTypeInstance.Pawn, LoadImage("/Assets/Pieces/Basic/PawnB.png") },
-        //{PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Basic/BishopB.png") },
-        //{PieceTypeInstance.Queen, LoadImage("/Assets/Pieces/Basic/QueenB.png") },
-        //{PieceTypeInstance.Rook, LoadImage("/Assets/Pieces/Basic/RookB.png") },
-        //{PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Basic/KnightB.png") },
-        //{PieceTypeInstance.King, LoadImage("/Assets/Pieces/Basic/KingB.png") }
-        //};
-
-        //public static readonly Dictionary<PieceTypeInstance, ImageSource> StandartWhitePieces = new()
-        //{
-        //{PieceTypeInstance.Pawn, LoadImage("/Assets/Pieces/Standard/PawnW.png") },
-        //{PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Standard/BishopW.png") },
-        //{PieceTypeInstance.Queen, LoadImage("/Assets/Pieces/Standard/QueenW.png") },
-        //{PieceTypeInstance.Rook, LoadImage("/Assets/Pieces/Standard/RookW.png") },
-        //{PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Standard/KnightW.png") },
-        //{PieceTypeInstance.King, LoadImage("/Assets/Pieces/Standard/KingW.png") }
-        //};
-
-        //public static readonly Dictionary<PieceTypeInstance, ImageSource> StandartBlackPieces = new()
-        //{
-        //{PieceTypeInstance.Pawn, LoadImage("/Assets/Pieces/Standard/PawnB.png") },
-        //{PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Standard/BishopB.png") },
-        //{PieceTypeInstance.Queen, LoadImage("/Assets/Pieces/Standard/QueenB.png") },
-        //{PieceTypeInstance.Rook, LoadImage("/Assets/Pieces/Standard/RookB.png") },
-        //{PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Standard/KnightB.png") },
-        //{PieceTypeInstance.King, LoadImage("/Assets/Pieces/Standard/KingB.png") }
-        //};
-
-
         // Dynamic piece image loading based on theme, color, and type
         public static ImageSource GetPieceImage(PieceTheme theme, PlayerColor color, PieceTypeInstance pieceType)
         {
@@ -144,16 +103,6 @@ namespace Chess_UI.Services
 
         public static ImageSource GetImage(BoardTheme background) => BoardBackgroundImages[background];
 
-        //// Images for the chess pieces used on the board! (later need to be modified when adding settings)
-        //public static ImageSource GetPieceImage(PlayerColor player, PieceTypeInstance pieceTypeInstance)
-        //{
-        //    return player switch
-        //    {
-        //        PlayerColor.White => CapturedWhitePiecesImages[pieceTypeInstance],
-        //        PlayerColor.Black => CapturedBlackPiecesImages[pieceTypeInstance],
-        //        _ => null
-        //    };
-        //}
 
         public static ImageSource GetCapturedPieceImage(PlayerColor player, PieceTypeInstance pieceTypeInstance)
         {
