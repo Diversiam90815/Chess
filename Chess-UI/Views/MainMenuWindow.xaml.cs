@@ -93,7 +93,7 @@ namespace Chess_UI
         {
             if (SettingsWindow == null)
             {
-                SettingsWindow = new SettingsWindow();
+                SettingsWindow = new SettingsWindow(SettingsViewModel);
                 SettingsWindow.Activate();
                 SettingsWindow.Closed += SettingsWindowClosed;
                 this.AppWindow.Hide();

@@ -18,17 +18,17 @@
                 <RowDefinition x:Name="LeftOverSpaceForFutureSettings" Height="220"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="1" Margin="16,16,16,16" Orientation="Vertical">
-                <TextBlock x:Name="Heading" Text="Themes" FontSize="24"/>
+            <StackPanel Grid.Row="1" Margin="25,16,16,16" Orientation="Vertical">
+                <TextBlock x:Name="Heading" Text="Themes" FontSize="24" FontFamily="Sergoe UI Variable"/>
 
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock x:Name="BoardThemeSetting" Text="Board" FontSize="20" HorizontalAlignment="Left"/>
-                    <ComboBox ItemsSource="{x:Bind ViewModel.BoardThemes}" SelectedItem="{x:Bind ViewModel.SelectedBoardTheme,Mode=TwoWay}" DisplayMemberPath="Name" Width="240" Height="40" HorizontalAlignment="Right"/>
+                <StackPanel Orientation="Horizontal" Margin="20,20,10,10">
+                    <TextBlock x:Name="BoardThemeSetting" Text="Board" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" FontFamily="Sergoe UI Variable"/>
+                    <ComboBox ItemsSource="{Binding BoardThemes}" SelectedItem="{x:Bind ViewModel.SelectedBoardTheme, Mode=TwoWay}" DisplayMemberPath="Name" Width="240" Height="40" HorizontalAlignment="Right"/>
                 </StackPanel>
                 
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock x:Name="PieceThemeSetting" Text="Pieces" FontSize="20" HorizontalAlignment="Left"/>
-                    <ComboBox ItemsSource="{x:Bind ViewModel.PieceThemes}" SelectedItem="{x:Bind ViewModel.SelectedPieceTheme,Mode=TwoWay}" DisplayMemberPath="Name" Width="240" Height="40" HorizontalAlignment="Right"/>
+                <StackPanel Orientation="Horizontal" Margin="20,10,10,20">
+                    <TextBlock x:Name="PieceThemeSetting" Text="Pieces" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" FontFamily="Sergoe UI Variable"/>
+                    <ComboBox ItemsSource="{Binding PieceThemes}" SelectedItem="{x:Bind ViewModel.SelectedPieceTheme, Mode=TwoWay}" DisplayMemberPath="Name" Width="240" Height="40" HorizontalAlignment="Right"/>
                 </StackPanel>
                 
             </StackPanel>

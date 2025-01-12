@@ -39,9 +39,9 @@ public:
 
 
 private:
-	std::string				 mCurrentBoardTheme = "";
+	std::string				 mCurrentBoardTheme = "Wood";
 
-	std::string				 mCurrentPieceTheme = "";
+	std::string				 mCurrentPieceTheme = "Basic";
 
 	bool					 mInitialized = false;
 };

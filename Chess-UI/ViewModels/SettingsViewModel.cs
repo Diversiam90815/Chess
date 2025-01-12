@@ -12,81 +12,88 @@ using System.Collections.ObjectModel;
 
 namespace Chess_UI.ViewModels
 {
-	public class SettingsViewModel : INotifyPropertyChanged
-	{
-		public event PropertyChangedEventHandler PropertyChanged;
+    public class SettingsViewModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
 
-		private readonly DispatcherQueue DispatcherQueue;
+        private readonly DispatcherQueue DispatcherQueue;
 
-		private Configuration Configuration;
+        private ThemeLoader ThemeLoader;
 
-		private ThemeLoader ThemeLoader;
+        public ObservableCollection<BoardTheme> BoardThemes { get; }
 
-		public ObservableCollection<BoardTheme> BoardThemes { get; private set; }
-
-		public ObservableCollection<PieceTheme> PieceThemes { get; private set; }
+        public ObservableCollection<PieceTheme> PieceThemes { get; }
 
 
-		public SettingsViewModel(DispatcherQueue dispatcherQueue)
-		{
-			this.DispatcherQueue = dispatcherQueue;
-			ThemeLoader = new();
+        public SettingsViewModel(DispatcherQueue dispatcherQueue)
+        {
+            this.DispatcherQueue = dispatcherQueue;
+            ThemeLoader = new();
 
-			BoardThemes = new ObservableCollection<BoardTheme>(ThemeLoader.LoadBoardThemes());
-			PieceThemes = new ObservableCollection<PieceTheme>(ThemeLoader.LoadPieceThemes());
+            BoardThemes = new ObservableCollection<BoardTheme>(ThemeLoader.LoadBoardThemes());
+            PieceThemes = new ObservableCollection<PieceTheme>(ThemeLoader.LoadPieceThemes());
 
-			
-		}
-
-
-		private BoardTheme GetCurrentSelectedBoardTheme()
-		{
-			string currentThemeName = Configuration.CurrentBoardTheme;
-			BoardTheme theme = BoardThemes.FirstOrDefault(b => string.Equals(b.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
-			return theme;
-		}
+            SelectedBoardTheme = GetCurrentSelectedBoardTheme();
+            SelectedPieceTheme = GetCurrentSelectedPieceTheme();
+        }
 
 
-		private BoardTheme selectedBoardTheme;
-		public BoardTheme SelectedBoardTheme
-		{
-			get => selectedBoardTheme;
-			set
-			{
-				if (selectedBoardTheme != value)
-				{
+        private BoardTheme GetCurrentSelectedBoardTheme()
+        {
+            string currentThemeName = Configuration.CurrentBoardTheme;
+            BoardTheme theme = BoardThemes.FirstOrDefault(b => string.Equals(b.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
+            return theme;
+        }
+
+
+        private PieceTheme GetCurrentSelectedPieceTheme()
+        {
+            string currentThemeName = Configuration.CurrentPieceTheme;
+            PieceTheme theme = PieceThemes.FirstOrDefault(p => string.Equals(p.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
+            return theme;
+        }
+
+
+        private BoardTheme selectedBoardTheme;
+        public BoardTheme SelectedBoardTheme
+        {
+            get => selectedBoardTheme;
+            set
+            {
+                if (selectedBoardTheme != value)
+                {
                     selectedBoardTheme = value;
-					if (value != null)
-						Configuration.CurrentBoardTheme = value.Name;
-					OnPropertyChanged();
-				}
-			}
-		}
+                    if (value != null)
+                        Configuration.CurrentBoardTheme = value.Name;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
 
-		private PieceTheme selectedPieceTheme;
-		public PieceTheme SelectedPieceTheme
-		{
-			get => selectedPieceTheme;
-			set
-			{
-				if (selectedPieceTheme != value)
-				{
+        private PieceTheme selectedPieceTheme;
+        public PieceTheme SelectedPieceTheme
+        {
+            get => selectedPieceTheme;
+            set
+            {
+                if (selectedPieceTheme != value)
+                {
                     selectedPieceTheme = value;
-					if (value != null)
-						Configuration.CurrentPieceTheme = value.Name;
-					OnPropertyChanged();
-				}
-			}
-		}
+                    if (value != null)
+                        Configuration.CurrentPieceTheme = value.Name;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
 
-		protected void OnPropertyChanged([CallerMemberName] string name = null)
-		{
-			DispatcherQueue.TryEnqueue(() =>
-			{
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-			});
-		}
-	}
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            });
+        }
+    }
 }

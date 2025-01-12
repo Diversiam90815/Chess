@@ -21,42 +21,44 @@ using Windows.Foundation.Collections;
 
 namespace Chess_UI.Views
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
-    public sealed partial class SettingsWindow : Window
-    {
-        private OverlappedPresenter Presenter;
+	/// <summary>
+	/// An empty window that can be used on its own or navigated to within a Frame.
+	/// </summary>
+	public sealed partial class SettingsWindow : Window
+	{
+		private OverlappedPresenter Presenter;
 
-        private SettingsViewModel ViewModel;
-
-
-        public SettingsWindow()
-        {
-            this.InitializeComponent();
-
-            this.RootGrid.DataContext = ViewModel;
+		private SettingsViewModel ViewModel;
 
 
-            Init();
-            SetWindowSize(430, 470);
-        }
+		public SettingsWindow(SettingsViewModel viewModel)
+		{
+			this.InitializeComponent();
+
+			this.ViewModel = viewModel;
+
+			this.RootGrid.DataContext = ViewModel;
 
 
-        private void SetWindowSize(double width, double height)
-        {
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            float scalingFactor = ChessLogicAPI.GetWindowScalingFactor(hwnd);
-            int scaledWidth = (int)(width * scalingFactor);
-            int scaledHeight = (int)(height * scalingFactor);
-            AppWindow.Resize(new(scaledWidth, scaledHeight));
-        }
+			Init();
+			SetWindowSize(430, 470);
+		}
 
 
-        private void Init()
-        {
-            Presenter = AppWindow.Presenter as OverlappedPresenter;
-            Presenter.IsResizable = false;
-        }
-    }
+		private void SetWindowSize(double width, double height)
+		{
+			var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+			float scalingFactor = ChessLogicAPI.GetWindowScalingFactor(hwnd);
+			int scaledWidth = (int)(width * scalingFactor);
+			int scaledHeight = (int)(height * scalingFactor);
+			AppWindow.Resize(new(scaledWidth, scaledHeight));
+		}
+
+
+		private void Init()
+		{
+			Presenter = AppWindow.Presenter as OverlappedPresenter;
+			Presenter.IsResizable = false;
+		}
+	}
 }
