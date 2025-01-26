@@ -93,7 +93,6 @@ namespace Chess_UI.ViewModels
                 int col = i % BOARD_SIZE;
                 int rowUI = 7 - rowFromTop;   // invert the row
 
-
                 var square = new BoardSquare(
                     x: col,
                     y: rowUI,
