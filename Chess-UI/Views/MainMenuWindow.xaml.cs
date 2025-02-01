@@ -74,7 +74,7 @@ namespace Chess_UI
 
         private void SettingsWindowClosed(object sender, WindowEventArgs args)
         {
-            SettingsWindow.Closed -= BoardWindowClosed;
+            SettingsWindow.Closed -= SettingsWindowClosed;
             SettingsWindow = null;
             this.Activate();
         }
