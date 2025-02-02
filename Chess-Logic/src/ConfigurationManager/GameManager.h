@@ -18,6 +18,7 @@
 #include "ChessLogicAPIDefines.h"
 
 #include "Logging.h"
+#include "UserSettings.h"
 
 
 class GameManager
@@ -65,6 +66,28 @@ public:
 	void					   setCurrentPlayer(PlayerColor player);
 	PlayerColor				   getCurrentPlayer() const;
 
+
+	void					   setBoardTheme(std::string theme)
+	{
+		mUserSettings.setCurrentBoardTheme(theme);
+	}
+
+	std::string getBoardTheme() const
+	{
+		return mUserSettings.getCurrentBoardTheme();
+	}
+
+	void setPieceTheme(std::string theme)
+	{
+		mUserSettings.setCurrentPieceTheme(theme);
+	}
+
+	std::string getPieceTheme() const
+	{
+		return mUserSettings.getCurrentPieceTheme();
+	}
+
+
 private:
 	GameManager();
 
@@ -88,6 +111,8 @@ private:
 	std::vector<PossibleMove>		 mAllMovesForPosition;
 
 	std::unique_ptr<MovementManager> mMovementManager;
+
+	UserSettings					 mUserSettings;
 
 	PFN_CALLBACK					 mDelegate = nullptr;
 };

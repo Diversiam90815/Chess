@@ -1,11 +1,11 @@
-﻿using Chess_UI.Configuration;
+﻿using Chess_UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using static Chess_UI.Configuration.Images;
-using static Chess_UI.Configuration.ChessLogicAPI;
+using static Chess_UI.Services.Images;
+using static Chess_UI.Services.ChessLogicAPI;
 using System.Collections.ObjectModel;
 using System;
 using Microsoft.UI.Composition.Interactions;
@@ -37,12 +37,14 @@ namespace Chess_UI.ViewModels
 
         public ScoreViewModel ScoreViewModel { get; }
 
+        private readonly ThemeManager themeManager;
 
 
-        public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller)
+        public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller, ThemeManager themeManager)
         {
             this.DispatcherQueue = dispatcherQueue;
             this.Controller = controller;
+            this.themeManager = themeManager;
 
             ScoreViewModel = new(DispatcherQueue, controller);
 
@@ -53,6 +55,9 @@ namespace Chess_UI.ViewModels
             Controller.MoveHistoryUpdated += OnHandleMoveHistoryUpdated;
             Controller.PlayerCapturedPieceEvent += ScoreViewModel.OnPlayerCapturedPiece;
             Controller.PlayerScoreUpdated += ScoreViewModel.OnPlayerScoreUpdated;
+            this.themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+
+            this.CurrentBoardTheme = themeManager.CurrentBoardTheme;
 
             ChessLogicAPI.StartGame();
 
@@ -60,7 +65,7 @@ namespace Chess_UI.ViewModels
 
             for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
             {
-                Board.Add(new(dispatcherQueue));
+                Board.Add(new(dispatcherQueue, themeManager));
             }
 
             for (int i = 0; i < MovesMaxColumns; i++)
@@ -90,13 +95,13 @@ namespace Chess_UI.ViewModels
                 int col = i % BOARD_SIZE;
                 int rowUI = 7 - rowFromTop;   // invert the row
 
-
                 var square = new BoardSquare(
                     x: col,
                     y: rowUI,
                     (PieceTypeInstance)pieceVal,
                     (PlayerColor)colorVal,
-                    DispatcherQueue
+                    DispatcherQueue,
+                    themeManager
                 );
 
                 // Now compute where in Board[] it should go, so that rowUI=7 is stored first and rowUI=0 last row
@@ -110,6 +115,14 @@ namespace Chess_UI.ViewModels
         {
             ChessLogicAPI.ResetGame();
             ClearMoveHistory();
+
+            Board.Clear();
+            for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
+            {
+                Board.Add(new BoardSquare(DispatcherQueue, themeManager));
+            }
+
+            StartGame();
         }
 
 
@@ -135,6 +148,21 @@ namespace Chess_UI.ViewModels
             {
                 MoveHistoryColumns.Add(new ObservableCollection<string>());
             }
+        }
+
+
+        private void OnThemeManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ThemeManager.CurrentBoardTheme))
+            {
+                UpdateBoardTheme(this.themeManager.CurrentBoardTheme);
+            }
+        }
+
+
+        private void UpdateBoardTheme(Images.BoardTheme boardTheme)
+        {
+            CurrentBoardTheme = boardTheme;
         }
 
 
@@ -185,7 +213,7 @@ namespace Chess_UI.ViewModels
                                 Logger.LogInfo("The move has been validated, so we start the execution now!");
 
                                 //Checking for a pawn promotion
-                                if (CurrentPossibleMove.Value.type == MoveTypeInstance.MoveType_PawnPromotion)
+                                if ((CurrentPossibleMove.Value.type & MoveTypeInstance.MoveType_PawnPromotion) == MoveTypeInstance.MoveType_PawnPromotion)
                                 {
                                     // Await user's promotion piece selection
                                     var promotionPiece = await RequestPawnPromotionAsync();
@@ -409,17 +437,14 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private ImageSource boardBackgroundImage = GetImage(BoardBackground.Wood);
+        public Images.BoardTheme CurrentBoardTheme;
+
+
         public ImageSource BoardBackgroundImage
         {
-            get => boardBackgroundImage;
-            set
+            get
             {
-                if (boardBackgroundImage != value)
-                {
-                    boardBackgroundImage = value;
-                    OnPropertyChanged();
-                }
+                return Images.GetImage(CurrentBoardTheme);
             }
         }
 

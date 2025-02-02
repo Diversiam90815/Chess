@@ -62,6 +62,15 @@ extern "C"
 
 	CHESS_API void LogWarningWithCaller(const char* message, const char* method, const char* className, const int lineNumber);
 
+	
+	CHESS_API void	SetCurrentBoardTheme(const char* theme);
+
+	CHESS_API char *GetCurrentBoardTheme();
+
+	CHESS_API void	SetCurrentPieceTheme(const char* theme);
+
+	CHESS_API char *GetCurrentPieceTheme();
+
 
 #ifdef __cplusplus
 }

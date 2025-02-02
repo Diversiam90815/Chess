@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 
-namespace Chess_UI.Configuration
+namespace Chess_UI.Services
 {
     public class ChessLogicAPI
     {
@@ -101,6 +101,25 @@ namespace Chess_UI.Configuration
 
         #endregion
 
+
+        #region User Config
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetCurrentBoardTheme", CharSet = CharSet.Unicode)]
+        public static extern void SetCurrentBoardTheme([In()][MarshalAs(UnmanagedType.LPStr)] string theme);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetCurrentBoardTheme", CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string GetCurrentBoardTheme();
+        
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetCurrentPieceTheme", CharSet = CharSet.Unicode)]
+        public static extern void SetCurrentPieceTheme([In()][MarshalAs(UnmanagedType.LPStr)] string theme);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetCurrentPieceTheme", CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string GetCurrentPieceTheme();
+
+
+        #endregion
 
         #endregion
 

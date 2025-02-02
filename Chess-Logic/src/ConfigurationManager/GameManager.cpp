@@ -41,6 +41,7 @@ void GameManager::ReleaseInstance()
 void GameManager::init()
 {
 	mLog.initLogging();
+	mUserSettings.init();
 
 	mMovementManager = std::make_unique<MovementManager>();
 
@@ -53,8 +54,6 @@ void GameManager::init()
 
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
-
-	//clearState();
 }
 
 
@@ -366,6 +365,7 @@ PlayerColor GameManager::getCurrentPlayer() const
 {
 	return mCurrentPlayer;
 }
+
 
 
 void GameManager::checkForEndGameConditions()

@@ -2,3 +2,7 @@
 	path = Chess-Logic/submodules/Logger
 	url = git@github.com:Diversiam90815/Logger.git
 	branch = main
+[submodule "Chess-Logic/submodules/json"]
+	path = Chess-Logic/submodules/json
+	url = git@github.com:nlohmann/json.git
+	branch = master

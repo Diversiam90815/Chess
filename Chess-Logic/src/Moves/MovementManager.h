@@ -76,7 +76,7 @@ private:
 	bool													canEnPassant(const Position &position, PlayerColor player);
 
 
-	bool													executePawnPromotion(const PossibleMove &move);
+	bool													executePawnPromotion(const PossibleMove &move, PlayerColor player);
 
 
 	const Move											   *getLastMove();

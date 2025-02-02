@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.0.0.184)
+set(CHESS_VERSION 1.0.0.223)
 
 project(Chess-Logic VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
@@ -36,6 +36,7 @@ set (API_DIR             ${SOURCE_DIR}/API)
 set (MISC_DIR            ${SOURCE_DIR}/Miscellaneous)
 set (LOGGER_DIR          ${SOURCE_DIR}/Logger)
 set (FILEMANAGER_DIR     ${SOURCE_DIR}/FileManager)
+set (USERSETTINGS_DIR     ${SOURCE_DIR}/UserSettings)
 
 
 ###########################################
@@ -53,6 +54,7 @@ set(ALL_PROJECT_DIRS
             ${LOGGER_DIR}
             ${FILEMANAGER_DIR}
             ${SOURCE_DIR}
+            ${USERSETTINGS_DIR}
 )
 
 include_directories(${ALL_PROJECT_DIRS})
@@ -110,6 +112,11 @@ set(FILEMANAGER_FILES
     ${FILEMANAGER_DIR}/FileManager.h    ${FILEMANAGER_DIR}/FileManager.cpp
 )
 
+set(USERSETTINGS_DIR
+    ${USERSETTINGS_DIR}/UserSettings.h    ${USERSETTINGS_DIR}/UserSettings.cpp
+)
+
+
 set(ALL_FILES
     ${API_FILES}
     ${PIECE_FILES}
@@ -120,6 +127,7 @@ set(ALL_FILES
     ${MISC_FILES}
     ${LOGGER_FILES}
     ${FILEMANAGER_FILES}
+    ${USERSETTINGS_DIR}
 )
 
 
@@ -136,6 +144,7 @@ source_group("Player"           FILES ${PLAYER_FILES})
 source_group("Miscellaneous"    FILES ${MISC_FILES})
 source_group("Logging"          FILES ${LOGGER_FILES})
 source_group("FileManager"      FILES ${FILEMANAGER_FILES})
+source_group("UserSettings"     FILES ${USERSETTINGS_DIR})
 
 
 ###########################################
@@ -144,7 +153,15 @@ source_group("FileManager"      FILES ${FILEMANAGER_FILES})
 
 # Logger
 
-add_subdirectory(submodules/Logger)
+add_subdirectory(${SUBMODULES_DIR}/Logger)
+set(LOGGER_INCLUDE_FILE   ${SUBMODULES_DIR}/Logger/include)
+
+
+# NLOHMANN JSON
+
+set(JSON_DIR submodules/json/)
+set(JSON_SINGLE_FILE ${JSON_DIR}/single_include/nlohmann)
+add_subdirectory(${SUBMODULES_DIR}/json)
 
 
 ###########################################
@@ -201,7 +218,9 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME} PUBLIC
         ${PROJECT_BINARY_DIR}
         ${ALL_PROJECT_DIRS}
-        ${SUBMODULES_DIR}/Logger/include
+        ${LOGGER_INCLUDE_FILE}
+        ${JSON_SINGLE_FILE}
+
 )
 
 

@@ -8,33 +8,63 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.System;
-using static Chess_UI.Configuration.ChessLogicAPI;
+using static Chess_UI.Services.ChessLogicAPI;
 
-namespace Chess_UI.Configuration
+namespace Chess_UI.Services
 {
     public class BoardSquare : INotifyPropertyChanged
     {
-        public BoardSquare(Microsoft.UI.Dispatching.DispatcherQueue dispatcher)
+        private readonly Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public Images.PieceTheme PieceTheme { get; private set; }
+
+        private readonly ThemeManager ThemeManager;
+
+
+        public BoardSquare(Microsoft.UI.Dispatching.DispatcherQueue dispatcher, ThemeManager themeManager)
         {
             this.pos = new PositionInstance(0, 0);
             this.piece = PieceTypeInstance.DefaultType;
             this.colour = PlayerColor.NoColor;
 
             this.DispatcherQueue = dispatcher;
+            this.ThemeManager = themeManager;
+            this.ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+
+            this.PieceTheme = themeManager.CurrentPieceTheme;
+
         }
 
-        public BoardSquare(int x, int y, PieceTypeInstance pieceTypeInstance, PlayerColor color, Microsoft.UI.Dispatching.DispatcherQueue dispatcher)
+        public BoardSquare(int x, int y, PieceTypeInstance pieceTypeInstance, PlayerColor color, Microsoft.UI.Dispatching.DispatcherQueue dispatcher, ThemeManager themeManager)
         {
             this.pos = new PositionInstance(x, y);
             this.piece = pieceTypeInstance;
             this.colour = color;
 
             this.DispatcherQueue = dispatcher;
+            this.ThemeManager = themeManager;
+            this.ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+
+            this.PieceTheme = themeManager.CurrentPieceTheme;
         }
 
-        private readonly Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnThemeManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ThemeManager.CurrentPieceTheme))
+            {
+                UpdatePieceTheme(ThemeManager.CurrentPieceTheme);
+            }
+        }
+
+
+        private void UpdatePieceTheme(Images.PieceTheme pieceTheme)
+        {
+            this.PieceTheme = pieceTheme;
+        }
+
 
         private PositionInstance _pos;
         public PositionInstance pos
@@ -100,7 +130,7 @@ namespace Chess_UI.Configuration
                 // Return a special color if IsHighlighted, otherwise transparent
                 return IsHighlighted
                     ? new SolidColorBrush(Windows.UI.Color.FromArgb(128, 173, 216, 230)) // a light blue-ish
-                    : new SolidColorBrush(Windows.UI.Color.FromArgb(0,0,0,0));
+                    : new SolidColorBrush(Windows.UI.Color.FromArgb(0, 0, 0, 0));
             }
         }
 
@@ -111,7 +141,7 @@ namespace Chess_UI.Configuration
                 if (piece == PieceTypeInstance.DefaultType || colour == PlayerColor.NoColor)
                     return null;
 
-                return Images.GetPieceImage(colour, piece);
+                return Images.GetPieceImage(PieceTheme, colour, piece);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using Chess_UI.Configuration;
+﻿using Chess_UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -43,11 +43,11 @@ namespace Chess_UI
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            MainMenu = new MainMenuWindow();
-
             ChessLogicAPI.SetUnvirtualizedAppDataPath(Project.AppDataDirectory);
 
             ChessLogicAPI.Init();
+
+            MainMenu = new MainMenuWindow();
 
             MainMenu.Closed += (sender, args) =>
             {

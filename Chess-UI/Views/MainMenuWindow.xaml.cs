@@ -1,4 +1,4 @@
-using Chess_UI.Configuration;
+using Chess_UI.Services;
 using Chess_UI.ViewModels;
 using Chess_UI.Views;
 using Microsoft.UI.Dispatching;
@@ -19,6 +19,14 @@ namespace Chess_UI
 
         public MainMenuViewModel ViewModel { get; private set; }
 
+        public SettingsViewModel SettingsViewModel { get; private set; }
+
+        public ChessBoardViewModel ChessBoardViewModel { get; private set; }
+
+        public SettingsWindow SettingsWindow;
+
+        private readonly ThemeManager themeManager;
+
 
         public MainMenuWindow()
         {
@@ -26,7 +34,11 @@ namespace Chess_UI
 
             DispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
+            themeManager = new ThemeManager();
+
             ViewModel = new MainMenuViewModel(DispatcherQueue);
+            SettingsViewModel = new SettingsViewModel(DispatcherQueue, themeManager);
+            ChessBoardViewModel = new ChessBoardViewModel(DispatcherQueue, this.ViewModel.Controller, themeManager);
 
             this.RootGrid.DataContext = ViewModel;
 
@@ -60,11 +72,20 @@ namespace Chess_UI
         }
 
 
+        private void SettingsWindowClosed(object sender, WindowEventArgs args)
+        {
+            SettingsWindow.Closed -= SettingsWindowClosed;
+            SettingsWindow = null;
+            this.Activate();
+        }
+
+
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
             if (ChessBoardWindow == null)
             {
-                ChessBoardWindow = new ChessBoardWindow(this.ViewModel.Controller);
+                ChessBoardViewModel.ResetGame();
+                ChessBoardWindow = new ChessBoardWindow(ChessBoardViewModel, this.ViewModel.Controller, themeManager);
                 ChessBoardWindow.Activate();
                 ChessBoardWindow.Closed += BoardWindowClosed;
                 this.AppWindow.Hide();
@@ -78,7 +99,17 @@ namespace Chess_UI
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            //Not yet implemented
+            if (SettingsWindow == null)
+            {
+                SettingsWindow = new SettingsWindow(SettingsViewModel);
+                SettingsWindow.Activate();
+                SettingsWindow.Closed += SettingsWindowClosed;
+                this.AppWindow.Hide();
+            }
+            else
+            {
+                SettingsWindow.Activate();
+            }
         }
 
 

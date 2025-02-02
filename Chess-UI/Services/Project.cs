@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Storage;
+﻿using Windows.Storage;
 
-namespace Chess_UI.Configuration
+namespace Chess_UI.Services
 {
     internal static class Project
     {
@@ -16,5 +11,6 @@ namespace Chess_UI.Configuration
         public static readonly string AppDataDirectory = ApplicationData.Current.LocalFolder.Path;  // %LOCALAPPDATA%\Packages\Chess-Game_wt5qqggg8cjge\LocalState
 
         #endregion
+        
     }
 }

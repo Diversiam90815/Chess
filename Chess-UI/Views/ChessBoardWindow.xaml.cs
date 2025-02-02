@@ -1,11 +1,11 @@
-using Chess_UI.Configuration;
+using Chess_UI.Services;
 using Chess_UI.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using static Chess_UI.Configuration.ChessLogicAPI;
+using static Chess_UI.Services.ChessLogicAPI;
 using System.Threading.Tasks;
 using System;
 using Microsoft.UI.Xaml.Media;
@@ -23,13 +23,16 @@ namespace Chess_UI.Views
 
         private PieceTypeInstance? ViewModelSelectedPiece { get; set; }
 
+        private readonly ThemeManager themeManager;
 
-        public ChessBoardWindow(Controller controller)
+
+        public ChessBoardWindow(ChessBoardViewModel viewModel, Controller controller, ThemeManager themeManager)
         {
             this.InitializeComponent();
             DispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-            ViewModel = new ChessBoardViewModel(DispatcherQueue, controller);
+            this.ViewModel = viewModel;
+            this.themeManager = themeManager;
             this.RootPanel.DataContext = ViewModel;
 
             ViewModel.ShowGameStateDialogRequested += OnShowGameStateDialogRequested;
@@ -158,7 +161,7 @@ namespace Chess_UI.Views
 
                 var image = new Image
                 {
-                    Source = Images.GetPieceImage(currentPlayer, pieceType),
+                    Source = Images.GetPieceImage(Images.PieceTheme.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
                     Stretch = Stretch.Uniform
                 };
 

@@ -176,7 +176,7 @@ Move MovementManager::executeMove(PossibleMove &possibleMove)
 	}
 	if ((possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
 	{
-		executePawnPromotion(possibleMove);
+		executePawnPromotion(possibleMove, executedMove.player);
 		executedMove.promotionType = possibleMove.promotionPiece;
 	}
 
@@ -326,7 +326,9 @@ bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor player
 
 	if (capturingPiece)
 	{
-		LOG_DEBUG("After placing, occupant of endSquare = {}", LoggingHelper::pieceTypeToString(capturingPiece->getType()).c_str());
+		auto type = capturingPiece->getType();
+		boardCopy.removePiece(move.endingPosition);
+		LOG_DEBUG("After placing, occupant of endSquare = {}", LoggingHelper::pieceTypeToString(type).c_str());
 	}
 
 	// Simulate the move
@@ -577,7 +579,7 @@ bool MovementManager::canEnPassant(const Position &position, PlayerColor player)
 }
 
 
-bool MovementManager::executePawnPromotion(const PossibleMove &move)
+bool MovementManager::executePawnPromotion(const PossibleMove &move, PlayerColor player)
 {
 	if ((move.type & MoveType::PawnPromotion) != MoveType::PawnPromotion)
 		return false;
@@ -590,9 +592,9 @@ bool MovementManager::executePawnPromotion(const PossibleMove &move)
 		return false;
 	}
 
-	// Get Pawn position and remove it
-	auto	   &pawn   = mChessBoard->getPiece(move.start);
-	PlayerColor player = pawn->getColor();
+	//// Get Pawn position and remove it
+	//auto	   &pawn   = mChessBoard->getPiece(move.start);
+	//PlayerColor player = pawn->getColor();
 
 	mChessBoard->removePiece(move.start);
 
