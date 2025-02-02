@@ -66,13 +66,15 @@ namespace Chess_UI.ViewModels
                 if (selectedBoardTheme != value)
                 {
                     selectedBoardTheme = value;
+
                     if (value != null)
                         Configuration.CurrentBoardTheme = value.Name;
+
                     OnPropertyChanged();
 
                     // Update ThemeManager’s board theme
                     // This triggers property change events in the manager
-                    themeManager.CurrentBoardTheme = value;
+                    themeManager.CurrentBoardTheme = value.BoardThemeID;
                 }
             }
         }
@@ -92,7 +94,7 @@ namespace Chess_UI.ViewModels
                     OnPropertyChanged();
 
                     // Update ThemeManager’s piece theme
-                    themeManager.CurrentPieceTheme = value;
+                    themeManager.CurrentPieceTheme = value.PieceThemeID;
                 }
             }
         }

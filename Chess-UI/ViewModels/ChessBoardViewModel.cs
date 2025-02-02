@@ -57,6 +57,8 @@ namespace Chess_UI.ViewModels
             Controller.PlayerScoreUpdated += ScoreViewModel.OnPlayerScoreUpdated;
             this.themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
+            this.CurrentBoardTheme = themeManager.CurrentBoardTheme;
+
             ChessLogicAPI.StartGame();
 
             Board = new ObservableCollection<BoardSquare>();
@@ -158,9 +160,9 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private void UpdateBoardTheme(Services.BoardTheme boardTheme)
+        private void UpdateBoardTheme(Images.BoardTheme boardTheme)
         {
-            CurrentBoardTheme = boardTheme.BoardThemeID;
+            CurrentBoardTheme = boardTheme;
         }
 
 
@@ -435,7 +437,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        public Images.BoardTheme CurrentBoardTheme = Images.BoardTheme.Wood;
+        public Images.BoardTheme CurrentBoardTheme;
 
 
         public ImageSource BoardBackgroundImage

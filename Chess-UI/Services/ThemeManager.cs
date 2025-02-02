@@ -15,11 +15,26 @@ namespace Chess_UI.Services
 
         public ThemeManager()
         {
+            string configPieceTheme = Configuration.CurrentPieceTheme;
+            string configBoardTheme = Configuration.CurrentBoardTheme;
+
+            // Try to parse the config themes to enum values
+            if (!Enum.TryParse<Images.PieceTheme>(configPieceTheme, out var parsedPieceTheme))
+            {
+                parsedPieceTheme = Images.PieceTheme.Standard;
+            }
+            CurrentPieceTheme = parsedPieceTheme;
+
+            if (!Enum.TryParse<Images.BoardTheme>(configBoardTheme, out var parsedBoardTheme))
+            {
+                parsedBoardTheme = Images.BoardTheme.Wood;
+            }
+            CurrentBoardTheme = parsedBoardTheme;
         }
 
 
-        private BoardTheme currentBoardTheme;
-        public BoardTheme CurrentBoardTheme
+        private Images.BoardTheme currentBoardTheme;
+        public Images.BoardTheme CurrentBoardTheme
         {
             get => currentBoardTheme;
             set
@@ -33,8 +48,8 @@ namespace Chess_UI.Services
         }
 
 
-        private PieceTheme currentPieceTheme;
-        public PieceTheme CurrentPieceTheme
+        private Images.PieceTheme currentPieceTheme;
+        public Images.PieceTheme CurrentPieceTheme
         {
             get => currentPieceTheme;
             set

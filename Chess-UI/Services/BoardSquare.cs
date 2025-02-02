@@ -18,7 +18,7 @@ namespace Chess_UI.Services
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Images.PieceTheme PieceTheme = Images.PieceTheme.Basic;
+        public Images.PieceTheme PieceTheme { get; private set; }
 
         private readonly ThemeManager ThemeManager;
 
@@ -32,6 +32,9 @@ namespace Chess_UI.Services
             this.DispatcherQueue = dispatcher;
             this.ThemeManager = themeManager;
             this.ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+
+            this.PieceTheme = themeManager.CurrentPieceTheme;
+
         }
 
         public BoardSquare(int x, int y, PieceTypeInstance pieceTypeInstance, PlayerColor color, Microsoft.UI.Dispatching.DispatcherQueue dispatcher, ThemeManager themeManager)
@@ -43,6 +46,8 @@ namespace Chess_UI.Services
             this.DispatcherQueue = dispatcher;
             this.ThemeManager = themeManager;
             this.ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+
+            this.PieceTheme = themeManager.CurrentPieceTheme;
         }
 
 
@@ -55,9 +60,9 @@ namespace Chess_UI.Services
         }
 
 
-        private void UpdatePieceTheme(PieceTheme pieceTheme) 
+        private void UpdatePieceTheme(Images.PieceTheme pieceTheme)
         {
-            this.PieceTheme = pieceTheme.PieceThemeID;
+            this.PieceTheme = pieceTheme;
         }
 
 
