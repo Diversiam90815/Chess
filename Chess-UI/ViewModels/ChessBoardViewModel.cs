@@ -113,6 +113,14 @@ namespace Chess_UI.ViewModels
         {
             ChessLogicAPI.ResetGame();
             ClearMoveHistory();
+
+            Board.Clear();
+            for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
+            {
+                Board.Add(new BoardSquare(DispatcherQueue, themeManager));
+            }
+
+            StartGame();
         }
 
 
