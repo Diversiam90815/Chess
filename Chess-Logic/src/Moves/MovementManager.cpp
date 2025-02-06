@@ -14,9 +14,7 @@
 #include <strsafe.h>
 
 
-MovementManager::MovementManager()
-{
-}
+MovementManager::MovementManager() {}
 
 
 void MovementManager::init()
@@ -54,8 +52,11 @@ std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &positio
 
 	if (piece->getType() == PieceType::Pawn)
 	{
-		auto enPasssantMove = generateEnPassantMove(position, player);
-		possibleMoves.push_back(enPasssantMove);
+		if (canEnPassant(position, player))
+		{
+			auto enPasssantMove = generateEnPassantMove(position, player);
+			possibleMoves.push_back(enPasssantMove);
+		}
 	}
 
 	LOG_INFO("Position {} has {} possible moves!", LoggingHelper::positionToString(position).c_str(), possibleMoves.size());
@@ -593,8 +594,8 @@ bool MovementManager::executePawnPromotion(const PossibleMove &move, PlayerColor
 	}
 
 	//// Get Pawn position and remove it
-	//auto	   &pawn   = mChessBoard->getPiece(move.start);
-	//PlayerColor player = pawn->getColor();
+	// auto	   &pawn   = mChessBoard->getPiece(move.start);
+	// PlayerColor player = pawn->getColor();
 
 	mChessBoard->removePiece(move.start);
 
