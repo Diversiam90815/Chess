@@ -24,10 +24,7 @@ struct Position
 	int	 x = 0;
 	int	 y = 0;
 
-	bool operator==(const Position &other) const
-	{
-		return x == other.x && y == other.y;
-	}
+	bool operator==(const Position &other) const { return x == other.x && y == other.y; }
 };
 
 // Hash method so we can use it in unordered_map
@@ -54,10 +51,7 @@ struct PossibleMove
 	MoveType  type			 = MoveType::Normal;
 	PieceType promotionPiece = PieceType::DefaultType;
 
-	bool	  operator==(const PossibleMove &other) const
-	{
-		return this->start == other.start && this->end == other.end;
-	}
+	bool	  operator==(const PossibleMove &other) const { return this->start == other.start && this->end == other.end; }
 };
 
 
@@ -88,13 +82,7 @@ public:
 	int			halfMoveClock = 0; // Incrememted with every move that is not a capture or pawn move (detect draw if halfMoveClock is 100)
 
 
-	bool		operator<(const Move &other) const
-	{
-		return this->number < other.number;
-	}
+	bool		operator<(const Move &other) const { return this->number < other.number; }
 
-	bool operator==(const Move &other) const
-	{
-		return this->number == other.number;
-	}
+	bool		operator==(const Move &other) const { return this->number == other.number; }
 };

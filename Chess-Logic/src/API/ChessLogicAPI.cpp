@@ -135,8 +135,8 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleM
 
 	auto		 moves	 = manager->getPossibleMoveForPosition();
 
-	Position	 start{0, 0};
-	Position	 end{0, 0};
+	Position	 start{-1, -1};
+	Position	 end{-1, -1};
 	MoveType	 type	 = MoveType::None;
 
 	int			 counter = -1;
@@ -153,7 +153,7 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleM
 		}
 	}
 
-	if ((start != Position{0, 0}) && (end != Position{0, 0}) && (type != MoveType::None))
+	if ((start != Position{-1, -1}) && (end != Position{-1, -1}) && (type != MoveType::None))
 	{
 		PositionInstance startPos	= MapToPositionInstance(start);
 		PositionInstance endPos		= MapToPositionInstance(end);
