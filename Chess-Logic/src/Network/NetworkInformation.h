@@ -10,6 +10,59 @@
 
 #pragma once
 
+#include <Windows.h>
+#include <WinSock2.h>
+#include <iphlpapi.h>
+#include <iptypes.h>
+#include <WS2tcpip.h>
+
+#include <vector>
+
+#include "Logging.h"
+#include "Helper.h"
+
+
+struct NetworkAdapterInformation
+{
+	NetworkAdapterInformation(const std::string &description, const std::string &ipv4, const std::string &subnet, const int id)
+		: description(description), IPv4(ipv4), subnet(subnet), ID(id)
+	{
+	}
+
+	std::string description;
+	std::string IPv4;
+	std::string subnet;
+	int			ID = 0;
+};
+
+
 class NetworkInformation
 {
+public:
+	NetworkInformation();
+	~NetworkInformation();
+
+	bool init();
+
+	void deinit();
+
+	bool getNetworkInformationFromOS();
+
+	void processAdapter();
+
+	void saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID);
+
+
+private:
+	std::string							   sockaddrToString(SOCKADDR *sa) const;
+	std::string							   prefixLengthToSubnetMask(USHORT family, ULONG prefixLength) const;
+
+
+	PIP_ADAPTER_ADDRESSES				   mAdapterAddresses;
+
+	ULONG								   mOutBufLen;
+
+	std::vector<NetworkAdapterInformation> mNetworkAdapters;
+
+	NetworkAdapterInformation			   mCurrentNetworkAdapter;
 };
