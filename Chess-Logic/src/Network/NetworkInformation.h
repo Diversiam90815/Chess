@@ -52,6 +52,7 @@ struct NetworkAdapterInformation
 	std::string subnet{};
 	int			ID{0};
 	bool		eligible{false};
+	bool		selected{false};
 };
 
 
@@ -75,17 +76,19 @@ public:
 
 	NetworkAdapterInformation getCurrentNetworkAdapter() const;
 
+	void					  updateNetworkAdapter(NetworkAdapterInformation &adapter);
+
 
 private:
 	std::string							   sockaddrToString(SOCKADDR *sa) const;
 	std::string							   prefixLengthToSubnetMask(USHORT family, ULONG prefixLength) const;
 
 
-	PIP_ADAPTER_ADDRESSES				   mAdapterAddresses;
+	PIP_ADAPTER_ADDRESSES				   mAdapterAddresses = nullptr;
 
-	ULONG								   mOutBufLen;
+	ULONG								   mOutBufLen{0};
 
-	std::vector<NetworkAdapterInformation> mNetworkAdapters;
+	std::vector<NetworkAdapterInformation> mNetworkAdapters{};
 
-	NetworkAdapterInformation			   mCurrentNetworkAdapter;
+	NetworkAdapterInformation			   mCurrentNetworkAdapter{};
 };

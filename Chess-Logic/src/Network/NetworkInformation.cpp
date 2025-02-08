@@ -143,6 +143,19 @@ NetworkAdapterInformation NetworkInformation::getCurrentNetworkAdapter() const
 }
 
 
+void NetworkInformation::updateNetworkAdapter(NetworkAdapterInformation &adapter)
+{
+	for (auto &it : mNetworkAdapters)
+	{
+		if (it == adapter)
+		{
+			it = adapter;
+			break;
+		}
+	}
+}
+
+
 std::string NetworkInformation::sockaddrToString(SOCKADDR *sa) const
 {
 	char addressBuffer[INET6_ADDRSTRLEN] = {0};
