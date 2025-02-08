@@ -24,19 +24,20 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 #   PROJECT DIRECTORIES
 ###########################################
 
-set (SOURCE_DIR          ${PROJECT_SOURCE_DIR}/src)
-set (SUBMODULES_DIR      ${PROJECT_SOURCE_DIR}/submodules)
+set (SOURCE_DIR             ${PROJECT_SOURCE_DIR}/src)
+set (SUBMODULES_DIR         ${PROJECT_SOURCE_DIR}/submodules)
     
-set (PIECE_DIR           ${SOURCE_DIR}/Piece)
-set (MOVE_DIR            ${SOURCE_DIR}/Moves)
-set (CONFIG_DIR          ${SOURCE_DIR}/ConfigurationManager)
-set (BOARD_DIR           ${SOURCE_DIR}/Board)
-set (PLAYER_DIR          ${SOURCE_DIR}/Player)
-set (API_DIR             ${SOURCE_DIR}/API)
-set (MISC_DIR            ${SOURCE_DIR}/Miscellaneous)
-set (LOGGER_DIR          ${SOURCE_DIR}/Logger)
-set (FILEMANAGER_DIR     ${SOURCE_DIR}/FileManager)
-set (USERSETTINGS_DIR     ${SOURCE_DIR}/UserSettings)
+set (PIECE_DIR              ${SOURCE_DIR}/Piece)
+set (MOVE_DIR               ${SOURCE_DIR}/Moves)
+set (CONFIG_DIR             ${SOURCE_DIR}/ConfigurationManager)
+set (BOARD_DIR              ${SOURCE_DIR}/Board)
+set (PLAYER_DIR             ${SOURCE_DIR}/Player)
+set (API_DIR                ${SOURCE_DIR}/API)
+set (MISC_DIR               ${SOURCE_DIR}/Miscellaneous)
+set (LOGGER_DIR             ${SOURCE_DIR}/Logger)
+set (FILEMANAGER_DIR        ${SOURCE_DIR}/FileManager)
+set (USERSETTINGS_DIR       ${SOURCE_DIR}/UserSettings)
+set (NETWORK_DIR            ${SOURCE_DIR}/Network)
 
 
 ###########################################
@@ -55,6 +56,7 @@ set(ALL_PROJECT_DIRS
             ${FILEMANAGER_DIR}
             ${SOURCE_DIR}
             ${USERSETTINGS_DIR}
+            ${NETWORK_DIR}
 )
 
 include_directories(${ALL_PROJECT_DIRS})
@@ -112,8 +114,12 @@ set(FILEMANAGER_FILES
     ${FILEMANAGER_DIR}/FileManager.h    ${FILEMANAGER_DIR}/FileManager.cpp
 )
 
-set(USERSETTINGS_DIR
+set(USERSETTINGS_FILES
     ${USERSETTINGS_DIR}/UserSettings.h    ${USERSETTINGS_DIR}/UserSettings.cpp
+)
+
+set(NETWORK_FILES
+    ${NETWORK_DIR}/NetworkInformation.h    ${NETWORK_DIR}/NetworkInformation.cpp
 )
 
 
@@ -127,7 +133,8 @@ set(ALL_FILES
     ${MISC_FILES}
     ${LOGGER_FILES}
     ${FILEMANAGER_FILES}
-    ${USERSETTINGS_DIR}
+    ${USERSETTINGS_FILES}
+    ${NETWORK_FILES}
 )
 
 
@@ -144,7 +151,8 @@ source_group("Player"           FILES ${PLAYER_FILES})
 source_group("Miscellaneous"    FILES ${MISC_FILES})
 source_group("Logging"          FILES ${LOGGER_FILES})
 source_group("FileManager"      FILES ${FILEMANAGER_FILES})
-source_group("UserSettings"     FILES ${USERSETTINGS_DIR})
+source_group("UserSettings"     FILES ${USERSETTINGS_FILES})
+source_group("Network"          FILES ${NETWORK_FILES})
 
 
 ###########################################
@@ -156,6 +164,9 @@ source_group("UserSettings"     FILES ${USERSETTINGS_DIR})
 add_subdirectory(${SUBMODULES_DIR}/Logger)
 set(LOGGER_INCLUDE_FILE   ${SUBMODULES_DIR}/Logger/include)
 
+# Boost ASIO
+add_subdirectory(${SUBMODULES_DIR}/asio )
+set(ASIO_INCLUDE_FILES ${SUBMODULES_DIR}/asio/include)
 
 # NLOHMANN JSON
 
@@ -220,6 +231,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         ${ALL_PROJECT_DIRS}
         ${LOGGER_INCLUDE_FILE}
         ${JSON_SINGLE_FILE}
+        ${ASIO_INCLUDE_FILES}
 
 )
 
