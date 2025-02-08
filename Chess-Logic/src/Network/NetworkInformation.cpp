@@ -128,6 +128,21 @@ void NetworkInformation::saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const 
 }
 
 
+void NetworkInformation::setCurrentNetworkAdapter(const NetworkAdapterInformation &adapter)
+{
+	if (mCurrentNetworkAdapter != adapter)
+	{
+		mCurrentNetworkAdapter = adapter;
+	}
+}
+
+
+NetworkAdapterInformation NetworkInformation::getCurrentNetworkAdapter() const
+{
+	return mCurrentNetworkAdapter;
+}
+
+
 std::string NetworkInformation::sockaddrToString(SOCKADDR *sa) const
 {
 	char addressBuffer[INET6_ADDRSTRLEN] = {0};
