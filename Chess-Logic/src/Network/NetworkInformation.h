@@ -28,32 +28,8 @@
 
 #include "Logging.h"
 #include "Helper.h"
+#include "NetworkAdapter.h"
 
-
-struct NetworkAdapterInformation
-{
-	NetworkAdapterInformation() = default;
-
-	NetworkAdapterInformation(const std::string &description, const std::string &ipv4, const std::string &subnet, const int id)
-		: description(description), IPv4(ipv4), subnet(subnet), ID(id)
-	{
-		eligible = filterSubnet(subnet);
-	}
-
-
-	bool		filterSubnet(const std::string &subnet) { return subnet == "255.255.255.0"; }
-
-	bool		operator==(const NetworkAdapterInformation &other) const { return std::tie(description, subnet) == std::tie(other.description, other.subnet); }
-	bool		operator!=(const NetworkAdapterInformation &other) const { return !(*this == other); }
-
-
-	std::string description{};
-	std::string IPv4{};
-	std::string subnet{};
-	int			ID{0};
-	bool		eligible{false};
-	bool		selected{false};
-};
 
 
 class NetworkInformation
@@ -62,33 +38,33 @@ public:
 	NetworkInformation();
 	~NetworkInformation();
 
-	bool					  init();
+	bool		   init();
 
-	void					  deinit();
+	void		   deinit();
 
-	bool					  getNetworkInformationFromOS();
+	bool		   getNetworkInformationFromOS();
 
-	void					  processAdapter();
+	void		   processAdapter();
 
-	void					  saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID);
+	void		   saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID);
 
-	void					  setCurrentNetworkAdapter(const NetworkAdapterInformation &adapter);
+	void		   setCurrentNetworkAdapter(const NetworkAdapter &adapter);
 
-	NetworkAdapterInformation getCurrentNetworkAdapter() const;
+	NetworkAdapter getCurrentNetworkAdapter() const;
 
-	void					  updateNetworkAdapter(NetworkAdapterInformation &adapter);
+	void		   updateNetworkAdapter(NetworkAdapter &adapter);
 
 
 private:
-	std::string							   sockaddrToString(SOCKADDR *sa) const;
-	std::string							   prefixLengthToSubnetMask(USHORT family, ULONG prefixLength) const;
+	std::string					sockaddrToString(SOCKADDR *sa) const;
+	std::string					prefixLengthToSubnetMask(USHORT family, ULONG prefixLength) const;
 
 
-	PIP_ADAPTER_ADDRESSES				   mAdapterAddresses = nullptr;
+	PIP_ADAPTER_ADDRESSES		mAdapterAddresses = nullptr;
 
-	ULONG								   mOutBufLen{0};
+	ULONG						mOutBufLen{0};
 
-	std::vector<NetworkAdapterInformation> mNetworkAdapters{};
+	std::vector<NetworkAdapter> mNetworkAdapters{};
 
-	NetworkAdapterInformation			   mCurrentNetworkAdapter{};
+	NetworkAdapter				mCurrentNetworkAdapter{};
 };

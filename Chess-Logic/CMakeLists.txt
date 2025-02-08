@@ -120,7 +120,9 @@ set(USERSETTINGS_FILES
 )
 
 set(NETWORK_FILES
-    ${NETWORK_DIR}/NetworkInformation.h    ${NETWORK_DIR}/NetworkInformation.cpp
+    ${NETWORK_DIR}/NetworkAdapter.h
+    ${NETWORK_DIR}/NetworkManager.h         ${NETWORK_DIR}/NetworkManager.cpp
+    ${NETWORK_DIR}/NetworkInformation.h     ${NETWORK_DIR}/NetworkInformation.cpp
 )
 
 

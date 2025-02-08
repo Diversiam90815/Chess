@@ -20,6 +20,8 @@
 #include "Logging.h"
 #include "UserSettings.h"
 
+#include "NetworkManager.h"
+
 
 class GameManager
 {
@@ -67,25 +69,13 @@ public:
 	PlayerColor				   getCurrentPlayer() const;
 
 
-	void					   setBoardTheme(std::string theme)
-	{
-		mUserSettings.setCurrentBoardTheme(theme);
-	}
+	void					   setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
 
-	std::string getBoardTheme() const
-	{
-		return mUserSettings.getCurrentBoardTheme();
-	}
+	std::string				   getBoardTheme() const { return mUserSettings.getCurrentBoardTheme(); }
 
-	void setPieceTheme(std::string theme)
-	{
-		mUserSettings.setCurrentPieceTheme(theme);
-	}
+	void					   setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
 
-	std::string getPieceTheme() const
-	{
-		return mUserSettings.getCurrentPieceTheme();
-	}
+	std::string				   getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
 
 
 private:
@@ -113,6 +103,8 @@ private:
 	std::unique_ptr<MovementManager> mMovementManager;
 
 	UserSettings					 mUserSettings;
+
+	std::unique_ptr<NetworkManager>	 mNetwork;
 
 	PFN_CALLBACK					 mDelegate = nullptr;
 };

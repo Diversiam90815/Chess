@@ -118,7 +118,7 @@ void NetworkInformation::saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const 
 			std::string addressString	 = sockaddrToString(unicast->Address.lpSockaddr);
 			std::string subnetMaskString = prefixLengthToSubnetMask(unicast->Address.lpSockaddr->sa_family, unicast->OnLinkPrefixLength);
 
-			auto		adapter			 = NetworkAdapterInformation(description, addressString, subnetMaskString, ID);
+			auto		adapter			 = NetworkAdapter(description, addressString, subnetMaskString, ID);
 
 			mNetworkAdapters.push_back(adapter);
 		}
@@ -128,7 +128,7 @@ void NetworkInformation::saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const 
 }
 
 
-void NetworkInformation::setCurrentNetworkAdapter(const NetworkAdapterInformation &adapter)
+void NetworkInformation::setCurrentNetworkAdapter(const NetworkAdapter &adapter)
 {
 	if (mCurrentNetworkAdapter != adapter)
 	{
@@ -137,13 +137,13 @@ void NetworkInformation::setCurrentNetworkAdapter(const NetworkAdapterInformatio
 }
 
 
-NetworkAdapterInformation NetworkInformation::getCurrentNetworkAdapter() const
+NetworkAdapter NetworkInformation::getCurrentNetworkAdapter() const
 {
 	return mCurrentNetworkAdapter;
 }
 
 
-void NetworkInformation::updateNetworkAdapter(NetworkAdapterInformation &adapter)
+void NetworkInformation::updateNetworkAdapter(NetworkAdapter &adapter)
 {
 	for (auto &it : mNetworkAdapters)
 	{

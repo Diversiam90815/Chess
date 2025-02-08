@@ -54,6 +54,9 @@ void GameManager::init()
 
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
+
+	mNetwork = std::make_unique<NetworkManager>();
+	mNetwork->init();
 }
 
 
