@@ -103,6 +103,7 @@ set(PLAYER_FILES
 
 set(MISC_FILES
     ${MISC_DIR}/Parameters.h
+    ${MISC_DIR}/Helper.h
 )
 
 set(LOGGER_FILES
