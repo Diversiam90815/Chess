@@ -10,11 +10,19 @@
 
 #pragma once
 
-#include <Windows.h>
-#include <WinSock2.h>
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#include <windows.h>
+#include <winsock2.h>
 #include <iphlpapi.h>
+#include <ws2tcpip.h>
 #include <iptypes.h>
-#include <WS2tcpip.h>
+
+#pragma comment(lib, "Ws2_32.lib")
+#pragma comment(lib, "Iphlpapi.lib")
+
 
 #include <vector>
 
@@ -24,6 +32,8 @@
 
 struct NetworkAdapterInformation
 {
+	NetworkAdapterInformation() = default;
+
 	NetworkAdapterInformation(const std::string &description, const std::string &ipv4, const std::string &subnet, const int id)
 		: description(description), IPv4(ipv4), subnet(subnet), ID(id)
 	{
@@ -62,7 +72,7 @@ public:
 	void					  saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID);
 
 	void					  setCurrentNetworkAdapter(const NetworkAdapterInformation &adapter);
-	
+
 	NetworkAdapterInformation getCurrentNetworkAdapter() const;
 
 

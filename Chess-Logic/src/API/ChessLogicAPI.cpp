@@ -9,6 +9,7 @@
 */
 
 #include <strsafe.h>
+#include <combaseapi.h>
 
 #include "ChessLogicAPI.h"
 #include "GameManager.h"
