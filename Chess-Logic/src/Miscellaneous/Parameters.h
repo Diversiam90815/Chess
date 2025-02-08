@@ -97,3 +97,4 @@ constexpr auto SettingsFolder	= "Settings";
 
 constexpr auto BoardTheme		= "BoardTheme";
 constexpr auto PieceTheme		= "PieceTheme";
+constexpr auto SelectedAdapter	= "Selected_Adapter";

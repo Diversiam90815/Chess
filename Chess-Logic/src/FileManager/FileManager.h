@@ -16,7 +16,7 @@
 
 #include "Parameters.h"
 #include "Logging.h"
-
+#include "NetworkAdapter.h"
 
 namespace fs = std::filesystem;
 using json	 = nlohmann::json;
@@ -28,20 +28,23 @@ public:
 	~FileManager() = default;
 
 	// Singleton instance
-	static FileManager *GetInstance();
-	static void			ReleaseInstance();
+	static FileManager			 *GetInstance();
+	static void					  ReleaseInstance();
 
 	// Getter - Setter
-	fs::path			getAppDataPath();
-	void				setAppDataPath(std::string path);
+	fs::path					  getAppDataPath();
+	void						  setAppDataPath(std::string path);
 
 	// Path retrieval functions
-	fs::path			getLoggingPath();
-	fs::path			getSettingsPath();
-	fs::path			getUserSettingsPath();
+	fs::path					  getLoggingPath();
+	fs::path					  getSettingsPath();
+	fs::path					  getUserSettingsPath();
 
-	std::string			readSettingFromFile(const std::string &setting);
-	bool				writeSettingToFile(const std::string &setting, const std::string &value);
+	std::string					  readSettingFromFile(const std::string &setting);
+	bool						  writeSettingToFile(const std::string &setting, const std::string &value);
+
+	std::optional<NetworkAdapter> readSelectedNetworkAdapter();
+	bool						  setSelectedNetworkAdapter(const NetworkAdapter &adpater);
 
 private:
 	FileManager() = default;

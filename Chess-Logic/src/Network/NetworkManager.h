@@ -11,6 +11,7 @@
 #pragma once
 
 #include "NetworkInformation.h"
+#include "FileManager.h"
 
 
 class NetworkManager
@@ -23,6 +24,10 @@ public:
 
 
 private:
+	bool			   presetNetworkAdapter();
+
+	bool			   setNetworkAdapterFromConfig();
+
 
 	NetworkInformation mNetworkInfo;
 };

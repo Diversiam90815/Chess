@@ -13,6 +13,7 @@
 #include <set>
 #include <unordered_map>
 #include <mutex>
+#include <combaseapi.h>
 
 #include "ChessLogicAPIDefines.h"
 #include "ChessBoard.h"

@@ -54,6 +54,9 @@ public:
 
 	void		   updateNetworkAdapter(NetworkAdapter &adapter);
 
+	bool		   isAdapterCurrentlyAvailable(const NetworkAdapter &adapter);
+
+	NetworkAdapter getFirstEligibleAdapter() const;
 
 private:
 	std::string					sockaddrToString(SOCKADDR *sa) const;

@@ -11,6 +11,22 @@
 #include "FileManager.h"
 #include <iostream>
 
+void to_json(json &j, const NetworkAdapter &adapter)
+{
+	j = json{{"ID", adapter.ID},		 {"Description", adapter.description}, {"IPv4", adapter.IPv4},
+			 {"Subnet", adapter.subnet}, {"Eligible", adapter.eligible},	   {"Selected", adapter.selected}};
+}
+
+void from_json(const json &j, NetworkAdapter &adapter)
+{
+	j.at("ID").get_to(adapter.ID);
+	j.at("Description").get_to(adapter.description);
+	j.at("IPv4").get_to(adapter.IPv4);
+	j.at("Subnet").get_to(adapter.subnet);
+	j.at("Eligible").get_to(adapter.eligible);
+	j.at("Selected").get_to(adapter.selected);
+}
+
 
 FileManager *FileManager::GetInstance()
 {
@@ -141,6 +157,83 @@ bool FileManager::writeSettingToFile(const std::string &setting, const std::stri
 		return false;
 	}
 	return false;
+}
+
+
+std::optional<NetworkAdapter> FileManager::readSelectedNetworkAdapter()
+{
+	NetworkAdapter adapter{};
+	fs::path	   configPath = getSettingsPath() / UserSettingsFile;
+
+	if (fs::exists(configPath))
+	{
+		// Read the file in
+		std::ifstream jsonIN(configPath);
+		if (jsonIN)
+		{
+			nlohmann::json userConfig;
+			jsonIN >> userConfig;
+
+			// Set the adapter if available
+			if (userConfig.contains(SelectedAdapter))
+			{
+				adapter = userConfig[SelectedAdapter].get<NetworkAdapter>();
+				return adapter;
+			}
+		}
+		else
+		{
+			LOG_WARNING("Failed to open the config file!");
+		}
+	}
+	else
+	{
+		LOG_WARNING("Config file does not exist!");
+	}
+	return std::nullopt;
+}
+
+
+bool FileManager::setSelectedNetworkAdapter(const NetworkAdapter &adapter)
+{
+	try
+	{
+		fs::path configPath = getSettingsPath() / UserSettingsFile;
+		json	 config;
+
+		// Read the file in
+		if (fs::exists(configPath))
+		{
+			std::ifstream jsonIN(configPath);
+			if (jsonIN)
+			{
+				jsonIN >> config;
+			}
+			else
+			{
+				LOG_WARNING("Failed to open existing config file {}", configPath.string().c_str());
+				return false;
+			}
+		}
+
+		// Set the adapter (or add it)
+		config[SelectedAdapter] = adapter;
+
+		// Write the file
+		std::ofstream jsonOUT(configPath);
+		if (!jsonOUT)
+		{
+			LOG_WARNING("Failed to open file {} for writing", configPath.string().c_str());
+			return false;
+		}
+		jsonOUT << std::setw(4) << config;
+		return true;
+	}
+	catch (std::exception e)
+	{
+		LOG_WARNING("Exception occured during writing network adapter: {}", e.what());
+		return false;
+	}
 }
 
 
