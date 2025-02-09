@@ -123,6 +123,9 @@ set(NETWORK_FILES
     ${NETWORK_DIR}/NetworkAdapter.h
     ${NETWORK_DIR}/NetworkManager.h         ${NETWORK_DIR}/NetworkManager.cpp
     ${NETWORK_DIR}/NetworkInformation.h     ${NETWORK_DIR}/NetworkInformation.cpp
+    ${NETWORK_DIR}/DiscoveryService.h       ${NETWORK_DIR}/DiscoveryService.cpp
+    ${NETWORK_DIR}/TCPServer.h              ${NETWORK_DIR}/TCPServer.cpp
+    ${NETWORK_DIR}/TCPClient.h              ${NETWORK_DIR}/TCPClient.cpp
 )
 
 
