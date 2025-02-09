@@ -108,7 +108,40 @@ void DiscoveryService::handleSend(const boost::system::error_code &error, size_t
 }
 
 
-void DiscoveryService::startReceive() {}
+void DiscoveryService::startReceive()
+{
+	if (!mIsRunning)
+		return;
+	mSocket.async_receive(boost::asio::buffer(mRecvBuffer), std::bind(&DiscoveryService::handleReceive, this, std::placeholders::_1, std::placeholders::_2));
+}
 
 
-void DiscoveryService::handleReceive(const boost::system::error_code &error, size_t bytesReceived) {}
+void DiscoveryService::handleReceive(const boost::system::error_code &error, size_t bytesReceived)
+{
+	if (!error && bytesReceived > 0)
+	{
+		try
+		{
+			std::string receivedData(mRecvBuffer.data(), bytesReceived);
+			json		j	   = json::parse(receivedData);
+
+			Endpoint	remote = j.get<Endpoint>();
+
+			if (mPeerCallback)
+				mPeerCallback(remote);
+		}
+		catch (std::exception &e)
+		{
+			LOG_ERROR("Error parsing discovery package: {}", e.what());
+		}
+	}
+	else if (error)
+	{
+		LOG_WARNING("Receive error occurred: {}", error.message().c_str());
+	}
+
+	if (mIsRunning.load())
+	{
+		startReceive();
+	}
+}
