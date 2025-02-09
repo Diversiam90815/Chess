@@ -170,9 +170,13 @@ source_group("Network"          FILES ${NETWORK_FILES})
 add_subdirectory(${SUBMODULES_DIR}/Logger)
 set(LOGGER_INCLUDE_FILE   ${SUBMODULES_DIR}/Logger/include)
 
-# Boost ASIO
-add_subdirectory(${SUBMODULES_DIR}/asio )
-set(ASIO_INCLUDE_FILES ${SUBMODULES_DIR}/asio/include)
+
+# Boost
+
+set(BOOST_ROOT ${SUBMODULES_DIR}/boost)
+set(Boost_INCLUDE_DIR ${SUBMODULES_DIR}/boost)
+find_package(Boost)
+
 
 # NLOHMANN JSON
 
@@ -241,8 +245,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
         ${ALL_PROJECT_DIRS}
         ${LOGGER_INCLUDE_FILE}
         ${JSON_SINGLE_FILE}
-        ${ASIO_INCLUDE_FILES}
-
+        ${BOOST_ASIO_INCLUDE_DIRS}
 )
 
 
@@ -250,7 +253,9 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 #   LINK LIBRARIES
 ###########################################
 
-set(PROJECT_LIBS Logger)
+set(PROJECT_LIBS    Logger
+                    Boost::boost
+)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_LIBS})
 
