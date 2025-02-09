@@ -15,15 +15,18 @@
 #include <string>
 #include <json.hpp>
 
+#include "Logging.h"
+
 
 using json	   = nlohmann::json;
 namespace asio = boost::asio;
 using boost::asio::ip::udp;
 
+
 using PeerCallback = std::function<void(const json &)>;
 
 
-struct RemoteEndpoint
+struct Endpoint
 {
 	std::string IPAddress{};
 	int			tcpPort{0};
@@ -32,12 +35,12 @@ struct RemoteEndpoint
 
 
 // Enable automatic JSON conversion.
-inline void to_json(json &j, const RemoteEndpoint &ep)
+inline void to_json(json &j, const Endpoint &ep)
 {
 	j = json{{"IPAddress", ep.IPAddress}, {"tcpPort", ep.tcpPort}, {"playerName", ep.playerName}};
 }
 
-inline void from_json(const json &j, RemoteEndpoint &ep)
+inline void from_json(const json &j, Endpoint &ep)
 {
 	j.at("IPAddress").get_to(ep.IPAddress);
 	j.at("tcpPort").get_to(ep.tcpPort);
@@ -51,7 +54,7 @@ public:
 	DiscoveryService();
 	~DiscoveryService();
 
-	void init(asio::io_context &io_context, unsigned short tcpPort, const std::string &playerName);
+	bool init(std::string localIPv4, unsigned short tcpPort, const std::string &playerName);
 
 	void start();
 
@@ -60,36 +63,37 @@ public:
 	void setPeerCallback(PeerCallback callback);
 
 private:
-	void						sendPackage(std::string IPAddress = "255.255.255.255");
+	void				   sendPackage(std::string IPAddress = "255.255.255.255");
 
-	void						handleSend(const boost::system::error_code &error, size_t bytesSent);
+	void				   handleSend(const boost::system::error_code &error, size_t bytesSent);
 
-	void						startReceive();
+	void				   startReceive();
 
-	void						handleReceive(const boost::system::error_code &error, size_t bytesReceived);
-
-
-	const int					mDiscoveryPort = 5555; // needs to be set from config later
-
-	int							tcpPort{0};
-
-	std::string					mPlayerName{};
+	void				   handleReceive(const boost::system::error_code &error, size_t bytesReceived);
 
 
+	const int			   mDiscoveryPort = 5555; // needs to be set from config later
 
-	std::vector<RemoteEndpoint> mRemoteDevices;
+	std::string			   localIPv4{};
+	int					   mTcpPort{0};
 
-	PeerCallback				mPeerCallback;
-
-	std::atomic<bool>			mInitialized{false};
-	std::atomic<bool>			mIsRunning{false};
+	std::string			   mPlayerName{};
 
 
-	asio::io_context		   *mIoContext = nullptr;
 
-	udp::socket					mSocket;
+	std::vector<Endpoint>  mRemoteDevices;
 
-	udp::endpoint				mSenderEndpoint;
+	PeerCallback		   mPeerCallback;
 
-	std::array<char, 1024>		mRecvBuffer;
+	std::atomic<bool>	   mInitialized{false};
+	std::atomic<bool>	   mIsRunning{false};
+
+
+	asio::io_context	  *mIoContext = nullptr;
+
+	udp::socket			   mSocket;
+
+	udp::endpoint		   mSenderEndpoint;
+
+	std::array<char, 1024> mRecvBuffer;
 };
