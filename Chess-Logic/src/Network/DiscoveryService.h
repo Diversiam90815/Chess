@@ -95,5 +95,5 @@ private:
 
 	udp::endpoint		   mSenderEndpoint;
 
-	std::array<char, 1024> mRecvBuffer;
+	std::array<char, 1024> mRecvBuffer{};
 };
