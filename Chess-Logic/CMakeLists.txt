@@ -126,6 +126,7 @@ set(NETWORK_FILES
     ${NETWORK_DIR}/DiscoveryService.h       ${NETWORK_DIR}/DiscoveryService.cpp
     ${NETWORK_DIR}/TCPServer.h              ${NETWORK_DIR}/TCPServer.cpp
     ${NETWORK_DIR}/TCPClient.h              ${NETWORK_DIR}/TCPClient.cpp
+    ${NETWORK_DIR}/TCPSession.h             ${NETWORK_DIR}/TCPSession.cpp
 )
 
 
