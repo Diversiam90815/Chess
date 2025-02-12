@@ -8,7 +8,10 @@
 #include "DiscoveryService.h"
 
 
-DiscoveryService::DiscoveryService() {}
+DiscoveryService::DiscoveryService(asio::io_context &ioContext) : mSocket(ioContext)
+{
+	mIoContext = &ioContext;
+}
 
 
 DiscoveryService::~DiscoveryService()

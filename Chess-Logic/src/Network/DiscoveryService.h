@@ -51,7 +51,7 @@ inline void from_json(const json &j, Endpoint &ep)
 class DiscoveryService
 {
 public:
-	DiscoveryService();
+	DiscoveryService(asio::io_context &ioContext);
 	~DiscoveryService();
 
 	bool init(std::string localIPv4, unsigned short tcpPort, const std::string &playerName);
