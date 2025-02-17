@@ -10,36 +10,33 @@
 
 #include <boost/asio.hpp>
 #include <functional>
-#include <json.hpp>
+
+#include "TCPSession.h"
+#include "Logging.h"
 
 
-using json = nlohmann::json;
 using boost::asio::ip::tcp;
 
-using MessageHandler = std::function<void(const json &message, std::shared_ptr<tcp::socket> socket)>;
+using SessionHandler = std::function<void(std::shared_ptr<TCPSession> session)>; // Callback invoked when a new session is accepted
 
 
 class TCPServer
 {
-	TCPServer();
+	TCPServer(boost::asio::io_context &ioContext, unsigned short port);
 	~TCPServer();
 
-	void init(boost::asio::io_context &ioContext, unsigned short port);
-
 	void startAccept();
-	
-	void setMessageHandler();
+
+	void setSessionHandler(SessionHandler handler);
 
 
 private:
-	void					 handleAccept(std::shared_ptr<tcp::socket> socket, const boost::system::error_code &error);
-	
-	void					 doRead(std::shared_ptr<tcp::socket> socket);
+	void					 handleAccept(std::shared_ptr<TCPSession> session, const boost::system::error_code &error);
 
 
 	boost::asio::io_context &mIoContext;
 
 	tcp::acceptor			 mAcceptor;
-	
-	MessageHandler			 mMessageHandler;
+
+	SessionHandler			 mSessionHandler;
 };
