@@ -1,13 +1,9 @@
 /*
   ==============================================================================
-
-	Class:          Knight
-
+	Module:         Knight
 	Description:    Knight class inheriting from ChessPiece
-
   ==============================================================================
 */
-
 
 #include "Knight.h"
 #include "ChessBoard.h"
