@@ -21,13 +21,5 @@ public:
 	}
 
 
-	std::vector<PossibleMove> getPossibleMoves(const Position &pos, ChessBoard &board, bool attackOnly = false) const override
-	{
-		MoveHelper	helper;
-		bool		moved = hasMoved();
-		PlayerColor color = getColor();
-		helper.checkAvailableMoves(pos, board, color, PieceType::Pawn, moved, attackOnly);
-		auto moves = helper.getAvailableMoves();
-		return moves;
-	}
+	std::vector<PossibleMove> getPossibleMoves(const Position &pos, ChessBoard &board, bool attackOnly = false) const override;
 };

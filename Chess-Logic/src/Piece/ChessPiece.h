@@ -17,6 +17,7 @@
 #include "Move.h"
 #include "Parameters.h"
 
+
 class ChessBoard;
 
 

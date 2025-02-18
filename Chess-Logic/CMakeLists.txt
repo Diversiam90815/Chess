@@ -85,7 +85,7 @@ set(BOARD_FILES
     
 set(MOVE_FILES
     ${MOVE_DIR}/MoveType.h
-    ${MOVE_DIR}/Move.h                  ${MOVE_DIR}/Move.cpp
+    ${MOVE_DIR}/Move.h
     ${MOVE_DIR}/MoveHelper.h            ${MOVE_DIR}/MoveHelper.cpp
     ${MOVE_DIR}/MovementManager.h       ${MOVE_DIR}/MovementManager.cpp
     ${MOVE_DIR}/MoveNotationHelper.h    ${MOVE_DIR}/MoveNotationHelper.cpp

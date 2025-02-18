@@ -19,12 +19,5 @@ public:
 	Bishop(PlayerColor color) : ChessPiece(PieceType::Bishop, color) {}
 
 
-	std::vector<PossibleMove> getPossibleMoves(const Position &pos, ChessBoard &board, bool attackOnly = false) const override
-	{
-		MoveHelper	helper;
-		PlayerColor color = getColor();
-		helper.checkAvailableMoves(pos, board, color, PieceType::Bishop, attackOnly);
-		auto moves = helper.getAvailableMoves();
-		return moves;
-	}
+	std::vector<PossibleMove> getPossibleMoves(const Position &pos, ChessBoard &board, bool attackOnly = false) const override;
 };
