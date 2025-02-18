@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          Move
-
+	Module:         Move
 	Description:    Storing information classifying a move in chess
-
   ==============================================================================
 */
 
@@ -58,12 +55,13 @@ struct PossibleMove
 class Move
 {
 public:
-	Move();
+	Move() {}
 
-	Move(PossibleMove &possibleMove);
+	Move(PossibleMove &possibleMove) {}
 
-	Move(
-		Position start, Position end, PieceType moved, PieceType captured = PieceType::DefaultType, MoveType type = MoveType::Normal, PieceType promotion = PieceType::DefaultType);
+	Move(Position start, Position end, PieceType moved, PieceType captured = PieceType::DefaultType, MoveType type = MoveType::Normal, PieceType promotion = PieceType::DefaultType)
+	{
+	}
 
 	Position	startingPosition;
 	Position	endingPosition;
