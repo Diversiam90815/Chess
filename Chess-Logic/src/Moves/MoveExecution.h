@@ -21,6 +21,24 @@ public:
 	MoveExecution(std::shared_ptr<ChessBoard> board);
 	~MoveExecution();
 
+	Move executeMove(PossibleMove &executedMove);
+
+	bool executeCastlingMove(PossibleMove &move);
+
+	bool executeEnPassantMove(PossibleMove &move, PlayerColor player);
+
+	bool executePawnPromotion(const PossibleMove &move, PlayerColor player);
+
+
 private:
-	std::shared_ptr<ChessBoard> mChessboard;
+	const Move						   *getLastMove();
+
+	void								addMoveToHistory(Move &move);
+
+	void								removeLastMove();
+
+	std::shared_ptr<ChessBoard>			mChessBoard;
+
+	std::shared_ptr<MoveNotationHelper> mMoveNotation;
+	std::set<Move>						mMoveHistory;
 };
