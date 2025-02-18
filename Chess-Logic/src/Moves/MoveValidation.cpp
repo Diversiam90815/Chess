@@ -7,3 +7,9 @@
 
 
 #include "MoveValidation.h"
+
+
+MoveValidation::MoveValidation(std::shared_ptr<ChessBoard> board) : mChessBoard(board) {}
+
+
+MoveValidation::~MoveValidation() {}
