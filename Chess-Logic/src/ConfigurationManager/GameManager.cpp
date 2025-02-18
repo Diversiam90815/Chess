@@ -1,15 +1,11 @@
 /*
   ==============================================================================
-
-	Class:          GameManager
-
+	Module:         GameManager
 	Description:    Manager for the Chess game
-
   ==============================================================================
 */
 
 #include "GameManager.h"
-// #include <strsafe.h>
 
 
 GameManager::GameManager()

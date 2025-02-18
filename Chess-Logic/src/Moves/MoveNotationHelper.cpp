@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          MoveNotationHelper
-
+	Module:         MoveNotationHelper
 	Description:    Transforming the Move class into a Standart Algebraic Notation string
-
   ==============================================================================
 */
 

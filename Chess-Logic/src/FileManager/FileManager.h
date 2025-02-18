@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          FileManager
-
+	Module:         FileManager
 	Description:    Singleton of the file system manager (AppData path's need to be set from UI project due to WinUi's virtualization.
-
   ==============================================================================
 */
 

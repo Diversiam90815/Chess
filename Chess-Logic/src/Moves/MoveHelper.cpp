@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          MoveHelper
-
+	Module:         MoveHelper
 	Description:    Helper class for generating general moves in chess
-
   ==============================================================================
 */
 

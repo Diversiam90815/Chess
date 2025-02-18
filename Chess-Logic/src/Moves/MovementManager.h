@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          MovementManager
-
+	Module:         MovementManager
 	Description:    Manages and executes valid moves in chess
-
   ==============================================================================
 */
 
