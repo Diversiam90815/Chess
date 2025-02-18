@@ -89,6 +89,8 @@ set(MOVE_FILES
     ${MOVE_DIR}/MoveHelper.h            ${MOVE_DIR}/MoveHelper.cpp
     ${MOVE_DIR}/MovementManager.h       ${MOVE_DIR}/MovementManager.cpp
     ${MOVE_DIR}/MoveNotationHelper.h    ${MOVE_DIR}/MoveNotationHelper.cpp
+    ${MOVE_DIR}/MoveValidation.h        ${MOVE_DIR}/MoveValidation.cpp
+    ${MOVE_DIR}/MoveExecution.h         ${MOVE_DIR}/MoveExecution.cpp
 )
 
 set(CONFIG_FILES
