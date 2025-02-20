@@ -24,19 +24,21 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 #   PROJECT DIRECTORIES
 ###########################################
 
-set (SOURCE_DIR          ${PROJECT_SOURCE_DIR}/src)
-set (SUBMODULES_DIR      ${PROJECT_SOURCE_DIR}/submodules)
+set (SOURCE_DIR                 ${PROJECT_SOURCE_DIR}/src)
+set (SUBMODULES_DIR             ${PROJECT_SOURCE_DIR}/submodules)
     
-set (PIECE_DIR           ${SOURCE_DIR}/Piece)
-set (MOVE_DIR            ${SOURCE_DIR}/Moves)
-set (GAME_MANAGER_DIR    ${SOURCE_DIR}/GameManager)
-set (BOARD_DIR           ${SOURCE_DIR}/Board)
-set (PLAYER_DIR          ${SOURCE_DIR}/Player)
-set (API_DIR             ${SOURCE_DIR}/API)
-set (MISC_DIR            ${SOURCE_DIR}/Miscellaneous)
-set (LOGGER_DIR          ${SOURCE_DIR}/Logger)
-set (FILEMANAGER_DIR     ${SOURCE_DIR}/FileManager)
-set (USERSETTINGS_DIR     ${SOURCE_DIR}/UserSettings)
+set (PIECE_DIR                  ${SOURCE_DIR}/Piece)
+set (MOVE_DIR                   ${SOURCE_DIR}/Moves)
+set (GAME_MANAGER_DIR           ${SOURCE_DIR}/GameManager)
+set (BOARD_DIR                  ${SOURCE_DIR}/Board)
+set (PLAYER_DIR                 ${SOURCE_DIR}/Player)
+set (API_DIR                    ${SOURCE_DIR}/API)
+set (MISC_DIR                   ${SOURCE_DIR}/Miscellaneous)
+set (FILEMANAGER_DIR            ${SOURCE_DIR}/FileManager)
+set (LOGGER_DIR                 ${SOURCE_DIR}/Logger)
+set (USERSETTINGS_DIR           ${SOURCE_DIR}/UserSettings)
+set (OBSERVER_DIR               ${SOURCE_DIR}/Observer)
+set (COMMUNICATION_DIR          ${SOURCE_DIR}/Communication)
 
 
 ###########################################
@@ -55,6 +57,8 @@ set(ALL_PROJECT_DIRS
             ${FILEMANAGER_DIR}
             ${SOURCE_DIR}
             ${USERSETTINGS_DIR}
+            ${OBSERVER_DIR}
+            ${COMMUNICATION_DIR}
 )
 
 include_directories(${ALL_PROJECT_DIRS})
@@ -114,8 +118,17 @@ set(FILEMANAGER_FILES
     ${FILEMANAGER_DIR}/FileManager.h    ${FILEMANAGER_DIR}/FileManager.cpp
 )
 
-set(USERSETTINGS_DIR
+set(USERSETTINGS_FILES
     ${USERSETTINGS_DIR}/UserSettings.h    ${USERSETTINGS_DIR}/UserSettings.cpp
+)
+
+set(OBSERVER_FILES
+    ${OBSERVER_DIR}/IObserver.h
+    ${OBSERVER_DIR}/IObservable.h
+)
+
+set(COMMUNICATION_FILES
+    ${COMMUNICATION_DIR}/UICommunication.h    ${COMMUNICATION_DIR}/UICommunication.cpp
 )
 
 
@@ -129,7 +142,9 @@ set(ALL_FILES
     ${MISC_FILES}
     ${LOGGER_FILES}
     ${FILEMANAGER_FILES}
-    ${USERSETTINGS_DIR}
+    ${USERSETTINGS_FILES}
+    ${OBSERVER_FILES}
+    ${COMMUNICATION_FILES}
 )
 
 
@@ -147,6 +162,8 @@ source_group("Miscellaneous"    FILES ${MISC_FILES})
 source_group("Logging"          FILES ${LOGGER_FILES})
 source_group("FileManager"      FILES ${FILEMANAGER_FILES})
 source_group("UserSettings"     FILES ${USERSETTINGS_DIR})
+source_group("Observer"         FILES ${OBSERVER_FILES})
+source_group("Communication"    FILES ${COMMUNICATION_FILES})
 
 
 ###########################################
