@@ -90,7 +90,6 @@ set(MOVE_FILES
     ${MOVE_DIR}/MoveGeneration.h        ${MOVE_DIR}/MoveGeneration.cpp
     ${MOVE_DIR}/MoveValidation.h        ${MOVE_DIR}/MoveValidation.cpp
     ${MOVE_DIR}/MoveExecution.h         ${MOVE_DIR}/MoveExecution.cpp
-    ${MOVE_DIR}/MovementManager.h       ${MOVE_DIR}/MovementManager.cpp
     ${MOVE_DIR}/MoveNotationHelper.h    ${MOVE_DIR}/MoveNotationHelper.cpp
 )
 

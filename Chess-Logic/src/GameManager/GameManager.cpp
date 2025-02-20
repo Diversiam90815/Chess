@@ -8,9 +8,7 @@
 #include "GameManager.h"
 
 
-GameManager::GameManager()
-{
-}
+GameManager::GameManager() {}
 
 
 GameManager *GameManager::GetInstance()
@@ -39,14 +37,11 @@ void GameManager::init()
 	mLog.initLogging();
 	mUserSettings.init();
 
-	mMovementManager = std::make_unique<MovementManager>();
+	mChessBoard		= std::make_shared<ChessBoard>();
 
-	if (mDelegate)
-	{
-		mMovementManager->setDelegate(mDelegate);
-	}
-
-	mMovementManager->init();
+	mMoveValidation = std::make_shared<MoveValidation>(mChessBoard);
+	mMoveExecution	= std::make_shared<MoveExecution>(mChessBoard, mMoveValidation);
+	mMoveGeneration = std::make_shared<MoveGeneration>(mChessBoard, mMoveValidation, mMoveExecution);
 
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
@@ -57,8 +52,8 @@ void GameManager::startGame()
 {
 	clearState();
 
-	mMovementManager->mChessBoard->initializeBoard(); // Reset the board
-	setCurrentPlayer(PlayerColor::White);			  // Setting the player at the end, since this will trigger the move calculation
+	mChessBoard->initializeBoard();		  // Reset the board
+	setCurrentPlayer(PlayerColor::White); // Setting the player at the end, since this will trigger the move calculation
 }
 
 
@@ -78,19 +73,15 @@ void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 	mDelegate = pDelegate;
 	mWhitePlayer.setDelegate(pDelegate);
 	mBlackPlayer.setDelegate(pDelegate);
-	if (mMovementManager)
-	{
-		mMovementManager->setDelegate(pDelegate);
-	}
 }
 
 
 PieceType GameManager::getCurrentPieceTypeAtPosition(const Position position)
 {
-	if (!mMovementManager)
+	if (!mChessBoard)
 		return PieceType::DefaultType;
 
-	auto &chessPiece = mMovementManager->mChessBoard->getPiece(position);
+	auto &chessPiece = mChessBoard->getPiece(position);
 
 	if (chessPiece)
 	{
@@ -108,17 +99,15 @@ std::vector<PossibleMove> GameManager::getPossibleMoveForPosition()
 
 bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 {
-	if (!mMovementManager || !mMovementManager->mChessBoard)
+	if (!mChessBoard)
 		return false;
-
-	auto &board = mMovementManager->mChessBoard;
 
 	for (int y = 0; y < BOARD_SIZE; ++y)
 	{
 		for (int x = 0; x < BOARD_SIZE; ++x)
 		{
 			Position pos	  = {x, y};
-			auto	&piece	  = board->getPiece(pos);
+			auto	&piece	  = mChessBoard->getPiece(pos);
 
 			int		 colorVal = 0; // 0 = no color
 			int		 typeVal  = 0; // 0 = PieceType::DefaultType
@@ -161,7 +150,7 @@ void GameManager::switchTurns()
 
 void GameManager::executeMove(PossibleMove &move)
 {
-	Move executedMove = mMovementManager->executeMove(move);
+	Move executedMove = mMoveExecution->executeMove(move);
 
 	LoggingHelper::logMove(executedMove);
 
@@ -190,7 +179,7 @@ void GameManager::executeMove(PossibleMove &move)
 
 void GameManager::undoMove()
 {
-	const Move *lastMove = mMovementManager->mMoveExecution->getLastMove();
+	const Move *lastMove = mMoveExecution->getLastMove();
 
 	if (!lastMove)
 	{
@@ -198,7 +187,7 @@ void GameManager::undoMove()
 		return;
 	}
 
-	mMovementManager->mChessBoard->movePiece(lastMove->endingPosition, lastMove->startingPosition);
+	mChessBoard->movePiece(lastMove->endingPosition, lastMove->startingPosition);
 
 	if (lastMove->capturedPiece != PieceType::DefaultType)
 	{
@@ -207,7 +196,7 @@ void GameManager::undoMove()
 
 		if (pieceToRestore)
 		{
-			mMovementManager->mChessBoard->setPiece(lastMove->endingPosition, pieceToRestore);
+			mChessBoard->setPiece(lastMove->endingPosition, pieceToRestore);
 		}
 
 		if (lastMove->player == PlayerColor::White)
@@ -220,10 +209,10 @@ void GameManager::undoMove()
 		}
 	}
 
-	auto &piece = mMovementManager->mChessBoard->getPiece(lastMove->startingPosition);
+	auto &piece = mChessBoard->getPiece(lastMove->startingPosition);
 	piece->decreaseMoveCounter();
 
-	mMovementManager->mMoveExecution->removeLastMove();
+	mMoveExecution->removeLastMove();
 	switchTurns();
 }
 
@@ -264,8 +253,8 @@ MoveState GameManager::getCurrentMoveState() const
 
 void GameManager::resetGame()
 {
-	mMovementManager->mChessBoard->removeAllPiecesFromBoard();
-	mMovementManager->mChessBoard->initializeBoard();
+	mChessBoard->removeAllPiecesFromBoard();
+	mChessBoard->initializeBoard();
 
 	mWhitePlayer.reset();
 	mBlackPlayer.reset();
@@ -305,7 +294,7 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 		if (!mMovesGeneratedForCurrentTurn)
 		{
 			LOG_INFO("Move State is NoMove -> We start calculating this player's possible moves!");
-			mMovementManager->calculateAllLegalBasicMoves(getCurrentPlayer());
+			mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer());
 			mMovesGeneratedForCurrentTurn = true;
 		}
 		break;
@@ -317,7 +306,7 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 
 		mAllMovesForPosition.clear();
 
-		auto possibleMoves = mMovementManager->getMovesForPosition(move.start);
+		auto possibleMoves = mMoveGeneration->getMovesForPosition(move.start);
 
 		mAllMovesForPosition.reserve(possibleMoves.size());
 		mAllMovesForPosition = possibleMoves;
@@ -367,7 +356,7 @@ PlayerColor GameManager::getCurrentPlayer() const
 
 void GameManager::checkForEndGameConditions()
 {
-	const Move *lastMove = mMovementManager->mMoveExecution->getLastMove();
+	const Move *lastMove = mMoveExecution->getLastMove();
 
 	if (lastMove)
 	{
@@ -380,7 +369,8 @@ void GameManager::checkForEndGameConditions()
 			return;
 		}
 
-		bool isStaleMate = mMovementManager->mMoveValidation->isStalemate(getCurrentPlayer());
+		mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer()); // Calculate all legal moves to check if we have a stalemate (no valid moves left)
+		bool isStaleMate = mMoveValidation->isStalemate(getCurrentPlayer());
 		if (isStaleMate)
 		{
 			LOG_INFO("Detected a Stalemate");

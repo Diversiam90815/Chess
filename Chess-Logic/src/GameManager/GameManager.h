@@ -8,11 +8,12 @@
 #pragma once
 
 #include <optional>
-#include "MovementManager.h"
-#include "Player.h"
 
 #include "ChessLogicAPIDefines.h"
-
+#include "MoveExecution.h"
+#include "MoveGeneration.h"
+#include "MoveValidation.h"
+#include "Player.h"
 #include "Logging.h"
 #include "UserSettings.h"
 
@@ -22,10 +23,8 @@ class GameManager
 public:
 	~GameManager() = default;
 
-
 	static GameManager		  *GetInstance();
 	static void				   ReleaseInstance();
-
 
 	void					   init();
 
@@ -62,53 +61,42 @@ public:
 	void					   setCurrentPlayer(PlayerColor player);
 	PlayerColor				   getCurrentPlayer() const;
 
+	void					   setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
+	std::string				   getBoardTheme() const { return mUserSettings.getCurrentBoardTheme(); }
 
-	void					   setBoardTheme(std::string theme)
-	{
-		mUserSettings.setCurrentBoardTheme(theme);
-	}
-
-	std::string getBoardTheme() const
-	{
-		return mUserSettings.getCurrentBoardTheme();
-	}
-
-	void setPieceTheme(std::string theme)
-	{
-		mUserSettings.setCurrentPieceTheme(theme);
-	}
-
-	std::string getPieceTheme() const
-	{
-		return mUserSettings.getCurrentPieceTheme();
-	}
+	void					   setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
+	std::string				   getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
 
 
 private:
 	GameManager();
 
-	void							 switchTurns();
+	void							switchTurns();
 
-	void							 checkForEndGameConditions();
+	void							checkForEndGameConditions();
 
-	Logging							 mLog;
+	Logging							mLog;
 
-	bool							 mMovesGeneratedForCurrentTurn = false;
+	bool							mMovesGeneratedForCurrentTurn = false;
 
-	Player							 mWhitePlayer;
-	Player							 mBlackPlayer;
+	Player							mWhitePlayer;
+	Player							mBlackPlayer;
 
-	PlayerColor						 mCurrentPlayer	   = PlayerColor::NoColor;
+	PlayerColor						mCurrentPlayer	  = PlayerColor::NoColor;
 
-	GameState						 mCurrentState	   = GameState::Init;
+	GameState						mCurrentState	  = GameState::Init;
 
-	MoveState						 mCurrentMoveState = MoveState::NoMove;
+	MoveState						mCurrentMoveState = MoveState::NoMove;
 
-	std::vector<PossibleMove>		 mAllMovesForPosition;
+	std::vector<PossibleMove>		mAllMovesForPosition;
 
-	std::unique_ptr<MovementManager> mMovementManager;
+	std::shared_ptr<ChessBoard>		mChessBoard;
 
-	UserSettings					 mUserSettings;
+	std::shared_ptr<MoveGeneration> mMoveGeneration;
+	std::shared_ptr<MoveValidation> mMoveValidation;
+	std::shared_ptr<MoveExecution>	mMoveExecution;
 
-	PFN_CALLBACK					 mDelegate = nullptr;
+	UserSettings					mUserSettings;
+
+	PFN_CALLBACK					mDelegate = nullptr;
 };
