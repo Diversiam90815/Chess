@@ -9,10 +9,7 @@
 #include <strsafe.h>
 
 
-MoveExecution::MoveExecution(std::shared_ptr<ChessBoard> board) : mChessBoard(board)
-{
-	mValidation = std::make_unique<MoveValidation>(mChessBoard);
-}
+MoveExecution::MoveExecution(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation) : mChessBoard(board), mValidation(validation) {}
 
 
 MoveExecution::~MoveExecution() {}
@@ -204,7 +201,7 @@ void MoveExecution::addMoveToHistory(Move &move)
 	move.number = mMoveHistory.size() + 1; // Set the move number based on history size
 	mMoveHistory.insert(move);
 
-	//if (mDelegate)
+										   // if (mDelegate)
 	//{
 	//	std::string numberedNotation = std::to_string(move.number) + ". " + move.notation;
 	//	size_t		len				 = numberedNotation.size();

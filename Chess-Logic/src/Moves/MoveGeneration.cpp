@@ -8,10 +8,9 @@
 #include "MoveGeneration.h"
 
 
-MoveGeneration::MoveGeneration(std::shared_ptr<ChessBoard> board) : mChessBoard(board)
+MoveGeneration::MoveGeneration(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation, std::shared_ptr<MoveExecution> execution)
+	: mChessBoard(board), mExecution(execution), mValidation(validation)
 {
-	mExecution	= std::make_unique<MoveExecution>(mChessBoard);
-	mValidation = std::make_unique<MoveValidation>(mChessBoard);
 }
 
 

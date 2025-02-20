@@ -16,11 +16,11 @@ MovementManager::MovementManager() {}
 
 void MovementManager::init()
 {
-	mChessBoard = std::make_shared<ChessBoard>();
+	mChessBoard		= std::make_shared<ChessBoard>();
 
-	 mMoveGeneration = std::make_shared<MoveGeneration>(mChessBoard);
-	 mMoveValidation = std::make_shared<MoveValidation>(mChessBoard);
-	 mMoveExecution	= std::make_shared<MoveExecution>(mChessBoard);
+	mMoveValidation = std::make_shared<MoveValidation>(mChessBoard);
+	mMoveExecution	= std::make_shared<MoveExecution>(mChessBoard, mMoveValidation);
+	mMoveGeneration = std::make_shared<MoveGeneration>(mChessBoard, mMoveValidation, mMoveExecution);
 }
 
 //

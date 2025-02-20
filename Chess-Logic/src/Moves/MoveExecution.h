@@ -20,7 +20,7 @@
 class MoveExecution
 {
 public:
-	MoveExecution(std::shared_ptr<ChessBoard> board);
+	MoveExecution(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation);
 	~MoveExecution();
 
 	Move		executeMove(PossibleMove &executedMove);
@@ -41,7 +41,7 @@ public:
 private:
 	std::shared_ptr<ChessBoard>			mChessBoard;
 
-	std::unique_ptr<MoveValidation>		mValidation;
+	std::shared_ptr<MoveValidation>		mValidation;
 
 	std::shared_ptr<MoveNotationHelper> mMoveNotation;
 

@@ -21,7 +21,7 @@
 class MoveGeneration
 {
 public:
-	MoveGeneration(std::shared_ptr<ChessBoard> board);
+	MoveGeneration(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation, std::shared_ptr<MoveExecution> execution);
 	~MoveGeneration();
 
 
@@ -46,9 +46,9 @@ private:
 
 	std::shared_ptr<ChessBoard>								mChessBoard;
 
-	std::unique_ptr<MoveValidation>							mValidation;
+	std::shared_ptr<MoveValidation>							mValidation;
 		 
-	std::unique_ptr<MoveExecution>							mExecution;
+	std::shared_ptr<MoveExecution>							mExecution;
 
 	std::unordered_map<Position, std::vector<PossibleMove>> mAllLegalMovesForCurrentRound;
 
