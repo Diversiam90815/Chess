@@ -7,9 +7,9 @@
 
 #pragma once
 
+#include <optional>
 #include "MovementManager.h"
 #include "Player.h"
-#include <optional>
 
 #include "ChessLogicAPIDefines.h"
 

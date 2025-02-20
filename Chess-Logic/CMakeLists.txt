@@ -29,7 +29,7 @@ set (SUBMODULES_DIR      ${PROJECT_SOURCE_DIR}/submodules)
     
 set (PIECE_DIR           ${SOURCE_DIR}/Piece)
 set (MOVE_DIR            ${SOURCE_DIR}/Moves)
-set (CONFIG_DIR          ${SOURCE_DIR}/ConfigurationManager)
+set (GAME_MANAGER_DIR    ${SOURCE_DIR}/GameManager)
 set (BOARD_DIR           ${SOURCE_DIR}/Board)
 set (PLAYER_DIR          ${SOURCE_DIR}/Player)
 set (API_DIR             ${SOURCE_DIR}/API)
@@ -46,7 +46,7 @@ set (USERSETTINGS_DIR     ${SOURCE_DIR}/UserSettings)
 set(ALL_PROJECT_DIRS 
             ${PIECE_DIR}
             ${MOVE_DIR}
-            ${CONFIG_DIR}
+            ${GAME_MANAGER_DIR}
             ${BOARD_DIR}
             ${PLAYER_DIR}
             ${API_DIR}
@@ -94,8 +94,8 @@ set(MOVE_FILES
     ${MOVE_DIR}/MoveExecution.h         ${MOVE_DIR}/MoveExecution.cpp
 )
 
-set(CONFIG_FILES
-    ${CONFIG_DIR}/GameManager.h    ${CONFIG_DIR}/GameManager.cpp
+set(GAME_MANAGER_FILES
+    ${GAME_MANAGER_DIR}/GameManager.h    ${GAME_MANAGER_DIR}/GameManager.cpp
 )
 
 set(PLAYER_FILES
@@ -125,7 +125,7 @@ set(ALL_FILES
     ${PIECE_FILES}
     ${BOARD_FILES}
     ${MOVE_FILES}
-    ${CONFIG_FILES}
+    ${GAME_MANAGER_FILES}
     ${PLAYER_FILES}
     ${MISC_FILES}
     ${LOGGER_FILES}
@@ -142,7 +142,7 @@ source_group("API"              FILES ${API_FILES})
 source_group("Pieces"           FILES ${PIECE_FILES})
 source_group("Board"            FILES ${BOARD_FILES})
 source_group("Moves"            FILES ${MOVE_FILES})
-source_group("Configuration"    FILES ${CONFIG_FILES})
+source_group("GameManager"      FILES ${GAME_MANAGER_FILES})
 source_group("Player"           FILES ${PLAYER_FILES})
 source_group("Miscellaneous"    FILES ${MISC_FILES})
 source_group("Logging"          FILES ${LOGGER_FILES})
