@@ -16,12 +16,15 @@ MovementManager::MovementManager() {}
 
 void MovementManager::init()
 {
-	mChessBoard	  = std::make_unique<ChessBoard>();
-	mMoveNotation = std::make_unique<MoveNotationHelper>();
+	mChessBoard = std::make_shared<ChessBoard>();
+
+	 mMoveGeneration = std::make_shared<MoveGeneration>(mChessBoard);
+	 mMoveValidation = std::make_shared<MoveValidation>(mChessBoard);
+	 mMoveExecution	= std::make_shared<MoveExecution>(mChessBoard);
 }
 
 //
-//std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &position)
+// std::vector<PossibleMove> MovementManager::getMovesForPosition(Position &position)
 //{
 //	auto &piece = mChessBoard->getPiece(position);
 //
@@ -61,11 +64,11 @@ void MovementManager::init()
 //}
 //
 //
-//bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
+// bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
 //{
 //	auto playerPieces = mChessBoard->getPiecesFromPlayer(playerColor);
 //
-//	// Clear the previous round’s legal-moves map
+//	// Clear the previous round legal-moves map
 //	{
 //		std::lock_guard<std::mutex> lock(mMoveMutex);
 //		mAllLegalMovesForCurrentRound.clear();
@@ -122,7 +125,7 @@ void MovementManager::init()
 //}
 //
 //
-//Move MovementManager::executeMove(PossibleMove &possibleMove)
+// Move MovementManager::executeMove(PossibleMove &possibleMove)
 //{
 //	// Store positions in Move from executed PossibleMove
 //	Move  executedMove		= Move(possibleMove);
@@ -216,7 +219,7 @@ void MovementManager::init()
 //}
 //
 //
-//void MovementManager::removeLastMove()
+// void MovementManager::removeLastMove()
 //{
 //	if (!mMoveHistory.empty())
 //	{
@@ -231,14 +234,32 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 }
 
 
-//void MovementManager::loadMoveToMap(Position pos, std::vector<PossibleMove> moves)
+std::vector<PossibleMove> MovementManager::getMovesForPosition(const Position &position)
+{
+	return mMoveGeneration->getMovesForPosition(position);
+}
+
+
+bool MovementManager::calculateAllLegalBasicMoves(PlayerColor playerColor)
+{
+	return mMoveGeneration->calculateAllLegalBasicMoves(playerColor);
+}
+
+
+Move MovementManager::executeMove(PossibleMove &possibleMove)
+{
+	return mMoveExecution->executeMove(possibleMove);
+}
+
+
+// void MovementManager::loadMoveToMap(Position pos, std::vector<PossibleMove> moves)
 //{
 //	std::lock_guard<std::mutex> lock(mMoveMutex);
 //	mAllLegalMovesForCurrentRound.emplace(pos, std::move(moves));
-//}
+// }
 
 
-//bool MovementManager::validateMove(Move &move, PlayerColor playerColor)
+// bool MovementManager::validateMove(Move &move, PlayerColor playerColor)
 //{
 //	auto kingPosition = mChessBoard->getKingsPosition(playerColor);
 //
@@ -250,17 +271,17 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //	}
 //
 //	return true;
-//}
+// }
 //
 //
-//bool MovementManager::isKingInCheck(Position &ourKing, PlayerColor playerColor)
+// bool MovementManager::isKingInCheck(Position &ourKing, PlayerColor playerColor)
 //{
 //	PlayerColor opponentColor = playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
 //	return isSquareAttacked(ourKing, opponentColor);
-//}
+// }
 //
 //
-//bool MovementManager::isCheckmate(PlayerColor player)
+// bool MovementManager::isCheckmate(PlayerColor player)
 //{
 //	Position kingPosition = mChessBoard->getKingsPosition(player);
 //
@@ -286,10 +307,10 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //
 //	// No legal move can stop the check; it's checkmate
 //	return true;
-//}
+// }
 //
 //
-//bool MovementManager::isStalemate(PlayerColor player)
+// bool MovementManager::isStalemate(PlayerColor player)
 //{
 //	Position kingPosition = mChessBoard->getKingsPosition(player);
 //	if (isKingInCheck(kingPosition, player))
@@ -303,10 +324,10 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //
 //	// Legal moves are available, so it's not stalemate
 //	return false;
-//}
+// }
 //
 //
-//bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor)
+// bool MovementManager::wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor)
 //{
 //	bool		kingInCheck	   = false;
 //
@@ -347,10 +368,10 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //	LOG_DEBUG("isSquareAttacked(...) = {}", kingInCheck ? "true" : "false");
 //
 //	return kingInCheck;
-//}
+// }
 //
 //
-//bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attackerColor)
+// bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attackerColor)
 //{
 //	// Iterate over all opponent pieces
 //	auto opponentPieces = mChessBoard->getPiecesFromPlayer(attackerColor);
@@ -370,10 +391,10 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //	}
 //
 //	return false;
-//}
+// }
 //
 //
-//bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard &chessboard)
+// bool MovementManager::isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard &chessboard)
 //{
 //	// Iterate over all opponent pieces
 //	auto opponentPieces = chessboard.getPiecesFromPlayer(attackerColor);
@@ -396,10 +417,10 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //	}
 //
 //	return false;
-//}
+// }
 
 //
-//bool MovementManager::executeCastlingMove(PossibleMove &move)
+// bool MovementManager::executeCastlingMove(PossibleMove &move)
 //{
 //	Position kingStart = move.start;
 //	Position kingEnd;
@@ -426,7 +447,7 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //}
 //
 //
-//std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position &kingPosition, PlayerColor player)
+// std::vector<PossibleMove> MovementManager::generateCastlingMoves(const Position &kingPosition, PlayerColor player)
 //{
 //	std::vector<PossibleMove> castlingMoves;
 //	castlingMoves.reserve(2 * sizeof(castlingMoves)); // There are max. of 2 moves of castling
@@ -453,7 +474,7 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //}
 //
 //
-//bool MovementManager::canCastle(const Position &kingposition, PlayerColor player, bool kingside)
+// bool MovementManager::canCastle(const Position &kingposition, PlayerColor player, bool kingside)
 //{
 //	auto &king		= mChessBoard->getPiece(kingposition);
 //	int	  direction = kingside ? +1 : -1; // Determine the direction of castling
@@ -494,7 +515,7 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //}
 
 //
-//bool MovementManager::executeEnPassantMove(PossibleMove &move, PlayerColor player)
+// bool MovementManager::executeEnPassantMove(PossibleMove &move, PlayerColor player)
 //{
 //	Position capturedPawnPosition;
 //	if (player == PlayerColor::White)
@@ -513,7 +534,7 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //}
 
 //
-//PossibleMove MovementManager::generateEnPassantMove(const Position &position, PlayerColor player)
+// PossibleMove MovementManager::generateEnPassantMove(const Position &position, PlayerColor player)
 //{
 //	if (!canEnPassant(position, player))
 //		return PossibleMove();
@@ -540,7 +561,7 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //}
 //
 //
-//bool MovementManager::canEnPassant(const Position &position, PlayerColor player)
+// bool MovementManager::canEnPassant(const Position &position, PlayerColor player)
 //{
 //	auto lastMove = getLastMove();
 //
@@ -577,7 +598,7 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //}
 //
 //
-//bool MovementManager::executePawnPromotion(const PossibleMove &move, PlayerColor player)
+// bool MovementManager::executePawnPromotion(const PossibleMove &move, PlayerColor player)
 //{
 //	if ((move.type & MoveType::PawnPromotion) != MoveType::PawnPromotion)
 //		return false;
@@ -610,7 +631,7 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //}
 //
 //
-//const Move *MovementManager::getLastMove()
+// const Move *MovementManager::getLastMove()
 //{
 //	if (mMoveHistory.empty())
 //		return nullptr;
@@ -619,7 +640,7 @@ void MovementManager::setDelegate(PFN_CALLBACK pDelegate)
 //}
 //
 //
-//void MovementManager::addMoveToHistory(Move &move)
+// void MovementManager::addMoveToHistory(Move &move)
 //{
 //	move.number = mMoveHistory.size() + 1; // Set the move number based on history size
 //	mMoveHistory.insert(move);

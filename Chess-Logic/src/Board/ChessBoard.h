@@ -18,6 +18,7 @@
 #include "Queen.h"
 #include "King.h"
 
+
 using PlayerPiece = std::pair<Position, std::shared_ptr<ChessPiece>>;
 
 

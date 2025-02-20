@@ -10,9 +10,12 @@
 #include <vector>
 #include <unordered_map>
 #include <future>
+#include <memory>
 
 #include "ChessBoard.h"
 #include "Move.h"
+#include "MoveValidation.h"
+#include "MoveExecution.h"
 
 
 class MoveGeneration
@@ -23,7 +26,7 @@ public:
 
 
 
-	std::vector<PossibleMove> getMovesForPosition(Position &position);
+	std::vector<PossibleMove> getMovesForPosition(const Position &position);
 
 	bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
 
@@ -42,6 +45,10 @@ private:
 
 
 	std::shared_ptr<ChessBoard>								mChessBoard;
+
+	std::unique_ptr<MoveValidation>							mValidation;
+		 
+	std::unique_ptr<MoveExecution>							mExecution;
 
 	std::unordered_map<Position, std::vector<PossibleMove>> mAllLegalMovesForCurrentRound;
 

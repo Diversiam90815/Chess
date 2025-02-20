@@ -7,9 +7,14 @@
 
 #pragma once
 
+#include "MoveExecution.h"
+#include "MoveValidation.h"
+#include "MoveGeneration.h"
+
 #include <set>
 #include <unordered_map>
 #include <mutex>
+#include <memory>
 
 #include "ChessLogicAPIDefines.h"
 #include "ChessBoard.h"
@@ -32,66 +37,79 @@ public:
 
 	void					  init();
 
-	//std::vector<PossibleMove> getMovesForPosition(Position &position);
+	// std::vector<PossibleMove> getMovesForPosition(Position &position);
 
-	//bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
+	// bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
 
-	//Move					  executeMove(PossibleMove &executedMove);
+	// Move					  executeMove(PossibleMove &executedMove);
 
-	//void					  removeLastMove();
+	// void					  removeLastMove();
 
 	void					  setDelegate(PFN_CALLBACK pDelegate);
 
+	std::vector<PossibleMove> getMovesForPosition(const Position &position);
+
+	bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
+
+	Move					  executeMove(PossibleMove &possibleMove);
+
+
 private:
-	//void													loadMoveToMap(Position pos, std::vector<PossibleMove> moves);
+	// void													loadMoveToMap(Position pos, std::vector<PossibleMove> moves);
 
-	//bool													validateMove(Move &move, PlayerColor playerColor);
+	// bool													validateMove(Move &move, PlayerColor playerColor);
 
-	//bool													isKingInCheck(Position &ourKing, PlayerColor playerColor);
+	// bool													isKingInCheck(Position &ourKing, PlayerColor playerColor);
 
-	//bool													isCheckmate(PlayerColor player);
+	// bool													isCheckmate(PlayerColor player);
 
-	//bool													isStalemate(PlayerColor player);
+	// bool													isStalemate(PlayerColor player);
 
-	//bool													wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor);
+	// bool													wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor);
 
-	//bool													isSquareAttacked(const Position &square, PlayerColor attackerColor);
-	//bool													isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard &chessboard);
-
-
-	//bool													executeCastlingMove(PossibleMove &move);
-
-	//std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PlayerColor player);
-
-	//bool													canCastle(const Position &kingposition, PlayerColor player, bool kingside);
+	// bool													isSquareAttacked(const Position &square, PlayerColor attackerColor);
+	// bool													isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard &chessboard);
 
 
-	//bool													executeEnPassantMove(PossibleMove &move, PlayerColor player);
+	// bool													executeCastlingMove(PossibleMove &move);
 
-	//PossibleMove											generateEnPassantMove(const Position &position, PlayerColor player);
+	// std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PlayerColor player);
 
-	//bool													canEnPassant(const Position &position, PlayerColor player);
-
-
-	//bool													executePawnPromotion(const PossibleMove &move, PlayerColor player);
+	// bool													canCastle(const Position &kingposition, PlayerColor player, bool kingside);
 
 
-	//const Move											   *getLastMove();
+	// bool													executeEnPassantMove(PossibleMove &move, PlayerColor player);
 
-	//void													addMoveToHistory(Move &move);
+	// PossibleMove											generateEnPassantMove(const Position &position, PlayerColor player);
+
+	// bool													canEnPassant(const Position &position, PlayerColor player);
 
 
-	//std::unordered_map<Position, std::vector<PossibleMove>> mAllLegalMovesForCurrentRound;
+	// bool													executePawnPromotion(const PossibleMove &move, PlayerColor player);
 
-	std::set<Move>											mMoveHistory;
 
-	std::shared_ptr<ChessBoard>								mChessBoard;
+	// const Move											   *getLastMove();
 
-	std::shared_ptr<MoveNotationHelper>						mMoveNotation;
+	// void													addMoveToHistory(Move &move);
 
-	std::mutex												mMoveMutex;
 
-	PFN_CALLBACK											mDelegate = nullptr;
+	// std::unordered_map<Position, std::vector<PossibleMove>> mAllLegalMovesForCurrentRound;
+
+
+	std::shared_ptr<ChessBoard>		mChessBoard;
+
+	std::shared_ptr<MoveGeneration> mMoveGeneration;
+	std::shared_ptr<MoveValidation> mMoveValidation;
+	std::shared_ptr<MoveExecution>	mMoveExecution;
+
+
+
+	std::set<Move>					mMoveHistory;
+
+
+	std::mutex						mMoveMutex;
+
+	PFN_CALLBACK					mDelegate = nullptr;
 
 	friend class GameManager;
 };

@@ -8,13 +8,17 @@
 #include "MoveGeneration.h"
 
 
-MoveGeneration::MoveGeneration(std::shared_ptr<ChessBoard> board) : mChessBoard(board) {}
+MoveGeneration::MoveGeneration(std::shared_ptr<ChessBoard> board) : mChessBoard(board)
+{
+	mExecution	= std::make_unique<MoveExecution>(mChessBoard);
+	mValidation = std::make_unique<MoveValidation>(mChessBoard);
+}
 
 
 MoveGeneration::~MoveGeneration() {}
 
 
-std::vector<PossibleMove> MoveGeneration::getMovesForPosition(Position &position)
+std::vector<PossibleMove> MoveGeneration::getMovesForPosition(const Position &position)
 {
 	auto &piece = mChessBoard->getPiece(position);
 
@@ -58,13 +62,13 @@ bool MoveGeneration::calculateAllLegalBasicMoves(PlayerColor playerColor)
 {
 	auto playerPieces = mChessBoard->getPiecesFromPlayer(playerColor);
 
-	// Clear the previous round’s legal-moves map
+	// Clear the previous round legal-moves map
 	{
 		std::lock_guard<std::mutex> lock(mMoveMutex);
 		mAllLegalMovesForCurrentRound.clear();
 	}
 
-	// Container to hold futures for each piece's move generation
+	// Container to hold futures for each piece move generation
 	std::vector<std::future<std::pair<Position, std::vector<PossibleMove>>>> futures;
 	futures.reserve(playerPieces.size());
 
@@ -84,7 +88,7 @@ bool MoveGeneration::calculateAllLegalBasicMoves(PlayerColor playerColor)
 										 for (const auto &pm : possibleMoves)
 										 {
 											 Move testMove(pm.start, pm.end, piece->getType());
-											 if (validateMove(testMove, playerColor))
+											 if (mValidation->validateMove(testMove, playerColor))
 											 {
 												 validMoves.push_back(pm);
 											 }
@@ -182,7 +186,7 @@ bool MoveGeneration::canCastle(const Position &kingposition, PlayerColor player,
 	for (const auto &pos : positionsToCheck)
 	{
 		Move testMove(kingposition, pos, PieceType::King);
-		if (wouldKingBeInCheckAfterMove(testMove, player))
+		if (mValidation->wouldKingBeInCheckAfterMove(testMove, player))
 			return false;
 	}
 
@@ -195,7 +199,7 @@ PossibleMove MoveGeneration::generateEnPassantMove(const Position &position, Pla
 	if (!canEnPassant(position, player))
 		return PossibleMove();
 
-	auto	 lastMove = getLastMove();
+	auto	 lastMove = mExecution->getLastMove();
 
 	// Calculate target position
 	Position targetPosition;
@@ -219,7 +223,7 @@ PossibleMove MoveGeneration::generateEnPassantMove(const Position &position, Pla
 
 bool MoveGeneration::canEnPassant(const Position &position, PlayerColor player)
 {
-	auto lastMove = getLastMove();
+	auto lastMove = mExecution->getLastMove();
 
 	if (!lastMove)
 		return false;

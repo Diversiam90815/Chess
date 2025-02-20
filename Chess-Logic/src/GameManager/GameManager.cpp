@@ -190,8 +190,7 @@ void GameManager::executeMove(PossibleMove &move)
 
 void GameManager::undoMove()
 {
-	//const Move *lastMove = mMovementManager->mMoveExecution->getLastMove();
-	Move *lastMove {};
+	const Move *lastMove = mMovementManager->mMoveExecution->getLastMove();
 
 	if (!lastMove)
 	{
@@ -224,7 +223,7 @@ void GameManager::undoMove()
 	auto &piece = mMovementManager->mChessBoard->getPiece(lastMove->startingPosition);
 	piece->decreaseMoveCounter();
 
-	//mMovementManager->mMoveExecution->removeLastMove();
+	mMovementManager->mMoveExecution->removeLastMove();
 	switchTurns();
 }
 
@@ -368,8 +367,7 @@ PlayerColor GameManager::getCurrentPlayer() const
 
 void GameManager::checkForEndGameConditions()
 {
-	//const Move *lastMove = mMovementManager->mMoveExecution->getLastMove();
-	Move *lastMove {};
+	const Move *lastMove = mMovementManager->mMoveExecution->getLastMove();
 
 	if (lastMove)
 	{
@@ -382,8 +380,7 @@ void GameManager::checkForEndGameConditions()
 			return;
 		}
 
-		//bool isStaleMate = mMovementManager->mMoveValidation->isStalemate(getCurrentPlayer());
-		bool isStaleMate = false;
+		bool isStaleMate = mMovementManager->mMoveValidation->isStalemate(getCurrentPlayer());
 		if (isStaleMate)
 		{
 			LOG_INFO("Detected a Stalemate");

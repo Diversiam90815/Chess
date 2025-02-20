@@ -9,7 +9,6 @@
 
 #include "ChessPiece.h"
 #include "Parameters.h"
-#include "MovementManager.h"
 
 
 class Pawn : public ChessPiece

@@ -15,6 +15,12 @@ MoveValidation::MoveValidation(std::shared_ptr<ChessBoard> board) : mChessBoard(
 MoveValidation::~MoveValidation() {}
 
 
+void MoveValidation::init(std::shared_ptr<ChessBoard> board)
+{
+	this->mChessBoard = board;
+}
+
+
 bool MoveValidation::validateMove(Move &move, PlayerColor playerColor)
 {
 	auto kingPosition = mChessBoard->getKingsPosition(playerColor);
@@ -72,14 +78,30 @@ bool MoveValidation::isStalemate(PlayerColor player)
 	if (isKingInCheck(kingPosition, player))
 		return false;
 
-	if (!calculateAllLegalBasicMoves(player))
-	{
-		// If no legal moves are available and king is not in check, it's stalemate
-		return true;
-	}
 
-	// Legal moves are available, so it's not stalemate
-	return false;
+	// Assume calculateAllLegalMoves() from MoveGeneration has been called before
+	auto playerPieces = mChessBoard->getPiecesFromPlayer(player);
+	for (const auto &[startPosition, piece] : playerPieces)
+	{
+		auto moves = piece->getPossibleMoves(startPosition, *mChessBoard);
+
+		for (const auto &moveCandidate : moves)
+		{
+			Move testMove(startPosition, moveCandidate.end, piece->getType());
+			if (!wouldKingBeInCheckAfterMove(testMove, player))
+				return false;
+		}
+	}
+	return true;
+
+	// if (!calculateAllLegalBasicMoves(player))
+	//{
+	//	// If no legal moves are available and king is not in check, it's stalemate
+	//	return true;
+	// }
+
+	//// Legal moves are available, so it's not stalemate
+	// return false;
 }
 
 

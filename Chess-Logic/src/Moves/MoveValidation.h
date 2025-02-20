@@ -10,15 +10,19 @@
 #include <memory>
 
 #include "ChessBoard.h"
-#include "Move.h"
+//#include "Move.h"
+//#include "Parameters.h"
 
 
 class MoveValidation
 {
 public:
+	MoveValidation() = default;
 	MoveValidation(std::shared_ptr<ChessBoard> board);
 
 	~MoveValidation();
+
+	void init(std::shared_ptr<ChessBoard> board);
 
 	bool validateMove(Move &move, PlayerColor playerColor);
 
@@ -32,9 +36,9 @@ public:
 
 
 private:
+
 	bool								isSquareAttacked(const Position &square, PlayerColor attackerColor);
 	bool								isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard &chessboard);
 
 	std::shared_ptr<ChessBoard>			mChessBoard;
-
 };
