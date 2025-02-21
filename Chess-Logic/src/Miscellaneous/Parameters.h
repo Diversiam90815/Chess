@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          Parameters
-
+	Module:         Parameters
 	Description:    Parameters and constants definitions
-
   ==============================================================================
 */
 
@@ -62,19 +59,6 @@ enum class MoveState
 	NoMove = 1,
 	InitiateMove,
 	ExecuteMove
-};
-
-
-enum delegateMessage
-{
-	playerHasWon = 1,
-	initiateMove,
-	playerScoreUpdated,
-	playerCapturedPiece,
-	moveExecuted,
-	playerChanged,
-	gameStateChanged,
-	moveHistoryAdded
 };
 
 

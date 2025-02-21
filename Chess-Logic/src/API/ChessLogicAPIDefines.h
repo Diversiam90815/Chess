@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          ChessLogicAPIDefines
-
+	Module:         ChessLogicAPIDefines
 	Description:    Definitions for the Chess Logic API
-
   ==============================================================================
 */
 

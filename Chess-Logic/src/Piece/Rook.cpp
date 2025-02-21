@@ -1,13 +1,9 @@
 /*
   ==============================================================================
-
-	Class:          Rook
-
+	Module:         Rook
 	Description:    Rook class inheriting from ChessPiece
-
   ==============================================================================
 */
-
 
 #include "Rook.h"
 #include "ChessBoard.h"

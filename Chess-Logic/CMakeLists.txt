@@ -24,20 +24,20 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 #   PROJECT DIRECTORIES
 ###########################################
 
-set (SOURCE_DIR             ${PROJECT_SOURCE_DIR}/src)
-set (SUBMODULES_DIR         ${PROJECT_SOURCE_DIR}/submodules)
+set (SOURCE_DIR          ${PROJECT_SOURCE_DIR}/src)
+set (SUBMODULES_DIR      ${PROJECT_SOURCE_DIR}/submodules)
     
-set (PIECE_DIR              ${SOURCE_DIR}/Piece)
-set (MOVE_DIR               ${SOURCE_DIR}/Moves)
-set (CONFIG_DIR             ${SOURCE_DIR}/ConfigurationManager)
-set (BOARD_DIR              ${SOURCE_DIR}/Board)
-set (PLAYER_DIR             ${SOURCE_DIR}/Player)
-set (API_DIR                ${SOURCE_DIR}/API)
-set (MISC_DIR               ${SOURCE_DIR}/Miscellaneous)
-set (LOGGER_DIR             ${SOURCE_DIR}/Logger)
-set (FILEMANAGER_DIR        ${SOURCE_DIR}/FileManager)
-set (USERSETTINGS_DIR       ${SOURCE_DIR}/UserSettings)
-set (NETWORK_DIR            ${SOURCE_DIR}/Network)
+set (PIECE_DIR           ${SOURCE_DIR}/Piece)
+set (MOVE_DIR            ${SOURCE_DIR}/Moves)
+set (GAME_MANAGER_DIR           ${SOURCE_DIR}/GameManager)
+set (BOARD_DIR           ${SOURCE_DIR}/Board)
+set (PLAYER_DIR          ${SOURCE_DIR}/Player)
+set (API_DIR             ${SOURCE_DIR}/API)
+set (MISC_DIR            ${SOURCE_DIR}/Miscellaneous)
+set (FILEMANAGER_DIR     ${SOURCE_DIR}/FileManager)
+set (LOGGER_DIR                 ${SOURCE_DIR}/Logger)
+set (USERSETTINGS_DIR     ${SOURCE_DIR}/UserSettings)
+set (COMMUNICATION_DIR          ${SOURCE_DIR}/Communication)
 
 
 ###########################################
@@ -47,7 +47,7 @@ set (NETWORK_DIR            ${SOURCE_DIR}/Network)
 set(ALL_PROJECT_DIRS 
             ${PIECE_DIR}
             ${MOVE_DIR}
-            ${CONFIG_DIR}
+            ${GAME_MANAGER_DIR}
             ${BOARD_DIR}
             ${PLAYER_DIR}
             ${API_DIR}
@@ -56,7 +56,7 @@ set(ALL_PROJECT_DIRS
             ${FILEMANAGER_DIR}
             ${SOURCE_DIR}
             ${USERSETTINGS_DIR}
-            ${NETWORK_DIR}
+            ${COMMUNICATION_DIR}
 )
 
 include_directories(${ALL_PROJECT_DIRS})
@@ -87,14 +87,16 @@ set(BOARD_FILES
     
 set(MOVE_FILES
     ${MOVE_DIR}/MoveType.h
-    ${MOVE_DIR}/Move.h                  ${MOVE_DIR}/Move.cpp
+    ${MOVE_DIR}/Move.h
     ${MOVE_DIR}/MoveHelper.h            ${MOVE_DIR}/MoveHelper.cpp
-    ${MOVE_DIR}/MovementManager.h       ${MOVE_DIR}/MovementManager.cpp
+    ${MOVE_DIR}/MoveGeneration.h        ${MOVE_DIR}/MoveGeneration.cpp
+    ${MOVE_DIR}/MoveValidation.h        ${MOVE_DIR}/MoveValidation.cpp
+    ${MOVE_DIR}/MoveExecution.h         ${MOVE_DIR}/MoveExecution.cpp
     ${MOVE_DIR}/MoveNotationHelper.h    ${MOVE_DIR}/MoveNotationHelper.cpp
 )
 
-set(CONFIG_FILES
-    ${CONFIG_DIR}/GameManager.h    ${CONFIG_DIR}/GameManager.cpp
+set(GAME_MANAGER_FILES
+    ${GAME_MANAGER_DIR}/GameManager.h    ${GAME_MANAGER_DIR}/GameManager.cpp
 )
 
 set(PLAYER_FILES
@@ -129,19 +131,28 @@ set(NETWORK_FILES
     ${NETWORK_DIR}/TCPSession.h             ${NETWORK_DIR}/TCPSession.cpp
 )
 
+set(OBSERVER_FILES
+    ${OBSERVER_DIR}/IObserver.h
+    ${OBSERVER_DIR}/IObservable.h
+)
+
+set(COMMUNICATION_FILES
+    ${COMMUNICATION_DIR}/UICommunication.h    ${COMMUNICATION_DIR}/UICommunication.cpp
+)
+
 
 set(ALL_FILES
     ${API_FILES}
     ${PIECE_FILES}
     ${BOARD_FILES}
     ${MOVE_FILES}
-    ${CONFIG_FILES}
+    ${GAME_MANAGER_FILES}
     ${PLAYER_FILES}
     ${MISC_FILES}
     ${LOGGER_FILES}
     ${FILEMANAGER_FILES}
     ${USERSETTINGS_FILES}
-    ${NETWORK_FILES}
+    ${COMMUNICATION_FILES}
 )
 
 
@@ -153,13 +164,13 @@ source_group("API"              FILES ${API_FILES})
 source_group("Pieces"           FILES ${PIECE_FILES})
 source_group("Board"            FILES ${BOARD_FILES})
 source_group("Moves"            FILES ${MOVE_FILES})
-source_group("Configuration"    FILES ${CONFIG_FILES})
+source_group("GameManager"      FILES ${GAME_MANAGER_FILES})
 source_group("Player"           FILES ${PLAYER_FILES})
 source_group("Miscellaneous"    FILES ${MISC_FILES})
 source_group("Logging"          FILES ${LOGGER_FILES})
 source_group("FileManager"      FILES ${FILEMANAGER_FILES})
 source_group("UserSettings"     FILES ${USERSETTINGS_FILES})
-source_group("Network"          FILES ${NETWORK_FILES})
+source_group("Communication"    FILES ${COMMUNICATION_FILES})
 
 
 ###########################################

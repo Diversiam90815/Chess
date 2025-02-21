@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          Bishop
-
+	Module:         Bishop
 	Description:    Bishop class inheriting from ChessPiece
-
   ==============================================================================
 */
 
@@ -19,9 +16,8 @@
 class Bishop : public ChessPiece
 {
 public:
-	Bishop(PlayerColor color) : ChessPiece(PieceType::Bishop, color)
-	{
-	}
+	Bishop(PlayerColor color) : ChessPiece(PieceType::Bishop, color) {}
 
-	std::vector<PossibleMove>		 getPossibleMoves(const Position &pos, ChessBoard &board, bool attackOnly = false) const override;
+
+	std::vector<PossibleMove> getPossibleMoves(const Position &pos, ChessBoard &board, bool attackOnly = false) const override;
 };
