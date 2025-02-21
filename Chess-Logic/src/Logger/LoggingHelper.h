@@ -1,13 +1,9 @@
 /*
   ==============================================================================
-
-	Class:          LoggingHelper
-
+	Module:         LoggingHelper
 	Description:    Helper class for simplifying logging messages
-
   ==============================================================================
 */
-
 
 #pragma once
 

@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          ChessPiece
-
+	Module:         ChessPiece
 	Description:    Virtual class defining a generalized chess piece
-
   ==============================================================================
 */
 
@@ -16,6 +13,7 @@
 
 #include "Move.h"
 #include "Parameters.h"
+
 
 class ChessBoard;
 

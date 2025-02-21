@@ -1,35 +1,32 @@
 /*
   ==============================================================================
-
-	Class:          GameManager
-
+	Module:         GameManager
 	Description:    Manager for the Chess game
-
   ==============================================================================
 */
 
-
 #pragma once
 
-#include "MovementManager.h"
-#include "Player.h"
 #include <optional>
 
 #include "ChessLogicAPIDefines.h"
-
+#include "MoveExecution.h"
+#include "MoveGeneration.h"
+#include "MoveValidation.h"
+#include "Player.h"
 #include "Logging.h"
 #include "UserSettings.h"
+#include "IObservable.h"
+#include "UICommunication.h"
 
 
-class GameManager
+class GameManager : public IGameObservable
 {
 public:
-	~GameManager() = default;
-
+	~GameManager();
 
 	static GameManager		  *GetInstance();
 	static void				   ReleaseInstance();
-
 
 	void					   init();
 
@@ -39,7 +36,7 @@ public:
 
 	void					   undoMove();
 
-	void					   setCurrentGameState(GameState state);
+	void					   gameStateChanged(GameState state) override;
 	GameState				   getCurrentGameState() const;
 
 	void					   setCurrentMoveState(MoveState state);
@@ -47,7 +44,7 @@ public:
 
 	void					   resetGame();
 
-	void					   endGame() const;
+	void					   endGame(PlayerColor player) override;
 
 	std::optional<PlayerColor> getWinner() const;
 
@@ -63,30 +60,19 @@ public:
 
 	void					   handleMoveStateChanges(PossibleMove &move);
 
-	void					   setCurrentPlayer(PlayerColor player);
+	void					   moveStateInitiated() override; // Let the UI know moves for current round are ready -> handling need to be refactored later!
+
+	void					   changeCurrentPlayer(PlayerColor player) override;
 	PlayerColor				   getCurrentPlayer() const;
 
+	void					   setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
+	std::string				   getBoardTheme() const { return mUserSettings.getCurrentBoardTheme(); }
 
-	void					   setBoardTheme(std::string theme)
-	{
-		mUserSettings.setCurrentBoardTheme(theme);
-	}
+	void					   setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
+	std::string				   getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
 
-	std::string getBoardTheme() const
-	{
-		return mUserSettings.getCurrentBoardTheme();
-	}
-
-	void setPieceTheme(std::string theme)
-	{
-		mUserSettings.setCurrentPieceTheme(theme);
-	}
-
-	std::string getPieceTheme() const
-	{
-		return mUserSettings.getCurrentPieceTheme();
-	}
-
+	void					   attachObserver(IGameObserver *observer) override;
+	void					   detachObserver(IGameObserver *observer) override;
 
 private:
 	GameManager();
@@ -94,6 +80,10 @@ private:
 	void							 switchTurns();
 
 	void							 checkForEndGameConditions();
+
+	void							 initObservers();
+	void							 deinitObservers();
+
 
 	Logging							 mLog;
 
@@ -110,9 +100,15 @@ private:
 
 	std::vector<PossibleMove>		 mAllMovesForPosition;
 
-	std::unique_ptr<MovementManager> mMovementManager;
+	std::shared_ptr<ChessBoard>		 mChessBoard;
+
+	std::shared_ptr<MoveGeneration>	 mMoveGeneration;
+	std::shared_ptr<MoveValidation>	 mMoveValidation;
+	std::shared_ptr<MoveExecution>	 mMoveExecution;
+
+	std::unique_ptr<UICommunication> mUiCommunicationLayer;
 
 	UserSettings					 mUserSettings;
 
-	PFN_CALLBACK					 mDelegate = nullptr;
+	std::vector<IGameObserver *>	 mObservers;
 };

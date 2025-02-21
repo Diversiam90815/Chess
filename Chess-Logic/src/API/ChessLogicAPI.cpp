@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          ChessLogicAPI
-
+	Module:         ChessLogicAPI
 	Description:    Plain C API for the Chess logic
-
   ==============================================================================
 */
 
@@ -167,14 +164,6 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleM
 }
 
 
-CHESS_API void ExecuteMove(const PossibleMoveInstance &moveInstance)
-{
-	GameManager *manager = GameManager::GetInstance();
-	PossibleMove move	 = MapToPossibleMove(moveInstance);
-	manager->executeMove(move);
-}
-
-
 CHESS_API void HandleMoveStateChanged(const PossibleMoveInstance &moveInstance)
 {
 	GameManager *manager = GameManager::GetInstance();
@@ -198,13 +187,6 @@ CHESS_API void StartGame()
 }
 
 
-CHESS_API void EndGame()
-{
-	GameManager *manager = GameManager::GetInstance();
-	manager->endGame();
-}
-
-
 CHESS_API void ResetGame()
 {
 	GameManager *manager = GameManager::GetInstance();
@@ -215,25 +197,6 @@ CHESS_API void ResetGame()
 CHESS_API void UndoMove()
 {
 	GameManager::GetInstance()->undoMove();
-}
-
-
-
-CHESS_API void GetPieceInPosition(PositionInstance posInstance, PieceTypeInstance *pieceTypeInstance)
-{
-	Position		  pos	= MapToPosition(posInstance);
-	PieceTypeInstance piece = PieceTypeInstance::DefaultType;
-
-	if (pos.x < 0 || pos.x >= BOARD_SIZE || pos.y < 0 || pos.y >= BOARD_SIZE)
-	{
-		*pieceTypeInstance = piece;
-		return;
-	}
-
-	GameManager *manager = GameManager::GetInstance();
-
-	PieceType	 type	 = manager->getCurrentPieceTypeAtPosition(pos);
-	*pieceTypeInstance	 = static_cast<PieceTypeInstance>(static_cast<int>(type));
 }
 
 

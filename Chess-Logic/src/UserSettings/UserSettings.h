@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          UserSetting
-
+	Module:         UserSetting
 	Description:    Storing and managing the settings set by the user
-
   ==============================================================================
 */
 

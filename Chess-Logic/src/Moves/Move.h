@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          Move
-
+	Module:         Move
 	Description:    Storing information classifying a move in chess
-
   ==============================================================================
 */
 
@@ -18,7 +15,6 @@
 #include "MoveType.h"
 
 
-
 struct Position
 {
 	int	 x = 0;
@@ -26,6 +22,7 @@ struct Position
 
 	bool operator==(const Position &other) const { return x == other.x && y == other.y; }
 };
+
 
 // Hash method so we can use it in unordered_map
 namespace std
@@ -43,7 +40,6 @@ struct hash<Position>
 } // namespace std
 
 
-
 struct PossibleMove
 {
 	Position  start;
@@ -58,12 +54,24 @@ struct PossibleMove
 class Move
 {
 public:
-	Move();
+	Move() {}
 
-	Move(PossibleMove &possibleMove);
+	Move(PossibleMove &possibleMove)
+	{
+		this->startingPosition = possibleMove.start;
+		this->endingPosition   = possibleMove.end;
+		this->type			   = possibleMove.type;
+	}
 
-	Move(
-		Position start, Position end, PieceType moved, PieceType captured = PieceType::DefaultType, MoveType type = MoveType::Normal, PieceType promotion = PieceType::DefaultType);
+	Move(Position start, Position end, PieceType moved, PieceType captured = PieceType::DefaultType, MoveType type = MoveType::Normal, PieceType promotion = PieceType::DefaultType)
+	{
+		this->startingPosition = start;
+		this->endingPosition   = end;
+		this->movedPiece	   = moved;
+		this->capturedPiece	   = captured;
+		this->type			   = type;
+		this->promotionType	   = promotion;
+	}
 
 	Position	startingPosition;
 	Position	endingPosition;

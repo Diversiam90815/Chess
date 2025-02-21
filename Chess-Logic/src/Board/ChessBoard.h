@@ -1,13 +1,9 @@
 /*
   ==============================================================================
-
-	Class:          ChessBoard
-
-	Description:    Class charecterizing a virtual chess board
-
+	Module:         ChessBoard
+	Description:    Class characterizing a virtual chess board
   ==============================================================================
 */
-
 
 #pragma once
 
@@ -21,6 +17,7 @@
 #include "Rook.h"
 #include "Queen.h"
 #include "King.h"
+
 
 using PlayerPiece = std::pair<Position, std::shared_ptr<ChessPiece>>;
 

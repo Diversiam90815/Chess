@@ -1,19 +1,14 @@
 /*
   ==============================================================================
-
-	Class:          Pawn
-
+	Module:         Pawn
 	Description:    Pawn class inheriting from ChessPiece
-
   ==============================================================================
 */
-
 
 #pragma once
 
 #include "ChessPiece.h"
 #include "Parameters.h"
-#include "MovementManager.h"
 
 
 class Pawn : public ChessPiece
