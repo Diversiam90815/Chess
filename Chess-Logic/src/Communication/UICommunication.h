@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <combaseapi.h>
 #include <strsafe.h>
 
 #include "IObserver.h"

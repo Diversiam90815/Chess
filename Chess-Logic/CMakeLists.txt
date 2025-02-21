@@ -24,21 +24,22 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 #   PROJECT DIRECTORIES
 ###########################################
 
-set (SOURCE_DIR          ${PROJECT_SOURCE_DIR}/src)
-set (SUBMODULES_DIR      ${PROJECT_SOURCE_DIR}/submodules)
+set (SOURCE_DIR             ${PROJECT_SOURCE_DIR}/src)
+set (SUBMODULES_DIR         ${PROJECT_SOURCE_DIR}/submodules)
     
-set (PIECE_DIR           ${SOURCE_DIR}/Piece)
-set (MOVE_DIR            ${SOURCE_DIR}/Moves)
-set (GAME_MANAGER_DIR           ${SOURCE_DIR}/GameManager)
-set (BOARD_DIR           ${SOURCE_DIR}/Board)
-set (PLAYER_DIR          ${SOURCE_DIR}/Player)
-set (API_DIR             ${SOURCE_DIR}/API)
-set (MISC_DIR            ${SOURCE_DIR}/Miscellaneous)
-set (FILEMANAGER_DIR     ${SOURCE_DIR}/FileManager)
-set (LOGGER_DIR                 ${SOURCE_DIR}/Logger)
-set (USERSETTINGS_DIR     ${SOURCE_DIR}/UserSettings)
-set (COMMUNICATION_DIR          ${SOURCE_DIR}/Communication)
-
+set (PIECE_DIR              ${SOURCE_DIR}/Piece)
+set (MOVE_DIR               ${SOURCE_DIR}/Moves)
+set (GAME_MANAGER_DIR       ${SOURCE_DIR}/GameManager)
+set (BOARD_DIR              ${SOURCE_DIR}/Board)
+set (PLAYER_DIR             ${SOURCE_DIR}/Player)
+set (API_DIR                ${SOURCE_DIR}/API)
+set (MISC_DIR               ${SOURCE_DIR}/Miscellaneous)
+set (FILEMANAGER_DIR        ${SOURCE_DIR}/FileManager)
+set (LOGGER_DIR             ${SOURCE_DIR}/Logger)
+set (USERSETTINGS_DIR       ${SOURCE_DIR}/UserSettings)
+set (COMMUNICATION_DIR      ${SOURCE_DIR}/Communication)
+set(OBSERVER_DIR            ${SOURCE_DIR}/Observer)
+set (NETWORK_DIR            ${SOURCE_DIR}/Network)
 
 ###########################################
 #   INCLUDE DIRECTORIES
@@ -57,6 +58,8 @@ set(ALL_PROJECT_DIRS
             ${SOURCE_DIR}
             ${USERSETTINGS_DIR}
             ${COMMUNICATION_DIR}
+            ${OBSERVER_DIR}
+            ${NETWORK_DIR}
 )
 
 include_directories(${ALL_PROJECT_DIRS})
@@ -153,6 +156,8 @@ set(ALL_FILES
     ${FILEMANAGER_FILES}
     ${USERSETTINGS_FILES}
     ${COMMUNICATION_FILES}
+    ${OBSERVER_FILES}
+    ${NETWORK_FILES}
 )
 
 
@@ -170,7 +175,9 @@ source_group("Miscellaneous"    FILES ${MISC_FILES})
 source_group("Logging"          FILES ${LOGGER_FILES})
 source_group("FileManager"      FILES ${FILEMANAGER_FILES})
 source_group("UserSettings"     FILES ${USERSETTINGS_FILES})
+source_group("IObserver"        FILES ${OBSERVER_FILES})
 source_group("Communication"    FILES ${COMMUNICATION_FILES})
+source_group("Network"          FILES ${NETWORK_FILES})
 
 
 ###########################################
