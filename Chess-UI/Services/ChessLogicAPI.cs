@@ -46,16 +46,10 @@ namespace Chess_UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetPossibleMoveAtIndex", CharSet = CharSet.Unicode)]
         public static extern bool GetPossibleMoveAtIndex(uint index, out PossibleMoveInstance move);
 
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ExecuteMove", CharSet = CharSet.Unicode)]
-        public static extern void ExecuteMove(PossibleMoveInstance move);
-
         #endregion
 
 
         #region Board
-
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetPieceInPosition", CharSet = CharSet.Unicode)]
-        public static extern void GetPieceInPosition(PositionInstance position, out PieceTypeInstance piece);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetBoardState", CharSet = CharSet.Unicode)]
         public static extern bool GetBoardState([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 64)] int[] boardState);

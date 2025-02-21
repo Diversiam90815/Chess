@@ -40,7 +40,6 @@ struct hash<Position>
 } // namespace std
 
 
-
 struct PossibleMove
 {
 	Position  start;

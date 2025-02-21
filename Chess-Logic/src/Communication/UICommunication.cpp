@@ -6,8 +6,6 @@
 */
 
 #include "UICommunication.h"
-#include <strsafe.h>
-#include "Player.h"
 
 
 void UICommunication::setDelegate(PFN_CALLBACK pDelegate)

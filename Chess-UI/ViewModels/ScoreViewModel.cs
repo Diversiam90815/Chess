@@ -104,7 +104,7 @@ namespace Chess_UI.ViewModels
                             {
                                 blackCapturedPieces[pieceType] = --value;
                             }
-                            OnPropertyChanged($"WhiteCaptured{pieceType}");
+                            OnPropertyChanged($"BlackCaptured{pieceType}");
                         }
                         break;
                     }

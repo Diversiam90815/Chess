@@ -24,18 +24,14 @@ public:
 	MoveGeneration(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation, std::shared_ptr<MoveExecution> execution);
 	~MoveGeneration();
 
-
-
 	std::vector<PossibleMove> getMovesForPosition(const Position &position);
 
 	bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
-
 
 private:
 	std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PlayerColor player);
 
 	bool													canCastle(const Position &kingposition, PlayerColor player, bool kingside);
-
 
 	PossibleMove											generateEnPassantMove(const Position &position, PlayerColor player);
 

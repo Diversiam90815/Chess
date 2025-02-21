@@ -7,8 +7,11 @@
 
 #pragma once
 
+#include <strsafe.h>
+
 #include "IObserver.h"
 #include "ChessLogicAPIDefines.h"
+#include "Player.h"
 
 
 enum class MessageType
@@ -29,7 +32,6 @@ struct PlayerCapturedPieceEvent
 	PieceType	pieceType;
 	bool		captured; // False if we undo the move and remove a piece
 };
-
 
 
 class UICommunication : public IMoveObserver, public IGameObserver, public IPlayerObserver
