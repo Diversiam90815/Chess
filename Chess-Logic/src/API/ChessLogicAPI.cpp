@@ -195,13 +195,6 @@ CHESS_API void StartGame()
 }
 
 
-CHESS_API void EndGame()
-{
-	GameManager *manager = GameManager::GetInstance();
-	manager->endGame();
-}
-
-
 CHESS_API void ResetGame()
 {
 	GameManager *manager = GameManager::GetInstance();

@@ -161,7 +161,7 @@ source_group("Player"           FILES ${PLAYER_FILES})
 source_group("Miscellaneous"    FILES ${MISC_FILES})
 source_group("Logging"          FILES ${LOGGER_FILES})
 source_group("FileManager"      FILES ${FILEMANAGER_FILES})
-source_group("UserSettings"     FILES ${USERSETTINGS_DIR})
+source_group("UserSettings"     FILES ${USERSETTINGS_FILES})
 source_group("Observer"         FILES ${OBSERVER_FILES})
 source_group("Communication"    FILES ${COMMUNICATION_FILES})
 

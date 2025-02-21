@@ -210,7 +210,6 @@ void MoveExecution::addMoveToHistory(Move &move)
 	move.number = mMoveHistory.size() + 1; // Set the move number based on history size
 	mMoveHistory.insert(move);
 
-
 	for (auto observer : mObservers)
 	{
 		if (observer)

@@ -81,10 +81,6 @@ void GameManager::clearState()
 void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 {
 	mUiCommunicationLayer->setDelegate(pDelegate);
-
-	mDelegate = pDelegate;
-	mWhitePlayer.setDelegate(pDelegate);
-	mBlackPlayer.setDelegate(pDelegate);
 }
 
 

@@ -111,6 +111,4 @@ private:
 	UserSettings					 mUserSettings;
 
 	std::vector<IGameObserver *>	 mObservers;
-
-	PFN_CALLBACK					 mDelegate = nullptr;
 };

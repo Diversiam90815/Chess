@@ -53,8 +53,6 @@ public:
 
 	void		  reset();
 
-	void		  setDelegate(PFN_CALLBACK pDelegate);
-
 	void		  attachObserver(IPlayerObserver *observer) override;
 	void		  detachObserver(IPlayerObserver *observer) override;
 
@@ -68,6 +66,4 @@ private:
 	Score						   mScore		  = Score(PlayerColor::NoColor, 0);
 
 	std::vector<IPlayerObserver *> mObservers;
-
-	PFN_CALLBACK				   mDelegate = nullptr;
 };

@@ -62,19 +62,6 @@ enum class MoveState
 };
 
 
-//enum delegateMessage
-//{
-//	playerHasWon = 1,
-//	initiateMove,
-//	playerScoreUpdated,
-//	playerCapturedPiece,
-//	moveExecuted,
-//	playerChanged,
-//	gameStateChanged,
-//	moveHistoryAdded
-//};
-
-
 enum SettingsType
 {
 	boardTheme,

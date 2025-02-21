@@ -59,7 +59,7 @@ void Player::addCapturedPiece(const PieceType piece)
 	{
 		if (observer)
 		{
-			observer->onRemoveLastCapturedPiece(getPlayerColor(), piece);
+			observer->onAddCapturedPiece(getPlayerColor(), piece);
 		}
 	}
 }
@@ -130,12 +130,6 @@ void Player::reset()
 {
 	setScore(0);
 	mCapturedPieces.clear();
-}
-
-
-void Player::setDelegate(PFN_CALLBACK pDelegate)
-{
-	mDelegate = pDelegate;
 }
 
 
