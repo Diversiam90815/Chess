@@ -16,9 +16,10 @@
 #include "Player.h"
 #include "Logging.h"
 #include "UserSettings.h"
+#include "IObservable.h"
 
 
-class GameManager
+class GameManager : public IGameObservable
 {
 public:
 	~GameManager() = default;
@@ -34,7 +35,7 @@ public:
 
 	void					   undoMove();
 
-	void					   setCurrentGameState(GameState state);
+	void					   gameStateChanged(GameState state) override;
 	GameState				   getCurrentGameState() const;
 
 	void					   setCurrentMoveState(MoveState state);
@@ -42,7 +43,7 @@ public:
 
 	void					   resetGame();
 
-	void					   endGame() const;
+	void					   endGame(PlayerColor player) override;
 
 	std::optional<PlayerColor> getWinner() const;
 
@@ -58,7 +59,7 @@ public:
 
 	void					   handleMoveStateChanges(PossibleMove &move);
 
-	void					   setCurrentPlayer(PlayerColor player);
+	void					   changeCurrentPlayer(PlayerColor player) override;
 	PlayerColor				   getCurrentPlayer() const;
 
 	void					   setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
@@ -67,6 +68,8 @@ public:
 	void					   setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
 	std::string				   getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
 
+	void					   attachObserver(IGameObserver *observer) override;
+	void					   detachObserver(IGameObserver *observer) override;
 
 private:
 	GameManager();
@@ -97,6 +100,8 @@ private:
 	std::shared_ptr<MoveExecution>	mMoveExecution;
 
 	UserSettings					mUserSettings;
+
+	std::vector<IGameObserver *>	mObservers;
 
 	PFN_CALLBACK					mDelegate = nullptr;
 };

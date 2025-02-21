@@ -52,16 +52,16 @@ void GameManager::startGame()
 {
 	clearState();
 
-	mChessBoard->initializeBoard();		  // Reset the board
-	setCurrentPlayer(PlayerColor::White); // Setting the player at the end, since this will trigger the move calculation
+	mChessBoard->initializeBoard();			 // Reset the board
+	changeCurrentPlayer(PlayerColor::White); // Setting the player at the end, since this will trigger the move calculation
 }
 
 
 void GameManager::clearState()
 {
-	setCurrentPlayer(PlayerColor::NoColor);
+	changeCurrentPlayer(PlayerColor::NoColor);
 
-	setCurrentGameState(GameState::Init);
+	gameStateChanged(GameState::Init);
 	setCurrentMoveState(MoveState::NoMove);
 	mAllMovesForPosition.clear();
 	mMovesGeneratedForCurrentTurn = false; // Reset flag
@@ -136,13 +136,13 @@ void GameManager::switchTurns()
 
 	if (getCurrentPlayer() == PlayerColor::White)
 	{
-		setCurrentPlayer(PlayerColor::Black);
+		changeCurrentPlayer(PlayerColor::Black);
 		LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
 
 		return;
 	}
 
-	setCurrentPlayer(PlayerColor::White);
+	changeCurrentPlayer(PlayerColor::White);
 
 	LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
 }
@@ -217,14 +217,18 @@ void GameManager::undoMove()
 }
 
 
-void GameManager::setCurrentGameState(GameState state)
+void GameManager::gameStateChanged(GameState state)
 {
-	if (mCurrentState != state)
+	if (mCurrentState == state)
+		return;
+
+	mCurrentState = state;
+
+	for (auto observer : mObservers)
 	{
-		mCurrentState = state;
-		if (mDelegate)
+		if (observer)
 		{
-			mDelegate(delegateMessage::gameStateChanged, &mCurrentState);
+			observer->onGameStateChanged(state);
 		}
 	}
 }
@@ -263,12 +267,14 @@ void GameManager::resetGame()
 }
 
 
-void GameManager::endGame() const
+void GameManager::endGame(PlayerColor player)
 {
-	auto winner = getWinner();
-	if (winner.has_value() && mDelegate)
+	for (auto observer : mObservers)
 	{
-		mDelegate(delegateMessage::playerHasWon, &winner);
+		if (observer)
+		{
+			observer->onEndGame(player);
+		}
 	}
 }
 
@@ -332,7 +338,7 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 }
 
 
-void GameManager::setCurrentPlayer(PlayerColor player)
+void GameManager::changeCurrentPlayer(PlayerColor player)
 {
 	if (mCurrentPlayer != player)
 	{
@@ -364,8 +370,12 @@ void GameManager::checkForEndGameConditions()
 		if (isCheckMate)
 		{
 			LOG_INFO("Detected a Checkmate!");
-			setCurrentGameState(GameState::Checkmate);
-			endGame();
+			gameStateChanged(GameState::Checkmate);
+
+			auto winner = getWinner();
+			if (winner.has_value())
+				endGame(winner.value());
+
 			return;
 		}
 
@@ -374,17 +384,33 @@ void GameManager::checkForEndGameConditions()
 		if (isStaleMate)
 		{
 			LOG_INFO("Detected a Stalemate");
-			setCurrentGameState(GameState::Stalemate);
-			endGame();
+			gameStateChanged(GameState::Stalemate);
+
+			auto winner = getWinner();
+			if (winner.has_value())
+				endGame(winner.value());
+
 			return;
 		}
 
 		LOG_INFO("Game is still on-going. We switch player's turns!");
-		setCurrentGameState(GameState::OnGoing);
+		gameStateChanged(GameState::OnGoing);
 		switchTurns();
 		return;
 	}
 
 	LOG_WARNING("Couldn't find the last move! Game is still on-going");
-	setCurrentGameState(GameState::OnGoing);
+	gameStateChanged(GameState::OnGoing);
+}
+
+
+void GameManager::attachObserver(IGameObserver *observer)
+{
+	mObservers.push_back(observer);
+}
+
+
+void GameManager::detachObserver(IGameObserver *observer)
+{
+	mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
 }
