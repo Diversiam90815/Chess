@@ -15,9 +15,9 @@ class IPlayerObserver
 public:
 	virtual ~IPlayerObserver() {};
 
-	virtual void onScoreUpdate()											   = 0;
-	virtual void onAddCapturedPiece(PlayerColor player, PieceType captured)	   = 0;
-	virtual void onRemoteCapturedPiece(PlayerColor player, PieceType captured) = 0;
+	virtual void onScoreUpdate(Score updatedScore)								   = 0;
+	virtual void onAddCapturedPiece(PlayerColor player, PieceType captured)		   = 0;
+	virtual void onRemoveLastCapturedPiece(PlayerColor player, PieceType captured) = 0;
 };
 
 
@@ -26,8 +26,8 @@ class IMoveObserver
 public:
 	virtual ~IMoveObserver() {};
 
-	virtual void onExecuteMove(PossibleMove &move) = 0;
-	virtual void onAddToMoveHistory(Move &move)	   = 0;
+	virtual void onExecuteMove()				= 0;
+	virtual void onAddToMoveHistory(Move &move) = 0;
 };
 
 

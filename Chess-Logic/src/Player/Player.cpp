@@ -10,19 +10,13 @@
 #include "Player.h"
 
 
-Player::Player()
-{
-}
+Player::Player() {}
 
 
-Player::Player(PlayerColor color) : mPlayerColor(color)
-{
-}
+Player::Player(PlayerColor color) : mPlayerColor(color) {}
 
 
-Player::~Player()
-{
-}
+Player::~Player() {}
 
 
 Score Player::getScore() const
@@ -39,10 +33,10 @@ void Player::setScore(int value)
 	{
 		mScore = newScore;
 
-		if (mDelegate)
-		{
-			mDelegate(delegateMessage::playerScoreUpdated, &mScore);
-		}
+		//	if (mDelegate)
+		//	{
+		//		mDelegate(delegateMessage::playerScoreUpdated, &mScore);
+		//	}
 	}
 }
 
@@ -66,14 +60,22 @@ void Player::addCapturedPiece(const PieceType piece)
 {
 	mCapturedPieces.push_back(piece);
 
-	if (mDelegate)
+	for (auto observer : mObservers)
 	{
-		PlayerCapturedPiece event{};
-		event.playerColor = getPlayerColor();
-		event.pieceType	  = piece;
-		event.captured	  = true; // We captured a piece
-		mDelegate(delegateMessage::playerCapturedPiece, &event);
+		if (observer)
+		{
+			observer->onRemoveLastCapturedPiece(getPlayerColor(), piece);
+		}
 	}
+
+	// if (mDelegate)
+	//{
+	//	PlayerCapturedPiece event{};
+	//	event.playerColor = getPlayerColor();
+	//	event.pieceType	  = piece;
+	//	event.captured	  = true; // We captured a piece
+	//	mDelegate(delegateMessage::playerCapturedPiece, &event);
+	// }
 }
 
 
@@ -92,14 +94,22 @@ void Player::removeLastCapturedPiece()
 
 	updateScore();
 
-	if (mDelegate)
+	for (auto observer : mObservers)
 	{
-		PlayerCapturedPiece event{};
-		event.playerColor = getPlayerColor();
-		event.pieceType	  = lastCapture;
-		event.captured	  = false; // We undo a move, which was a capture
-		mDelegate(delegateMessage::playerCapturedPiece, &event);
+		if (observer)
+		{
+			observer->onRemoveLastCapturedPiece(getPlayerColor(), lastCapture);
+		}
 	}
+
+	// if (mDelegate)
+	//{
+	//	PlayerCapturedPiece event{};
+	//	event.playerColor = getPlayerColor();
+	//	event.pieceType	  = lastCapture;
+	//	event.captured	  = false; // We undo a move, which was a capture
+	//	mDelegate(delegateMessage::playerCapturedPiece, &event);
+	// }
 }
 
 
@@ -111,6 +121,14 @@ void Player::updateScore()
 		score += getPieceValue(piece);
 	}
 	setScore(score);
+
+	for (auto observer : mObservers)
+	{
+		if (observer)
+		{
+			observer->onScoreUpdate(mScore);
+		}
+	}
 
 	LOG_INFO("Updated Score for {} : {}", LoggingHelper::playerColourToString(mPlayerColor).c_str(), score);
 }
@@ -141,4 +159,16 @@ void Player::reset()
 void Player::setDelegate(PFN_CALLBACK pDelegate)
 {
 	mDelegate = pDelegate;
+}
+
+
+void Player::attachObserver(IPlayerObserver *observer)
+{
+	mObservers.push_back(observer);
+}
+
+
+void Player::detachObserver(IPlayerObserver *observer)
+{
+	mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
 }

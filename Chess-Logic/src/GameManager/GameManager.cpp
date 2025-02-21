@@ -168,10 +168,10 @@ void GameManager::executeMove(PossibleMove &move)
 		}
 	}
 
-	if (mDelegate)
-	{
-		mDelegate(delegateMessage::moveExecuted, 0);
-	}
+	//if (mDelegate)
+	//{
+	//	mDelegate(delegateMessage::moveExecuted, 0);
+	//}
 
 	checkForEndGameConditions();
 }

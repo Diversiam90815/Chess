@@ -107,7 +107,16 @@ Move MoveExecution::executeMove(PossibleMove &possibleMove)
 
 	executedMove.notation = mMoveNotation->generateStandardAlgebraicNotation(executedMove);
 
+	for (auto observer : mObservers)
+	{
+		if (observer)
+		{
+			observer->onExecuteMove();
+		}
+	}
+
 	addMoveToHistory(executedMove);
+
 	return executedMove;
 }
 
@@ -201,7 +210,16 @@ void MoveExecution::addMoveToHistory(Move &move)
 	move.number = mMoveHistory.size() + 1; // Set the move number based on history size
 	mMoveHistory.insert(move);
 
-										   // if (mDelegate)
+
+	for (auto observer : mObservers)
+	{
+		if (observer)
+		{
+			observer->onAddToMoveHistory(move);
+		}
+	}
+
+	// if (mDelegate)
 	//{
 	//	std::string numberedNotation = std::to_string(move.number) + ". " + move.notation;
 	//	size_t		len				 = numberedNotation.size();
@@ -226,4 +244,16 @@ void MoveExecution::removeLastMove()
 	{
 		mMoveHistory.erase(std::prev(mMoveHistory.end()));
 	}
+}
+
+
+void MoveExecution::attachObserver(IMoveObserver *observer)
+{
+	mObservers.push_back(observer);
+}
+
+
+void MoveExecution::detachObserver(IMoveObserver *observer)
+{
+	mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
 }

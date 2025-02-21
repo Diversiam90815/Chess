@@ -15,15 +15,16 @@
 #include "ChessBoard.h"
 #include "MoveNotationHelper.h"
 #include "Move.h"
+#include "IObservable.h"
 
 
-class MoveExecution
+class MoveExecution : public IMoveObservable
 {
 public:
 	MoveExecution(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation);
 	~MoveExecution();
 
-	Move		executeMove(PossibleMove &executedMove);
+	Move		executeMove(PossibleMove &executedMove) override;
 
 	bool		executeCastlingMove(PossibleMove &move);
 
@@ -33,9 +34,12 @@ public:
 
 	const Move *getLastMove();
 
-	void		addMoveToHistory(Move &move);
+	void		addMoveToHistory(Move &move) override;
 
 	void		removeLastMove();
+
+	void		attachObserver(IMoveObserver* observer) override;
+	void		detachObserver(IMoveObserver* observer) override;
 
 
 private:
@@ -46,4 +50,6 @@ private:
 	std::shared_ptr<MoveNotationHelper> mMoveNotation;
 
 	std::set<Move>						mMoveHistory;
+
+	std::vector<IMoveObserver*> mObservers;
 };
