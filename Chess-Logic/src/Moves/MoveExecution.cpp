@@ -218,23 +218,6 @@ void MoveExecution::addMoveToHistory(Move &move)
 			observer->onAddToMoveHistory(move);
 		}
 	}
-
-	// if (mDelegate)
-	//{
-	//	std::string numberedNotation = std::to_string(move.number) + ". " + move.notation;
-	//	size_t		len				 = numberedNotation.size();
-	//	size_t		bufferSize		 = (len + 1) * sizeof(char);
-	//	char	   *strCopy			 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
-
-	//	if (strCopy != nullptr)
-	//	{
-	//		HRESULT hr = StringCbCopyA(strCopy, bufferSize, numberedNotation.c_str());
-	//		if (SUCCEEDED(hr))
-	//		{
-	//			mDelegate(delegateMessage::moveHistoryAdded, strCopy);
-	//		}
-	//	}
-	//}
 }
 
 

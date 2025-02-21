@@ -32,11 +32,6 @@ void Player::setScore(int value)
 	if (mScore != newScore)
 	{
 		mScore = newScore;
-
-		//	if (mDelegate)
-		//	{
-		//		mDelegate(delegateMessage::playerScoreUpdated, &mScore);
-		//	}
 	}
 }
 
@@ -67,15 +62,6 @@ void Player::addCapturedPiece(const PieceType piece)
 			observer->onRemoveLastCapturedPiece(getPlayerColor(), piece);
 		}
 	}
-
-	// if (mDelegate)
-	//{
-	//	PlayerCapturedPiece event{};
-	//	event.playerColor = getPlayerColor();
-	//	event.pieceType	  = piece;
-	//	event.captured	  = true; // We captured a piece
-	//	mDelegate(delegateMessage::playerCapturedPiece, &event);
-	// }
 }
 
 
@@ -101,15 +87,6 @@ void Player::removeLastCapturedPiece()
 			observer->onRemoveLastCapturedPiece(getPlayerColor(), lastCapture);
 		}
 	}
-
-	// if (mDelegate)
-	//{
-	//	PlayerCapturedPiece event{};
-	//	event.playerColor = getPlayerColor();
-	//	event.pieceType	  = lastCapture;
-	//	event.captured	  = false; // We undo a move, which was a capture
-	//	mDelegate(delegateMessage::playerCapturedPiece, &event);
-	// }
 }
 
 
@@ -126,7 +103,7 @@ void Player::updateScore()
 	{
 		if (observer)
 		{
-			observer->onScoreUpdate(mScore);
+			observer->onScoreUpdate(mScore.player, mScore.value);
 		}
 	}
 

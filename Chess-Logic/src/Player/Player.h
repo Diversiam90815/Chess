@@ -18,19 +18,12 @@
 
 struct Score
 {
-	Score(PlayerColor player, int value) : player(player), score(value) {};
+	Score(PlayerColor player, int value) : player(player), value(value) {};
 
 	PlayerColor player = PlayerColor::NoColor;
-	int			score  = 0;
+	int			value  = 0;
 
-	bool		operator==(Score other) { return this->score == other.score && this->player == other.player; }
-};
-
-struct PlayerCapturedPiece
-{
-	PlayerColor playerColor;
-	PieceType	pieceType;
-	bool		captured; // False if we undo the move and remove a piece
+	bool		operator==(Score other) { return this->value == other.value && this->player == other.player; }
 };
 
 

@@ -17,12 +17,13 @@
 #include "Logging.h"
 #include "UserSettings.h"
 #include "IObservable.h"
+#include "UICommunication.h"
 
 
 class GameManager : public IGameObservable
 {
 public:
-	~GameManager() = default;
+	~GameManager();
 
 	static GameManager		  *GetInstance();
 	static void				   ReleaseInstance();
@@ -59,6 +60,8 @@ public:
 
 	void					   handleMoveStateChanges(PossibleMove &move);
 
+	void					   moveStateInitiated() override; // Let the UI know moves for current round are ready -> handling need to be refactored later!
+
 	void					   changeCurrentPlayer(PlayerColor player) override;
 	PlayerColor				   getCurrentPlayer() const;
 
@@ -74,34 +77,40 @@ public:
 private:
 	GameManager();
 
-	void							switchTurns();
+	void							 switchTurns();
 
-	void							checkForEndGameConditions();
+	void							 checkForEndGameConditions();
 
-	Logging							mLog;
+	void							 initObservers();
+	void							 deinitObservers();
 
-	bool							mMovesGeneratedForCurrentTurn = false;
 
-	Player							mWhitePlayer;
-	Player							mBlackPlayer;
+	Logging							 mLog;
 
-	PlayerColor						mCurrentPlayer	  = PlayerColor::NoColor;
+	bool							 mMovesGeneratedForCurrentTurn = false;
 
-	GameState						mCurrentState	  = GameState::Init;
+	Player							 mWhitePlayer;
+	Player							 mBlackPlayer;
 
-	MoveState						mCurrentMoveState = MoveState::NoMove;
+	PlayerColor						 mCurrentPlayer	   = PlayerColor::NoColor;
 
-	std::vector<PossibleMove>		mAllMovesForPosition;
+	GameState						 mCurrentState	   = GameState::Init;
 
-	std::shared_ptr<ChessBoard>		mChessBoard;
+	MoveState						 mCurrentMoveState = MoveState::NoMove;
 
-	std::shared_ptr<MoveGeneration> mMoveGeneration;
-	std::shared_ptr<MoveValidation> mMoveValidation;
-	std::shared_ptr<MoveExecution>	mMoveExecution;
+	std::vector<PossibleMove>		 mAllMovesForPosition;
 
-	UserSettings					mUserSettings;
+	std::shared_ptr<ChessBoard>		 mChessBoard;
 
-	std::vector<IGameObserver *>	mObservers;
+	std::shared_ptr<MoveGeneration>	 mMoveGeneration;
+	std::shared_ptr<MoveValidation>	 mMoveValidation;
+	std::shared_ptr<MoveExecution>	 mMoveExecution;
 
-	PFN_CALLBACK					mDelegate = nullptr;
+	std::unique_ptr<UICommunication> mUiCommunicationLayer;
+
+	UserSettings					 mUserSettings;
+
+	std::vector<IGameObserver *>	 mObservers;
+
+	PFN_CALLBACK					 mDelegate = nullptr;
 };

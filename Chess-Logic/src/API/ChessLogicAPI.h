@@ -45,8 +45,6 @@ extern "C"
 
 	CHESS_API void	StartGame();
 
-	CHESS_API void	EndGame();
-
 	CHESS_API void	ResetGame();
 
 	CHESS_API void	UndoMove();

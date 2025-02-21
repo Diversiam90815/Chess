@@ -68,9 +68,6 @@ namespace Chess_UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartGame", CharSet = CharSet.Unicode)]
         public static extern void StartGame();
 
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "EndGame", CharSet = CharSet.Unicode)]
-        public static extern void EndGame();
-
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ResetGame", CharSet = CharSet.Unicode)]
         public static extern void ResetGame();
 

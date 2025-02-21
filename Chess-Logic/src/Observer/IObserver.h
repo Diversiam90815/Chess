@@ -15,7 +15,7 @@ class IPlayerObserver
 public:
 	virtual ~IPlayerObserver() {};
 
-	virtual void onScoreUpdate(Score updatedScore)								   = 0;
+	virtual void onScoreUpdate(PlayerColor player, int value)					   = 0;
 	virtual void onAddCapturedPiece(PlayerColor player, PieceType captured)		   = 0;
 	virtual void onRemoveLastCapturedPiece(PlayerColor player, PieceType captured) = 0;
 };
@@ -39,4 +39,5 @@ public:
 	virtual void onGameStateChanged(GameState state)	   = 0;
 	virtual void onEndGame(PlayerColor winner)			   = 0;
 	virtual void onChangeCurrentPlayer(PlayerColor player) = 0;
+	virtual void onMoveStateInitiated()					   = 0;
 };

@@ -11,6 +11,12 @@
 GameManager::GameManager() {}
 
 
+GameManager::~GameManager()
+{
+	deinitObservers();
+}
+
+
 GameManager *GameManager::GetInstance()
 {
 	static GameManager *sInstance = nullptr;
@@ -37,14 +43,18 @@ void GameManager::init()
 	mLog.initLogging();
 	mUserSettings.init();
 
-	mChessBoard		= std::make_shared<ChessBoard>();
+	mUiCommunicationLayer = std::make_unique<UICommunication>();
 
-	mMoveValidation = std::make_shared<MoveValidation>(mChessBoard);
-	mMoveExecution	= std::make_shared<MoveExecution>(mChessBoard, mMoveValidation);
-	mMoveGeneration = std::make_shared<MoveGeneration>(mChessBoard, mMoveValidation, mMoveExecution);
+	mChessBoard			  = std::make_shared<ChessBoard>();
+
+	mMoveValidation		  = std::make_shared<MoveValidation>(mChessBoard);
+	mMoveExecution		  = std::make_shared<MoveExecution>(mChessBoard, mMoveValidation);
+	mMoveGeneration		  = std::make_shared<MoveGeneration>(mChessBoard, mMoveValidation, mMoveExecution);
 
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
+
+	initObservers();
 }
 
 
@@ -70,6 +80,8 @@ void GameManager::clearState()
 
 void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 {
+	mUiCommunicationLayer->setDelegate(pDelegate);
+
 	mDelegate = pDelegate;
 	mWhitePlayer.setDelegate(pDelegate);
 	mBlackPlayer.setDelegate(pDelegate);
@@ -168,10 +180,10 @@ void GameManager::executeMove(PossibleMove &move)
 		}
 	}
 
-	//if (mDelegate)
+	// if (mDelegate)
 	//{
 	//	mDelegate(delegateMessage::moveExecuted, 0);
-	//}
+	// }
 
 	checkForEndGameConditions();
 }
@@ -317,10 +329,7 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 		mAllMovesForPosition.reserve(possibleMoves.size());
 		mAllMovesForPosition = possibleMoves;
 
-		if (mDelegate)
-		{
-			mDelegate(delegateMessage::initiateMove, 0); // UI can now get all the moves for the piece
-		}
+		moveStateInitiated(); // Let the UI know the moves for current round are ready -> handling need to be refactored later!
 
 		LOG_INFO("Number of possible moves for the current position is {}", mAllMovesForPosition.size());
 
@@ -338,16 +347,30 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 }
 
 
+void GameManager::moveStateInitiated()
+{
+	for (auto observer : mObservers)
+	{
+		if (observer)
+		{
+			observer->onMoveStateInitiated();
+		}
+	}
+}
+
+
 void GameManager::changeCurrentPlayer(PlayerColor player)
 {
 	if (mCurrentPlayer != player)
 	{
 		mCurrentPlayer = player;
 
-		if (mDelegate)
+		for (auto observer : mObservers)
 		{
-			int currentPlayer = (int)mCurrentPlayer;
-			mDelegate(delegateMessage::playerChanged, &currentPlayer);
+			if (observer)
+			{
+				observer->onChangeCurrentPlayer(mCurrentPlayer);
+			}
 		}
 	}
 }
@@ -401,6 +424,28 @@ void GameManager::checkForEndGameConditions()
 
 	LOG_WARNING("Couldn't find the last move! Game is still on-going");
 	gameStateChanged(GameState::OnGoing);
+}
+
+
+void GameManager::initObservers()
+{
+	this->attachObserver(mUiCommunicationLayer.get());
+
+	mWhitePlayer.attachObserver(mUiCommunicationLayer.get());
+	mBlackPlayer.attachObserver(mUiCommunicationLayer.get());
+
+	mMoveExecution->attachObserver(mUiCommunicationLayer.get());
+}
+
+
+void GameManager::deinitObservers()
+{
+	this->detachObserver(mUiCommunicationLayer.get());
+
+	mWhitePlayer.detachObserver(mUiCommunicationLayer.get());
+	mBlackPlayer.detachObserver(mUiCommunicationLayer.get());
+
+	mMoveExecution->detachObserver(mUiCommunicationLayer.get());
 }
 
 
