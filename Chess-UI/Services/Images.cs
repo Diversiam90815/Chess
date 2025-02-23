@@ -82,9 +82,9 @@ namespace Chess_UI.Services
         public static ImageSource GetPieceImage(PieceTheme theme, PlayerColor color, PieceTypeInstance pieceType)
         {
             // Convert enum values to strings that match folder and file naming conventions
-            string themeName = theme.ToString();    // e.g., "Standard" or "Basic"
+            string themeName = theme.ToString();
             string colorSuffix = color == PlayerColor.White ? "W" : "B";
-            string pieceName = pieceType.ToString(); // e.g., "Pawn", "Bishop", etc.
+            string pieceName = pieceType.ToString();
 
             // Construct the relative file path. Assumes folder structure: Assets/Pieces/{Theme}/
             string relativePath = $"/Assets/Pieces/{themeName}/{pieceName}{colorSuffix}.png";

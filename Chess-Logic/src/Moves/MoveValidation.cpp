@@ -93,15 +93,6 @@ bool MoveValidation::isStalemate(PlayerColor player)
 		}
 	}
 	return true;
-
-	// if (!calculateAllLegalBasicMoves(player))
-	//{
-	//	// If no legal moves are available and king is not in check, it's stalemate
-	//	return true;
-	// }
-
-	//// Legal moves are available, so it's not stalemate
-	// return false;
 }
 
 
@@ -190,8 +181,6 @@ bool MoveValidation::isSquareAttacked(const Position &square, PlayerColor attack
 				return true;
 			}
 		}
-
-		// Need to check extra for possible pawn movement captures ( they do not appear here, since they are not valid if the square was left empty)
 	}
 
 	return false;
