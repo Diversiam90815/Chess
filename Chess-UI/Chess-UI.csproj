@@ -45,7 +45,6 @@
 		<ProjectCapability Include="Msix" />
 	</ItemGroup>
 
-	<!-- Add the Chess Logic DLL library to project -->
 	<PropertyGroup>
 		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Release'">..\Chess-Logic\build\Release</LocalChessLogicFiles>
 		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Debug'">..\Chess-Logic\build\Debug</LocalChessLogicFiles>
@@ -58,9 +57,9 @@
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
 		<AppxBundle>Never</AppxBundle>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
-		<AppxPackageDir>F:\SoftwareProjects\Chess\Installer</AppxPackageDir>
 	</PropertyGroup>
 
+	<!-- Add the Chess Logic DLL library to project -->
 	<ItemGroup>
 		<None Include="$(LocalChessLogicFiles)\*.dll">
 			<Link>%(Filename)%(Extension)</Link>
