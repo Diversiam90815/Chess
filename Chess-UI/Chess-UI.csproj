@@ -49,6 +49,16 @@
 	<PropertyGroup>
 		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Release'">..\Chess-Logic\build\Release</LocalChessLogicFiles>
 		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Debug'">..\Chess-Logic\build\Debug</LocalChessLogicFiles>
+		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+		<PackageCertificateThumbprint>1E78FA83BFB0BB085640F0BA80FFCBE6725475EA</PackageCertificateThumbprint>
+		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
+		<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+		<GenerateTestArtifacts>True</GenerateTestArtifacts>
+		<AppxBundle>Never</AppxBundle>
+		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+		<AppxPackageDir>F:\SoftwareProjects\Chess\Installer</AppxPackageDir>
 	</PropertyGroup>
 
 	<ItemGroup>
