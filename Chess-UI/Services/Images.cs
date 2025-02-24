@@ -46,6 +46,7 @@ namespace Chess_UI.Services
         {BoardTheme.Plastic, LoadImage("/Assets/Board/Plastic.png") },
         {BoardTheme.Marble, LoadImage("/Assets/Board/Marble.png") },
         {BoardTheme.Marble2, LoadImage("/Assets/Board/Marble2.png") },
+        {BoardTheme.Glass, LoadImage("/Assets/Board/Glass.png") }
         };
 
         public static readonly Dictionary<MainMenuButton, ImageSource> MainMenutImages = new()

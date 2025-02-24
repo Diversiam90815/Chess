@@ -18,7 +18,7 @@
                 <ImageBrush ImageSource="{x:Bind ViewModel.BoardBackgroundImage, Mode=OneWay}"/>
             </Grid.Background>
 
-            <ItemsRepeater x:Name="ChessBoardRepeater" Width="600" Height="600" ItemsSource="{x:Bind ViewModel.Board, Mode=TwoWay}">
+            <ItemsRepeater x:Name="ChessBoardRepeater" ItemsSource="{x:Bind ViewModel.Board, Mode=TwoWay}">
                 <ItemsRepeater.Layout>
                     <UniformGridLayout MaximumRowsOrColumns="8" />
                 </ItemsRepeater.Layout>
