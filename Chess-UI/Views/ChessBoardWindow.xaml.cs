@@ -9,10 +9,28 @@ using static Chess_UI.Services.ChessLogicAPI;
 using System.Threading.Tasks;
 using System;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Data;
 
 
 namespace Chess_UI.Views
 {
+
+    public class DivideByEightConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is double d)
+                return d / 8;
+            return 0;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
     public sealed partial class ChessBoardWindow : Window
     {
         private ChessBoardViewModel ViewModel;
@@ -47,9 +65,11 @@ namespace Chess_UI.Views
         {
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
             float scalingFactor = ChessLogicAPI.GetWindowScalingFactor(hwnd);
+
             int scaledWidth = (int)(width * scalingFactor);
             int scaledHeight = (int)(height * scalingFactor);
             AppWindow.Resize(new(scaledWidth, scaledHeight));
+            Logger.LogInfo(string.Format("Window size set to {0} - {1} with a scaling factor of {2}", scaledWidth.ToString(), scaledHeight.ToString(), scalingFactor.ToString()));
         }
 
 

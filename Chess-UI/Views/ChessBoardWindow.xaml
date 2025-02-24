@@ -18,14 +18,14 @@
                 <ImageBrush ImageSource="{x:Bind ViewModel.BoardBackgroundImage, Mode=OneWay}"/>
             </Grid.Background>
 
-            <ItemsRepeater x:Name="ChessBoardRepeater" Height="600" Width="600" ItemsSource="{x:Bind ViewModel.Board, Mode=TwoWay}">
+            <ItemsRepeater x:Name="ChessBoardRepeater" ItemsSource="{x:Bind ViewModel.Board, Mode=TwoWay}">
                 <ItemsRepeater.Layout>
                     <UniformGridLayout MaximumRowsOrColumns="8" />
                 </ItemsRepeater.Layout>
 
                 <ItemsRepeater.ItemTemplate >
                     <DataTemplate x:DataType="vm:BoardSquare" >
-                        <Grid Width="75" Height="75" Tapped="ChessPiece_Clicked" DataContext="{x:Bind}" Background="{x:Bind BackgroundBrush, Mode=OneWay}" >
+                        <Grid Tapped="ChessPiece_Clicked" DataContext="{x:Bind}" Background="{x:Bind BackgroundBrush, Mode=OneWay}" Width="{Binding ElementName=BoardGrid, Path=ActualWidth, Converter={StaticResource DivideByEightConverter}}" Height="{Binding ElementName=BoardGrid, Path=ActualWidth, Converter={StaticResource DivideByEightConverter}}" >
                             <Image Source="{x:Bind PieceImage, Mode=OneWay}" Stretch="Uniform"/>
                         </Grid>
                     </DataTemplate>
