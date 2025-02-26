@@ -14,13 +14,6 @@
 #include "DiscoveryService.h"
 
 
-enum class EndpointType
-{
-	Server = 1,
-	Client = 2
-};
-
-
 class NetworkManager
 {
 public:

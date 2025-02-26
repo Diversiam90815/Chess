@@ -20,7 +20,7 @@
 /*
 	The message we're sending/receiving consists of 2 sections: header and body.
 	Header will be 4 bytes long and contain the length of the body
-	Body will contain the type of message and the data itself
+	Body will contain the type (first 4 bytes of body) of message and the data itself preceding
 */
 
 
