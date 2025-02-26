@@ -23,9 +23,6 @@ namespace asio = boost::asio;
 using boost::asio::ip::udp;
 
 
-using PeerCallback = std::function<void(const json &)>;
-
-
 struct Endpoint
 {
 	std::string IPAddress{};
@@ -33,6 +30,8 @@ struct Endpoint
 	std::string playerName{};
 	bool		operator==(Endpoint &other) { return this->IPAddress == other.IPAddress && this->tcpPort == other.tcpPort && this->playerName == other.playerName; }
 };
+
+using PeerCallback = std::function<void(const Endpoint &remote)>;
 
 
 // Enable automatic JSON conversion.

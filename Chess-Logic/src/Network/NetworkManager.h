@@ -14,22 +14,32 @@
 #include "DiscoveryService.h"
 
 
+enum class EndpointType
+{
+	Server = 1,
+	Client = 2
+};
+
+
 class NetworkManager
 {
 public:
 	NetworkManager();
 	~NetworkManager();
 
-	void init();
+	void		init();
 
-	bool hostSession();
+	bool		hostSession();
 
-	void joinSession(const std::string IPv4, const int port);
+	void		joinSession(const Endpoint remote);
 
-	void setTCPSession(TCPSession::pointer session);
+	void		setTCPSession(TCPSession::pointer session);
 
-	bool isInitialized() const { return initialized.load(); }
-	void setInitialized(const bool value) { initialized.store(value); }
+	bool		isInitialized() const { return initialized.load(); }
+	void		setInitialized(const bool value) { initialized.store(value); }
+
+	void		setPlayerName(const std::string name) { mPlayerName = name; }
+	std::string getPlayerName() const { return mPlayerName; }
 
 
 private:
@@ -37,18 +47,20 @@ private:
 
 	bool							  setNetworkAdapterFromConfig();
 
-	void							  startDiscovery(const std::string IPv4, const int port);
-
+	void							  startServerDiscovery(const std::string IPv4, const int port);
+	void							  startClientDiscovery();
 
 	TCPSession::pointer				  mSession = nullptr;
 
 	std::unique_ptr<TCPServer>		  mServer;
-
 	std::unique_ptr<TCPClient>		  mClient;
-
 	std::unique_ptr<DiscoveryService> mDiscovery;
 
 	NetworkInformation				  mNetworkInfo;
 
 	std::atomic<bool>				  initialized{false};
+
+	boost::asio::io_context			  mIoContext;
+
+	std::string						  mPlayerName{};
 };

@@ -23,7 +23,7 @@ using SessionHandler = std::function<void(boost::shared_ptr<TCPSession> session)
 class TCPServer
 {
 public:
-	TCPServer(boost::asio::io_context &ioContext, unsigned short port);
+	TCPServer(boost::asio::io_context &ioContext);
 	~TCPServer();
 
 	void	  startAccept();

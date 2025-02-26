@@ -8,7 +8,7 @@
 #include "TCPServer.h"
 
 
-TCPServer::TCPServer(boost::asio::io_context &ioContext, unsigned short port) : mIoContext(ioContext), mAcceptor(ioContext, tcp::endpoint(tcp::v4(), port)) {}
+TCPServer::TCPServer(boost::asio::io_context &ioContext) : mIoContext(ioContext), mAcceptor(ioContext, tcp::endpoint(tcp::v4(), 0)) {}
 
 
 TCPServer::~TCPServer() {}

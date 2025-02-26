@@ -25,33 +25,32 @@ void NetworkManager::init()
 		presetNetworkAdapter();
 	}
 
-	mDiscovery = std::make_unique<DiscoveryService>();
-	//mDiscovery->init();
-	mDiscovery->setPeerCallback()
 	setInitialized(true);
 }
 
 
 bool NetworkManager::hostSession()
 {
-	mServer = std::make_unique<TCPServer>(mNetworkInfo.getCurrentNetworkAdapter().ID);
+	mServer = std::make_unique<TCPServer>(mIoContext);
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
 	mServer->startAccept();
+	mIoContext.run();
 
 	if (isInitialized())
 		return false;
 
 	const std::string localIPv4 = mNetworkInfo.getCurrentNetworkAdapter().IPv4;
 	const int		  port		= mServer->getBoundPort();
-	startDiscovery(localIPv4, port);
+	startServerDiscovery(localIPv4, port);
 }
 
 
-void NetworkManager::joinSession(const std::string IPv4, const int port)
+void NetworkManager::joinSession(const Endpoint remote)
 {
-	mClient = std::make_unique<TCPClient>();
+	mClient = std::make_unique<TCPClient>(mIoContext);
 	mClient->setConnectHandler([this](TCPSession::pointer session) { setTCPSession(session); });
-	mClient->connect(IPv4, port);
+	mClient->connect(remote.IPAddress, remote.tcpPort);
+	mIoContext.run();
 }
 
 
@@ -110,4 +109,23 @@ bool NetworkManager::setNetworkAdapterFromConfig()
 }
 
 
-void NetworkManager::startDiscovery(const std::string IPv4, const int port) {}
+void NetworkManager::startServerDiscovery(const std::string IPv4, const int port)
+{
+	mDiscovery.reset(new DiscoveryService(mIoContext));
+
+	mDiscovery->init(IPv4, port, getPlayerName());
+	mDiscovery->startSender();
+
+	mIoContext.run();
+}
+
+
+void NetworkManager::startClientDiscovery()
+{
+	mDiscovery.reset(new DiscoveryService(mIoContext));
+
+	mDiscovery->setPeerCallback([this](Endpoint remote) { joinSession(remote); });
+	mDiscovery->startReceiver();
+
+	mIoContext.run();
+}
