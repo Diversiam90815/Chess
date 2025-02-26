@@ -1,6 +1,6 @@
 /*
   ==============================================================================
-	Class:          NetworkDiscovery
+	Module:         NetworkDiscovery
 	Description:    Discovery of other Chess Apps on the local network using multicast packages
   ==============================================================================
 */
@@ -8,7 +8,7 @@
 #include "DiscoveryService.h"
 
 
-DiscoveryService::DiscoveryService(asio::io_context &ioContext) : mSocket(ioContext)
+DiscoveryService::DiscoveryService(asio::io_context &ioContext) : mSocket(ioContext), mTimer(ioContext)
 {
 	mIoContext = &ioContext;
 }
@@ -42,7 +42,7 @@ bool DiscoveryService::init(std::string localIPv4, unsigned short tcpPort, const
 }
 
 
-void DiscoveryService::start()
+void DiscoveryService::startSender()
 {
 	if (!mInitialized.load())
 	{
@@ -52,21 +52,28 @@ void DiscoveryService::start()
 
 	mIsRunning.store(true);
 
-	sendPackage();
-
-	startReceive();
+	scheduleNextSend();
 }
 
 
 void DiscoveryService::stop()
 {
 	mIsRunning.store(false);
+
 	boost::system::error_code ec;
 	mSocket.close(ec);
 	if (ec)
 	{
 		LOG_ERROR("Error occurred during closing of the socket! Error : {}", ec.message().c_str());
 	}
+
+	mTimer.cancel();
+}
+
+
+void DiscoveryService::startReceiver()
+{
+	mSocket.async_receive(boost::asio::buffer(mRecvBuffer), std::bind(&DiscoveryService::handleReceive, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 
@@ -76,12 +83,12 @@ void DiscoveryService::setPeerCallback(PeerCallback callback)
 }
 
 
-void DiscoveryService::sendPackage(std::string IPAddress)
+void DiscoveryService::sendPackage()
 {
 	if (!mIsRunning.load())
 		return;
 
-	boost::asio::ip::address_v4 address = boost::asio::ip::make_address_v4(IPAddress);
+	boost::asio::ip::address_v4 address = boost::asio::ip::make_address_v4(broadCastAddress);
 
 	udp::endpoint				target(address, mDiscoveryPort);
 
@@ -98,6 +105,24 @@ void DiscoveryService::sendPackage(std::string IPAddress)
 }
 
 
+void DiscoveryService::scheduleNextSend()
+{
+	mTimer.expires_at(mTimer.expiry() + boost::asio::chrono::seconds(1));
+	mTimer.async_wait(std::bind(&DiscoveryService::onSendTimer, this, std::placeholders::_1));
+}
+
+
+void DiscoveryService::onSendTimer(const boost::system::error_code &ec)
+{
+	if (!ec && mIsRunning.load())
+	{
+		sendPackage();
+
+		scheduleNextSend();
+	}
+}
+
+
 void DiscoveryService::handleSend(const boost::system::error_code &error, size_t bytesSent)
 {
 	if (error)
@@ -108,14 +133,6 @@ void DiscoveryService::handleSend(const boost::system::error_code &error, size_t
 	{
 		LOG_INFO("Discovery package sent ({} bytes)!", std::to_string(bytesSent).c_str());
 	}
-}
-
-
-void DiscoveryService::startReceive()
-{
-	if (!mIsRunning)
-		return;
-	mSocket.async_receive(boost::asio::buffer(mRecvBuffer), std::bind(&DiscoveryService::handleReceive, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 
@@ -130,8 +147,7 @@ void DiscoveryService::handleReceive(const boost::system::error_code &error, siz
 
 			Endpoint	remote = j.get<Endpoint>();
 
-			if (mPeerCallback)
-				mPeerCallback(remote);
+			addRemoteToList(remote);
 		}
 		catch (std::exception &e)
 		{
@@ -145,6 +161,20 @@ void DiscoveryService::handleReceive(const boost::system::error_code &error, siz
 
 	if (mIsRunning.load())
 	{
-		startReceive();
+		startReceiver();
 	}
+}
+
+
+void DiscoveryService::addRemoteToList(Endpoint remote)
+{
+	for (auto &ep : mRemoteDevices) // Detecting duplicates
+	{
+		if (ep == remote)
+			return;
+	}
+	mRemoteDevices.push_back(remote);
+
+	if (mPeerCallback)
+		mPeerCallback(remote);
 }

@@ -1,6 +1,6 @@
 /*
   ==============================================================================
-	Class:          NetworkDiscovery
+	Module:         NetworkDiscovery
 	Description:    Discovery of other Chess Apps on the local network using multicast packages
   ==============================================================================
 */
@@ -31,6 +31,7 @@ struct Endpoint
 	std::string IPAddress{};
 	int			tcpPort{0};
 	std::string playerName{};
+	bool		operator==(Endpoint &other) { return this->IPAddress == other.IPAddress && this->tcpPort == other.tcpPort && this->playerName == other.playerName; }
 };
 
 
@@ -56,44 +57,51 @@ public:
 
 	bool init(std::string localIPv4, unsigned short tcpPort, const std::string &playerName);
 
-	void start();
+	void startSender();
 
 	void stop();
+
+	void startReceiver();
 
 	void setPeerCallback(PeerCallback callback);
 
 private:
-	void				   sendPackage(std::string IPAddress = "255.255.255.255");
+	void					   sendPackage();
 
-	void				   handleSend(const boost::system::error_code &error, size_t bytesSent);
+	void					   scheduleNextSend();
 
-	void				   startReceive();
+	void					   onSendTimer(const boost::system::error_code &ec);
 
-	void				   handleReceive(const boost::system::error_code &error, size_t bytesReceived);
+	void					   handleSend(const boost::system::error_code &error, size_t bytesSent);
 
+	void					   handleReceive(const boost::system::error_code &error, size_t bytesReceived);
 
-	const int			   mDiscoveryPort = 5555; // needs to be set from config later
-
-	std::string			   localIPv4{};
-	int					   mTcpPort{0};
-
-	std::string			   mPlayerName{};
+	void					   addRemoteToList(Endpoint remote);
 
 
+	const int				   mDiscoveryPort = 5555; // needs to be set from config later
 
-	std::vector<Endpoint>  mRemoteDevices;
+	std::string				   localIPv4{};
+	int						   mTcpPort{0};
 
-	PeerCallback		   mPeerCallback;
+	std::string				   mPlayerName{};
 
-	std::atomic<bool>	   mInitialized{false};
-	std::atomic<bool>	   mIsRunning{false};
+	std::vector<Endpoint>	   mRemoteDevices;
 
+	PeerCallback			   mPeerCallback;
 
-	asio::io_context	  *mIoContext = nullptr;
+	std::atomic<bool>		   mInitialized{false};
+	std::atomic<bool>		   mIsRunning{false};
 
-	udp::socket			   mSocket;
+	asio::io_context		  *mIoContext = nullptr;
 
-	udp::endpoint		   mSenderEndpoint;
+	udp::socket				   mSocket;
 
-	std::array<char, 1024> mRecvBuffer{};
+	udp::endpoint			   mSenderEndpoint;
+
+	std::array<char, 1024>	   mRecvBuffer{};
+
+	std::string				   broadCastAddress = "255.255.255.255";
+
+	boost::asio::system_timer  mTimer;
 };

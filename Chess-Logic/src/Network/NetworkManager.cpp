@@ -27,7 +27,7 @@ void NetworkManager::init()
 
 	mDiscovery = std::make_unique<DiscoveryService>();
 	//mDiscovery->init();
-
+	mDiscovery->setPeerCallback()
 	setInitialized(true);
 }
 
