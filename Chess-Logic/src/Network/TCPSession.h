@@ -14,11 +14,28 @@
 #include <vector>
 #include <json.hpp>
 
+#include "Logging.h"
+
+
+/*
+	The message we're sending/receiving consists of 2 sections: header and body.
+	Header will be 4 bytes long and contain the length of the body
+	Body will contain the type of message and the data itself
+*/
+
+
+enum class MessageType : uint32_t
+{
+	Move = 1,
+	test = 2
+	// more to come
+};
+
 
 using json = nlohmann::json;
 using boost::asio::ip::tcp;
 
-using MessageHandler = std::function<void(const json &message)>;
+using MessageHandler = std::function<void(MessageType type, const json &message)>;
 
 
 class TCPSession : public boost::enable_shared_from_this<TCPSession>
@@ -34,23 +51,23 @@ public:
 
 	const int							  getBoundPort() const { return mBoundPort; }
 
+	void								  sendJson(MessageType type, const json &message);
+
 private:
 	explicit TCPSession(boost::asio::io_context &ioContext);
 
-	void		handleRead(const boost::system::error_code &error, size_t bytesRead);
+	void			  readHeader();
 
-	void		handleWrite(const boost::system::error_code &error);
+	void			  readBody();
 
-	tcp::socket mSocket;
 
-	enum
-	{
-		max_length = 1024
-	};
+	tcp::socket		  mSocket;
 
-	char		   mData[max_length]{};
+	char			  mHeader[4]{};
+	std::vector<char> mBody{};
+	uint32_t		  mBodyLength{0};
 
-	int			   mBoundPort{0};
+	int				  mBoundPort{0};
 
-	MessageHandler mMessageHandler = nullptr;
+	MessageHandler	  mMessageHandler = nullptr;
 };
