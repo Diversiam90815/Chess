@@ -130,6 +130,12 @@ void NetworkInformation::setCurrentNetworkAdapter(const NetworkAdapter &adapter)
 	if (mCurrentNetworkAdapter != adapter)
 	{
 		mCurrentNetworkAdapter = adapter;
+
+		LOG_INFO("Set user defined adapter to :");
+		LOG_INFO("\t Description:\t {}", adapter.description);
+		LOG_INFO("\t IPv4: \t\t\t{}", adapter.IPv4);
+		LOG_INFO("\t Subnet: \t\t{}", adapter.subnet);
+		LOG_INFO("\t ID: \t\t\t{}", adapter.ID);
 	}
 }
 

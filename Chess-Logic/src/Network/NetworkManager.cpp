@@ -75,12 +75,6 @@ bool NetworkManager::presetNetworkAdapter()
 	mNetworkInfo.setCurrentNetworkAdapter(adapter);
 	FileManager::GetInstance()->setSelectedNetworkAdapter(adapter);
 
-	LOG_INFO("Set user defined adapter to :");
-	LOG_INFO("\t Description:\t {}", adapter.description);
-	LOG_INFO("\t IPv4: \t\t\t{}", adapter.IPv4);
-	LOG_INFO("\t Subnet: \t\t{}", adapter.subnet);
-	LOG_INFO("\t ID: \t\t\t{}", adapter.ID);
-
 	return true;
 }
 
@@ -99,11 +93,6 @@ bool NetworkManager::setNetworkAdapterFromConfig()
 	if (!mNetworkInfo.isAdapterCurrentlyAvailable(userSetAdapter))
 		return false;
 
-	LOG_INFO("Set user defined adapter to :");
-	LOG_INFO("\t Description:\t {}", userSetAdapter.description);
-	LOG_INFO("\t IPv4: \t\t\t{}", userSetAdapter.IPv4);
-	LOG_INFO("\t Subnet: \t\t{}", userSetAdapter.subnet);
-	LOG_INFO("\t ID: \t\t\t{}", userSetAdapter.ID);
 	mNetworkInfo.setCurrentNetworkAdapter(userSetAdapter);
 
 	return true;
