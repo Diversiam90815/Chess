@@ -24,14 +24,26 @@ void NetworkManager::init()
 	{
 		presetNetworkAdapter();
 	}
+
+	mDiscovery = std::make_unique<DiscoveryService>();
+	//mDiscovery->init();
+
+	setInitialized(true);
 }
 
 
-void NetworkManager::hostSession()
+bool NetworkManager::hostSession()
 {
 	mServer = std::make_unique<TCPServer>(mNetworkInfo.getCurrentNetworkAdapter().ID);
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
 	mServer->startAccept();
+
+	if (isInitialized())
+		return false;
+
+	const std::string localIPv4 = mNetworkInfo.getCurrentNetworkAdapter().IPv4;
+	const int		  port		= mServer->getBoundPort();
+	startDiscovery(localIPv4, port);
 }
 
 
@@ -39,7 +51,7 @@ void NetworkManager::joinSession(const std::string IPv4, const int port)
 {
 	mClient = std::make_unique<TCPClient>();
 	mClient->setConnectHandler([this](TCPSession::pointer session) { setTCPSession(session); });
-	mClient->connect(IPv4,port);
+	mClient->connect(IPv4, port);
 }
 
 
@@ -96,3 +108,6 @@ bool NetworkManager::setNetworkAdapterFromConfig()
 
 	return true;
 }
+
+
+void NetworkManager::startDiscovery(const std::string IPv4, const int port) {}

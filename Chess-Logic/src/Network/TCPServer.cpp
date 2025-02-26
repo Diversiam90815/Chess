@@ -17,6 +17,8 @@ TCPServer::~TCPServer() {}
 void TCPServer::startAccept()
 {
 	auto session = TCPSession::create(mIoContext);
+	mBoundPort	 = session->getBoundPort();
+
 	mAcceptor.async_accept(session->socket(), [this, session](const boost::system::error_code &error) { handleAccept(session, error); });
 }
 
@@ -24,6 +26,12 @@ void TCPServer::startAccept()
 void TCPServer::setSessionHandler(SessionHandler handler)
 {
 	mSessionHandler = handler;
+}
+
+
+const int TCPServer::getBoundPort() const
+{
+	return mBoundPort;
 }
 
 

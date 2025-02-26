@@ -32,6 +32,8 @@ public:
 
 	void								  start();
 
+	const int							  getBoundPort() const { return mBoundPort; }
+
 private:
 	explicit TCPSession(boost::asio::io_context &ioContext);
 
@@ -47,6 +49,8 @@ private:
 	};
 
 	char		   mData[max_length]{};
+
+	int			   mBoundPort{0};
 
 	MessageHandler mMessageHandler = nullptr;
 };

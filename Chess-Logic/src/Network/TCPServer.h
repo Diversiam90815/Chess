@@ -26,9 +26,11 @@ public:
 	TCPServer(boost::asio::io_context &ioContext, unsigned short port);
 	~TCPServer();
 
-	void startAccept();
+	void	  startAccept();
 
-	void setSessionHandler(SessionHandler handler);
+	void	  setSessionHandler(SessionHandler handler);
+
+	const int getBoundPort() const;
 
 
 private:
@@ -38,6 +40,8 @@ private:
 	boost::asio::io_context &mIoContext;
 
 	tcp::acceptor			 mAcceptor;
+
+	int						 mBoundPort{0};
 
 	SessionHandler			 mSessionHandler;
 };

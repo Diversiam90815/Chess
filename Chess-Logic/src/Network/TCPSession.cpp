@@ -12,7 +12,7 @@ TCPSession::TCPSession(boost::asio::io_context &ioContext) : mSocket(ioContext)
 {
 	mSocket.open(tcp::v4());						 // Open the socket
 	mSocket.bind(tcp::endpoint(tcp::v4(), 0));		 // Bind to a OS assigned port
-	int boundPort = mSocket.local_endpoint().port(); // Get the port number it is bound to
+	mBoundPort = mSocket.local_endpoint().port(); // Get the port number it is bound to
 }
 
 
