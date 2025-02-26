@@ -1,6 +1,6 @@
 /*
   ==============================================================================
-	Class:          TCPSession
+	Module:         TCPSession
 	Description:    Managing the socket and session used for the multiplayer mode
   ==============================================================================
 */
@@ -9,6 +9,7 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <functional>
 #include <vector>
 #include <json.hpp>
@@ -20,16 +21,20 @@ using boost::asio::ip::tcp;
 using MessageHandler = std::function<void(const json &message)>;
 
 
-class TCPSession
+class TCPSession : public boost::enable_shared_from_this<TCPSession>
 {
 public:
-	explicit TCPSession(boost::asio::io_context &ioContext);
+	typedef boost::shared_ptr<TCPSession> pointer;
 
-	tcp::socket &socket();
+	static pointer						  create(boost::asio::io_context &io_context) { return pointer(new TCPSession(io_context)); }
 
-	void		 start();
+	tcp::socket							 &socket();
+
+	void								  start();
 
 private:
+	explicit TCPSession(boost::asio::io_context &ioContext);
+
 	void		handleRead(const boost::system::error_code &error, size_t bytesRead);
 
 	void		handleWrite(const boost::system::error_code &error);
@@ -43,5 +48,5 @@ private:
 
 	char		   mData[max_length]{};
 
-	MessageHandler mMessageHandler;
+	MessageHandler mMessageHandler = nullptr;
 };

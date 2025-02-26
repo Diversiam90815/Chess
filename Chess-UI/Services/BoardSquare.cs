@@ -34,8 +34,8 @@ namespace Chess_UI.Services
             this.ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
             this.PieceTheme = themeManager.CurrentPieceTheme;
-
         }
+
 
         public BoardSquare(int x, int y, PieceTypeInstance pieceTypeInstance, PlayerColor color, Microsoft.UI.Dispatching.DispatcherQueue dispatcher, ThemeManager themeManager)
         {
@@ -80,6 +80,7 @@ namespace Chess_UI.Services
             }
         }
 
+
         private PieceTypeInstance _piece;
         public PieceTypeInstance piece
         {
@@ -94,6 +95,7 @@ namespace Chess_UI.Services
             }
         }
 
+
         private PlayerColor _colour;
         public PlayerColor colour
         {
@@ -107,6 +109,7 @@ namespace Chess_UI.Services
                 }
             }
         }
+
 
         private bool isHighlighted;
         public bool IsHighlighted
@@ -123,6 +126,7 @@ namespace Chess_UI.Services
             }
         }
 
+
         public Brush BackgroundBrush
         {
             get
@@ -134,6 +138,7 @@ namespace Chess_UI.Services
             }
         }
 
+
         public ImageSource PieceImage
         {
             get
@@ -144,6 +149,7 @@ namespace Chess_UI.Services
                 return Images.GetPieceImage(PieceTheme, colour, piece);
             }
         }
+
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

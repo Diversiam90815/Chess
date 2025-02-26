@@ -1,6 +1,6 @@
 /*
   ==============================================================================
-	Class:          TCPServer
+	Module:         TCPServer
 	Description:    Server implementation used for the multiplayer mode
   ==============================================================================
 */
@@ -17,7 +17,7 @@
 
 using boost::asio::ip::tcp;
 
-using SessionHandler = std::function<void(std::shared_ptr<TCPSession> session)>; // Callback invoked when a new session is accepted
+using SessionHandler = std::function<void(boost::shared_ptr<TCPSession> session)>; // Callback invoked when a new session is accepted
 
 
 class TCPServer
@@ -31,7 +31,7 @@ class TCPServer
 
 
 private:
-	void					 handleAccept(std::shared_ptr<TCPSession> session, const boost::system::error_code &error);
+	void					 handleAccept(boost::shared_ptr<TCPSession> session, const boost::system::error_code &error);
 
 
 	boost::asio::io_context &mIoContext;

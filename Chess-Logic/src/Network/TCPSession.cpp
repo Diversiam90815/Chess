@@ -1,6 +1,6 @@
 /*
   ==============================================================================
-	Class:          TCPSession
+	Module:         TCPSession
 	Description:    Managing the socket and session used for the multiplayer mode
   ==============================================================================
 */
@@ -31,7 +31,6 @@ void TCPSession::start()
 
 void TCPSession::handleRead(const boost::system::error_code &error, size_t bytesRead)
 {
-
 	if (!error)
 	{
 		boost::asio::async_write(mSocket, boost::asio::buffer(mData, bytesRead), boost::bind(&TCPSession::handleWrite, this, boost::asio::placeholders::error));

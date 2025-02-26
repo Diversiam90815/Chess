@@ -1,6 +1,6 @@
 /*
   ==============================================================================
-	Class:          TCPServer
+	Module:         TCPServer
 	Description:    Server implementation used for the multiplayer mode
   ==============================================================================
 */
@@ -16,7 +16,7 @@ TCPServer::~TCPServer() {}
 
 void TCPServer::startAccept()
 {
-	auto session = std::make_shared<TCPSession>(mIoContext);
+	auto session = TCPSession::create(mIoContext);
 	mAcceptor.async_accept(session->socket(), [this, session](const boost::system::error_code &error) { handleAccept(session, error); });
 }
 
@@ -27,7 +27,7 @@ void TCPServer::setSessionHandler(SessionHandler handler)
 }
 
 
-void TCPServer::handleAccept(std::shared_ptr<TCPSession> session, const boost::system::error_code &error)
+void TCPServer::handleAccept(boost::shared_ptr<TCPSession> session, const boost::system::error_code &error)
 {
 	if (!error)
 	{

@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          NetworkManager
-
+	Module:         NetworkManager
 	Description:    Managing the network part of this app
-
   ==============================================================================
 */
 
@@ -12,6 +9,8 @@
 
 #include "NetworkInformation.h"
 #include "FileManager.h"
+#include "TCPClient.h"
+#include "TCPServer.h"
 
 
 class NetworkManager
@@ -22,12 +21,22 @@ public:
 
 	void init();
 
+	void hostSession();
+
+	void joinSession();
+
 
 private:
-	bool			   presetNetworkAdapter();
+	bool					   presetNetworkAdapter();
 
-	bool			   setNetworkAdapterFromConfig();
+	bool					   setNetworkAdapterFromConfig();
 
 
-	NetworkInformation mNetworkInfo;
+	TCPSession::pointer		   mSession = nullptr;
+
+	std::unique_ptr<TCPServer> mServer;
+
+	std::unique_ptr<TCPClient> mClient;
+
+	NetworkInformation		   mNetworkInfo;
 };

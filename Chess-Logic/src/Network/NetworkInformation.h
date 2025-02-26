@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          NetworkInformation
-
+	Module:         NetworkInformation
 	Description:    Information about the local Network setup
-
   ==============================================================================
 */
 

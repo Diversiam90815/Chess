@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          NetworkManager
-
+	Module:         NetworkManager
 	Description:    Managing the network part of this app
-
   ==============================================================================
 */
 

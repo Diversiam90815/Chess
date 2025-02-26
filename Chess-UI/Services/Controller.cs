@@ -191,6 +191,7 @@ namespace Chess_UI.Services
         public event MoveHistoryUpdatedHandler MoveHistoryUpdated;
         public event PlayerCaputeredPieceHandler PlayerCapturedPieceEvent;
         public event PlayerScoreUpdatedHandler PlayerScoreUpdated;
+
         #endregion
 
     }

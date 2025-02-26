@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          NetworkAdapter
-
+	Module:         NetworkAdapter
 	Description:    Storing information about the network adapter
-
   ==============================================================================
 */
 

@@ -1,6 +1,6 @@
 /*
   ==============================================================================
-	Class:          TCPClient
+	Module:         TCPClient
 	Description:    Client implementation used for the multiplayer mode
   ==============================================================================
 */
