@@ -27,6 +27,28 @@ void NetworkManager::init()
 }
 
 
+void NetworkManager::hostSession()
+{
+	mServer = std::make_unique<TCPServer>(mNetworkInfo.getCurrentNetworkAdapter().ID);
+	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
+	mServer->startAccept();
+}
+
+
+void NetworkManager::joinSession(const std::string IPv4, const int port)
+{
+	mClient = std::make_unique<TCPClient>();
+	mClient->setConnectHandler([this](TCPSession::pointer session) { setTCPSession(session); });
+	mClient->connect(IPv4,port);
+}
+
+
+void NetworkManager::setTCPSession(TCPSession::pointer session)
+{
+	mSession = session;
+}
+
+
 bool NetworkManager::presetNetworkAdapter()
 {
 	auto adapterInFile = FileManager::GetInstance()->readSelectedNetworkAdapter();

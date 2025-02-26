@@ -23,7 +23,9 @@ public:
 
 	void hostSession();
 
-	void joinSession();
+	void joinSession(const std::string IPv4, const int port);
+
+	void setTCPSession(TCPSession::pointer session);
 
 
 private:
