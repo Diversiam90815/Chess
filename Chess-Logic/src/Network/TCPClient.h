@@ -17,7 +17,7 @@
 
 using boost::asio::ip::tcp;
 
-using ConnectHandler = std::function<void(std::shared_ptr<TCPSession> session)>;
+using ConnectHandler = std::function<void(boost::shared_ptr<TCPSession> session)>;
 
 
 class TCPClient
@@ -26,8 +26,12 @@ public:
 	TCPClient(boost::asio::io_context &ioContext);
 	~TCPClient() = default;
 
-	void connect(const std::string &host, unsigned short port, ConnectHandler handler);
+	void connect(const std::string &host, unsigned short port);
+
+	void setConnectHandler(ConnectHandler handler);
 
 private:
+	ConnectHandler			 mConnectHandler;
+
 	boost::asio::io_context &mIoContext;
 };
