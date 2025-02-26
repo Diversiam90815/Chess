@@ -41,7 +41,8 @@ bool NetworkManager::hostSession()
 
 	const std::string localIPv4 = mNetworkInfo.getCurrentNetworkAdapter().IPv4;
 	const int		  port		= mServer->getBoundPort();
-	startServerDiscovery(localIPv4, port);
+	bool			  success	= startServerDiscovery(localIPv4, port);
+	return success;
 }
 
 
@@ -109,14 +110,16 @@ bool NetworkManager::setNetworkAdapterFromConfig()
 }
 
 
-void NetworkManager::startServerDiscovery(const std::string IPv4, const int port)
+bool NetworkManager::startServerDiscovery(const std::string IPv4, const int port)
 {
 	mDiscovery.reset(new DiscoveryService(mIoContext));
 
-	mDiscovery->init(IPv4, port, getPlayerName());
+	bool bindingSucceeded = mDiscovery->init(IPv4, port, getPlayerName());
 	mDiscovery->startSender();
 
 	mIoContext.run();
+
+	return bindingSucceeded;
 }
 
 

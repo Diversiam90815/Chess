@@ -47,8 +47,9 @@ private:
 
 	bool							  setNetworkAdapterFromConfig();
 
-	void							  startServerDiscovery(const std::string IPv4, const int port);
+	bool							  startServerDiscovery(const std::string IPv4, const int port);
 	void							  startClientDiscovery();
+
 
 	TCPSession::pointer				  mSession = nullptr;
 
