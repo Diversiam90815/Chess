@@ -6,7 +6,6 @@ namespace Chess_UI.Services
 {
 	public class ChessLogicAPI
 	{
-
 		#region DLL Defines
 
 		#region Defines
