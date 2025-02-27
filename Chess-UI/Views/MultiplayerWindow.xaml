@@ -35,8 +35,8 @@
 
             <StackPanel Grid.Row="3" Orientation="Vertical" Margin="20,10,20,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Name="HostGameButton" Content="Host a game" Margin="8" Width="115" Height="40" Click="HostGameButton_Click"/>
-                    <Button Name="JoinGameButton" Content="Join a game" Margin="8" Width="115" Height="40" Click="JoinGameButton_Click"/>
+                    <Button Name="HostGameButton" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Content="Host a game" Margin="8" Width="115" Height="40" Click="HostGameButton_Click"/>
+                    <Button Name="JoinGameButton" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Content="Join a game" Margin="8" Width="115" Height="40" Click="JoinGameButton_Click"/>
                 </StackPanel>
                 <Button Name="ReturnButton" Content="Return" HorizontalAlignment="Center" Width="250" Height="40" Click="ReturnButton_Click"/>
             </StackPanel>
@@ -44,15 +44,57 @@
 
 
         <Grid Name="HostGameGrid" Visibility="{x:Bind mViewModel.HostGameVisibility, Mode=TwoWay}">
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="TopSpacingHost" Height="50"/>
+                <RowDefinition x:Name="RemotePlayerName" Height="60"/>
+                <RowDefinition x:Name="Text" Height="60"/>
+                <RowDefinition x:Name="SpacingHost" Height="50"/>
+                <RowDefinition x:Name="ButtonsHost" Height="200"/>
+            </Grid.RowDefinitions>
 
+            <TextBlock Grid.Row="1" Text="{x:Bind mViewModel.RemotePlayerName, Mode=OneWay}" FontSize="25" HorizontalAlignment="Center" />
+            <TextBlock Grid.Row="2" Text="wants to join" FontSize="20" HorizontalAlignment="Center"/>
+
+            <StackPanel Orientation="Vertical" Grid.Row="4" HorizontalAlignment="Center">
+                <Button Name="HostStartButton" Content="Accept" Width="200" Height="50" FontSize="20" Margin="8" CornerRadius="8" Click="HostStartButton_Click"/>
+                <Button Name="HostDeclineButton" Content="Decline" Width="200" Height="50" FontSize="20" Margin="8" CornerRadius="8" Click="HostDeclineButton_Click"/>
+            </StackPanel>
         </Grid>
 
 
         <Grid Name="JoinGameGrid" Visibility="{x:Bind mViewModel.JoinGameVisibility, Mode=TwoWay}">
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="TopSpacingJoin" Height="30"/>
+                <RowDefinition x:Name="Text1Join" Height="40"/>
+                <RowDefinition x:Name="RemotePlayerNameJoin" Height="50"/>
+                <RowDefinition x:Name="Text2Join" Height="40"/>
+                <RowDefinition x:Name="SpacingJoin" Height="20"/>
+                <RowDefinition x:Name="Text3Join" Height="40"/>
+                <RowDefinition x:Name="ButtonsJoin" Height="200"/>
+            </Grid.RowDefinitions>
 
+            <TextBlock Grid.Row="1" Text="Found" HorizontalAlignment="Center" FontSize="20"/>
+            <TextBlock Grid.Row="2" Text="{x:Bind mViewModel.RemotePlayerName, Mode=OneWay}" HorizontalAlignment="Center" FontSize="25"/>
+            <TextBlock Grid.Row="3" Text="on the network" HorizontalAlignment="Center" FontSize="20"/>
+
+            <TextBlock Grid.Row="5" Text="Do you want to join?" HorizontalAlignment="Center" FontSize="20"/>
+
+            <StackPanel Orientation="Vertical" Grid.Row="6" HorizontalAlignment="Center">
+                <Button Name="JoinAcceptButton" Content="Join" Width="200" Height="50" Margin="8" FontSize="20" CornerRadius="8" Click="JoinAcceptButton_Click" />
+                <Button Name="JoinDiscardButton" Content="Discard" Width="200" Height="50" Margin="8" FontSize="20" CornerRadius="8" Click="JoinDiscardButton_Click"/>
+            </StackPanel>
         </Grid>
 
+        <Grid Name="WaitingForResponseGrid" Visibility="{x:Bind mViewModel.WaitingForResponseVisibility, Mode=TwoWay}">
+            
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                <TextBlock Text="Waiting for a response from" Margin="20,50,20,10" FontSize="22"/>
+                <TextBlock Text="{x:Bind mViewModel.RemotePlayerName}" Margin="20,10,20,10" HorizontalAlignment="Center" FontSize="25"/>
+                <ProgressRing Foreground="Black" Height="50" Width="50" Margin="20,20,20,0"/>
+                <Button Name="AbortWaitButton" Content="Abort" FontSize="20" CornerRadius="8" Click="AbortWaitButton_Click" Margin="20,70,20,10" HorizontalAlignment="Center" Width="100" Height="50"/>
+            </StackPanel>
 
+        </Grid>
 
     </Grid>
 </Window>

@@ -95,6 +95,21 @@ namespace Chess_UI.ViewModels
         }
 
 
+        private string remotePlayerName = "Test User";
+        public string RemotePlayerName
+        {
+            get => remotePlayerName;
+            set
+            {
+                if (remotePlayerName != value)
+                {
+                    remotePlayerName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
         private Visibility multiplayerSettingsVisibility = Visibility.Visible;
         public Visibility MultiplayerSettingsVisibility
         {
@@ -140,6 +155,21 @@ namespace Chess_UI.ViewModels
         }
 
 
+        private Visibility waitingForResponseVisibility = Visibility.Collapsed;
+        public Visibility WaitingForResponseVisibility
+        {
+            get => waitingForResponseVisibility;
+            set
+            {
+                if (waitingForResponseVisibility != value)
+                {
+                    waitingForResponseVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
         public void SelectPresavedNetworkAdapter()
         {
             int savedAdapterID = mModel.GetSelectedNetworkAdapterID();
@@ -175,6 +205,44 @@ namespace Chess_UI.ViewModels
                 }
                 SelectPresavedNetworkAdapter();
             });
+        }
+
+
+        public void ChangeToJoinGameView()
+        {
+            MultiplayerSettingsVisibility = Visibility.Collapsed;
+            JoinGameVisibility = Visibility.Visible;
+            HostGameVisibility = Visibility.Collapsed;
+            WaitingForResponseVisibility = Visibility.Collapsed;
+        }
+
+
+        public void ChangeToHostGameView()
+        {
+            MultiplayerSettingsVisibility = Visibility.Collapsed;
+            JoinGameVisibility = Visibility.Collapsed;
+            HostGameVisibility = Visibility.Visible;
+            WaitingForResponseVisibility = Visibility.Collapsed;
+
+        }
+
+        public void ChangeToSettingsView()
+        {
+            MultiplayerSettingsVisibility = Visibility.Visible;
+            JoinGameVisibility = Visibility.Collapsed;
+            HostGameVisibility = Visibility.Collapsed;
+            WaitingForResponseVisibility = Visibility.Collapsed;
+
+            Processing = false;
+        }
+
+
+        public void ChangeToWaitingForResponseView()
+        {
+            MultiplayerSettingsVisibility = Visibility.Collapsed;
+            JoinGameVisibility = Visibility.Collapsed;
+            HostGameVisibility = Visibility.Collapsed;
+            WaitingForResponseVisibility = Visibility.Visible;
         }
 
 

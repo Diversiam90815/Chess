@@ -29,12 +29,10 @@ namespace Chess_UI.Views
 
         private MultiplayerViewModel mViewModel;
 
-        private readonly DispatcherQueue DispatcherQueue;
 
         public MultiplayerWindow(DispatcherQueue dispatcher)
         {
             this.InitializeComponent();
-            this.DispatcherQueue = dispatcher;
             mViewModel = new(dispatcher);
 
             this.Rootgrid.DataContext = mViewModel;
@@ -84,6 +82,8 @@ namespace Chess_UI.Views
             string name = LocalPlayerName.Text.Trim();
 
             mViewModel.Processing = true;
+
+            mViewModel.ChangeToHostGameView();  // Dummy Visibility set for desing purposes
         }
 
 
@@ -92,6 +92,8 @@ namespace Chess_UI.Views
             string name = LocalPlayerName.Text.Trim();
 
             mViewModel.Processing = true;
+
+            mViewModel.ChangeToJoinGameView();  // Dummy Visibility set for designing purposes
         }
 
 
@@ -124,5 +126,34 @@ namespace Chess_UI.Views
             }
         }
 
+
+        private void HostStartButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+
+        private void HostDeclineButton_Click(object sender, RoutedEventArgs e)
+        {
+            mViewModel.ChangeToSettingsView();
+        }
+
+
+        private void JoinAcceptButton_Click(object sender, RoutedEventArgs e)
+        {
+            mViewModel.ChangeToWaitingForResponseView();
+        }
+
+
+        private void JoinDiscardButton_Click(object sender, RoutedEventArgs e)
+        {
+            mViewModel.ChangeToSettingsView();
+        }
+
+
+        private void AbortWaitButton_Click(object sender, RoutedEventArgs e)
+        {
+            mViewModel.ChangeToJoinGameView();
+        }
     }
 }
