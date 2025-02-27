@@ -35,25 +35,28 @@ public:
 	NetworkInformation();
 	~NetworkInformation();
 
-	bool		   init();
+	bool						init();
 
-	void		   deinit();
+	void						deinit();
 
-	bool		   getNetworkInformationFromOS();
+	bool						getNetworkInformationFromOS();
 
-	void		   processAdapter();
+	void						processAdapter();
 
-	void		   saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID);
+	void						saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID);
 
-	void		   setCurrentNetworkAdapter(const NetworkAdapter &adapter);
+	void						setCurrentNetworkAdapter(const NetworkAdapter &adapter);
+	NetworkAdapter				getCurrentNetworkAdapter() const;
 
-	NetworkAdapter getCurrentNetworkAdapter() const;
+	void						updateNetworkAdapter(NetworkAdapter &adapter);
 
-	void		   updateNetworkAdapter(NetworkAdapter &adapter);
+	bool						isAdapterCurrentlyAvailable(const NetworkAdapter &adapter);
 
-	bool		   isAdapterCurrentlyAvailable(const NetworkAdapter &adapter);
+	NetworkAdapter				getFirstEligibleAdapter() const;
 
-	NetworkAdapter getFirstEligibleAdapter() const;
+	std::vector<NetworkAdapter> getAvailableNetworkAdapters() const;
+
+	bool						changeCurrentAdapter(const int ID);
 
 private:
 	std::string					sockaddrToString(SOCKADDR *sa) const;

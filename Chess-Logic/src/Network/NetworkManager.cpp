@@ -61,6 +61,24 @@ void NetworkManager::setTCPSession(TCPSession::pointer session)
 }
 
 
+std::vector<NetworkAdapter> NetworkManager::getAvailableNetworkAdapters() const
+{
+	return mNetworkInfo.getAvailableNetworkAdapters();
+}
+
+
+bool NetworkManager::changeNetworkAdapter(const int ID)
+{
+	return mNetworkInfo.changeCurrentAdapter(ID);
+}
+
+
+int NetworkManager::getCurrentNetworkAdapterID()
+{
+	return mNetworkInfo.getCurrentNetworkAdapter().ID;
+}
+
+
 bool NetworkManager::presetNetworkAdapter()
 {
 	auto adapterInFile = FileManager::GetInstance()->readSelectedNetworkAdapter();
@@ -103,7 +121,7 @@ bool NetworkManager::startServerDiscovery(const std::string IPv4, const int port
 {
 	mDiscovery.reset(new DiscoveryService(mIoContext));
 
-	bool bindingSucceeded = mDiscovery->init(IPv4, port, getPlayerName());
+	bool bindingSucceeded = mDiscovery->init(IPv4, port, getLocalPlayerName());
 	mDiscovery->startSender();
 
 	mIoContext.run();

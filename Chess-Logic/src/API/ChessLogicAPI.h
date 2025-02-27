@@ -24,7 +24,7 @@ extern "C"
 
 	CHESS_API float GetWindowScalingFactor(HWND hwnd);
 
-	CHESS_API void	SetUnvirtualizedAppDataPath(const char* appDataPath);
+	CHESS_API void	SetUnvirtualizedAppDataPath(const char *appDataPath);
 
 
 	CHESS_API int	GetNumPossibleMoves();
@@ -46,20 +46,33 @@ extern "C"
 	CHESS_API void	UndoMove();
 
 
-	CHESS_API void LogInfoWithCaller(const char* message, const char* method, const char* className, const int lineNumber);
+	CHESS_API void	LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber);
 
-	CHESS_API void LogErrorWithCaller(const char* message, const char* method, const char* className, const int lineNumber);
+	CHESS_API void	LogErrorWithCaller(const char *message, const char *method, const char *className, const int lineNumber);
 
-	CHESS_API void LogWarningWithCaller(const char* message, const char* method, const char* className, const int lineNumber);
+	CHESS_API void	LogWarningWithCaller(const char *message, const char *method, const char *className, const int lineNumber);
 
-	
-	CHESS_API void	SetCurrentBoardTheme(const char* theme);
+
+	CHESS_API void	SetCurrentBoardTheme(const char *theme);
 
 	CHESS_API char *GetCurrentBoardTheme();
 
-	CHESS_API void	SetCurrentPieceTheme(const char* theme);
+	CHESS_API void	SetCurrentPieceTheme(const char *theme);
 
 	CHESS_API char *GetCurrentPieceTheme();
+
+
+	CHESS_API void	SetLocalPlayerName(const char *name);
+
+	CHESS_API char *GetRemotePlayerName();
+
+	CHESS_API int	GetNetworkAdapterCount();
+
+	CHESS_API bool	GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInstance *adapter);
+
+	CHESS_API int	GetSavedAdapterID();
+
+	CHESS_API bool	ChangeCurrentAdapter(int ID);
 
 
 #ifdef __cplusplus

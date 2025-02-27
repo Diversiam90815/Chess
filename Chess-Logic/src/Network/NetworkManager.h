@@ -20,19 +20,27 @@ public:
 	NetworkManager();
 	~NetworkManager();
 
-	void		init();
+	void						init();
 
-	bool		hostSession();
+	bool						hostSession();
 
-	void		joinSession(const Endpoint remote);
+	void						joinSession(const Endpoint remote);
 
-	void		setTCPSession(TCPSession::pointer session);
+	void						setTCPSession(TCPSession::pointer session);
 
-	bool		isInitialized() const { return initialized.load(); }
-	void		setInitialized(const bool value) { initialized.store(value); }
+	std::vector<NetworkAdapter> getAvailableNetworkAdapters() const;
+	bool						changeNetworkAdapter(const int ID);
 
-	void		setPlayerName(const std::string name) { mPlayerName = name; }
-	std::string getPlayerName() const { return mPlayerName; }
+	int							getCurrentNetworkAdapterID();
+
+	bool						isInitialized() const { return initialized.load(); }
+	void						setInitialized(const bool value) { initialized.store(value); }
+
+	void						setLocalPlayerName(const std::string name) { mLocalPlayerName = name; }
+	std::string					getLocalPlayerName() const { return mLocalPlayerName; }
+
+	void						setRemotePlayerName(const std::string name) { mRemotePlayerName = name; }
+	std::string					getRemotePlayerName() const { return mRemotePlayerName; }
 
 
 private:
@@ -56,5 +64,6 @@ private:
 
 	boost::asio::io_context			  mIoContext;
 
-	std::string						  mPlayerName{};
+	std::string						  mLocalPlayerName{};
+	std::string						  mRemotePlayerName{};
 };

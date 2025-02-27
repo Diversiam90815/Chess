@@ -69,7 +69,7 @@ void TCPSession::readBody()
 								// Extract type
 								uint32_t typeNetOrder = 0;
 								std::memcpy(&typeNetOrder, mBody.data(), 4);
-								MessageType type	 = static_cast<MessageType>(typeNetOrder);
+								TCPMessageType type	 = static_cast<TCPMessageType>(typeNetOrder);
 
 								// Extract JSON substring
 								size_t		jsonSize = mBodyLength - 4;
@@ -94,7 +94,7 @@ void TCPSession::readBody()
 }
 
 
-void TCPSession::sendJson(MessageType type, const json &message)
+void TCPSession::sendJson(TCPMessageType type, const json &message)
 {
 	std::string			 body			  = message.dump(); // convert j to string
 

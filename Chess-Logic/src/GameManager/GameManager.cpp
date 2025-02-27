@@ -350,6 +350,36 @@ void GameManager::moveStateInitiated()
 }
 
 
+std::vector<NetworkAdapter> GameManager::getNetworkAdapters()
+{
+	return mNetwork->getAvailableNetworkAdapters();
+}
+
+
+bool GameManager::changeCurrentNetworkAdapter(int ID)
+{
+	return mNetwork->changeNetworkAdapter(ID);
+}
+
+
+int GameManager::getCurrentNetworkAdapterID()
+{
+	return mNetwork->getCurrentNetworkAdapterID();
+}
+
+
+std::string GameManager::getRemotePlayerName()
+{
+	return mNetwork->getRemotePlayerName();
+}
+
+
+void GameManager::setLocalPlayerName(std::string name)
+{
+	mNetwork->setLocalPlayerName(name);
+}
+
+
 void GameManager::changeCurrentPlayer(PlayerColor player)
 {
 	if (mCurrentPlayer != player)

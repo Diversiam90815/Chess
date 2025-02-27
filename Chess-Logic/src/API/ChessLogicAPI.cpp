@@ -282,3 +282,72 @@ CHESS_API char *GetCurrentPieceTheme()
 	char		*themeTmp = StringToCharPtr(theme);
 	return themeTmp;
 }
+
+
+CHESS_API void SetLocalPlayerName(const char *name)
+{
+	return GameManager::GetInstance()->setLocalPlayerName(name);
+}
+
+
+CHESS_API char *GetRemotePlayerName()
+{
+	std::string remoteName = GameManager::GetInstance()->getRemotePlayerName();
+	char	   *name	   = StringToCharPtr(remoteName);
+	return name;
+}
+
+
+CHESS_API int GetNetworkAdapterCount()
+{
+	GameManager *manager	 = GameManager::GetInstance();
+	auto		 adapters	 = manager->getNetworkAdapters();
+	size_t		 numAdapters = adapters.size();
+	return numAdapters;
+}
+
+
+CHESS_API bool GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInstance *adapter)
+{
+	GameManager *manager  = GameManager::GetInstance();
+	auto		 adapters = manager->getNetworkAdapters();
+
+	std::string	 name{};
+	int			 ID{0};
+	bool		 selectedByUser{0};
+	int			 counter{-1};
+
+	for (auto &adapter : adapters)
+	{
+		counter++;
+		if (counter == index)
+		{
+			name		   = adapter.description;
+			ID			   = adapter.ID;
+			selectedByUser = adapter.selected;
+			break;
+		}
+	}
+
+	if (name.empty() && ID == 0)
+		return false;
+
+	adapter->ID				= ID;
+	adapter->selectedByUser = selectedByUser;
+	StringCbCopyA(adapter->name, MAX_STRING_LENGTH, name.c_str());
+	return true;
+}
+
+
+CHESS_API int GetSavedAdapterID()
+{
+	return GameManager::GetInstance()->getCurrentNetworkAdapterID();
+}
+
+
+CHESS_API bool ChangeCurrentAdapter(int ID)
+{
+	GameManager *manager = GameManager::GetInstance();
+	bool		 result	 = manager->changeCurrentNetworkAdapter(ID);
+	return result;
+}

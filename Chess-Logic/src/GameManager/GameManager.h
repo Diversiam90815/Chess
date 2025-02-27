@@ -27,54 +27,61 @@ class GameManager : public IGameObservable
 public:
 	~GameManager();
 
-	static GameManager		  *GetInstance();
-	static void				   ReleaseInstance();
+	static GameManager		   *GetInstance();
+	static void					ReleaseInstance();
 
-	void					   init();
+	void						init();
 
-	void					   startGame();
+	void						startGame();
 
-	void					   executeMove(PossibleMove &move);
+	void						executeMove(PossibleMove &move);
 
-	void					   undoMove();
+	void						undoMove();
 
-	void					   gameStateChanged(GameState state) override;
-	GameState				   getCurrentGameState() const;
+	void						gameStateChanged(GameState state) override;
+	GameState					getCurrentGameState() const;
 
-	void					   setCurrentMoveState(MoveState state);
-	MoveState				   getCurrentMoveState() const;
+	void						setCurrentMoveState(MoveState state);
+	MoveState					getCurrentMoveState() const;
 
-	void					   resetGame();
+	void						resetGame();
 
-	void					   endGame(PlayerColor player) override;
+	void						endGame(PlayerColor player) override;
 
-	std::optional<PlayerColor> getWinner() const;
+	std::optional<PlayerColor>	getWinner() const;
 
-	void					   clearState();
+	void						clearState();
 
-	void					   setDelegate(PFN_CALLBACK pDelegate);
+	void						setDelegate(PFN_CALLBACK pDelegate);
 
-	PieceType				   getCurrentPieceTypeAtPosition(const Position position);
+	PieceType					getCurrentPieceTypeAtPosition(const Position position);
 
-	std::vector<PossibleMove>  getPossibleMoveForPosition();
+	std::vector<PossibleMove>	getPossibleMoveForPosition();
 
-	bool					   getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE]);
+	bool						getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE]);
 
-	void					   handleMoveStateChanges(PossibleMove &move);
+	void						handleMoveStateChanges(PossibleMove &move);
 
-	void					   moveStateInitiated() override; // Let the UI know moves for current round are ready -> handling need to be refactored later!
+	void						moveStateInitiated() override; // Let the UI know moves for current round are ready -> handling need to be refactored later!
 
-	void					   changeCurrentPlayer(PlayerColor player) override;
-	PlayerColor				   getCurrentPlayer() const;
+	std::vector<NetworkAdapter> getNetworkAdapters();
+	bool						changeCurrentNetworkAdapter(int ID);
+	int							getCurrentNetworkAdapterID();
 
-	void					   setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
-	std::string				   getBoardTheme() const { return mUserSettings.getCurrentBoardTheme(); }
+	std::string					getRemotePlayerName();
+	void						setLocalPlayerName(std::string name);
 
-	void					   setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
-	std::string				   getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
+	void						changeCurrentPlayer(PlayerColor player) override;
+	PlayerColor					getCurrentPlayer() const;
 
-	void					   attachObserver(IGameObserver *observer) override;
-	void					   detachObserver(IGameObserver *observer) override;
+	void						setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
+	std::string					getBoardTheme() const { return mUserSettings.getCurrentBoardTheme(); }
+
+	void						setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
+	std::string					getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
+
+	void						attachObserver(IGameObserver *observer) override;
+	void						detachObserver(IGameObserver *observer) override;
 
 private:
 	GameManager();

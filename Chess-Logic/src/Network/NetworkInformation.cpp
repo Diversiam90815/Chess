@@ -130,6 +130,7 @@ void NetworkInformation::setCurrentNetworkAdapter(const NetworkAdapter &adapter)
 	if (mCurrentNetworkAdapter != adapter)
 	{
 		mCurrentNetworkAdapter = adapter;
+		FileManager::GetInstance()->setSelectedNetworkAdapter(adapter);
 
 		LOG_INFO("Set user defined adapter to :");
 		LOG_INFO("\t Description:\t {}", adapter.description);
@@ -178,6 +179,26 @@ NetworkAdapter NetworkInformation::getFirstEligibleAdapter() const
 			return adapter;
 	}
 	return {};
+}
+
+
+std::vector<NetworkAdapter> NetworkInformation::getAvailableNetworkAdapters() const
+{
+	return mNetworkAdapters;
+}
+
+
+bool NetworkInformation::changeCurrentAdapter(const int ID)
+{
+	for (auto &adapter : mNetworkAdapters)
+	{
+		if (adapter.ID == ID)
+		{
+			setCurrentNetworkAdapter(adapter);
+			return true;
+		}
+	}
+	return false;
 }
 
 
