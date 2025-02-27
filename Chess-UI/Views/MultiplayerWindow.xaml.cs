@@ -80,6 +80,8 @@ namespace Chess_UI.Views
         private void HostGameButton_Click(object sender, RoutedEventArgs e)
         {
             string name = LocalPlayerName.Text.Trim();
+            if (name.Length == 0)
+                return;
 
             mViewModel.Processing = true;
 
@@ -90,6 +92,8 @@ namespace Chess_UI.Views
         private void JoinGameButton_Click(object sender, RoutedEventArgs e)
         {
             string name = LocalPlayerName.Text.Trim();
+            if (name.Length == 0)
+                return;
 
             mViewModel.Processing = true;
 

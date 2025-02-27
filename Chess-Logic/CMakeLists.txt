@@ -41,6 +41,7 @@ set (COMMUNICATION_DIR      ${SOURCE_DIR}/Communication)
 set(OBSERVER_DIR            ${SOURCE_DIR}/Observer)
 set (NETWORK_DIR            ${SOURCE_DIR}/Network)
 
+
 ###########################################
 #   INCLUDE DIRECTORIES
 ###########################################
