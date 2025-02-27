@@ -18,10 +18,12 @@ namespace Chess_UI.Models
     {
         private List<NetworkAdapter> mAdapters = new();
 
+
         public void Init()
         {
             SetNetworkAdapters();
         }
+
 
         private bool SetNetworkAdapters()
         {
@@ -52,6 +54,7 @@ namespace Chess_UI.Models
         {
             return mAdapters;
         }
+
 
         public int GetSelectedNetworkAdapterID()
         {

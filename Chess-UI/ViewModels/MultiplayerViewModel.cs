@@ -26,7 +26,12 @@ namespace Chess_UI.ViewModels
             this.DispatcherQueue = dispatcher;
             NetworkAdapters = new();
 
+            mModel = new MultiplayerModel();
+            mModel.Init();
+
+            UpdateAdapterBox();
         }
+
 
         private ObservableCollection<NetworkAdapter> networkAdapters;
         public ObservableCollection<NetworkAdapter> NetworkAdapters

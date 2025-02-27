@@ -25,6 +25,8 @@ namespace Chess_UI
 
         public SettingsWindow SettingsWindow;
 
+        public MultiplayerWindow MultiplayerWindow;
+
         private readonly ThemeManager themeManager;
 
 
@@ -80,6 +82,14 @@ namespace Chess_UI
         }
 
 
+        private void MultiplayerWindowClosed(object sender, WindowEventArgs args)
+        {
+            MultiplayerWindow.Closed -= MultiplayerWindowClosed;
+            MultiplayerWindow = null;
+            this.Activate();
+        }
+
+
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
             if (ChessBoardWindow == null)
@@ -115,7 +125,18 @@ namespace Chess_UI
 
         private void MultiplayerButton_Click(object sender, RoutedEventArgs e)
         {
-            //Not yet implemented
+            if (MultiplayerWindow == null)
+            {
+                MultiplayerWindow = new MultiplayerWindow(DispatcherQueue);
+                MultiplayerWindow.Activate();
+                MultiplayerWindow.Closed += MultiplayerWindowClosed;
+                this.AppWindow.Hide();
+            }
+            else
+            {
+                MultiplayerWindow.Activate();
+            }
+
         }
 
 

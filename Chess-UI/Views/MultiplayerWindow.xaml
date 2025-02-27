@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="Chess_UI.Views.MultiplayerWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Chess_UI.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Multiplayer">
+
+    <Grid Name="RootGrid" Background="#0B0B0D">
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="TopSpacing" Height="50"/>
+            <RowDefinition x:Name="EnterField" Height="120"/>
+            <RowDefinition x:Name="Spacing" Height="50"/>
+            <RowDefinition x:Name="Buttons" Height="120"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="20,0,20,20">
+            <StackPanel Orientation="Horizontal" Margin="8">
+                <TextBlock Text="Network" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <ComboBox HorizontalAlignment="Right" Width="180" Height="40" ItemsSource="{x:Bind mViewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="ID" SelectedItem="{x:Bind mViewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="8">
+                <TextBlock Text="Name" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                <TextBox HorizontalAlignment="Right" Width="180"/>
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Orientation="Vertical" Margin="20,10,20,0">
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Name="HostGameButton" Content="Host a game" Margin="8" Width="115" Height="40" Click="HostGameButton_Click"/>
+                <Button Name="JoinGameButton" Content="Join a game" Margin="8" Width="115" Height="40" Click="JoinGameButton_Click"/>
+            </StackPanel>
+            <Button Name="ReturnButton" Content="Return" HorizontalAlignment="Center" Width="250" Height="40" Click="ReturnButton_Click"/>
+
+
+        </StackPanel>
+    </Grid>
+</Window>
