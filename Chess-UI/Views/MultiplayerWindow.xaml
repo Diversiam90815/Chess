@@ -22,12 +22,12 @@
             <StackPanel Grid.Row="1" Orientation="Vertical" Margin="20,0,20,0">
                 <StackPanel Orientation="Horizontal" Margin="8">
                     <TextBlock Text="Network" Width="130" Foreground="#EEE9DA" FontSize="19" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <ComboBox HorizontalAlignment="Right" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Width="180" Height="40" Foreground="#EEE9DA" FontSize="15" ItemsSource="{x:Bind mViewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="ID" SelectedItem="{x:Bind mViewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged" Background="#000005" CornerRadius="8"/>
+                    <ComboBox HorizontalAlignment="Right" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Width="180" Height="40" Foreground="#EEE9DA" FontSize="15" ItemsSource="{x:Bind mViewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="ID" SelectedItem="{x:Bind mViewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="NetworkAdapterChanged" Background="#000005" CornerRadius="8"/>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Margin="8">
                     <TextBlock Text="Name" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#EEE9DA" FontSize="19"/>
-                    <TextBox HorizontalAlignment="Right" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Width="180" Height="40" Background="#000005" Foreground="#EEE9DA" FontSize="15" PlaceholderText="Set your name"/>
+                    <TextBox Name="LocalPlayerName" HorizontalAlignment="Right" TextChanging="PlayerName_TextChanging" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Width="180" Height="40" Background="#000005" Foreground="#EEE9DA" FontSize="15" PlaceholderText="Set your name"/>
                 </StackPanel>
             </StackPanel>
 

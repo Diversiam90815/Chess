@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text.RegularExpressions;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Media;
@@ -60,7 +61,7 @@ namespace Chess_UI.Views
         }
 
 
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void NetworkAdapterChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.RemovedItems.Count == 0 || e.AddedItems.Count == 0)
             {
@@ -80,12 +81,16 @@ namespace Chess_UI.Views
 
         private void HostGameButton_Click(object sender, RoutedEventArgs e)
         {
+            string name = LocalPlayerName.Text.Trim();
+
             mViewModel.Processing = true;
         }
 
 
         private void JoinGameButton_Click(object sender, RoutedEventArgs e)
         {
+            string name = LocalPlayerName.Text.Trim();
+
             mViewModel.Processing = true;
         }
 
@@ -102,5 +107,22 @@ namespace Chess_UI.Views
                 this.Close();
             }
         }
+
+
+        private void PlayerName_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        {
+            var newText = sender.Text;
+
+            var filteredText = Regex.Replace(newText, "[^A-Za-z]", "");
+
+            if (newText != filteredText)
+            {
+                int oldCaretPos = sender.SelectionStart;
+                sender.Text = filteredText;
+
+                sender.SelectionStart = Math.Min(oldCaretPos, newText.Length);
+            }
+        }
+
     }
 }
