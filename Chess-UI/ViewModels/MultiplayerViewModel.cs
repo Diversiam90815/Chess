@@ -1,5 +1,6 @@
 ﻿using Chess_UI.Models;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -57,6 +58,82 @@ namespace Chess_UI.ViewModels
                 if (selectedAdapter != value)
                 {
                     selectedAdapter = value;
+                    mModel.ChangeNetworkAdapter(SelectedAdapter.ID);
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private bool processing = false;
+        public bool Processing
+        {
+            get => processing;
+            set
+            {
+                if (processing != value)
+                {
+                    processing = value;
+                    SettingsEditable = !value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private bool settingsEditable = true;
+        public bool SettingsEditable
+        {
+            get => settingsEditable;
+            set
+            {
+                if (settingsEditable != value)
+                {
+                    settingsEditable = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private Visibility multiplayerSettingsVisibility = Visibility.Visible;
+        public Visibility MultiplayerSettingsVisibility
+        {
+            get => multiplayerSettingsVisibility;
+            set
+            {
+                if (multiplayerSettingsVisibility != value)
+                {
+                    multiplayerSettingsVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private Visibility joinGameVisibility = Visibility.Collapsed;
+        public Visibility JoinGameVisibility
+        {
+            get => joinGameVisibility;
+            set
+            {
+                if (joinGameVisibility != value)
+                {
+                    joinGameVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private Visibility hostGameVisibility = Visibility.Collapsed;
+        public Visibility HostGameVisibility
+        {
+            get => hostGameVisibility;
+            set
+            {
+                if (hostGameVisibility != value)
+                {
+                    hostGameVisibility = value;
                     OnPropertyChanged();
                 }
             }

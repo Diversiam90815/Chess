@@ -1,3 +1,4 @@
+using Chess_UI.Models;
 using Chess_UI.Services;
 using Chess_UI.ViewModels;
 using Microsoft.UI.Dispatching;
@@ -16,6 +17,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Media;
 
 
 namespace Chess_UI.Views
@@ -34,7 +36,7 @@ namespace Chess_UI.Views
             this.DispatcherQueue = dispatcher;
             mViewModel = new(dispatcher);
 
-            this.RootGrid.DataContext = mViewModel;
+            this.Rootgrid.DataContext = mViewModel;
 
             Init();
             SetWindowSize(388, 405);
@@ -60,25 +62,45 @@ namespace Chess_UI.Views
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            if (e.RemovedItems.Count == 0 || e.AddedItems.Count == 0)
+            {
+                // This is the first initialization of the Combobox
+                return;
+            }
+            else
+            {
+                NetworkAdapter selectedAdapter = (NetworkAdapter)e.AddedItems[0];
+                if (selectedAdapter != null)
+                {
+                    mViewModel.SelectedAdapter = selectedAdapter;
+                }
+            }
         }
 
 
         private void HostGameButton_Click(object sender, RoutedEventArgs e)
         {
-
+            mViewModel.Processing = true;
         }
 
 
         private void JoinGameButton_Click(object sender, RoutedEventArgs e)
         {
-
+            mViewModel.Processing = true;
         }
 
 
         private void ReturnButton_Click(object sender, RoutedEventArgs e)
         {
+            if (mViewModel.Processing)
+            {
+                mViewModel.Processing = false;
+            }
 
+            else
+            {
+                this.Close();
+            }
         }
     }
 }

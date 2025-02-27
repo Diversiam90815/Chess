@@ -9,35 +9,50 @@
     mc:Ignorable="d"
     Title="Multiplayer">
 
-    <Grid Name="RootGrid" Background="#0B0B0D">
-        <Grid.RowDefinitions>
-            <RowDefinition x:Name="TopSpacing" Height="50"/>
-            <RowDefinition x:Name="EnterField" Height="120"/>
-            <RowDefinition x:Name="Spacing" Height="50"/>
-            <RowDefinition x:Name="Buttons" Height="120"/>
-        </Grid.RowDefinitions>
+    <Grid Name="Rootgrid" Background="#0B0B0D">
 
-        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="20,0,20,20">
-            <StackPanel Orientation="Horizontal" Margin="8">
-                <TextBlock Text="Network" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <ComboBox HorizontalAlignment="Right" Width="180" Height="40" ItemsSource="{x:Bind mViewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="ID" SelectedItem="{x:Bind mViewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged"/>
+        <Grid Name="SettingsGrid" Visibility="{x:Bind mViewModel.MultiplayerSettingsVisibility, Mode=TwoWay}">
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="TopSpacing" Height="50"/>
+                <RowDefinition x:Name="EnterField" Height="130"/>
+                <RowDefinition x:Name="Spacing" Height="50"/>
+                <RowDefinition x:Name="Buttons" Height="120"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="1" Orientation="Vertical" Margin="20,0,20,0">
+                <StackPanel Orientation="Horizontal" Margin="8">
+                    <TextBlock Text="Network" Width="130" Foreground="#EEE9DA" FontSize="19" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    <ComboBox HorizontalAlignment="Right" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Width="180" Height="40" Foreground="#EEE9DA" FontSize="15" ItemsSource="{x:Bind mViewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="ID" SelectedItem="{x:Bind mViewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged" Background="#000005" CornerRadius="8"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="8">
+                    <TextBlock Text="Name" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#EEE9DA" FontSize="19"/>
+                    <TextBox HorizontalAlignment="Right" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Width="180" Height="40" Background="#000005" Foreground="#EEE9DA" FontSize="15" PlaceholderText="Set your name"/>
+                </StackPanel>
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Margin="8">
-                <TextBlock Text="Name" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <TextBox HorizontalAlignment="Right" Width="180"/>
+            <ProgressRing Grid.Row="2" Foreground="Black" IsActive="{x:Bind mViewModel.Processing, Mode=TwoWay}"/>
+
+            <StackPanel Grid.Row="3" Orientation="Vertical" Margin="20,10,20,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Name="HostGameButton" Content="Host a game" Margin="8" Width="115" Height="40" Click="HostGameButton_Click"/>
+                    <Button Name="JoinGameButton" Content="Join a game" Margin="8" Width="115" Height="40" Click="JoinGameButton_Click"/>
+                </StackPanel>
+                <Button Name="ReturnButton" Content="Return" HorizontalAlignment="Center" Width="250" Height="40" Click="ReturnButton_Click"/>
             </StackPanel>
-        </StackPanel>
-
-        <StackPanel Grid.Row="3" Orientation="Vertical" Margin="20,10,20,0">
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Name="HostGameButton" Content="Host a game" Margin="8" Width="115" Height="40" Click="HostGameButton_Click"/>
-                <Button Name="JoinGameButton" Content="Join a game" Margin="8" Width="115" Height="40" Click="JoinGameButton_Click"/>
-            </StackPanel>
-            <Button Name="ReturnButton" Content="Return" HorizontalAlignment="Center" Width="250" Height="40" Click="ReturnButton_Click"/>
+        </Grid>
 
 
-        </StackPanel>
+        <Grid Name="HostGameGrid" Visibility="{x:Bind mViewModel.HostGameVisibility, Mode=TwoWay}">
+
+        </Grid>
+
+
+        <Grid Name="JoinGameGrid" Visibility="{x:Bind mViewModel.JoinGameVisibility, Mode=TwoWay}">
+
+        </Grid>
+
+
+
     </Grid>
 </Window>

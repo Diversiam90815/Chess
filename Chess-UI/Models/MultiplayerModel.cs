@@ -62,6 +62,12 @@ namespace Chess_UI.Models
         }
 
 
+        public void ChangeNetworkAdapter(int ID)
+        {
+            ChessLogicAPI.ChangeCurrentAdapter(ID);
+        }
+
+
         public string GetRemotePlayerName()
         {
             return ChessLogicAPI.GetRemotePlayerName();
