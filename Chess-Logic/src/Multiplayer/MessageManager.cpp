@@ -1,8 +1,8 @@
 /*
   ==============================================================================
-	Module:         MessageDispatcher
-	Description:    Delegating received messages in multiplayer mode
+	Module:         MessageManager
+	Description:    Managing received messages in multiplayer mode
   ==============================================================================
 */
 
-#include "MessageDispatcher.h"
+#include "MessageManager.h"

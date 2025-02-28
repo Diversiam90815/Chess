@@ -14,7 +14,7 @@
 using json = nlohmann::json;
 
 
-class ChatMessage : IMultiplayerMessage
+class ChatMessage : public IMultiplayerMessage
 {
 public:
 	MultiplayerMessageType getMessageType() const override { return MultiplayerMessageType::Chat; }

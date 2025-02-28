@@ -16,7 +16,7 @@
 using json = nlohmann::json;
 
 
-class MoveMessage : IMultiplayerMessage
+class MoveMessage : public IMultiplayerMessage
 {
 public:
 	MultiplayerMessageType getMessageType() const override { return MultiplayerMessageType::Move; }
