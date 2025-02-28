@@ -78,7 +78,7 @@ void TCPSession::readBody()
 								// parse JSON
 								try
 								{
-									json j = json::parse(mBody);
+									json j = json::parse(jsonData);
 									if (mMessageHandler)
 									{
 										mMessageHandler(type, j);
@@ -102,7 +102,7 @@ void TCPSession::sendJson(TCPMessageType type, const json &message)
 	// We'll compute "bodyLength" = 4 + jsonData.size().
 	// Then in the 4-byte TCP header, we store bodyLength in network order.
 	uint32_t			 typeNetworkOrder = htonl(static_cast<uint32_t>(type));
-	uint32_t			 bodyLen		  = 4 + static_cast<uint32_t>(message.size());
+	uint32_t			 bodyLen		  = 4 + static_cast<uint32_t>(body.size());
 	uint32_t			 bodyLenNetwork	  = htonl(bodyLen);
 
 
