@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <json.hpp>
+
 #include "Move.h"
 
 
@@ -40,4 +42,13 @@ public:
 	virtual void onEndGame(PlayerColor winner)			   = 0;
 	virtual void onChangeCurrentPlayer(PlayerColor player) = 0;
 	virtual void onMoveStateInitiated()					   = 0;
+};
+
+
+class IRemoteCommunicationObserver
+{
+public:
+	virtual ~IRemoteCommunicationObserver() {};
+
+	virtual void onMessageReceived(const nlohmann::json &j) = 0;
 };

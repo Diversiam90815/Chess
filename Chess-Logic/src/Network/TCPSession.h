@@ -15,7 +15,7 @@
 #include <json.hpp>
 
 #include "Logging.h"
-
+#include "IObservable.h"
 #include "IMultiplayerMessage.h"
 
 /*
@@ -25,7 +25,7 @@
 */
 
 //
-//enum class TCPMessageType : uint32_t
+// enum class TCPMessageType : uint32_t
 //{
 //	Move = 1,
 //	test = 2
@@ -39,7 +39,7 @@ using boost::asio::ip::tcp;
 using MessageHandler = std::function<void(MultiplayerMessageType type, const json &message)>;
 
 
-class TCPSession : public boost::enable_shared_from_this<TCPSession>
+class TCPSession : public boost::enable_shared_from_this<TCPSession>, public IRemoteCommunicationObservable
 {
 public:
 	typedef boost::shared_ptr<TCPSession> pointer;
@@ -54,21 +54,28 @@ public:
 
 	void								  sendJson(MultiplayerMessageType type, const json &message);
 
+	void								  attachObserver(IRemoteCommunicationObserver *observer) override;
+	void								  detachObserver(IRemoteCommunicationObserver *observer) override;
+
+	void								  receivedMessage(const json &j) override;
+
 private:
 	explicit TCPSession(boost::asio::io_context &ioContext);
 
-	void			  readHeader();
+	void										readHeader();
 
-	void			  readBody();
+	void										readBody();
 
 
-	tcp::socket		  mSocket;
+	tcp::socket									mSocket;
 
-	char			  mHeader[4]{};
-	std::vector<char> mBody{};
-	uint32_t		  mBodyLength{0};
+	char										mHeader[4]{};
+	std::vector<char>							mBody{};
+	uint32_t									mBodyLength{0};
 
-	int				  mBoundPort{0};
+	int											mBoundPort{0};
 
-	MessageHandler	  mMessageHandler = nullptr;
+	std::vector<IRemoteCommunicationObserver *> mObservers;
+
+	MessageHandler								mMessageHandler = nullptr;
 };

@@ -48,3 +48,14 @@ public:
 	virtual void changeCurrentPlayer(PlayerColor player) = 0;
 	virtual void moveStateInitiated()					 = 0;
 };
+
+
+class IRemoteCommunicationObservable
+{
+public:
+	virtual ~IRemoteCommunicationObservable() {};
+	virtual void attachObserver(IRemoteCommunicationObserver *observer) = 0;
+	virtual void detachObserver(IRemoteCommunicationObserver *observer) = 0;
+
+	virtual void receivedMessage(const json &j)							= 0;
+};

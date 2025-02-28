@@ -66,23 +66,14 @@ void TCPSession::readBody()
 									return;
 								}
 
-								// Extract type
-								uint32_t typeNetOrder = 0;
-								std::memcpy(&typeNetOrder, mBody.data(), 4);
-								MultiplayerMessageType type		= static_cast<MultiplayerMessageType>(typeNetOrder);
-
-								// Extract JSON substring
-								size_t		jsonSize = mBodyLength - 4;
-								std::string jsonData(mBody.data() + 4, jsonSize);
+								// Extract JSON string
+								std::string			   jsonData(mBody.data(), mBodyLength);
 
 								// parse JSON
 								try
 								{
 									json j = json::parse(jsonData);
-									if (mMessageHandler)
-									{
-										mMessageHandler(type, j);
-									}
+									receivedMessage(j);
 								}
 								catch (std::exception &e)
 								{
@@ -126,4 +117,28 @@ void TCPSession::sendJson(MultiplayerMessageType type, const json &message)
 									 LOG_ERROR("Error writing message: {}", ec.message());
 								 }
 							 });
+}
+
+
+void TCPSession::attachObserver(IRemoteCommunicationObserver *observer)
+{
+	mObservers.push_back(observer);
+}
+
+
+void TCPSession::detachObserver(IRemoteCommunicationObserver *observer)
+{
+	mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
+}
+
+
+void TCPSession::receivedMessage(const json &j)
+{
+	for (auto observer : mObservers)
+	{
+		if (observer)
+		{
+			observer->onMessageReceived(j);
+		}
+	}
 }

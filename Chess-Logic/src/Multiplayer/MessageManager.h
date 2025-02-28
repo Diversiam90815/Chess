@@ -12,21 +12,22 @@
 #include "MessageDispatcher.h"
 #include "MoveMessage.h"
 #include "GameManager.h"
+#include "IObserver.h"
 
 using json = nlohmann::json;
 
 
-class MessageManager
+class MessageManager : public IRemoteCommunicationObserver
 {
 public:
 	MessageManager();
 	~MessageManager();
 
-	void onMessageReceived(const json &j); // TBI with observer
-
+	void onMessageReceived(const json &j) override; 
 
 private:
 	MessageDispatcher mDispatcher;
 
 	void			  handleMoveMessage(const IMultiplayerMessage& message);
+
 };
