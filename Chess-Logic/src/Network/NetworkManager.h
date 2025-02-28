@@ -44,26 +44,28 @@ public:
 
 
 private:
-	bool							  presetNetworkAdapter();
+	bool																	 presetNetworkAdapter();
 
-	bool							  setNetworkAdapterFromConfig();
+	bool																	 setNetworkAdapterFromConfig();
 
-	bool							  startServerDiscovery(const std::string IPv4, const int port);
-	void							  startClientDiscovery();
+	bool																	 startServerDiscovery(const std::string IPv4, const int port);
+	void																	 startClientDiscovery();
 
 
-	TCPSession::pointer				  mSession = nullptr;
+	TCPSession::pointer														 mSession = nullptr;
 
-	std::unique_ptr<TCPServer>		  mServer;
-	std::unique_ptr<TCPClient>		  mClient;
-	std::unique_ptr<DiscoveryService> mDiscovery;
+	std::unique_ptr<TCPServer>												 mServer;
+	std::unique_ptr<TCPClient>												 mClient;
+	std::unique_ptr<DiscoveryService>										 mDiscovery;
 
-	NetworkInformation				  mNetworkInfo;
+	NetworkInformation														 mNetworkInfo;
 
-	std::atomic<bool>				  initialized{false};
+	std::atomic<bool>														 initialized{false};
 
-	boost::asio::io_context			  mIoContext;
+	boost::asio::io_context													 mIoContext;
+	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> mWorkGuard;
+	std::thread																 mWorkerThread;
 
-	std::string						  mLocalPlayerName{};
-	std::string						  mRemotePlayerName{};
+	std::string																 mLocalPlayerName{};
+	std::string																 mRemotePlayerName{};
 };

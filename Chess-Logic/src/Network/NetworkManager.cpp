@@ -8,10 +8,23 @@
 #include "NetworkManager.h"
 
 
-NetworkManager::NetworkManager() {}
+NetworkManager::NetworkManager() : mWorkGuard(boost::asio::make_work_guard(mIoContext))
+{
+	// Start the IO Context in a dedicated thread
+	mWorkerThread = std::thread([this]() { mIoContext.run(); });
+}
 
 
-NetworkManager::~NetworkManager() {}
+NetworkManager::~NetworkManager()
+{
+	// Stop the IO context
+	mWorkGuard.reset();
+	mIoContext.stop();
+	if (mWorkerThread.joinable())
+	{
+		mWorkerThread.join();
+	}
+}
 
 
 void NetworkManager::init()
@@ -34,7 +47,6 @@ bool NetworkManager::hostSession()
 	mServer = std::make_unique<TCPServer>(mIoContext);
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
 	mServer->startAccept();
-	mIoContext.run();
 
 	if (isInitialized())
 		return false;
@@ -51,7 +63,6 @@ void NetworkManager::joinSession(const Endpoint remote)
 	mClient = std::make_unique<TCPClient>(mIoContext);
 	mClient->setConnectHandler([this](TCPSession::pointer session) { setTCPSession(session); });
 	mClient->connect(remote.IPAddress, remote.tcpPort);
-	mIoContext.run();
 }
 
 
@@ -124,8 +135,6 @@ bool NetworkManager::startServerDiscovery(const std::string IPv4, const int port
 	bool bindingSucceeded = mDiscovery->init(IPv4, port, getLocalPlayerName());
 	mDiscovery->startSender();
 
-	mIoContext.run();
-
 	return bindingSucceeded;
 }
 
@@ -136,6 +145,4 @@ void NetworkManager::startClientDiscovery()
 
 	mDiscovery->setPeerCallback([this](Endpoint remote) { joinSession(remote); });
 	mDiscovery->startReceiver();
-
-	mIoContext.run();
 }
