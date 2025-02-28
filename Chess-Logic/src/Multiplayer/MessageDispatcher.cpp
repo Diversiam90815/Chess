@@ -14,7 +14,7 @@ MessageDispatcher::MessageDispatcher() {}
 MessageDispatcher::~MessageDispatcher() {}
 
 
-void MessageDispatcher::registerHandler(MultiplayerMessageType type, MessageHandler handler)
+void MessageDispatcher::registerHandler(MultiplayerMessageType type, MultiplayerMessageHandler handler)
 {
 	mHandlers[type] = handler;
 }

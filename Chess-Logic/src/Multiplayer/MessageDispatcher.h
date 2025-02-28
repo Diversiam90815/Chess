@@ -18,7 +18,7 @@
 
 
 using json			 = nlohmann::json;
-using MessageHandler = std::function<void(const IMultiplayerMessage &)>;
+using MultiplayerMessageHandler  = std::function<void(const IMultiplayerMessage &)>;
 
 
 class MessageDispatcher
@@ -27,12 +27,12 @@ public:
 	MessageDispatcher();
 	~MessageDispatcher();
 
-	void registerHandler(MultiplayerMessageType type, MessageHandler handler);
+	void registerHandler(MultiplayerMessageType type, MultiplayerMessageHandler handler);
 
 	void dispatchMessage(const json &j);
 
 private:
 	std::unique_ptr<IMultiplayerMessage>					   createMessage(MultiplayerMessageType type, const json &j);
 
-	std::unordered_map<MultiplayerMessageType, MessageHandler> mHandlers;
+	std::unordered_map<MultiplayerMessageType, MultiplayerMessageHandler> mHandlers;
 };
