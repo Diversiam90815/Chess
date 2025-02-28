@@ -26,7 +26,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 set (SOURCE_DIR             ${PROJECT_SOURCE_DIR}/src)
 set (SUBMODULES_DIR         ${PROJECT_SOURCE_DIR}/submodules)
-    
+	
 set (PIECE_DIR              ${SOURCE_DIR}/Piece)
 set (MOVE_DIR               ${SOURCE_DIR}/Moves)
 set (GAME_MANAGER_DIR       ${SOURCE_DIR}/GameManager)
@@ -38,8 +38,9 @@ set (FILEMANAGER_DIR        ${SOURCE_DIR}/FileManager)
 set (LOGGER_DIR             ${SOURCE_DIR}/Logger)
 set (USERSETTINGS_DIR       ${SOURCE_DIR}/UserSettings)
 set (COMMUNICATION_DIR      ${SOURCE_DIR}/Communication)
-set(OBSERVER_DIR            ${SOURCE_DIR}/Observer)
+set (OBSERVER_DIR           ${SOURCE_DIR}/Observer)
 set (NETWORK_DIR            ${SOURCE_DIR}/Network)
+set (MULTIPLAYER_DIR        ${SOURCE_DIR}/Multiplayer)
 
 
 ###########################################
@@ -47,20 +48,21 @@ set (NETWORK_DIR            ${SOURCE_DIR}/Network)
 ###########################################
 
 set(ALL_PROJECT_DIRS 
-            ${PIECE_DIR}
-            ${MOVE_DIR}
-            ${GAME_MANAGER_DIR}
-            ${BOARD_DIR}
-            ${PLAYER_DIR}
-            ${API_DIR}
-            ${MISC_DIR}
-            ${LOGGER_DIR}
-            ${FILEMANAGER_DIR}
-            ${SOURCE_DIR}
-            ${USERSETTINGS_DIR}
-            ${COMMUNICATION_DIR}
-            ${OBSERVER_DIR}
-            ${NETWORK_DIR}
+			${PIECE_DIR}
+			${MOVE_DIR}
+			${GAME_MANAGER_DIR}
+			${BOARD_DIR}
+			${PLAYER_DIR}
+			${API_DIR}
+			${MISC_DIR}
+			${LOGGER_DIR}
+			${FILEMANAGER_DIR}
+			${SOURCE_DIR}
+			${USERSETTINGS_DIR}
+			${COMMUNICATION_DIR}
+			${OBSERVER_DIR}
+			${NETWORK_DIR}
+			${MULTIPLAYER_DIR}
 )
 
 include_directories(${ALL_PROJECT_DIRS})
@@ -71,94 +73,104 @@ include_directories(${ALL_PROJECT_DIRS})
 ###########################################
 
 set(API_FILES
-    ${API_DIR}/ChessLogicAPI.h    ${API_DIR}/ChessLogicAPI.cpp
-    ${API_DIR}/ChessLogicAPIDefines.h
+	${API_DIR}/ChessLogicAPI.h    ${API_DIR}/ChessLogicAPI.cpp
+	${API_DIR}/ChessLogicAPIDefines.h
 )
 
 set(PIECE_FILES
-    ${PIECE_DIR}/ChessPiece.h   ${PIECE_DIR}/ChessPiece.cpp
-    ${PIECE_DIR}/Pawn.h         ${PIECE_DIR}/Pawn.cpp
-    ${PIECE_DIR}/Knight.h       ${PIECE_DIR}/Knight.cpp
-    ${PIECE_DIR}/Bishop.h       ${PIECE_DIR}/Bishop.cpp
-    ${PIECE_DIR}/Rook.h         ${PIECE_DIR}/Rook.cpp
-    ${PIECE_DIR}/Queen.h        ${PIECE_DIR}/Queen.cpp
-    ${PIECE_DIR}/King.h         ${PIECE_DIR}/King.cpp
+	${PIECE_DIR}/ChessPiece.h   ${PIECE_DIR}/ChessPiece.cpp
+	${PIECE_DIR}/Pawn.h         ${PIECE_DIR}/Pawn.cpp
+	${PIECE_DIR}/Knight.h       ${PIECE_DIR}/Knight.cpp
+	${PIECE_DIR}/Bishop.h       ${PIECE_DIR}/Bishop.cpp
+	${PIECE_DIR}/Rook.h         ${PIECE_DIR}/Rook.cpp
+	${PIECE_DIR}/Queen.h        ${PIECE_DIR}/Queen.cpp
+	${PIECE_DIR}/King.h         ${PIECE_DIR}/King.cpp
 )
 
 set(BOARD_FILES
-    ${BOARD_DIR}/ChessBoard.h    ${BOARD_DIR}/ChessBoard.cpp
+	${BOARD_DIR}/ChessBoard.h    ${BOARD_DIR}/ChessBoard.cpp
 )
-    
+	
 set(MOVE_FILES
-    ${MOVE_DIR}/MoveType.h
-    ${MOVE_DIR}/Move.h
-    ${MOVE_DIR}/MoveHelper.h            ${MOVE_DIR}/MoveHelper.cpp
-    ${MOVE_DIR}/MoveGeneration.h        ${MOVE_DIR}/MoveGeneration.cpp
-    ${MOVE_DIR}/MoveValidation.h        ${MOVE_DIR}/MoveValidation.cpp
-    ${MOVE_DIR}/MoveExecution.h         ${MOVE_DIR}/MoveExecution.cpp
-    ${MOVE_DIR}/MoveNotationHelper.h    ${MOVE_DIR}/MoveNotationHelper.cpp
+	${MOVE_DIR}/MoveType.h
+	${MOVE_DIR}/Move.h
+	${MOVE_DIR}/MoveSerialization.h
+	${MOVE_DIR}/MoveHelper.h                ${MOVE_DIR}/MoveHelper.cpp
+	${MOVE_DIR}/MoveGeneration.h            ${MOVE_DIR}/MoveGeneration.cpp
+	${MOVE_DIR}/MoveValidation.h            ${MOVE_DIR}/MoveValidation.cpp
+	${MOVE_DIR}/MoveExecution.h             ${MOVE_DIR}/MoveExecution.cpp
+	${MOVE_DIR}/MoveNotationHelper.h        ${MOVE_DIR}/MoveNotationHelper.cpp
+	${MOVE_DIR}/MultiplayerMoveManager.h    ${MOVE_DIR}/MultiplayerMoveManager.cpp
 )
 
 set(GAME_MANAGER_FILES
-    ${GAME_MANAGER_DIR}/GameManager.h    ${GAME_MANAGER_DIR}/GameManager.cpp
+	${GAME_MANAGER_DIR}/GameManager.h    ${GAME_MANAGER_DIR}/GameManager.cpp
 )
 
 set(PLAYER_FILES
-    ${PLAYER_DIR}/Player.h      ${PLAYER_DIR}/Player.cpp
+	${PLAYER_DIR}/Player.h      ${PLAYER_DIR}/Player.cpp
 )
 
 set(MISC_FILES
-    ${MISC_DIR}/Parameters.h
-    ${MISC_DIR}/Helper.h
+	${MISC_DIR}/Parameters.h
+	${MISC_DIR}/Helper.h
 )
 
 set(LOGGER_FILES
-    ${LOGGER_DIR}/Logging.h             ${LOGGER_DIR}/Logging.cpp
-    ${LOGGER_DIR}/LoggingHelper.h       ${LOGGER_DIR}/LoggingHelper.cpp
+	${LOGGER_DIR}/Logging.h             ${LOGGER_DIR}/Logging.cpp
+	${LOGGER_DIR}/LoggingHelper.h       ${LOGGER_DIR}/LoggingHelper.cpp
 )
 
 set(FILEMANAGER_FILES
-    ${FILEMANAGER_DIR}/FileManager.h    ${FILEMANAGER_DIR}/FileManager.cpp
+	${FILEMANAGER_DIR}/FileManager.h    ${FILEMANAGER_DIR}/FileManager.cpp
 )
 
 set(USERSETTINGS_FILES
-    ${USERSETTINGS_DIR}/UserSettings.h    ${USERSETTINGS_DIR}/UserSettings.cpp
+	${USERSETTINGS_DIR}/UserSettings.h    ${USERSETTINGS_DIR}/UserSettings.cpp
 )
 
 set(NETWORK_FILES
-    ${NETWORK_DIR}/NetworkAdapter.h
-    ${NETWORK_DIR}/NetworkManager.h         ${NETWORK_DIR}/NetworkManager.cpp
-    ${NETWORK_DIR}/NetworkInformation.h     ${NETWORK_DIR}/NetworkInformation.cpp
-    ${NETWORK_DIR}/DiscoveryService.h       ${NETWORK_DIR}/DiscoveryService.cpp
-    ${NETWORK_DIR}/TCPServer.h              ${NETWORK_DIR}/TCPServer.cpp
-    ${NETWORK_DIR}/TCPClient.h              ${NETWORK_DIR}/TCPClient.cpp
-    ${NETWORK_DIR}/TCPSession.h             ${NETWORK_DIR}/TCPSession.cpp
+	${NETWORK_DIR}/NetworkAdapter.h
+	${NETWORK_DIR}/NetworkManager.h         ${NETWORK_DIR}/NetworkManager.cpp
+	${NETWORK_DIR}/NetworkInformation.h     ${NETWORK_DIR}/NetworkInformation.cpp
+	${NETWORK_DIR}/DiscoveryService.h       ${NETWORK_DIR}/DiscoveryService.cpp
+	${NETWORK_DIR}/TCPServer.h              ${NETWORK_DIR}/TCPServer.cpp
+	${NETWORK_DIR}/TCPClient.h              ${NETWORK_DIR}/TCPClient.cpp
+	${NETWORK_DIR}/TCPSession.h             ${NETWORK_DIR}/TCPSession.cpp
 )
 
 set(OBSERVER_FILES
-    ${OBSERVER_DIR}/IObserver.h
-    ${OBSERVER_DIR}/IObservable.h
+	${OBSERVER_DIR}/IObserver.h
+	${OBSERVER_DIR}/IObservable.h
 )
 
 set(COMMUNICATION_FILES
-    ${COMMUNICATION_DIR}/UICommunication.h    ${COMMUNICATION_DIR}/UICommunication.cpp
+	${COMMUNICATION_DIR}/UICommunication.h    ${COMMUNICATION_DIR}/UICommunication.cpp
+)
+
+set(MULTIPLAYER_FILES
+	${MULTIPLAYER_DIR}/IMultiplayerMessage.h	${MULTIPLAYER_DIR}/IMultiplayerMessage.cpp
+	${MULTIPLAYER_DIR}/MessageDispatcher.h		${MULTIPLAYER_DIR}/MessageDispatcher.cpp
+	${MULTIPLAYER_DIR}/MoveMessage.h			${MULTIPLAYER_DIR}/MoveMessage.cpp
+	${MULTIPLAYER_DIR}/ChatMessage.h			${MULTIPLAYER_DIR}/ChatMessage.cpp
 )
 
 
 set(ALL_FILES
-    ${API_FILES}
-    ${PIECE_FILES}
-    ${BOARD_FILES}
-    ${MOVE_FILES}
-    ${GAME_MANAGER_FILES}
-    ${PLAYER_FILES}
-    ${MISC_FILES}
-    ${LOGGER_FILES}
-    ${FILEMANAGER_FILES}
-    ${USERSETTINGS_FILES}
-    ${COMMUNICATION_FILES}
-    ${OBSERVER_FILES}
-    ${NETWORK_FILES}
+	${API_FILES}
+	${PIECE_FILES}
+	${BOARD_FILES}
+	${MOVE_FILES}
+	${GAME_MANAGER_FILES}
+	${PLAYER_FILES}
+	${MISC_FILES}
+	${LOGGER_FILES}
+	${FILEMANAGER_FILES}
+	${USERSETTINGS_FILES}
+	${COMMUNICATION_FILES}
+	${OBSERVER_FILES}
+	${NETWORK_FILES}
+	${MULTIPLAYER_FILES}
 )
 
 
@@ -179,6 +191,7 @@ source_group("UserSettings"     FILES ${USERSETTINGS_FILES})
 source_group("IObserver"        FILES ${OBSERVER_FILES})
 source_group("Communication"    FILES ${COMMUNICATION_FILES})
 source_group("Network"          FILES ${NETWORK_FILES})
+source_group("Multiplayer"      FILES ${MULTIPLAYER_FILES})
 
 
 ###########################################
@@ -210,7 +223,7 @@ add_subdirectory(${SUBMODULES_DIR}/json)
 ###########################################
 
 add_library(${PROJECT_NAME} SHARED
-    ${ALL_FILES}
+	${ALL_FILES}
 )
 
 
@@ -219,7 +232,7 @@ add_library(${PROJECT_NAME} SHARED
 ###########################################
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    OUTPUT_NAME "${PROJECT_NAME}"
+	OUTPUT_NAME "${PROJECT_NAME}"
 )
 
 
@@ -228,12 +241,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 ###########################################
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC
-    -DENV_DEVELOPMENT
-    _CRT_SECURE_NO_WARNINGS
+	-DENV_DEVELOPMENT
+	_CRT_SECURE_NO_WARNINGS
 
-    _WINDOWS
-    WIN32_LEAN_AND_MEAN
-    _WINSOCK_DEPRECATED_NO_WARNING
+	_WINDOWS
+	WIN32_LEAN_AND_MEAN
+	_WINSOCK_DEPRECATED_NO_WARNING
 )
 
 
@@ -242,17 +255,17 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 ###########################################
 
 target_compile_options(${PROJECT_NAME} PRIVATE
-    $<$<CONFIG:Release>:
-        /Oi
-        /Gy
-    >
-    $<$<CONFIG:Debug>:
-        /Od
-        /Z7
-    >
-    /sdl
-    /MP
-    /WX-        # Don't treat warnings as errors
+	$<$<CONFIG:Release>:
+		/Oi
+		/Gy
+	>
+	$<$<CONFIG:Debug>:
+		/Od
+		/Z7
+	>
+	/sdl
+	/MP
+	/WX-        # Don't treat warnings as errors
 )
 
 
@@ -261,11 +274,11 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 ###########################################
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-        ${PROJECT_BINARY_DIR}
-        ${ALL_PROJECT_DIRS}
-        ${LOGGER_INCLUDE_FILE}
-        ${JSON_SINGLE_FILE}
-        ${BOOST_ASIO_INCLUDE_DIRS}
+		${PROJECT_BINARY_DIR}
+		${ALL_PROJECT_DIRS}
+		${LOGGER_INCLUDE_FILE}
+		${JSON_SINGLE_FILE}
+		${BOOST_ASIO_INCLUDE_DIRS}
 )
 
 
@@ -274,7 +287,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 ###########################################
 
 set(PROJECT_LIBS    Logger
-                    Boost::boost
+					Boost::boost
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_LIBS})
