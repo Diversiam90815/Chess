@@ -1,8 +1,8 @@
 /*
   ==============================================================================
-	Module:         ChatMessage
-	Description:    Message type containing chat information
+	Module:         MessageDispatcher
+	Description:    Delegating received messages in multiplayer mode
   ==============================================================================
 */
 
-#include "ChatMessage.h"
+#include "MessageDispatcher.h"

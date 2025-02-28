@@ -1,8 +1,13 @@
 /*
   ==============================================================================
-	Module:         MoveMessage
-	Description:    Message type containing move information
+	Module:         MessageDispatcher
+	Description:    Delegating received messages in multiplayer mode
   ==============================================================================
 */
 
-#include "MoveMessage.h"
+#pragma once
+
+class MessageDispatcher
+{
+
+};

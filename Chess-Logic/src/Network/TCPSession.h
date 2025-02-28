@@ -16,6 +16,7 @@
 
 #include "Logging.h"
 
+#include "IMultiplayerMessage.h"
 
 /*
 	The message we're sending/receiving consists of 2 sections: header and body.
@@ -23,19 +24,19 @@
 	Body will contain the type (first 4 bytes of body) of message and the data itself preceding
 */
 
-
-enum class TCPMessageType : uint32_t
-{
-	Move = 1,
-	test = 2
-	// more to come
-};
+//
+//enum class TCPMessageType : uint32_t
+//{
+//	Move = 1,
+//	test = 2
+//	// more to come
+//};
 
 
 using json = nlohmann::json;
 using boost::asio::ip::tcp;
 
-using MessageHandler = std::function<void(TCPMessageType type, const json &message)>;
+using MessageHandler = std::function<void(MultiplayerMessageType type, const json &message)>;
 
 
 class TCPSession : public boost::enable_shared_from_this<TCPSession>
@@ -51,7 +52,7 @@ public:
 
 	const int							  getBoundPort() const { return mBoundPort; }
 
-	void								  sendJson(TCPMessageType type, const json &message);
+	void								  sendJson(MultiplayerMessageType type, const json &message);
 
 private:
 	explicit TCPSession(boost::asio::io_context &ioContext);

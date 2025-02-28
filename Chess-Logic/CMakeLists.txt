@@ -100,7 +100,6 @@ set(MOVE_FILES
 	${MOVE_DIR}/MoveValidation.h            ${MOVE_DIR}/MoveValidation.cpp
 	${MOVE_DIR}/MoveExecution.h             ${MOVE_DIR}/MoveExecution.cpp
 	${MOVE_DIR}/MoveNotationHelper.h        ${MOVE_DIR}/MoveNotationHelper.cpp
-	${MOVE_DIR}/MultiplayerMoveManager.h    ${MOVE_DIR}/MultiplayerMoveManager.cpp
 )
 
 set(GAME_MANAGER_FILES
@@ -149,10 +148,11 @@ set(COMMUNICATION_FILES
 )
 
 set(MULTIPLAYER_FILES
-	${MULTIPLAYER_DIR}/IMultiplayerMessage.h	${MULTIPLAYER_DIR}/IMultiplayerMessage.cpp
+	${MULTIPLAYER_DIR}/IMultiplayerMessage.h
+	${MULTIPLAYER_DIR}/MoveMessage.h
+	${MULTIPLAYER_DIR}/ChatMessage.h
+	${MULTIPLAYER_DIR}/MessageManager.h			${MULTIPLAYER_DIR}/MessageManager.cpp
 	${MULTIPLAYER_DIR}/MessageDispatcher.h		${MULTIPLAYER_DIR}/MessageDispatcher.cpp
-	${MULTIPLAYER_DIR}/MoveMessage.h			${MULTIPLAYER_DIR}/MoveMessage.cpp
-	${MULTIPLAYER_DIR}/ChatMessage.h			${MULTIPLAYER_DIR}/ChatMessage.cpp
 )
 
 
