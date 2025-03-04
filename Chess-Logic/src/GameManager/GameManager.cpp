@@ -38,7 +38,7 @@ void GameManager::ReleaseInstance()
 }
 
 
-void GameManager::init()
+bool GameManager::init()
 {
 	mLog.initLogging();
 	mUserSettings.init();
@@ -56,6 +56,8 @@ void GameManager::init()
 
 	mNetwork = std::make_unique<NetworkManager>();
 	mNetwork->init();
+
+	return true;
 }
 
 
@@ -154,6 +156,19 @@ void GameManager::switchTurns()
 	changeCurrentPlayer(PlayerColor::White);
 
 	LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
+}
+
+
+bool GameManager::calculateAllMovesForPlayer()
+{
+	if (!mMovesGeneratedForCurrentTurn)
+	{
+		LOG_INFO("We start calculating this player's possible moves!");
+		mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer());
+		mMovesGeneratedForCurrentTurn = true;
+		return true;
+	}
+	return false;
 }
 
 

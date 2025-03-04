@@ -14,13 +14,13 @@
 
 #include "Parameters.h"
 #include "Move.h"
+#include "GameManager.h"
 
 
 enum class GameState
 {
 	Undefined		 = 0,
-	InitLocal		 = 1,
-	InitLAN			 = 2,
+	Init			 = 1,
 	WaitingForInput	 = 3,
 	MoveInitiated	 = 4,
 	WaitingForTarget = 5,
@@ -47,18 +47,42 @@ public:
 
 	~StateMachine();
 
-	void start();
-	void stop();
+	void	  start();
+	void	  stop();
+
+	void	  onGameStarted();							  // Called from UI
+	void	  onSquareSelected(const Position &pos);	  // Called from UI
+	void	  onPawnPromotionChosen(PieceType promotion); // Called from UI
+
+	void	  setGameState(const GameState state);
+	GameState getGameState() const;
+
+	bool	  isInitialized() const;
+	void	  setInitialized(const bool value);
 
 private:
 	StateMachine();
 
 	void					run();
 
+	bool					handleInitState(bool multiplayer);
+	bool					handleWaitingForInputState();
+	bool					handleMoveInitiatedState();
+	bool					handleWaitingForTargetState();
+	bool					handleValidatingMoveState();
+	bool					handleExecutingMoveState();
+	bool					handlePawnPromotionState();
+	bool					handleGameOverState();
+
+	bool					switchToNextState();
+
+
 	boost::thread			worker;
 	std::atomic<bool>		mRunning;
 	std::mutex				mMutex;
 	std::condition_variable cv;
+
+	std::atomic<bool>		mInitialized{false};
 
 	GameState				mCurrentState{GameState::Undefined};
 	Position				mMoveStart{};

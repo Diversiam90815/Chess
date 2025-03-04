@@ -30,7 +30,7 @@ public:
 	static GameManager		   *GetInstance();
 	static void					ReleaseInstance();
 
-	void						init();
+	bool						init();
 
 	void						startGame();
 
@@ -38,8 +38,8 @@ public:
 
 	void						undoMove();
 
-	//void						gameStateChanged(GameState state) override;
-	//GameState					getCurrentGameState() const;
+	// void						gameStateChanged(GameState state) override;
+	// GameState					getCurrentGameState() const;
 
 	void						setCurrentMoveState(MoveState state);
 	MoveState					getCurrentMoveState() const;
@@ -83,10 +83,13 @@ public:
 	void						attachObserver(IGameObserver *observer) override;
 	void						detachObserver(IGameObserver *observer) override;
 
+	void						switchTurns();
+
+	bool						calculateAllMovesForPlayer();
+
 private:
 	GameManager();
 
-	void							 switchTurns();
 
 	void							 checkForEndGameConditions();
 
@@ -103,7 +106,7 @@ private:
 
 	PlayerColor						 mCurrentPlayer	   = PlayerColor::NoColor;
 
-	//GameState						 mCurrentState	   = GameState::Init;
+	// GameState						 mCurrentState	   = GameState::Init;
 
 	MoveState						 mCurrentMoveState = MoveState::NoMove;
 
