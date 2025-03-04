@@ -87,6 +87,8 @@ public:
 
 	bool						calculateAllMovesForPlayer();
 
+	bool						initiateMove(const Position& startPosition);
+
 private:
 	GameManager();
 

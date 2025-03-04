@@ -288,7 +288,10 @@ bool StateMachine::handleWaitingForInputState()
 }
 
 
-bool StateMachine::handleMoveInitiatedState() {}
+bool StateMachine::handleMoveInitiatedState()
+{
+	GameManager::GetInstance()->initiateMove(mMoveStart);
+}
 
 
 bool StateMachine::handleWaitingForTargetState() {}

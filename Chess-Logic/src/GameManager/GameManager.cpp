@@ -172,6 +172,23 @@ bool GameManager::calculateAllMovesForPlayer()
 }
 
 
+bool GameManager::initiateMove(const Position &startPosition)
+{
+	LOG_INFO("We started to initate a move with starting position {}", LoggingHelper::positionToString(startPosition).c_str());
+
+	mAllMovesForPosition.clear();
+
+	auto possibleMoves = mMoveGeneration->getMovesForPosition(startPosition);
+
+	mAllMovesForPosition.reserve(possibleMoves.size());
+	mAllMovesForPosition = possibleMoves;
+
+	moveStateInitiated(); // Let the UI know the moves for current round are ready -> handling need to be refactored later!
+
+	LOG_INFO("Number of possible moves for the current position is {}", mAllMovesForPosition.size());
+}
+
+
 void GameManager::executeMove(PossibleMove &move)
 {
 	Move executedMove = mMoveExecution->executeMove(move);
