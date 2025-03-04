@@ -43,19 +43,19 @@ std::string LoggingHelper::pieceTypeToString(PieceType piece)
 }
 
 
-std::string LoggingHelper::gameStateToString(GameState state)
-{
-	switch (state)
-	{
-	case GameState::Init: return "Init";
-	case GameState::OnGoing: return "On Going";
-	case GameState::Paused: return "Paused";
-	case GameState::Checkmate: return "Checkmate";
-	case GameState::Stalemate: return "Stalemate";
-	case GameState::Draw: return "Draw";
-	default: return "Unknown GameState";
-	}
-}
+//std::string LoggingHelper::gameStateToString(GameState state)
+//{
+//	switch (state)
+//	{
+//	case GameState::Init: return "Init";
+//	case GameState::OnGoing: return "On Going";
+//	case GameState::Paused: return "Paused";
+//	case GameState::Checkmate: return "Checkmate";
+//	case GameState::Stalemate: return "Stalemate";
+//	case GameState::Draw: return "Draw";
+//	default: return "Unknown GameState";
+//	}
+//}
 
 
 std::string LoggingHelper::moveStateToString(MoveState state)

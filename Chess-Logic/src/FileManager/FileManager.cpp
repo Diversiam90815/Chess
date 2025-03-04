@@ -111,6 +111,7 @@ std::string FileManager::readSettingFromFile(const std::string &setting)
 	catch (const std::exception &e)
 	{
 		LOG_WARNING("Exception occured during reading from JSON: {}", e.what());
+		return "";
 	}
 }
 

@@ -43,15 +43,15 @@ enum class PlayerColor
 };
 
 
-enum class GameState
-{
-	Init = 1,
-	OnGoing,
-	Paused,
-	Checkmate,
-	Stalemate,
-	Draw
-};
+//enum class GameState
+//{
+//	Init = 1,
+//	OnGoing,
+//	Paused,
+//	Checkmate,
+//	Stalemate,
+//	Draw
+//};
 
 
 enum class MoveState

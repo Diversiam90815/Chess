@@ -44,7 +44,7 @@ public:
 	virtual void detachObserver(IGameObserver *observer) = 0;
 
 	virtual void endGame(PlayerColor winner)			 = 0;
-	virtual void gameStateChanged(GameState state)		 = 0;
+	//virtual void gameStateChanged(GameState state)		 = 0;
 	virtual void changeCurrentPlayer(PlayerColor player) = 0;
 	virtual void moveStateInitiated()					 = 0;
 };

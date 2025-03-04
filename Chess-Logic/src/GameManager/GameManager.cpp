@@ -72,7 +72,7 @@ void GameManager::clearState()
 {
 	changeCurrentPlayer(PlayerColor::NoColor);
 
-	gameStateChanged(GameState::Init);
+	//gameStateChanged(GameState::Init);
 	setCurrentMoveState(MoveState::NoMove);
 	mAllMovesForPosition.clear();
 	mMovesGeneratedForCurrentTurn = false; // Reset flag
@@ -220,28 +220,28 @@ void GameManager::undoMove()
 	switchTurns();
 }
 
-
-void GameManager::gameStateChanged(GameState state)
-{
-	if (mCurrentState == state)
-		return;
-
-	mCurrentState = state;
-
-	for (auto observer : mObservers)
-	{
-		if (observer)
-		{
-			observer->onGameStateChanged(state);
-		}
-	}
-}
-
-
-GameState GameManager::getCurrentGameState() const
-{
-	return mCurrentState;
-}
+//
+//void GameManager::gameStateChanged(GameState state)
+//{
+//	if (mCurrentState == state)
+//		return;
+//
+//	mCurrentState = state;
+//
+//	for (auto observer : mObservers)
+//	{
+//		if (observer)
+//		{
+//			observer->onGameStateChanged(state);
+//		}
+//	}
+//}
+//
+//
+//GameState GameManager::getCurrentGameState() const
+//{
+//	return mCurrentState;
+//}
 
 
 void GameManager::setCurrentMoveState(MoveState state)
@@ -285,11 +285,11 @@ void GameManager::endGame(PlayerColor player)
 
 std::optional<PlayerColor> GameManager::getWinner() const
 {
-	if (mCurrentState == GameState::Checkmate)
-		return getCurrentPlayer() == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
+	////if (mCurrentState == GameState::Checkmate)
+	//	//return getCurrentPlayer() == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
 
-	else if (mCurrentState == GameState::Stalemate)
-		return std::nullopt; // Draw in case of stalemate
+	////else if (mCurrentState == GameState::Stalemate)
+	//	//return std::nullopt; // Draw in case of stalemate
 
 	return std::nullopt;
 }
@@ -415,7 +415,7 @@ void GameManager::checkForEndGameConditions()
 		if (isCheckMate)
 		{
 			LOG_INFO("Detected a Checkmate!");
-			gameStateChanged(GameState::Checkmate);
+			//gameStateChanged(GameState::Checkmate);
 
 			auto winner = getWinner();
 			if (winner.has_value())
@@ -429,7 +429,7 @@ void GameManager::checkForEndGameConditions()
 		if (isStaleMate)
 		{
 			LOG_INFO("Detected a Stalemate");
-			gameStateChanged(GameState::Stalemate);
+			//gameStateChanged(GameState::Stalemate);
 
 			auto winner = getWinner();
 			if (winner.has_value())
@@ -439,13 +439,13 @@ void GameManager::checkForEndGameConditions()
 		}
 
 		LOG_INFO("Game is still on-going. We switch player's turns!");
-		gameStateChanged(GameState::OnGoing);
+		//gameStateChanged(GameState::OnGoing);
 		switchTurns();
 		return;
 	}
 
 	LOG_WARNING("Couldn't find the last move! Game is still on-going");
-	gameStateChanged(GameState::OnGoing);
+	//gameStateChanged(GameState::OnGoing);
 }
 
 

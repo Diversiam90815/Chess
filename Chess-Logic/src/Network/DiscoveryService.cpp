@@ -39,6 +39,7 @@ bool DiscoveryService::init(std::string localIPv4, unsigned short tcpPort, const
 	mSocket.set_option(boost::asio::socket_base::broadcast(true));
 
 	mInitialized.store(true);
+	return true;
 }
 
 

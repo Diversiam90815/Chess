@@ -50,7 +50,7 @@ public:
 	void onExecuteMove() override;
 	void onAddToMoveHistory(Move &move) override;
 
-	void onGameStateChanged(GameState state) override;
+	//void onGameStateChanged(GameState state) override;
 	void onEndGame(PlayerColor winner) override;
 	void onChangeCurrentPlayer(PlayerColor player) override;
 	void onMoveStateInitiated() override;

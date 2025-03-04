@@ -38,8 +38,8 @@ public:
 
 	void						undoMove();
 
-	void						gameStateChanged(GameState state) override;
-	GameState					getCurrentGameState() const;
+	//void						gameStateChanged(GameState state) override;
+	//GameState					getCurrentGameState() const;
 
 	void						setCurrentMoveState(MoveState state);
 	MoveState					getCurrentMoveState() const;
@@ -103,7 +103,7 @@ private:
 
 	PlayerColor						 mCurrentPlayer	   = PlayerColor::NoColor;
 
-	GameState						 mCurrentState	   = GameState::Init;
+	//GameState						 mCurrentState	   = GameState::Init;
 
 	MoveState						 mCurrentMoveState = MoveState::NoMove;
 

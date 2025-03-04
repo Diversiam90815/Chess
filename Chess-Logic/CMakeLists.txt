@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.0.0.255)
+set(CHESS_VERSION 1.0.0.309)
 
 project(Chess-Logic VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
@@ -41,6 +41,7 @@ set (COMMUNICATION_DIR      ${SOURCE_DIR}/Communication)
 set (OBSERVER_DIR           ${SOURCE_DIR}/Observer)
 set (NETWORK_DIR            ${SOURCE_DIR}/Network)
 set (MULTIPLAYER_DIR        ${SOURCE_DIR}/Multiplayer)
+set (STATEMACHINE_DIR       ${SOURCE_DIR}/StateMachine)
 
 
 ###########################################
@@ -63,6 +64,7 @@ set(ALL_PROJECT_DIRS
 			${OBSERVER_DIR}
 			${NETWORK_DIR}
 			${MULTIPLAYER_DIR}
+			${STATEMACHINE_DIR}
 )
 
 include_directories(${ALL_PROJECT_DIRS})
@@ -75,6 +77,10 @@ include_directories(${ALL_PROJECT_DIRS})
 set(API_FILES
 	${API_DIR}/ChessLogicAPI.h    ${API_DIR}/ChessLogicAPI.cpp
 	${API_DIR}/ChessLogicAPIDefines.h
+)
+
+set(STATEMACHINE_FILES
+	${STATEMACHINE_DIR}/StateMachine.h	${STATEMACHINE_DIR}/StateMachine.cpp
 )
 
 set(PIECE_FILES
@@ -171,6 +177,7 @@ set(ALL_FILES
 	${OBSERVER_FILES}
 	${NETWORK_FILES}
 	${MULTIPLAYER_FILES}
+	${STATEMACHINE_FILES}
 )
 
 
@@ -192,6 +199,7 @@ source_group("IObserver"        FILES ${OBSERVER_FILES})
 source_group("Communication"    FILES ${COMMUNICATION_FILES})
 source_group("Network"          FILES ${NETWORK_FILES})
 source_group("Multiplayer"      FILES ${MULTIPLAYER_FILES})
+source_group("StateMachine"     FILES ${STATEMACHINE_FILES})
 
 
 ###########################################
@@ -208,7 +216,7 @@ set(LOGGER_INCLUDE_FILE   ${SUBMODULES_DIR}/Logger/include)
 
 set(BOOST_ROOT ${SUBMODULES_DIR}/boost)
 set(Boost_INCLUDE_DIR ${SUBMODULES_DIR}/boost)
-find_package(Boost)
+find_package(Boost REQUIRED thread system)
 
 
 # NLOHMANN JSON
@@ -288,6 +296,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 set(PROJECT_LIBS    Logger
 					Boost::boost
+					Boost::thread
+					Boost::system
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_LIBS})

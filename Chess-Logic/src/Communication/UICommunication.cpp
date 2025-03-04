@@ -65,11 +65,11 @@ void UICommunication::onAddToMoveHistory(Move &move)
 	}
 }
 
-
-void UICommunication::onGameStateChanged(GameState state)
-{
-	communicateToUI(MessageType::GameStateChanged, &state);
-}
+//
+//void UICommunication::onGameStateChanged(GameState state)
+//{
+//	communicateToUI(MessageType::GameStateChanged, &state);
+//}
 
 
 void UICommunication::onEndGame(PlayerColor winner)
