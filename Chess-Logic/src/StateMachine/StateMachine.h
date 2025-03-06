@@ -87,9 +87,11 @@ private:
 	GameState				mCurrentState{GameState::Undefined};
 	Position				mMoveStart{};
 	Position				mMoveEnd{};
-	bool					mMoveStartSet{false};
 
 	bool					mMovesCalulated{false};
+
+	bool					mWaitingForTargetStart{false};
+	bool					mWaitingForTargetEnd{false};
 
 	bool					mIsValidMove{false};
 

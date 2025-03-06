@@ -76,8 +76,7 @@ void StateMachine::onSquareSelected(const Position &pos)
 
 	if (mCurrentState == GameState::WaitingForInput) // Selected Start Position
 	{
-		mMoveStart	  = pos;
-		mMoveStartSet = true;
+		mMoveStart = pos;
 		switchToNextState();
 	}
 	else if (mCurrentState == GameState::WaitingForTarget) // Selected End Position
@@ -146,9 +145,11 @@ void StateMachine::run()
 		}
 		case GameState::Init:
 		{
-			// Initialize the Local Game
-			bool result = handleInitState(false);
-			setInitialized(result);
+			if (!isInitialized())
+			{
+				bool result = handleInitState(false); // Initialize the Local Game
+				setInitialized(result);
+			}
 
 			switchToNextState();
 
@@ -158,23 +159,33 @@ void StateMachine::run()
 		{
 			// Set the player
 			// Calculate moves and wait for input
-			if (!mMovesCalulated)
-				handleWaitingForInputState();
 
+			if (!mWaitingForTargetStart)
+			{
+				mWaitingForTargetStart = handleWaitingForInputState();
+			}
+
+			// Switch to next state happening in onSquareSelected
 			break;
 		}
 		case GameState::MoveInitiated:
 		{
 			// Display possible moves to UI
 			handleMoveInitiatedState();
+			switchToNextState();
 			break;
 		}
 		case GameState::WaitingForTarget:
 		{
 			// Waiting for move end / Target
 			// Start validating the move
-			handleWaitingForTargetState();
-			switchToNextState();
+			if (!mWaitingForTargetEnd)
+			{
+				bool result			 = handleWaitingForTargetState();
+				mWaitingForTargetEnd = result;
+			}
+
+			// Change to ValidatingMove happening in onSquareSelected
 			break;
 		}
 		case GameState::ValidatingMove:
@@ -264,9 +275,9 @@ bool StateMachine::switchToNextState()
 		}
 		else
 		{
-			mMoveStart	  = {};
-			mMoveEnd	  = {};
-			mMoveStartSet = false;
+			mMoveStart			 = {};
+			mMoveEnd			 = {};
+			mWaitingForTargetEnd = false;
 			setGameState(GameState::WaitingForInput);
 		}
 		stateChanged = true;
@@ -274,10 +285,11 @@ bool StateMachine::switchToNextState()
 	}
 	case GameState::ExecutingMove:
 	{
-		mMoveStart		= {};
-		mMoveEnd		= {};
-		mMoveStartSet	= false;
-		mMovesCalulated = false;
+		mMoveStart			   = {};
+		mMoveEnd			   = {};
+		mMovesCalulated		   = false;
+		mWaitingForTargetStart = false;
+		mWaitingForTargetEnd   = false;
 
 		setGameState(GameState::WaitingForInput);
 		stateChanged = true;
@@ -327,7 +339,8 @@ bool StateMachine::handleWaitingForInputState()
 
 bool StateMachine::handleMoveInitiatedState()
 {
-	return GameManager::GetInstance()->initiateMove(mMoveStart);
+	bool result = GameManager::GetInstance()->initiateMove(mMoveStart);
+	return result;
 }
 
 
@@ -359,7 +372,13 @@ bool StateMachine::handleExecutingMoveState()
 }
 
 
-bool StateMachine::handlePawnPromotionState() {}
+bool StateMachine::handlePawnPromotionState()
+{
+	return false;
+}
 
 
-bool StateMachine::handleGameOverState() {}
+bool StateMachine::handleGameOverState()
+{
+	return false;
+}
