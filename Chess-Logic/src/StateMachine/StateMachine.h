@@ -89,6 +89,10 @@ private:
 	Position				mMoveEnd{};
 	bool					mMoveStartSet{false};
 
+	bool					mMovesCalulated{false};
+
+	bool					mIsValidMove{false};
+
 	bool					mAwaitingPromotion{false};
 	PieceType				mPromotionChoice{PieceType::DefaultType};
 };

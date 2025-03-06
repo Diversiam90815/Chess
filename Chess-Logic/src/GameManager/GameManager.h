@@ -34,7 +34,7 @@ public:
 
 	void						startGame();
 
-	void						executeMove(PossibleMove &move);
+	void						executeMove(PossibleMove &tmpMove);
 
 	void						undoMove();
 
@@ -62,6 +62,9 @@ public:
 
 	void						handleMoveStateChanges(PossibleMove &move);
 
+	bool						checkForValidMoves(const PossibleMove &move);
+	bool						checkForPawnPromotionMove(const PossibleMove &move);
+
 	void						moveStateInitiated() override; // Let the UI know moves for current round are ready -> handling need to be refactored later!
 
 	std::vector<NetworkAdapter> getNetworkAdapters();
@@ -87,7 +90,7 @@ public:
 
 	bool						calculateAllMovesForPlayer();
 
-	bool						initiateMove(const Position& startPosition);
+	bool						initiateMove(const Position &startPosition);
 
 private:
 	GameManager();

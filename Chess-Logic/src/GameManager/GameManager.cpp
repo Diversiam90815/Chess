@@ -74,7 +74,7 @@ void GameManager::clearState()
 {
 	changeCurrentPlayer(PlayerColor::NoColor);
 
-	//gameStateChanged(GameState::Init);
+	// gameStateChanged(GameState::Init);
 	setCurrentMoveState(MoveState::NoMove);
 	mAllMovesForPosition.clear();
 	mMovesGeneratedForCurrentTurn = false; // Reset flag
@@ -164,9 +164,9 @@ bool GameManager::calculateAllMovesForPlayer()
 	if (!mMovesGeneratedForCurrentTurn)
 	{
 		LOG_INFO("We start calculating this player's possible moves!");
-		mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer());
+		bool result					  = mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer());
 		mMovesGeneratedForCurrentTurn = true;
-		return true;
+		return result;
 	}
 	return false;
 }
@@ -183,15 +183,26 @@ bool GameManager::initiateMove(const Position &startPosition)
 	mAllMovesForPosition.reserve(possibleMoves.size());
 	mAllMovesForPosition = possibleMoves;
 
-	moveStateInitiated(); // Let the UI know the moves for current round are ready -> handling need to be refactored later!
+	// moveStateInitiated(); // Let the UI know the moves for current round are ready -> handling need to be refactored later!
 
 	LOG_INFO("Number of possible moves for the current position is {}", mAllMovesForPosition.size());
+	return true;
 }
 
 
-void GameManager::executeMove(PossibleMove &move)
+void GameManager::executeMove(PossibleMove &tmpMove)
 {
-	Move executedMove = mMoveExecution->executeMove(move);
+	PossibleMove moveToExecute {};
+	for (auto &move : mAllMovesForPosition)
+	{
+		if (move == tmpMove)
+		{
+			moveToExecute = move;
+			break;
+		}
+	}
+
+	Move executedMove = mMoveExecution->executeMove(moveToExecute);
 
 	LoggingHelper::logMove(executedMove);
 
@@ -253,7 +264,7 @@ void GameManager::undoMove()
 }
 
 //
-//void GameManager::gameStateChanged(GameState state)
+// void GameManager::gameStateChanged(GameState state)
 //{
 //	if (mCurrentState == state)
 //		return;
@@ -270,7 +281,7 @@ void GameManager::undoMove()
 //}
 //
 //
-//GameState GameManager::getCurrentGameState() const
+// GameState GameManager::getCurrentGameState() const
 //{
 //	return mCurrentState;
 //}
@@ -371,6 +382,32 @@ void GameManager::handleMoveStateChanges(PossibleMove &move)
 }
 
 
+bool GameManager::checkForValidMoves(const PossibleMove &move)
+{
+	if (move.start == move.end)						// The user aborted the move by clicking the piece again
+		return false;
+
+	for (auto &possibleMove : mAllMovesForPosition) // Check if the move is a valid move
+	{
+		if (move == possibleMove)
+			return true;
+	}
+
+	return false;
+}
+
+
+bool GameManager::checkForPawnPromotionMove(const PossibleMove &move)
+{
+	for (auto &possibleMove : mAllMovesForPosition)
+	{
+		if (move == possibleMove)
+			return (move.type & MoveType::PawnPromotion) == MoveType::PawnPromotion;
+	}
+	return false;
+}
+
+
 void GameManager::moveStateInitiated()
 {
 	for (auto observer : mObservers)
@@ -447,7 +484,7 @@ void GameManager::checkForEndGameConditions()
 		if (isCheckMate)
 		{
 			LOG_INFO("Detected a Checkmate!");
-			//gameStateChanged(GameState::Checkmate);
+			// gameStateChanged(GameState::Checkmate);
 
 			auto winner = getWinner();
 			if (winner.has_value())
@@ -461,7 +498,7 @@ void GameManager::checkForEndGameConditions()
 		if (isStaleMate)
 		{
 			LOG_INFO("Detected a Stalemate");
-			//gameStateChanged(GameState::Stalemate);
+			// gameStateChanged(GameState::Stalemate);
 
 			auto winner = getWinner();
 			if (winner.has_value())
@@ -471,13 +508,13 @@ void GameManager::checkForEndGameConditions()
 		}
 
 		LOG_INFO("Game is still on-going. We switch player's turns!");
-		//gameStateChanged(GameState::OnGoing);
+		// gameStateChanged(GameState::OnGoing);
 		switchTurns();
 		return;
 	}
 
 	LOG_WARNING("Couldn't find the last move! Game is still on-going");
-	//gameStateChanged(GameState::OnGoing);
+	// gameStateChanged(GameState::OnGoing);
 }
 
 

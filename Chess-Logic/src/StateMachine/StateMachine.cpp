@@ -74,12 +74,17 @@ void StateMachine::onSquareSelected(const Position &pos)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
-	if (mCurrentState == GameState::WaitingForInput) // Move initiated
+	if (mCurrentState == GameState::WaitingForInput) // Selected Start Position
 	{
 		mMoveStart	  = pos;
 		mMoveStartSet = true;
+		switchToNextState();
 	}
-	switchToNextState();
+	else if (mCurrentState == GameState::WaitingForTarget) // Selected End Position
+	{
+		mMoveEnd = pos;
+		switchToNextState();
+	}
 }
 
 
@@ -91,6 +96,7 @@ void StateMachine::onPawnPromotionChosen(PieceType promotion)
 		mPromotionChoice   = promotion;
 		mAwaitingPromotion = false;
 	}
+	setGameState(GameState::ExecutingMove);
 	cv.notify_all();
 }
 
@@ -152,7 +158,9 @@ void StateMachine::run()
 		{
 			// Set the player
 			// Calculate moves and wait for input
-			handleWaitingForInputState();
+			if (!mMovesCalulated)
+				handleWaitingForInputState();
+
 			break;
 		}
 		case GameState::MoveInitiated:
@@ -166,6 +174,7 @@ void StateMachine::run()
 			// Waiting for move end / Target
 			// Start validating the move
 			handleWaitingForTargetState();
+			switchToNextState();
 			break;
 		}
 		case GameState::ValidatingMove:
@@ -173,12 +182,14 @@ void StateMachine::run()
 			// Check whether the move is valid -> jump to move execution
 			// Check whether the move is not a valid move (target square it same as start or not a valid square) -> jump to waiting for input
 			handleValidatingMoveState();
+			switchToNextState();
 			break;
 		}
 		case GameState::ExecutingMove:
 		{
 			// Execute the move
 			handleExecutingMoveState();
+			switchToNextState();
 			break;
 		}
 		case GameState::PawnPromotion:
@@ -218,42 +229,67 @@ bool StateMachine::switchToNextState()
 			setGameState(GameState::WaitingForInput);
 			stateChanged = true;
 		}
-
 		break;
 	}
 
 	case GameState::WaitingForInput:
 	{
+		// Change to MoveInitiated happening in onSquareSelected
 		break;
 	}
 	case GameState::MoveInitiated:
 	{
-
+		setGameState(GameState::WaitingForTarget);
+		stateChanged = true;
 		break;
 	}
 	case GameState::WaitingForTarget:
 	{
-
+		// Change to ValidatingMove happening in onSquareSelected
 		break;
 	}
 	case GameState::ValidatingMove:
 	{
+		if (mIsValidMove)
+		{
+			PossibleMove tmpMove{};
+			tmpMove.start		 = mMoveStart;
+			tmpMove.end			 = mMoveEnd;
+			bool isPawnPromotion = GameManager::GetInstance()->checkForPawnPromotionMove(tmpMove);
 
+			if (isPawnPromotion)
+				setGameState(GameState::PawnPromotion);
+			else
+				setGameState(GameState::ExecutingMove);
+		}
+		else
+		{
+			mMoveStart	  = {};
+			mMoveEnd	  = {};
+			mMoveStartSet = false;
+			setGameState(GameState::WaitingForInput);
+		}
+		stateChanged = true;
 		break;
 	}
 	case GameState::ExecutingMove:
 	{
+		mMoveStart		= {};
+		mMoveEnd		= {};
+		mMoveStartSet	= false;
+		mMovesCalulated = false;
 
+		setGameState(GameState::WaitingForInput);
+		stateChanged = true;
 		break;
 	}
 	case GameState::PawnPromotion:
 	{
-
+		// Change to Execute Move happening in onPawnPromotionChosen
 		break;
 	}
 	case GameState::GameOver:
 	{
-
 		break;
 	}
 	default: break;
@@ -284,23 +320,43 @@ bool StateMachine::handleInitState(bool multiplayer)
 bool StateMachine::handleWaitingForInputState()
 {
 	GameManager::GetInstance()->switchTurns(); // Sets the player
-	GameManager::GetInstance()->calculateAllMovesForPlayer();
+	mMovesCalulated = GameManager::GetInstance()->calculateAllMovesForPlayer();
+	return mMovesCalulated;
 }
 
 
 bool StateMachine::handleMoveInitiatedState()
 {
-	GameManager::GetInstance()->initiateMove(mMoveStart);
+	return GameManager::GetInstance()->initiateMove(mMoveStart);
 }
 
 
-bool StateMachine::handleWaitingForTargetState() {}
+bool StateMachine::handleWaitingForTargetState()
+{
+	GameManager::GetInstance()->moveStateInitiated();
+	return true;
+}
 
 
-bool StateMachine::handleValidatingMoveState() {}
+bool StateMachine::handleValidatingMoveState()
+{
+	PossibleMove tmpMove{};
+	tmpMove.start = mMoveStart;
+	tmpMove.end	  = mMoveEnd;
+
+	mIsValidMove  = GameManager::GetInstance()->checkForValidMoves(tmpMove);
+	return mIsValidMove;
+}
 
 
-bool StateMachine::handleExecutingMoveState() {}
+bool StateMachine::handleExecutingMoveState()
+{
+	PossibleMove tmpMove{};
+	tmpMove.start = mMoveStart;
+	tmpMove.end	  = mMoveEnd;
+	GameManager::GetInstance()->executeMove(tmpMove);
+	return true;
+}
 
 
 bool StateMachine::handlePawnPromotionState() {}
