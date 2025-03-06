@@ -35,7 +35,7 @@ namespace Chess_UI.Views
             this.themeManager = themeManager;
             this.RootPanel.DataContext = ViewModel;
 
-            ViewModel.ShowGameStateDialogRequested += OnShowGameStateDialogRequested;
+            //ViewModel.ShowGameStateDialogRequested += OnShowGameStateDialogRequested;
             ViewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
 
             Init();
@@ -90,42 +90,42 @@ namespace Chess_UI.Views
         }
 
 
-        private async Task OnShowGameStateDialogRequested(GameState state)
-        {
-            switch (state)
-            {
-                case GameState.Checkmate:
-                    var dialog = new ContentDialog
-                    {
-                        Title = "Checkmate",
-                        Content = "You have been checkmated!",
-                        PrimaryButtonText = "New Game",
-                        CloseButtonText = "Close",
-                        XamlRoot = this.Content.XamlRoot
-                    };
+        //private async Task OnShowGameStateDialogRequested(GameState state)
+        //{
+            //switch (state)
+            //{
+            //    case GameState.Checkmate:
+            //        var dialog = new ContentDialog
+            //        {
+            //            Title = "Checkmate",
+            //            Content = "You have been checkmated!",
+            //            PrimaryButtonText = "New Game",
+            //            CloseButtonText = "Close",
+            //            XamlRoot = this.Content.XamlRoot
+            //        };
 
-                    var result = await dialog.ShowAsync();
+            //        var result = await dialog.ShowAsync();
 
-                    if (result == ContentDialogResult.Primary)
-                    {
-                        ViewModel.ResetGame();
-                        ViewModel.StartGame();
-                    }
-                    else
-                    {
-                        ViewModel.ResetGame();
-                        this.Close();
-                    }
-                    break;
+            //        if (result == ContentDialogResult.Primary)
+            //        {
+            //            ViewModel.ResetGame();
+            //            ViewModel.StartGame();
+            //        }
+            //        else
+            //        {
+            //            ViewModel.ResetGame();
+            //            this.Close();
+            //        }
+            //        break;
 
-                case GameState.Stalemate:
-                    // Handle stalemate 
-                    break;
+            //    case GameState.Stalemate:
+            //        // Handle stalemate 
+            //        break;
 
-                default:
-                    break;
-            }
-        }
+            //    default:
+            //        break;
+            //}
+        //}
 
 
         private async Task<PieceTypeInstance?> OnShowPawnPromotionPieces()

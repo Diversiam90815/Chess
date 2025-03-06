@@ -22,15 +22,6 @@
 #include "NetworkManager.h"
 
 
-enum class EndGameState
-{
-	OnGoing	  = 1,
-	Checkmate = 2,
-	StaleMate = 3,
-	Reset	  = 4
-};
-
-
 class GameManager : public IGameObservable
 {
 public:
@@ -47,15 +38,12 @@ public:
 
 	void						undoMove();
 
-	// void						gameStateChanged(GameState state) override;
-	// GameState					getCurrentGameState() const;
-
-	void						setCurrentMoveState(MoveState state);
-	MoveState					getCurrentMoveState() const;
+	//void						setCurrentMoveState(MoveState state);
+	//MoveState					getCurrentMoveState() const;
 
 	void						resetGame();
 
-	void						endGame(PlayerColor player) override;
+	void						endGame(EndGameState state, PlayerColor player) override;
 
 	std::optional<PlayerColor>	getWinner() const;
 
@@ -120,9 +108,7 @@ private:
 
 	PlayerColor						 mCurrentPlayer	   = PlayerColor::NoColor;
 
-	// GameState						 mCurrentState	   = GameState::Init;
-
-	MoveState						 mCurrentMoveState = MoveState::NoMove;
+	//MoveState						 mCurrentMoveState = MoveState::NoMove;
 
 	std::vector<PossibleMove>		 mAllMovesForPosition;
 

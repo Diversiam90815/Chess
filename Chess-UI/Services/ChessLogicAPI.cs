@@ -67,11 +67,11 @@ namespace Chess_UI.Services
 		[DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "UndoMove", CharSet = CharSet.Unicode)]
 		public static extern void UndoMove();
 
-		[DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ChangeMoveState", CharSet = CharSet.Unicode)]
-		public static extern void ChangeMoveState(int state);
+		//[DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ChangeMoveState", CharSet = CharSet.Unicode)]
+		//public static extern void ChangeMoveState(int state);
 
-		[DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "HandleMoveStateChanged", CharSet = CharSet.Unicode)]
-		public static extern void HandleMoveStateChanged(PossibleMoveInstance move);
+		//[DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "HandleMoveStateChanged", CharSet = CharSet.Unicode)]
+		//public static extern void HandleMoveStateChanged(PossibleMoveInstance move);
 
 		#endregion // Game
 
@@ -231,23 +231,23 @@ namespace Chess_UI.Services
 		}
 
 
-		public enum GameState
-		{
-			Init = 1,
-			OnGoing,
-			Paused,
-			Checkmate,
-			Stalemate,
-			Draw
-		}
+		//public enum GameState
+		//{
+		//	Init = 1,
+		//	OnGoing,
+		//	Paused,
+		//	Checkmate,
+		//	Stalemate,
+		//	Draw
+		//}
 
 
-		public enum MoveState
-		{
-			NoMove = 1,
-			InitiateMove,
-			ExecuteMove
-		}
+		//public enum MoveState
+		//{
+		//	NoMove = 1,
+		//	InitiateMove,
+		//	ExecuteMove
+		//}
 
 
 		[Flags]

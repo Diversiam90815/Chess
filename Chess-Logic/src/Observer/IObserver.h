@@ -10,6 +10,7 @@
 #include <json.hpp>
 
 #include "Move.h"
+#include "Parameters.h"
 
 
 class IPlayerObserver
@@ -38,10 +39,9 @@ class IGameObserver
 public:
 	virtual ~IGameObserver() {};
 
-	//virtual void onGameStateChanged(GameState state)	   = 0;
-	virtual void onEndGame(PlayerColor winner)			   = 0;
-	virtual void onChangeCurrentPlayer(PlayerColor player) = 0;
-	virtual void onMoveStateInitiated()					   = 0;
+	virtual void onEndGame(EndGameState state, PlayerColor winner) = 0;
+	virtual void onChangeCurrentPlayer(PlayerColor player)		   = 0;
+	virtual void onMoveStateInitiated()							   = 0;
 };
 
 

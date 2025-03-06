@@ -68,11 +68,11 @@ namespace Chess_UI.Services
                         HandlePlayerChanged(data);
                         break;
                     }
-                case DelegateMessage.GameStateChanged:
-                    {
-                        HandleGameStateChanges(data);
-                        break;
-                    }
+                //case DelegateMessage.GameStateChanged:
+                //    {
+                //        HandleGameStateChanges(data);
+                //        break;
+                //    }
                 case DelegateMessage.MoveHistoryAdded:
                     {
                         HandleMoveNotationAdded(data);
@@ -124,12 +124,12 @@ namespace Chess_UI.Services
         }
 
 
-        private void HandleGameStateChanges(nint data)
-        {
-            int iState = Marshal.ReadInt32(data);
-            GameState state = (GameState)iState;
-            GameStateChanged?.Invoke(state);
-        }
+        //private void HandleGameStateChanges(nint data)
+        //{
+        //    int iState = Marshal.ReadInt32(data);
+        //    GameState state = (GameState)iState;
+        //    GameStateChanged?.Invoke(state);
+        //}
 
 
         private void HandlePlayerScoreUpdate(nint data)
@@ -178,7 +178,7 @@ namespace Chess_UI.Services
         public delegate void ExecutedMoveHandler();
         public delegate void PossibleMovesCalculatedHandler();
         public delegate void PlayerChangedHandler(PlayerColor player);
-        public delegate void GameStateChangedHandler(GameState state);
+        //public delegate void GameStateChangedHandler(GameState state);
         public delegate void MoveHistoryUpdatedHandler();
         public delegate void PlayerCaputeredPieceHandler(PlayerCapturedPiece capturedPiece);
         public delegate void PlayerScoreUpdatedHandler(Score score);
@@ -187,7 +187,7 @@ namespace Chess_UI.Services
         public event ExecutedMoveHandler ExecutedMove;
         public event PossibleMovesCalculatedHandler PossibleMovesCalculated;
         public event PlayerChangedHandler PlayerChanged;
-        public event GameStateChangedHandler GameStateChanged;
+        //public event GameStateChangedHandler GameStateChanged;
         public event MoveHistoryUpdatedHandler MoveHistoryUpdated;
         public event PlayerCaputeredPieceHandler PlayerCapturedPieceEvent;
         public event PlayerScoreUpdatedHandler PlayerScoreUpdated;

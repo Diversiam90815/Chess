@@ -31,7 +31,7 @@ namespace Chess_UI.ViewModels
 
         public ObservableCollection<BoardSquare> Board { get; set; }
 
-        public event Func<GameState, Task> ShowGameStateDialogRequested;
+        //public event Func<GameState, Task> ShowGameStateDialogRequested;
 
         public event Func<Task<PieceTypeInstance?>> ShowPawnPromotionDialogRequested;
 
@@ -51,7 +51,7 @@ namespace Chess_UI.ViewModels
             Controller.ExecutedMove += OnExecutedMove;
             Controller.PossibleMovesCalculated += OnHighlightPossibleMoves;
             Controller.PlayerChanged += OnHandlePlayerChanged;
-            Controller.GameStateChanged += OnHandleGameStateChanged;
+            //Controller.GameStateChanged += OnHandleGameStateChanged;
             Controller.MoveHistoryUpdated += OnHandleMoveHistoryUpdated;
             Controller.PlayerCapturedPieceEvent += ScoreViewModel.OnPlayerCapturedPiece;
             Controller.PlayerScoreUpdated += ScoreViewModel.OnPlayerScoreUpdated;
@@ -166,101 +166,101 @@ namespace Chess_UI.ViewModels
         }
 
 
-        public async void HandleSquareClick(BoardSquare square)
-        {
-            int engineX = square.pos.x;
-            int engineY = 7 - square.pos.y; // invert back
+        //public async void HandleSquareClick(BoardSquare square)
+        //{
+        //    int engineX = square.pos.x;
+        //    int engineY = 7 - square.pos.y; // invert back
 
-            Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{engineX}-Y{engineY}!");
+        //    Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{engineX}-Y{engineY}!");
 
-            switch (CurrentMoveState)
-            {
-                // The user is picking the start of a move
-                case MoveState.NoMove:
-                    {
-                        Logger.LogInfo("Move State is NoMove and we start to initialize the move now!");
+        //    switch (CurrentMoveState)
+        //    {
+        //        // The user is picking the start of a move
+        //        case MoveState.NoMove:
+        //            {
+        //                Logger.LogInfo("Move State is NoMove and we start to initialize the move now!");
 
-                        if (square.piece == PieceTypeInstance.DefaultType)
-                            return;
+        //                if (square.piece == PieceTypeInstance.DefaultType)
+        //                    return;
 
-                        CurrentPossibleMove = new PossibleMoveInstance
-                        {
-                            start = new PositionInstance(engineX, engineY)
-                        };
-                        CurrentMoveState = MoveState.InitiateMove;
+        //                CurrentPossibleMove = new PossibleMoveInstance
+        //                {
+        //                    start = new PositionInstance(engineX, engineY)
+        //                };
+        //                CurrentMoveState = MoveState.InitiateMove;
 
-                        ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+        //                ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
 
-                        // The engine will calculate possible moves 
-                        // and eventually call back "delegateMessage::initiateMove"
+        //                // The engine will calculate possible moves 
+        //                // and eventually call back "delegateMessage::initiateMove"
 
-                        break;
-                    }
+        //                break;
+        //            }
 
-                // The user is picking the end of a move
-                case MoveState.InitiateMove:
-                    {
-                        Logger.LogInfo("Move has already been initiated, and we start validating the move now!");
+        //        // The user is picking the end of a move
+        //        case MoveState.InitiateMove:
+        //            {
+        //                Logger.LogInfo("Move has already been initiated, and we start validating the move now!");
 
-                        if (CurrentPossibleMove != null)
-                        {
-                            var move = CurrentPossibleMove.Value;
-                            move.end = new PositionInstance(engineX, engineY);
-                            CurrentPossibleMove = move;
+        //                if (CurrentPossibleMove != null)
+        //                {
+        //                    var move = CurrentPossibleMove.Value;
+        //                    move.end = new PositionInstance(engineX, engineY);
+        //                    CurrentPossibleMove = move;
 
-                            if (CheckForValidMove())
-                            {
-                                Logger.LogInfo("The move has been validated, so we start the execution now!");
+        //                    if (CheckForValidMove())
+        //                    {
+        //                        Logger.LogInfo("The move has been validated, so we start the execution now!");
 
-                                //Checking for a pawn promotion
-                                if ((CurrentPossibleMove.Value.type & MoveTypeInstance.MoveType_PawnPromotion) == MoveTypeInstance.MoveType_PawnPromotion)
-                                {
-                                    // Await user's promotion piece selection
-                                    var promotionPiece = await RequestPawnPromotionAsync();
+        //                        //Checking for a pawn promotion
+        //                        if ((CurrentPossibleMove.Value.type & MoveTypeInstance.MoveType_PawnPromotion) == MoveTypeInstance.MoveType_PawnPromotion)
+        //                        {
+        //                            // Await user's promotion piece selection
+        //                            var promotionPiece = await RequestPawnPromotionAsync();
 
-                                    if (promotionPiece.HasValue)
-                                    {
-                                        CurrentPossibleMove = CurrentPossibleMove.Value with { promotionPiece = promotionPiece.Value };
-                                        CurrentMoveState = MoveState.ExecuteMove;
-                                        ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
-                                    }
-                                    else
-                                    {
-                                        // User canceled promotion
-                                        ResetHighlightsOnBoard();
-                                        CurrentMoveState = MoveState.NoMove;
-                                        CurrentPossibleMove = null;
-                                        HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
-                                    }
-                                }
-                                else
-                                {
-                                    CurrentMoveState = MoveState.ExecuteMove;
-                                    ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
-                                }
-                            }
-                            else
-                            {
-                                Logger.LogWarning("Since the move could not been validated, we reset the move now!");
+        //                            if (promotionPiece.HasValue)
+        //                            {
+        //                                CurrentPossibleMove = CurrentPossibleMove.Value with { promotionPiece = promotionPiece.Value };
+        //                                CurrentMoveState = MoveState.ExecuteMove;
+        //                                ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+        //                            }
+        //                            else
+        //                            {
+        //                                // User canceled promotion
+        //                                ResetHighlightsOnBoard();
+        //                                CurrentMoveState = MoveState.NoMove;
+        //                                CurrentPossibleMove = null;
+        //                                HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+        //                            }
+        //                        }
+        //                        else
+        //                        {
+        //                            CurrentMoveState = MoveState.ExecuteMove;
+        //                            ChessLogicAPI.HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+        //                        Logger.LogWarning("Since the move could not been validated, we reset the move now!");
 
-                                CurrentMoveState = MoveState.NoMove;
-                                CurrentPossibleMove = null;
-                                HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
-                            }
+        //                        CurrentMoveState = MoveState.NoMove;
+        //                        CurrentPossibleMove = null;
+        //                        HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+        //                    }
 
-                            // The engine executes the move, calls delegate "moveExecuted",
-                            // We'll get that event in the Controller.
-                        }
-                        else
-                        {
-                            Logger.LogError("CurrentPossible move is null!");
-                        }
-                        break;
-                    }
+        //                    // The engine executes the move, calls delegate "moveExecuted",
+        //                    // We'll get that event in the Controller.
+        //                }
+        //                else
+        //                {
+        //                    Logger.LogError("CurrentPossible move is null!");
+        //                }
+        //                break;
+        //            }
 
-                default: break;
-            }
-        }
+        //        default: break;
+        //    }
+        //}
 
 
         public void OnHighlightPossibleMoves()
@@ -357,7 +357,7 @@ namespace Chess_UI.ViewModels
         private void OnExecutedMove()
         {
             LoadBoardFromNative();
-            CurrentMoveState = MoveState.NoMove;
+            //CurrentMoveState = MoveState.NoMove;
         }
 
 
@@ -366,20 +366,20 @@ namespace Chess_UI.ViewModels
             CurrentPlayer = player;
 
             // Call HandleMoveStateChanged in order to trigger the move calculation
-            HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
+            //HandleMoveStateChanged(CurrentPossibleMove.GetValueOrDefault());
         }
 
 
-        private void OnHandleGameStateChanged(GameState state)
-        {
-            DispatcherQueue.TryEnqueue(async () =>
-            {
-                if (ShowGameStateDialogRequested != null)
-                {
-                    await ShowGameStateDialogRequested.Invoke(state);
-                }
-            });
-        }
+        //private void OnHandleGameStateChanged(GameState state)
+        //{
+        //    DispatcherQueue.TryEnqueue(async () =>
+        //    {
+        //        if (ShowGameStateDialogRequested != null)
+        //        {
+        //            await ShowGameStateDialogRequested.Invoke(state);
+        //        }
+        //    });
+        //}
 
 
         private void OnHandleMoveHistoryUpdated()
@@ -395,20 +395,20 @@ namespace Chess_UI.ViewModels
 
         #region Current Move
 
-        private MoveState currentMoveState = MoveState.NoMove;
-        public MoveState CurrentMoveState
-        {
-            get => currentMoveState;
-            set
-            {
-                if (value != currentMoveState)
-                {
-                    currentMoveState = value;
-                    int state = (int)currentMoveState;
-                    ChessLogicAPI.ChangeMoveState(state);
-                }
-            }
-        }
+        //private MoveState currentMoveState = MoveState.NoMove;
+        //public MoveState CurrentMoveState
+        //{
+        //    get => currentMoveState;
+        //    set
+        //    {
+        //        if (value != currentMoveState)
+        //        {
+        //            currentMoveState = value;
+        //            int state = (int)currentMoveState;
+        //            ChessLogicAPI.ChangeMoveState(state);
+        //        }
+        //    }
+        //}
 
         private PossibleMoveInstance? currentPossibleMove = null;
         public PossibleMoveInstance? CurrentPossibleMove

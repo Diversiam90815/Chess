@@ -43,23 +43,21 @@ enum class PlayerColor
 };
 
 
-//enum class GameState
-//{
-//	Init = 1,
-//	OnGoing,
-//	Paused,
-//	Checkmate,
-//	Stalemate,
-//	Draw
-//};
-
-
-enum class MoveState
+enum class EndGameState
 {
-	NoMove = 1,
-	InitiateMove,
-	ExecuteMove
+	OnGoing	  = 1,
+	Checkmate = 2,
+	StaleMate = 3,
+	Reset	  = 4
 };
+
+
+//enum class MoveState
+//{
+//	NoMove = 1,
+//	InitiateMove,
+//	ExecuteMove
+//};
 
 
 enum SettingsType
