@@ -267,10 +267,9 @@ namespace Chess_UI.ViewModels
         {
             ResetHighlightsOnBoard();
 
-            // Then for each possible move, find the matching BoardSquare
             foreach (var pm in Controller.PossibleMoves)
             {
-                // Remember we invert row with (7 - rowUI) in your code, so be consistent.
+                // we invert row with (7 - rowUI) in your code, so be consistent.
                 var targetX = pm.end.x;
                 var targetY = pm.end.y;
 
@@ -303,45 +302,45 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private bool CheckForValidMove()
-        {
-            if (!CurrentPossibleMove.HasValue)
-            {
-                Logger.LogError("CurrentPossibleMove.HasValue has returned false!");
-                return false;
-            }
+        //private bool CheckForValidMove()
+        //{
+        //    if (!CurrentPossibleMove.HasValue)
+        //    {
+        //        Logger.LogError("CurrentPossibleMove.HasValue has returned false!");
+        //        return false;
+        //    }
 
-            var move = CurrentPossibleMove.Value;
+        //    var move = CurrentPossibleMove.Value;
 
-            // Check first if the move was aborted by selecting the same square again
-            if (move.start == move.end)
-            {
-                ResetHighlightsOnBoard();
-                Logger.LogInfo("Move has been cancelled since Start and End are the same square. The user has thus terminated the move!");
-                return false;
-            }
+        //    // Check first if the move was aborted by selecting the same square again
+        //    if (move.start == move.end)
+        //    {
+        //        ResetHighlightsOnBoard();
+        //        Logger.LogInfo("Move has been cancelled since Start and End are the same square. The user has thus terminated the move!");
+        //        return false;
+        //    }
 
-            // Check if it is a possible move
-            foreach (var possibleMoves in Controller.PossibleMoves)
-            {
-                if (move == possibleMoves)
-                {
-                    Logger.LogInfo("The move seems to be valid!");
+        //    // Check if it is a possible move
+        //    foreach (var possibleMoves in Controller.PossibleMoves)
+        //    {
+        //        if (move == possibleMoves)
+        //        {
+        //            Logger.LogInfo("The move seems to be valid!");
 
-                    // Update the CurrentPossibleMove so that its .type is set to the correct value
-                    var temp = move;
-                    temp.type = possibleMoves.type;
-                    CurrentPossibleMove = temp;
+        //            // Update the CurrentPossibleMove so that its .type is set to the correct value
+        //            var temp = move;
+        //            temp.type = possibleMoves.type;
+        //            CurrentPossibleMove = temp;
 
-                    return true;
-                }
-            }
+        //            return true;
+        //        }
+        //    }
 
-            Logger.LogWarning("The move could not be found within the PossibleMoves");
-            Logger.LogWarning($"Move is from Start X{move.start.x}-Y{move.start.y} to End X{move.end.x}-Y{move.end.y}");
+        //    Logger.LogWarning("The move could not be found within the PossibleMoves");
+        //    Logger.LogWarning($"Move is from Start X{move.start.x}-Y{move.start.y} to End X{move.end.x}-Y{move.end.y}");
 
-            return false;
-        }
+        //    return false;
+        //}
 
 
         private Task<PieceTypeInstance?> RequestPawnPromotionAsync()
