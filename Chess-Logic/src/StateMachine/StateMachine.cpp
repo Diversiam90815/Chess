@@ -285,13 +285,22 @@ bool StateMachine::switchToNextState()
 	}
 	case GameState::ExecutingMove:
 	{
-		mMoveStart			   = {};
-		mMoveEnd			   = {};
-		mMovesCalulated		   = false;
-		mWaitingForTargetStart = false;
-		mWaitingForTargetEnd   = false;
+		mEndgameState = GameManager::GetInstance()->checkForEndGameConditions();
+		if (isGameOngoing())
+		{
+			mMoveStart			   = {};
+			mMoveEnd			   = {};
+			mMovesCalulated		   = false;
+			mWaitingForTargetStart = false;
+			mWaitingForTargetEnd   = false;
 
-		setGameState(GameState::WaitingForInput);
+			setGameState(GameState::WaitingForInput);
+		}
+		else
+		{
+			setGameState(GameState::GameOver);
+		}
+
 		stateChanged = true;
 		break;
 	}
@@ -380,5 +389,6 @@ bool StateMachine::handlePawnPromotionState()
 
 bool StateMachine::handleGameOverState()
 {
+	// Let UI know of EndGameState -> Checkmate or Stalemate
 	return false;
 }

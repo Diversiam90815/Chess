@@ -192,7 +192,7 @@ bool GameManager::initiateMove(const Position &startPosition)
 
 void GameManager::executeMove(PossibleMove &tmpMove)
 {
-	PossibleMove moveToExecute {};
+	PossibleMove moveToExecute{};
 	for (auto &move : mAllMovesForPosition)
 	{
 		if (move == tmpMove)
@@ -474,7 +474,7 @@ PlayerColor GameManager::getCurrentPlayer() const
 
 
 
-void GameManager::checkForEndGameConditions()
+EndGameState GameManager::checkForEndGameConditions()
 {
 	const Move *lastMove = mMoveExecution->getLastMove();
 
@@ -490,7 +490,7 @@ void GameManager::checkForEndGameConditions()
 			if (winner.has_value())
 				endGame(winner.value());
 
-			return;
+			return EndGameState::Checkmate;
 		}
 
 		mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer()); // Calculate all legal moves to check if we have a stalemate (no valid moves left)
@@ -504,17 +504,18 @@ void GameManager::checkForEndGameConditions()
 			if (winner.has_value())
 				endGame(winner.value());
 
-			return;
+			return EndGameState::StaleMate;
 		}
 
 		LOG_INFO("Game is still on-going. We switch player's turns!");
 		// gameStateChanged(GameState::OnGoing);
-		switchTurns();
-		return;
+		// switchTurns();
+		return EndGameState::OnGoing;
 	}
 
 	LOG_WARNING("Couldn't find the last move! Game is still on-going");
 	// gameStateChanged(GameState::OnGoing);
+	return EndGameState::OnGoing;
 }
 
 

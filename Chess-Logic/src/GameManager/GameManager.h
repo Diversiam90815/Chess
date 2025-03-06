@@ -22,6 +22,15 @@
 #include "NetworkManager.h"
 
 
+enum class EndGameState
+{
+	OnGoing	  = 1,
+	Checkmate = 2,
+	StaleMate = 3,
+	Reset	  = 4
+};
+
+
 class GameManager : public IGameObservable
 {
 public:
@@ -92,11 +101,11 @@ public:
 
 	bool						initiateMove(const Position &startPosition);
 
+	EndGameState				checkForEndGameConditions();
+
 private:
 	GameManager();
 
-
-	void							 checkForEndGameConditions();
 
 	void							 initObservers();
 	void							 deinitObservers();

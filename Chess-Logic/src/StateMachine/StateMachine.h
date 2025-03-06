@@ -30,13 +30,13 @@ enum class GameState
 	GameOver		 = 9
 };
 
-
-enum class EndGameState
-{
-	Checkmate = 1,
-	StaleMate = 2,
-	Reset	  = 3
-};
+//
+// enum class EndGameState
+//{
+//	Checkmate = 1,
+//	StaleMate = 2,
+//	Reset	  = 3
+//};
 
 
 class StateMachine
@@ -76,6 +76,8 @@ private:
 
 	bool					switchToNextState();
 
+	bool					isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
+
 
 	boost::thread			worker;
 	std::atomic<bool>		mRunning;
@@ -97,4 +99,6 @@ private:
 
 	bool					mAwaitingPromotion{false};
 	PieceType				mPromotionChoice{PieceType::DefaultType};
+
+	EndGameState			mEndgameState{EndGameState::OnGoing};
 };
