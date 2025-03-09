@@ -65,14 +65,14 @@ void UICommunication::onAddToMoveHistory(Move &move)
 	}
 }
 
-//
-//void UICommunication::onGameStateChanged(GameState state)
-//{
-//	communicateToUI(MessageType::GameStateChanged, &state);
-//}
+
+void UICommunication::onGameStateChanged(GameState state)
+{
+	communicateToUI(MessageType::GameStateChanged, &state);
+}
 
 
-void UICommunication::onEndGame(PlayerColor winner)
+void UICommunication::onEndGame(EndGameState state, PlayerColor winner)
 {
 	communicateToUI(MessageType::PlayerHasWon, &winner);
 }
@@ -83,11 +83,11 @@ void UICommunication::onChangeCurrentPlayer(PlayerColor player)
 	communicateToUI(MessageType::PlayerChanged, &player);
 }
 
-
-void UICommunication::onMoveStateInitiated()
-{
-	communicateToUI(MessageType::InitiateMove, nullptr);
-}
+//
+// void UICommunication::onMoveStateInitiated()
+//{
+//	communicateToUI(MessageType::InitiateMove, nullptr);
+//}
 
 
 bool UICommunication::communicateToUI(MessageType type, void *message) const

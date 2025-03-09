@@ -57,6 +57,8 @@ namespace Chess_UI.ViewModels
             Controller.PlayerScoreUpdated += ScoreViewModel.OnPlayerScoreUpdated;
             this.themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
+            Controller.MovePawnPromotionEvent += OnPromotionPiece; 
+
             this.CurrentBoardTheme = themeManager.CurrentBoardTheme;
 
             ChessLogicAPI.StartGame();
@@ -163,6 +165,21 @@ namespace Chess_UI.ViewModels
         private void UpdateBoardTheme(Images.BoardTheme boardTheme)
         {
             CurrentBoardTheme = boardTheme;
+        }
+
+
+        private async void OnPromotionPiece()
+        {
+            var promotionPiece = await RequestPawnPromotionAsync();
+            if (promotionPiece.HasValue)
+            {
+                Controller.SetPromotionPieceType(promotionPiece.Value);
+            }
+            else
+            {
+                // Pawn Promotion has been cancelled
+                ResetHighlightsOnBoard();
+            }
         }
 
 
@@ -371,13 +388,13 @@ namespace Chess_UI.ViewModels
 
         //private void OnHandleGameStateChanged(GameState state)
         //{
-        //    DispatcherQueue.TryEnqueue(async () =>
+        //DispatcherQueue.TryEnqueue(async () =>
+        //{
+        //    if (ShowGameStateDialogRequested != null)
         //    {
-        //        if (ShowGameStateDialogRequested != null)
-        //        {
-        //            await ShowGameStateDialogRequested.Invoke(state);
-        //        }
-        //    });
+        //        await ShowGameStateDialogRequested.Invoke(state);
+        //    }
+        //});
         //}
 
 

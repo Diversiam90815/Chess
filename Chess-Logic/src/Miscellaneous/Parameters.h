@@ -60,6 +60,20 @@ enum class EndGameState
 //};
 
 
+enum class GameState
+{
+	Undefined		 = 0,
+	Init			 = 1,
+	WaitingForInput	 = 3,
+	MoveInitiated	 = 4,
+	WaitingForTarget = 5,
+	ValidatingMove	 = 6,
+	ExecutingMove	 = 7,
+	PawnPromotion	 = 8,
+	GameOver		 = 9
+};
+
+
 enum SettingsType
 {
 	boardTheme,

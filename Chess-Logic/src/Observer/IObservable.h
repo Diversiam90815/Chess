@@ -9,6 +9,9 @@
 
 #include "IObserver.h"
 #include "Move.h"
+#include <json.hpp>
+
+using json = nlohmann::json;
 
 
 class IPlayerObservable
@@ -45,7 +48,18 @@ public:
 
 	virtual void endGame(EndGameState state, PlayerColor winner) = 0;
 	virtual void changeCurrentPlayer(PlayerColor player)		 = 0;
-	virtual void moveStateInitiated()							 = 0;
+	// virtual void moveStateInitiated()							 = 0;
+};
+
+
+class IGameStateObservable
+{
+public:
+	virtual ~IGameStateObservable() {};
+	virtual void attachObserver(IGameStateObserver *observer) = 0;
+	virtual void detachObserver(IGameStateObserver *observer) = 0;
+
+	virtual void gameStateChanged(const GameState state)	  = 0;
 };
 
 

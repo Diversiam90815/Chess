@@ -167,17 +167,17 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleM
 
 CHESS_API void HandleMoveStateChanged(const PossibleMoveInstance &moveInstance)
 {
-	GameManager *manager = GameManager::GetInstance();
-	PossibleMove move	 = MapToPossibleMove(moveInstance);
-	manager->handleMoveStateChanges(move);
+	//GameManager *manager = GameManager::GetInstance();
+	//PossibleMove move	 = MapToPossibleMove(moveInstance);
+	//manager->handleMoveStateChanges(move);
 }
 
 
 CHESS_API void ChangeMoveState(int moveState)
 {
-	GameManager *manager = GameManager::GetInstance();
-	MoveState	 state	 = (MoveState)moveState;
-	manager->setCurrentMoveState(state);
+	//GameManager *manager = GameManager::GetInstance();
+	//MoveState	 state	 = (MoveState)moveState;
+	//manager->setCurrentMoveState(state);
 }
 
 

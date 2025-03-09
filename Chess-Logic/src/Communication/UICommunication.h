@@ -35,7 +35,7 @@ struct PlayerCapturedPieceEvent
 };
 
 
-class UICommunication : public IMoveObserver, public IGameObserver, public IPlayerObserver
+class UICommunication : public IMoveObserver, public IGameObserver, public IPlayerObserver, public IGameStateObserver
 {
 public:
 	UICommunication()  = default;
@@ -50,10 +50,12 @@ public:
 	void onExecuteMove() override;
 	void onAddToMoveHistory(Move &move) override;
 
-	//void onGameStateChanged(GameState state) override;
-	void onEndGame(PlayerColor winner) override;
+	void onGameStateChanged(GameState state) override;
+	void onEndGame(EndGameState state, PlayerColor winner) override;
 	void onChangeCurrentPlayer(PlayerColor player) override;
-	void onMoveStateInitiated() override;
+	// void onMoveStateInitiated() override;
+
+
 
 private:
 	bool		 communicateToUI(MessageType type, void *message) const;

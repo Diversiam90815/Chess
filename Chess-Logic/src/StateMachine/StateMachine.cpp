@@ -7,6 +7,7 @@
 
 
 #include "StateMachine.h"
+#include "GameManager.h"
 
 
 StateMachine *StateMachine::GetInstance()
@@ -76,12 +77,12 @@ void StateMachine::onSquareSelected(const Position &pos)
 
 	if (mCurrentState == GameState::WaitingForInput) // Selected Start Position
 	{
-		mMoveStart = pos;
+		mCurrentPossibleMove.start = pos;
 		switchToNextState();
 	}
 	else if (mCurrentState == GameState::WaitingForTarget) // Selected End Position
 	{
-		mMoveEnd = pos;
+		mCurrentPossibleMove.end = pos;
 		switchToNextState();
 	}
 }
@@ -95,16 +96,19 @@ void StateMachine::onPawnPromotionChosen(PieceType promotion)
 		mPromotionChoice   = promotion;
 		mAwaitingPromotion = false;
 	}
-	setGameState(GameState::ExecutingMove);
+	gameStateChanged(GameState::ExecutingMove);
 	cv.notify_all();
 }
 
 
-void StateMachine::setGameState(const GameState state)
+void StateMachine::gameStateChanged(const GameState state)
 {
-	if (mCurrentState != state)
+	mCurrentState = state;
+
+	for (auto observer : mObservers)
 	{
-		mCurrentState = state;
+		if (observer)
+			observer->onGameStateChanged(state);
 	}
 }
 
@@ -128,6 +132,10 @@ void StateMachine::setInitialized(const bool value)
 		mInitialized.store(value);
 	}
 }
+
+void StateMachine::attachObserver(IGameStateObserver *observer) {}
+
+void StateMachine::detachObserver(IGameStateObserver *observer) {}
 
 
 void StateMachine::run()
@@ -229,7 +237,7 @@ bool StateMachine::switchToNextState()
 	{
 	case GameState::Undefined:
 	{
-		setGameState(GameState::Init);
+		gameStateChanged(GameState::Init);
 		stateChanged = true;
 		break;
 	}
@@ -237,7 +245,7 @@ bool StateMachine::switchToNextState()
 	{
 		if (isInitialized())
 		{
-			setGameState(GameState::WaitingForInput);
+			gameStateChanged(GameState::WaitingForInput);
 			stateChanged = true;
 		}
 		break;
@@ -250,7 +258,7 @@ bool StateMachine::switchToNextState()
 	}
 	case GameState::MoveInitiated:
 	{
-		setGameState(GameState::WaitingForTarget);
+		gameStateChanged(GameState::WaitingForTarget);
 		stateChanged = true;
 		break;
 	}
@@ -263,22 +271,24 @@ bool StateMachine::switchToNextState()
 	{
 		if (mIsValidMove)
 		{
-			PossibleMove tmpMove{};
-			tmpMove.start		 = mMoveStart;
-			tmpMove.end			 = mMoveEnd;
-			bool isPawnPromotion = GameManager::GetInstance()->checkForPawnPromotionMove(tmpMove);
+			// PossibleMove tmpMove{};
+			// tmpMove.start		 = mMoveStart;
+			// tmpMove.end			 = mMoveEnd;
+
+			bool isPawnPromotion = GameManager::GetInstance()->checkForPawnPromotionMove(mCurrentPossibleMove);
 
 			if (isPawnPromotion)
-				setGameState(GameState::PawnPromotion);
+				gameStateChanged(GameState::PawnPromotion);
 			else
-				setGameState(GameState::ExecutingMove);
+				gameStateChanged(GameState::ExecutingMove);
 		}
 		else
 		{
-			mMoveStart			 = {};
-			mMoveEnd			 = {};
+			// mMoveStart			 = {};
+			// mMoveEnd			 = {};
+			resetCurrentPossibleMove();
 			mWaitingForTargetEnd = false;
-			setGameState(GameState::WaitingForInput);
+			gameStateChanged(GameState::WaitingForInput);
 		}
 		stateChanged = true;
 		break;
@@ -288,17 +298,18 @@ bool StateMachine::switchToNextState()
 		mEndgameState = GameManager::GetInstance()->checkForEndGameConditions();
 		if (isGameOngoing())
 		{
-			mMoveStart			   = {};
-			mMoveEnd			   = {};
+			// mMoveStart			   = {};
+			// mMoveEnd			   = {};
+			resetCurrentPossibleMove();
 			mMovesCalulated		   = false;
 			mWaitingForTargetStart = false;
 			mWaitingForTargetEnd   = false;
 
-			setGameState(GameState::WaitingForInput);
+			gameStateChanged(GameState::WaitingForInput);
 		}
 		else
 		{
-			setGameState(GameState::GameOver);
+			gameStateChanged(GameState::GameOver);
 		}
 
 		stateChanged = true;
@@ -324,9 +335,20 @@ bool StateMachine::switchToNextState()
 }
 
 
+void StateMachine::resetCurrentPossibleMove()
+{
+	LOG_INFO("Resetting the temporary saved possible move");
+	mCurrentPossibleMove.start = {};
+	mCurrentPossibleMove.end   = {};
+	mCurrentPossibleMove.type  = MoveType::Normal;
+}
+
+
 bool StateMachine::handleInitState(bool multiplayer)
 {
 	// currently impl with no multiplayer
+	LOG_INFO("Handling init state");
+
 	bool result = GameManager::GetInstance()->init();
 
 	if (result)
@@ -340,7 +362,12 @@ bool StateMachine::handleInitState(bool multiplayer)
 
 bool StateMachine::handleWaitingForInputState()
 {
+	LOG_INFO("Handling waiting for input state");
+
+	resetCurrentPossibleMove();
+
 	GameManager::GetInstance()->switchTurns(); // Sets the player
+
 	mMovesCalulated = GameManager::GetInstance()->calculateAllMovesForPlayer();
 	return mMovesCalulated;
 }
@@ -348,35 +375,30 @@ bool StateMachine::handleWaitingForInputState()
 
 bool StateMachine::handleMoveInitiatedState()
 {
-	bool result = GameManager::GetInstance()->initiateMove(mMoveStart);
+	LOG_INFO("Handling move initiated state");
+	bool result = GameManager::GetInstance()->initiateMove(mCurrentPossibleMove.start);
 	return result;
 }
 
 
 bool StateMachine::handleWaitingForTargetState()
 {
-	GameManager::GetInstance()->moveStateInitiated();
+	// GameManager::GetInstance()->moveStateInitiated();
 	return true;
 }
 
 
 bool StateMachine::handleValidatingMoveState()
 {
-	PossibleMove tmpMove{};
-	tmpMove.start = mMoveStart;
-	tmpMove.end	  = mMoveEnd;
-
-	mIsValidMove  = GameManager::GetInstance()->checkForValidMoves(tmpMove);
+	LOG_INFO("Validating move");
+	mIsValidMove = GameManager::GetInstance()->checkForValidMoves(mCurrentPossibleMove);
 	return mIsValidMove;
 }
 
 
 bool StateMachine::handleExecutingMoveState()
 {
-	PossibleMove tmpMove{};
-	tmpMove.start = mMoveStart;
-	tmpMove.end	  = mMoveEnd;
-	GameManager::GetInstance()->executeMove(tmpMove);
+	GameManager::GetInstance()->executeMove(mCurrentPossibleMove);
 	return true;
 }
 

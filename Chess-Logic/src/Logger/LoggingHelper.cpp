@@ -57,17 +57,17 @@ std::string LoggingHelper::pieceTypeToString(PieceType piece)
 //	}
 //}
 
-
-std::string LoggingHelper::moveStateToString(MoveState state)
-{
-	switch (state)
-	{
-	case MoveState::NoMove: return "No Move";
-	case MoveState::InitiateMove: return "Initiate Move";
-	case MoveState::ExecuteMove: return "Execute Move";
-	default: return "Unknown MoveState";
-	}
-}
+//
+//std::string LoggingHelper::moveStateToString(MoveState state)
+//{
+//	switch (state)
+//	{
+//	case MoveState::NoMove: return "No Move";
+//	case MoveState::InitiateMove: return "Initiate Move";
+//	case MoveState::ExecuteMove: return "Execute Move";
+//	default: return "Unknown MoveState";
+//	}
+//}
 
 
 std::string LoggingHelper::moveTypeToString(MoveType type)

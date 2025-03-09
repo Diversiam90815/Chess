@@ -22,6 +22,9 @@
 #include "NetworkManager.h"
 
 
+class StateMachine;
+
+
 class GameManager : public IGameObservable
 {
 public:
@@ -57,12 +60,12 @@ public:
 
 	bool						getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE]);
 
-	void						handleMoveStateChanges(PossibleMove &move);
+	//void						handleMoveStateChanges(PossibleMove &move);
 
 	bool						checkForValidMoves(const PossibleMove &move);
 	bool						checkForPawnPromotionMove(const PossibleMove &move);
 
-	void						moveStateInitiated() override; // Let the UI know moves for current round are ready -> handling need to be refactored later!
+	//void						moveStateInitiated() override; // Let the UI know moves for current round are ready -> handling need to be refactored later!
 
 	std::vector<NetworkAdapter> getNetworkAdapters();
 	bool						changeCurrentNetworkAdapter(int ID);
@@ -93,7 +96,6 @@ public:
 
 private:
 	GameManager();
-
 
 	void							 initObservers();
 	void							 deinitObservers();

@@ -7,6 +7,8 @@
 
 #include "GameManager.h"
 
+#include "StateMachine.h"
+
 
 GameManager::GameManager() {}
 
@@ -57,6 +59,8 @@ bool GameManager::init()
 	mNetwork = std::make_unique<NetworkManager>();
 	mNetwork->init();
 
+	initObservers();
+
 	return true;
 }
 
@@ -74,7 +78,7 @@ void GameManager::clearState()
 {
 	changeCurrentPlayer(PlayerColor::NoColor);
 
-	//setCurrentMoveState(MoveState::NoMove);
+	// setCurrentMoveState(MoveState::NoMove);
 	mAllMovesForPosition.clear();
 	mMovesGeneratedForCurrentTurn = false; // Reset flag
 }
@@ -141,7 +145,7 @@ bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 
 void GameManager::switchTurns()
 {
-	//setCurrentMoveState(MoveState::NoMove);
+	// setCurrentMoveState(MoveState::NoMove);
 	mMovesGeneratedForCurrentTurn = false; // Reset flag for the new turn
 
 	if (getCurrentPlayer() == PlayerColor::White)
@@ -261,7 +265,7 @@ void GameManager::undoMove()
 }
 
 //
-//void GameManager::setCurrentMoveState(MoveState state)
+// void GameManager::setCurrentMoveState(MoveState state)
 //{
 //	if (mCurrentMoveState != state)
 //	{
@@ -270,7 +274,7 @@ void GameManager::undoMove()
 //}
 //
 //
-//MoveState GameManager::getCurrentMoveState() const
+// MoveState GameManager::getCurrentMoveState() const
 //{
 //	return mCurrentMoveState;
 //}
@@ -302,17 +306,17 @@ void GameManager::endGame(EndGameState state, PlayerColor player)
 
 std::optional<PlayerColor> GameManager::getWinner() const
 {
-	////if (mCurrentState == GameState::Checkmate)
-	//	//return getCurrentPlayer() == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
+	//if (mCurrentState == GameState::Checkmate)
+	//	return getCurrentPlayer() == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
 
-	////else if (mCurrentState == GameState::Stalemate)
-	//	//return std::nullopt; // Draw in case of stalemate
+	//else if (mCurrentState == GameState::Stalemate)
+	//	return std::nullopt; // Draw in case of stalemate
 
 	return std::nullopt;
 }
 
 
-//void GameManager::handleMoveStateChanges(PossibleMove &move)
+// void GameManager::handleMoveStateChanges(PossibleMove &move)
 //{
 //	switch (mCurrentMoveState)
 //	{
@@ -353,7 +357,7 @@ std::optional<PlayerColor> GameManager::getWinner() const
 //	}
 //	default: break;
 //	}
-//}
+// }
 
 
 bool GameManager::checkForValidMoves(const PossibleMove &move)
@@ -381,17 +385,17 @@ bool GameManager::checkForPawnPromotionMove(const PossibleMove &move)
 	return false;
 }
 
-
-void GameManager::moveStateInitiated()
-{
-	for (auto observer : mObservers)
-	{
-		if (observer)
-		{
-			observer->onMoveStateInitiated();
-		}
-	}
-}
+//
+// void GameManager::moveStateInitiated()
+//{
+//	for (auto observer : mObservers)
+//	{
+//		if (observer)
+//		{
+//			observer->onMoveStateInitiated();
+//		}
+//	}
+//}
 
 
 std::vector<NetworkAdapter> GameManager::getNetworkAdapters()
@@ -495,6 +499,8 @@ void GameManager::initObservers()
 	mBlackPlayer.attachObserver(mUiCommunicationLayer.get());
 
 	mMoveExecution->attachObserver(mUiCommunicationLayer.get());
+
+	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer.get());
 }
 
 
@@ -506,6 +512,8 @@ void GameManager::deinitObservers()
 	mBlackPlayer.detachObserver(mUiCommunicationLayer.get());
 
 	mMoveExecution->detachObserver(mUiCommunicationLayer.get());
+
+	StateMachine::GetInstance()->detachObserver(mUiCommunicationLayer.get());
 }
 
 

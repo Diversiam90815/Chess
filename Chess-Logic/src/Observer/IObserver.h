@@ -41,7 +41,16 @@ public:
 
 	virtual void onEndGame(EndGameState state, PlayerColor winner) = 0;
 	virtual void onChangeCurrentPlayer(PlayerColor player)		   = 0;
-	virtual void onMoveStateInitiated()							   = 0;
+	// virtual void onMoveStateInitiated()							   = 0;
+};
+
+
+class IGameStateObserver
+{
+public:
+	virtual ~IGameStateObserver() {};
+
+	virtual void onGameStateChanged(GameState state) = 0;
 };
 
 

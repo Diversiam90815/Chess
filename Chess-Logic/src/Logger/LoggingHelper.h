@@ -20,7 +20,7 @@ public:
 	static std::string pieceTypeToString(PieceType piece);
 
 	//static std::string gameStateToString(GameState state);
-	static std::string moveStateToString(MoveState state);
+	//static std::string moveStateToString(MoveState state);
 	static std::string moveTypeToString(MoveType type);
 
 	static std::string boardStateToString(const int *boardState);
