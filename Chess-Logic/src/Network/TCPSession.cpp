@@ -67,7 +67,7 @@ void TCPSession::readBody()
 								}
 
 								// Extract JSON string
-								std::string			   jsonData(mBody.data(), mBodyLength);
+								std::string jsonData(mBody.data(), mBodyLength);
 
 								// parse JSON
 								try
@@ -120,25 +120,37 @@ void TCPSession::sendJson(MultiplayerMessageType type, const json &message)
 }
 
 
-void TCPSession::attachObserver(IRemoteCommunicationObserver *observer)
+void TCPSession::attachObserver(std::weak_ptr<IRemoteCommunicationObserver> observer)
 {
 	mObservers.push_back(observer);
 }
 
 
-void TCPSession::detachObserver(IRemoteCommunicationObserver *observer)
+void TCPSession::detachObserver(std::weak_ptr<IRemoteCommunicationObserver> observer)
 {
-	mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
+	// Remove observer from the vector by checking if they point to the same object
+	mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(),
+									[&observer](const std::weak_ptr<IRemoteCommunicationObserver> &obs)
+									{
+										// Compare the objects they point to, not the weak_ptrs themselves
+										if (obs.expired() || observer.expired())
+										{
+											return false; // Can't compare expired weak_ptrs
+										}
+										return !obs.owner_before(observer) && !observer.owner_before(obs);
+										// This is equivalent to obs.lock() == observer.lock() without the overhead
+									}),
+					 mObservers.end());
 }
 
 
 void TCPSession::receivedMessage(const json &j)
 {
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onMessageReceived(j);
-		}
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onMessageReceived(j);
 	}
 }

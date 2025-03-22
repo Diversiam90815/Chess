@@ -38,18 +38,18 @@ public:
 
 	void		removeLastMove();
 
-	void		attachObserver(IMoveObserver* observer) override;
-	void		detachObserver(IMoveObserver* observer) override;
+	void		attachObserver(std::weak_ptr<IMoveObserver> observer) override;
+	void		detachObserver(std::weak_ptr<IMoveObserver> observer) override;
 
 
 private:
-	std::shared_ptr<ChessBoard>			mChessBoard;
+	std::shared_ptr<ChessBoard>				  mChessBoard;
 
-	std::shared_ptr<MoveValidation>		mValidation;
+	std::shared_ptr<MoveValidation>			  mValidation;
 
-	std::shared_ptr<MoveNotationHelper> mMoveNotation;
+	std::shared_ptr<MoveNotationHelper>		  mMoveNotation;
 
-	std::set<Move>						mMoveHistory;
+	std::set<Move>							  mMoveHistory;
 
-	std::vector<IMoveObserver*> mObservers;
+	std::vector<std::weak_ptr<IMoveObserver>> mObservers;
 };

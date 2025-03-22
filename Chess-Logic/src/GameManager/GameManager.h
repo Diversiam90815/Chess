@@ -41,8 +41,8 @@ public:
 
 	void						undoMove();
 
-	//void						setCurrentMoveState(MoveState state);
-	//MoveState					getCurrentMoveState() const;
+	// void						setCurrentMoveState(MoveState state);
+	// MoveState					getCurrentMoveState() const;
 
 	void						resetGame();
 
@@ -60,12 +60,12 @@ public:
 
 	bool						getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE]);
 
-	//void						handleMoveStateChanges(PossibleMove &move);
+	// void						handleMoveStateChanges(PossibleMove &move);
 
 	bool						checkForValidMoves(const PossibleMove &move);
 	bool						checkForPawnPromotionMove(const PossibleMove &move);
 
-	//void						moveStateInitiated() override; // Let the UI know moves for current round are ready -> handling need to be refactored later!
+	// void						moveStateInitiated() override; // Let the UI know moves for current round are ready -> handling need to be refactored later!
 
 	std::vector<NetworkAdapter> getNetworkAdapters();
 	bool						changeCurrentNetworkAdapter(int ID);
@@ -83,8 +83,8 @@ public:
 	void						setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
 	std::string					getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
 
-	void						attachObserver(IGameObserver *observer) override;
-	void						detachObserver(IGameObserver *observer) override;
+	void						attachObserver(std::weak_ptr<IGameObserver> observer) override;
+	void						detachObserver(std::weak_ptr<IGameObserver> observer) override;
 
 	void						switchTurns();
 
@@ -97,34 +97,34 @@ public:
 private:
 	GameManager();
 
-	void							 initObservers();
-	void							 deinitObservers();
+	void									  initObservers();
+	void									  deinitObservers();
 
 
-	Logging							 mLog;
+	Logging									  mLog;
 
-	bool							 mMovesGeneratedForCurrentTurn = false;
+	bool									  mMovesGeneratedForCurrentTurn = false;
 
-	Player							 mWhitePlayer;
-	Player							 mBlackPlayer;
+	Player									  mWhitePlayer;
+	Player									  mBlackPlayer;
 
-	PlayerColor						 mCurrentPlayer	   = PlayerColor::NoColor;
+	PlayerColor								  mCurrentPlayer = PlayerColor::NoColor;
 
-	//MoveState						 mCurrentMoveState = MoveState::NoMove;
+	// MoveState						 mCurrentMoveState = MoveState::NoMove;
 
-	std::vector<PossibleMove>		 mAllMovesForPosition;
+	std::vector<PossibleMove>				  mAllMovesForPosition;
 
-	std::shared_ptr<ChessBoard>		 mChessBoard;
+	std::shared_ptr<ChessBoard>				  mChessBoard;
 
-	std::shared_ptr<MoveGeneration>	 mMoveGeneration;
-	std::shared_ptr<MoveValidation>	 mMoveValidation;
-	std::shared_ptr<MoveExecution>	 mMoveExecution;
+	std::shared_ptr<MoveGeneration>			  mMoveGeneration;
+	std::shared_ptr<MoveValidation>			  mMoveValidation;
+	std::shared_ptr<MoveExecution>			  mMoveExecution;
 
-	std::unique_ptr<UICommunication> mUiCommunicationLayer;
+	std::shared_ptr<UICommunication>		  mUiCommunicationLayer;
 
-	UserSettings					 mUserSettings;
+	UserSettings							  mUserSettings;
 
-	std::unique_ptr<NetworkManager>	 mNetwork;
+	std::unique_ptr<NetworkManager>			  mNetwork;
 
-	std::vector<IGameObserver *>	 mObservers;
+	std::vector<std::weak_ptr<IGameObserver>> mObservers;
 };

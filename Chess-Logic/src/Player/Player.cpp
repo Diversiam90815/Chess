@@ -55,12 +55,12 @@ void Player::addCapturedPiece(const PieceType piece)
 {
 	mCapturedPieces.push_back(piece);
 
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onAddCapturedPiece(getPlayerColor(), piece);
-		}
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onAddCapturedPiece(getPlayerColor(), piece);
 	}
 }
 
@@ -80,12 +80,12 @@ void Player::removeLastCapturedPiece()
 
 	updateScore();
 
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onRemoveLastCapturedPiece(getPlayerColor(), lastCapture);
-		}
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onRemoveLastCapturedPiece(getPlayerColor(), lastCapture);
 	}
 }
 
@@ -99,12 +99,12 @@ void Player::updateScore()
 	}
 	setScore(score);
 
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onScoreUpdate(mScore.player, mScore.value);
-		}
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onScoreUpdate(mScore.player, mScore.value);
 	}
 
 	LOG_INFO("Updated Score for {} : {}", LoggingHelper::playerColourToString(mPlayerColor).c_str(), score);
@@ -133,13 +133,25 @@ void Player::reset()
 }
 
 
-void Player::attachObserver(IPlayerObserver *observer)
+void Player::attachObserver(std::weak_ptr<IPlayerObserver> observer)
 {
 	mObservers.push_back(observer);
 }
 
 
-void Player::detachObserver(IPlayerObserver *observer)
+void Player::detachObserver(std::weak_ptr<IPlayerObserver> observer)
 {
-	mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
+	// Remove observer from the vector by checking if they point to the same object
+	mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(),
+									[&observer](const std::weak_ptr<IPlayerObserver> &obs)
+									{
+										// Compare the objects they point to, not the weak_ptrs themselves
+										if (obs.expired() || observer.expired())
+										{
+											return false; // Can't compare expired weak_ptrs
+										}
+										return !obs.owner_before(observer) && !observer.owner_before(obs);
+										// This is equivalent to obs.lock() == observer.lock() without the overhead
+									}),
+					 mObservers.end());
 }

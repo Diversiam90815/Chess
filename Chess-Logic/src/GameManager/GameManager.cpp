@@ -71,6 +71,7 @@ void GameManager::startGame()
 
 	mChessBoard->initializeBoard();			 // Reset the board
 	changeCurrentPlayer(PlayerColor::White); // Setting the player at the end, since this will trigger the move calculation
+	StateMachine::GetInstance()->start();
 }
 
 
@@ -294,22 +295,22 @@ void GameManager::resetGame()
 
 void GameManager::endGame(EndGameState state, PlayerColor player)
 {
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onEndGame(state, player);
-		}
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onEndGame(state, player);
 	}
 }
 
 
 std::optional<PlayerColor> GameManager::getWinner() const
 {
-	//if (mCurrentState == GameState::Checkmate)
+	// if (mCurrentState == GameState::Checkmate)
 	//	return getCurrentPlayer() == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
 
-	//else if (mCurrentState == GameState::Stalemate)
+	// else if (mCurrentState == GameState::Stalemate)
 	//	return std::nullopt; // Draw in case of stalemate
 
 	return std::nullopt;
@@ -434,12 +435,12 @@ void GameManager::changeCurrentPlayer(PlayerColor player)
 	{
 		mCurrentPlayer = player;
 
-		for (auto observer : mObservers)
+		for (auto &observer : mObservers)
 		{
-			if (observer)
-			{
-				observer->onChangeCurrentPlayer(mCurrentPlayer);
-			}
+			auto obs = observer.lock();
+
+			if (obs)
+				obs->onChangeCurrentPlayer(mCurrentPlayer);
 		}
 	}
 }
@@ -493,37 +494,49 @@ EndGameState GameManager::checkForEndGameConditions()
 
 void GameManager::initObservers()
 {
-	this->attachObserver(mUiCommunicationLayer.get());
+	this->attachObserver(mUiCommunicationLayer);
 
-	mWhitePlayer.attachObserver(mUiCommunicationLayer.get());
-	mBlackPlayer.attachObserver(mUiCommunicationLayer.get());
+	mWhitePlayer.attachObserver(mUiCommunicationLayer);
+	mBlackPlayer.attachObserver(mUiCommunicationLayer);
 
-	mMoveExecution->attachObserver(mUiCommunicationLayer.get());
+	mMoveExecution->attachObserver(mUiCommunicationLayer);
 
-	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer.get());
+	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer);
 }
 
 
 void GameManager::deinitObservers()
 {
-	this->detachObserver(mUiCommunicationLayer.get());
+	this->detachObserver(mUiCommunicationLayer);
 
-	mWhitePlayer.detachObserver(mUiCommunicationLayer.get());
-	mBlackPlayer.detachObserver(mUiCommunicationLayer.get());
+	mWhitePlayer.detachObserver(mUiCommunicationLayer);
+	mBlackPlayer.detachObserver(mUiCommunicationLayer);
 
-	mMoveExecution->detachObserver(mUiCommunicationLayer.get());
+	mMoveExecution->detachObserver(mUiCommunicationLayer);
 
-	StateMachine::GetInstance()->detachObserver(mUiCommunicationLayer.get());
+	StateMachine::GetInstance()->detachObserver(mUiCommunicationLayer);
 }
 
 
-void GameManager::attachObserver(IGameObserver *observer)
+void GameManager::attachObserver(std::weak_ptr<IGameObserver> observer)
 {
 	mObservers.push_back(observer);
 }
 
 
-void GameManager::detachObserver(IGameObserver *observer)
+void GameManager::detachObserver(std::weak_ptr<IGameObserver> observer)
 {
-	mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
+	// Remove observer from the vector by checking if they point to the same object
+	mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(),
+									[&observer](const std::weak_ptr<IGameObserver> &obs)
+									{
+										// Compare the objects they point to, not the weak_ptrs themselves
+										if (obs.expired() || observer.expired())
+										{
+											return false; // Can't compare expired weak_ptrs
+										}
+										return !obs.owner_before(observer) && !observer.owner_before(obs);
+										// This is equivalent to obs.lock() == observer.lock() without the overhead
+									}),
+					 mObservers.end());
 }

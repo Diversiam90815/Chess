@@ -42,54 +42,54 @@ public:
 	bool	  isInitialized() const;
 	void	  setInitialized(const bool value);
 
-	void	  attachObserver(IGameStateObserver *observer) override;
-	void	  detachObserver(IGameStateObserver *observer) override;
+	void	  attachObserver(std::weak_ptr<IGameStateObserver> observer) override;
+	void	  detachObserver(std::weak_ptr<IGameStateObserver> observer) override;
 
 
 private:
 	StateMachine();
 
-	void							  run();
+	void										   run();
 
-	bool							  handleInitState(bool multiplayer);
-	bool							  handleWaitingForInputState();
-	bool							  handleMoveInitiatedState();
-	bool							  handleWaitingForTargetState();
-	bool							  handleValidatingMoveState();
-	bool							  handleExecutingMoveState();
-	bool							  handlePawnPromotionState();
-	bool							  handleGameOverState();
+	bool										   handleInitState(bool multiplayer);
+	bool										   handleWaitingForInputState();
+	bool										   handleMoveInitiatedState();
+	bool										   handleWaitingForTargetState();
+	bool										   handleValidatingMoveState();
+	bool										   handleExecutingMoveState();
+	bool										   handlePawnPromotionState();
+	bool										   handleGameOverState();
 
-	bool							  switchToNextState();
+	bool										   switchToNextState();
 
-	bool							  isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
+	bool										   isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
 
-	void							  resetCurrentPossibleMove();
+	void										   resetCurrentPossibleMove();
 
 
-	boost::thread					  worker;
-	std::atomic<bool>				  mRunning;
-	std::mutex						  mMutex;
-	std::condition_variable			  cv;
+	boost::thread								   worker;
+	std::atomic<bool>							   mRunning;
+	std::mutex									   mMutex;
+	std::condition_variable						   cv;
 
-	std::atomic<bool>				  mInitialized{false};
+	std::atomic<bool>							   mInitialized{false};
 
-	GameState						  mCurrentState{GameState::Undefined};
-	//Position						  mMoveStart{};
-	//Position						  mMoveEnd{};
-	PossibleMove					  mCurrentPossibleMove{};
+	GameState									   mCurrentState{GameState::Undefined};
+	// Position						  mMoveStart{};
+	// Position						  mMoveEnd{};
+	PossibleMove								   mCurrentPossibleMove{};
 
-	bool							  mMovesCalulated{false};
+	bool										   mMovesCalulated{false};
 
-	bool							  mWaitingForTargetStart{false};
-	bool							  mWaitingForTargetEnd{false};
+	bool										   mWaitingForTargetStart{false};
+	bool										   mWaitingForTargetEnd{false};
 
-	bool							  mIsValidMove{false};
+	bool										   mIsValidMove{false};
 
-	bool							  mAwaitingPromotion{false};
-	PieceType						  mPromotionChoice{PieceType::DefaultType};
+	bool										   mAwaitingPromotion{false};
+	PieceType									   mPromotionChoice{PieceType::DefaultType};
 
-	EndGameState					  mEndgameState{EndGameState::OnGoing};
+	EndGameState								   mEndgameState{EndGameState::OnGoing};
 
-	std::vector<IGameStateObserver *> mObservers;
+	std::vector<std::weak_ptr<IGameStateObserver>> mObservers;
 };

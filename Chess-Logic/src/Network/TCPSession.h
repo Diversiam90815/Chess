@@ -54,28 +54,28 @@ public:
 
 	void								  sendJson(MultiplayerMessageType type, const json &message);
 
-	void								  attachObserver(IRemoteCommunicationObserver *observer) override;
-	void								  detachObserver(IRemoteCommunicationObserver *observer) override;
+	void								  attachObserver(std::weak_ptr<IRemoteCommunicationObserver> observer) override;
+	void								  detachObserver(std::weak_ptr<IRemoteCommunicationObserver> observer) override;
 
 	void								  receivedMessage(const json &j) override;
 
 private:
 	explicit TCPSession(boost::asio::io_context &ioContext);
 
-	void										readHeader();
+	void													 readHeader();
 
-	void										readBody();
+	void													 readBody();
 
 
-	tcp::socket									mSocket;
+	tcp::socket												 mSocket;
 
-	char										mHeader[4]{};
-	std::vector<char>							mBody{};
-	uint32_t									mBodyLength{0};
+	char													 mHeader[4]{};
+	std::vector<char>										 mBody{};
+	uint32_t												 mBodyLength{0};
 
-	int											mBoundPort{0};
+	int														 mBoundPort{0};
 
-	std::vector<IRemoteCommunicationObserver *> mObservers;
+	std::vector<std::weak_ptr<IRemoteCommunicationObserver>> mObservers;
 
-	MessageHandler								mMessageHandler = nullptr;
+	MessageHandler											 mMessageHandler = nullptr;
 };

@@ -53,17 +53,17 @@ public:
 
 	void		  reset();
 
-	void		  attachObserver(IPlayerObserver *observer) override;
-	void		  detachObserver(IPlayerObserver *observer) override;
+	void		  attachObserver(std::weak_ptr<IPlayerObserver> observer) override;
+	void		  detachObserver(std::weak_ptr<IPlayerObserver> observer) override;
 
 private:
-	PlayerColor					   mPlayerColor = PlayerColor::NoColor;
+	PlayerColor									mPlayerColor = PlayerColor::NoColor;
 
-	std::vector<PieceType>		   mCapturedPieces;
+	std::vector<PieceType>						mCapturedPieces;
 
-	bool						   mIsCurrentTurn = false;
+	bool										mIsCurrentTurn = false;
 
-	Score						   mScore		  = Score(PlayerColor::NoColor, 0);
+	Score										mScore		   = Score(PlayerColor::NoColor, 0);
 
-	std::vector<IPlayerObserver *> mObservers;
+	std::vector<std::weak_ptr<IPlayerObserver>> mObservers;
 };

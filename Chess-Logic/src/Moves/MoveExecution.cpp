@@ -107,12 +107,12 @@ Move MoveExecution::executeMove(PossibleMove &possibleMove)
 
 	executedMove.notation = mMoveNotation->generateStandardAlgebraicNotation(executedMove);
 
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onExecuteMove();
-		}
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onExecuteMove();
 	}
 
 	addMoveToHistory(executedMove);
@@ -210,12 +210,12 @@ void MoveExecution::addMoveToHistory(Move &move)
 	move.number = mMoveHistory.size() + 1; // Set the move number based on history size
 	mMoveHistory.insert(move);
 
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onAddToMoveHistory(move);
-		}
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onAddToMoveHistory(move);
 	}
 }
 
@@ -229,13 +229,25 @@ void MoveExecution::removeLastMove()
 }
 
 
-void MoveExecution::attachObserver(IMoveObserver *observer)
+void MoveExecution::attachObserver(std::weak_ptr<IMoveObserver> observer)
 {
 	mObservers.push_back(observer);
 }
 
 
-void MoveExecution::detachObserver(IMoveObserver *observer)
+void MoveExecution::detachObserver(std::weak_ptr<IMoveObserver> observer)
 {
-	mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
+	// Remove observer from the vector by checking if they point to the same object
+	mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(),
+									[&observer](const std::weak_ptr<IMoveObserver> &obs)
+									{
+										// Compare the objects they point to, not the weak_ptrs themselves
+										if (obs.expired() || observer.expired())
+										{
+											return false; // Can't compare expired weak_ptrs
+										}
+										return !obs.owner_before(observer) && !observer.owner_before(obs);
+										// This is equivalent to obs.lock() == observer.lock() without the overhead
+									}),
+					 mObservers.end());
 }

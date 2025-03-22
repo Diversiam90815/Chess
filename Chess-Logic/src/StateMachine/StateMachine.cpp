@@ -105,10 +105,12 @@ void StateMachine::gameStateChanged(const GameState state)
 {
 	mCurrentState = state;
 
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-			observer->onGameStateChanged(state);
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onGameStateChanged(state);
 	}
 }
 
@@ -133,9 +135,28 @@ void StateMachine::setInitialized(const bool value)
 	}
 }
 
-void StateMachine::attachObserver(IGameStateObserver *observer) {}
+void StateMachine::attachObserver(std::weak_ptr<IGameStateObserver> observer)
+{
+	mObservers.push_back(observer);
+}
 
-void StateMachine::detachObserver(IGameStateObserver *observer) {}
+
+void StateMachine::detachObserver(std::weak_ptr<IGameStateObserver> observer)
+{
+	// Remove observer from the vector by checking if they point to the same object
+	mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(),
+									[&observer](const std::weak_ptr<IGameStateObserver> &obs)
+									{
+										// Compare the objects they point to, not the weak_ptrs themselves
+										if (obs.expired() || observer.expired())
+										{
+											return false; // Can't compare expired weak_ptrs
+										}
+										return !obs.owner_before(observer) && !observer.owner_before(obs);
+										// This is equivalent to obs.lock() == observer.lock() without the overhead
+									}),
+					 mObservers.end());
+}
 
 
 void StateMachine::run()
@@ -143,12 +164,13 @@ void StateMachine::run()
 	while (mRunning)
 	{
 		std::unique_lock<std::mutex> lock(mMutex);
-		cv.wait_for(lock, std::chrono::milliseconds(100)); // Runs through every 100ms in absence of any notification
+		cv.wait_for(lock, std::chrono::milliseconds(200)); // Runs through every 100ms in absence of any notification
 
 		switch (mCurrentState)
 		{
 		case GameState::Undefined:
 		{
+			switchToNextState();
 			break;
 		}
 		case GameState::Init:
