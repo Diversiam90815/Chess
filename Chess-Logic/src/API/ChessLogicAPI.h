@@ -39,6 +39,11 @@ extern "C"
 	CHESS_API bool	GetBoardState(int *boardState);
 
 
+	CHESS_API void	OnSquareSelected(PositionInstance positionInstance);
+
+	CHESS_API void	OnPawnPromotionChosen(PieceTypeInstance promotionInstance);
+
+
 	CHESS_API void	StartGame();
 
 	CHESS_API void	ResetGame();

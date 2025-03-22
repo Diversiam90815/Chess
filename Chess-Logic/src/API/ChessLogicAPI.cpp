@@ -11,6 +11,7 @@
 #include "ChessLogicAPI.h"
 #include "GameManager.h"
 #include "FileManager.h"
+#include "StateMachine.h"
 
 
 
@@ -167,17 +168,17 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleM
 
 CHESS_API void HandleMoveStateChanged(const PossibleMoveInstance &moveInstance)
 {
-	//GameManager *manager = GameManager::GetInstance();
-	//PossibleMove move	 = MapToPossibleMove(moveInstance);
-	//manager->handleMoveStateChanges(move);
+	// GameManager *manager = GameManager::GetInstance();
+	// PossibleMove move	 = MapToPossibleMove(moveInstance);
+	// manager->handleMoveStateChanges(move);
 }
 
 
 CHESS_API void ChangeMoveState(int moveState)
 {
-	//GameManager *manager = GameManager::GetInstance();
-	//MoveState	 state	 = (MoveState)moveState;
-	//manager->setCurrentMoveState(state);
+	// GameManager *manager = GameManager::GetInstance();
+	// MoveState	 state	 = (MoveState)moveState;
+	// manager->setCurrentMoveState(state);
 }
 
 
@@ -228,6 +229,20 @@ CHESS_API bool GetBoardState(int *boardState)
 
 	LoggingHelper::logBoardState(boardState);
 	return true;
+}
+
+
+CHESS_API void OnSquareSelected(PositionInstance positionInstance)
+{
+	Position pos = MapToPosition(positionInstance);
+	StateMachine::GetInstance()->onSquareSelected(pos);
+}
+
+
+CHESS_API void OnPawnPromotionChosen(PieceTypeInstance promotionInstance)
+{
+	PieceType promotion = static_cast<PieceType>(promotionInstance);
+	StateMachine::GetInstance()->onPawnPromotionChosen(promotion);
 }
 
 

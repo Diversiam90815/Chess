@@ -76,6 +76,18 @@ namespace Chess_UI.Services
         #endregion // Game
 
 
+        #region State Machine
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "OnSquareSelected", CharSet = CharSet.Unicode)]
+        public static extern void OnSquareSelected(PositionInstance position);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "OnPawnPromotionChosen", CharSet = CharSet.Unicode)]
+        public static extern void OnPawnPromotionChosen(PieceTypeInstance promotion);
+
+
+        #endregion  // State Machine
+
+
         #region Logging
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "LogInfoWithCaller", CharSet = CharSet.Unicode)]
