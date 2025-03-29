@@ -71,7 +71,6 @@ void GameManager::startGame()
 
 	mChessBoard->initializeBoard();			 // Reset the board
 	changeCurrentPlayer(PlayerColor::White); // Setting the player at the end, since this will trigger the move calculation
-	StateMachine::GetInstance()->start();
 }
 
 

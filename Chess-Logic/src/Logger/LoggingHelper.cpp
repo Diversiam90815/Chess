@@ -43,22 +43,25 @@ std::string LoggingHelper::pieceTypeToString(PieceType piece)
 }
 
 
-//std::string LoggingHelper::gameStateToString(GameState state)
-//{
-//	switch (state)
-//	{
-//	case GameState::Init: return "Init";
-//	case GameState::OnGoing: return "On Going";
-//	case GameState::Paused: return "Paused";
-//	case GameState::Checkmate: return "Checkmate";
-//	case GameState::Stalemate: return "Stalemate";
-//	case GameState::Draw: return "Draw";
-//	default: return "Unknown GameState";
-//	}
-//}
+std::string LoggingHelper::gameStateToString(GameState state)
+{
+	switch (state)
+	{
+	case GameState::Undefined: return "Undefined";
+	case GameState::Init: return "Init";
+	case GameState::MoveInitiated: return "Move Initiated";
+	case GameState::ExecutingMove: return "Executing Move";
+	case GameState::ValidatingMove: return "Validating Move";
+	case GameState::WaitingForInput: return "Waiting For Input";
+	case GameState::WaitingForTarget: return "Waiting For Target";
+	case GameState::GameOver: return "Game Over";
+	case GameState::PawnPromotion: return "Pawn Promotion";
+	default: return "Unknown GameState";
+	}
+}
 
 //
-//std::string LoggingHelper::moveStateToString(MoveState state)
+// std::string LoggingHelper::moveStateToString(MoveState state)
 //{
 //	switch (state)
 //	{

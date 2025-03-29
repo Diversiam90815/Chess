@@ -66,25 +66,32 @@ void StateMachine::onGameStarted()
 {
 	if (mCurrentState == GameState::Undefined)
 	{
-		switchToNextState();
+		gameStateChanged(GameState::Init);
+		start();
+		triggerEvent();
 	}
 }
 
 
 void StateMachine::onSquareSelected(const Position &pos)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
+	{
+		std::lock_guard<std::mutex> lock(mMutex);
 
-	if (mCurrentState == GameState::WaitingForInput) // Selected Start Position
-	{
-		mCurrentPossibleMove.start = pos;
-		switchToNextState();
+		if (mCurrentState == GameState::WaitingForInput) // Selected Start Position
+		{
+			mCurrentPossibleMove.start = pos;
+			gameStateChanged(GameState::MoveInitiated);
+			mEventTriggered = true;							   // Set it directly, since we have the lock
+		}
+		else if (mCurrentState == GameState::WaitingForTarget) // Selected End Position
+		{
+			mCurrentPossibleMove.end = pos;
+			gameStateChanged(GameState::ValidatingMove);
+			triggerEvent();
+		}
 	}
-	else if (mCurrentState == GameState::WaitingForTarget) // Selected End Position
-	{
-		mCurrentPossibleMove.end = pos;
-		switchToNextState();
-	}
+	cv.notify_all();
 }
 
 
@@ -104,6 +111,7 @@ void StateMachine::onPawnPromotionChosen(PieceType promotion)
 void StateMachine::gameStateChanged(const GameState state)
 {
 	mCurrentState = state;
+	LOG_INFO("Game State changed to : {}", LoggingHelper::gameStateToString(state).c_str());
 
 	for (auto &observer : mObservers)
 	{
@@ -159,12 +167,24 @@ void StateMachine::detachObserver(std::weak_ptr<IGameStateObserver> observer)
 }
 
 
+void StateMachine::triggerEvent()
+{
+	// std::lock_guard<std::mutex> lock(mMutex);
+	mEventTriggered = true;
+	cv.notify_all();
+}
+
+
 void StateMachine::run()
 {
 	while (mRunning)
 	{
 		std::unique_lock<std::mutex> lock(mMutex);
-		cv.wait_for(lock, std::chrono::milliseconds(200)); // Runs through every 100ms in absence of any notification
+		cv.wait(lock, [this]() { return !mRunning || mEventTriggered; });
+
+		mEventTriggered = false;
+
+		LOG_INFO("Processing state: {}", LoggingHelper::gameStateToString(mCurrentState).c_str());
 
 		switch (mCurrentState)
 		{
@@ -247,6 +267,10 @@ void StateMachine::run()
 		}
 		default: break;
 		}
+
+		// Always notify after processing, in case we need to continue processing states
+		lock.unlock(); // Unlock before notifying to prevent any potential deadlock
+		cv.notify_all();
 	}
 }
 
@@ -275,7 +299,8 @@ bool StateMachine::switchToNextState()
 
 	case GameState::WaitingForInput:
 	{
-		// Change to MoveInitiated happening in onSquareSelected
+		// gameStateChanged(GameState::MoveInitiated);
+
 		break;
 	}
 	case GameState::MoveInitiated:
@@ -349,8 +374,9 @@ bool StateMachine::switchToNextState()
 	default: break;
 	}
 
-	if (stateChanged)
+	// if (stateChanged)
 	{
+		// triggerEvent();
 		cv.notify_all();
 	}
 	return stateChanged;

@@ -69,7 +69,6 @@ namespace Chess_UI.Views
         private void ResetGame_Click(object sender, RoutedEventArgs e)
         {
             ViewModel.ResetGame();
-            ViewModel.StartGame();
         }
 
 

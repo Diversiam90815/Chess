@@ -61,7 +61,7 @@ namespace Chess_UI.ViewModels
 
             this.CurrentBoardTheme = themeManager.CurrentBoardTheme;
 
-            ChessLogicAPI.StartGame();
+            //ChessLogicAPI.StartGame();
 
             Board = new ObservableCollection<BoardSquare>();
 
@@ -75,7 +75,7 @@ namespace Chess_UI.ViewModels
                 MoveHistoryColumns.Add(new ObservableCollection<string>());
             }
 
-            LoadBoardFromNative();
+            //LoadBoardFromNative();
         }
 
 
@@ -181,6 +181,18 @@ namespace Chess_UI.ViewModels
                 ResetHighlightsOnBoard();
             }
         }
+
+
+        public void HandleSquareClick(BoardSquare square)
+        {
+            int engineX = square.pos.x;
+            int engineY = 7 - square.pos.y;
+
+            Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{engineX}-Y{engineY}!");
+
+            ChessLogicAPI.OnSquareSelected(new PositionInstance(engineX, engineY));
+        }
+
 
 
         //public async void HandleSquareClick(BoardSquare square)

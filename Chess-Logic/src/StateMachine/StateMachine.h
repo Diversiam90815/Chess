@@ -45,6 +45,7 @@ public:
 	void	  attachObserver(std::weak_ptr<IGameStateObserver> observer) override;
 	void	  detachObserver(std::weak_ptr<IGameStateObserver> observer) override;
 
+	void	  triggerEvent();
 
 private:
 	StateMachine();
@@ -73,6 +74,7 @@ private:
 	std::condition_variable						   cv;
 
 	std::atomic<bool>							   mInitialized{false};
+	bool										   mEventTriggered{false};
 
 	GameState									   mCurrentState{GameState::Undefined};
 	// Position						  mMoveStart{};
