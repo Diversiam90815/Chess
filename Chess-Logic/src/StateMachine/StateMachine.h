@@ -61,7 +61,7 @@ private:
 	bool										   handlePawnPromotionState();
 	bool										   handleGameOverState();
 
-	bool										   switchToNextState();
+	void										   switchToNextState();
 
 	bool										   isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
 

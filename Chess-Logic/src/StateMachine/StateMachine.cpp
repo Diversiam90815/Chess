@@ -120,6 +120,9 @@ void StateMachine::gameStateChanged(const GameState state)
 		if (obs)
 			obs->onGameStateChanged(state);
 	}
+
+	cv.notify_all();
+	mEventTriggered = true;
 }
 
 
@@ -169,8 +172,10 @@ void StateMachine::detachObserver(std::weak_ptr<IGameStateObserver> observer)
 
 void StateMachine::triggerEvent()
 {
-	// std::lock_guard<std::mutex> lock(mMutex);
-	mEventTriggered = true;
+	{
+		std::lock_guard<std::mutex> lock(mMutex);
+		mEventTriggered = true;
+	}
 	cv.notify_all();
 }
 
@@ -275,16 +280,13 @@ void StateMachine::run()
 }
 
 
-bool StateMachine::switchToNextState()
+void StateMachine::switchToNextState()
 {
-	bool stateChanged = false;
-
 	switch (mCurrentState)
 	{
 	case GameState::Undefined:
 	{
 		gameStateChanged(GameState::Init);
-		stateChanged = true;
 		break;
 	}
 	case GameState::Init:
@@ -292,7 +294,6 @@ bool StateMachine::switchToNextState()
 		if (isInitialized())
 		{
 			gameStateChanged(GameState::WaitingForInput);
-			stateChanged = true;
 		}
 		break;
 	}
@@ -306,7 +307,6 @@ bool StateMachine::switchToNextState()
 	case GameState::MoveInitiated:
 	{
 		gameStateChanged(GameState::WaitingForTarget);
-		stateChanged = true;
 		break;
 	}
 	case GameState::WaitingForTarget:
@@ -337,7 +337,6 @@ bool StateMachine::switchToNextState()
 			mWaitingForTargetEnd = false;
 			gameStateChanged(GameState::WaitingForInput);
 		}
-		stateChanged = true;
 		break;
 	}
 	case GameState::ExecutingMove:
@@ -358,8 +357,6 @@ bool StateMachine::switchToNextState()
 		{
 			gameStateChanged(GameState::GameOver);
 		}
-
-		stateChanged = true;
 		break;
 	}
 	case GameState::PawnPromotion:
@@ -373,13 +370,6 @@ bool StateMachine::switchToNextState()
 	}
 	default: break;
 	}
-
-	// if (stateChanged)
-	{
-		// triggerEvent();
-		cv.notify_all();
-	}
-	return stateChanged;
 }
 
 
