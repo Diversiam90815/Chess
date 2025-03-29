@@ -134,35 +134,24 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleM
 
 	auto		 moves	 = manager->getPossibleMoveForPosition();
 
-	Position	 start{-1, -1};
-	Position	 end{-1, -1};
-	MoveType	 type	 = MoveType::None;
+	if (index < 0 || index >= static_cast<int>(moves.size()))
+		return false;
 
-	int			 counter = -1;
+	//auto it = moves.begin();
+	//std::advance(it, index); // Get the iterator to the desired element
 
-	for (auto &move : moves)
-	{
-		counter++;
-		if (counter == index)
-		{
-			start = move.start;
-			end	  = move.end;
-			type  = move.type;
-			break;
-		}
-	}
+	PossibleMove tmpMove = moves.at(index);
 
-	if ((start != Position{-1, -1}) && (end != Position{-1, -1}) && (type != MoveType::None))
-	{
-		PositionInstance startPos	= MapToPositionInstance(start);
-		PositionInstance endPos		= MapToPositionInstance(end);
+	if (tmpMove.isEmpty())
+		return false;
 
-		possibleMoveInstance->start = startPos;
-		possibleMoveInstance->end	= endPos;
-		possibleMoveInstance->type	= static_cast<MoveTypeInstance>(type);
-		return true;
-	}
-	return false;
+	PositionInstance startPos	= MapToPositionInstance(tmpMove.start);
+	PositionInstance endPos		= MapToPositionInstance(tmpMove.end);
+
+	possibleMoveInstance->start = startPos;
+	possibleMoveInstance->end	= endPos;
+	possibleMoveInstance->type	= static_cast<MoveTypeInstance>(tmpMove.type);
+	return true;
 }
 
 

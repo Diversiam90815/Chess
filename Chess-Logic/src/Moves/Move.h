@@ -48,6 +48,7 @@ struct PossibleMove
 	PieceType promotionPiece = PieceType::DefaultType;
 
 	bool	  operator==(const PossibleMove &other) const { return this->start == other.start && this->end == other.end; }
+	bool	  isEmpty() const { return start == Position{-1, -1} && end == Position{-1, -1}; }
 };
 
 
