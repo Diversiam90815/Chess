@@ -25,8 +25,6 @@ namespace Chess_UI.ViewModels
 
         private const int MovesMaxColumns = 3;
 
-        private Controller Controller;
-
         public ObservableCollection<ObservableCollection<string>> MoveHistoryColumns { get; } = [];
 
         public ObservableCollection<BoardSquare> Board { get; set; }
@@ -40,24 +38,23 @@ namespace Chess_UI.ViewModels
         private readonly ThemeManager themeManager;
 
 
-        public ChessBoardViewModel(DispatcherQueue dispatcherQueue, Controller controller, ThemeManager themeManager)
+        public ChessBoardViewModel(DispatcherQueue dispatcherQueue, ThemeManager themeManager)
         {
             this.DispatcherQueue = dispatcherQueue;
-            this.Controller = controller;
             this.themeManager = themeManager;
 
-            ScoreViewModel = new(DispatcherQueue, controller);
+            ScoreViewModel = new(DispatcherQueue);
 
-            Controller.ExecutedMove += OnExecutedMove;
-            Controller.PossibleMovesCalculated += OnHighlightPossibleMoves;
-            Controller.PlayerChanged += OnHandlePlayerChanged;
-            //Controller.GameStateChanged += OnHandleGameStateChanged;
-            Controller.MoveHistoryUpdated += OnHandleMoveHistoryUpdated;
-            Controller.PlayerCapturedPieceEvent += ScoreViewModel.OnPlayerCapturedPiece;
-            Controller.PlayerScoreUpdated += ScoreViewModel.OnPlayerScoreUpdated;
+            //Controller.ExecutedMove += OnExecutedMove;
+            //Controller.PossibleMovesCalculated += OnHighlightPossibleMoves;
+            //Controller.PlayerChanged += OnHandlePlayerChanged;
+            ////Controller.GameStateChanged += OnHandleGameStateChanged;
+            //Controller.MoveHistoryUpdated += OnHandleMoveHistoryUpdated;
+            //Controller.PlayerCapturedPieceEvent += ScoreViewModel.OnPlayerCapturedPiece;
+            //Controller.PlayerScoreUpdated += ScoreViewModel.OnPlayerScoreUpdated;
             this.themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
-            Controller.MovePawnPromotionEvent += OnPromotionPiece; 
+            //Controller.MovePawnPromotionEvent += OnPromotionPiece; 
 
             this.CurrentBoardTheme = themeManager.CurrentBoardTheme;
 

@@ -45,7 +45,7 @@ bool GameManager::init()
 	mLog.initLogging();
 	mUserSettings.init();
 
-	mUiCommunicationLayer = std::make_unique<UICommunication>();
+	mUiCommunicationLayer = std::make_shared<UICommunication>();
 
 	mChessBoard			  = std::make_shared<ChessBoard>();
 

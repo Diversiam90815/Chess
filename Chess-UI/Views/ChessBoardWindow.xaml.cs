@@ -26,7 +26,7 @@ namespace Chess_UI.Views
         private readonly ThemeManager themeManager;
 
 
-        public ChessBoardWindow(ChessBoardViewModel viewModel, Controller controller, ThemeManager themeManager)
+        public ChessBoardWindow(ChessBoardViewModel viewModel, ThemeManager themeManager)
         {
             this.InitializeComponent();
             DispatcherQueue = DispatcherQueue.GetForCurrentThread();

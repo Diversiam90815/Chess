@@ -156,13 +156,11 @@ namespace Chess_UI.Services
         public enum DelegateMessage
         {
             PlayerHasWon = 1,
-            InitiateMove,
-            PlayerScoreUpdate,
-            PlayerCapturedPiece,
-            MoveExecuted,
-            PlayerChanged,
-            GameStateChanged,
-            MoveHistoryAdded
+            PlayerScoreUpdate = 2,
+            PlayerCapturedPiece = 3,
+            PlayerChanged = 4,
+            GameStateChanged = 5,
+            MoveHistoryAdded = 6
         }
 
         #endregion  // Delegate

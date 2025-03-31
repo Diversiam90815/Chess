@@ -18,14 +18,13 @@
 enum class MessageType
 {
 	PlayerHasWon		= 1,
-	InitiateMove		= 2,
-	PlayerScoreUpdated	= 3,
-	PlayerCapturedPiece = 4,
-	MoveExecuted		= 5,
-	PlayerChanged		= 6,
-	GameStateChanged	= 7,
-	MoveHistoryAdded	= 8
+	PlayerScoreUpdated	= 2,
+	PlayerCapturedPiece = 3,
+	PlayerChanged		= 4,
+	GameStateChanged	= 5,
+	MoveHistoryAdded	= 6
 };
+
 
 struct PlayerCapturedPieceEvent
 {

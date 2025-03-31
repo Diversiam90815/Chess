@@ -17,8 +17,6 @@ namespace Chess_UI.ViewModels
 
         private readonly DispatcherQueue DispatcherQueue;
 
-        private Controller Controller;
-
         private Dictionary<PieceTypeInstance, int> whiteCapturedPieces = new Dictionary<PieceTypeInstance, int>
     {
         { PieceTypeInstance.Pawn, 0 },
@@ -39,10 +37,9 @@ namespace Chess_UI.ViewModels
 
 
 
-        public ScoreViewModel(DispatcherQueue dispatcherQueue, Controller controller)
+        public ScoreViewModel(DispatcherQueue dispatcherQueue)
         {
             this.DispatcherQueue = dispatcherQueue;
-            this.Controller = controller;
         }
 
 
