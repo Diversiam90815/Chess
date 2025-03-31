@@ -82,16 +82,16 @@ void StateMachine::onSquareSelected(const Position &pos)
 		{
 			mCurrentPossibleMove.start = pos;
 			gameStateChanged(GameState::MoveInitiated);
-			mEventTriggered = true;							   // Set it directly, since we have the lock
+			//mEventTriggered = true;							   // Set it directly, since we have the lock
 		}
 		else if (mCurrentState == GameState::WaitingForTarget) // Selected End Position
 		{
 			mCurrentPossibleMove.end = pos;
 			gameStateChanged(GameState::ValidatingMove);
-			triggerEvent();
+			//triggerEvent();
 		}
 	}
-	cv.notify_all();
+	//cv.notify_all();
 }
 
 
@@ -104,7 +104,7 @@ void StateMachine::onPawnPromotionChosen(PieceType promotion)
 		mAwaitingPromotion = false;
 	}
 	gameStateChanged(GameState::ExecutingMove);
-	cv.notify_all();
+	//cv.notify_all();
 }
 
 

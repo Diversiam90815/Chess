@@ -69,8 +69,8 @@ void GameManager::startGame()
 {
 	clearState();
 
-	mChessBoard->initializeBoard();			 // Reset the board
-	changeCurrentPlayer(PlayerColor::White); // Setting the player at the end, since this will trigger the move calculation
+	mChessBoard->initializeBoard(); // Reset the board
+									// changeCurrentPlayer(PlayerColor::White); // Setting the player at the end, since this will trigger the move calculation
 }
 
 
@@ -146,7 +146,14 @@ bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 void GameManager::switchTurns()
 {
 	// setCurrentMoveState(MoveState::NoMove);
-	mMovesGeneratedForCurrentTurn = false; // Reset flag for the new turn
+	mMovesGeneratedForCurrentTurn = false;			// Reset flag for the new turn
+
+	if (getCurrentPlayer() == PlayerColor::NoColor) // We are in init state and set the first round's player : white
+	{
+		LOG_INFO("Since we setup the game now, we select the white player as the current player!");
+		changeCurrentPlayer(PlayerColor::White);
+		return;
+	}
 
 	if (getCurrentPlayer() == PlayerColor::White)
 	{
