@@ -45,5 +45,8 @@ namespace Chess_UI.Models
         {
             // Call onPawnPromotionChosen via API
         }
+
+        public delegate void PossibleMovesCalculatedDelegate();
+        public event PossibleMovesCalculatedDelegate PossibleMovesCalculated;
     }
 }

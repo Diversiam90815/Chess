@@ -12,7 +12,23 @@ namespace Chess_UI.Services
     {
         private GCHandle _delegateHandle;
 
-        public void SetDelegate()
+
+        public void Init()
+        {
+            ChessLogicAPI.SetUnvirtualizedAppDataPath(Project.AppDataDirectory);
+            ChessLogicAPI.Init();
+            SetDelegate();
+        }
+
+
+        public void Deinit()
+        {
+            ChessLogicAPI.Deinit();
+            _delegateHandle.Free();
+        }
+
+
+        private void SetDelegate()
         {
             APIDelegate mDelegate = new(DelegateHandler);
             _delegateHandle = GCHandle.Alloc(mDelegate);

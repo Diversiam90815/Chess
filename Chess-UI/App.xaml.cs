@@ -43,15 +43,14 @@ namespace Chess_UI
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            ChessLogicAPI.SetUnvirtualizedAppDataPath(Project.AppDataDirectory);
-
-            ChessLogicAPI.Init();
+            ChessLogicCommunicationLayer = new ChessLogicCommunicationLayer();
+            ChessLogicCommunicationLayer.Init();
 
             MainMenu = new MainMenuWindow();
 
             MainMenu.Closed += (sender, args) =>
             {
-                ChessLogicAPI.Deinit();
+                ChessLogicCommunicationLayer.Deinit();
             };
 
             MainMenu.Activate();
@@ -60,5 +59,7 @@ namespace Chess_UI
         }
 
         private Window MainMenu;
+
+        public ChessLogicCommunicationLayer ChessLogicCommunicationLayer { get; private set; }
     }
 }

@@ -393,6 +393,7 @@ namespace Chess_UI.ViewModels
 
         #endregion
 
+
         #region Score Values
 
         private int whiteScoreValue = 0;

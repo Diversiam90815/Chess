@@ -13,6 +13,7 @@ using Windows.UI.Popups;
 using Microsoft.UI.Xaml;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Chess_UI.Models;
 
 
 namespace Chess_UI.ViewModels
@@ -37,6 +38,10 @@ namespace Chess_UI.ViewModels
 
         private readonly ThemeManager themeManager;
 
+        private MoveModel MoveModel;
+
+        private BoardModel BoardModel;
+
 
         public ChessBoardViewModel(DispatcherQueue dispatcherQueue, ThemeManager themeManager)
         {
@@ -44,6 +49,8 @@ namespace Chess_UI.ViewModels
             this.themeManager = themeManager;
 
             ScoreViewModel = new(DispatcherQueue);
+            MoveModel = new();
+            BoardModel = new();
 
             //Controller.ExecutedMove += OnExecutedMove;
             //Controller.PossibleMovesCalculated += OnHighlightPossibleMoves;
@@ -78,7 +85,7 @@ namespace Chess_UI.ViewModels
 
         public void LoadBoardFromNative()
         {
-            var boardState = Controller.GetBoardStateFromNative();
+            var boardState = BoardModel.GetBoardStateFromNative();
 
             for (int i = 0; i < boardState.Length; i++)
             {
@@ -170,7 +177,7 @@ namespace Chess_UI.ViewModels
             var promotionPiece = await RequestPawnPromotionAsync();
             if (promotionPiece.HasValue)
             {
-                Controller.SetPromotionPieceType(promotionPiece.Value);
+                MoveModel.SetPromotionPieceType(promotionPiece.Value);
             }
             else
             {
@@ -293,7 +300,7 @@ namespace Chess_UI.ViewModels
         {
             ResetHighlightsOnBoard();
 
-            foreach (var pm in Controller.PossibleMoves)
+            foreach (var pm in MoveModel.PossibleMoves)
             {
                 // we invert row with (7 - rowUI) in your code, so be consistent.
                 var targetX = pm.end.x;
@@ -323,7 +330,7 @@ namespace Chess_UI.ViewModels
         {
             ChessLogicAPI.UndoMove();
             LoadBoardFromNative();
-            Controller.MoveHistory.Remove(Controller.MoveHistory.LastOrDefault());
+            MoveModel.MoveHistory.Remove(MoveModel.MoveHistory.LastOrDefault());
             OnHandleMoveHistoryUpdated();
         }
 
@@ -411,7 +418,7 @@ namespace Chess_UI.ViewModels
         {
             ClearMoveHistory();
 
-            foreach (var moveNotation in Controller.MoveHistory)
+            foreach (var moveNotation in MoveModel.MoveHistory)
             {
                 AddMove(moveNotation);
             }

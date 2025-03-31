@@ -40,7 +40,7 @@ namespace Chess_UI
 
             ViewModel = new MainMenuViewModel(DispatcherQueue);
             SettingsViewModel = new SettingsViewModel(DispatcherQueue, themeManager);
-            ChessBoardViewModel = new ChessBoardViewModel(DispatcherQueue, this.ViewModel.Controller, themeManager);
+            ChessBoardViewModel = new ChessBoardViewModel(DispatcherQueue, themeManager);
 
             this.RootGrid.DataContext = ViewModel;
 
@@ -95,7 +95,7 @@ namespace Chess_UI
             if (ChessBoardWindow == null)
             {
                 ChessBoardViewModel.ResetGame();
-                ChessBoardWindow = new ChessBoardWindow(ChessBoardViewModel, this.ViewModel.Controller, themeManager);
+                ChessBoardWindow = new ChessBoardWindow(ChessBoardViewModel, themeManager);
                 ChessBoardWindow.Activate();
                 ChessBoardWindow.Closed += BoardWindowClosed;
                 this.AppWindow.Hide();
