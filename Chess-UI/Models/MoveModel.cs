@@ -6,14 +6,48 @@ using System.Text;
 using System.Threading.Tasks;
 using static Chess_UI.Services.ChessLogicAPI;
 
+
 namespace Chess_UI.Models
 {
     public class MoveModel
     {
         public List<PossibleMoveInstance> PossibleMoves;
 
-        public List<string> MoveHistory = new();
+        //public List<string> MoveHistory = new();
 
+        public MoveModel()
+        {
+            var logicCommunication = App.Current.ChessLogicCommunication as ChessLogicCommunicationLayer;
+            logicCommunication.GameStateChanged += HandleGameStateChanged;
+        }
+
+
+        private void HandleGameStateChanged(GameState gameState)
+        {
+            switch (gameState)
+            {
+                case GameState.WaitingForInput:
+                    {
+
+                        break;
+                    }
+                case GameState.MoveInitiated:
+                    {
+                        HandleInitiatedMove();
+                        break;
+                    }
+                case GameState.ValidatingMove:
+                    {
+                        break;
+                    }
+                case GameState.GameOver:
+                    {
+                        break;
+                    }
+                default:
+                    break;
+            }
+        }
 
 
         private void HandleInitiatedMove()
@@ -35,16 +69,17 @@ namespace Chess_UI.Models
         }
 
 
-        private void UpdateMoveHistory(string notation)
-        {
-            MoveHistory.Add(notation);
-        }
+        //private void UpdateMoveHistory(string moveNotation)
+        //{
+        //    MoveHistory.Add(moveNotation);
+        //}
 
 
         public void SetPromotionPieceType(PieceTypeInstance pieceType)
         {
             // Call onPawnPromotionChosen via API
         }
+
 
         public delegate void PossibleMovesCalculatedDelegate();
         public event PossibleMovesCalculatedDelegate PossibleMovesCalculated;

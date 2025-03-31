@@ -1,13 +1,61 @@
-﻿using System;
+﻿using Chess_UI.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Chess_UI.Services.ChessLogicAPI;
 
 namespace Chess_UI.Models
 {
     public class ScoreModel
     {
+
+        public Dictionary<PieceTypeInstance, int> whiteCapturedPieces = new Dictionary<PieceTypeInstance, int>
+    {
+        { PieceTypeInstance.Pawn, 0 },
+        { PieceTypeInstance.Bishop, 0 },
+        { PieceTypeInstance.Knight, 0 },
+        { PieceTypeInstance.Rook, 0 },
+        { PieceTypeInstance.Queen, 0 }
+    };
+
+        public Dictionary<PieceTypeInstance, int> blackCapturedPieces = new Dictionary<PieceTypeInstance, int>
+    {
+        { PieceTypeInstance.Pawn, 0 },
+        { PieceTypeInstance.Bishop, 0 },
+        { PieceTypeInstance.Knight, 0 },
+        { PieceTypeInstance.Rook, 0 },
+        { PieceTypeInstance.Queen, 0 }
+    };
+
+
+        public ScoreModel()
+        {
+            var logicCommunication = App.Current.ChessLogicCommunication as ChessLogicCommunicationLayer;
+            logicCommunication.PlayerCapturedPieceEvent += OnPlayerCapturedPiece;
+            logicCommunication.PlayerScoreUpdated += HandlePlayerScoreUpdated;
+
+        }
+
+        public void Init()
+        { }
+
+
+
+        private void OnPlayerCapturedPiece(PlayerCapturedPiece captureEvent)
+        {
+
+        }
+
+
+        private void HandlePlayerScoreUpdated(Score score)
+        {
+
+
+        }
+
+
 
     }
 }

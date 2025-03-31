@@ -24,9 +24,9 @@ namespace Chess_UI.ViewModels
 
         private readonly DispatcherQueue DispatcherQueue;
 
-        private const int MovesMaxColumns = 3;
+        //private const int MovesMaxColumns = 3;
 
-        public ObservableCollection<ObservableCollection<string>> MoveHistoryColumns { get; } = [];
+        //public ObservableCollection<ObservableCollection<string>> MoveHistoryColumns { get; } = [];
 
         public ObservableCollection<BoardSquare> Board { get; set; }
 
@@ -35,6 +35,7 @@ namespace Chess_UI.ViewModels
         public event Func<Task<PieceTypeInstance?>> ShowPawnPromotionDialogRequested;
 
         public ScoreViewModel ScoreViewModel { get; }
+        public MoveHistoryViewModel MoveHistoryViewModel { get; set; }
 
         private readonly ThemeManager themeManager;
 
@@ -74,10 +75,10 @@ namespace Chess_UI.ViewModels
                 Board.Add(new(dispatcherQueue, themeManager));
             }
 
-            for (int i = 0; i < MovesMaxColumns; i++)
-            {
-                MoveHistoryColumns.Add(new ObservableCollection<string>());
-            }
+            //for (int i = 0; i < MovesMaxColumns; i++)
+            //{
+            //    MoveHistoryColumns.Add(new ObservableCollection<string>());
+            //}
 
             //LoadBoardFromNative();
         }
@@ -120,7 +121,7 @@ namespace Chess_UI.ViewModels
         public void ResetGame()
         {
             ChessLogicAPI.ResetGame();
-            ClearMoveHistory();
+            MoveHistoryViewModel.ClearMoveHistory();
 
             Board.Clear();
             for (int i = 0; i < BOARD_SIZE * BOARD_SIZE; i++)
@@ -139,22 +140,22 @@ namespace Chess_UI.ViewModels
         }
 
 
-        public void AddMove(string move)
-        {
-            // Find the column with the least number of moves
-            var minColumn = MoveHistoryColumns.OrderBy(col => col.Count).First();
-            minColumn.Add(move);
-        }
+        //public void AddMove(string move)
+        //{
+        //    // Find the column with the least number of moves
+        //    var minColumn = MoveHistoryColumns.OrderBy(col => col.Count).First();
+        //    minColumn.Add(move);
+        //}
 
 
-        public void ClearMoveHistory()
-        {
-            MoveHistoryColumns.Clear();
-            for (int i = 0; i < MovesMaxColumns; i++)
-            {
-                MoveHistoryColumns.Add(new ObservableCollection<string>());
-            }
-        }
+        //public void ClearMoveHistory()
+        //{
+        //    MoveHistoryColumns.Clear();
+        //    for (int i = 0; i < MovesMaxColumns; i++)
+        //    {
+        //        MoveHistoryColumns.Add(new ObservableCollection<string>());
+        //    }
+        //}
 
 
         private void OnThemeManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -330,8 +331,7 @@ namespace Chess_UI.ViewModels
         {
             ChessLogicAPI.UndoMove();
             LoadBoardFromNative();
-            MoveModel.MoveHistory.Remove(MoveModel.MoveHistory.LastOrDefault());
-            OnHandleMoveHistoryUpdated();
+            MoveHistoryViewModel.RemoveLastMove();
         }
 
 
@@ -414,15 +414,15 @@ namespace Chess_UI.ViewModels
         //}
 
 
-        private void OnHandleMoveHistoryUpdated()
-        {
-            ClearMoveHistory();
+        //private void OnHandleMoveHistoryUpdated()
+        //{
+        //    ClearMoveHistory();
 
-            foreach (var moveNotation in MoveModel.MoveHistory)
-            {
-                AddMove(moveNotation);
-            }
-        }
+        //    foreach (var moveNotation in MoveModel.MoveHistory)
+        //    {
+        //        AddMove(moveNotation);
+        //    }
+        //}
 
 
         #region Current Move

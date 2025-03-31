@@ -87,7 +87,7 @@ namespace Chess_UI.Services
         private void HandleMoveNotationAdded(nint data)
         {
             string notation = Marshal.PtrToStringUTF8(data);
-            MoveHistoryUpdated?.Invoke();
+            MoveHistoryUpdated?.Invoke(notation);
         }
 
 
@@ -129,7 +129,7 @@ namespace Chess_UI.Services
         // Define the delegate
         public delegate void PlayerChangedHandler(PlayerColor player);
         public delegate void GameStateChangedHandler(GameState state);
-        public delegate void MoveHistoryUpdatedHandler();
+        public delegate void MoveHistoryUpdatedHandler(string moveNotation);
         public delegate void PlayerCaputeredPieceHandler(PlayerCapturedPiece capturedPiece);
         public delegate void PlayerScoreUpdatedHandler(Score score);
 

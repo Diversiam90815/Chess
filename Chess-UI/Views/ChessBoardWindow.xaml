@@ -109,7 +109,7 @@
 
                     <!-- Moves with Wrapping Columns -->
                     <ScrollViewer Grid.Row="1" Margin="8,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl x:Name="MovesColumns" ItemsSource="{x:Bind ViewModel.MoveHistoryColumns, Mode=OneWay}" Background="#1E1E21" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <ItemsControl x:Name="MovesColumns" ItemsSource="{x:Bind ViewModel.MoveHistoryViewModel.MoveHistoryColumns, Mode=OneWay}" Background="#1E1E21" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Orientation="Horizontal"/>
