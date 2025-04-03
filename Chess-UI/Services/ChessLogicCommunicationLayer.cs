@@ -41,9 +41,9 @@ namespace Chess_UI.Services
             DelegateMessage delegateMessage = (DelegateMessage)message;
             switch (delegateMessage)
             {
-                case DelegateMessage.PlayerHasWon:
+                case DelegateMessage.EndGameState:
                     {
-                        HandleWinner(data);
+                        HandleEndGameState(data);
                         break;
                     }
                 case DelegateMessage.PlayerScoreUpdate:
@@ -100,12 +100,11 @@ namespace Chess_UI.Services
         }
 
 
-        private void HandleWinner(nint data)
+        private void HandleEndGameState(nint data)
         {
-            int player = Marshal.ReadInt32(data);
-            PlayerColor winner = (PlayerColor)player;
-
-            // set winner through event trigger
+            int endGame = Marshal.ReadInt32(data);
+            EndGameState state = (EndGameState)endGame;
+            EndGameStateEvent?.Invoke(state);
         }
 
 
@@ -126,19 +125,23 @@ namespace Chess_UI.Services
 
         #region ViewModel Delegates
 
-        // Define the delegate
         public delegate void PlayerChangedHandler(PlayerColor player);
-        public delegate void GameStateChangedHandler(GameState state);
-        public delegate void MoveHistoryUpdatedHandler(string moveNotation);
-        public delegate void PlayerCaputeredPieceHandler(PlayerCapturedPiece capturedPiece);
-        public delegate void PlayerScoreUpdatedHandler(Score score);
-
-        // define the event
         public event PlayerChangedHandler PlayerChanged;
+
+        public delegate void GameStateChangedHandler(GameState state);
         public event GameStateChangedHandler GameStateChanged;
+
+        public delegate void MoveHistoryUpdatedHandler(string moveNotation);
         public event MoveHistoryUpdatedHandler MoveHistoryUpdated;
+
+        public delegate void PlayerCaputeredPieceHandler(PlayerCapturedPiece capturedPiece);
         public event PlayerCaputeredPieceHandler PlayerCapturedPieceEvent;
+
+        public delegate void PlayerScoreUpdatedHandler(Score score);
         public event PlayerScoreUpdatedHandler PlayerScoreUpdated;
+
+        public delegate void EndGameStateHandler(EndGameState state);
+        public event EndGameStateHandler EndGameStateEvent;
 
         #endregion
 

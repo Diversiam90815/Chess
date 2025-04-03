@@ -43,7 +43,8 @@ void UICommunication::onRemoveLastCapturedPiece(PlayerColor player, PieceType ca
 
 void UICommunication::onExecuteMove()
 {
-	communicateToUI(MessageType::MoveExecuted, nullptr);
+	GameState state = GameState::ExecutingMove;
+	communicateToUI(MessageType::GameStateChanged, &state);
 }
 
 
@@ -74,7 +75,7 @@ void UICommunication::onGameStateChanged(GameState state)
 
 void UICommunication::onEndGame(EndGameState state, PlayerColor winner)
 {
-	communicateToUI(MessageType::PlayerHasWon, &winner);
+	communicateToUI(MessageType::EndGameState, &state);
 }
 
 

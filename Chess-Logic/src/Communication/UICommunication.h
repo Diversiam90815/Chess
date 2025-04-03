@@ -17,7 +17,7 @@
 
 enum class MessageType
 {
-	PlayerHasWon		= 1,
+	EndGameState		= 1,
 	PlayerScoreUpdated	= 2,
 	PlayerCapturedPiece = 3,
 	PlayerChanged		= 4,

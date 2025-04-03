@@ -18,7 +18,7 @@ namespace Chess_UI.ViewModels
 
         private readonly DispatcherQueue DispatcherQueue;
 
-        private ScoreModel ScoreModel;
+        private readonly ScoreModel ScoreModel;
 
 
         public ScoreViewModel(DispatcherQueue dispatcherQueue)
@@ -26,6 +26,9 @@ namespace Chess_UI.ViewModels
             this.DispatcherQueue = dispatcherQueue;
             ScoreModel = new ScoreModel();
             ScoreModel.Init();
+
+            ScoreModel.PlayerCapturedPiece += OnPlayerCapturedPiece;
+            ScoreModel.PlayerScoreUpdated += OnPlayerScoreUpdated;
         }
 
 

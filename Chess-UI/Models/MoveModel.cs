@@ -11,14 +11,15 @@ namespace Chess_UI.Models
 {
     public class MoveModel
     {
-        public List<PossibleMoveInstance> PossibleMoves;
+        public List<PossibleMoveInstance> PossibleMoves = [];
 
-        //public List<string> MoveHistory = new();
 
         public MoveModel()
         {
             var logicCommunication = App.Current.ChessLogicCommunication as ChessLogicCommunicationLayer;
             logicCommunication.GameStateChanged += HandleGameStateChanged;
+            logicCommunication.PlayerChanged += HandlePlayerChanged;
+            logicCommunication.EndGameStateEvent += HandleEndGameState;
         }
 
 
@@ -28,7 +29,6 @@ namespace Chess_UI.Models
             {
                 case GameState.WaitingForInput:
                     {
-
                         break;
                     }
                 case GameState.MoveInitiated:
@@ -40,8 +40,17 @@ namespace Chess_UI.Models
                     {
                         break;
                     }
+                case GameState.ExecutingMove:
+                    {
+                        break;
+                    }
                 case GameState.GameOver:
                     {
+                        break;
+                    }
+                case GameState.PawnPromotion:
+                    {
+                        PawnPromotionEvent?.Invoke();
                         break;
                     }
                 default:
@@ -50,11 +59,16 @@ namespace Chess_UI.Models
         }
 
 
+        public void HandleEndGameState(EndGameState endgame)
+        {
+            GameOverEvent?.Invoke(endgame);
+        }
+
+
         private void HandleInitiatedMove()
         {
             Logger.LogInfo("Due to delegate message initiateMove we start getting the moves!");
 
-            PossibleMoves = new List<PossibleMoveInstance>();
             PossibleMoves.Clear();
 
             int numMoves = ChessLogicAPI.GetNumPossibleMoves();
@@ -69,19 +83,29 @@ namespace Chess_UI.Models
         }
 
 
-        //private void UpdateMoveHistory(string moveNotation)
-        //{
-        //    MoveHistory.Add(moveNotation);
-        //}
-
-
         public void SetPromotionPieceType(PieceTypeInstance pieceType)
         {
-            // Call onPawnPromotionChosen via API
+            Logger.LogInfo("Promoting to " + pieceType.ToString());
+            ChessLogicAPI.OnPawnPromotionChosen(pieceType);
+        }
+
+
+        public void HandlePlayerChanged(PlayerColor player)
+        {
+            PlayerChanged?.Invoke(player);
         }
 
 
         public delegate void PossibleMovesCalculatedDelegate();
         public event PossibleMovesCalculatedDelegate PossibleMovesCalculated;
+
+        public delegate void PlayerChangedHandler(PlayerColor newPlayer);
+        public event PlayerChangedHandler PlayerChanged;
+
+        public delegate void PawnPromotionEventhander();
+        public event PawnPromotionEventhander PawnPromotionEvent;
+
+        public delegate void GameOverEventHandler(EndGameState endgame);
+        public event GameOverEventHandler GameOverEvent;
     }
 }

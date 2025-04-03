@@ -11,7 +11,6 @@ namespace Chess_UI.ViewModels
 {
     public class MoveHistoryViewModel
     {
-
         private const int MovesMaxColumns = 3;
 
         public ObservableCollection<ObservableCollection<string>> MoveHistoryColumns { get; } = [];

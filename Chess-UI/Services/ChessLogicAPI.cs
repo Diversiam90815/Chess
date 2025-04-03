@@ -67,12 +67,6 @@ namespace Chess_UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "UndoMove", CharSet = CharSet.Unicode)]
         public static extern void UndoMove();
 
-        //[DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ChangeMoveState", CharSet = CharSet.Unicode)]
-        //public static extern void ChangeMoveState(int state);
-
-        //[DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "HandleMoveStateChanged", CharSet = CharSet.Unicode)]
-        //public static extern void HandleMoveStateChanged(PossibleMoveInstance move);
-
         #endregion // Game
 
 
@@ -155,7 +149,7 @@ namespace Chess_UI.Services
 
         public enum DelegateMessage
         {
-            PlayerHasWon = 1,
+            EndGameState = 1,
             PlayerScoreUpdate = 2,
             PlayerCapturedPiece = 3,
             PlayerChanged = 4,
@@ -253,12 +247,13 @@ namespace Chess_UI.Services
         }
 
 
-        //public enum MoveState
-        //{
-        //	NoMove = 1,
-        //	InitiateMove,
-        //	ExecuteMove
-        //}
+        public enum EndGameState
+        {
+            OnGoing = 1,
+            Checkmate = 2,
+            StaleMate = 3,
+            Reset = 4
+        };
 
 
         [Flags]

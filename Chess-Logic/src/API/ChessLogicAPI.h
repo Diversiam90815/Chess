@@ -36,9 +36,6 @@ extern "C"
 	CHESS_API void	HandleMoveStateChanged(const PossibleMoveInstance &moveInstance);
 
 
-	CHESS_API bool	GetBoardState(int *boardState);
-
-
 	CHESS_API void	OnSquareSelected(PositionInstance positionInstance);
 
 	CHESS_API void	OnPawnPromotionChosen(PieceTypeInstance promotionInstance);
@@ -49,6 +46,8 @@ extern "C"
 	CHESS_API void	ResetGame();
 
 	CHESS_API void	UndoMove();
+
+	CHESS_API int	GetEndgameState();
 
 
 	CHESS_API void	LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber);

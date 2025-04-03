@@ -45,17 +45,21 @@ namespace Chess_UI.Models
 
         private void OnPlayerCapturedPiece(PlayerCapturedPiece captureEvent)
         {
-
+            PlayerCapturedPiece?.Invoke(captureEvent);
         }
 
 
         private void HandlePlayerScoreUpdated(Score score)
         {
-
-
+            PlayerScoreUpdated?.Invoke(score);
         }
 
 
+        public delegate void PlayerCapturedPieceHandler(PlayerCapturedPiece captureEvent);
+        public event PlayerCapturedPieceHandler PlayerCapturedPiece;
+
+        public delegate void PlayerScoreUpdatedHandler(Score score);
+        public event PlayerScoreUpdatedHandler PlayerScoreUpdated;
 
     }
 }
