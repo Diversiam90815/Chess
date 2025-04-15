@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.0.0.309)
+set(CHESS_VERSION 1.0.0.330)
 
 project(Chess-Logic VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
@@ -216,7 +216,7 @@ set(LOGGER_INCLUDE_FILE   ${SUBMODULES_DIR}/Logger/include)
 
 set(BOOST_ROOT ${SUBMODULES_DIR}/boost)
 set(Boost_INCLUDE_DIR ${SUBMODULES_DIR}/boost)
-find_package(Boost REQUIRED thread system)
+find_package(Boost REQUIRED thread system atomic)
 
 
 # NLOHMANN JSON
@@ -298,6 +298,7 @@ set(PROJECT_LIBS    Logger
 					Boost::boost
 					Boost::thread
 					Boost::system
+					Boost::atomic
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_LIBS})
