@@ -190,7 +190,7 @@ CHESS_API void UndoMove()
 }
 
 
-CHESS_API bool GetBoardState(it();nt *boardState)
+CHESS_API bool GetBoardState(int *boardState)
 {
 	if (!boardState)
 		return false;
