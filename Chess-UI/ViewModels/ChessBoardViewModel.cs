@@ -45,6 +45,8 @@ namespace Chess_UI.ViewModels
             this.DispatcherQueue = dispatcherQueue;
             this.themeManager = themeManager;
 
+            MoveHistoryViewModel = new();
+
             ScoreViewModel = new(DispatcherQueue);
             MoveModel = new();
             BoardModel = new();
@@ -217,13 +219,6 @@ namespace Chess_UI.ViewModels
         private void OnEndGameState(EndGameState state)
         {
             ShowEndGameDialog?.Invoke(state);
-        }
-
-
-        private void OnExecutedMove()
-        {
-            LoadBoardFromNative();
-            //CurrentMoveState = MoveState.NoMove;
         }
 
 

@@ -15,13 +15,14 @@ namespace Chess_UI
 
         public App()
         {
+            ChessLogicCommunication = new ChessLogicCommunicationLayer();
+            Current = this;
             this.InitializeComponent();
         }
 
 
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            ChessLogicCommunication = new ChessLogicCommunicationLayer();
             ChessLogicCommunication.Init();
 
             MainMenu = new MainMenuWindow();

@@ -190,6 +190,13 @@ CHESS_API void UndoMove()
 }
 
 
+CHESS_API int GetEndgameState()
+{
+	// TODO
+	return 0;
+}
+
+
 CHESS_API bool GetBoardState(int *boardState)
 {
 	if (!boardState)

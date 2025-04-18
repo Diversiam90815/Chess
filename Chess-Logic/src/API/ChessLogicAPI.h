@@ -49,6 +49,8 @@ extern "C"
 
 	CHESS_API int	GetEndgameState();
 
+	CHESS_API bool	GetBoardState(int* boardstate);
+
 
 	CHESS_API void	LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber);
 
