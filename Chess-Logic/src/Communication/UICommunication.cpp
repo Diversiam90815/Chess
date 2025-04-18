@@ -10,6 +10,7 @@
 
 void UICommunication::setDelegate(PFN_CALLBACK pDelegate)
 {
+	std::lock_guard<std::mutex> lock(mDelegateMutex);
 	mDelegate = pDelegate;
 }
 
@@ -93,10 +94,18 @@ void UICommunication::onChangeCurrentPlayer(PlayerColor player)
 
 bool UICommunication::communicateToUI(MessageType type, void *message) const
 {
-	if (mDelegate)
+	PFN_CALLBACK delegate = nullptr;
 	{
-		mDelegate(static_cast<int>(type), message);
+		std::lock_guard<std::mutex> lock(mDelegateMutex);
+		delegate = mDelegate;
+	}
+
+	if (delegate)
+	{
+		delegate(static_cast<int>(type), message);
 		return true;
 	}
+
+	LOG_WARNING("Failed to communicate to UI. Error: Delegate is null");
 	return false;
 }

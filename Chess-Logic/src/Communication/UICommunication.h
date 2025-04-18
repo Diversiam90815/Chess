@@ -57,7 +57,8 @@ public:
 
 
 private:
-	bool		 communicateToUI(MessageType type, void *message) const;
+	bool			   communicateToUI(MessageType type, void *message) const;
 
-	PFN_CALLBACK mDelegate = nullptr;
+	PFN_CALLBACK	   mDelegate = nullptr;
+	mutable std::mutex mDelegateMutex;
 };
