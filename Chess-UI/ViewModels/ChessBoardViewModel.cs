@@ -46,7 +46,7 @@ namespace Chess_UI.ViewModels
             this.DispatcherQueue = dispatcherQueue;
             this.themeManager = themeManager;
 
-            MoveHistoryViewModel = new();
+            MoveHistoryViewModel = new(DispatcherQueue);
 
             ScoreViewModel = new(DispatcherQueue);
             MoveModel = new();

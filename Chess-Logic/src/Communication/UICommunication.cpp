@@ -56,15 +56,15 @@ void UICommunication::onAddToMoveHistory(Move &move)
 	size_t		bufferSize		 = (len + 1) * sizeof(char);
 	char	   *strCopy			 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
 
-	if (strCopy != nullptr)
-	{
-		HRESULT hr = StringCbCopyA(strCopy, bufferSize, numberedNotation.c_str());
+	if (!strCopy)
+		return;
 
-		if (SUCCEEDED(hr))
-		{
-			communicateToUI(MessageType::MoveHistoryAdded, strCopy);
-		}
-	}
+	HRESULT hr = StringCbCopyA(strCopy, bufferSize, numberedNotation.c_str());
+
+	if (!SUCCEEDED(hr))
+		return;
+
+	communicateToUI(MessageType::MoveHistoryAdded, strCopy);
 }
 
 

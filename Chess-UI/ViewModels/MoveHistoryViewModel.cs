@@ -1,10 +1,14 @@
 ﻿using Chess_UI.Models;
+using Chess_UI.Services;
+using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 
 namespace Chess_UI.ViewModels
@@ -17,14 +21,18 @@ namespace Chess_UI.ViewModels
 
         public MoveHistoryModel Model { get; } = new MoveHistoryModel();
 
+        private readonly Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue;
 
 
-        public MoveHistoryViewModel()
+        public MoveHistoryViewModel(DispatcherQueue dispatcher)
         {
+            DispatcherQueue = dispatcher;
+
             for (int i = 0; i < MovesMaxColumns; i++)
             {
                 MoveHistoryColumns.Add(new ObservableCollection<string>());
             }
+            Model.MoveHistoryUpdated += OnHandleMoveHistoryUpdated;
         }
 
 
@@ -32,23 +40,35 @@ namespace Chess_UI.ViewModels
         {
             // Find the column with the least number of moves
             var minColumn = MoveHistoryColumns.OrderBy(col => col.Count).First();
-            minColumn.Add(move);
+
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                minColumn.Add(move);
+            });
         }
 
 
         public void ClearMoveHistory()
         {
-            MoveHistoryColumns.Clear();
-            for (int i = 0; i < MovesMaxColumns; i++)
+            DispatcherQueue.TryEnqueue(() =>
             {
-                MoveHistoryColumns.Add(new ObservableCollection<string>());
-            }
+                foreach (var column in MoveHistoryColumns)
+                {
+                    column.Clear();
+                }
+
+                for (int i = 0; i < MovesMaxColumns; i++)
+                {
+                    MoveHistoryColumns.Add([]);
+                }
+            });
+
         }
 
 
         public void RemoveLastMove()
         {
-            Model.MoveHistory.Remove(Model.MoveHistory.LastOrDefault());
+            Model.RemoveLastMove();
             OnHandleMoveHistoryUpdated();
         }
 
