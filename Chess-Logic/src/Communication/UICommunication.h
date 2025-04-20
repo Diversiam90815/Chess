@@ -52,8 +52,6 @@ public:
 	void onGameStateChanged(GameState state) override;
 	void onEndGame(EndGameState state, PlayerColor winner) override;
 	void onChangeCurrentPlayer(PlayerColor player) override;
-	// void onMoveStateInitiated() override;
-
 
 
 private:

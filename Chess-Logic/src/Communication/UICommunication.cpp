@@ -85,12 +85,6 @@ void UICommunication::onChangeCurrentPlayer(PlayerColor player)
 	communicateToUI(MessageType::PlayerChanged, &player);
 }
 
-//
-// void UICommunication::onMoveStateInitiated()
-//{
-//	communicateToUI(MessageType::InitiateMove, nullptr);
-//}
-
 
 bool UICommunication::communicateToUI(MessageType type, void *message) const
 {

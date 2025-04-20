@@ -52,14 +52,6 @@ enum class EndGameState
 };
 
 
-// enum class MoveState
-//{
-//	NoMove = 1,
-//	InitiateMove,
-//	ExecuteMove
-// };
-
-
 enum class GameState
 {
 	Undefined		 = 0,

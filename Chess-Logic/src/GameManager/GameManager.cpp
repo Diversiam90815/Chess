@@ -70,7 +70,6 @@ void GameManager::startGame()
 	clearState();
 
 	mChessBoard->initializeBoard(); // Reset the board
-									// changeCurrentPlayer(PlayerColor::White); // Setting the player at the end, since this will trigger the move calculation
 }
 
 
@@ -78,7 +77,6 @@ void GameManager::clearState()
 {
 	changeCurrentPlayer(PlayerColor::NoColor);
 
-	// setCurrentMoveState(MoveState::NoMove);
 	mAllMovesForPosition.clear();
 	mMovesGeneratedForCurrentTurn = false; // Reset flag
 }
@@ -145,7 +143,6 @@ bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 
 void GameManager::switchTurns()
 {
-	// setCurrentMoveState(MoveState::NoMove);
 	mMovesGeneratedForCurrentTurn = false;			// Reset flag for the new turn
 
 	if (getCurrentPlayer() == PlayerColor::NoColor) // We are in init state and set the first round's player : white
@@ -271,21 +268,6 @@ void GameManager::undoMove()
 	switchTurns();
 }
 
-//
-// void GameManager::setCurrentMoveState(MoveState state)
-//{
-//	if (mCurrentMoveState != state)
-//	{
-//		mCurrentMoveState = state;
-//	}
-//}
-//
-//
-// MoveState GameManager::getCurrentMoveState() const
-//{
-//	return mCurrentMoveState;
-//}
-//
 
 void GameManager::resetGame()
 {
@@ -313,58 +295,8 @@ void GameManager::endGame(EndGameState state, PlayerColor player)
 
 std::optional<PlayerColor> GameManager::getWinner() const
 {
-	// if (mCurrentState == GameState::Checkmate)
-	//	return getCurrentPlayer() == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
-
-	// else if (mCurrentState == GameState::Stalemate)
-	//	return std::nullopt; // Draw in case of stalemate
-
 	return std::nullopt;
 }
-
-
-// void GameManager::handleMoveStateChanges(PossibleMove &move)
-//{
-//	switch (mCurrentMoveState)
-//	{
-//	case (MoveState::NoMove):
-//	{
-//		if (!mMovesGeneratedForCurrentTurn)
-//		{
-//			LOG_INFO("Move State is NoMove -> We start calculating this player's possible moves!");
-//			mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer());
-//			mMovesGeneratedForCurrentTurn = true;
-//		}
-//		break;
-//	}
-//
-//	case (MoveState::InitiateMove):
-//	{
-//		LOG_INFO("We started to initate a move with starting position {}", LoggingHelper::positionToString(move.start).c_str());
-//
-//		mAllMovesForPosition.clear();
-//
-//		auto possibleMoves = mMoveGeneration->getMovesForPosition(move.start);
-//
-//		mAllMovesForPosition.reserve(possibleMoves.size());
-//		mAllMovesForPosition = possibleMoves;
-//
-//		moveStateInitiated(); // Let the UI know the moves for current round are ready -> handling need to be refactored later!
-//
-//		LOG_INFO("Number of possible moves for the current position is {}", mAllMovesForPosition.size());
-//
-//		break;
-//	}
-//
-//	case (MoveState::ExecuteMove):
-//	{
-//		LOG_INFO("Executing the move now!");
-//		executeMove(move);
-//		break;
-//	}
-//	default: break;
-//	}
-// }
 
 
 bool GameManager::checkForValidMoves(const PossibleMove &move)
@@ -391,18 +323,6 @@ bool GameManager::checkForPawnPromotionMove(const PossibleMove &move)
 	}
 	return false;
 }
-
-//
-// void GameManager::moveStateInitiated()
-//{
-//	for (auto observer : mObservers)
-//	{
-//		if (observer)
-//		{
-//			observer->onMoveStateInitiated();
-//		}
-//	}
-//}
 
 
 std::vector<NetworkAdapter> GameManager::getNetworkAdapters()

@@ -82,16 +82,13 @@ void StateMachine::onSquareSelected(const Position &pos)
 		{
 			mCurrentPossibleMove.start = pos;
 			gameStateChanged(GameState::MoveInitiated);
-			// mEventTriggered = true;							   // Set it directly, since we have the lock
 		}
 		else if (getCurrentGameState() == GameState::WaitingForTarget) // Selected End Position
 		{
 			mCurrentPossibleMove.end = pos;
 			gameStateChanged(GameState::ValidatingMove);
-			// triggerEvent();
 		}
 	}
-	// cv.notify_all();
 }
 
 
@@ -104,7 +101,6 @@ void StateMachine::onPawnPromotionChosen(PieceType promotion)
 		mAwaitingPromotion = false;
 	}
 	gameStateChanged(GameState::ExecutingMove);
-	// cv.notify_all();
 }
 
 
@@ -314,8 +310,6 @@ void StateMachine::switchToNextState()
 	}
 	case GameState::WaitingForInput:
 	{
-		// gameStateChanged(GameState::MoveInitiated);
-
 		break;
 	}
 	case GameState::MoveInitiated:
@@ -332,10 +326,6 @@ void StateMachine::switchToNextState()
 	{
 		if (mIsValidMove)
 		{
-			// PossibleMove tmpMove{};
-			// tmpMove.start		 = mMoveStart;
-			// tmpMove.end			 = mMoveEnd;
-
 			bool isPawnPromotion = GameManager::GetInstance()->checkForPawnPromotionMove(mCurrentPossibleMove);
 
 			if (isPawnPromotion)
@@ -345,8 +335,6 @@ void StateMachine::switchToNextState()
 		}
 		else
 		{
-			// mMoveStart			 = {};
-			// mMoveEnd			 = {};
 			resetCurrentPossibleMove();
 			mWaitingForTargetEnd = false;
 			gameStateChanged(GameState::WaitingForInput);
@@ -358,8 +346,6 @@ void StateMachine::switchToNextState()
 		mEndgameState = GameManager::GetInstance()->checkForEndGameConditions();
 		if (isGameOngoing())
 		{
-			// mMoveStart			   = {};
-			// mMoveEnd			   = {};
 			resetCurrentPossibleMove();
 			mMovesCalulated		   = false;
 			mWaitingForTargetStart = false;
@@ -401,12 +387,7 @@ bool StateMachine::handleInitState(bool multiplayer)
 	// currently impl with no multiplayer
 	LOG_INFO("Handling init state");
 
-	// bool result = GameManager::GetInstance()->init();
-
-	// if (result)
-	{
-		GameManager::GetInstance()->startGame();
-	}
+	GameManager::GetInstance()->startGame();
 
 	return true;
 }
@@ -435,7 +416,6 @@ bool StateMachine::handleMoveInitiatedState()
 
 bool StateMachine::handleWaitingForTargetState()
 {
-	// GameManager::GetInstance()->moveStateInitiated();
 	return true;
 }
 

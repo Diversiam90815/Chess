@@ -14,7 +14,6 @@
 
 #include "Parameters.h"
 #include "Move.h"
-// #include "GameManager.h"
 #include "IObservable.h"
 
 

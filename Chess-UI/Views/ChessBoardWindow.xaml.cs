@@ -80,7 +80,6 @@ namespace Chess_UI.Views
 
         private void EndGame_Click(object sender, RoutedEventArgs e)
         {
-            //ViewModel.ResetGame();
             this.Close();
         }
 
