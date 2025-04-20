@@ -25,7 +25,6 @@ namespace Chess_UI.ViewModels
         {
             this.DispatcherQueue = dispatcherQueue;
             ScoreModel = new ScoreModel();
-            ScoreModel.Init();
 
             ScoreModel.PlayerCapturedPiece += OnPlayerCapturedPiece;
             ScoreModel.PlayerScoreUpdated += OnPlayerScoreUpdated;
@@ -54,6 +53,26 @@ namespace Chess_UI.ViewModels
             PieceTypeInstance type = piece.pieceType;
             bool captured = piece.captured;
             AlterCapturedPieces(player, type, captured);
+        }
+
+
+        public void ReinitScoreValues()
+        {
+            BlackScoreValue = 0;
+            BlackCapturedBishop = 0;
+            BlackCapturedKnight = 0;
+            BlackCapturedKnight = 0;
+            BlackCapturedQueen = 0;
+            BlackCapturedRook = 0;
+            BlackCapturedPawn = 0;
+            
+            WhiteScoreValue = 0;
+            WhiteCapturedBishop = 0;
+            WhiteCapturedKnight = 0;
+            WhiteCapturedKnight = 0;
+            WhiteCapturedQueen = 0;
+            WhiteCapturedRook = 0;
+            WhiteCapturedPawn = 0;
         }
 
 

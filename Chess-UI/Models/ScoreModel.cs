@@ -38,10 +38,6 @@ namespace Chess_UI.Models
 
         }
 
-        public void Init()
-        { }
-
-
 
         private void OnPlayerCapturedPiece(PlayerCapturedPiece captureEvent)
         {
