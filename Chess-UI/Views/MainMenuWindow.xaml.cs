@@ -95,7 +95,7 @@ namespace Chess_UI
         {
             if (ChessBoardWindow == null)
             {
-                ChessBoardViewModel.ResetGame();
+                //ChessBoardViewModel.ResetGame();
                 ChessBoardWindow = new ChessBoardWindow(ChessBoardViewModel, themeManager);
                 ChessBoardWindow.Activate();
                 ChessBoardWindow.Closed += BoardWindowClosed;

@@ -177,6 +177,8 @@ void StateMachine::triggerEvent()
 
 void StateMachine::resetGame()
 {
+	mWaitingForTargetStart = false;
+	mWaitingForTargetEnd   = false;
 	resetCurrentPossibleMove();
 	setCurrrentGameState(GameState::Undefined);
 	GameManager::GetInstance()->resetGame();
@@ -211,6 +213,11 @@ void StateMachine::run()
 
 			switchToNextState();
 
+			break;
+		}
+		case GameState::InitSucceeded:
+		{
+			switchToNextState();
 			break;
 		}
 		case GameState::WaitingForInput:
@@ -296,11 +303,15 @@ void StateMachine::switchToNextState()
 	{
 		if (isInitialized())
 		{
-			gameStateChanged(GameState::WaitingForInput);
+			gameStateChanged(GameState::InitSucceeded);
 		}
 		break;
 	}
-
+	case GameState::InitSucceeded:
+	{
+		gameStateChanged(GameState::WaitingForInput);
+		break;
+	}
 	case GameState::WaitingForInput:
 	{
 		// gameStateChanged(GameState::MoveInitiated);
@@ -390,14 +401,14 @@ bool StateMachine::handleInitState(bool multiplayer)
 	// currently impl with no multiplayer
 	LOG_INFO("Handling init state");
 
-	bool result = GameManager::GetInstance()->init();
+	// bool result = GameManager::GetInstance()->init();
 
-	if (result)
+	// if (result)
 	{
 		GameManager::GetInstance()->startGame();
 	}
 
-	return result;
+	return true;
 }
 
 

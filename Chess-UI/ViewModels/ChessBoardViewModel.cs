@@ -14,6 +14,7 @@ using Microsoft.UI.Xaml;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Chess_UI.Models;
+using System.Xml.Linq;
 
 
 namespace Chess_UI.ViewModels
@@ -53,8 +54,9 @@ namespace Chess_UI.ViewModels
 
             MoveModel.PossibleMovesCalculated += OnHighlightPossibleMoves;
             MoveModel.PlayerChanged += OnHandlePlayerChanged;
-
+            MoveModel.GameStateInitSucceeded += OnGameStateInitSucceeded;
             MoveModel.GameOverEvent += OnEndGameState;
+            MoveModel.NewBoardFromBackendEvent += OnBoardFromBackendUpdated;
 
             this.themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
@@ -100,8 +102,21 @@ namespace Chess_UI.ViewModels
 
                 // Now compute where in Board[] it should go, so that rowUI=7 is stored first and rowUI=0 last row
                 int index = (7 - rowUI) * BOARD_SIZE + col;
-                Board[index] = square;
+
+                DispatcherQueue.TryEnqueue(() =>
+                {
+                    Board[index] = square;
+                    OnPropertyChanged(nameof(Board));
+                });
             }
+        }
+
+        private void OnBoardFromBackendUpdated()
+        {
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                LoadBoardFromNative();
+            });
         }
 
 
@@ -116,13 +131,21 @@ namespace Chess_UI.ViewModels
                 Board.Add(new BoardSquare(DispatcherQueue, themeManager));
             }
 
+            //LoadBoardFromNative();
             //StartGame();
         }
 
 
         public void StartGame()
         {
-            ChessLogicAPI.StartGame();
+            ChessLogicAPI.StartGame();  // Start the game and thus the StateMachine
+            //LoadBoardFromNative();
+        }
+
+
+        public void OnGameStateInitSucceeded()
+        {
+            // Once the board is ready calculated, we load it from native
             LoadBoardFromNative();
         }
 

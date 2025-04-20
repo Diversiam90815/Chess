@@ -27,8 +27,14 @@ namespace Chess_UI.Models
         {
             switch (gameState)
             {
+                case GameState.InitSucceeded:
+                    {
+                        HandleInitSucceeded();
+                        break;
+                    }
                 case GameState.WaitingForInput:
                     {
+                        NewBoardFromBackendEvent?.Invoke();
                         break;
                     }
                 case GameState.MoveInitiated:
@@ -42,6 +48,7 @@ namespace Chess_UI.Models
                     }
                 case GameState.ExecutingMove:
                     {
+                        NewBoardFromBackendEvent?.Invoke();
                         break;
                     }
                 case GameState.GameOver:
@@ -56,6 +63,12 @@ namespace Chess_UI.Models
                 default:
                     break;
             }
+        }
+
+
+        public void HandleInitSucceeded()
+        {
+            GameStateInitSucceeded?.Invoke();
         }
 
 
@@ -107,5 +120,11 @@ namespace Chess_UI.Models
 
         public delegate void GameOverEventHandler(EndGameState endgame);
         public event GameOverEventHandler GameOverEvent;
+
+        public delegate void GameStateInitSucceededHandler();
+        public event GameStateInitSucceededHandler GameStateInitSucceeded;
+
+        public delegate void NewBoardFromBackendHandler();
+        public event NewBoardFromBackendHandler NewBoardFromBackendEvent;
     }
 }
