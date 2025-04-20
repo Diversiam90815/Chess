@@ -37,9 +37,9 @@ namespace Chess_UI.Models
                         NewBoardFromBackendEvent?.Invoke();
                         break;
                     }
-                case GameState.MoveInitiated:
+                case GameState.WaitingForTarget:
                     {
-                        HandleInitiatedMove();
+                        HandleWaitingForTarget();
                         break;
                     }
                 case GameState.ValidatingMove:
@@ -78,9 +78,9 @@ namespace Chess_UI.Models
         }
 
 
-        private void HandleInitiatedMove()
+        private void HandleWaitingForTarget()
         {
-            Logger.LogInfo("Due to delegate message initiateMove we start getting the moves!");
+            Logger.LogInfo("Due to delegate message WaitingForTarget we start getting the moves!");
 
             PossibleMoves.Clear();
 
