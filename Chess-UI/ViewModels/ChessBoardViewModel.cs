@@ -116,7 +116,7 @@ namespace Chess_UI.ViewModels
                 Board.Add(new BoardSquare(DispatcherQueue, themeManager));
             }
 
-            StartGame();
+            //StartGame();
         }
 
 

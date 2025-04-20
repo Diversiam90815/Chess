@@ -37,7 +37,8 @@ public:
 	void	  onPawnPromotionChosen(PieceType promotion); // Called from UI
 
 	void	  gameStateChanged(const GameState state) override;
-	GameState getGameState() const;
+	GameState getCurrentGameState() { return mCurrentState.load(); }
+	void	  setCurrrentGameState(const GameState state) { mCurrentState.store(state); }
 
 	bool	  isInitialized() const;
 	void	  setInitialized(const bool value);
@@ -46,6 +47,9 @@ public:
 	void	  detachObserver(std::weak_ptr<IGameStateObserver> observer) override;
 
 	void	  triggerEvent();
+
+	void	  resetGame();
+
 
 private:
 	StateMachine();
@@ -76,9 +80,8 @@ private:
 	std::atomic<bool>							   mInitialized{false};
 	bool										   mEventTriggered{false};
 
-	GameState									   mCurrentState{GameState::Undefined};
-	// Position						  mMoveStart{};
-	// Position						  mMoveEnd{};
+	std::atomic<GameState>						   mCurrentState{GameState::Undefined};
+
 	PossibleMove								   mCurrentPossibleMove{};
 
 	bool										   mMovesCalulated{false};

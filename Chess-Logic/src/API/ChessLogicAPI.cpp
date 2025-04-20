@@ -137,8 +137,8 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleM
 	if (index < 0 || index >= static_cast<int>(moves.size()))
 		return false;
 
-	//auto it = moves.begin();
-	//std::advance(it, index); // Get the iterator to the desired element
+	// auto it = moves.begin();
+	// std::advance(it, index); // Get the iterator to the desired element
 
 	PossibleMove tmpMove = moves.at(index);
 
@@ -179,8 +179,7 @@ CHESS_API void StartGame()
 
 CHESS_API void ResetGame()
 {
-	GameManager *manager = GameManager::GetInstance();
-	manager->resetGame();
+	StateMachine::GetInstance()->resetGame();
 }
 
 

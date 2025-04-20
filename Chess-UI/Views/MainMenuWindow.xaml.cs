@@ -70,6 +70,7 @@ namespace Chess_UI
         {
             ChessBoardWindow.Closed -= BoardWindowClosed;
             ChessBoardWindow = null;
+            ChessBoardViewModel.ResetGame();
             this.Activate();
         }
 
@@ -99,6 +100,8 @@ namespace Chess_UI
                 ChessBoardWindow.Activate();
                 ChessBoardWindow.Closed += BoardWindowClosed;
                 this.AppWindow.Hide();
+
+                ChessBoardViewModel.StartGame();
             }
             else
             {

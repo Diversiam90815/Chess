@@ -64,7 +64,7 @@ void StateMachine::stop()
 
 void StateMachine::onGameStarted()
 {
-	if (mCurrentState == GameState::Undefined)
+	if (getCurrentGameState() == GameState::Undefined)
 	{
 		gameStateChanged(GameState::Init);
 		start();
@@ -78,39 +78,40 @@ void StateMachine::onSquareSelected(const Position &pos)
 	{
 		std::lock_guard<std::mutex> lock(mMutex);
 
-		if (mCurrentState == GameState::WaitingForInput) // Selected Start Position
+		if (getCurrentGameState() == GameState::WaitingForInput) // Selected Start Position
 		{
 			mCurrentPossibleMove.start = pos;
 			gameStateChanged(GameState::MoveInitiated);
-			//mEventTriggered = true;							   // Set it directly, since we have the lock
+			// mEventTriggered = true;							   // Set it directly, since we have the lock
 		}
-		else if (mCurrentState == GameState::WaitingForTarget) // Selected End Position
+		else if (getCurrentGameState() == GameState::WaitingForTarget) // Selected End Position
 		{
 			mCurrentPossibleMove.end = pos;
 			gameStateChanged(GameState::ValidatingMove);
-			//triggerEvent();
+			// triggerEvent();
 		}
 	}
-	//cv.notify_all();
+	// cv.notify_all();
 }
 
 
 void StateMachine::onPawnPromotionChosen(PieceType promotion)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
-	if (mCurrentState == GameState::PawnPromotion)
+	if (getCurrentGameState() == GameState::PawnPromotion)
 	{
 		mPromotionChoice   = promotion;
 		mAwaitingPromotion = false;
 	}
 	gameStateChanged(GameState::ExecutingMove);
-	//cv.notify_all();
+	// cv.notify_all();
 }
 
 
 void StateMachine::gameStateChanged(const GameState state)
 {
-	mCurrentState = state;
+	setCurrrentGameState(state);
+
 	LOG_INFO("Game State changed to : {}", LoggingHelper::gameStateToString(state).c_str());
 
 	for (auto &observer : mObservers)
@@ -123,12 +124,6 @@ void StateMachine::gameStateChanged(const GameState state)
 
 	cv.notify_all();
 	mEventTriggered = true;
-}
-
-
-GameState StateMachine::getGameState() const
-{
-	return mCurrentState;
 }
 
 
@@ -180,6 +175,14 @@ void StateMachine::triggerEvent()
 }
 
 
+void StateMachine::resetGame()
+{
+	resetCurrentPossibleMove();
+	setCurrrentGameState(GameState::Undefined);
+	GameManager::GetInstance()->resetGame();
+}
+
+
 void StateMachine::run()
 {
 	while (mRunning)
@@ -189,9 +192,9 @@ void StateMachine::run()
 
 		mEventTriggered = false;
 
-		LOG_INFO("Processing state: {}", LoggingHelper::gameStateToString(mCurrentState).c_str());
+		LOG_INFO("Processing state: {}", LoggingHelper::gameStateToString(getCurrentGameState()).c_str());
 
-		switch (mCurrentState)
+		switch (getCurrentGameState())
 		{
 		case GameState::Undefined:
 		{
@@ -282,7 +285,7 @@ void StateMachine::run()
 
 void StateMachine::switchToNextState()
 {
-	switch (mCurrentState)
+	switch (getCurrentGameState())
 	{
 	case GameState::Undefined:
 	{
@@ -443,12 +446,13 @@ bool StateMachine::handleExecutingMoveState()
 
 bool StateMachine::handlePawnPromotionState()
 {
+	// @TODO
 	return false;
 }
 
 
 bool StateMachine::handleGameOverState()
 {
-	// Let UI know of EndGameState -> Checkmate or Stalemate
+	// @TODO: Let UI know of EndGameState -> Checkmate or Stalemate
 	return false;
 }
