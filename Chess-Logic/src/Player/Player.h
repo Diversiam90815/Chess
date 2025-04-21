@@ -53,7 +53,7 @@ public:
 
 	void		  reset();
 
-	bool		  isLocalPlayer() const { return mIsLocalPlayer };
+	bool		  isLocalPlayer() const { return mIsLocalPlayer; }
 	void		  setIsLocalPlayer(const bool isLocal) { mIsLocalPlayer = isLocal; }
 
 	void		  attachObserver(std::weak_ptr<IPlayerObserver> observer) override;

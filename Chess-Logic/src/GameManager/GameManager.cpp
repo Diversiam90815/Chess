@@ -211,6 +211,21 @@ void GameManager::executeMove(PossibleMove &tmpMove)
 
 	Move executedMove = mMoveExecution->executeMove(moveToExecute);
 
+	// If we're in multiplayer mode and it's our turn (local player), send the move to the remote
+	if (mIsMultiplayerMode)
+	{
+		PlayerColor currentPlayer = getCurrentPlayer();
+		bool isLocalPlayersTurn	  = (currentPlayer == PlayerColor::White && mWhitePlayer.isLocalPlayer()) || (currentPlayer == PlayerColor::Black && mBlackPlayer.isLocalPlayer());
+
+		if (isLocalPlayersTurn && mNetwork && mNetwork->getActiveSession())
+		{
+			// Create and send move message
+			MoveMessage moveMsg(moveToExecute);
+			json		j = moveMsg.toJson();
+			mNetwork->getActiveSession()->sendJson(MultiplayerMessageType::Move, j);
+		}
+	}
+
 	LoggingHelper::logMove(executedMove);
 
 	if (executedMove.capturedPiece != PieceType::DefaultType)

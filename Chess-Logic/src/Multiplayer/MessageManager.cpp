@@ -28,13 +28,15 @@ void MessageManager::handleMoveMessage(const IMultiplayerMessage &message)
 	const MoveMessage &moveMsg = static_cast<const MoveMessage &>(message);
 
 	// Implementation needs to be refined at a later point
-	GameManager		  *manager = GameManager::GetInstance();
+	//GameManager		  *manager = GameManager::GetInstance();
 
-	PossibleMove	   remoteMove;
-	remoteMove.start		  = moveMsg.move.startingPosition;
-	remoteMove.end			  = moveMsg.move.endingPosition;
-	remoteMove.type			  = moveMsg.move.type;
-	remoteMove.promotionPiece = moveMsg.move.promotionType;
+	//PossibleMove	   remoteMove;
+	//remoteMove.start		  = moveMsg.move.start;
+	//remoteMove.end			  = moveMsg.move.end;
+	//remoteMove.type			  = moveMsg.move.type;
+	//remoteMove.promotionPiece = moveMsg.move.promotionPiece;
 
-	manager->executeMove(remoteMove);
+	//manager->executeMove(remoteMove);
+
+	// TODO: need to refactor
 }

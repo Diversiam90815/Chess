@@ -11,7 +11,7 @@
 
 #include "MessageDispatcher.h"
 #include "MoveMessage.h"
-#include "GameManager.h"
+
 #include "IObserver.h"
 
 using json = nlohmann::json;
