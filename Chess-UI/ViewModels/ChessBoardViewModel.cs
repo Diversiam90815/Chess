@@ -111,6 +111,7 @@ namespace Chess_UI.ViewModels
             }
         }
 
+
         private void OnBoardFromBackendUpdated()
         {
             DispatcherQueue.TryEnqueue(() =>

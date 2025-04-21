@@ -53,6 +53,9 @@ public:
 
 	void		  reset();
 
+	bool		  isLocalPlayer() const { return mIsLocalPlayer };
+	void		  setIsLocalPlayer(const bool isLocal) { mIsLocalPlayer = isLocal; }
+
 	void		  attachObserver(std::weak_ptr<IPlayerObserver> observer) override;
 	void		  detachObserver(std::weak_ptr<IPlayerObserver> observer) override;
 
@@ -64,6 +67,8 @@ private:
 	bool										mIsCurrentTurn = false;
 
 	Score										mScore		   = Score(PlayerColor::NoColor, 0);
+
+	bool										mIsLocalPlayer{true};	// Default to local player in single-player mode
 
 	std::vector<std::weak_ptr<IPlayerObserver>> mObservers;
 };

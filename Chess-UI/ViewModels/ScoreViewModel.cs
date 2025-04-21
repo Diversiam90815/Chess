@@ -61,14 +61,12 @@ namespace Chess_UI.ViewModels
             BlackScoreValue = 0;
             BlackCapturedBishop = 0;
             BlackCapturedKnight = 0;
-            BlackCapturedKnight = 0;
             BlackCapturedQueen = 0;
             BlackCapturedRook = 0;
             BlackCapturedPawn = 0;
             
             WhiteScoreValue = 0;
             WhiteCapturedBishop = 0;
-            WhiteCapturedKnight = 0;
             WhiteCapturedKnight = 0;
             WhiteCapturedQueen = 0;
             WhiteCapturedRook = 0;

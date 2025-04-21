@@ -254,7 +254,7 @@ namespace Chess_UI.Services
             Checkmate = 2,
             StaleMate = 3,
             Reset = 4
-        };
+        }
 
 
         [Flags]
