@@ -37,7 +37,7 @@ public:
 
 	bool						init();
 
-	void						startGame();
+	bool						startGame();
 
 	void						executeMove(PossibleMove &tmpMove);
 

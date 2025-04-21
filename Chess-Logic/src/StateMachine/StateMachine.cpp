@@ -73,6 +73,15 @@ void StateMachine::onGameStarted()
 }
 
 
+void StateMachine::onMultiplayerGameStarted(bool isHost)
+{
+	mIsMultiplayerGame = true;
+	mIsLocalHost	   = isHost;
+
+	onGameStarted();
+}
+
+
 void StateMachine::onSquareSelected(const Position &pos)
 {
 	{
@@ -203,7 +212,7 @@ void StateMachine::run()
 		{
 			if (!isInitialized())
 			{
-				bool result = handleInitState(false); // Initialize the Local Game
+				bool result = handleInitState(mIsMultiplayerGame);
 				setInitialized(result);
 			}
 
@@ -384,12 +393,16 @@ void StateMachine::resetCurrentPossibleMove()
 
 bool StateMachine::handleInitState(bool multiplayer)
 {
-	// currently impl with no multiplayer
 	LOG_INFO("Handling init state");
 
-	GameManager::GetInstance()->startGame();
-
-	return true;
+	if (multiplayer)
+	{
+		return GameManager::GetInstance()->startMultiplayerGame(mIsLocalHost);
+	}
+	else
+	{
+		return GameManager::GetInstance()->startGame();
+	}
 }
 
 

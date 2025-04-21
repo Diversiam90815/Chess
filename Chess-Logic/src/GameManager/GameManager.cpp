@@ -65,11 +65,13 @@ bool GameManager::init()
 }
 
 
-void GameManager::startGame()
+bool GameManager::startGame()
 {
 	clearState();
 
 	mChessBoard->initializeBoard(); // Reset the board
+
+	return true;
 }
 
 

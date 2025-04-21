@@ -32,6 +32,7 @@ public:
 	void	  stop();
 
 	void	  onGameStarted();							  // Called from UI
+	void	  onMultiplayerGameStarted(bool isHost);
 	void	  onSquareSelected(const Position &pos);	  // Called from UI
 	void	  onPawnPromotionChosen(PieceType promotion); // Called from UI
 
@@ -94,6 +95,9 @@ private:
 	PieceType									   mPromotionChoice{PieceType::DefaultType};
 
 	EndGameState								   mEndgameState{EndGameState::OnGoing};
+
+	bool										   mIsMultiplayerGame{false};
+	bool										   mIsLocalHost{false};
 
 	std::vector<std::weak_ptr<IGameStateObserver>> mObservers;
 };
