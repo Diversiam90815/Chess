@@ -418,6 +418,27 @@ EndGameState GameManager::checkForEndGameConditions()
 }
 
 
+bool GameManager::startMultiplayerGame(bool isHost)
+{
+	return false;
+}
+
+
+bool GameManager::connectToRemote(const std::string &remoteIP, const int remotePort)
+{
+	return false;
+}
+
+
+void GameManager::disconnectMultiplayerGame() {}
+
+
+bool GameManager::isMultiplayerActive()
+{
+	return false;
+}
+
+
 void GameManager::initObservers()
 {
 	this->attachObserver(mUiCommunicationLayer);

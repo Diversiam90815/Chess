@@ -226,6 +226,31 @@ CHESS_API bool GetBoardState(int *boardState)
 }
 
 
+CHESS_API bool StartMultiplayerGame(bool isHost)
+{
+	// TODO
+	return false;
+}
+
+
+CHESS_API bool ConnectToRemoteGame(const char *ipAddress, int port)
+{
+	return GameManager::GetInstance()->connectToRemote(std::string(ipAddress), port);
+}
+
+
+CHESS_API void DisconnectMultiplayerGame()
+{
+	return GameManager::GetInstance()->disconnectMultiplayerGame();
+}
+
+
+CHESS_API bool isMultiplayerActive()
+{
+	return GameManager::GetInstance()->isMultiplayerActive();
+}
+
+
 CHESS_API void OnSquareSelected(PositionInstance positionInstance)
 {
 	Position pos = MapToPosition(positionInstance);

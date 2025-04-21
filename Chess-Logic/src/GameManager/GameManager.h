@@ -19,7 +19,9 @@
 #include "IObservable.h"
 #include "UICommunication.h"
 
+
 #include "NetworkManager.h"
+#include "MessageManager.h"
 
 
 class StateMachine;
@@ -87,6 +89,15 @@ public:
 
 	EndGameState				checkForEndGameConditions();
 
+
+	bool						startMultiplayerGame(bool isHost);
+
+	bool						connectToRemote(const std::string &remoteIP, const int remotePort);
+	void						disconnectMultiplayerGame();
+
+	bool						isMultiplayerActive();
+
+
 private:
 	GameManager();
 
@@ -95,6 +106,8 @@ private:
 
 
 	Logging									  mLog;
+
+	UserSettings							  mUserSettings;
 
 	bool									  mMovesGeneratedForCurrentTurn = false;
 
@@ -113,9 +126,13 @@ private:
 
 	std::shared_ptr<UICommunication>		  mUiCommunicationLayer;
 
-	UserSettings							  mUserSettings;
+	std::shared_ptr<NetworkManager>			  mNetwork;
 
-	std::unique_ptr<NetworkManager>			  mNetwork;
+	std::shared_ptr<MessageManager>			  mMessageManager;
+
+
+	bool									  mIsMultiplayerMode{false};
+	bool									  mIsHost{false};
 
 	std::vector<std::weak_ptr<IGameObserver>> mObservers;
 };
