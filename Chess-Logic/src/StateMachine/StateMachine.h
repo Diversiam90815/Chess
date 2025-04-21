@@ -43,9 +43,6 @@ public:
 	bool	  isInitialized() const;
 	void	  setInitialized(const bool value);
 
-	void	  attachObserver(std::weak_ptr<IGameStateObserver> observer) override;
-	void	  detachObserver(std::weak_ptr<IGameStateObserver> observer) override;
-
 	void	  triggerEvent();
 
 	void	  resetGame();
@@ -98,6 +95,4 @@ private:
 
 	bool										   mIsMultiplayerGame{false};
 	bool										   mIsLocalHost{false};
-
-	std::vector<std::weak_ptr<IGameStateObserver>> mObservers;
 };

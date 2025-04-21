@@ -78,9 +78,6 @@ public:
 	void						setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
 	std::string					getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
 
-	void						attachObserver(std::weak_ptr<IGameObserver> observer) override;
-	void						detachObserver(std::weak_ptr<IGameObserver> observer) override;
-
 	void						switchTurns();
 
 	bool						calculateAllMovesForPlayer();
@@ -99,7 +96,7 @@ public:
 
 
 private:
-	GameManager();
+	GameManager() = default;
 
 	void									  initObservers();
 	void									  deinitObservers();
@@ -133,6 +130,4 @@ private:
 
 	bool									  mIsMultiplayerMode{false};
 	bool									  mIsHost{false};
-
-	std::vector<std::weak_ptr<IGameObserver>> mObservers;
 };

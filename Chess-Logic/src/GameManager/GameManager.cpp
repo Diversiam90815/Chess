@@ -10,9 +10,6 @@
 #include "StateMachine.h"
 
 
-GameManager::GameManager() {}
-
-
 GameManager::~GameManager()
 {
 	deinitObservers();
@@ -517,28 +514,4 @@ void GameManager::deinitObservers()
 	mMoveExecution->detachObserver(mUiCommunicationLayer);
 
 	StateMachine::GetInstance()->detachObserver(mUiCommunicationLayer);
-}
-
-
-void GameManager::attachObserver(std::weak_ptr<IGameObserver> observer)
-{
-	mObservers.push_back(observer);
-}
-
-
-void GameManager::detachObserver(std::weak_ptr<IGameObserver> observer)
-{
-	// Remove observer from the vector by checking if they point to the same object
-	mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(),
-									[&observer](const std::weak_ptr<IGameObserver> &obs)
-									{
-										// Compare the objects they point to, not the weak_ptrs themselves
-										if (obs.expired() || observer.expired())
-										{
-											return false; // Can't compare expired weak_ptrs
-										}
-										return !obs.owner_before(observer) && !observer.owner_before(obs);
-										// This is equivalent to obs.lock() == observer.lock() without the overhead
-									}),
-					 mObservers.end());
 }

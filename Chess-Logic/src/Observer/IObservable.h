@@ -17,12 +17,35 @@
 using json = nlohmann::json;
 
 
-class IPlayerObservable
+template <typename ObserverType>
+class ObservableBase
+{
+public:
+	virtual void attachObserver(std::weak_ptr<ObserverType> observer) { mObservers.push_back(observer); }
+	virtual void detachObserver(std::weak_ptr<ObserverType> observer)
+	{
+		std::shared_ptr<ObserverType> target = observer.lock();
+		if (!target)
+			return;
+
+		mObservers.erase(std::remove_if(mObservers.begin(), mObservers.end(),
+										[&target](const std::weak_ptr<ObserverType> &obs)
+										{
+											auto current = obs.lock();
+											return !current || current == target;
+										}),
+						 mObservers.end());
+	}
+
+protected:
+	std::vector<std::weak_ptr<ObserverType>> mObservers;
+};
+
+
+class IPlayerObservable : public ObservableBase<IPlayerObserver>
 {
 public:
 	virtual ~IPlayerObservable() {};
-	virtual void attachObserver(std::weak_ptr<IPlayerObserver> observer) = 0;
-	virtual void detachObserver(std::weak_ptr<IPlayerObserver> observer) = 0;
 
 	virtual void updateScore()											 = 0;
 	virtual void addCapturedPiece(const PieceType captured)				 = 0;
@@ -30,48 +53,39 @@ public:
 };
 
 
-class IMoveObservable
+class IMoveObservable : public ObservableBase<IMoveObserver>
 {
 public:
 	virtual ~IMoveObservable() {};
-	virtual void attachObserver(std::weak_ptr<IMoveObserver> observer) = 0;
-	virtual void detachObserver(std::weak_ptr<IMoveObserver> observer) = 0;
 
 	virtual Move executeMove(PossibleMove &move)					   = 0;
 	virtual void addMoveToHistory(Move &move)						   = 0;
 };
 
 
-class IGameObservable
+class IGameObservable : public ObservableBase<IGameObserver>
 {
 public:
 	virtual ~IGameObservable() {};
-	virtual void attachObserver(std::weak_ptr<IGameObserver> observer) = 0;
-	virtual void detachObserver(std::weak_ptr<IGameObserver> observer) = 0;
 
 	virtual void endGame(EndGameState state, PlayerColor winner)	   = 0;
 	virtual void changeCurrentPlayer(PlayerColor player)			   = 0;
-	// virtual void moveStateInitiated()							 = 0;
 };
 
 
-class IGameStateObservable
+class IGameStateObservable : public ObservableBase<IGameStateObserver>
 {
 public:
 	virtual ~IGameStateObservable() {};
-	virtual void attachObserver(std::weak_ptr<IGameStateObserver> observer) = 0;
-	virtual void detachObserver(std::weak_ptr<IGameStateObserver> observer) = 0;
 
 	virtual void gameStateChanged(const GameState state)					= 0;
 };
 
 
-class IRemoteCommunicationObservable
+class IRemoteCommunicationObservable : public ObservableBase<IRemoteCommunicationObserver>
 {
 public:
 	virtual ~IRemoteCommunicationObservable() {};
-	virtual void attachObserver(std::weak_ptr<IRemoteCommunicationObserver> observer) = 0;
-	virtual void detachObserver(std::weak_ptr<IRemoteCommunicationObserver> observer) = 0;
 
 	virtual void receivedMessage(const json &j)										  = 0;
 };

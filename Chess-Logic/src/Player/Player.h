@@ -30,11 +30,11 @@ struct Score
 class Player : public IPlayerObservable
 {
 public:
-	Player();
+	Player() = default;
 
 	Player(PlayerColor color);
 
-	~Player();
+	~Player() = default;
 
 
 	Score		  getScore() const;
@@ -56,9 +56,6 @@ public:
 	bool		  isLocalPlayer() const { return mIsLocalPlayer; }
 	void		  setIsLocalPlayer(const bool isLocal) { mIsLocalPlayer = isLocal; }
 
-	void		  attachObserver(std::weak_ptr<IPlayerObserver> observer) override;
-	void		  detachObserver(std::weak_ptr<IPlayerObserver> observer) override;
-
 private:
 	PlayerColor									mPlayerColor = PlayerColor::NoColor;
 
@@ -69,6 +66,4 @@ private:
 	Score										mScore		   = Score(PlayerColor::NoColor, 0);
 
 	bool										mIsLocalPlayer{true};	// Default to local player in single-player mode
-
-	std::vector<std::weak_ptr<IPlayerObserver>> mObservers;
 };

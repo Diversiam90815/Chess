@@ -54,9 +54,6 @@ public:
 
 	void								  sendJson(MultiplayerMessageType type, const json &message);
 
-	void								  attachObserver(std::weak_ptr<IRemoteCommunicationObserver> observer) override;
-	void								  detachObserver(std::weak_ptr<IRemoteCommunicationObserver> observer) override;
-
 	void								  receivedMessage(const json &j) override;
 
 private:
@@ -74,8 +71,6 @@ private:
 	uint32_t												 mBodyLength{0};
 
 	int														 mBoundPort{0};
-
-	std::vector<std::weak_ptr<IRemoteCommunicationObserver>> mObservers;
 
 	MessageHandler											 mMessageHandler = nullptr;
 };
