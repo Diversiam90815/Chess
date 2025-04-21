@@ -27,6 +27,10 @@ public:
 	void						joinSession(const Endpoint remote);
 
 	void						setTCPSession(TCPSession::pointer session);
+	TCPSession::pointer			getActiveSession();
+
+	bool						connectToRemote(const std::string &remoteIP, const int port);
+	void						disconnect();
 
 	std::vector<NetworkAdapter> getAvailableNetworkAdapters() const;
 	bool						changeNetworkAdapter(const int ID);

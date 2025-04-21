@@ -95,7 +95,7 @@ public:
 	bool						connectToRemote(const std::string &remoteIP, const int remotePort);
 	void						disconnectMultiplayerGame();
 
-	bool						isMultiplayerActive();
+	bool						isMultiplayerActive() const;
 
 
 private:

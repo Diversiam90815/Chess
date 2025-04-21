@@ -420,22 +420,60 @@ EndGameState GameManager::checkForEndGameConditions()
 
 bool GameManager::startMultiplayerGame(bool isHost)
 {
-	return false;
+	mIsMultiplayerMode = true;
+	mIsHost			   = isHost;
+
+	mMessageManager	   = std::make_shared<MessageManager>(); // Create the message manager
+
+	// Initialize the game & board
+	clearState();
+	mChessBoard->initializeBoard();
+
+	if (isHost)
+	{
+		changeCurrentPlayer(PlayerColor::White); // If we are the host, we are chosen to play as white -> TODO : Add UI selector in future
+		mWhitePlayer.setIsLocalPlayer(true);
+		mBlackPlayer.setIsLocalPlayer(false);
+	}
+	else
+	{
+		// Guests are black
+		changeCurrentPlayer(PlayerColor::White); // Game still starts with white
+		mWhitePlayer.setIsLocalPlayer(false);
+		mBlackPlayer.setIsLocalPlayer(true);
+	}
+
+	if (mNetwork && mNetwork->getActiveSession())
+	{
+		mNetwork->getActiveSession()->attachObserver(mMessageManager);
+	}
+
+	return true;
 }
 
 
 bool GameManager::connectToRemote(const std::string &remoteIP, const int remotePort)
 {
-	return false;
+	if (!mNetwork)
+		return false;
+
+	return mNetwork->connectToRemote(remoteIP, remotePort);
 }
 
 
-void GameManager::disconnectMultiplayerGame() {}
-
-
-bool GameManager::isMultiplayerActive()
+void GameManager::disconnectMultiplayerGame()
 {
-	return false;
+	if (mNetwork)
+		mNetwork->disconnect();
+
+	mIsMultiplayerMode = false;
+	resetGame(); // Reset to single player
+}
+
+
+bool GameManager::isMultiplayerActive() const
+{
+	return mIsMultiplayerMode;
 }
 
 

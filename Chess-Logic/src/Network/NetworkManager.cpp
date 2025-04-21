@@ -72,6 +72,43 @@ void NetworkManager::setTCPSession(TCPSession::pointer session)
 }
 
 
+TCPSession::pointer NetworkManager::getActiveSession()
+{
+	return mSession;
+}
+
+
+bool NetworkManager::connectToRemote(const std::string &remoteIP, const int port)
+{
+	try
+	{
+		mClient->connect(remoteIP, port);
+		return true;
+	}
+	catch (const boost::system::system_error &e)
+	{
+		LOG_ERROR("Failed to connect to remote: {}", e.what());
+		return false;
+	}
+}
+
+
+void NetworkManager::disconnect()
+{
+	if (mDiscovery)
+	{
+		mDiscovery->stop();
+		mDiscovery.reset();
+	}
+
+	mSession.reset();
+	mClient.reset();
+	mServer.reset();
+
+	LOG_INFO("Network Connection closed.");
+}
+
+
 std::vector<NetworkAdapter> NetworkManager::getAvailableNetworkAdapters() const
 {
 	return mNetworkInfo.getAvailableNetworkAdapters();
