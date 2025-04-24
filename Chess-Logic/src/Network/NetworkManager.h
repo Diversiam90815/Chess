@@ -9,9 +9,9 @@
 
 #include "NetworkInformation.h"
 #include "FileManager.h"
-#include "TCPClient.h"
-#include "TCPServer.h"
-#include "DiscoveryService.h"
+#include "TCPConnection/TCPClient.h"
+#include "TCPConnection/TCPServer.h"
+#include "Discovery/DiscoveryService.h"
 
 
 class NetworkManager

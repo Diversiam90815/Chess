@@ -138,10 +138,6 @@ set(NETWORK_FILES
 	${NETWORK_DIR}/NetworkAdapter.h
 	${NETWORK_DIR}/NetworkManager.h         ${NETWORK_DIR}/NetworkManager.cpp
 	${NETWORK_DIR}/NetworkInformation.h     ${NETWORK_DIR}/NetworkInformation.cpp
-	${NETWORK_DIR}/DiscoveryService.h       ${NETWORK_DIR}/DiscoveryService.cpp
-	${NETWORK_DIR}/TCPServer.h              ${NETWORK_DIR}/TCPServer.cpp
-	${NETWORK_DIR}/TCPClient.h              ${NETWORK_DIR}/TCPClient.cpp
-	${NETWORK_DIR}/TCPSession.h             ${NETWORK_DIR}/TCPSession.cpp
 )
 
 set(OBSERVER_FILES
@@ -154,11 +150,13 @@ set(COMMUNICATION_FILES
 )
 
 set(MULTIPLAYER_FILES
-	${MULTIPLAYER_DIR}/IMultiplayerMessage.h
-	${MULTIPLAYER_DIR}/MoveMessage.h
-	${MULTIPLAYER_DIR}/ChatMessage.h
-	${MULTIPLAYER_DIR}/MessageManager.h			${MULTIPLAYER_DIR}/MessageManager.cpp
-	${MULTIPLAYER_DIR}/MessageDispatcher.h		${MULTIPLAYER_DIR}/MessageDispatcher.cpp
+	${MULTIPLAYER_DIR}/MultiplayerManager.h					${MULTIPLAYER_DIR}/MultiplayerManager.cpp
+	${MULTIPLAYER_DIR}/Discovery/DiscoveryService.h			${MULTIPLAYER_DIR}/Discovery/DiscoveryService.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPSession.h			${MULTIPLAYER_DIR}/TCPConnection/TCPSession.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPServer.h			${MULTIPLAYER_DIR}/TCPConnection/TCPServer.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPClient.h			${MULTIPLAYER_DIR}/TCPConnection/TCPClient.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.h		${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.h		${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.cpp
 )
 
 
@@ -185,21 +183,7 @@ set(ALL_FILES
 #   SOURCE GROUPS
 ###########################################
 
-source_group("API"              FILES ${API_FILES})
-source_group("Pieces"           FILES ${PIECE_FILES})
-source_group("Board"            FILES ${BOARD_FILES})
-source_group("Moves"            FILES ${MOVE_FILES})
-source_group("GameManager"      FILES ${GAME_MANAGER_FILES})
-source_group("Player"           FILES ${PLAYER_FILES})
-source_group("Miscellaneous"    FILES ${MISC_FILES})
-source_group("Logging"          FILES ${LOGGER_FILES})
-source_group("FileManager"      FILES ${FILEMANAGER_FILES})
-source_group("UserSettings"     FILES ${USERSETTINGS_FILES})
-source_group("IObserver"        FILES ${OBSERVER_FILES})
-source_group("Communication"    FILES ${COMMUNICATION_FILES})
-source_group("Network"          FILES ${NETWORK_FILES})
-source_group("Multiplayer"      FILES ${MULTIPLAYER_FILES})
-source_group("StateMachine"     FILES ${STATEMACHINE_FILES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ALL_FILES})
 
 
 ###########################################

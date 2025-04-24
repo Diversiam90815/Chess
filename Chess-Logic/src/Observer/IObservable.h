@@ -6,8 +6,8 @@
 */
 
 #pragma once
-#include <memory>
 
+#include <memory>
 
 #include "IObserver.h"
 #include "Move.h"
