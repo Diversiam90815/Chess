@@ -24,13 +24,6 @@
 */
 
 
-enum class MultiplayerMessageType : uint32_t
-{
-	Move = 1,
-	Chat = 2
-	// To be expanded
-};
-
 
 using json = nlohmann::json;
 using boost::asio::ip::tcp;
@@ -56,16 +49,16 @@ public:
 private:
 	explicit TCPSession(boost::asio::io_context &ioContext);
 
-	void			  readHeader();
+	void				 readHeader();
 
-	void			  readBody();
+	void				 readBody();
 
 
-	tcp::socket		  mSocket;
+	tcp::socket			 mSocket;
 
-	char			  mHeader[4]{};
-	std::vector<char> mBody{};
-	uint32_t		  mBodyLength{0};
+	uint8_t				 mHeader[4]{};
+	std::vector<uint8_t> mBody{};
+	uint32_t			 mBodyLength{0};
 
-	int				  mBoundPort{0};
+	int					 mBoundPort{0};
 };

@@ -56,9 +56,8 @@ void TCPSession::readBody()
 							[this, self](boost::system::error_code ec, size_t length)
 							{
 								if (ec)
-								{
 									return;
-								}
+								
 
 								if (mBodyLength < 4) // We expect at least 4 bytes for the type
 								{
@@ -67,7 +66,7 @@ void TCPSession::readBody()
 								}
 
 								// Extract JSON string
-								std::string jsonData(mBody.data(), mBodyLength);
+								std::string jsonData(reinterpret_cast<char *>(mBody.data()), mBodyLength);
 
 								// parse JSON
 								try

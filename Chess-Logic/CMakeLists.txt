@@ -150,13 +150,15 @@ set(COMMUNICATION_FILES
 )
 
 set(MULTIPLAYER_FILES
-	${MULTIPLAYER_DIR}/MultiplayerManager.h					${MULTIPLAYER_DIR}/MultiplayerManager.cpp
-	${MULTIPLAYER_DIR}/Discovery/DiscoveryService.h			${MULTIPLAYER_DIR}/Discovery/DiscoveryService.cpp
-	${MULTIPLAYER_DIR}/TCPConnection/TCPSession.h			${MULTIPLAYER_DIR}/TCPConnection/TCPSession.cpp
-	${MULTIPLAYER_DIR}/TCPConnection/TCPServer.h			${MULTIPLAYER_DIR}/TCPConnection/TCPServer.cpp
-	${MULTIPLAYER_DIR}/TCPConnection/TCPClient.h			${MULTIPLAYER_DIR}/TCPConnection/TCPClient.cpp
-	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.h		${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.cpp
-	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.h		${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/MultiplayerMessageStruct.h
+	${MULTIPLAYER_DIR}/MultiplayerManager.h							${MULTIPLAYER_DIR}/MultiplayerManager.cpp
+	${MULTIPLAYER_DIR}/Discovery/DiscoveryService.h					${MULTIPLAYER_DIR}/Discovery/DiscoveryService.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPSession.h					${MULTIPLAYER_DIR}/TCPConnection/TCPSession.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPServer.h					${MULTIPLAYER_DIR}/TCPConnection/TCPServer.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPClient.h					${MULTIPLAYER_DIR}/TCPConnection/TCPClient.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.h				${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.h				${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.h		${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.cpp
 )
 
 
