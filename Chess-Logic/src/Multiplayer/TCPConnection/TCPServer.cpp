@@ -40,7 +40,6 @@ void TCPServer::handleAccept(boost::shared_ptr<TCPSession> session, const boost:
 	if (!error)
 	{
 		LOG_INFO("TCP accepted connection from {}", session->socket().remote_endpoint().address().to_string().c_str());
-		session->start(); // Start session's async operation
 
 		if (mSessionHandler)
 		{

@@ -16,49 +16,37 @@
 
 #include "Logging.h"
 #include "IObservable.h"
-
-/*
-	The message we're sending/receiving consists of 2 sections: header and body.
-	Header will be 4 bytes long and contain the length of the body
-	Body will contain the type (first 4 bytes of body) of message and the data itself preceding
-*/
+#include "RemoteMessaging/MultiPlayerMessageStruct.h"
 
 
-
-using json = nlohmann::json;
 using boost::asio::ip::tcp;
 
 
-class TCPSession : public boost::enable_shared_from_this<TCPSession>, public IRemoteReceiverObservable
+class TCPSession : public boost::enable_shared_from_this<TCPSession>
 {
 public:
+	~TCPSession();
+
 	typedef boost::shared_ptr<TCPSession> pointer;
 
 	static pointer						  create(boost::asio::io_context &io_context) { return pointer(new TCPSession(io_context)); }
 
 	tcp::socket							 &socket();
 
-	void								  start();
-
 	const int							  getBoundPort() const { return mBoundPort; }
 
-	void								  sendMessage(MultiplayerMessageType type, const json &message);
+	void								  sendMessage(MultiplayerMessageStruct &message);
 
-	void								  receivedMessage(const json &j) override;
+	void								  readMessage(MultiplayerMessageStruct &message);
 
 private:
 	explicit TCPSession(boost::asio::io_context &ioContext);
 
-	void				 readHeader();
 
-	void				 readBody();
+	tcp::socket	  mSocket;
 
+	uint8_t		 *mBuffer = nullptr;
 
-	tcp::socket			 mSocket;
+	int			  mBoundPort{0};
 
-	uint8_t				 mHeader[4]{};
-	std::vector<uint8_t> mBody{};
-	uint32_t			 mBodyLength{0};
-
-	int					 mBoundPort{0};
 };

@@ -78,12 +78,20 @@ enum SettingsType
 //			File Manager
 //============================================================
 
-constexpr auto LoggingFolder	= "Logs";
-constexpr auto LogFile			= "Chess.log";
+constexpr auto LoggingFolder	 = "Logs";
+constexpr auto LogFile			 = "Chess.log";
 
-constexpr auto UserSettingsFile = "Config.json";
-constexpr auto SettingsFolder	= "Settings";
+constexpr auto UserSettingsFile	 = "Config.json";
+constexpr auto SettingsFolder	 = "Settings";
 
-constexpr auto BoardTheme		= "BoardTheme";
-constexpr auto PieceTheme		= "PieceTheme";
-constexpr auto SelectedAdapter	= "Selected_Adapter";
+constexpr auto BoardTheme		 = "BoardTheme";
+constexpr auto PieceTheme		 = "PieceTheme";
+constexpr auto SelectedAdapter	 = "Selected_Adapter";
+
+
+//============================================================
+//			Multiplayer - Network Communication
+//============================================================
+
+constexpr int  PackageBufferSize = 65536;
+constexpr auto RemoteComSecret	 = "316";

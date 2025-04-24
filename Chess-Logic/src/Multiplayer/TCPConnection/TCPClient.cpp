@@ -26,7 +26,6 @@ void TCPClient::connect(const std::string &host, unsigned short port)
 								   if (!error)
 								   {
 									   LOG_INFO("TCPClient connected to {}", endpoint.address().to_string().c_str());
-									   session->start();
 
 									   if (mConnectHandler)
 									   {

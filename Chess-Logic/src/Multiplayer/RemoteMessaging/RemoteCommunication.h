@@ -16,6 +16,6 @@ public:
 	RemoteCommunication()  = default;
 	~RemoteCommunication() = default;
 
-	bool read(MessageType type, std::vector<uint8_t> &destination);
-	bool write(std::vector<uint8_t> &data, std::string remoteIP, int remotePort, MessageType type);
+	bool read(MultiplayerMessageType type, std::vector<uint8_t> &destination);
+	bool write(std::vector<uint8_t> &data, std::string remoteIP, int remotePort, MultiplayerMessageType type);
 };

@@ -13,6 +13,14 @@ TCPSession::TCPSession(boost::asio::io_context &ioContext) : mSocket(ioContext)
 	mSocket.open(tcp::v4());					  // Open the socket
 	mSocket.bind(tcp::endpoint(tcp::v4(), 0));	  // Bind to a OS assigned port
 	mBoundPort = mSocket.local_endpoint().port(); // Get the port number it is bound to
+
+	mBuffer	   = new uint8_t[PackageBufferSize];
+}
+
+
+TCPSession::~TCPSession()
+{
+	free(mBuffer);
 }
 
 
@@ -22,93 +30,36 @@ tcp::socket &TCPSession::socket()
 }
 
 
-void TCPSession::start()
+void TCPSession::sendMessage(MultiplayerMessageStruct &message)
 {
-	readHeader();
-}
+	// Calculate sizes for the message's parts
+	const size_t messageTypeSize	   = sizeof(message.type);
+	const size_t messageDataSize	   = message.data.size();
+	const size_t messageDataSizeLength = sizeof(messageDataSize);
 
+	size_t		 offset				   = 0;
 
-void TCPSession::readHeader()
-{
+	memset(mBuffer, 0, PackageBufferSize); // Clear the buffer
+
+	// Copy the secret identifier
+	memcpy(&mBuffer[offset], RemoteComSecret, sizeof(RemoteComSecret));
+	offset += sizeof(RemoteComSecret);
+
+	// Copy the message type
+	memcpy(&mBuffer[offset], &message.type, messageTypeSize);
+	offset += messageTypeSize;
+
+	// Copy the message data size
+	memcpy(&mBuffer[offset], &messageDataSize, messageDataSizeLength);
+	offset += messageDataSizeLength;
+
+	// Copy the message data
+	memcpy(&mBuffer[offset], message.data.data(), messageDataSize);
+	offset += messageDataSize;
+
+	// Send the buffer asynchronously
 	auto self = shared_from_this();
-
-	boost::asio::async_read(mSocket, boost::asio::buffer(mHeader, 4),
-							[this, self](boost::system::error_code ec, size_t length)
-							{
-								if (ec)
-								{
-									return;
-								}
-								uint32_t netLength;
-								std::memcpy(&netLength, mHeader, 4);
-								mBodyLength = ntohl(netLength);
-
-								mBody.resize(mBodyLength);
-								readBody();
-							});
-}
-
-
-void TCPSession::readBody()
-{
-	auto self = shared_from_this();
-	boost::asio::async_read(mSocket, boost::asio::buffer(mBody),
-							[this, self](boost::system::error_code ec, size_t length)
-							{
-								if (ec)
-									return;
-								
-
-								if (mBodyLength < 4) // We expect at least 4 bytes for the type
-								{
-									LOG_ERROR("Body length < 4 bytes. Protocol error?");
-									return;
-								}
-
-								// Extract JSON string
-								std::string jsonData(reinterpret_cast<char *>(mBody.data()), mBodyLength);
-
-								// parse JSON
-								try
-								{
-									json j = json::parse(jsonData);
-									receivedMessage(j);
-								}
-								catch (std::exception &e)
-								{
-									LOG_ERROR("JSON parse error: {}", e.what());
-								}
-
-								readHeader(); // Read next message
-							});
-}
-
-
-void TCPSession::sendMessage(MultiplayerMessageType type, const json &message)
-{
-	std::string			 body			  = message.dump(); // convert j to string
-
-	// The body is: [4 bytes of type] + [N bytes of JSON data]
-	// We'll compute "bodyLength" = 4 + jsonData.size().
-	// Then in the 4-byte TCP header, we store bodyLength in network order.
-	uint32_t			 typeNetworkOrder = htonl(static_cast<uint32_t>(type));
-	uint32_t			 bodyLen		  = 4 + static_cast<uint32_t>(body.size());
-	uint32_t			 bodyLenNetwork	  = htonl(bodyLen);
-
-
-	// Prepare a buffer of size (4 [header] + bodyLen)
-	// The first 4 bytes => "header" (which is bodyLen)
-	// The next 4 bytes => "type"
-	// The remaining bytes => JSON data
-	std::vector<uint8_t> buffer(4 + bodyLen);
-	std::memcpy(buffer.data(), &bodyLenNetwork, 4);			  // Copy 4 byte header
-	std::memcpy(buffer.data() + 4, &typeNetworkOrder, 4);	  // Copy 4 byte message type
-	std::memcpy(buffer.data() + 8, body.data(), body.size()); // Copy the JSON string
-
-
-	// Write it async
-	auto self = shared_from_this();
-	boost::asio::async_write(mSocket, boost::asio::buffer(buffer),
+	boost::asio::async_write(mSocket, boost::asio::buffer(mBuffer, offset),
 							 [this, self](boost::system::error_code ec, std::size_t /*bytesWritten*/)
 							 {
 								 if (ec)
@@ -119,13 +70,46 @@ void TCPSession::sendMessage(MultiplayerMessageType type, const json &message)
 }
 
 
-void TCPSession::receivedMessage(const json &j)
+void TCPSession::readMessage(MultiplayerMessageStruct &message)
 {
-	for (auto &observer : mObservers)
-	{
-		auto obs = observer.lock();
+	const size_t dataTypeLength = sizeof(message.data.data());
 
-		if (obs)
-			obs->onMessageReceived(j);
-	}
+	auto		 self			= shared_from_this();
+	boost::asio::async_read(mSocket, boost::asio::buffer(mBuffer, PackageBufferSize),
+							[this, self, &message](boost::system::error_code ec, std::size_t bytesRead)
+							{
+								if (ec)
+								{
+									LOG_ERROR("Error reading message: {}", ec.message());
+									return;
+								}
+
+								// Validate the secret identifier
+								if (memcmp(mBuffer, RemoteComSecret, sizeof(RemoteComSecret)) != 0)
+								{
+									LOG_ERROR("Invalid message format: Secret identifier mismatch");
+									return;
+								}
+
+								size_t		 offset			 = sizeof(RemoteComSecret);
+
+								// Extract message type
+								const size_t messageTypeSize = sizeof(message.type);
+								memcpy(&message.type, &mBuffer[offset], messageTypeSize);
+								offset += messageTypeSize;
+
+								// Extract message data size
+								size_t		 dataLength			   = 0;
+								const size_t messageDataSizeLength = sizeof(message.data.size());
+								memcpy(&dataLength, &mBuffer[offset], messageDataSizeLength);
+								offset += messageDataSizeLength;
+
+								// Extract message data
+
+								if ((offset + dataLength) > bytesRead)
+									dataLength = bytesRead - offset; // We make sure we do not overflow.
+
+																	 // Read the message data
+								message.data = std::vector<uint8_t>(&mBuffer[offset], &mBuffer[offset + dataLength]);
+							});
 }

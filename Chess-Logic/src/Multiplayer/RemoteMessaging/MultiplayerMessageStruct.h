@@ -11,7 +11,7 @@
 #include <vector>
 
 
-enum class MessageType : uint32_t
+enum class MultiplayerMessageType : uint32_t
 {
 	Move = 1,
 	Chat = 2
@@ -21,11 +21,6 @@ enum class MessageType : uint32_t
 
 struct MultiplayerMessageStruct
 {
-	std::vector<uint8_t> data;
-
-	std::string			 remoteIPv4;
-	int					 remotePort;
-
-	MessageType			 messageType;
-	uint64_t			 messageID;
+	MultiplayerMessageType type;
+	std::vector<uint8_t>   data;
 };
