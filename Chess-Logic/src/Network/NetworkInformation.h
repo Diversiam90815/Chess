@@ -56,7 +56,6 @@ public:
 
 	std::vector<NetworkAdapter> getAvailableNetworkAdapters() const;
 
-	bool						changeCurrentAdapter(const int ID);
 
 private:
 	std::string					sockaddrToString(SOCKADDR *sa) const;

@@ -208,20 +208,20 @@ void GameManager::executeMove(PossibleMove &tmpMove)
 
 	Move executedMove = mMoveExecution->executeMove(moveToExecute);
 
-	// If we're in multiplayer mode and it's our turn (local player), send the move to the remote
-	if (mIsMultiplayerMode)
-	{
-		PlayerColor currentPlayer = getCurrentPlayer();
-		bool isLocalPlayersTurn	  = (currentPlayer == PlayerColor::White && mWhitePlayer.isLocalPlayer()) || (currentPlayer == PlayerColor::Black && mBlackPlayer.isLocalPlayer());
+	//// If we're in multiplayer mode and it's our turn (local player), send the move to the remote
+	//if (mIsMultiplayerMode)
+	//{
+	//	PlayerColor currentPlayer = getCurrentPlayer();
+	//	bool isLocalPlayersTurn	  = (currentPlayer == PlayerColor::White && mWhitePlayer.isLocalPlayer()) || (currentPlayer == PlayerColor::Black && mBlackPlayer.isLocalPlayer());
 
-		if (isLocalPlayersTurn && mNetwork && mNetwork->getActiveSession())
-		{
-			// Create and send move message
-			MoveMessage moveMsg(moveToExecute);
-			json		j = moveMsg.toJson();
-			mNetwork->getActiveSession()->sendJson(MultiplayerMessageType::Move, j);
-		}
-	}
+	//	if (isLocalPlayersTurn && mNetwork && mNetwork->getActiveSession())
+	//	{
+	//		// Create and send move message
+	//		MoveMessage moveMsg(moveToExecute);
+	//		json		j = moveMsg.toJson();
+	//		mNetwork->getActiveSession()->sendMessage(MultiplayerMessageType::Move, j);
+	//	}
+	//}
 
 	LoggingHelper::logMove(executedMove);
 
@@ -347,7 +347,17 @@ std::vector<NetworkAdapter> GameManager::getNetworkAdapters()
 
 bool GameManager::changeCurrentNetworkAdapter(int ID)
 {
-	return mNetwork->changeNetworkAdapter(ID);
+	auto adapters = mNetwork->getAvailableNetworkAdapters();
+
+	for (auto &adapter : adapters)
+	{
+		if (adapter.ID != ID)
+			continue;
+
+		mNetwork->networkAdapterChanged(adapter);
+		return true;
+	}
+	return false;
 }
 
 
@@ -359,13 +369,13 @@ int GameManager::getCurrentNetworkAdapterID()
 
 std::string GameManager::getRemotePlayerName()
 {
-	return mNetwork->getRemotePlayerName();
+	return mMultiplayerManager->getRemotePlayerName();
 }
 
 
 void GameManager::setLocalPlayerName(std::string name)
 {
-	mNetwork->setLocalPlayerName(name);
+	mMultiplayerManager->setLocalPlayerName(name);
 }
 
 
@@ -434,10 +444,10 @@ EndGameState GameManager::checkForEndGameConditions()
 
 bool GameManager::startMultiplayerGame(bool isHost)
 {
-	mIsMultiplayerMode = true;
-	mIsHost			   = isHost;
+	mIsMultiplayerMode	= true;
+	mIsHost				= isHost;
 
-	mMessageManager	   = std::make_shared<MessageManager>(); // Create the message manager
+	mMultiplayerManager = std::make_shared<MultiplayerManager>(); // Create the message manager
 
 	// Initialize the game & board
 	clearState();
@@ -457,10 +467,10 @@ bool GameManager::startMultiplayerGame(bool isHost)
 		mBlackPlayer.setIsLocalPlayer(true);
 	}
 
-	if (mNetwork && mNetwork->getActiveSession())
-	{
-		mNetwork->getActiveSession()->attachObserver(mMessageManager);
-	}
+	//if (mMultiplayerManager && mMultiplayerManager->getActiveSession())
+	//{
+	//	mMultiplayerManager->getActiveSession()->attachObserver(mMessageManager);
+	//}
 
 	return true;
 }
@@ -468,17 +478,17 @@ bool GameManager::startMultiplayerGame(bool isHost)
 
 bool GameManager::connectToRemote(const std::string &remoteIP, const int remotePort)
 {
-	if (!mNetwork)
+	if (!mMultiplayerManager)
 		return false;
 
-	return mNetwork->connectToRemote(remoteIP, remotePort);
+	return mMultiplayerManager->connectToRemote(remoteIP, remotePort);
 }
 
 
 void GameManager::disconnectMultiplayerGame()
 {
-	if (mNetwork)
-		mNetwork->disconnect();
+	if (mMultiplayerManager)
+		mMultiplayerManager->disconnect();
 
 	mIsMultiplayerMode = false;
 	resetGame(); // Reset to single player
@@ -499,6 +509,8 @@ void GameManager::initObservers()
 	mBlackPlayer.attachObserver(mUiCommunicationLayer);
 
 	mMoveExecution->attachObserver(mUiCommunicationLayer);
+
+	mNetwork->attachObserver(mMultiplayerManager);
 
 	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer);
 }

@@ -11,6 +11,7 @@
 
 #include "Move.h"
 #include "Parameters.h"
+#include "NetworkAdapter.h"
 
 
 class IPlayerObserver
@@ -41,7 +42,6 @@ public:
 
 	virtual void onEndGame(EndGameState state, PlayerColor winner) = 0;
 	virtual void onChangeCurrentPlayer(PlayerColor player)		   = 0;
-	// virtual void onMoveStateInitiated()							   = 0;
 };
 
 
@@ -54,10 +54,19 @@ public:
 };
 
 
-class IRemoteCommunicationObserver
+class IRemoteReceiverObserver
 {
 public:
-	virtual ~IRemoteCommunicationObserver() {};
+	virtual ~IRemoteReceiverObserver() {};
 
 	virtual void onMessageReceived(const nlohmann::json &j) = 0;
+};
+
+
+class INetworkObserver
+{
+public:
+	virtual ~INetworkObserver() {};
+
+	virtual void onNetworkAdapterChanged(const NetworkAdapter &adapter) = 0;
 };

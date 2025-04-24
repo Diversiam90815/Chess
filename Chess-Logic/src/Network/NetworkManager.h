@@ -9,67 +9,31 @@
 
 #include "NetworkInformation.h"
 #include "FileManager.h"
-#include "TCPConnection/TCPClient.h"
-#include "TCPConnection/TCPServer.h"
-#include "Discovery/DiscoveryService.h"
+#include "IObservable.h"
 
-
-class NetworkManager
+class NetworkManager : public INetworkObservable
 {
 public:
-	NetworkManager();
-	~NetworkManager();
+	NetworkManager()  = default;
+	~NetworkManager() = default;
 
 	void						init();
 
-	bool						hostSession();
-
-	void						joinSession(const Endpoint remote);
-
-	void						setTCPSession(TCPSession::pointer session);
-	TCPSession::pointer			getActiveSession();
-
-	bool						connectToRemote(const std::string &remoteIP, const int port);
-	void						disconnect();
-
 	std::vector<NetworkAdapter> getAvailableNetworkAdapters() const;
-	bool						changeNetworkAdapter(const int ID);
+	void						networkAdapterChanged(const NetworkAdapter &adapter) override;
 
 	int							getCurrentNetworkAdapterID();
 
 	bool						isInitialized() const { return initialized.load(); }
 	void						setInitialized(const bool value) { initialized.store(value); }
 
-	void						setLocalPlayerName(const std::string name) { mLocalPlayerName = name; }
-	std::string					getLocalPlayerName() const { return mLocalPlayerName; }
-
-	void						setRemotePlayerName(const std::string name) { mRemotePlayerName = name; }
-	std::string					getRemotePlayerName() const { return mRemotePlayerName; }
-
 
 private:
-	bool																	 presetNetworkAdapter();
+	bool			   presetNetworkAdapter();
 
-	bool																	 setNetworkAdapterFromConfig();
+	bool			   setNetworkAdapterFromConfig();
 
-	bool																	 startServerDiscovery(const std::string IPv4, const int port);
-	void																	 startClientDiscovery();
+	NetworkInformation mNetworkInfo;
 
-
-	TCPSession::pointer														 mSession = nullptr;
-
-	std::unique_ptr<TCPServer>												 mServer;
-	std::unique_ptr<TCPClient>												 mClient;
-	std::unique_ptr<DiscoveryService>										 mDiscovery;
-
-	NetworkInformation														 mNetworkInfo;
-
-	std::atomic<bool>														 initialized{false};
-
-	boost::asio::io_context													 mIoContext;
-	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> mWorkGuard;
-	std::thread																 mWorkerThread;
-
-	std::string																 mLocalPlayerName{};
-	std::string																 mRemotePlayerName{};
+	std::atomic<bool>  initialized{false};
 };

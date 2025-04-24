@@ -85,7 +85,7 @@ void TCPSession::readBody()
 }
 
 
-void TCPSession::sendJson(MultiplayerMessageType type, const json &message)
+void TCPSession::sendMessage(MultiplayerMessageType type, const json &message)
 {
 	std::string			 body			  = message.dump(); // convert j to string
 

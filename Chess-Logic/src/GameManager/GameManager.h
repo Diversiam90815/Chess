@@ -18,10 +18,8 @@
 #include "UserSettings.h"
 #include "IObservable.h"
 #include "UICommunication.h"
-
-
 #include "NetworkManager.h"
-#include "MessageManager.h"
+#include "MultiplayerManager.h"
 
 
 class StateMachine;
@@ -98,36 +96,36 @@ public:
 private:
 	GameManager() = default;
 
-	void									  initObservers();
-	void									  deinitObservers();
+	void								initObservers();
+	void								deinitObservers();
 
 
-	Logging									  mLog;
+	Logging								mLog;
 
-	UserSettings							  mUserSettings;
+	UserSettings						mUserSettings;
 
-	bool									  mMovesGeneratedForCurrentTurn = false;
+	bool								mMovesGeneratedForCurrentTurn = false;
 
-	Player									  mWhitePlayer;
-	Player									  mBlackPlayer;
+	Player								mWhitePlayer;
+	Player								mBlackPlayer;
 
-	PlayerColor								  mCurrentPlayer = PlayerColor::NoColor;
+	PlayerColor							mCurrentPlayer = PlayerColor::NoColor;
 
-	std::vector<PossibleMove>				  mAllMovesForPosition;
+	std::vector<PossibleMove>			mAllMovesForPosition;
 
-	std::shared_ptr<ChessBoard>				  mChessBoard;
+	std::shared_ptr<ChessBoard>			mChessBoard;
 
-	std::shared_ptr<MoveGeneration>			  mMoveGeneration;
-	std::shared_ptr<MoveValidation>			  mMoveValidation;
-	std::shared_ptr<MoveExecution>			  mMoveExecution;
+	std::shared_ptr<MoveGeneration>		mMoveGeneration;
+	std::shared_ptr<MoveValidation>		mMoveValidation;
+	std::shared_ptr<MoveExecution>		mMoveExecution;
 
-	std::shared_ptr<UICommunication>		  mUiCommunicationLayer;
+	std::shared_ptr<UICommunication>	mUiCommunicationLayer;
 
-	std::shared_ptr<NetworkManager>			  mNetwork;
+	std::shared_ptr<NetworkManager>		mNetwork;
 
-	std::shared_ptr<MessageManager>			  mMessageManager;
+	std::shared_ptr<MultiplayerManager> mMultiplayerManager;
 
 
-	bool									  mIsMultiplayerMode{false};
-	bool									  mIsHost{false};
+	bool								mIsMultiplayerMode{false};
+	bool								mIsHost{false};
 };

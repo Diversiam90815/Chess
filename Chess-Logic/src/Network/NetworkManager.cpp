@@ -8,25 +8,6 @@
 #include "NetworkManager.h"
 
 
-NetworkManager::NetworkManager() : mWorkGuard(boost::asio::make_work_guard(mIoContext))
-{
-	// Start the IO Context in a dedicated thread
-	mWorkerThread = std::thread([this]() { mIoContext.run(); });
-}
-
-
-NetworkManager::~NetworkManager()
-{
-	// Stop the IO context
-	mWorkGuard.reset();
-	mIoContext.stop();
-	if (mWorkerThread.joinable())
-	{
-		mWorkerThread.join();
-	}
-}
-
-
 void NetworkManager::init()
 {
 	mNetworkInfo.init();
@@ -42,82 +23,28 @@ void NetworkManager::init()
 }
 
 
-bool NetworkManager::hostSession()
-{
-	mServer = std::make_unique<TCPServer>(mIoContext);
-	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
-	mServer->startAccept();
-
-	if (isInitialized())
-		return false;
-
-	const std::string localIPv4 = mNetworkInfo.getCurrentNetworkAdapter().IPv4;
-	const int		  port		= mServer->getBoundPort();
-	bool			  success	= startServerDiscovery(localIPv4, port);
-	return success;
-}
-
-
-void NetworkManager::joinSession(const Endpoint remote)
-{
-	mClient = std::make_unique<TCPClient>(mIoContext);
-	mClient->setConnectHandler([this](TCPSession::pointer session) { setTCPSession(session); });
-	mClient->connect(remote.IPAddress, remote.tcpPort);
-}
-
-
-void NetworkManager::setTCPSession(TCPSession::pointer session)
-{
-	mSession = session;
-}
-
-
-TCPSession::pointer NetworkManager::getActiveSession()
-{
-	return mSession;
-}
-
-
-bool NetworkManager::connectToRemote(const std::string &remoteIP, const int port)
-{
-	try
-	{
-		mClient->connect(remoteIP, port);
-		return true;
-	}
-	catch (const boost::system::system_error &e)
-	{
-		LOG_ERROR("Failed to connect to remote: {}", e.what());
-		return false;
-	}
-}
-
-
-void NetworkManager::disconnect()
-{
-	if (mDiscovery)
-	{
-		mDiscovery->stop();
-		mDiscovery.reset();
-	}
-
-	mSession.reset();
-	mClient.reset();
-	mServer.reset();
-
-	LOG_INFO("Network Connection closed.");
-}
-
-
 std::vector<NetworkAdapter> NetworkManager::getAvailableNetworkAdapters() const
 {
 	return mNetworkInfo.getAvailableNetworkAdapters();
 }
 
 
-bool NetworkManager::changeNetworkAdapter(const int ID)
+void NetworkManager::networkAdapterChanged(const NetworkAdapter &adapter)
 {
-	return mNetworkInfo.changeCurrentAdapter(ID);
+	auto currentAdapter = mNetworkInfo.getCurrentNetworkAdapter();
+
+	if (currentAdapter != adapter)
+	{
+		LOG_INFO("Network Adapter has been changed to {} with IP", adapter.description.c_str(), adapter.IPv4.c_str());
+
+		mNetworkInfo.setCurrentNetworkAdapter(adapter);
+
+		for (auto &observer : mObservers)
+		{
+			if (auto obs = observer.lock())
+				obs->onNetworkAdapterChanged(adapter);
+		}
+	}
 }
 
 
@@ -162,24 +89,4 @@ bool NetworkManager::setNetworkAdapterFromConfig()
 	mNetworkInfo.setCurrentNetworkAdapter(userSetAdapter);
 
 	return true;
-}
-
-
-bool NetworkManager::startServerDiscovery(const std::string IPv4, const int port)
-{
-	mDiscovery.reset(new DiscoveryService(mIoContext));
-
-	bool bindingSucceeded = mDiscovery->init(IPv4, port, getLocalPlayerName());
-	mDiscovery->startSender();
-
-	return bindingSucceeded;
-}
-
-
-void NetworkManager::startClientDiscovery()
-{
-	mDiscovery.reset(new DiscoveryService(mIoContext));
-
-	mDiscovery->setPeerCallback([this](Endpoint remote) { joinSession(remote); });
-	mDiscovery->startReceiver();
 }

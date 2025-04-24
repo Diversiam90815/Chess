@@ -188,20 +188,6 @@ std::vector<NetworkAdapter> NetworkInformation::getAvailableNetworkAdapters() co
 }
 
 
-bool NetworkInformation::changeCurrentAdapter(const int ID)
-{
-	for (auto &adapter : mNetworkAdapters)
-	{
-		if (adapter.ID == ID)
-		{
-			setCurrentNetworkAdapter(adapter);
-			return true;
-		}
-	}
-	return false;
-}
-
-
 std::string NetworkInformation::sockaddrToString(SOCKADDR *sa) const
 {
 	char addressBuffer[INET6_ADDRSTRLEN] = {0};

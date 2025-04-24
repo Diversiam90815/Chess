@@ -7,6 +7,56 @@
 
 #pragma once
 
-class MultiplayerManager
+#include "TCPConnection/TCPClient.h"
+#include "TCPConnection/TCPServer.h"
+#include "Discovery/DiscoveryService.h"
+#include "RemoteMessaging/RemoteReceiver.h"
+#include "RemoteMessaging/RemoteSender.h"
+
+#include "IObserver.h"
+
+class MultiplayerManager : public INetworkObserver
 {
+public:
+	MultiplayerManager();
+	~MultiplayerManager();
+
+
+	bool				hostSession();
+
+	void				joinSession(const Endpoint remote);
+
+	void				setTCPSession(TCPSession::pointer session);
+	TCPSession::pointer getActiveSession();
+
+	bool				connectToRemote(const std::string &remoteIP, const int port);
+	void				disconnect();
+
+	void				setLocalPlayerName(const std::string name) { mLocalPlayerName = name; }
+	std::string			getLocalPlayerName() const { return mLocalPlayerName; }
+
+	void				setRemotePlayerName(const std::string name) { mRemotePlayerName = name; }
+	std::string			getRemotePlayerName() const { return mRemotePlayerName; }
+
+	void				onNetworkAdapterChanged(const NetworkAdapter &adapter) override;
+
+	bool				startServerDiscovery(const std::string IPv4, const int port);
+	void				startClientDiscovery();
+
+private:
+	TCPSession::pointer														 mSession = nullptr;
+
+	std::unique_ptr<TCPServer>												 mServer;
+	std::unique_ptr<TCPClient>												 mClient;
+	std::unique_ptr<DiscoveryService>										 mDiscovery;
+
+
+	boost::asio::io_context													 mIoContext;
+	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> mWorkGuard;
+	std::thread																 mWorkerThread;
+
+	std::string																 mLocalPlayerName{};
+	std::string																 mRemotePlayerName{};
+
+	std::string																 mLocalIPv4{};
 };

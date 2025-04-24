@@ -47,9 +47,9 @@ class IPlayerObservable : public ObservableBase<IPlayerObserver>
 public:
 	virtual ~IPlayerObservable() {};
 
-	virtual void updateScore()											 = 0;
-	virtual void addCapturedPiece(const PieceType captured)				 = 0;
-	virtual void removeLastCapturedPiece()								 = 0;
+	virtual void updateScore()								= 0;
+	virtual void addCapturedPiece(const PieceType captured) = 0;
+	virtual void removeLastCapturedPiece()					= 0;
 };
 
 
@@ -58,8 +58,8 @@ class IMoveObservable : public ObservableBase<IMoveObserver>
 public:
 	virtual ~IMoveObservable() {};
 
-	virtual Move executeMove(PossibleMove &move)					   = 0;
-	virtual void addMoveToHistory(Move &move)						   = 0;
+	virtual Move executeMove(PossibleMove &move) = 0;
+	virtual void addMoveToHistory(Move &move)	 = 0;
 };
 
 
@@ -68,8 +68,8 @@ class IGameObservable : public ObservableBase<IGameObserver>
 public:
 	virtual ~IGameObservable() {};
 
-	virtual void endGame(EndGameState state, PlayerColor winner)	   = 0;
-	virtual void changeCurrentPlayer(PlayerColor player)			   = 0;
+	virtual void endGame(EndGameState state, PlayerColor winner) = 0;
+	virtual void changeCurrentPlayer(PlayerColor player)		 = 0;
 };
 
 
@@ -78,14 +78,23 @@ class IGameStateObservable : public ObservableBase<IGameStateObserver>
 public:
 	virtual ~IGameStateObservable() {};
 
-	virtual void gameStateChanged(const GameState state)					= 0;
+	virtual void gameStateChanged(const GameState state) = 0;
 };
 
 
-class IRemoteCommunicationObservable : public ObservableBase<IRemoteCommunicationObserver>
+class IRemoteReceiverObservable : public ObservableBase<IRemoteReceiverObserver>
 {
 public:
-	virtual ~IRemoteCommunicationObservable() {};
+	virtual ~IRemoteReceiverObservable() {};
 
-	virtual void receivedMessage(const json &j)										  = 0;
+	virtual void receivedMessage(const json &j) = 0;
+};
+
+
+class INetworkObservable : public ObservableBase<INetworkObserver>
+{
+public:
+	virtual ~INetworkObservable() {};
+
+	virtual void networkAdapterChanged(const NetworkAdapter &adapter) = 0;
 };
