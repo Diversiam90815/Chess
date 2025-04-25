@@ -14,9 +14,9 @@
 #include "Parameters.h"
 #include "Logging.h"
 #include "NetworkAdapter.h"
+#include "JsonConversion.h"
 
 namespace fs = std::filesystem;
-using json	 = nlohmann::json;
 
 
 class FileManager

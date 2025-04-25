@@ -8,22 +8,6 @@
 #include "FileManager.h"
 #include <iostream>
 
-void to_json(json &j, const NetworkAdapter &adapter)
-{
-	j = json{{"ID", adapter.ID},		 {"Description", adapter.description}, {"IPv4", adapter.IPv4},
-			 {"Subnet", adapter.subnet}, {"Eligible", adapter.eligible},	   {"Selected", adapter.selected}};
-}
-
-void from_json(const json &j, NetworkAdapter &adapter)
-{
-	j.at("ID").get_to(adapter.ID);
-	j.at("Description").get_to(adapter.description);
-	j.at("IPv4").get_to(adapter.IPv4);
-	j.at("Subnet").get_to(adapter.subnet);
-	j.at("Eligible").get_to(adapter.eligible);
-	j.at("Selected").get_to(adapter.selected);
-}
-
 
 FileManager *FileManager::GetInstance()
 {
