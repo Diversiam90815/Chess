@@ -54,28 +54,12 @@ void MultiplayerManager::joinSession(const Endpoint remote)
 void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 {
 	mSession = session;
-	//mSession->attachObserver(..);		// TODO : attach receiver here
 }
 
 
 TCPSession::pointer MultiplayerManager::getActiveSession()
 {
 	return mSession;
-}
-
-
-bool MultiplayerManager::connectToRemote(const std::string &remoteIP, const int port)
-{
-	try
-	{
-		mClient->connect(remoteIP, port);
-		return true;
-	}
-	catch (const boost::system::system_error &e)
-	{
-		LOG_ERROR("Failed to connect to remote: {}", e.what());
-		return false;
-	}
 }
 
 

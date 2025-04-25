@@ -8,11 +8,9 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <functional>
 #include <vector>
-#include <json.hpp>
 
 #include "Logging.h"
 #include "IObservable.h"

@@ -467,22 +467,9 @@ bool GameManager::startMultiplayerGame(bool isHost)
 		mBlackPlayer.setIsLocalPlayer(true);
 	}
 
-	//if (mMultiplayerManager && mMultiplayerManager->getActiveSession())
-	//{
-	//	mMultiplayerManager->getActiveSession()->attachObserver(mMessageManager);
-	//}
-
 	return true;
 }
 
-
-bool GameManager::connectToRemote(const std::string &remoteIP, const int remotePort)
-{
-	if (!mMultiplayerManager)
-		return false;
-
-	return mMultiplayerManager->connectToRemote(remoteIP, remotePort);
-}
 
 
 void GameManager::disconnectMultiplayerGame()

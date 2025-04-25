@@ -226,16 +226,9 @@ CHESS_API bool GetBoardState(int *boardState)
 }
 
 
-CHESS_API bool StartMultiplayerGame(bool isHost)
+CHESS_API void StartMultiplayerGame(bool isHost)
 {
-	// TODO
-	return false;
-}
-
-
-CHESS_API bool ConnectToRemoteGame(const char *ipAddress, int port)
-{
-	return GameManager::GetInstance()->connectToRemote(std::string(ipAddress), port);
+	StateMachine::GetInstance()->onMultiplayerGameStarted(isHost);
 }
 
 
@@ -245,7 +238,7 @@ CHESS_API void DisconnectMultiplayerGame()
 }
 
 
-CHESS_API bool isMultiplayerActive()
+CHESS_API bool IsMultiplayerActive()
 {
 	return GameManager::GetInstance()->isMultiplayerActive();
 }

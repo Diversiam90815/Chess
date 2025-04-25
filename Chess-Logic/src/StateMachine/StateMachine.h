@@ -32,7 +32,7 @@ public:
 	void	  stop();
 
 	void	  onGameStarted();							  // Called from UI
-	void	  onMultiplayerGameStarted(bool isHost);
+	void	  onMultiplayerGameStarted(bool isHost);	  // Called from UI
 	void	  onSquareSelected(const Position &pos);	  // Called from UI
 	void	  onPawnPromotionChosen(PieceType promotion); // Called from UI
 
@@ -51,48 +51,48 @@ public:
 private:
 	StateMachine();
 
-	void										   run();
+	void					run();
 
-	bool										   handleInitState(bool multiplayer);
-	bool										   handleWaitingForInputState();
-	bool										   handleMoveInitiatedState();
-	bool										   handleWaitingForTargetState();
-	bool										   handleValidatingMoveState();
-	bool										   handleExecutingMoveState();
-	bool										   handlePawnPromotionState();
-	bool										   handleGameOverState();
+	bool					handleInitState(bool multiplayer);
+	bool					handleWaitingForInputState();
+	bool					handleMoveInitiatedState();
+	bool					handleWaitingForTargetState();
+	bool					handleValidatingMoveState();
+	bool					handleExecutingMoveState();
+	bool					handlePawnPromotionState();
+	bool					handleGameOverState();
 
-	void										   switchToNextState();
+	void					switchToNextState();
 
-	bool										   isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
+	bool					isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
 
-	void										   resetCurrentPossibleMove();
+	void					resetCurrentPossibleMove();
 
 
-	boost::thread								   worker;
-	std::atomic<bool>							   mRunning;
-	std::mutex									   mMutex;
-	std::condition_variable						   cv;
+	boost::thread			worker;
+	std::atomic<bool>		mRunning;
+	std::mutex				mMutex;
+	std::condition_variable cv;
 
-	std::atomic<bool>							   mInitialized{false};
-	bool										   mEventTriggered{false};
+	std::atomic<bool>		mInitialized{false};
+	bool					mEventTriggered{false};
 
-	std::atomic<GameState>						   mCurrentState{GameState::Undefined};
+	std::atomic<GameState>	mCurrentState{GameState::Undefined};
 
-	PossibleMove								   mCurrentPossibleMove{};
+	PossibleMove			mCurrentPossibleMove{};
 
-	bool										   mMovesCalulated{false};
+	bool					mMovesCalulated{false};
 
-	bool										   mWaitingForTargetStart{false};
-	bool										   mWaitingForTargetEnd{false};
+	bool					mWaitingForTargetStart{false};
+	bool					mWaitingForTargetEnd{false};
 
-	bool										   mIsValidMove{false};
+	bool					mIsValidMove{false};
 
-	bool										   mAwaitingPromotion{false};
-	PieceType									   mPromotionChoice{PieceType::DefaultType};
+	bool					mAwaitingPromotion{false};
+	PieceType				mPromotionChoice{PieceType::DefaultType};
 
-	EndGameState								   mEndgameState{EndGameState::OnGoing};
+	EndGameState			mEndgameState{EndGameState::OnGoing};
 
-	bool										   mIsMultiplayerGame{false};
-	bool										   mIsLocalHost{false};
+	bool					mIsMultiplayerGame{false};
+	bool					mIsLocalHost{false};
 };

@@ -87,7 +87,6 @@ public:
 
 	bool						startMultiplayerGame(bool isHost);
 
-	bool						connectToRemote(const std::string &remoteIP, const int remotePort);
 	void						disconnectMultiplayerGame();
 
 	bool						isMultiplayerActive() const;

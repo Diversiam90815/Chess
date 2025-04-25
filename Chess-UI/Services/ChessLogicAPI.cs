@@ -85,10 +85,7 @@ namespace Chess_UI.Services
         #region Multiplayer
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartMultiplayerGame", CharSet = CharSet.Unicode)]
-        public static extern bool StartMultiplayerGame(bool isHost);
-
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ConnectToRemoteGame", CharSet = CharSet.Unicode)]
-        public static extern bool ConnectToRemoteGame([In()][MarshalAs(UnmanagedType.LPStr)] string ipAddress, int port);
+        public static extern void StartMultiplayerGame(bool isHost);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "DisconnectMultiplayerGame", CharSet = CharSet.Unicode)]
         public static extern void DisconnectMultiplayerGame();

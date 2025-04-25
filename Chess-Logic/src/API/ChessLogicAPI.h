@@ -52,13 +52,11 @@ extern "C"
 	CHESS_API bool	GetBoardState(int* boardstate);
 
 
-	CHESS_API bool	StartMultiplayerGame(bool isHost);
-
-	CHESS_API bool	ConnectToRemoteGame(const char* ipAddress, int port);
+	CHESS_API void	StartMultiplayerGame(bool isHost);
 
 	CHESS_API void	DisconnectMultiplayerGame();
 
-	CHESS_API bool	isMultiplayerActive();
+	CHESS_API bool	IsMultiplayerActive();
 
 
 	CHESS_API void	LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber);

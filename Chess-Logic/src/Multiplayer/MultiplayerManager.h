@@ -29,7 +29,6 @@ public:
 	void				setTCPSession(TCPSession::pointer session);
 	TCPSession::pointer getActiveSession();
 
-	bool				connectToRemote(const std::string &remoteIP, const int port);
 	void				disconnect();
 
 	void				setLocalPlayerName(const std::string name) { mLocalPlayerName = name; }
