@@ -49,6 +49,8 @@ private:
 
 	std::mutex							  mIncomingListMutex;
 	std::mutex							  mOutgoingListMutex;
+	std::mutex							  mSendThreadMutex;
+	std::mutex							  mReceiveThreadMutex;
 
 	std::condition_variable				  mSenderCV;
 	std::condition_variable				  mReceiverCV;

@@ -33,7 +33,7 @@ set (GAME_MANAGER_DIR       ${SOURCE_DIR}/GameManager)
 set (BOARD_DIR              ${SOURCE_DIR}/Board)
 set (PLAYER_DIR             ${SOURCE_DIR}/Player)
 set (API_DIR                ${SOURCE_DIR}/API)
-set (MISC_DIR               ${SOURCE_DIR}/Miscellaneous)
+set (HELPER_DIR             ${SOURCE_DIR}/Helper)
 set (FILEMANAGER_DIR        ${SOURCE_DIR}/FileManager)
 set (LOGGER_DIR             ${SOURCE_DIR}/Logger)
 set (USERSETTINGS_DIR       ${SOURCE_DIR}/UserSettings)
@@ -55,7 +55,7 @@ set(ALL_PROJECT_DIRS
 			${BOARD_DIR}
 			${PLAYER_DIR}
 			${API_DIR}
-			${MISC_DIR}
+			${HELPER_DIR}
 			${LOGGER_DIR}
 			${FILEMANAGER_DIR}
 			${SOURCE_DIR}
@@ -116,10 +116,11 @@ set(PLAYER_FILES
 	${PLAYER_DIR}/Player.h      ${PLAYER_DIR}/Player.cpp
 )
 
-set(MISC_FILES
-	${MISC_DIR}/JsonConversion.h
-	${MISC_DIR}/Parameters.h
-	${MISC_DIR}/Helper.h
+set(HELPER_FILES
+	${HELPER_DIR}/JsonConversion.h
+	${HELPER_DIR}/Parameters.h
+	${HELPER_DIR}/ThreadBase.h
+	${HELPER_DIR}/Conversion.h
 )
 
 set(LOGGER_FILES
@@ -170,7 +171,7 @@ set(ALL_FILES
 	${MOVE_FILES}
 	${GAME_MANAGER_FILES}
 	${PLAYER_FILES}
-	${MISC_FILES}
+	${HELPER_FILES}
 	${LOGGER_FILES}
 	${FILEMANAGER_FILES}
 	${USERSETTINGS_FILES}

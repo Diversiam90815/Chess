@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "Logging.h"
-#include "Helper.h"
+#include "Conversion.h"
 #include "NetworkAdapter.h"
 
 

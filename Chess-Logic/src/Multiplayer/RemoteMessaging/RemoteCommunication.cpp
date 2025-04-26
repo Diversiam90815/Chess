@@ -35,7 +35,16 @@ void RemoteCommunication::start()
 void RemoteCommunication::stop() {}
 
 
-void RemoteCommunication::runSendThread() {}
+void RemoteCommunication::runSendThread()
+{
+	while (mSendThreadRunning.load())
+	{
+		/*
+		mSenderCV.wait_for()
+		sendMessages();*/
+
+	}
+}
 
 
 void RemoteCommunication::runReceiveThread() {}

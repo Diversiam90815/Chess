@@ -1,10 +1,7 @@
 /*
   ==============================================================================
-
-	Class:          Helper
-
-	Description:    Helper functions to be used throughout the project
-
+	Module:         Conversion
+	Description:	Conversion functions to be used throughout the project
   ==============================================================================
 */
 

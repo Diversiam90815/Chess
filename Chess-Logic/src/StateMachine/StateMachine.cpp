@@ -169,7 +169,7 @@ void StateMachine::resetGame()
 
 void StateMachine::run()
 {
-	while (mRunning)
+	while (mRunning.load())
 	{
 		std::unique_lock<std::mutex> lock(mMutex);
 		cv.wait(lock, [this]() { return !mRunning || mEventTriggered; });
