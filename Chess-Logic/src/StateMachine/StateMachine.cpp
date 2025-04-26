@@ -31,34 +31,12 @@ void StateMachine::ReleaseInstance()
 }
 
 
-StateMachine::StateMachine() : mRunning(false) {}
+StateMachine::StateMachine() {}
 
 
 StateMachine::~StateMachine()
 {
 	stop();
-}
-
-
-void StateMachine::start()
-{
-	mRunning.store(true);
-	worker = boost::thread(&StateMachine::run, this);
-}
-
-
-void StateMachine::stop()
-{
-	{
-		std::lock_guard<std::mutex> lock(mMutex);
-		mRunning.store(false);
-		cv.notify_all();
-	}
-
-	if (worker.joinable())
-	{
-		worker.join();
-	}
 }
 
 
@@ -84,8 +62,6 @@ void StateMachine::onMultiplayerGameStarted(bool isHost)
 
 void StateMachine::onSquareSelected(const Position &pos)
 {
-	{
-		std::lock_guard<std::mutex> lock(mMutex);
 
 		if (getCurrentGameState() == GameState::WaitingForInput) // Selected Start Position
 		{
@@ -97,13 +73,11 @@ void StateMachine::onSquareSelected(const Position &pos)
 			mCurrentPossibleMove.end = pos;
 			gameStateChanged(GameState::ValidatingMove);
 		}
-	}
 }
 
 
 void StateMachine::onPawnPromotionChosen(PieceType promotion)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
 	if (getCurrentGameState() == GameState::PawnPromotion)
 	{
 		mPromotionChoice   = promotion;
@@ -126,9 +100,7 @@ void StateMachine::gameStateChanged(const GameState state)
 		if (obs)
 			obs->onGameStateChanged(state);
 	}
-
-	cv.notify_all();
-	mEventTriggered = true;
+	triggerEvent();
 }
 
 
@@ -147,16 +119,6 @@ void StateMachine::setInitialized(const bool value)
 }
 
 
-void StateMachine::triggerEvent()
-{
-	{
-		std::lock_guard<std::mutex> lock(mMutex);
-		mEventTriggered = true;
-	}
-	cv.notify_all();
-}
-
-
 void StateMachine::resetGame()
 {
 	mWaitingForTargetStart = false;
@@ -169,12 +131,9 @@ void StateMachine::resetGame()
 
 void StateMachine::run()
 {
-	while (mRunning.load())
+	while (isRunning())
 	{
-		std::unique_lock<std::mutex> lock(mMutex);
-		cv.wait(lock, [this]() { return !mRunning || mEventTriggered; });
-
-		mEventTriggered = false;
+		waitForEvent();
 
 		LOG_INFO("Processing state: {}", LoggingHelper::gameStateToString(getCurrentGameState()).c_str());
 
@@ -264,10 +223,6 @@ void StateMachine::run()
 		}
 		default: break;
 		}
-
-		// Always notify after processing, in case we need to continue processing states
-		lock.unlock(); // Unlock before notifying to prevent any potential deadlock
-		cv.notify_all();
 	}
 }
 

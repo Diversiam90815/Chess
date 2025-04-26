@@ -15,21 +15,18 @@
 #include "Parameters.h"
 #include "Move.h"
 #include "IObservable.h"
-
+#include "ThreadBase.h"
 
 class GameManager;
 
 
-class StateMachine : public IGameStateObservable
+class StateMachine : public IGameStateObservable, public ThreadBase
 {
 public:
 	static StateMachine *GetInstance();
 	static void			 ReleaseInstance();
 
 	~StateMachine();
-
-	void	  start();
-	void	  stop();
 
 	void	  onGameStarted();							  // Called from UI
 	void	  onMultiplayerGameStarted(bool isHost);	  // Called from UI
@@ -43,15 +40,12 @@ public:
 	bool	  isInitialized() const;
 	void	  setInitialized(const bool value);
 
-	void	  triggerEvent();
-
 	void	  resetGame();
-
 
 private:
 	StateMachine();
 
-	void					run();
+	void					run() override;
 
 	bool					handleInitState(bool multiplayer);
 	bool					handleWaitingForInputState();
@@ -68,14 +62,7 @@ private:
 
 	void					resetCurrentPossibleMove();
 
-
-	boost::thread			worker;
-	std::atomic<bool>		mRunning;
-	std::mutex				mMutex;
-	std::condition_variable cv;
-
 	std::atomic<bool>		mInitialized{false};
-	bool					mEventTriggered{false};
 
 	std::atomic<GameState>	mCurrentState{GameState::Undefined};
 
