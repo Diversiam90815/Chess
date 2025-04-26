@@ -9,8 +9,43 @@
 
 #include <boost/thread.hpp>
 
+#include "ThreadBase.h"
 #include "MultiplayerMessageStruct.h"
 #include "TCPConnection/TCPSession.h"
+
+
+class SendThread : public ThreadBase
+{
+public:
+	SendThread(RemoteCommunication *owner) : mOwner(owner) {}
+
+protected:
+	void run() override
+	{
+		waitForEvent(200);
+		mOwner->sendMessages();
+	}
+
+private:
+	RemoteCommunication *mOwner;
+};
+
+
+class ReceiveThread : public ThreadBase
+{
+public:
+	ReceiveThread(RemoteCommunication *owner) : mOwner(owner) {}
+
+protected:
+	void run() override
+	{
+		waitForEvent(200);
+		mOwner->receiveMessages();
+	}
+
+private:
+	RemoteCommunication *mOwner;
+};
 
 
 class RemoteCommunication : public IRemoteReceiverObservable
@@ -25,38 +60,27 @@ public:
 	void start();
 	void stop();
 
-	void runSendThread();
-	void runReceiveThread();
-
 	bool read(MultiplayerMessageType &type, std::vector<uint8_t> &dest);
 	void write(MultiplayerMessageType type, std::vector<uint8_t> data);
 
 	bool isInitialized() const { return mIsInitialized.load(); }
 
+	bool receiveMessages();
+	bool sendMessages();
+
 private:
 	void								  notifyObservers();
 	void								  receivedMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) override;
-
-	bool								  receiveMessages();
-	bool								  sendMessages();
 
 	std::atomic<bool>					  mIsInitialized{false};
 
 	boost::shared_ptr<TCPSession>		  mTCPSession;
 
-	boost::thread						  mSendThread;
-	boost::thread						  mReceiveThread;
+	std::shared_ptr<SendThread>			  mSendThread;
+	std::shared_ptr<ReceiveThread>		  mReceiveThread;
 
 	std::mutex							  mIncomingListMutex;
 	std::mutex							  mOutgoingListMutex;
-	std::mutex							  mSendThreadMutex;
-	std::mutex							  mReceiveThreadMutex;
-
-	std::condition_variable				  mSenderCV;
-	std::condition_variable				  mReceiverCV;
-
-	std::atomic<bool>					  mSendThreadRunning{false};
-	std::atomic<bool>					  mReceiveThreadRunning{false};
 
 	std::vector<MultiplayerMessageStruct> mIncomingMessages;
 	std::vector<MultiplayerMessageStruct> mOutgoingMessages;

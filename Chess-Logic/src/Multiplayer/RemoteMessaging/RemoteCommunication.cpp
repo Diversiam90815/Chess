@@ -10,7 +10,11 @@
 
 bool RemoteCommunication::init(boost::shared_ptr<TCPSession> session)
 {
-	mTCPSession = session;
+	mTCPSession	   = session;
+
+	mSendThread	   = std::make_shared<SendThread>(this);
+	mReceiveThread = std::make_shared<ReceiveThread>(this);
+
 	mIsInitialized.store(true);
 	return true;
 }
@@ -21,33 +25,22 @@ void RemoteCommunication::deinit()
 	mTCPSession.reset();
 	mTCPSession = nullptr;
 	mIsInitialized.store(false);
-	mIsInitialized.store(false);
 }
 
 
 void RemoteCommunication::start()
 {
-	mSendThread	   = boost::thread(&RemoteCommunication::runSendThread, this);
-	mReceiveThread = boost::thread(&RemoteCommunication::runReceiveThread, this);
+	mSendThread->start();
+	mReceiveThread->start();
 }
 
 
-void RemoteCommunication::stop() {}
-
-
-void RemoteCommunication::runSendThread()
+void RemoteCommunication::stop()
 {
-	while (mSendThreadRunning.load())
-	{
-		/*
-		mSenderCV.wait_for()
-		sendMessages();*/
-
-	}
+	mSendThread->stop();
+	mReceiveThread->stop();
 }
 
-
-void RemoteCommunication::runReceiveThread() {}
 
 
 bool RemoteCommunication::read(MultiplayerMessageType &type, std::vector<uint8_t> &dest)
