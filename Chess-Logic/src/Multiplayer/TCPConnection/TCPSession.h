@@ -33,9 +33,9 @@ public:
 
 	const int							  getBoundPort() const { return mBoundPort; }
 
-	void								  sendMessage(MultiplayerMessageStruct &message);
+	bool								  sendMessage(MultiplayerMessageStruct &message);
 
-	void								  readMessage(MultiplayerMessageStruct &message);
+	bool								  readMessage(MultiplayerMessageStruct &message);
 
 private:
 	explicit TCPSession(boost::asio::io_context &ioContext);
