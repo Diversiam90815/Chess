@@ -22,6 +22,6 @@ enum class MultiplayerMessageType : uint32_t
 
 struct MultiplayerMessageStruct
 {
-	MultiplayerMessageType type;
+	MultiplayerMessageType type = MultiplayerMessageType::Default;
 	std::vector<uint8_t>   data;
 };

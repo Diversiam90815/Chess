@@ -1,8 +1,9 @@
 /*
   ==============================================================================
-    Module:         RemoteSender
-    Description:    Handles sending messages to remote clients/servers
+	Module:         RemoteSender
+	Description:    Bridge between local chess session and outgoing messages
   ==============================================================================
 */
+
 
 #include "RemoteSender.h"

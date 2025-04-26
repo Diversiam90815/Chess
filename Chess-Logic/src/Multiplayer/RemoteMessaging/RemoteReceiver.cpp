@@ -1,7 +1,7 @@
 /*
   ==============================================================================
-    Module:         RemoteReceiver
-    Description:    Handles receiving messages from remote clients/servers
+	Module:         RemoteReceiver
+	Description:    Bridge between received messages and local chess session
   ==============================================================================
 */
 

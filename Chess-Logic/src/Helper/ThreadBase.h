@@ -78,5 +78,5 @@ private:
 	std::atomic<bool>		mRunning;
 	std::mutex				mMutex;
 	std::condition_variable cv;
-	bool					mEventTriggered;
+	bool					mEventTriggered{false};
 };

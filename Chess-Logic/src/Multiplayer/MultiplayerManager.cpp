@@ -53,7 +53,10 @@ void MultiplayerManager::joinSession(const Endpoint remote)
 
 void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 {
-	mSession = session;
+	mSession   = session;
+
+	mRemoteCom = std::make_unique<RemoteCommunication>();
+	mRemoteCom->init(mSession);
 }
 
 

@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 	Module:         RemoteSender
-	Description:    Handles sending messages to remote clients/servers
+	Description:    Bridge between local chess session and outgoing messages
   ==============================================================================
 */
 

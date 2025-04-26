@@ -12,8 +12,9 @@
 #include "Discovery/DiscoveryService.h"
 #include "RemoteMessaging/RemoteReceiver.h"
 #include "RemoteMessaging/RemoteSender.h"
-
+#include "RemoteMessaging/RemoteCommunication.h"
 #include "IObserver.h"
+
 
 class MultiplayerManager : public INetworkObserver
 {
@@ -48,7 +49,7 @@ private:
 	std::unique_ptr<TCPServer>												 mServer;
 	std::unique_ptr<TCPClient>												 mClient;
 	std::unique_ptr<DiscoveryService>										 mDiscovery;
-
+	std::unique_ptr<RemoteCommunication>									 mRemoteCom;
 
 	boost::asio::io_context													 mIoContext;
 	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> mWorkGuard;
