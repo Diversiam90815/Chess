@@ -47,13 +47,17 @@ bool RemoteCommunication::read(MultiplayerMessageType &type, std::vector<uint8_t
 {
 	std::lock_guard<std::mutex> lock(mIncomingListMutex);
 
-	for (auto &message : mIncomingMessages)
-	{
-		type = message.type;
-		dest = message.data;
-		return true;
-	}
-	return false;
+	if (mIncomingMessages.empty())
+		return false;
+
+	// Get the first message
+	auto &message = mIncomingMessages.front();
+	type		  = message.type;
+	dest		  = message.data;
+
+	// Remove the processed message
+	mIncomingMessages.erase(mIncomingMessages.begin());
+	return true;
 }
 
 
@@ -125,5 +129,8 @@ bool RemoteCommunication::sendMessages()
 		if (!success)
 			return false;
 	}
+
+	// Clear all messages after successful sending
+	mOutgoingMessages.clear();
 	return true;
 }
