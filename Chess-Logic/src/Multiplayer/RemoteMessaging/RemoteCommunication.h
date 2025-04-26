@@ -9,43 +9,9 @@
 
 #include <boost/thread.hpp>
 
-#include "ThreadBase.h"
 #include "MultiplayerMessageStruct.h"
 #include "TCPConnection/TCPSession.h"
-
-
-class SendThread : public ThreadBase
-{
-public:
-	SendThread(RemoteCommunication *owner) : mOwner(owner) {}
-
-protected:
-	void run() override
-	{
-		waitForEvent(200);
-		mOwner->sendMessages();
-	}
-
-private:
-	RemoteCommunication *mOwner;
-};
-
-
-class ReceiveThread : public ThreadBase
-{
-public:
-	ReceiveThread(RemoteCommunication *owner) : mOwner(owner) {}
-
-protected:
-	void run() override
-	{
-		waitForEvent(200);
-		mOwner->receiveMessages();
-	}
-
-private:
-	RemoteCommunication *mOwner;
-};
+#include "CommunicationThreads.h"
 
 
 class RemoteCommunication : public IRemoteReceiverObservable

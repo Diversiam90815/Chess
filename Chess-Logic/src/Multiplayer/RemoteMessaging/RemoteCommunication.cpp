@@ -70,6 +70,7 @@ void RemoteCommunication::write(MultiplayerMessageType type, std::vector<uint8_t
 	message.data = data;
 
 	mOutgoingMessages.push_back(message);
+	mSendThread->triggerEvent();
 }
 
 
