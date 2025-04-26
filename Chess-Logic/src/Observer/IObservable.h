@@ -87,7 +87,7 @@ class IRemoteReceiverObservable : public ObservableBase<IRemoteReceiverObserver>
 public:
 	virtual ~IRemoteReceiverObservable() {};
 
-	virtual void receivedMessage(const json &j) = 0;
+	virtual void receivedMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) = 0;
 };
 
 

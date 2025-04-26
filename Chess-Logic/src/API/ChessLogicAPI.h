@@ -14,7 +14,6 @@ extern "C"
 {
 #endif // __cplusplus
 
-
 	CHESS_API void	Init();
 
 	CHESS_API void	Deinit();
@@ -86,7 +85,6 @@ extern "C"
 	CHESS_API int	GetSavedAdapterID();
 
 	CHESS_API bool	ChangeCurrentAdapter(int ID);
-
 
 #ifdef __cplusplus
 }

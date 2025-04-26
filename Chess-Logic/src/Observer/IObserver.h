@@ -59,7 +59,7 @@ class IRemoteReceiverObserver
 public:
 	virtual ~IRemoteReceiverObserver() {};
 
-	virtual void onMessageReceived(const nlohmann::json &j) = 0;
+	virtual void onMessageReceived(MultiplayerMessageType type, std::vector<uint8_t> &message) = 0;
 };
 
 

@@ -13,6 +13,7 @@
 
 enum class MultiplayerMessageType : uint32_t
 {
+	Default = 0,
 	Move = 1,
 	Chat = 2
 	// To be expanded
