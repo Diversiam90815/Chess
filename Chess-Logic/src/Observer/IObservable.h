@@ -12,6 +12,7 @@
 #include "IObserver.h"
 #include "Move.h"
 #include "json.hpp"
+#include "Multiplayer/RemoteMessaging/MultiplayerMessageStruct.h"
 
 
 using json = nlohmann::json;

@@ -12,6 +12,7 @@
 #include "Move.h"
 #include "Parameters.h"
 #include "NetworkAdapter.h"
+#include "Multiplayer/RemoteMessaging/MultiplayerMessageStruct.h"
 
 
 class IPlayerObserver

@@ -12,6 +12,7 @@ bool RemoteCommunication::init(boost::shared_ptr<TCPSession> session)
 {
 	mTCPSession = session;
 	mIsInitialized.store(true);
+	return true;
 }
 
 
