@@ -13,7 +13,7 @@
 #include "Parameters.h"
 #include "NetworkAdapter.h"
 #include "Multiplayer/RemoteMessaging/MultiplayerMessageStruct.h"
-
+#include "Discovery/DiscoveryEndpoint.h"
 
 class IPlayerObserver
 {
@@ -31,8 +31,8 @@ class IMoveObserver
 public:
 	virtual ~IMoveObserver() {};
 
-	virtual void onExecuteMove(const PossibleMove &move)				= 0;
-	virtual void onAddToMoveHistory(Move &move) = 0;
+	virtual void onExecuteMove(const PossibleMove &move) = 0;
+	virtual void onAddToMoveHistory(Move &move)			 = 0;
 };
 
 
@@ -86,5 +86,17 @@ public:
 class IRemoteSenderObserver
 {
 public:
+	virtual ~IRemoteSenderObserver() {};
+
 	virtual void onSendMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) = 0;
+};
+
+
+class IDiscoveryObserver
+{
+public:
+	virtual ~IDiscoveryObserver() {};
+
+	virtual void onRemoteFound(const Endpoint &remote)	  = 0;
+	virtual void onRemoteSelected(const Endpoint &remote) = 0;
 };

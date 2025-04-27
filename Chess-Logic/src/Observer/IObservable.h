@@ -118,3 +118,13 @@ public:
 
 	virtual void sendMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) = 0;
 };
+
+
+class IDiscoveryObservable : public ObservableBase<IDiscoveryObserver>
+{
+public:
+	virtual ~IDiscoveryObservable() {};
+
+	virtual void onRemoteFound(const Endpoint &remote)	  = 0;
+	virtual void onRemoteSelected(const Endpoint &remote) = 0;
+};
