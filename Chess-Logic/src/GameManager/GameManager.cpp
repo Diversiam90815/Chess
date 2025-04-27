@@ -432,7 +432,7 @@ bool GameManager::startMultiplayerGame(bool isHost)
 	mIsMultiplayerMode	= true;
 	mIsHost				= isHost;
 
-	mMultiplayerManager = std::make_shared<MultiplayerManager>(); // Create the message manager
+	mMultiplayerManager = std::make_shared<MultiplayerManager>(); // Create the multiplayer manager
 
 	// Initialize the game & board
 	clearState();
@@ -451,6 +451,8 @@ bool GameManager::startMultiplayerGame(bool isHost)
 		mWhitePlayer.setIsLocalPlayer(false);
 		mBlackPlayer.setIsLocalPlayer(true);
 	}
+
+	mMultiplayerManager->setInternalObservers(); // Set the internal multiplayer observers
 
 	return true;
 }
@@ -476,13 +478,13 @@ bool GameManager::isMultiplayerActive() const
 bool GameManager::isLocalPlayerTurn()
 {
 	// If we're in single player mode, it is always our turn
-	if (!mIsMultiplayerMode)
+	if (!isMultiplayerActive())
 		return true;
 
-	PlayerColor currentPlayer = getCurrentPlayer();
+	PlayerColor currentPlayer	   = getCurrentPlayer();
 
-	bool isWhitePlayerTurn = currentPlayer == PlayerColor::White;
-	bool isBlackPlayerTurn = currentPlayer == PlayerColor::Black;
+	bool		isWhitePlayerTurn  = currentPlayer == PlayerColor::White;
+	bool		isBlackPlayerTurn  = currentPlayer == PlayerColor::Black;
 
 	bool		isLocalPlayersTurn = (isWhitePlayerTurn && mWhitePlayer.isLocalPlayer() || isBlackPlayerTurn && mBlackPlayer.isLocalPlayer());
 	return isLocalPlayersTurn;
@@ -501,6 +503,19 @@ void GameManager::initObservers()
 	mNetwork->attachObserver(mMultiplayerManager);
 
 	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer);
+}
+
+
+void GameManager::initMultiplayerObservers()
+{
+	if (!mMultiplayerManager)
+	{
+		LOG_WARNING("Could not set up the observers, since the Multiplayer Manager is not set up yet!");
+		return;
+	}
+
+	mMoveExecution->attachObserver(mMultiplayerManager->mRemoteSender);				   // Moves will be sent to the remote
+	mMultiplayerManager->mRemoteReceiver->attachObserver(StateMachine::GetInstance()); // Received moves will be handled in the state machine
 }
 
 

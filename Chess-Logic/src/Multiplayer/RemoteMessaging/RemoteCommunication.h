@@ -14,7 +14,7 @@
 #include "CommunicationThreads.h"
 
 
-class RemoteCommunication : public IRemoteReceiverObservable
+class RemoteCommunication : public IRemoteReceiverObservable, public IRemoteSenderObserver
 {
 public:
 	RemoteCommunication()  = default;
@@ -25,6 +25,8 @@ public:
 
 	void start();
 	void stop();
+
+	void onSendMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) override;
 
 	bool read(MultiplayerMessageType &type, std::vector<uint8_t> &dest);
 	void write(MultiplayerMessageType type, std::vector<uint8_t> data);

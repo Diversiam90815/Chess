@@ -96,6 +96,7 @@ private:
 	GameManager() = default;
 
 	void								initObservers();
+	void								initMultiplayerObservers();
 	void								deinitObservers();
 
 

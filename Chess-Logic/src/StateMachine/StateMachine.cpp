@@ -10,23 +10,19 @@
 #include "GameManager.h"
 
 
-StateMachine *StateMachine::GetInstance()
+std::shared_ptr<StateMachine> StateMachine::GetInstance()
 {
-	static StateMachine *sInstance = nullptr;
-	if (nullptr == sInstance)
-	{
-		sInstance = new StateMachine();
-	}
+	static std::shared_ptr<StateMachine> sInstance(new StateMachine());
 	return sInstance;
 }
 
 
 void StateMachine::ReleaseInstance()
 {
-	StateMachine *sInstance = GetInstance();
+	auto sInstance = GetInstance();
 	if (sInstance)
 	{
-		delete sInstance;
+		sInstance = nullptr;
 	}
 }
 

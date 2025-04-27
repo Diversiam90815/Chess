@@ -42,6 +42,17 @@ void RemoteCommunication::stop()
 }
 
 
+void RemoteCommunication::onSendMessage(MultiplayerMessageType type, std::vector<uint8_t> &message)
+{
+	if (!isInitialized())
+	{
+		LOG_WARNING("Could not sent message, since the Remote Communication is not initialized! Please initialize the Remote Communication before attempting to send messages!");
+		return;
+	}
+
+	write(type, message);
+}
+
 
 bool RemoteCommunication::read(MultiplayerMessageType &type, std::vector<uint8_t> &dest)
 {

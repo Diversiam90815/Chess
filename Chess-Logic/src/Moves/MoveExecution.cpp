@@ -106,9 +106,7 @@ Move MoveExecution::executeMove(PossibleMove &possibleMove)
 
 	for (auto &observer : mObservers)
 	{
-		auto obs = observer.lock();
-
-		if (obs)
+		if (auto obs = observer.lock())
 			obs->onExecuteMove(possibleMove);
 	}
 
@@ -209,9 +207,7 @@ void MoveExecution::addMoveToHistory(Move &move)
 
 	for (auto &observer : mObservers)
 	{
-		auto obs = observer.lock();
-
-		if (obs)
+		if (auto obs = observer.lock())
 			obs->onAddToMoveHistory(move);
 	}
 }

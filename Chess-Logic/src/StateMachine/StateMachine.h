@@ -20,11 +20,11 @@
 class GameManager;
 
 
-class StateMachine : public IGameStateObservable, public ThreadBase, public IRemoteMessagesObserver
+class StateMachine : public IGameStateObservable, public ThreadBase, public IRemoteMessagesObserver, public std::enable_shared_from_this<StateMachine>
 {
 public:
-	static StateMachine *GetInstance();
-	static void			 ReleaseInstance();
+	static std::shared_ptr<StateMachine> GetInstance();
+	static void							 ReleaseInstance();
 
 	~StateMachine();
 

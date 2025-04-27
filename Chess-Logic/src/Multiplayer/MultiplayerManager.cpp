@@ -12,7 +12,11 @@
 MultiplayerManager::MultiplayerManager() : mWorkGuard(boost::asio::make_work_guard(mIoContext))
 {
 	// Start the IO Context in a dedicated thread
-	mWorkerThread = std::thread([this]() { mIoContext.run(); });
+	mWorkerThread	= std::thread([this]() { mIoContext.run(); });
+
+	mRemoteCom		= std::make_shared<RemoteCommunication>();
+	mRemoteReceiver = std::make_shared<RemoteReceiver>();
+	mRemoteSender	= std::make_shared<RemoteSender>();
 }
 
 
@@ -55,8 +59,9 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 {
 	mSession   = session;
 
-	mRemoteCom = std::make_unique<RemoteCommunication>();
 	mRemoteCom->init(mSession);
+
+	setInternalObservers();
 }
 
 
@@ -106,4 +111,18 @@ void MultiplayerManager::startClientDiscovery()
 
 	mDiscovery->setPeerCallback([this](Endpoint remote) { joinSession(remote); });
 	mDiscovery->startReceiver();
+}
+
+
+void MultiplayerManager::setInternalObservers()
+{
+	if (!mRemoteCom || !mRemoteReceiver || !mRemoteSender)
+	{
+		LOG_ERROR("Could not set the observers, since the modules are not set up yet!");
+		return;
+	}
+
+	// Remote Communication and Sender/Receiver Connection
+	mRemoteCom->attachObserver(mRemoteReceiver);
+	mRemoteSender->attachObserver(mRemoteCom);
 }

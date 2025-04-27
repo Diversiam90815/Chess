@@ -22,7 +22,6 @@ public:
 	MultiplayerManager();
 	~MultiplayerManager();
 
-
 	bool				hostSession();
 
 	void				joinSession(const Endpoint remote);
@@ -43,13 +42,18 @@ public:
 	bool				startServerDiscovery(const std::string IPv4, const int port);
 	void				startClientDiscovery();
 
+	void				setInternalObservers();
+
 private:
 	TCPSession::pointer														 mSession = nullptr;
 
 	std::unique_ptr<TCPServer>												 mServer;
 	std::unique_ptr<TCPClient>												 mClient;
 	std::unique_ptr<DiscoveryService>										 mDiscovery;
-	std::unique_ptr<RemoteCommunication>									 mRemoteCom;
+
+	std::shared_ptr<RemoteCommunication>									 mRemoteCom;
+	std::shared_ptr<RemoteReceiver>											 mRemoteReceiver;
+	std::shared_ptr<RemoteSender>											 mRemoteSender;
 
 	boost::asio::io_context													 mIoContext;
 	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> mWorkGuard;
@@ -59,4 +63,6 @@ private:
 	std::string																 mRemotePlayerName{};
 
 	std::string																 mLocalIPv4{};
+
+	friend class GameManager;
 };
