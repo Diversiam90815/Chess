@@ -109,7 +109,7 @@ Move MoveExecution::executeMove(PossibleMove &possibleMove)
 		auto obs = observer.lock();
 
 		if (obs)
-			obs->onExecuteMove();
+			obs->onExecuteMove(possibleMove);
 	}
 
 	addMoveToHistory(executedMove);

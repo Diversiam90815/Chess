@@ -96,3 +96,6 @@ constexpr auto SelectedAdapter	 = "Selected_Adapter";
 
 constexpr int  PackageBufferSize = 65536;
 constexpr auto RemoteComSecret	 = "316";
+
+constexpr auto MoveKey			 = "Move";
+constexpr auto ChatMessageKey	 = "Chat";

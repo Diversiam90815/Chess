@@ -109,3 +109,12 @@ public:
 	virtual void remoteMoveReceived(const PossibleMove &move)		   = 0;
 	virtual void remoteChatMessageReceived(const std::string &message) = 0;
 };
+
+
+class IRemoteSenderObservable : public ObservableBase<IRemoteSenderObserver>
+{
+public:
+	virtual ~IRemoteSenderObservable() {};
+
+	virtual void sendMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) = 0;
+};

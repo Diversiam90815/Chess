@@ -31,7 +31,7 @@ class IMoveObserver
 public:
 	virtual ~IMoveObserver() {};
 
-	virtual void onExecuteMove()				= 0;
+	virtual void onExecuteMove(const PossibleMove &move)				= 0;
 	virtual void onAddToMoveHistory(Move &move) = 0;
 };
 
@@ -80,4 +80,11 @@ public:
 
 	virtual void onRemoteMoveReceived(const PossibleMove &remoteMove)	= 0;
 	virtual void onRemoteChatMessageReceived(const std::string &mesage) = 0;
+};
+
+
+class IRemoteSenderObserver
+{
+public:
+	virtual void onSendMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) = 0;
 };

@@ -35,7 +35,7 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 
 	case MultiplayerMessageType::Move:
 	{
-		PossibleMove remoteMove = tryGetContentFromMessage<PossibleMove>(jMessage, "Move");
+		PossibleMove remoteMove = tryGetContentFromMessage<PossibleMove>(jMessage, MoveKey);
 
 		if (remoteMove.isEmpty())
 		{
@@ -49,7 +49,7 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 
 	case MultiplayerMessageType::Chat:
 	{
-		std::string chatMessage = tryGetContentFromMessage<std::string>(jMessage, "Message");
+		std::string chatMessage = tryGetContentFromMessage<std::string>(jMessage, ChatMessageKey);
 
 		if (chatMessage.empty())
 		{
