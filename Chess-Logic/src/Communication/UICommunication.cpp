@@ -42,13 +42,6 @@ void UICommunication::onRemoveLastCapturedPiece(PlayerColor player, PieceType ca
 }
 
 
-void UICommunication::onExecuteMove()
-{
-	GameState state = GameState::ExecutingMove;
-	communicateToUI(MessageType::GameStateChanged, &state);
-}
-
-
 void UICommunication::onAddToMoveHistory(Move &move)
 {
 	std::string numberedNotation = std::to_string(move.number) + ". " + move.notation;

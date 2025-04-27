@@ -46,13 +46,12 @@ public:
 	void onAddCapturedPiece(PlayerColor player, PieceType captured) override;
 	void onRemoveLastCapturedPiece(PlayerColor player, PieceType captured) override;
 
-	void onExecuteMove() override;
+	void onExecuteMove(const PossibleMove &move) override {}
 	void onAddToMoveHistory(Move &move) override;
 
 	void onGameStateChanged(GameState state) override;
 	void onEndGame(EndGameState state, PlayerColor winner) override;
 	void onChangeCurrentPlayer(PlayerColor player) override;
-
 
 private:
 	bool			   communicateToUI(MessageType type, void *message) const;
