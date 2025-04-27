@@ -71,3 +71,13 @@ public:
 
 	virtual void onNetworkAdapterChanged(const NetworkAdapter &adapter) = 0;
 };
+
+
+class IRemoteMessagesObserver
+{
+public:
+	virtual ~IRemoteMessagesObserver() {};
+
+	virtual void onRemoteMoveReceived(const PossibleMove &remoteMove)	= 0;
+	virtual void onRemoteChatMessageReceived(const std::string &mesage) = 0;
+};
