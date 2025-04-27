@@ -66,7 +66,7 @@ std::string UserSettings::readSetting(SettingsType setting)
 		LOG_INFO("Piece theme read from file : {}", value.c_str());
 		return value;
 	}
-	default: break;
+	default: return value;
 	}
 }
 
