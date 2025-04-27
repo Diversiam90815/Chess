@@ -10,6 +10,7 @@
 #include "json.hpp"
 #include "NetworkAdapter.h"
 #include "Move.h"
+#include "Discovery/DiscoveryEndpoint.h"
 
 using json = nlohmann::json;
 
@@ -74,4 +75,21 @@ inline void from_json(const json &j, PossibleMove &possibleMove)
 	j.at("end").get_to(possibleMove.end);
 	j.at("type").get_to(possibleMove.type);
 	j.at("promotion").get_to(possibleMove.promotionPiece);
+}
+
+
+//==============================================================================
+//			Discovery Endpoint
+//==============================================================================
+
+inline void to_json(json &j, const Endpoint &ep)
+{
+	j = json{{"IPAddress", ep.IPAddress}, {"tcpPort", ep.tcpPort}, {"playerName", ep.playerName}};
+}
+
+inline void from_json(const json &j, Endpoint &ep)
+{
+	j.at("IPAddress").get_to(ep.IPAddress);
+	j.at("tcpPort").get_to(ep.tcpPort);
+	j.at("playerName").get_to(ep.playerName);
 }

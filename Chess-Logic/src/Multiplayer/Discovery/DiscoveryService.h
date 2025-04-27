@@ -13,39 +13,17 @@
 
 #include <functional>
 #include <string>
-#include <json.hpp>
 
 #include "Logging.h"
+#include "JsonConversion.h"
+#include "Discovery/DiscoveryEndpoint.h"
 
 
-using json	   = nlohmann::json;
 namespace asio = boost::asio;
 using boost::asio::ip::udp;
 
 
-struct Endpoint
-{
-	std::string IPAddress{};
-	int			tcpPort{0};
-	std::string playerName{};
-	bool		operator==(Endpoint &other) { return this->IPAddress == other.IPAddress && this->tcpPort == other.tcpPort && this->playerName == other.playerName; }
-};
-
 using PeerCallback = std::function<void(const Endpoint &remote)>;
-
-
-// Enable automatic JSON conversion.
-inline void to_json(json &j, const Endpoint &ep)
-{
-	j = json{{"IPAddress", ep.IPAddress}, {"tcpPort", ep.tcpPort}, {"playerName", ep.playerName}};
-}
-
-inline void from_json(const json &j, Endpoint &ep)
-{
-	j.at("IPAddress").get_to(ep.IPAddress);
-	j.at("tcpPort").get_to(ep.tcpPort);
-	j.at("playerName").get_to(ep.playerName);
-}
 
 
 class DiscoveryService
@@ -64,6 +42,7 @@ public:
 
 	void setPeerCallback(PeerCallback callback);
 
+
 private:
 	void					   sendPackage();
 
@@ -78,7 +57,7 @@ private:
 	void					   addRemoteToList(Endpoint remote);
 
 
-	const int				   mDiscoveryPort = 5555; // needs to be set from config later
+	const int				   mDiscoveryPort = 5555; // TODO: needs to be set from config later
 
 	std::string				   localIPv4{};
 	int						   mTcpPort{0};
