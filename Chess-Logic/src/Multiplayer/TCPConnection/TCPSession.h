@@ -43,7 +43,8 @@ private:
 
 	tcp::socket	  mSocket;
 
-	uint8_t		 *mBuffer = nullptr;
+	uint8_t		 *mReceiveBuffer = nullptr;
+	uint8_t		 *mSendBuffer = nullptr;
 
 	int			  mBoundPort{0};
 

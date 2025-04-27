@@ -14,13 +14,15 @@ TCPSession::TCPSession(boost::asio::io_context &ioContext) : mSocket(ioContext)
 	mSocket.bind(tcp::endpoint(tcp::v4(), 0));	  // Bind to a OS assigned port
 	mBoundPort = mSocket.local_endpoint().port(); // Get the port number it is bound to
 
-	mBuffer	   = new uint8_t[PackageBufferSize];
+	mSendBuffer	   = new uint8_t[PackageBufferSize];
+	mReceiveBuffer	   = new uint8_t[PackageBufferSize];
 }
 
 
 TCPSession::~TCPSession()
 {
-	free(mBuffer);
+	delete[] mSendBuffer;
+	delete[] mReceiveBuffer;
 }
 
 
@@ -39,28 +41,28 @@ bool TCPSession::sendMessage(MultiplayerMessageStruct &message)
 
 	size_t		 offset				   = 0;
 
-	memset(mBuffer, 0, PackageBufferSize); // Clear the buffer
+	memset(mSendBuffer, 0, PackageBufferSize); // Clear the buffer
 
 	// Copy the secret identifier
-	memcpy(&mBuffer[offset], RemoteComSecret, sizeof(RemoteComSecret));
+	memcpy(&mSendBuffer[offset], RemoteComSecret, sizeof(RemoteComSecret));
 	offset += sizeof(RemoteComSecret);
 
 	// Copy the message type
-	memcpy(&mBuffer[offset], &message.type, messageTypeSize);
+	memcpy(&mSendBuffer[offset], &message.type, messageTypeSize);
 	offset += messageTypeSize;
 
 	// Copy the message data size
-	memcpy(&mBuffer[offset], &messageDataSize, messageDataSizeLength);
+	memcpy(&mSendBuffer[offset], &messageDataSize, messageDataSizeLength);
 	offset += messageDataSizeLength;
 
 	// Copy the message data
-	memcpy(&mBuffer[offset], message.data.data(), messageDataSize);
+	memcpy(&mSendBuffer[offset], message.data.data(), messageDataSize);
 	offset += messageDataSize;
 
 	try
 	{
 		boost::system::error_code ec;
-		boost::asio::write(mSocket, boost::asio::buffer(mBuffer, offset), ec);
+		boost::asio::write(mSocket, boost::asio::buffer(mSendBuffer, offset), ec);
 
 		if (ec)
 		{
@@ -82,7 +84,7 @@ bool TCPSession::readMessage(MultiplayerMessageStruct &message)
 	try
 	{
 		boost::system::error_code ec;
-		size_t					  bytesRead = boost::asio::read(mSocket, boost::asio::buffer(mBuffer, PackageBufferSize), ec);
+		size_t					  bytesRead = boost::asio::read(mSocket, boost::asio::buffer(mReceiveBuffer, PackageBufferSize), ec);
 
 		if (ec)
 		{
@@ -91,7 +93,7 @@ bool TCPSession::readMessage(MultiplayerMessageStruct &message)
 		}
 
 		// Validate the secret identifier
-		if (memcmp(mBuffer, RemoteComSecret, sizeof(RemoteComSecret)) != 0)
+		if (memcmp(mReceiveBuffer, RemoteComSecret, sizeof(RemoteComSecret)) != 0)
 		{
 			LOG_ERROR("Invalid message format: Secret identifier mismatch");
 			return false;
@@ -101,13 +103,13 @@ bool TCPSession::readMessage(MultiplayerMessageStruct &message)
 
 		// Extract message type
 		const size_t messageTypeSize = sizeof(message.type);
-		memcpy(&message.type, &mBuffer[offset], messageTypeSize);
+		memcpy(&message.type, &mReceiveBuffer[offset], messageTypeSize);
 		offset += messageTypeSize;
 
 		// Extract message data size
 		size_t		 dataLength			   = 0;
 		const size_t messageDataSizeLength = sizeof(message.data.size());
-		memcpy(&dataLength, &mBuffer[offset], messageDataSizeLength);
+		memcpy(&dataLength, &mReceiveBuffer[offset], messageDataSizeLength);
 		offset += messageDataSizeLength;
 
 		// Extract message data
@@ -115,7 +117,7 @@ bool TCPSession::readMessage(MultiplayerMessageStruct &message)
 			dataLength = bytesRead - offset; // We make sure we do not overflow.
 
 		// Read the message data
-		message.data = std::vector<uint8_t>(&mBuffer[offset], &mBuffer[offset + dataLength]);
+		message.data = std::vector<uint8_t>(&mReceiveBuffer[offset], &mReceiveBuffer[offset + dataLength]);
 
 		return true;
 	}
