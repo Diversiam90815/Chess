@@ -63,16 +63,16 @@ void StateMachine::onMultiplayerGameStarted(bool isHost)
 void StateMachine::onSquareSelected(const Position &pos)
 {
 
-		if (getCurrentGameState() == GameState::WaitingForInput) // Selected Start Position
-		{
-			mCurrentPossibleMove.start = pos;
-			gameStateChanged(GameState::MoveInitiated);
-		}
-		else if (getCurrentGameState() == GameState::WaitingForTarget) // Selected End Position
-		{
-			mCurrentPossibleMove.end = pos;
-			gameStateChanged(GameState::ValidatingMove);
-		}
+	if (getCurrentGameState() == GameState::WaitingForInput) // Selected Start Position
+	{
+		mCurrentPossibleMove.start = pos;
+		gameStateChanged(GameState::MoveInitiated);
+	}
+	else if (getCurrentGameState() == GameState::WaitingForTarget) // Selected End Position
+	{
+		mCurrentPossibleMove.end = pos;
+		gameStateChanged(GameState::ValidatingMove);
+	}
 }
 
 
@@ -101,6 +101,40 @@ void StateMachine::gameStateChanged(const GameState state)
 			obs->onGameStateChanged(state);
 	}
 	triggerEvent();
+}
+
+
+void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
+{
+	if (getCurrentGameState() == GameState::WaitingForRemoteMove)
+	{
+		LOG_INFO("Remote move received!");
+
+		// Setting the current move
+		mCurrentPossibleMove = remoteMove;
+
+		// Is it valid?
+		mIsValidMove		 = GameManager::GetInstance()->checkForValidMoves(mCurrentPossibleMove);
+
+		if (!mIsValidMove)
+		{
+			LOG_WARNING("Invalid remote move received! This could indicate synchronisation issues!");
+			resetCurrentPossibleMove();
+			return;
+		}
+
+		// Check if a pawn promotion is needed!
+		bool isPawnPromotion = GameManager::GetInstance()->checkForPawnPromotionMove(mCurrentPossibleMove);
+
+		if (isPawnPromotion && mCurrentPossibleMove.promotionPiece == PieceType::DefaultType)
+		{
+			LOG_ERROR("Remote move requires promotion, however no promotion piece has been specified!");
+			return;
+		}
+
+		// If the move is valid and set correctly, we will enter the execute move state!
+		gameStateChanged(GameState::ExecutingMove);
+	}
 }
 
 
@@ -215,6 +249,12 @@ void StateMachine::run()
 			handlePawnPromotionState();
 			break;
 		}
+		case GameState::WaitingForRemoteMove:
+		{
+			// This state is passive -> we are waiting for onREmoteMoveReceieved to be called
+			// Maybe implement a timeout later? (-> TODO?)
+			break;
+		}
 		case GameState::GameOver:
 		{
 			// Determine the EndGameState and send message to UI
@@ -292,6 +332,22 @@ void StateMachine::switchToNextState()
 			mWaitingForTargetStart = false;
 			mWaitingForTargetEnd   = false;
 
+			// If we're in multiplayer mode, check who's turn it is
+			if (mIsMultiplayerGame)
+			{
+				bool isLocalPlayerTurn = GameManager::GetInstance()->isLocalPlayerTurn();
+				if (isLocalPlayerTurn)
+				{
+					gameStateChanged(GameState::WaitingForInput);
+				}
+				else
+				{
+					// If it's not local player's turn, switch to WaitForRemoteMove state!
+					gameStateChanged(GameState::WaitingForRemoteMove);
+				}
+			}
+
+			// Single player moves always switch to Waiting For Input!
 			gameStateChanged(GameState::WaitingForInput);
 		}
 		else

@@ -84,13 +84,13 @@ public:
 
 	EndGameState				checkForEndGameConditions();
 
-
 	bool						startMultiplayerGame(bool isHost);
 
 	void						disconnectMultiplayerGame();
 
 	bool						isMultiplayerActive() const;
 
+	bool						isLocalPlayerTurn();
 
 private:
 	GameManager() = default;

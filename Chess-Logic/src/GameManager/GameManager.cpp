@@ -208,21 +208,6 @@ void GameManager::executeMove(PossibleMove &tmpMove)
 
 	Move executedMove = mMoveExecution->executeMove(moveToExecute);
 
-	//// If we're in multiplayer mode and it's our turn (local player), send the move to the remote
-	//if (mIsMultiplayerMode)
-	//{
-	//	PlayerColor currentPlayer = getCurrentPlayer();
-	//	bool isLocalPlayersTurn	  = (currentPlayer == PlayerColor::White && mWhitePlayer.isLocalPlayer()) || (currentPlayer == PlayerColor::Black && mBlackPlayer.isLocalPlayer());
-
-	//	if (isLocalPlayersTurn && mNetwork && mNetwork->getActiveSession())
-	//	{
-	//		// Create and send move message
-	//		MoveMessage moveMsg(moveToExecute);
-	//		json		j = moveMsg.toJson();
-	//		mNetwork->getActiveSession()->sendMessage(MultiplayerMessageType::Move, j);
-	//	}
-	//}
-
 	LoggingHelper::logMove(executedMove);
 
 	if (executedMove.capturedPiece != PieceType::DefaultType)
@@ -485,6 +470,22 @@ void GameManager::disconnectMultiplayerGame()
 bool GameManager::isMultiplayerActive() const
 {
 	return mIsMultiplayerMode;
+}
+
+
+bool GameManager::isLocalPlayerTurn()
+{
+	// If we're in single player mode, it is always our turn
+	if (!mIsMultiplayerMode)
+		return true;
+
+	PlayerColor currentPlayer = getCurrentPlayer();
+
+	bool isWhitePlayerTurn = currentPlayer == PlayerColor::White;
+	bool isBlackPlayerTurn = currentPlayer == PlayerColor::Black;
+
+	bool		isLocalPlayersTurn = (isWhitePlayerTurn && mWhitePlayer.isLocalPlayer() || isBlackPlayerTurn && mBlackPlayer.isLocalPlayer());
+	return isLocalPlayersTurn;
 }
 
 

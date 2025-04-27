@@ -56,21 +56,10 @@ std::string LoggingHelper::gameStateToString(GameState state)
 	case GameState::WaitingForTarget: return "Waiting For Target";
 	case GameState::GameOver: return "Game Over";
 	case GameState::PawnPromotion: return "Pawn Promotion";
+	case GameState::WaitingForRemoteMove: return "Waiting for remote move";
 	default: return "Unknown GameState";
 	}
 }
-
-//
-// std::string LoggingHelper::moveStateToString(MoveState state)
-//{
-//	switch (state)
-//	{
-//	case MoveState::NoMove: return "No Move";
-//	case MoveState::InitiateMove: return "Initiate Move";
-//	case MoveState::ExecuteMove: return "Execute Move";
-//	default: return "Unknown MoveState";
-//	}
-//}
 
 
 std::string LoggingHelper::moveTypeToString(MoveType type)

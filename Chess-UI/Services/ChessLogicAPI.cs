@@ -258,7 +258,8 @@ namespace Chess_UI.Services
             ValidatingMove = 6,
             ExecutingMove = 7,
             PawnPromotion = 8,
-            GameOver = 9
+            WaitingForRemoteMove = 9,
+            GameOver = 10
         }
 
 

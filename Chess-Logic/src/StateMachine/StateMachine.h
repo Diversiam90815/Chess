@@ -20,7 +20,7 @@
 class GameManager;
 
 
-class StateMachine : public IGameStateObservable, public ThreadBase
+class StateMachine : public IGameStateObservable, public ThreadBase, public IRemoteMessagesObserver
 {
 public:
 	static StateMachine *GetInstance();
@@ -37,6 +37,9 @@ public:
 	GameState getCurrentGameState() { return mCurrentState.load(); }
 	void	  setCurrrentGameState(const GameState state) { mCurrentState.store(state); }
 
+	void	  onRemoteMoveReceived(const PossibleMove &remoteMove) override;
+	void	  onRemoteChatMessageReceived(const std::string &mesage) override {}
+
 	bool	  isInitialized() const;
 	void	  setInitialized(const bool value);
 
@@ -45,41 +48,41 @@ public:
 private:
 	StateMachine();
 
-	void					run() override;
+	void				   run() override;
 
-	bool					handleInitState(bool multiplayer);
-	bool					handleWaitingForInputState();
-	bool					handleMoveInitiatedState();
-	bool					handleWaitingForTargetState();
-	bool					handleValidatingMoveState();
-	bool					handleExecutingMoveState();
-	bool					handlePawnPromotionState();
-	bool					handleGameOverState();
+	bool				   handleInitState(bool multiplayer);
+	bool				   handleWaitingForInputState();
+	bool				   handleMoveInitiatedState();
+	bool				   handleWaitingForTargetState();
+	bool				   handleValidatingMoveState();
+	bool				   handleExecutingMoveState();
+	bool				   handlePawnPromotionState();
+	bool				   handleGameOverState();
 
-	void					switchToNextState();
+	void				   switchToNextState();
 
-	bool					isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
+	bool				   isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
 
-	void					resetCurrentPossibleMove();
+	void				   resetCurrentPossibleMove();
 
-	std::atomic<bool>		mInitialized{false};
+	std::atomic<bool>	   mInitialized{false};
 
-	std::atomic<GameState>	mCurrentState{GameState::Undefined};
+	std::atomic<GameState> mCurrentState{GameState::Undefined};
 
-	PossibleMove			mCurrentPossibleMove{};
+	PossibleMove		   mCurrentPossibleMove{};
 
-	bool					mMovesCalulated{false};
+	bool				   mMovesCalulated{false};
 
-	bool					mWaitingForTargetStart{false};
-	bool					mWaitingForTargetEnd{false};
+	bool				   mWaitingForTargetStart{false};
+	bool				   mWaitingForTargetEnd{false};
 
-	bool					mIsValidMove{false};
+	bool				   mIsValidMove{false};
 
-	bool					mAwaitingPromotion{false};
-	PieceType				mPromotionChoice{PieceType::DefaultType};
+	bool				   mAwaitingPromotion{false};
+	PieceType			   mPromotionChoice{PieceType::DefaultType};
 
-	EndGameState			mEndgameState{EndGameState::OnGoing};
+	EndGameState		   mEndgameState{EndGameState::OnGoing};
 
-	bool					mIsMultiplayerGame{false};
-	bool					mIsLocalHost{false};
+	bool				   mIsMultiplayerGame{false};
+	bool				   mIsLocalHost{false};
 };
