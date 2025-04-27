@@ -491,6 +491,21 @@ bool GameManager::isLocalPlayerTurn()
 }
 
 
+void GameManager::startRemoteDiscovery(bool isHost)
+{
+	if (isHost)
+	{
+		LOG_INFO("Starting to host a session..");
+		mMultiplayerManager->hostSession();
+	}
+	else
+	{
+		LOG_INFO("Starting to join a session..");
+		mMultiplayerManager->joinSession();
+	}
+}
+
+
 void GameManager::initObservers()
 {
 	this->attachObserver(mUiCommunicationLayer);

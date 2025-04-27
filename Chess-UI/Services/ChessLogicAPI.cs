@@ -87,6 +87,9 @@ namespace Chess_UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartMultiplayerGame", CharSet = CharSet.Unicode)]
         public static extern void StartMultiplayerGame(bool isHost);
 
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartRemoteDiscovery", CharSet = CharSet.Unicode)]
+        public static extern void StartRemoteDiscovery(bool isHost);
+
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "DisconnectMultiplayerGame", CharSet = CharSet.Unicode)]
         public static extern void DisconnectMultiplayerGame();
 
@@ -357,6 +360,5 @@ namespace Chess_UI.Services
         }
 
         #endregion  // Structures and Enums
-
     }
 }

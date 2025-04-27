@@ -232,6 +232,12 @@ CHESS_API void StartMultiplayerGame(bool isHost)
 }
 
 
+CHESS_API void StartRemoteDiscovery(bool isHost)
+{
+	GameManager::GetInstance()->startRemoteDiscovery();
+}
+
+
 CHESS_API void DisconnectMultiplayerGame()
 {
 	return GameManager::GetInstance()->disconnectMultiplayerGame();

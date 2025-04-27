@@ -53,9 +53,15 @@ extern "C"
 
 	CHESS_API void	StartMultiplayerGame(bool isHost);
 
+	CHESS_API void	StartRemoteDiscovery(bool isHost);
+
 	CHESS_API void	DisconnectMultiplayerGame();
 
 	CHESS_API bool	IsMultiplayerActive();
+
+	CHESS_API void	SetLocalPlayerName(const char *name);
+
+	CHESS_API char *GetRemotePlayerName();
 
 
 	CHESS_API void	LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber);
@@ -73,10 +79,6 @@ extern "C"
 
 	CHESS_API char *GetCurrentPieceTheme();
 
-
-	CHESS_API void	SetLocalPlayerName(const char *name);
-
-	CHESS_API char *GetRemotePlayerName();
 
 	CHESS_API int	GetNetworkAdapterCount();
 

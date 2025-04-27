@@ -92,6 +92,8 @@ public:
 
 	bool						isLocalPlayerTurn();
 
+	void						startRemoteDiscovery(bool isHost);
+
 private:
 	GameManager() = default;
 
