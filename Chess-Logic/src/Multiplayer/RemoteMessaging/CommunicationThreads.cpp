@@ -14,8 +14,11 @@ SendThread::SendThread(RemoteCommunication *owner) : mOwner(owner) {}
 
 void SendThread::run()
 {
-	waitForEvent(200);
-	mOwner->sendMessages();
+	while (isRunning())
+	{
+		waitForEvent(200);
+		mOwner->sendMessages();
+	}
 }
 
 
@@ -24,6 +27,9 @@ ReceiveThread::ReceiveThread(RemoteCommunication *owner) : mOwner(owner) {}
 
 void ReceiveThread::run()
 {
-	waitForEvent(200);
-	mOwner->receiveMessages();
+	while (isRunning())
+	{
+		waitForEvent(200);
+		mOwner->receiveMessages();
+	}
 }
