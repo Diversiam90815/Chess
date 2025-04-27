@@ -33,6 +33,8 @@ public:
 
 	const int							  getBoundPort() const { return mBoundPort; }
 
+	bool								  isConnected() const;
+
 	bool								  sendMessage(MultiplayerMessageStruct &message);
 
 	bool								  readMessage(MultiplayerMessageStruct &message);

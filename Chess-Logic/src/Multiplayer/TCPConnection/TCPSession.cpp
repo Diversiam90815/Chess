@@ -10,12 +10,12 @@
 
 TCPSession::TCPSession(boost::asio::io_context &ioContext) : mSocket(ioContext)
 {
-	mSocket.open(tcp::v4());					  // Open the socket
-	mSocket.bind(tcp::endpoint(tcp::v4(), 0));	  // Bind to a OS assigned port
-	mBoundPort = mSocket.local_endpoint().port(); // Get the port number it is bound to
+	mSocket.open(tcp::v4());						  // Open the socket
+	mSocket.bind(tcp::endpoint(tcp::v4(), 0));		  // Bind to a OS assigned port
+	mBoundPort	   = mSocket.local_endpoint().port(); // Get the port number it is bound to
 
 	mSendBuffer	   = new uint8_t[PackageBufferSize];
-	mReceiveBuffer	   = new uint8_t[PackageBufferSize];
+	mReceiveBuffer = new uint8_t[PackageBufferSize];
 }
 
 
@@ -32,8 +32,20 @@ tcp::socket &TCPSession::socket()
 }
 
 
+bool TCPSession::isConnected() const
+{
+	return mSocket.is_open() && !mSocket.remote_endpoint().address().is_unspecified();
+}
+
+
 bool TCPSession::sendMessage(MultiplayerMessageStruct &message)
 {
+	if (!isConnected())
+	{
+		LOG_ERROR("Socket is not connected. Cannot send message.");
+		return false;
+	}
+
 	// Calculate sizes for the message's parts
 	const size_t messageTypeSize	   = sizeof(message.type);
 	const size_t messageDataSize	   = message.data.size();
@@ -81,10 +93,17 @@ bool TCPSession::sendMessage(MultiplayerMessageStruct &message)
 
 bool TCPSession::readMessage(MultiplayerMessageStruct &message)
 {
+	if (!isConnected())
+	{
+		LOG_ERROR("Socket is not connected. Cannot read message.");
+		return false;
+	}
+
 	try
 	{
 		boost::system::error_code ec;
-		size_t					  bytesRead = boost::asio::read(mSocket, boost::asio::buffer(mReceiveBuffer, PackageBufferSize), ec);
+		size_t					  bytesRead = boost::asio::read(mSocket, boost::asio::buffer(mReceiveBuffer, PackageBufferSize),
+																ec); // TODO: Adjusted size that is being read -> create a two phase reading -> header + data
 
 		if (ec)
 		{
