@@ -102,9 +102,14 @@ bool TCPSession::readMessage(MultiplayerMessageStruct &message)
 	try
 	{
 		boost::system::error_code ec;
-		size_t					  bytesRead = boost::asio::read(mSocket, boost::asio::buffer(mReceiveBuffer, PackageBufferSize),
-																ec); // TODO: Adjusted size that is being read -> create a two phase reading -> header + data
 
+		// Calculate header size
+		const size_t			  headerSize = sizeof(RemoteComSecret) + sizeof(message.type) + sizeof(size_t);
+
+		// First phase: Read the header
+		size_t					  bytesRead	 = boost::asio::read(mSocket, boost::asio::buffer(mReceiveBuffer, headerSize), boost::asio::transfer_exactly(headerSize), ec);
+
+		// Check for error
 		if (ec)
 		{
 			LOG_ERROR("Error reading message: {}", ec.message());
@@ -131,12 +136,32 @@ bool TCPSession::readMessage(MultiplayerMessageStruct &message)
 		memcpy(&dataLength, &mReceiveBuffer[offset], messageDataSizeLength);
 		offset += messageDataSizeLength;
 
-		// Extract message data
-		if ((offset + dataLength) > bytesRead)
-			dataLength = bytesRead - offset; // We make sure we do not overflow.
 
-		// Read the message data
-		message.data = std::vector<uint8_t>(&mReceiveBuffer[offset], &mReceiveBuffer[offset + dataLength]);
+		// Second phase: Read the actual data
+
+		if (dataLength <= 0)
+		{
+			message.data.clear();
+			return false;
+		}
+
+		// Check for buffer overflow
+		if (dataLength > PackageBufferSize)
+		{
+			LOG_ERROR("Message data size ({} bytes) exceeds buffer capacity!", dataLength);
+			return false;
+		}
+
+		bytesRead = boost::asio::read(mSocket, boost::asio::buffer(mReceiveBuffer, dataLength), boost::asio::transfer_exactly(dataLength), ec);
+
+		if (ec)
+		{
+			LOG_ERROR("Error reading message data: {}", ec.message());
+			return false;
+		}
+
+		// Copy data to message
+		message.data.assign(mReceiveBuffer, mReceiveBuffer + dataLength);
 
 		return true;
 	}
