@@ -17,6 +17,7 @@
 #include "JsonConversion.h"
 #include "Discovery/DiscoveryEndpoint.h"
 #include "ThreadBase.h"
+#include "IObservable.h"
 
 
 namespace asio = boost::asio;
@@ -31,7 +32,7 @@ enum class DiscoveryMode
 };
 
 
-class DiscoveryService : public ThreadBase
+class DiscoveryService : public ThreadBase, public IDiscoveryObservable
 {
 public:
 	DiscoveryService(asio::io_context &ioContext);
@@ -56,10 +57,13 @@ private:
 
 	bool				   isInitialized() const { return mInitialized.load(); }
 
+	void				   remoteFound(const Endpoint &remote) override;
+	void				   remoteSelected(const std::string &remoteName) override {};
+	void				   remoteRemoved(const std::string &remoteName) override {};
 
 	const int			   mDiscoveryPort = 5555; // TODO: needs to be set from config later
 
-	std::string			   localIPv4{};
+	std::string			   mLocalIPv4{};
 	int					   mTcpPort{0};
 
 	std::string			   mPlayerName{};
@@ -79,7 +83,7 @@ private:
 
 	DiscoveryMode		   mDiscoveryMode{DiscoveryMode::None};
 
-	std::string			   broadCastAddress = "255.255.255.255";
+	const std::string	   broadCastAddress = "255.255.255.255";
 
 	asio::steady_timer	   mTimer;
 };

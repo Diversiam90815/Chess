@@ -57,7 +57,7 @@ void MultiplayerManager::joinSession(const Endpoint remote)
 
 void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 {
-	mSession   = session;
+	mSession = session;
 
 	mRemoteCom->init(mSession);
 
@@ -87,7 +87,6 @@ void MultiplayerManager::disconnect()
 }
 
 
-
 void MultiplayerManager::onNetworkAdapterChanged(const NetworkAdapter &adapter)
 {
 	mLocalIPv4 = adapter.IPv4;
@@ -99,7 +98,7 @@ bool MultiplayerManager::startServerDiscovery(const std::string IPv4, const int 
 	mDiscovery.reset(new DiscoveryService(mIoContext));
 
 	bool bindingSucceeded = mDiscovery->init(IPv4, port, getLocalPlayerName());
-	mDiscovery->startSender();
+	mDiscovery->startDiscovery(DiscoveryMode::Server);
 
 	return bindingSucceeded;
 }
@@ -108,9 +107,7 @@ bool MultiplayerManager::startServerDiscovery(const std::string IPv4, const int 
 void MultiplayerManager::startClientDiscovery()
 {
 	mDiscovery.reset(new DiscoveryService(mIoContext));
-
-	mDiscovery->setPeerCallback([this](Endpoint remote) { joinSession(remote); });
-	mDiscovery->startReceiver();
+	mDiscovery->startDiscovery(DiscoveryMode::Client);
 }
 
 

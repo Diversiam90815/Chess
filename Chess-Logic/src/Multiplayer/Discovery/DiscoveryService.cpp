@@ -91,12 +91,6 @@ void DiscoveryService::startDiscovery(DiscoveryMode mode)
 
 void DiscoveryService::run()
 {
-	if (!isInitialized())
-	{
-		LOG_ERROR("DiscoveryService is not initialized!");
-		return;
-	}
-
 	// Start the first async receive operation
 	receivePackage();
 
@@ -119,8 +113,14 @@ void DiscoveryService::run()
 
 void DiscoveryService::sendPackage()
 {
+	if (!isInitialized())
+	{
+		LOG_ERROR("Tried to start the Discovery in Server mode without initializing first! Please initialize before attempting to start the Discovery in Server Mode!");
+		return;
+	}
+
 	Endpoint local{};
-	local.IPAddress					  = this->localIPv4;
+	local.IPAddress					  = this->mLocalIPv4;
 	local.playerName				  = this->mPlayerName;
 	local.tcpPort					  = this->mTcpPort;
 
@@ -145,7 +145,7 @@ void DiscoveryService::sendPackage()
 
 void DiscoveryService::receivePackage()
 {
-	mSocket.async_receive(mRecvBuffer, [this](const boost::system::error_code &error, size_t bytesReceived) { handleReceive(error, bytesReceived); });
+	mSocket.async_receive(asio::buffer(mRecvBuffer), [this](const boost::system::error_code &error, size_t bytesReceived) { handleReceive(error, bytesReceived); });
 }
 
 
@@ -185,4 +185,15 @@ void DiscoveryService::addRemoteToList(Endpoint remote)
 			return;
 	}
 	mRemoteDevices.push_back(remote);
+	remoteFound(remote);
+}
+
+
+void DiscoveryService::remoteFound(const Endpoint &remote)
+{
+	for (auto &observer : mObservers)
+	{
+		if (auto obs = observer.lock())
+			obs->onRemoteFound(remote);
+	}
 }
