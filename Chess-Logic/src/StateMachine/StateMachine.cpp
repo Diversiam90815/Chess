@@ -129,7 +129,13 @@ void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
 		}
 
 		// If the move is valid and set correctly, we will enter the execute move state!
-		gameStateChanged(GameState::ExecutingMove);
+
+		{
+			std::lock_guard<std::mutex> lock(mStateChangedMutex);
+			mHasPendingStateChange = true;
+			mPendingState		   = GameState::ExecutingMove;
+		}
+		triggerEvent();
 	}
 }
 
@@ -167,6 +173,27 @@ void StateMachine::run()
 
 		LOG_INFO("Processing state: {}", LoggingHelper::gameStateToString(getCurrentGameState()).c_str());
 
+		// Check for pending state changes
+		GameState pendingState;
+		bool	  hasStateChange = false;
+
+		{
+			std::lock_guard<std::mutex> stateLock(mStateChangedMutex);
+			if (mHasPendingStateChange)
+			{
+				pendingState		   = mPendingState;
+				mHasPendingStateChange = false;
+				hasStateChange		   = true;
+			}
+		}
+
+		if (hasStateChange)
+		{
+			// Process the state change, call stateChanged
+			gameStateChanged(pendingState);
+		}
+
+		// Process the current state
 		switch (getCurrentGameState())
 		{
 		case GameState::Undefined:

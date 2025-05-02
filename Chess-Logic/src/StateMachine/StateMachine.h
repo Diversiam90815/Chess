@@ -85,4 +85,8 @@ private:
 
 	bool				   mIsMultiplayerGame{false};
 	bool				   mIsLocalHost{false};
+
+	std::mutex			   mStateChangedMutex;
+	bool				   mHasPendingStateChange{false};
+	GameState			   mPendingState{GameState::Undefined};
 };
