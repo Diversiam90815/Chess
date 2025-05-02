@@ -11,22 +11,27 @@
 #include <boost/asio/steady_timer.hpp>
 #include <boost/asio/ip/udp.hpp>
 
-#include <functional>
 #include <string>
 
 #include "Logging.h"
 #include "JsonConversion.h"
 #include "Discovery/DiscoveryEndpoint.h"
+#include "ThreadBase.h"
 
 
 namespace asio = boost::asio;
 using boost::asio::ip::udp;
 
 
-using PeerCallback = std::function<void(const Endpoint &remote)>;
+enum class DiscoveryMode
+{
+	None   = 1,
+	Server = 2,
+	Client = 3
+};
 
 
-class DiscoveryService
+class DiscoveryService : public ThreadBase
 {
 public:
 	DiscoveryService(asio::io_context &ioContext);
@@ -34,52 +39,47 @@ public:
 
 	bool init(std::string localIPv4, unsigned short tcpPort, const std::string &playerName);
 
-	void startSender();
+	void deinit();
 
-	void stop();
-
-	void startReceiver();
-
-	void setPeerCallback(PeerCallback callback);
-
+	void startDiscovery(DiscoveryMode mode);
 
 private:
-	void					   sendPackage();
+	void				   run() override;
 
-	void					   scheduleNextSend();
+	void				   sendPackage();
 
-	void					   onSendTimer(const boost::system::error_code &ec);
+	void				   receivePackage();
 
-	void					   handleSend(const boost::system::error_code &error, size_t bytesSent);
+	void				   handleReceive(const boost::system::error_code &error, size_t bytesReceived);
 
-	void					   handleReceive(const boost::system::error_code &error, size_t bytesReceived);
+	void				   addRemoteToList(Endpoint remote);
 
-	void					   addRemoteToList(Endpoint remote);
+	bool				   isInitialized() const { return mInitialized.load(); }
 
 
-	const int				   mDiscoveryPort = 5555; // TODO: needs to be set from config later
+	const int			   mDiscoveryPort = 5555; // TODO: needs to be set from config later
 
-	std::string				   localIPv4{};
-	int						   mTcpPort{0};
+	std::string			   localIPv4{};
+	int					   mTcpPort{0};
 
-	std::string				   mPlayerName{};
+	std::string			   mPlayerName{};
 
-	std::vector<Endpoint>	   mRemoteDevices;
+	std::vector<Endpoint>  mRemoteDevices;
 
-	PeerCallback			   mPeerCallback;
+	std::atomic<bool>	   mInitialized{false};
 
-	std::atomic<bool>		   mInitialized{false};
-	std::atomic<bool>		   mIsRunning{false};
+	asio::io_context	  *mIoContext = nullptr;
 
-	asio::io_context		  *mIoContext = nullptr;
+	udp::socket			   mSocket;
 
-	udp::socket				   mSocket;
+	udp::endpoint		   mLocalEndpoint;
+	udp::endpoint		   mTargetEndpoint;
 
-	udp::endpoint			   mSenderEndpoint;
+	std::array<char, 1024> mRecvBuffer{};
 
-	std::array<char, 1024>	   mRecvBuffer{};
+	DiscoveryMode		   mDiscoveryMode{DiscoveryMode::None};
 
-	std::string				   broadCastAddress = "255.255.255.255";
+	std::string			   broadCastAddress = "255.255.255.255";
 
-	boost::asio::system_timer  mTimer;
+	asio::steady_timer	   mTimer;
 };

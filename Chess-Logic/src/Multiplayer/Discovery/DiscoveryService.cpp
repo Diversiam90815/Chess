@@ -16,7 +16,7 @@ DiscoveryService::DiscoveryService(asio::io_context &ioContext) : mSocket(ioCont
 
 DiscoveryService::~DiscoveryService()
 {
-	stop();
+	deinit();
 }
 
 
@@ -27,15 +27,23 @@ bool DiscoveryService::init(std::string localIPv4, unsigned short tcpPort, const
 
 	mSocket.open(udp::v4());
 
-	udp::endpoint			  localEndpoint(udp::v4(), mDiscoveryPort);
-	boost::system::error_code ec;
-	mSocket.bind(localEndpoint, ec);
+	// setting the local endpoint
+	mLocalEndpoint = udp::endpoint(udp::v4(), mDiscoveryPort);
+	boost::system::error_code	ec;
+
+	// Setting the target endpoint
+	boost::asio::ip::address_v4 address = boost::asio::ip::make_address_v4(broadCastAddress);
+	mTargetEndpoint						= udp::endpoint(address, mDiscoveryPort);
+
+	// Binding the socket to the local endpoint
+	mSocket.bind(mLocalEndpoint, ec);
 	if (ec)
 	{
 		LOG_ERROR("Failed to bind UDP Socket : {}", ec.message().c_str());
 		return false;
 	}
 
+	// Turn broadcast on
 	mSocket.set_option(boost::asio::socket_base::broadcast(true));
 
 	mInitialized.store(true);
@@ -43,24 +51,8 @@ bool DiscoveryService::init(std::string localIPv4, unsigned short tcpPort, const
 }
 
 
-void DiscoveryService::startSender()
+void DiscoveryService::deinit()
 {
-	if (!mInitialized.load())
-	{
-		LOG_ERROR("Discovery Service not initialized! Please initialize before calling to start!");
-		return;
-	}
-
-	mIsRunning.store(true);
-
-	scheduleNextSend();
-}
-
-
-void DiscoveryService::stop()
-{
-	mIsRunning.store(false);
-
 	boost::system::error_code ec;
 	mSocket.close(ec);
 	if (ec)
@@ -69,71 +61,91 @@ void DiscoveryService::stop()
 	}
 
 	mTimer.cancel();
+
+	// stop the thread
+	stop();
 }
 
 
-void DiscoveryService::startReceiver()
+void DiscoveryService::startDiscovery(DiscoveryMode mode)
 {
-	mSocket.async_receive(boost::asio::buffer(mRecvBuffer), std::bind(&DiscoveryService::handleReceive, this, std::placeholders::_1, std::placeholders::_2));
+	mDiscoveryMode = mode;
+
+	if (mDiscoveryMode == DiscoveryMode::Server)
+	{
+		LOG_INFO("Starting discovery server...");
+	}
+	else if (mDiscoveryMode == DiscoveryMode::Client)
+	{
+		LOG_INFO("Starting discovery client...");
+	}
+	else
+	{
+		LOG_ERROR("Invalid discovery mode!");
+		return;
+	}
+
+	run();
 }
 
 
-void DiscoveryService::setPeerCallback(PeerCallback callback)
+void DiscoveryService::run()
 {
-	mPeerCallback = callback;
+	if (!isInitialized())
+	{
+		LOG_ERROR("DiscoveryService is not initialized!");
+		return;
+	}
+
+	// Start the first async receive operation
+	receivePackage();
+
+	while (isRunning())
+	{
+		// If in Server mode, periodically send discovery packages
+		if (mDiscoveryMode == DiscoveryMode::Server)
+		{
+			sendPackage();
+		}
+
+		// Run IO context for processing async operations
+		mIoContext->run_for(std::chrono::milliseconds(500));
+
+		// Sleep or wait for event
+		waitForEvent(200);
+	}
 }
 
 
 void DiscoveryService::sendPackage()
 {
-	if (!mIsRunning.load())
-		return;
+	Endpoint local{};
+	local.IPAddress					  = this->localIPv4;
+	local.playerName				  = this->mPlayerName;
+	local.tcpPort					  = this->mTcpPort;
 
-	boost::asio::ip::address_v4 address = boost::asio::ip::make_address_v4(broadCastAddress);
+	json					  j		  = local;
+	std::string				  message = j.dump();
 
-	udp::endpoint				target(address, mDiscoveryPort);
+	boost::system::error_code ec;
 
-	Endpoint					local{};
-	local.IPAddress		= this->localIPv4;
-	local.playerName	= this->mPlayerName;
-	local.tcpPort		= this->mTcpPort;
+	// Sending the message
+	size_t					  bytesSent = mSocket.send_to(boost::asio::buffer(message), mTargetEndpoint, 0, ec);
 
-	json		j		= local;
-	std::string message = j.dump();
-
-	// Sending the message asynch
-	mSocket.async_send_to(boost::asio::buffer(message), target, std::bind(&DiscoveryService::handleSend, this, std::placeholders::_1, std::placeholders::_2));
-}
-
-
-void DiscoveryService::scheduleNextSend()
-{
-	mTimer.expires_at(mTimer.expiry() + boost::asio::chrono::seconds(1));
-	mTimer.async_wait(std::bind(&DiscoveryService::onSendTimer, this, std::placeholders::_1));
-}
-
-
-void DiscoveryService::onSendTimer(const boost::system::error_code &ec)
-{
-	if (!ec && mIsRunning.load())
+	if (ec)
 	{
-		sendPackage();
-
-		scheduleNextSend();
-	}
-}
-
-
-void DiscoveryService::handleSend(const boost::system::error_code &error, size_t bytesSent)
-{
-	if (error)
-	{
-		LOG_ERROR("Error sending discovery package: {}", error.message().c_str());
+		LOG_ERROR("Error sending discovery package: {}", ec.message().c_str());
 	}
 	else
 	{
-		LOG_INFO("Discovery package sent ({} bytes)!", std::to_string(bytesSent).c_str());
+		LOG_INFO("Discovery package sent ({} bytes)!", bytesSent);
 	}
+}
+
+
+void DiscoveryService::receivePackage()
+{
+	mSocket.async_receive(mRecvBuffer, [this](const boost::system::error_code &error, size_t bytesReceived) { handleReceive(error, bytesReceived); });
 }
 
 
@@ -160,10 +172,8 @@ void DiscoveryService::handleReceive(const boost::system::error_code &error, siz
 		LOG_WARNING("Receive error occurred: {}", error.message().c_str());
 	}
 
-	if (mIsRunning.load())
-	{
-		startReceiver();
-	}
+	// Continue receiving packages
+	receivePackage();
 }
 
 
@@ -175,7 +185,4 @@ void DiscoveryService::addRemoteToList(Endpoint remote)
 			return;
 	}
 	mRemoteDevices.push_back(remote);
-
-	if (mPeerCallback)
-		mPeerCallback(remote);
 }
