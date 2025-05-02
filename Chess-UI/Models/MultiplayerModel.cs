@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Chess_UI.Services.ChessLogicAPI;
 
 namespace Chess_UI.Models
 {
@@ -21,7 +22,25 @@ namespace Chess_UI.Models
 
         public void Init()
         {
+            var logicCommunication = App.Current.ChessLogicCommunication as ChessLogicCommunicationLayer;
+            logicCommunication.ConnectionStatusEvent += HandleConnectionStatusUpdates;
+
             SetNetworkAdapters();
+        }
+
+
+        private void HandleConnectionStatusUpdates(ConnectionStatusEvent connectionStatusEvent)
+        {
+            ConnectionState connectionState = connectionStatusEvent.ConnectionState;
+
+            if (connectionState == ConnectionState.Error)
+            {
+                string errorMessage = connectionStatusEvent.ErrorMessage;
+                OnConnectionErrorOccured?.Invoke(errorMessage);
+                return;
+            }
+
+            OnConnectionStatusChanged?.Invoke(connectionState);
         }
 
 
@@ -78,5 +97,12 @@ namespace Chess_UI.Models
         {
             ChessLogicAPI.SetLocalPlayerName(name);
         }
+
+
+        public delegate void ConnectionErrorOccured(string message);
+        public event ConnectionErrorOccured OnConnectionErrorOccured;
+
+        public delegate void ConnectionStatusChanged(ConnectionState newState);
+        public event ConnectionStatusChanged OnConnectionStatusChanged;
     }
 }

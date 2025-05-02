@@ -115,7 +115,7 @@ bool MultiplayerManager::startServerDiscovery(const std::string IPv4, const int 
 	if (!bindingSucceeded)
 	{
 		connectionStatusChanged(ConnectionState::Error, "Failed to bind the discovery socket!");
-		return;
+		return false;
 	}
 
 	mDiscovery->startDiscovery(DiscoveryMode::Server);

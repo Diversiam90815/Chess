@@ -1,10 +1,12 @@
 ﻿using Chess_UI.Models;
+using Chess_UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -29,6 +31,9 @@ namespace Chess_UI.ViewModels
 
             mModel = new MultiplayerModel();
             mModel.Init();
+
+            mModel.OnConnectionErrorOccured += HandleConnectionError;
+            mModel.OnConnectionStatusChanged += HandleConnectionStatusUpdated;
 
             UpdateAdapterBox();
         }
@@ -63,6 +68,7 @@ namespace Chess_UI.ViewModels
                 }
             }
         }
+
 
         private bool processing = false;
         public bool Processing
@@ -109,6 +115,9 @@ namespace Chess_UI.ViewModels
             }
         }
 
+
+
+        #region Visibilities
 
         private Visibility multiplayerSettingsVisibility = Visibility.Visible;
         public Visibility MultiplayerSettingsVisibility
@@ -167,6 +176,21 @@ namespace Chess_UI.ViewModels
                     OnPropertyChanged();
                 }
             }
+        }
+
+        #endregion
+
+
+
+        private void HandleConnectionError(string errorMessage)
+        {
+            // TODO: Display error
+        }
+
+
+        private void HandleConnectionStatusUpdated(ChessLogicAPI.ConnectionState state)
+        {
+            // TODO: Implement reactive UI
         }
 
 

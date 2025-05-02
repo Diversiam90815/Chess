@@ -167,11 +167,12 @@ namespace Chess_UI.Services
         public enum DelegateMessage
         {
             EndGameState = 1,
-            PlayerScoreUpdate = 2,
+            PlayerScoreUpdated = 2,
             PlayerCapturedPiece = 3,
             PlayerChanged = 4,
             GameStateChanged = 5,
-            MoveHistoryAdded = 6
+            MoveHistoryAdded = 6,
+            ConnectionStateChanged = 7
         }
 
         #endregion  // Delegate
@@ -247,6 +248,18 @@ namespace Chess_UI.Services
             NoColor,
             White,
             Black
+        }
+
+
+        public enum ConnectionState
+        {
+            Disconnected = 1,
+            HostingSession = 2,
+            WaitingForARemote = 3,
+            Connecting = 4,
+            Connected = 5,
+            Disconnecting = 6,
+            Error = 7
         }
 
 
@@ -349,6 +362,15 @@ namespace Chess_UI.Services
             public PieceTypeInstance pieceType;
             public bool captured;
         };
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct ConnectionStatusEvent
+        {
+            public ConnectionState ConnectionState;
+            public string ErrorMessage;
+        };
+
 
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]

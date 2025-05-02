@@ -46,7 +46,7 @@ namespace Chess_UI.Services
                         HandleEndGameState(data);
                         break;
                     }
-                case DelegateMessage.PlayerScoreUpdate:
+                case DelegateMessage.PlayerScoreUpdated:
                     {
                         HandlePlayerScoreUpdate(data);
                         break;
@@ -69,6 +69,11 @@ namespace Chess_UI.Services
                 case DelegateMessage.PlayerCapturedPiece:
                     {
                         HandlePlayerCapturedPiece(data);
+                        break;
+                    }
+                case DelegateMessage.ConnectionStateChanged:
+                    {
+                        HandleConnectionStatusChanged(data);
                         break;
                     }
 
@@ -123,6 +128,13 @@ namespace Chess_UI.Services
         }
 
 
+        private void HandleConnectionStatusChanged(nint data)
+        {
+            ConnectionStatusEvent connectionEvent = (ConnectionStatusEvent)Marshal.PtrToStructure(data, typeof(ConnectionStatusEvent));
+            ConnectionStatusEvent?.Invoke(connectionEvent);
+        }
+
+
         #region ViewModel Delegates
 
         public delegate void PlayerChangedHandler(PlayerColor player);
@@ -142,6 +154,9 @@ namespace Chess_UI.Services
 
         public delegate void EndGameStateHandler(EndGameState state);
         public event EndGameStateHandler EndGameStateEvent;
+
+        public delegate void ConnectionStatusEventHandler(ConnectionStatusEvent connectionStatus);
+        public event ConnectionStatusEventHandler ConnectionStatusEvent;
 
         #endregion
 
