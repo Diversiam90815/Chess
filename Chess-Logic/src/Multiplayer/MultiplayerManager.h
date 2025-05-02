@@ -64,5 +64,7 @@ private:
 
 	std::string																 mLocalIPv4{};
 
+	std::mutex																 mSessionMutex;
+
 	friend class GameManager;
 };

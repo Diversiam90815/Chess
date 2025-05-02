@@ -57,7 +57,10 @@ void MultiplayerManager::joinSession(const Endpoint remote)
 
 void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 {
-	mSession = session;
+	{
+		std::lock_guard<std::mutex> lock(mSessionMutex);
+		mSession = session;
+	}
 
 	mRemoteCom->init(mSession);
 
@@ -67,6 +70,7 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 
 TCPSession::pointer MultiplayerManager::getActiveSession()
 {
+	std::lock_guard<std::mutex> lock(mSessionMutex);
 	return mSession;
 }
 
