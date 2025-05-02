@@ -79,6 +79,26 @@ void UICommunication::onChangeCurrentPlayer(PlayerColor player)
 }
 
 
+void UICommunication::onConnectionStateChanged(ConnectionState state, const std::string &errorMessage)
+{
+	ConnectionEvent event{};
+	event.state = state;
+
+	if (state == ConnectionState::Error)
+	{
+		size_t	len		   = errorMessage.size();
+		size_t	bufferSize = (len + 1) * sizeof(char);
+
+		HRESULT hr		   = StringCbCopyA(event.errorMessage, bufferSize, errorMessage.c_str());
+
+		if (!SUCCEEDED(hr))
+			return;
+	}
+
+	communicateToUI(MessageType::ConnectionStateChanged, &event);
+}
+
+
 bool UICommunication::communicateToUI(MessageType type, void *message) const
 {
 	PFN_CALLBACK delegate = nullptr;

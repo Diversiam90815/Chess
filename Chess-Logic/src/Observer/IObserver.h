@@ -101,3 +101,12 @@ public:
 	virtual void onRemoteSelected(const std::string &remoteName) = 0;
 	virtual void onRemoteRemoved(const std::string &remoteName)	 = 0;
 };
+
+
+class IConnectionStatusObserver
+{
+public:
+	virtual ~IConnectionStatusObserver() {};
+
+	virtual void onConnectionStateChanged(ConnectionState state, const std::string &errorMessage = "") = 0;
+};

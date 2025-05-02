@@ -43,12 +43,15 @@ bool MultiplayerManager::hostSession()
 
 	const int port	  = mServer->getBoundPort();
 	bool	  success = startServerDiscovery(mLocalIPv4, port);
+
 	return success;
 }
 
 
 void MultiplayerManager::joinSession(const Endpoint remote)
 {
+	connectionStatusChanged(ConnectionState::Connecting);
+
 	mClient = std::make_unique<TCPClient>(mIoContext);
 	mClient->setConnectHandler([this](TCPSession::pointer session) { setTCPSession(session); });
 	mClient->connect(remote.IPAddress, remote.tcpPort);
@@ -65,6 +68,8 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 	mRemoteCom->init(mSession);
 
 	setInternalObservers();
+
+	connectionStatusChanged(ConnectionState::Connected);
 }
 
 
@@ -77,6 +82,8 @@ TCPSession::pointer MultiplayerManager::getActiveSession()
 
 void MultiplayerManager::disconnect()
 {
+	connectionStatusChanged(ConnectionState::Disconnecting);
+
 	if (mDiscovery)
 	{
 		mDiscovery->stop();
@@ -86,6 +93,8 @@ void MultiplayerManager::disconnect()
 	mSession.reset();
 	mClient.reset();
 	mServer.reset();
+
+	connectionStatusChanged(ConnectionState::Disconnected);
 
 	LOG_INFO("Network Connection closed.");
 }
@@ -101,8 +110,17 @@ bool MultiplayerManager::startServerDiscovery(const std::string IPv4, const int 
 {
 	mDiscovery.reset(new DiscoveryService(mIoContext));
 
-	bool bindingSucceeded = mDiscovery->init(IPv4, port, getLocalPlayerName());
+	bool bindingSucceeded = mDiscovery->init(getLocalPlayerName(), IPv4, port);
+
+	if (!bindingSucceeded)
+	{
+		connectionStatusChanged(ConnectionState::Error, "Failed to bind the discovery socket!");
+		return;
+	}
+
 	mDiscovery->startDiscovery(DiscoveryMode::Server);
+
+	connectionStatusChanged(ConnectionState::HostingSession);
 
 	return bindingSucceeded;
 }
@@ -111,7 +129,16 @@ bool MultiplayerManager::startServerDiscovery(const std::string IPv4, const int 
 void MultiplayerManager::startClientDiscovery()
 {
 	mDiscovery.reset(new DiscoveryService(mIoContext));
+	bool bindingSucceeded = mDiscovery->init(getLocalPlayerName());
+
+	if (!bindingSucceeded)
+	{
+		connectionStatusChanged(ConnectionState::Error, "Failed to bind socket in client discovery!");
+		return;
+	}
+
 	mDiscovery->startDiscovery(DiscoveryMode::Client);
+	connectionStatusChanged(ConnectionState::WaitingForARemote);
 }
 
 
@@ -126,4 +153,21 @@ void MultiplayerManager::setInternalObservers()
 	// Remote Communication and Sender/Receiver Connection
 	mRemoteCom->attachObserver(mRemoteReceiver);
 	mRemoteSender->attachObserver(mRemoteCom);
+}
+
+
+void MultiplayerManager::connectionStatusChanged(ConnectionState state, const std::string &errorMessage)
+{
+	if (mConnectionState == state)
+		return;
+
+	// Update the connection state
+	mConnectionState.store(state);
+
+	// Notify all observers about the connection state change
+	for (auto &observer : mObservers)
+	{
+		if (auto obs = observer.lock())
+			obs->onConnectionStateChanged(state, errorMessage);
+	}
 }

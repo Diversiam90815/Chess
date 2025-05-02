@@ -129,3 +129,12 @@ public:
 	virtual void remoteSelected(const std::string &remoteName) = 0;
 	virtual void remoteRemoved(const std::string &remoteName)  = 0;
 };
+
+
+class IConnectionStatusObservable : public ObservableBase<IConnectionStatusObserver>
+{
+public:
+	virtual ~IConnectionStatusObservable() {};
+
+	virtual void connectionStatusChanged(ConnectionState state, const std::string &errorMessage = "") = 0;
+};

@@ -17,12 +17,13 @@
 
 enum class MessageType
 {
-	EndGameState		= 1,
-	PlayerScoreUpdated	= 2,
-	PlayerCapturedPiece = 3,
-	PlayerChanged		= 4,
-	GameStateChanged	= 5,
-	MoveHistoryAdded	= 6
+	EndGameState		   = 1,
+	PlayerScoreUpdated	   = 2,
+	PlayerCapturedPiece	   = 3,
+	PlayerChanged		   = 4,
+	GameStateChanged	   = 5,
+	MoveHistoryAdded	   = 6,
+	ConnectionStateChanged = 7
 };
 
 
@@ -34,7 +35,14 @@ struct PlayerCapturedPieceEvent
 };
 
 
-class UICommunication : public IMoveObserver, public IGameObserver, public IPlayerObserver, public IGameStateObserver
+struct ConnectionEvent
+{
+	ConnectionState state{ConnectionState::Disconnected};
+	char			errorMessage[MAX_STRING_LENGTH];
+};
+
+
+class UICommunication : public IMoveObserver, public IGameObserver, public IPlayerObserver, public IGameStateObserver, public IConnectionStatusObserver
 {
 public:
 	UICommunication()  = default;
@@ -52,6 +60,8 @@ public:
 	void onGameStateChanged(GameState state) override;
 	void onEndGame(EndGameState state, PlayerColor winner) override;
 	void onChangeCurrentPlayer(PlayerColor player) override;
+
+	void onConnectionStateChanged(ConnectionState state, const std::string &errorMessage = "") override;
 
 private:
 	bool			   communicateToUI(MessageType type, void *message) const;

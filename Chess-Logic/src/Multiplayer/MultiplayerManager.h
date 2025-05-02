@@ -16,7 +16,7 @@
 #include "IObserver.h"
 
 
-class MultiplayerManager : public INetworkObserver
+class MultiplayerManager : public INetworkObserver, public IConnectionStatusObservable
 {
 public:
 	MultiplayerManager();
@@ -44,6 +44,8 @@ public:
 
 	void				setInternalObservers();
 
+	void				connectionStatusChanged(ConnectionState state, const std::string &errorMessage = "") override;
+
 private:
 	TCPSession::pointer														 mSession = nullptr;
 
@@ -65,6 +67,8 @@ private:
 	std::string																 mLocalIPv4{};
 
 	std::mutex																 mSessionMutex;
+
+	std::atomic<ConnectionState>											 mConnectionState{ConnectionState::Disconnected};
 
 	friend class GameManager;
 };

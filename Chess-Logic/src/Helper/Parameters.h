@@ -75,6 +75,18 @@ enum SettingsType
 };
 
 
+enum class ConnectionState
+{
+	Disconnected	  = 1,
+	HostingSession	  = 2,
+	WaitingForARemote = 3,
+	Connecting		  = 4,
+	Connected		  = 5,
+	Disconnecting	  = 6,
+	Error			  = 7
+};
+
+
 //============================================================
 //			File Manager
 //============================================================

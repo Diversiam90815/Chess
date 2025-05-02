@@ -20,9 +20,14 @@ DiscoveryService::~DiscoveryService()
 }
 
 
-bool DiscoveryService::init(std::string localIPv4, unsigned short tcpPort, const std::string &playerName)
+bool DiscoveryService::init(const std::string &playerName, std::string localIPv4, unsigned short tcpPort)
 {
-	mTcpPort	= tcpPort;
+	if (tcpPort != 0 && !localIPv4.empty())
+	{
+		mTcpPort   = tcpPort;
+		mLocalIPv4 = localIPv4;
+	}
+
 	mPlayerName = playerName;
 
 	mSocket.open(udp::v4());

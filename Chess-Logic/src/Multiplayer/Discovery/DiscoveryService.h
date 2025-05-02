@@ -38,7 +38,7 @@ public:
 	DiscoveryService(asio::io_context &ioContext);
 	~DiscoveryService();
 
-	bool init(std::string localIPv4, unsigned short tcpPort, const std::string &playerName);
+	bool init(const std::string &playerName, std::string localIPv4 = "", unsigned short tcpPort = 0);
 
 	void deinit();
 
