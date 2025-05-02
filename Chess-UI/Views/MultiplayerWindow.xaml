@@ -85,6 +85,7 @@
             </StackPanel>
         </Grid>
 
+
         <Grid Name="WaitingForResponseGrid" Visibility="{x:Bind mViewModel.WaitingForResponseVisibility, Mode=TwoWay}">
             
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">

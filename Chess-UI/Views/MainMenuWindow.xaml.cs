@@ -6,7 +6,6 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 
 
-
 namespace Chess_UI
 {
     public sealed partial class MainMenuWindow : Window
