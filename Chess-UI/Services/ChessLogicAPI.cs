@@ -173,7 +173,7 @@ namespace Chess_UI.Services
             GameStateChanged = 5,
             MoveHistoryAdded = 6,
             ConnectionStateChanged = 7,
-            ConnectionStateHostPendingApproval = 8
+            ClientRequestedConnection = 8
         }
 
         #endregion  // Delegate

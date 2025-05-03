@@ -24,6 +24,7 @@ namespace Chess_UI.Models
         {
             var logicCommunication = App.Current.ChessLogicCommunication as ChessLogicCommunicationLayer;
             logicCommunication.ConnectionStatusEvent += HandleConnectionStatusUpdates;
+            logicCommunication.ClientRequestedConnection += ClientRequestedConnection;
 
             SetNetworkAdapters();
         }
@@ -99,10 +100,19 @@ namespace Chess_UI.Models
         }
 
 
+        public void ClientRequestedConnection(string clientName)
+        {
+            OnClientRequestedConnection?.Invoke(clientName);
+        }
+
+
         public delegate void ConnectionErrorOccured(string message);
         public event ConnectionErrorOccured OnConnectionErrorOccured;
 
         public delegate void ConnectionStatusChanged(ConnectionState newState);
         public event ConnectionStatusChanged OnConnectionStatusChanged;
+
+        public delegate void ClientRequestedConnectionHandler(string clientName);
+        public event ClientRequestedConnectionHandler OnClientRequestedConnection;
     }
 }

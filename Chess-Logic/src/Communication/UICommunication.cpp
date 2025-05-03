@@ -113,7 +113,7 @@ void UICommunication::onPendingHostApproval(const std::string &remotePlayerName)
 	if (!SUCCEEDED(hr))
 		return;
 
-	communicateToUI(MessageType::ConnectionStateHostPendingApproval, &strCopy);
+	communicateToUI(MessageType::ClientRequestedConnection, &strCopy);
 }
 
 

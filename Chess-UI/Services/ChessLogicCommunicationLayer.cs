@@ -76,6 +76,11 @@ namespace Chess_UI.Services
                         HandleConnectionStatusChanged(data);
                         break;
                     }
+                case DelegateMessage.ClientRequestedConnection:
+                    {
+                        HandleClientRequestedConnection(data);
+                        break;
+                    }
 
                 default: break;
             }
@@ -135,6 +140,13 @@ namespace Chess_UI.Services
         }
 
 
+        private void HandleClientRequestedConnection(nint data)
+        {
+            string clientName = Marshal.PtrToStringUTF8(data);
+            ClientRequestedConnection?.Invoke(clientName);
+        }
+
+
         #region ViewModel Delegates
 
         public delegate void PlayerChangedHandler(PlayerColor player);
@@ -157,6 +169,9 @@ namespace Chess_UI.Services
 
         public delegate void ConnectionStatusEventHandler(ConnectionStatusEvent connectionStatus);
         public event ConnectionStatusEventHandler ConnectionStatusEvent;
+
+        public delegate void ClientRequestedConnectionHandler(string clientName);
+        public event ClientRequestedConnectionHandler ClientRequestedConnection;
 
         #endregion
 
