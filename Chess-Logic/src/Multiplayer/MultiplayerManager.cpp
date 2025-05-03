@@ -35,10 +35,10 @@ MultiplayerManager::~MultiplayerManager()
 bool MultiplayerManager::hostSession()
 {
 	mServer = std::make_unique<TCPServer>(mIoContext);
-	
+
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
-	mServer->setConnectionRequestHandler([this]() { connectionStatusChanged(ConnectionState::ConnectionRequested); });	// Notify observers that we have a connection request
-	
+	mServer->setConnectionRequestHandler([this]() { connectionStatusChanged(ConnectionState::ConnectionRequested); }); // Notify observers that we have a connection request
+
 	mServer->startAccept();
 
 	if (mLocalIPv4.empty())
@@ -58,6 +58,8 @@ void MultiplayerManager::joinSession(const Endpoint remote)
 	mClient = std::make_unique<TCPClient>(mIoContext);
 
 	mClient->setConnectHandler([this](TCPSession::pointer session) { setTCPSession(session); });
+	mClient->setConnectTimeoutHandler([this]() { connectionStatusChanged(ConnectionState::Error, "Connection request timed out or was rejected!"); });
+
 	mClient->connect(remote.IPAddress, remote.tcpPort);
 }
 

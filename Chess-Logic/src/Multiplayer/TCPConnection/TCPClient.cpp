@@ -14,15 +14,36 @@ TCPClient::TCPClient(boost::asio::io_context &ioContext) : mIoContext(ioContext)
 void TCPClient::connect(const std::string &host, unsigned short port)
 {
 	// Create a new session
-	auto		  session = TCPSession::create(mIoContext); // TCPSession constructor binds the socket to a port
+	auto session = TCPSession::create(mIoContext); // TCPSession constructor binds the socket to a port
+
+	// Create timer for the connection timeout
+	auto timer	 = std::make_shared<boost::asio::steady_timer>(mIoContext);
+	timer->expires_after(std::chrono::seconds(mTimeoutInSeconds));
+
+	// Start timeout timer
+	timer->async_wait(
+		[this, timer](const boost::system::error_code &ec)
+		{
+			if (!ec)
+			{
+				// Timer expired -> connection timed out
+				if (mConnectTimeoutHandler)
+				{
+					mConnectTimeoutHandler();
+				}
+			}
+		});
 
 	// Resolve host and port
 	tcp::resolver resolver(mIoContext);
 	auto		  endpoints = resolver.resolve(host, std::to_string(port));
 
 	boost::asio::async_connect(session->socket(), endpoints,
-							   [session, this](const boost::system::error_code &error, const tcp::endpoint &endpoint)
+							   [session, timer, this](const boost::system::error_code &error, const tcp::endpoint &endpoint)
 							   {
+								   // Cancel timeout timer
+								   timer->cancel();
+
 								   if (!error)
 								   {
 									   LOG_INFO("TCPClient connected to {}", endpoint.address().to_string().c_str());
@@ -35,6 +56,13 @@ void TCPClient::connect(const std::string &host, unsigned short port)
 								   else
 								   {
 									   LOG_ERROR("TCPClient connect error : {}!", error.message().c_str());
+
+									   // Call the timeout handler if it is a timeout-related error
+									   if (error == boost::asio::error::timed_out || error == boost::asio::error::connection_refused)
+									   {
+										   if (mConnectTimeoutHandler)
+											   mConnectTimeoutHandler();
+									   }
 								   }
 							   });
 }
@@ -43,4 +71,10 @@ void TCPClient::connect(const std::string &host, unsigned short port)
 void TCPClient::setConnectHandler(ConnectHandler handler)
 {
 	mConnectHandler = handler;
+}
+
+
+void TCPClient::setConnectTimeoutHandler(ConnectTimeoutHandler handler)
+{
+	mConnectTimeoutHandler = handler;
 }
