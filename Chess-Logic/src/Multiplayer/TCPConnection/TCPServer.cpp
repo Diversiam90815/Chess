@@ -23,27 +23,19 @@ void TCPServer::startAccept()
 }
 
 
-void TCPServer::setSessionHandler(SessionHandler handler)
-{
-	mSessionHandler = handler;
-}
-
-
-const int TCPServer::getBoundPort() const
-{
-	return mBoundPort;
-}
-
-
 void TCPServer::handleAccept(boost::shared_ptr<TCPSession> session, const boost::system::error_code &error)
 {
 	if (!error)
 	{
 		LOG_INFO("TCP accepted connection from {}", session->socket().remote_endpoint().address().to_string().c_str());
 
-		if (mSessionHandler)
+		// Store pending session
+		mPendingSession = session;
+
+		// Notify that we have a connection request
+		if (mConnectionRequestHandler)
 		{
-			mSessionHandler(session);
+			mConnectionRequestHandler();
 		}
 	}
 	else
@@ -52,4 +44,51 @@ void TCPServer::handleAccept(boost::shared_ptr<TCPSession> session, const boost:
 	}
 
 	startAccept(); // Start accepting new conection
+}
+
+
+void TCPServer::setSessionHandler(SessionHandler handler)
+{
+	mSessionHandler = handler;
+}
+
+
+void TCPServer::setConnectionRequestHandler(ConnectionRequestHandler handler)
+{
+	mConnectionRequestHandler = handler;
+}
+
+
+void TCPServer::respondToConnectionRequest(bool accepted)
+{
+	if (!mPendingSession)
+		return;
+
+	if (accepted)
+	{
+		LOG_INFO("Accepting connection from: {}", mPendingSession->socket().remote_endpoint().address().to_string().c_str());
+
+		if (mSessionHandler)
+		{
+			mSessionHandler(mPendingSession);
+		}
+	}
+
+	else
+	{
+		LOG_INFO("Rejecting connection from {}", mPendingSession->socket().remote_endpoint().address().to_string().c_str());
+
+		// Close the socket
+		boost::system::error_code ec;
+		mPendingSession->socket().close(ec);
+	}
+
+	// Clear the pending session
+	mPendingSession.reset();
+}
+
+
+const int TCPServer::getBoundPort() const
+{
+	return mBoundPort;
 }

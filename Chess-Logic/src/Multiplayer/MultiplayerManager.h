@@ -44,6 +44,9 @@ public:
 
 	void				setInternalObservers();
 
+	void				approveConnectionRequest();
+	void				rejectConnectionRequest();
+
 	void				connectionStatusChanged(ConnectionState state, const std::string &errorMessage = "") override;
 
 private:

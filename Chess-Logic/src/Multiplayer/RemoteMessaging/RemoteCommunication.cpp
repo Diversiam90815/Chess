@@ -117,7 +117,7 @@ bool RemoteCommunication::receiveMessages()
 		message.data.clear();
 		message.type = MultiplayerMessageType::Default;
 
-		success		 = mTCPSession->readMessage(message);
+		success		 = mTCPSession->readMessage(message);	// TODO: Make non blocking
 
 		if (!success)
 			return false;

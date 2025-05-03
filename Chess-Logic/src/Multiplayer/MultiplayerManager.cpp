@@ -35,7 +35,10 @@ MultiplayerManager::~MultiplayerManager()
 bool MultiplayerManager::hostSession()
 {
 	mServer = std::make_unique<TCPServer>(mIoContext);
+	
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
+	mServer->setConnectionRequestHandler([this]() { connectionStatusChanged(ConnectionState::ConnectionRequested); });	// Notify observers that we have a connection request
+	
 	mServer->startAccept();
 
 	if (mLocalIPv4.empty())
@@ -50,9 +53,10 @@ bool MultiplayerManager::hostSession()
 
 void MultiplayerManager::joinSession(const Endpoint remote)
 {
-	connectionStatusChanged(ConnectionState::Connecting);
+	connectionStatusChanged(ConnectionState::PendingHostApproval);
 
 	mClient = std::make_unique<TCPClient>(mIoContext);
+
 	mClient->setConnectHandler([this](TCPSession::pointer session) { setTCPSession(session); });
 	mClient->connect(remote.IPAddress, remote.tcpPort);
 }
@@ -153,6 +157,24 @@ void MultiplayerManager::setInternalObservers()
 	// Remote Communication and Sender/Receiver Connection
 	mRemoteCom->attachObserver(mRemoteReceiver);
 	mRemoteSender->attachObserver(mRemoteCom);
+}
+
+
+void MultiplayerManager::approveConnectionRequest()
+{
+	if (!mServer)
+		return;
+
+	mServer->respondToConnectionRequest(true);
+}
+
+
+void MultiplayerManager::rejectConnectionRequest()
+{
+	if (!mServer)
+		return;
+
+	mServer->respondToConnectionRequest(false);
 }
 
 

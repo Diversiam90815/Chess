@@ -17,7 +17,9 @@
 
 using boost::asio::ip::tcp;
 
-using SessionHandler = std::function<void(boost::shared_ptr<TCPSession> session)>; // Callback invoked when a new session is accepted
+using SessionHandler		   = std::function<void(boost::shared_ptr<TCPSession> session)>; // Callback invoked when a new session is accepted
+
+using ConnectionRequestHandler = std::function<void()>;
 
 
 class TCPServer
@@ -28,20 +30,26 @@ public:
 
 	void	  startAccept();
 
-	void	  setSessionHandler(SessionHandler handler);
-
 	const int getBoundPort() const;
+
+	void	  setSessionHandler(SessionHandler handler);
+	void	  setConnectionRequestHandler(ConnectionRequestHandler handler);
+
+	void	  respondToConnectionRequest(bool accepted);
 
 
 private:
-	void					 handleAccept(boost::shared_ptr<TCPSession> session, const boost::system::error_code &error);
+	void						  handleAccept(boost::shared_ptr<TCPSession> session, const boost::system::error_code &error);
 
 
-	boost::asio::io_context &mIoContext;
+	boost::asio::io_context		 &mIoContext;
 
-	tcp::acceptor			 mAcceptor;
+	tcp::acceptor				  mAcceptor;
 
-	int						 mBoundPort{0};
+	int							  mBoundPort{0};
 
-	SessionHandler			 mSessionHandler;
+	boost::shared_ptr<TCPSession> mPendingSession;
+
+	SessionHandler				  mSessionHandler;
+	ConnectionRequestHandler	  mConnectionRequestHandler;
 };

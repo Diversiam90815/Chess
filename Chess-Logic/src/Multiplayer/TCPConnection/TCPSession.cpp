@@ -102,7 +102,7 @@ bool TCPSession::readMessage(MultiplayerMessageStruct &message)
 	try
 	{
 		boost::system::error_code ec;
-
+		
 		// Calculate header size
 		const size_t			  headerSize = sizeof(RemoteComSecret) + sizeof(message.type) + sizeof(size_t);
 
