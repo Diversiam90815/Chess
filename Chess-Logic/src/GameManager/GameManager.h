@@ -64,7 +64,6 @@ public:
 	bool						changeCurrentNetworkAdapter(int ID);
 	int							getCurrentNetworkAdapterID();
 
-	std::string					getRemotePlayerName();
 	void						setLocalPlayerName(std::string name);
 
 	void						changeCurrentPlayer(PlayerColor player) override;

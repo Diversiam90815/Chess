@@ -323,14 +323,6 @@ CHESS_API void SetLocalPlayerName(const char *name)
 }
 
 
-CHESS_API char *GetRemotePlayerName()
-{
-	std::string remoteName = GameManager::GetInstance()->getRemotePlayerName();
-	char	   *name	   = StringToCharPtr(remoteName);
-	return name;
-}
-
-
 CHESS_API int GetNetworkAdapterCount()
 {
 	GameManager *manager	 = GameManager::GetInstance();

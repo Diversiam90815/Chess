@@ -61,8 +61,6 @@ extern "C"
 
 	CHESS_API void	SetLocalPlayerName(const char *name);
 
-	CHESS_API char *GetRemotePlayerName();
-
 
 	CHESS_API void	LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber);
 

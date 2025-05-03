@@ -99,6 +99,24 @@ void UICommunication::onConnectionStateChanged(ConnectionState state, const std:
 }
 
 
+void UICommunication::onPendingHostApproval(const std::string &remotePlayerName)
+{
+	size_t len		  = remotePlayerName.size();
+	size_t bufferSize = (len + 1) * sizeof(char);
+	char  *strCopy	  = static_cast<char *>(CoTaskMemAlloc(bufferSize));
+
+	if (!strCopy)
+		return;
+
+	HRESULT hr = StringCbCopyA(strCopy, bufferSize, remotePlayerName.c_str());
+
+	if (!SUCCEEDED(hr))
+		return;
+
+	communicateToUI(MessageType::ConnectionStateHostPendingApproval, &strCopy);
+}
+
+
 bool UICommunication::communicateToUI(MessageType type, void *message) const
 {
 	PFN_CALLBACK delegate = nullptr;

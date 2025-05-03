@@ -98,8 +98,8 @@ public:
 	virtual ~IDiscoveryObserver() {};
 
 	virtual void onRemoteFound(const Endpoint &remote)			 = 0;
-	virtual void onRemoteSelected(const std::string &remoteName) = 0;
-	virtual void onRemoteRemoved(const std::string &remoteName)	 = 0;
+	//virtual void onRemoteSelected(const std::string &remoteName) = 0;
+	//virtual void onRemoteRemoved(const std::string &remoteName)	 = 0;
 };
 
 
@@ -109,4 +109,5 @@ public:
 	virtual ~IConnectionStatusObserver() {};
 
 	virtual void onConnectionStateChanged(ConnectionState state, const std::string &errorMessage = "") = 0;
+	virtual void onPendingHostApproval(const std::string &remotePlayerName)							   = 0;
 };

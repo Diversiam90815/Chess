@@ -19,7 +19,7 @@ using boost::asio::ip::tcp;
 
 using SessionHandler		   = std::function<void(boost::shared_ptr<TCPSession> session)>; // Callback invoked when a new session is accepted
 
-using ConnectionRequestHandler = std::function<void()>;
+using ConnectionRequestHandler = std::function<void(const std::string &remoteIPv4)>;
 
 
 class TCPServer

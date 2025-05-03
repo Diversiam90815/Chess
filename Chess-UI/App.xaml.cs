@@ -23,8 +23,6 @@ namespace Chess_UI
 
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            Current = this;
-
             ChessLogicCommunication.Init();
 
             MainMenu = new MainMenuWindow();

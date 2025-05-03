@@ -17,13 +17,14 @@
 
 enum class MessageType
 {
-	EndGameState		   = 1,
-	PlayerScoreUpdated	   = 2,
-	PlayerCapturedPiece	   = 3,
-	PlayerChanged		   = 4,
-	GameStateChanged	   = 5,
-	MoveHistoryAdded	   = 6,
-	ConnectionStateChanged = 7
+	EndGameState					   = 1,
+	PlayerScoreUpdated				   = 2,
+	PlayerCapturedPiece				   = 3,
+	PlayerChanged					   = 4,
+	GameStateChanged				   = 5,
+	MoveHistoryAdded				   = 6,
+	ConnectionStateChanged			   = 7,
+	ConnectionStateHostPendingApproval = 8
 };
 
 
@@ -62,6 +63,8 @@ public:
 	void onChangeCurrentPlayer(PlayerColor player) override;
 
 	void onConnectionStateChanged(ConnectionState state, const std::string &errorMessage = "") override;
+	void onPendingHostApproval(const std::string &remotePlayerName) override;
+
 
 private:
 	bool			   communicateToUI(MessageType type, void *message) const;

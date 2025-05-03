@@ -16,7 +16,7 @@
 #include "IObserver.h"
 
 
-class MultiplayerManager : public INetworkObserver, public IConnectionStatusObservable
+class MultiplayerManager : public INetworkObserver, public IConnectionStatusObservable, public IDiscoveryObserver
 {
 public:
 	MultiplayerManager();
@@ -24,7 +24,7 @@ public:
 
 	bool				hostSession();
 
-	void				joinSession(const Endpoint remote);
+	void				joinSession();
 
 	void				setTCPSession(TCPSession::pointer session);
 	TCPSession::pointer getActiveSession();
@@ -33,9 +33,6 @@ public:
 
 	void				setLocalPlayerName(const std::string name) { mLocalPlayerName = name; }
 	std::string			getLocalPlayerName() const { return mLocalPlayerName; }
-
-	void				setRemotePlayerName(const std::string name) { mRemotePlayerName = name; }
-	std::string			getRemotePlayerName() const { return mRemotePlayerName; }
 
 	void				onNetworkAdapterChanged(const NetworkAdapter &adapter) override;
 
@@ -48,6 +45,9 @@ public:
 	void				rejectConnectionRequest();
 
 	void				connectionStatusChanged(ConnectionState state, const std::string &errorMessage = "") override;
+	void				pendingHostApproval(const std::string &remoteIPv4) override;
+
+	void				onRemoteFound(const Endpoint &remote) override;
 
 private:
 	TCPSession::pointer														 mSession = nullptr;
@@ -65,9 +65,10 @@ private:
 	std::thread																 mWorkerThread;
 
 	std::string																 mLocalPlayerName{};
-	std::string																 mRemotePlayerName{};
 
 	std::string																 mLocalIPv4{};
+
+	Endpoint																 mRemoteEndpoint;
 
 	std::mutex																 mSessionMutex;
 

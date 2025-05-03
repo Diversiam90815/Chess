@@ -30,12 +30,14 @@ void TCPServer::handleAccept(boost::shared_ptr<TCPSession> session, const boost:
 		LOG_INFO("TCP accepted connection from {}", session->socket().remote_endpoint().address().to_string().c_str());
 
 		// Store pending session
-		mPendingSession = session;
+		mPendingSession			= session;
+
+		const std::string &remoteIPv4 = mPendingSession->socket().remote_endpoint().address().to_string();
 
 		// Notify that we have a connection request
 		if (mConnectionRequestHandler)
 		{
-			mConnectionRequestHandler();
+			mConnectionRequestHandler(remoteIPv4);
 		}
 	}
 	else

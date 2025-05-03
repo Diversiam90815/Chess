@@ -352,12 +352,6 @@ int GameManager::getCurrentNetworkAdapterID()
 }
 
 
-std::string GameManager::getRemotePlayerName()
-{
-	return mMultiplayerManager->getRemotePlayerName();
-}
-
-
 void GameManager::setLocalPlayerName(std::string name)
 {
 	mMultiplayerManager->setLocalPlayerName(name);

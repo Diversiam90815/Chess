@@ -126,8 +126,8 @@ public:
 	virtual ~IDiscoveryObservable() {};
 
 	virtual void remoteFound(const Endpoint &remote)		   = 0;
-	virtual void remoteSelected(const std::string &remoteName) = 0;
-	virtual void remoteRemoved(const std::string &remoteName)  = 0;
+	//virtual void remoteSelected(const std::string &remoteName) = 0;
+	//virtual void remoteRemoved(const std::string &remoteName)  = 0;
 };
 
 
@@ -137,4 +137,5 @@ public:
 	virtual ~IConnectionStatusObservable() {};
 
 	virtual void connectionStatusChanged(ConnectionState state, const std::string &errorMessage = "") = 0;
+	virtual void pendingHostApproval(const std::string &remoteIPv4)									  = 0;
 };

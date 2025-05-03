@@ -37,7 +37,7 @@ bool MultiplayerManager::hostSession()
 	mServer = std::make_unique<TCPServer>(mIoContext);
 
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
-	mServer->setConnectionRequestHandler([this]() { connectionStatusChanged(ConnectionState::ConnectionRequested); }); // Notify observers that we have a connection request
+	mServer->setConnectionRequestHandler([this](const std::string &remoteIPv4) { pendingHostApproval(remoteIPv4); }); // Notify observers that we have a connection request
 
 	mServer->startAccept();
 
@@ -51,8 +51,11 @@ bool MultiplayerManager::hostSession()
 }
 
 
-void MultiplayerManager::joinSession(const Endpoint remote)
+void MultiplayerManager::joinSession()
 {
+	if (!mRemoteEndpoint.isValid())
+		return;
+
 	connectionStatusChanged(ConnectionState::PendingHostApproval);
 
 	mClient = std::make_unique<TCPClient>(mIoContext);
@@ -60,7 +63,7 @@ void MultiplayerManager::joinSession(const Endpoint remote)
 	mClient->setConnectHandler([this](TCPSession::pointer session) { setTCPSession(session); });
 	mClient->setConnectTimeoutHandler([this]() { connectionStatusChanged(ConnectionState::Error, "Connection request timed out or was rejected!"); });
 
-	mClient->connect(remote.IPAddress, remote.tcpPort);
+	mClient->connect(mRemoteEndpoint.IPAddress, mRemoteEndpoint.tcpPort);
 }
 
 
@@ -194,4 +197,24 @@ void MultiplayerManager::connectionStatusChanged(ConnectionState state, const st
 		if (auto obs = observer.lock())
 			obs->onConnectionStateChanged(state, errorMessage);
 	}
+}
+
+
+void MultiplayerManager::pendingHostApproval(const std::string &remoteIPv4)
+{
+	// If the client requests to connect to the host, we let the UI know
+	if (mRemoteEndpoint.IPAddress == remoteIPv4)
+	{
+		for (auto &observer : mObservers)
+		{
+			if (auto obs = observer.lock())
+				obs->onPendingHostApproval(mRemoteEndpoint.playerName);
+		}
+	}
+}
+
+
+void MultiplayerManager::onRemoteFound(const Endpoint &remote)
+{
+	mRemoteEndpoint = remote;
 }
