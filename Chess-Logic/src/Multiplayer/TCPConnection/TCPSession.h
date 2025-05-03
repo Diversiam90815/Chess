@@ -25,6 +25,8 @@ class TCPSession : public boost::enable_shared_from_this<TCPSession>
 public:
 	~TCPSession();
 
+	using MessageReceivedCallback = std::function<void(MultiplayerMessageStruct &message)>;
+
 	typedef boost::shared_ptr<TCPSession> pointer;
 
 	static pointer						  create(boost::asio::io_context &io_context) { return pointer(new TCPSession(io_context)); }
@@ -37,17 +39,34 @@ public:
 
 	bool								  sendMessage(MultiplayerMessageStruct &message);
 
-	bool								  readMessage(MultiplayerMessageStruct &message);
+	void								  startReadAsync(MessageReceivedCallback callback);
+	void								  stopReadAsync();
 
 private:
 	explicit TCPSession(boost::asio::io_context &ioContext);
 
+	void		readHeaderAsync();
+	void		readMessageBodyAsync(size_t dataLength, MultiplayerMessageType messageType);
 
-	tcp::socket	  mSocket;
+	void		processHeader(size_t bytesTransfered);
 
-	uint8_t		 *mReceiveBuffer = nullptr;
-	uint8_t		 *mSendBuffer = nullptr;
 
-	int			  mBoundPort{0};
+	tcp::socket mSocket;
 
+	uint8_t	   *mReceiveBuffer = nullptr;
+	uint8_t	   *mSendBuffer	   = nullptr;
+
+	struct AsyncReadState
+	{
+		MultiplayerMessageType messageType;
+		size_t				   dataLength = 0;
+	};
+
+	AsyncReadState			mReadState;
+
+	MessageReceivedCallback mMessageReceivedCallback;
+
+	bool					mAsyncReadActive{false};
+
+	int						mBoundPort{0};
 };

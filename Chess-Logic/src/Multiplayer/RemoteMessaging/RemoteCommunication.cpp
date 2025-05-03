@@ -10,10 +10,10 @@
 
 bool RemoteCommunication::init(boost::shared_ptr<TCPSession> session)
 {
-	mTCPSession	   = session;
+	mTCPSession = session;
 
-	mSendThread	   = std::make_shared<SendThread>(this);
-	mReceiveThread = std::make_shared<ReceiveThread>(this);
+	mSendThread.reset(new SendThread(this));
+	mReceiveThread.reset(new ReceiveThread(this));
 
 	mIsInitialized.store(true);
 	return true;
@@ -22,14 +22,35 @@ bool RemoteCommunication::init(boost::shared_ptr<TCPSession> session)
 
 void RemoteCommunication::deinit()
 {
-	mTCPSession.reset();
-	mTCPSession = nullptr;
+	if (mTCPSession)
+	{
+		mTCPSession->stopReadAsync();
+		mTCPSession.reset();
+		mTCPSession = nullptr;
+	}
+
+	stop();
+
 	mIsInitialized.store(false);
 }
 
 
 void RemoteCommunication::start()
 {
+	if (!isInitialized())
+		return;
+
+	// Start async read
+	mTCPSession->startReadAsync(
+		[this](MultiplayerMessageStruct message)
+		{
+			// Queue the message
+			{
+				std::lock_guard<std::mutex> lock(mIncomingListMutex);
+				mIncomingMessages.push_back(message);
+			};
+		});
+
 	mSendThread->start();
 	mReceiveThread->start();
 }
@@ -109,26 +130,24 @@ void RemoteCommunication::receivedMessage(MultiplayerMessageType type, std::vect
 
 bool RemoteCommunication::receiveMessages()
 {
-	MultiplayerMessageStruct message;
-	bool					 success = false;
+	// Get all messages from the queue
+	std::vector<MultiplayerMessageStruct> messages;
 
-	while (true)
 	{
-		message.data.clear();
-		message.type = MultiplayerMessageType::Default;
+		std::lock_guard<std::mutex> lock(mIncomingListMutex);
+		if (mIncomingMessages.empty())
+			return true; // No messages, but not an error
 
-		success		 = mTCPSession->readMessage(message);	// TODO: Make non blocking
-
-		if (!success)
-			return false;
-
-		{
-			std::lock_guard<std::mutex> lock(mIncomingListMutex);
-
-			mIncomingMessages.push_back(message);
-			continue;
-		}
+		messages.swap(mIncomingMessages);
 	}
+
+	// Process all received messages
+	for (auto &message : messages)
+	{
+		receivedMessage(message.type, message.data);
+	}
+
+	return true;
 }
 
 

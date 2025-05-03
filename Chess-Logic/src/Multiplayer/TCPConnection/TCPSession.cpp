@@ -19,6 +19,125 @@ TCPSession::TCPSession(boost::asio::io_context &ioContext) : mSocket(ioContext)
 }
 
 
+void TCPSession::readHeaderAsync()
+{
+	if (!mAsyncReadActive || !isConnected())
+		return;
+
+	// Calculate Header size
+	const size_t headerSize = sizeof(RemoteComSecret) + sizeof(MultiplayerMessageType) + sizeof(size_t);
+
+	// Start async read for message header
+	boost::asio::async_read(mSocket, boost::asio::buffer(mReceiveBuffer, headerSize), boost::asio::transfer_exactly(headerSize),
+							[this](const boost::system::error_code &ec, size_t bytesTransfered)
+							{
+								if (!mAsyncReadActive)
+									return;
+
+								if (ec)
+								{
+									LOG_ERROR("Error reading message header : {}", ec.message().c_str());
+
+									// If connection is still active, try reading again
+									if (isConnected() && mAsyncReadActive)
+										readHeaderAsync();
+
+									return;
+								}
+
+								// Process the header
+								processHeader(bytesTransfered);
+							});
+}
+
+
+void TCPSession::readMessageBodyAsync(size_t dataLength, MultiplayerMessageType messageType)
+{
+	if (!mAsyncReadActive || !isConnected())
+		return;
+
+	boost::asio::async_read(mSocket, boost::asio::buffer(mReceiveBuffer, dataLength), boost::asio::transfer_exactly(dataLength),
+							[this, dataLength, messageType](const boost::system::error_code &ec, size_t bytesTransfered)
+							{
+								if (!mAsyncReadActive)
+									return;
+
+								if (ec)
+								{
+									LOG_ERROR("Error reading message body: {}", ec.message().c_str());
+
+									// If still active, read next message
+									if (mAsyncReadActive && isConnected())
+										readHeaderAsync();
+
+									return;
+								}
+
+								// Create complete message
+								MultiplayerMessageStruct message;
+								message.type = messageType;
+								message.data.assign(mReceiveBuffer, mReceiveBuffer + dataLength);
+
+								// Deliver message
+								if (mMessageReceivedCallback)
+									mMessageReceivedCallback(message);
+
+								// Continue reading the next message
+								readHeaderAsync();
+							});
+}
+
+
+void TCPSession::processHeader(size_t bytesTransfered)
+{
+	// Validate the secret identifier
+	if (memcmp(mReceiveBuffer, RemoteComSecret, sizeof(RemoteComSecret)) != 0)
+	{
+		LOG_ERROR("Invalid message format: Secret identifier mismatch");
+		readHeaderAsync(); // Continue listening for next message
+		return;
+	}
+
+	size_t		 offset			 = sizeof(RemoteComSecret);
+
+	// Extract message type
+	const size_t messageTypeSize = sizeof(MultiplayerMessageType);
+	memcpy(&mReadState.messageType, &mReceiveBuffer[offset], messageTypeSize);
+	offset += messageTypeSize;
+
+	// Extract message data size
+	memcpy(&mReadState.dataLength, &mReceiveBuffer[offset], sizeof(size_t));
+
+	// Check for buffer overflow
+	if (mReadState.dataLength > PackageBufferSize)
+	{
+		LOG_ERROR("Message data size ({} bytes) exceeds buffer capacity!", mReadState.dataLength);
+		readHeaderAsync(); // read next message
+		return;
+	}
+
+	// If we have data to read, proceed with reading the message body
+	if (mReadState.dataLength > 0)
+	{
+		readMessageBodyAsync(mReadState.dataLength, mReadState.messageType);
+	}
+	else
+	{
+		// empty message: create message with just the type and no data
+		MultiplayerMessageStruct message;
+		message.type = mReadState.messageType;
+		message.data.clear();
+
+		// Deliver message
+		if (mMessageReceivedCallback)
+			mMessageReceivedCallback(message);
+	}
+
+	// Continue reading next message
+	readHeaderAsync();
+}
+
+
 TCPSession::~TCPSession()
 {
 	delete[] mSendBuffer;
@@ -91,83 +210,24 @@ bool TCPSession::sendMessage(MultiplayerMessageStruct &message)
 }
 
 
-bool TCPSession::readMessage(MultiplayerMessageStruct &message)
+void TCPSession::startReadAsync(MessageReceivedCallback callback)
 {
 	if (!isConnected())
 	{
-		LOG_ERROR("Socket is not connected. Cannot read message.");
-		return false;
+		LOG_ERROR("Cannot start async read on disconnected socket!");
+		return;
 	}
 
-	try
-	{
-		boost::system::error_code ec;
-		
-		// Calculate header size
-		const size_t			  headerSize = sizeof(RemoteComSecret) + sizeof(message.type) + sizeof(size_t);
+	// Init async read
+	mMessageReceivedCallback = callback;
+	mAsyncReadActive		 = true;
 
-		// First phase: Read the header
-		size_t					  bytesRead	 = boost::asio::read(mSocket, boost::asio::buffer(mReceiveBuffer, headerSize), boost::asio::transfer_exactly(headerSize), ec);
-
-		// Check for error
-		if (ec)
-		{
-			LOG_ERROR("Error reading message: {}", ec.message());
-			return false;
-		}
-
-		// Validate the secret identifier
-		if (memcmp(mReceiveBuffer, RemoteComSecret, sizeof(RemoteComSecret)) != 0)
-		{
-			LOG_ERROR("Invalid message format: Secret identifier mismatch");
-			return false;
-		}
-
-		size_t		 offset			 = sizeof(RemoteComSecret);
-
-		// Extract message type
-		const size_t messageTypeSize = sizeof(message.type);
-		memcpy(&message.type, &mReceiveBuffer[offset], messageTypeSize);
-		offset += messageTypeSize;
-
-		// Extract message data size
-		size_t		 dataLength			   = 0;
-		const size_t messageDataSizeLength = sizeof(message.data.size());
-		memcpy(&dataLength, &mReceiveBuffer[offset], messageDataSizeLength);
-		offset += messageDataSizeLength;
+	// Start the read chain
+	readHeaderAsync();
+}
 
 
-		// Second phase: Read the actual data
-
-		if (dataLength <= 0)
-		{
-			message.data.clear();
-			return false;
-		}
-
-		// Check for buffer overflow
-		if (dataLength > PackageBufferSize)
-		{
-			LOG_ERROR("Message data size ({} bytes) exceeds buffer capacity!", dataLength);
-			return false;
-		}
-
-		bytesRead = boost::asio::read(mSocket, boost::asio::buffer(mReceiveBuffer, dataLength), boost::asio::transfer_exactly(dataLength), ec);
-
-		if (ec)
-		{
-			LOG_ERROR("Error reading message data: {}", ec.message());
-			return false;
-		}
-
-		// Copy data to message
-		message.data.assign(mReceiveBuffer, mReceiveBuffer + dataLength);
-
-		return true;
-	}
-	catch (const std::exception &e)
-	{
-		LOG_ERROR("Exception while reading message: {}", e.what());
-		return false;
-	}
+void TCPSession::stopReadAsync()
+{
+	mAsyncReadActive = false;
 }

@@ -16,8 +16,11 @@ void SendThread::run()
 {
 	while (isRunning())
 	{
-		waitForEvent(200);
+		if (!mOwner)
+			return;
+
 		mOwner->sendMessages();
+		waitForEvent(200);
 	}
 }
 
@@ -29,7 +32,10 @@ void ReceiveThread::run()
 {
 	while (isRunning())
 	{
-		waitForEvent(200);
+		if (!mOwner)
+			return;
+
 		mOwner->receiveMessages();
+		waitForEvent(50);
 	}
 }
