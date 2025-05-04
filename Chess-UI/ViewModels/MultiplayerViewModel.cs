@@ -414,6 +414,7 @@ namespace Chess_UI.ViewModels
         public void DisplayClientWaitingForResponseView()
         {
             InitView = Visibility.Collapsed;
+
             Processing = false;
             UpdateMPButtons(MultiplayerMode.Client);
 
