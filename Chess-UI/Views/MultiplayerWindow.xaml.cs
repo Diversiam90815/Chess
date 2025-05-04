@@ -36,7 +36,7 @@ namespace Chess_UI.Views
             mViewModel = new(dispatcher);
 
             this.Rootgrid.DataContext = mViewModel;
-            
+
             Init();
             SetWindowSize(388, 405);
         }
@@ -83,9 +83,7 @@ namespace Chess_UI.Views
             if (name.Length == 0)
                 return;
 
-            mViewModel.Processing = true;
-
-            mViewModel.ChangeToHostGameView();  // Dummy Visibility set for desing purposes
+            mViewModel.EnterServerMultiplayerMode();
         }
 
 
@@ -95,9 +93,7 @@ namespace Chess_UI.Views
             if (name.Length == 0)
                 return;
 
-            mViewModel.Processing = true;
-
-            mViewModel.ChangeToJoinGameView();  // Dummy Visibility set for designing purposes
+            mViewModel.EnterServerMultiplayerMode();
         }
 
 
@@ -106,12 +102,49 @@ namespace Chess_UI.Views
             if (mViewModel.Processing)
             {
                 mViewModel.Processing = false;
+                mViewModel.UpdateMPButtons(MultiplayerMode.Init);
             }
 
             else
             {
                 this.Close();
             }
+        }
+
+
+        private void HostStartButton_Click(object sender, RoutedEventArgs e)
+        {
+            mViewModel.AcceptClientConnection();
+        }
+
+
+        private void HostDeclineButton_Click(object sender, RoutedEventArgs e)
+        {
+            mViewModel.DeclineClientConnection();
+        }
+
+
+        private void JoinAcceptButton_Click(object sender, RoutedEventArgs e)
+        {
+            mViewModel.AcceptConnectingToHost();
+        }
+
+
+        private void JoinDiscardButton_Click(object sender, RoutedEventArgs e)
+        {
+            mViewModel.DeclineConnectingToHost();
+        }
+
+
+        private void AbortWaitButton_Click(object sender, RoutedEventArgs e)
+        {
+            mViewModel.DisplayClientView();
+        }
+
+
+        private void LocalPlayerName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            mViewModel.UpdateMPButtons(MultiplayerMode.Init);
         }
 
 
@@ -128,36 +161,6 @@ namespace Chess_UI.Views
 
                 sender.SelectionStart = Math.Min(oldCaretPos, newText.Length);
             }
-        }
-
-
-        private void HostStartButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-
-        private void HostDeclineButton_Click(object sender, RoutedEventArgs e)
-        {
-            mViewModel.ChangeToSettingsView();
-        }
-
-
-        private void JoinAcceptButton_Click(object sender, RoutedEventArgs e)
-        {
-            mViewModel.ChangeToWaitingForResponseView();
-        }
-
-
-        private void JoinDiscardButton_Click(object sender, RoutedEventArgs e)
-        {
-            mViewModel.ChangeToSettingsView();
-        }
-
-
-        private void AbortWaitButton_Click(object sender, RoutedEventArgs e)
-        {
-            mViewModel.ChangeToJoinGameView();
         }
     }
 }

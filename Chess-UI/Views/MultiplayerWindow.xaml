@@ -11,7 +11,7 @@
 
     <Grid Name="Rootgrid" Background="#0B0B0D">
 
-        <Grid Name="SettingsGrid" Visibility="{x:Bind mViewModel.MultiplayerSettingsVisibility, Mode=TwoWay}">
+        <Grid Name="SettingsGrid" Visibility="{x:Bind mViewModel.InitView, Mode=TwoWay}">
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="TopSpacing" Height="50"/>
                 <RowDefinition x:Name="EnterField" Height="130"/>
@@ -27,23 +27,23 @@
 
                 <StackPanel Orientation="Horizontal" Margin="8">
                     <TextBlock Text="Name" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#EEE9DA" FontSize="19"/>
-                    <TextBox Name="LocalPlayerName" HorizontalAlignment="Right" TextChanging="PlayerName_TextChanging" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Width="180" Height="40" Background="#000005" Foreground="#EEE9DA" FontSize="15" PlaceholderText="Set your name"/>
+                    <TextBox Name="LocalPlayerName" HorizontalAlignment="Right" TextChanging="PlayerName_TextChanging" TextChanged="LocalPlayerName_TextChanged" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Width="180" Height="40" Background="#000005" Foreground="#EEE9DA" FontSize="15" PlaceholderText="Set your name"/>
                 </StackPanel>
             </StackPanel>
 
-            <ProgressRing Grid.Row="2" Foreground="Black" IsActive="{x:Bind mViewModel.Processing, Mode=TwoWay}"/>
+            <ProgressRing Grid.Row="2" IsActive="{x:Bind mViewModel.Processing, Mode=TwoWay}"/>
 
             <StackPanel Grid.Row="3" Orientation="Vertical" Margin="20,10,20,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Name="HostGameButton" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Content="Host a game" Margin="8" Width="115" Height="40" Click="HostGameButton_Click"/>
-                    <Button Name="JoinGameButton" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Content="Join a game" Margin="8" Width="115" Height="40" Click="JoinGameButton_Click"/>
+                    <Button Name="HostGameButton" IsEnabled="{x:Bind mViewModel.HostGameButtonEnabled, Mode=TwoWay}" Content="Host a game" Margin="8" Width="115" Height="40" Click="HostGameButton_Click"/>
+                    <Button Name="JoinGameButton" IsEnabled="{x:Bind mViewModel.ClientGameButtonEnabled, Mode=TwoWay}" Content="Join a game" Margin="8" Width="115" Height="40" Click="JoinGameButton_Click"/>
                 </StackPanel>
                 <Button Name="ReturnButton" Content="Return" HorizontalAlignment="Center" Width="250" Height="40" Click="ReturnButton_Click"/>
             </StackPanel>
         </Grid>
 
 
-        <Grid Name="HostGameGrid" Visibility="{x:Bind mViewModel.HostGameVisibility, Mode=TwoWay}">
+        <Grid Name="ClientRequestedConnectionGrid" Visibility="{x:Bind mViewModel.ClientRequestedConnectionView, Mode=TwoWay}">
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="TopSpacingHost" Height="50"/>
                 <RowDefinition x:Name="RemotePlayerName" Height="60"/>
@@ -62,7 +62,7 @@
         </Grid>
 
 
-        <Grid Name="JoinGameGrid" Visibility="{x:Bind mViewModel.JoinGameVisibility, Mode=TwoWay}">
+        <Grid Name="ClientFoundHostGrid" Visibility="{x:Bind mViewModel.ClientFoundHostView, Mode=TwoWay}">
             <Grid.RowDefinitions>
                 <RowDefinition x:Name="TopSpacingJoin" Height="30"/>
                 <RowDefinition x:Name="Text1Join" Height="40"/>
@@ -86,7 +86,7 @@
         </Grid>
 
 
-        <Grid Name="WaitingForResponseGrid" Visibility="{x:Bind mViewModel.WaitingForResponseVisibility, Mode=TwoWay}">
+        <Grid Name="ClientWaitingForResponeGrid" Visibility="{x:Bind mViewModel.ClientWaitingForResponseView, Mode=TwoWay}">
             
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                 <TextBlock Text="Waiting for a response from" Margin="20,50,20,10" FontSize="22"/>

@@ -15,6 +15,15 @@ namespace Chess_UI.Models
     }
 
 
+    public enum MultiplayerMode
+    {
+        None = 0,
+        Init = 1,
+        Server = 2,
+        Client = 3
+    }
+
+
     public class MultiplayerModel
     {
         private List<NetworkAdapter> mAdapters = new();
@@ -97,6 +106,18 @@ namespace Chess_UI.Models
         public void SetLocalPlayerName(string name)
         {
             ChessLogicAPI.SetLocalPlayerName(name);
+        }
+
+
+        public void StartGameServer()
+        {
+
+        }
+
+
+        public void StartGameClient()
+        {
+
         }
 
 
