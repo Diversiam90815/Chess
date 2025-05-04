@@ -403,7 +403,7 @@ namespace Chess_UI.ViewModels
             InitView = Visibility.Visible;
 
             Processing = false;
-            UpdateMPButtons(MultiplayerMode.None);
+            UpdateMPButtons(MultiplayerMode.Init);
 
             ClientFoundHostView = Visibility.Collapsed;
             ClientRequestedConnectionView = Visibility.Collapsed;

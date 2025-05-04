@@ -38,7 +38,7 @@ namespace Chess_UI.Views
             this.Rootgrid.DataContext = mViewModel;
 
             Init();
-            SetWindowSize(388, 405);
+            SetWindowSize(600, 400);
         }
 
 
@@ -46,6 +46,7 @@ namespace Chess_UI.Views
         {
             Presenter = AppWindow.Presenter as OverlappedPresenter;
             Presenter.IsResizable = false;
+            Presenter.IsMaximizable = false;
         }
 
 
@@ -93,7 +94,7 @@ namespace Chess_UI.Views
             if (name.Length == 0)
                 return;
 
-            mViewModel.EnterServerMultiplayerMode();
+            mViewModel.EnterClientMultiplayerMode();
         }
 
 
@@ -101,8 +102,7 @@ namespace Chess_UI.Views
         {
             if (mViewModel.Processing)
             {
-                mViewModel.Processing = false;
-                mViewModel.UpdateMPButtons(MultiplayerMode.Init);
+                mViewModel.EnterInitMode();
             }
 
             else

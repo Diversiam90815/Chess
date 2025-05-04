@@ -11,36 +11,64 @@
 
     <Grid Name="Rootgrid" Background="#0B0B0D">
 
-        <Grid Name="SettingsGrid" Visibility="{x:Bind mViewModel.InitView, Mode=TwoWay}">
-            <Grid.RowDefinitions>
-                <RowDefinition x:Name="TopSpacing" Height="50"/>
-                <RowDefinition x:Name="EnterField" Height="130"/>
-                <RowDefinition x:Name="Spacing" Height="50"/>
-                <RowDefinition x:Name="Buttons" Height="120"/>
-            </Grid.RowDefinitions>
+        <StackPanel Name="InitView" Visibility="{x:Bind mViewModel.InitView, Mode=OneWay}" Orientation="Vertical" Spacing="8">
 
-            <StackPanel Grid.Row="1" Orientation="Vertical" Margin="20,0,20,0">
-                <StackPanel Orientation="Horizontal" Margin="8">
-                    <TextBlock Text="Network" Width="130" Foreground="#EEE9DA" FontSize="19" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                    <ComboBox HorizontalAlignment="Right" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Width="180" Height="40" Foreground="#EEE9DA" FontSize="15" ItemsSource="{x:Bind mViewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedValuePath="ID" SelectedItem="{x:Bind mViewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="NetworkAdapterChanged" Background="#000005" CornerRadius="8"/>
+            <!--Title-->
+            <TextBlock Text="Multiplayer" FontSize="24" HorizontalAlignment="Center" Margin="16"/>
+
+            <!--Settings-->
+            <StackPanel Orientation="Vertical" Margin="20,0,0,0">
+
+                <!--Network adapter-->
+                <StackPanel Orientation="Vertical" Margin="8">
+
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="250"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Network" HorizontalAlignment="Left" Foreground="#EEE9DA" FontSize="19" VerticalAlignment="Center"/>
+                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" ItemsSource="{x:Bind mViewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind mViewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="NetworkAdapterChanged" CornerRadius="8"/>
+
+                    </Grid>
+
+                    <TextBlock Text="Select your network adapter" Foreground="#EEE9DA" FontSize="16" VerticalAlignment="Center"/>
+
                 </StackPanel>
 
-                <StackPanel Orientation="Horizontal" Margin="8">
-                    <TextBlock Text="Name" Width="130" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="#EEE9DA" FontSize="19"/>
-                    <TextBox Name="LocalPlayerName" HorizontalAlignment="Right" TextChanging="PlayerName_TextChanging" TextChanged="LocalPlayerName_TextChanged" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" Width="180" Height="40" Background="#000005" Foreground="#EEE9DA" FontSize="15" PlaceholderText="Set your name"/>
+                <!--Local Player Name-->
+                <StackPanel Orientation="Vertical" Margin="8">
+
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="250"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="Name" HorizontalAlignment="Left" Foreground="#EEE9DA" FontSize="19" VerticalAlignment="Center"/>
+                        <TextBox Name="LocalPlayerName" Grid.Column="1" HorizontalAlignment="Stretch" TextChanging="PlayerName_TextChanging" TextChanged="LocalPlayerName_TextChanged" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" FontSize="15" PlaceholderText="Set your name"/>
+
+                    </Grid>
+
+                    <TextBlock Text="Chose your player name" FontSize="12"/>
                 </StackPanel>
+
             </StackPanel>
 
-            <ProgressRing Grid.Row="2" IsActive="{x:Bind mViewModel.Processing, Mode=TwoWay}"/>
+            <ProgressRing IsActive="{x:Bind mViewModel.Processing, Mode=TwoWay}" Margin="16"/>
 
-            <StackPanel Grid.Row="3" Orientation="Vertical" Margin="20,10,20,0">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Name="HostGameButton" IsEnabled="{x:Bind mViewModel.HostGameButtonEnabled, Mode=TwoWay}" Content="Host a game" Margin="8" Width="115" Height="40" Click="HostGameButton_Click"/>
-                    <Button Name="JoinGameButton" IsEnabled="{x:Bind mViewModel.ClientGameButtonEnabled, Mode=TwoWay}" Content="Join a game" Margin="8" Width="115" Height="40" Click="JoinGameButton_Click"/>
-                </StackPanel>
-                <Button Name="ReturnButton" Content="Return" HorizontalAlignment="Center" Width="250" Height="40" Click="ReturnButton_Click"/>
+            <StackPanel Orientation="Horizontal" Spacing="8" Height="40" HorizontalAlignment="Center">
+                <Button Name="HostGameButton" IsEnabled="{x:Bind mViewModel.HostGameButtonEnabled, Mode=TwoWay}" Content="Host a game" Width="115" Click="HostGameButton_Click"/>
+                <Button Name="JoinGameButton" IsEnabled="{x:Bind mViewModel.ClientGameButtonEnabled, Mode=TwoWay}" Content="Join a game" Width="115" Click="JoinGameButton_Click"/>
+
+                <Button Name="ReturnButton" HorizontalAlignment="Center" Click="ReturnButton_Click" >
+                    <FontIcon Glyph="&#xEB97;"/>
+                </Button>
+
             </StackPanel>
-        </Grid>
+
+        </StackPanel>
 
 
         <Grid Name="ClientRequestedConnectionGrid" Visibility="{x:Bind mViewModel.ClientRequestedConnectionView, Mode=TwoWay}">
@@ -87,7 +115,7 @@
 
 
         <Grid Name="ClientWaitingForResponeGrid" Visibility="{x:Bind mViewModel.ClientWaitingForResponseView, Mode=TwoWay}">
-            
+
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                 <TextBlock Text="Waiting for a response from" Margin="20,50,20,10" FontSize="22"/>
                 <TextBlock Text="{x:Bind mViewModel.RemotePlayerName}" Margin="20,10,20,10" HorizontalAlignment="Center" FontSize="25"/>
