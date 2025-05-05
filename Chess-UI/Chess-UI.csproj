@@ -74,10 +74,17 @@
 	<ItemGroup>
 	  <None Remove="Views\MultiplayerWindow.xaml" />
 	  <None Remove="Views\SettingsWindow.xaml" />
+	  <None Remove="Views\Styles.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Chess-Logic\build\Chess-Logic.vcxproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Page Update="Views\Styles.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 
 	<ItemGroup>

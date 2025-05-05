@@ -14,7 +14,7 @@
         <StackPanel Name="InitView" Visibility="{x:Bind mViewModel.InitView, Mode=OneWay}" Orientation="Vertical" Spacing="8">
 
             <!--Title-->
-            <TextBlock Text="Multiplayer" FontSize="24" HorizontalAlignment="Center" Margin="16"/>
+            <TextBlock Text="Multiplayer" Style="{StaticResource MPTitle}"/>
 
             <!--Settings-->
             <StackPanel Orientation="Vertical" Margin="20,0,0,0">
@@ -28,12 +28,12 @@
                             <ColumnDefinition Width="250"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Network" HorizontalAlignment="Left" Foreground="#EEE9DA" FontSize="19" VerticalAlignment="Center"/>
+                        <TextBlock Text="Network" Style="{StaticResource MPSubTitle}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                         <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" ItemsSource="{x:Bind mViewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind mViewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="NetworkAdapterChanged" CornerRadius="8"/>
 
                     </Grid>
 
-                    <TextBlock Text="Select your network adapter" Foreground="#EEE9DA" FontSize="16" VerticalAlignment="Center"/>
+                    <TextBlock Text="Select your network adapter" Style="{StaticResource MPDesc}" VerticalAlignment="Center"/>
 
                 </StackPanel>
 
@@ -46,12 +46,12 @@
                             <ColumnDefinition Width="250"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="Name" HorizontalAlignment="Left" Foreground="#EEE9DA" FontSize="19" VerticalAlignment="Center"/>
-                        <TextBox Name="LocalPlayerName" Grid.Column="1" HorizontalAlignment="Stretch" TextChanging="PlayerName_TextChanging" TextChanged="LocalPlayerName_TextChanged" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" FontSize="15" PlaceholderText="Set your name"/>
+                        <TextBlock Text="Name" HorizontalAlignment="Left" Style="{StaticResource MPSubTitle}" VerticalAlignment="Center"/>
+                        <TextBox Name="LocalPlayerName" Grid.Column="1" Style="{StaticResource PlainTextEnter}" HorizontalAlignment="Stretch" TextChanging="PlayerName_TextChanging" TextChanged="LocalPlayerName_TextChanged" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" PlaceholderText="Set your name"/>
 
                     </Grid>
 
-                    <TextBlock Text="Chose your player name" FontSize="12"/>
+                    <TextBlock Text="Chose your player name" Style="{StaticResource MPDesc}"/>
                 </StackPanel>
 
             </StackPanel>
