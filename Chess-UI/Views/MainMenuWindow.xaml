@@ -34,55 +34,31 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Name="StartGameButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="StartGameButton_Click">
-                    <Image Source="{x:Bind ViewModel.StartGameButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button.Resources>
-                        <ResourceDictionary>
-                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
-                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Transparent" />
-                        </ResourceDictionary>
-                    </Button.Resources>
+                <Button Style="{StaticResource MainMenuButtonStyle}" Click="StartGameButton_Click">
+                    <Image Source="{x:Bind ViewModel.StartGameButtonImage}" Style="{StaticResource MainMenuImageStyle}"/>
                 </Button>
-                <TextBlock Text="Start Game" FontFamily="Instrument Serif" FontSize="20" Width="100" Foreground="#F5DFDF"/>
+                <TextBlock Text="Start Game" Style="{ThemeResource MainMenuTitleStyles}"/>
             </StackPanel>
 
             <StackPanel Name="SettingsButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
-                <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="SettingsButton_Click">
-                    <Image Source="{x:Bind ViewModel.SettingButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button.Resources>
-                        <ResourceDictionary>
-                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
-                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Transparent" />
-                        </ResourceDictionary>
-                    </Button.Resources>
+                <Button Style="{StaticResource MainMenuButtonStyle}" Click="SettingsButton_Click">
+                    <Image Source="{x:Bind ViewModel.SettingButtonImage}" Style="{StaticResource MainMenuImageStyle}"/>
                 </Button>
-                <TextBlock Text="Settings" FontFamily="Instrument Serif" FontSize="20" Width="75" Foreground="#F5DFDF" />
+                <TextBlock Text="Settings" Style="{ThemeResource MainMenuTitleStyles}" />
             </StackPanel>
 
             <StackPanel Name="MultiplayerButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top">
-                <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="MultiplayerButton_Click">
-                    <Image Source="{x:Bind ViewModel.MultiplayerButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button.Resources>
-                        <ResourceDictionary>
-                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
-                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Transparent" />
-                        </ResourceDictionary>
-                    </Button.Resources>
+                <Button Style="{StaticResource MainMenuButtonStyle}" Click="MultiplayerButton_Click">
+                    <Image Source="{x:Bind ViewModel.MultiplayerButtonImage}" Style="{StaticResource MainMenuImageStyle}"/>
                 </Button>
-                <TextBlock Text="Multiplayer" FontFamily="Instrument Serif" FontSize="20" Width="105" Foreground="#F5DFDF" />
+                <TextBlock Text="Multiplayer" Style="{ThemeResource MainMenuTitleStyles}" />
             </StackPanel>
 
             <StackPanel Name="QuitButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-                <Button Width="100" Height="100" Background="Transparent" BorderThickness="0" Click="QuitButton_Click">
-                    <Image Source="{x:Bind ViewModel.EndGameButtonImage}" Stretch="Uniform" Width="100" Height="90" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <Button.Resources>
-                        <ResourceDictionary>
-                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
-                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Transparent" />
-                        </ResourceDictionary>
-                    </Button.Resources>
+                <Button Style="{StaticResource MainMenuButtonStyle}" Click="QuitButton_Click">
+                    <Image Source="{x:Bind ViewModel.EndGameButtonImage}" Style="{StaticResource MainMenuImageStyle}"/>
                 </Button>
-                <TextBlock Text="Quit" FontFamily="Instrument Serif" FontSize="20" Width="45" Foreground="#F5DFDF" />
+                <TextBlock Text="Quit" Style="{ThemeResource MainMenuTitleStyles}"/>
             </StackPanel>
         </Grid>
     </Grid>

@@ -29,7 +29,7 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Text="Network" Style="{StaticResource MPSubTitle}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" ItemsSource="{x:Bind mViewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind mViewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="NetworkAdapterChanged" CornerRadius="8"/>
+                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" ItemsSource="{x:Bind mViewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind mViewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="NetworkAdapterChanged" Style="{StaticResource ComboBoxStyle}"/>
 
                     </Grid>
 
@@ -59,10 +59,10 @@
             <ProgressRing IsActive="{x:Bind mViewModel.Processing, Mode=TwoWay}" Margin="16"/>
 
             <StackPanel Orientation="Horizontal" Spacing="8" Height="40" HorizontalAlignment="Center">
-                <Button Name="HostGameButton" IsEnabled="{x:Bind mViewModel.HostGameButtonEnabled, Mode=TwoWay}" Content="Host a game" Width="115" Click="HostGameButton_Click"/>
-                <Button Name="JoinGameButton" IsEnabled="{x:Bind mViewModel.ClientGameButtonEnabled, Mode=TwoWay}" Content="Join a game" Width="115" Click="JoinGameButton_Click"/>
+                <Button Name="HostGameButton" IsEnabled="{x:Bind mViewModel.HostGameButtonEnabled, Mode=TwoWay}" Content="Host a game" Style="{StaticResource MPStartButtonStyle}" Click="HostGameButton_Click"/>
+                <Button Name="JoinGameButton" IsEnabled="{x:Bind mViewModel.ClientGameButtonEnabled, Mode=TwoWay}" Content="Join a game"  Style="{StaticResource MPStartButtonStyle}" Click="JoinGameButton_Click"/>
 
-                <Button Name="ReturnButton" HorizontalAlignment="Center" Click="ReturnButton_Click" >
+                <Button Name="ReturnButton" HorizontalAlignment="Center" Click="ReturnButton_Click" Style="{StaticResource FontIconButtonStyle}" >
                     <FontIcon Glyph="&#xEB97;"/>
                 </Button>
 
@@ -78,10 +78,10 @@
             <TextBlock Text="Accept this request?" FontSize="20" HorizontalAlignment="Center"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Name="HostStartButton" Height="50" FontSize="20" Margin="8" CornerRadius="8" Click="HostStartButton_Click">
+                <Button Name="HostStartButton" Style="{StaticResource FontIconButtonStyle}" Click="HostStartButton_Click">
                     <FontIcon Glyph="&#xE8FB;"/>
                 </Button>
-                <Button Name="HostDeclineButton"  Height="50" FontSize="20" Margin="8" CornerRadius="8" Click="HostDeclineButton_Click">
+                <Button Name="HostDeclineButton" Style="{StaticResource FontIconButtonStyle}" Click="HostDeclineButton_Click">
                     <FontIcon Glyph="&#xE711;"/>
                 </Button>
             </StackPanel>
@@ -97,11 +97,11 @@
             <TextBlock Text="Do you want to join?" HorizontalAlignment="Center" FontSize="20"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Name="JoinAcceptButton" Height="50" FontSize="20" Margin="8" CornerRadius="8" Click="JoinAcceptButton_Click">
+                <Button Name="JoinAcceptButton" Style="{StaticResource FontIconButtonStyle}" Click="JoinAcceptButton_Click">
                     <FontIcon Glyph="&#xE8FB;"/>
                 </Button>
 
-                <Button Name="JoinDiscardButton"  Height="50" FontSize="20" Margin="8" CornerRadius="8" Click="JoinDiscardButton_Click">
+                <Button Name="JoinDiscardButton" Style="{StaticResource FontIconButtonStyle}" Click="JoinDiscardButton_Click">
                     <FontIcon Glyph="&#xE711;"/>
                 </Button>
             </StackPanel>
@@ -115,7 +115,7 @@
             <TextBlock Text="{x:Bind mViewModel.RemotePlayerName}" Margin="20,10,20,10" HorizontalAlignment="Center" FontSize="25"/>
             <ProgressRing Height="50" Width="50" Margin="20,20,20,0"/>
 
-            <Button Name="AbortWaitButton" FontSize="20" CornerRadius="8" Click="AbortWaitButton_Click" Margin="20,70,20,10" HorizontalAlignment="Center" Width="100" Height="50">
+            <Button Name="AbortWaitButton" Style="{StaticResource FontIconButtonStyle}" Click="AbortWaitButton_Click" Margin="20,70,20,10" HorizontalAlignment="Center">
                 <FontIcon Glyph="&#xE711;"/>
             </Button>
         </StackPanel>
