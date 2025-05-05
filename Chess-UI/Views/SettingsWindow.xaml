@@ -19,16 +19,16 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="1" Margin="25,16,16,16" Orientation="Vertical">
-                <TextBlock x:Name="Heading" Text="Themes" FontSize="24" FontFamily="Sergoe UI Variable"/>
+                <TextBlock x:Name="Heading" Text="Themes" Style="{StaticResource SettingsTitle}"/>
 
-                <StackPanel Orientation="Horizontal" Margin="20,20,10,10">
-                    <TextBlock x:Name="BoardThemeSetting" Text="Board" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" FontFamily="Sergoe UI Variable"/>
-                    <ComboBox ItemsSource="{Binding BoardThemes}" SelectedItem="{x:Bind ViewModel.SelectedBoardTheme, Mode=TwoWay}" DisplayMemberPath="Name" Width="240" Height="40" HorizontalAlignment="Right"/>
+                <StackPanel Orientation="Horizontal" Margin="20,20,10,10" Spacing="20">
+                    <TextBlock x:Name="BoardThemeSetting" Text="Board" Style="{StaticResource SettingsSubTitle}"/>
+                    <ComboBox ItemsSource="{Binding BoardThemes}" SelectedItem="{x:Bind ViewModel.SelectedBoardTheme, Mode=TwoWay}" DisplayMemberPath="Name" Style="{StaticResource SettingComboBoxStyle}"/>
                 </StackPanel>
                 
-                <StackPanel Orientation="Horizontal" Margin="20,10,10,20">
-                    <TextBlock x:Name="PieceThemeSetting" Text="Pieces" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" FontFamily="Sergoe UI Variable"/>
-                    <ComboBox ItemsSource="{Binding PieceThemes}" SelectedItem="{x:Bind ViewModel.SelectedPieceTheme, Mode=TwoWay}" DisplayMemberPath="Name" Width="240" Height="40" HorizontalAlignment="Right"/>
+                <StackPanel Orientation="Horizontal" Margin="20,10,10,20" Spacing="20">
+                    <TextBlock x:Name="PieceThemeSetting" Text="Pieces" Style="{StaticResource SettingsSubTitle}"/>
+                    <ComboBox ItemsSource="{Binding PieceThemes}" SelectedItem="{x:Bind ViewModel.SelectedPieceTheme, Mode=TwoWay}" DisplayMemberPath="Name" Style="{StaticResource SettingComboBoxStyle}"/>
                 </StackPanel>
                 
             </StackPanel>
