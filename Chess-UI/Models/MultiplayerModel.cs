@@ -111,13 +111,33 @@ namespace Chess_UI.Models
 
         public void StartGameServer()
         {
-
+            ChessLogicAPI.StartRemoteDiscovery(true);
         }
 
 
         public void StartGameClient()
         {
+            ChessLogicAPI.StartRemoteDiscovery(false);
+        }
 
+
+        public void StartMultiplerGame(MultiplayerMode mode)
+        {
+            switch (mode)
+            {
+                case MultiplayerMode.Client:
+                    {
+                        ChessLogicAPI.StartMultiplayerGame(false);
+                        break;
+                    }
+                case MultiplayerMode.Server:
+                    {
+                        ChessLogicAPI.StartMultiplayerGame(true);
+                        break;
+                    }
+                default: break;
+
+            }
         }
 
 

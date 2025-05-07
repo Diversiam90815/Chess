@@ -12,6 +12,7 @@ using System.Net.Security;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Media.Playback;
 
 
 namespace Chess_UI.ViewModels
@@ -23,6 +24,8 @@ namespace Chess_UI.ViewModels
         private readonly DispatcherQueue DispatcherQueue;
 
         public readonly MultiplayerModel mModel;
+
+        public MultiplayerMode MPMode { get; private set; }
 
 
         public MultiplayerViewModel(DispatcherQueue dispatcher)
@@ -215,6 +218,7 @@ namespace Chess_UI.ViewModels
 
         public void EnterServerMultiplayerMode()
         {
+            MPMode = MultiplayerMode.Server;
             mModel.StartGameServer();
             DisplayServerView();
         }
@@ -222,6 +226,7 @@ namespace Chess_UI.ViewModels
 
         public void EnterClientMultiplayerMode()
         {
+            MPMode = MultiplayerMode.Client;
             mModel.StartGameClient();
             DisplayClientView();
         }
@@ -240,7 +245,10 @@ namespace Chess_UI.ViewModels
 
         private void EnterMultiplayerGame()
         {
-            // TODO: After connected, enter a multiplayer game
+            if (MPMode == MultiplayerMode.None || MPMode == MultiplayerMode.Init)
+                return;
+
+            mModel.StartMultiplerGame(MPMode);
         }
 
 
