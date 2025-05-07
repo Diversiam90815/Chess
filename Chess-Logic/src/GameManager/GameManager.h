@@ -93,6 +93,9 @@ public:
 
 	void						startRemoteDiscovery(bool isHost);
 
+	void						approveConnectionRequest();
+	void						rejectConnectionRequest();
+
 private:
 	GameManager() = default;
 

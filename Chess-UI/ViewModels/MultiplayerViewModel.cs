@@ -268,12 +268,15 @@ namespace Chess_UI.ViewModels
         public void AcceptClientConnection()
         {
             //We are the host and accepted a connection try from the client
+            mModel.AcceptConnectionRequest();
         }
 
 
         public void DeclineClientConnection()
         {
             //We are the host and declined a connection try from the client
+            mModel.RejectConnectionRequest();
+
             EnterInitMode();
         }
 

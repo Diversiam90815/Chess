@@ -500,6 +500,24 @@ void GameManager::startRemoteDiscovery(bool isHost)
 }
 
 
+void GameManager::approveConnectionRequest()
+{
+	if (!mMultiplayerManager)
+		return;
+
+	mMultiplayerManager->approveConnectionRequest();
+}
+
+
+void GameManager::rejectConnectionRequest()
+{
+	if (!mMultiplayerManager)
+		return;
+
+	mMultiplayerManager->rejectConnectionRequest();
+}
+
+
 void GameManager::initObservers()
 {
 	this->attachObserver(mUiCommunicationLayer);

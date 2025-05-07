@@ -323,6 +323,18 @@ CHESS_API void SetLocalPlayerName(const char *name)
 }
 
 
+CHESS_API void ApproveConnectionRequest()
+{
+	GameManager::GetInstance()->approveConnectionRequest();
+}
+
+
+CHESS_API void RejectConnectionRequest()
+{
+	GameManager::GetInstance()->rejectConnectionRequest();
+}
+
+
 CHESS_API int GetNetworkAdapterCount()
 {
 	GameManager *manager	 = GameManager::GetInstance();

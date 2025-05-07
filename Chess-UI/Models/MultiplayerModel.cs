@@ -136,8 +136,18 @@ namespace Chess_UI.Models
                         break;
                     }
                 default: break;
-
             }
+        }
+
+        public void AcceptConnectionRequest()
+        {
+            ChessLogicAPI.ApproveConnectionRequest();
+        }
+
+
+        public void RejectConnectionRequest()
+        {
+            ChessLogicAPI.RejectConnectionRequest();
         }
 
 
