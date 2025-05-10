@@ -38,31 +38,20 @@ namespace Chess_UI.ViewModels
 
         public void AddMove(string move)
         {
+
             // Find the column with the least number of moves
             var minColumn = MoveHistoryColumns.OrderBy(col => col.Count).First();
 
-            DispatcherQueue.TryEnqueue(() =>
-            {
-                minColumn.Add(move);
-            });
+            minColumn.Add(move);
         }
 
 
         public void ClearMoveHistory()
         {
-            DispatcherQueue.TryEnqueue(() =>
+            foreach (var column in MoveHistoryColumns)
             {
-                foreach (var column in MoveHistoryColumns)
-                {
-                    column.Clear();
-                }
-
-                for (int i = 0; i < MovesMaxColumns; i++)
-                {
-                    MoveHistoryColumns.Add([]);
-                }
-            });
-
+                column.Clear();
+            }
         }
 
 
@@ -75,12 +64,15 @@ namespace Chess_UI.ViewModels
 
         private void OnHandleMoveHistoryUpdated()
         {
-            ClearMoveHistory();
-
-            foreach (var moveNotation in Model.MoveHistory)
+            DispatcherQueue.TryEnqueue(() =>
             {
-                AddMove(moveNotation);
-            }
+                ClearMoveHistory();
+
+                foreach (var moveNotation in Model.MoveHistory)
+                {
+                    AddMove(moveNotation);
+                }
+            });
         }
 
     }

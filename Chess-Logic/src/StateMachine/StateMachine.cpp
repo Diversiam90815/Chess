@@ -58,7 +58,6 @@ void StateMachine::onMultiplayerGameStarted(bool isHost)
 
 void StateMachine::onSquareSelected(const Position &pos)
 {
-
 	if (getCurrentGameState() == GameState::WaitingForInput) // Selected Start Position
 	{
 		mCurrentPossibleMove.start = pos;
