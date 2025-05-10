@@ -76,7 +76,7 @@ void StateMachine::onPawnPromotionChosen(PieceType promotion)
 {
 	if (getCurrentGameState() == GameState::PawnPromotion)
 	{
-		mPromotionChoice   = promotion;
+		mCurrentPossibleMove.promotionPiece = promotion;
 		mAwaitingPromotion = false;
 	}
 	gameStateChanged(GameState::ExecutingMove);
@@ -402,7 +402,7 @@ void StateMachine::resetCurrentPossibleMove()
 }
 
 
-bool StateMachine::handleInitState(bool multiplayer)
+bool StateMachine::handleInitState(bool multiplayer) const
 {
 	LOG_INFO("Handling init state");
 
@@ -430,7 +430,7 @@ bool StateMachine::handleWaitingForInputState()
 }
 
 
-bool StateMachine::handleMoveInitiatedState()
+bool StateMachine::handleMoveInitiatedState() const
 {
 	LOG_INFO("Handling move initiated state");
 	bool result = GameManager::GetInstance()->initiateMove(mCurrentPossibleMove.start);

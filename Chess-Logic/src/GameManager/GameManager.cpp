@@ -202,6 +202,12 @@ void GameManager::executeMove(PossibleMove &tmpMove)
 		if (move == tmpMove)
 		{
 			moveToExecute = move;
+
+			// On pawn promotion, assign the promotion piece type
+			if (moveToExecute.type == MoveType::PawnPromotion)
+			{
+				moveToExecute.promotionPiece = tmpMove.promotionPiece;
+			}
 			break;
 		}
 	}

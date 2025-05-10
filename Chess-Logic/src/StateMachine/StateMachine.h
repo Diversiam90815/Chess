@@ -50,9 +50,9 @@ private:
 
 	void				   run() override;
 
-	bool				   handleInitState(bool multiplayer);
+	bool				   handleInitState(bool multiplayer) const;
 	bool				   handleWaitingForInputState();
-	bool				   handleMoveInitiatedState();
+	bool				   handleMoveInitiatedState() const;
 	bool				   handleWaitingForTargetState();
 	bool				   handleValidatingMoveState();
 	bool				   handleExecutingMoveState();
@@ -79,7 +79,6 @@ private:
 	bool				   mIsValidMove{false};
 
 	bool				   mAwaitingPromotion{false};
-	PieceType			   mPromotionChoice{PieceType::DefaultType};
 
 	EndGameState		   mEndgameState{EndGameState::OnGoing};
 
