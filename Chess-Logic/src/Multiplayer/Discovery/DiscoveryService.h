@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
-#include <boost/asio/steady_timer.hpp>
-#include <boost/asio/ip/udp.hpp>
+#include <asio.hpp>
+#include <asio/steady_timer.hpp>
+#include <asio/ip/udp.hpp>
 
 #include <string>
 
@@ -20,8 +20,7 @@
 #include "IObservable.h"
 
 
-namespace asio = boost::asio;
-using boost::asio::ip::udp;
+using asio::ip::udp;
 
 
 enum class DiscoveryMode
@@ -51,7 +50,7 @@ private:
 
 	void				   receivePackage();
 
-	void				   handleReceive(const boost::system::error_code &error, size_t bytesReceived);
+	void				   handleReceive(const asio::error_code &error, size_t bytesReceived);
 
 	void				   addRemoteToList(Endpoint remote);
 

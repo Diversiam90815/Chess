@@ -34,11 +34,11 @@ bool DiscoveryService::init(const std::string &playerName, std::string localIPv4
 
 	// setting the local endpoint
 	mLocalEndpoint = udp::endpoint(udp::v4(), mDiscoveryPort);
-	boost::system::error_code	ec;
+	asio::error_code	 ec;
 
 	// Setting the target endpoint
-	boost::asio::ip::address_v4 address = boost::asio::ip::make_address_v4(broadCastAddress);
-	mTargetEndpoint						= udp::endpoint(address, mDiscoveryPort);
+	asio::ip::address_v4 address = asio::ip::make_address_v4(broadCastAddress);
+	mTargetEndpoint				 = udp::endpoint(address, mDiscoveryPort);
 
 	// Binding the socket to the local endpoint
 	mSocket.bind(mLocalEndpoint, ec);
@@ -49,7 +49,7 @@ bool DiscoveryService::init(const std::string &playerName, std::string localIPv4
 	}
 
 	// Turn broadcast on
-	mSocket.set_option(boost::asio::socket_base::broadcast(true));
+	mSocket.set_option(asio::socket_base::broadcast(true));
 
 	mInitialized.store(true);
 	return true;
@@ -58,7 +58,7 @@ bool DiscoveryService::init(const std::string &playerName, std::string localIPv4
 
 void DiscoveryService::deinit()
 {
-	boost::system::error_code ec;
+	asio::error_code ec;
 	mSocket.close(ec);
 	if (ec)
 	{
@@ -125,17 +125,17 @@ void DiscoveryService::sendPackage()
 	}
 
 	Endpoint local{};
-	local.IPAddress					  = this->mLocalIPv4;
-	local.playerName				  = this->mPlayerName;
-	local.tcpPort					  = this->mTcpPort;
+	local.IPAddress			 = this->mLocalIPv4;
+	local.playerName		 = this->mPlayerName;
+	local.tcpPort			 = this->mTcpPort;
 
-	json					  j		  = local;
-	std::string				  message = j.dump();
+	json			 j		 = local;
+	std::string		 message = j.dump();
 
-	boost::system::error_code ec;
+	asio::error_code ec;
 
 	// Sending the message
-	size_t					  bytesSent = mSocket.send_to(boost::asio::buffer(message), mTargetEndpoint, 0, ec);
+	size_t			 bytesSent = mSocket.send_to(asio::buffer(message), mTargetEndpoint, 0, ec);
 
 	if (ec)
 	{
@@ -150,11 +150,11 @@ void DiscoveryService::sendPackage()
 
 void DiscoveryService::receivePackage()
 {
-	mSocket.async_receive(asio::buffer(mRecvBuffer), [this](const boost::system::error_code &error, size_t bytesReceived) { handleReceive(error, bytesReceived); });
+	mSocket.async_receive(asio::buffer(mRecvBuffer), [this](const asio::error_code &error, size_t bytesReceived) { handleReceive(error, bytesReceived); });
 }
 
 
-void DiscoveryService::handleReceive(const boost::system::error_code &error, size_t bytesReceived)
+void DiscoveryService::handleReceive(const asio::error_code &error, size_t bytesReceived)
 {
 	if (!error && bytesReceived > 0)
 	{

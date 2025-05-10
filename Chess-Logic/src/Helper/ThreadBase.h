@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <boost/thread.hpp>
+#include <thread>
 #include <mutex>
 #include <atomic>
 #include <condition_variable>
@@ -25,7 +25,7 @@ public:
 			return;
 
 		mRunning.store(true);
-		mThread = boost::thread(&ThreadBase::run, this);
+		mThread = std::thread(&ThreadBase::run, this);
 	}
 
 	void stop()
@@ -74,7 +74,7 @@ protected:
 	bool isRunning() const { return mRunning.load(); }
 
 private:
-	boost::thread			mThread;
+	std::thread				mThread;
 	std::atomic<bool>		mRunning;
 	std::mutex				mMutex;
 	std::condition_variable cv;

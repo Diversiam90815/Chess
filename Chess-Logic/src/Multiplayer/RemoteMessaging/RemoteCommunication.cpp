@@ -8,7 +8,7 @@
 #include "RemoteCommunication.h"
 
 
-bool RemoteCommunication::init(boost::shared_ptr<TCPSession> session)
+bool RemoteCommunication::init(std::shared_ptr<TCPSession> session)
 {
 	mTCPSession = session;
 
