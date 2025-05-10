@@ -101,6 +101,9 @@ namespace Chess_UI.Services
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "RejectConnectionRequest", CharSet = CharSet.Unicode)]
         public static extern void RejectConnectionRequest();
+        
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SendConnectionRequestToHost", CharSet = CharSet.Unicode)]
+        public static extern void SendConnectionRequestToHost();
 
         #endregion // Multiplayer
 

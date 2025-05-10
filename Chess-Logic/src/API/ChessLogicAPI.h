@@ -65,6 +65,8 @@ extern "C"
 
 	CHESS_API void	RejectConnectionRequest();
 
+	CHESS_API void	SendConnectionRequestToHost();
+
 
 	CHESS_API void	LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber);
 

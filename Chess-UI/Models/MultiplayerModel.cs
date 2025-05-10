@@ -8,7 +8,7 @@ using static Chess_UI.Services.ChessLogicAPI;
 
 namespace Chess_UI.Models
 {
-    public class NetworkAdapter
+    public record NetworkAdapter
     {
         public string Name { get; set; }
         public int ID { get; set; }
@@ -118,6 +118,12 @@ namespace Chess_UI.Models
         public void StartGameClient()
         {
             ChessLogicAPI.StartRemoteDiscovery(false);
+        }
+
+
+        public void ConnectToHost()
+        {
+            
         }
 
 

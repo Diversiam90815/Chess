@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Security;
 using System.Runtime.CompilerServices;
@@ -136,7 +137,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private string remotePlayerName = "Test User";
+        private string remotePlayerName;
         public string RemotePlayerName
         {
             get => remotePlayerName;
@@ -150,6 +151,20 @@ namespace Chess_UI.ViewModels
             }
         }
 
+
+        private string localPlayerName;
+        public string LocalPlayerName
+        {
+            get => localPlayerName;
+            set
+            {
+                if (localPlayerName != value)
+                {
+                    localPlayerName = value;
+                    mModel.SetLocalPlayerName(value);
+                }
+            }
+        }
 
 
         #region Visibilities
@@ -236,7 +251,7 @@ namespace Chess_UI.ViewModels
         {
             // TODO:
             // Enter Init Mode Hosting game via Model
-            // Setting local player name if saved earlier
+            // Setting local player name in UI if saved earlier
             // Display Init view
 
             DisplayInitView();
@@ -255,6 +270,7 @@ namespace Chess_UI.ViewModels
         public void AcceptConnectingToHost()
         {
             //We are the client and accepted a connection to the host
+            mModel.ConnectToHost();
         }
 
 
@@ -290,6 +306,34 @@ namespace Chess_UI.ViewModels
         private void HandleConnectionStatusUpdated(ChessLogicAPI.ConnectionState state)
         {
             // TODO: Implement reactive UI
+            switch (state)
+            {
+                case ChessLogicAPI.ConnectionState.HostingSession:
+                    {
+                        break;
+                    }
+                case ChessLogicAPI.ConnectionState.Connecting:
+                    {
+                        break;
+                    }
+                case ChessLogicAPI.ConnectionState.Connected:
+                    {
+                        break;
+                    }
+                case ChessLogicAPI.ConnectionState.WaitingForARemote:
+                    {
+                        break;
+                    }
+                case ChessLogicAPI.ConnectionState.Disconnecting:
+                    {
+                        break;
+                    }
+                case ChessLogicAPI.ConnectionState.Disconnected:
+                    {
+                        break;
+                    }
+                default: break;
+            }
         }
 
 

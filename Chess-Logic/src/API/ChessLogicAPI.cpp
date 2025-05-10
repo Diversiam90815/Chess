@@ -335,6 +335,12 @@ CHESS_API void RejectConnectionRequest()
 }
 
 
+CHESS_API void SendConnectionRequestToHost()
+{
+	GameManager::GetInstance()->sendConnectionRequestToHost();
+}
+
+
 CHESS_API int GetNetworkAdapterCount()
 {
 	GameManager *manager	 = GameManager::GetInstance();

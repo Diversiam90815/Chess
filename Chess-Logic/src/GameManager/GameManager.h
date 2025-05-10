@@ -95,6 +95,7 @@ public:
 
 	void						approveConnectionRequest();
 	void						rejectConnectionRequest();
+	void						sendConnectionRequestToHost();
 
 private:
 	GameManager() = default;

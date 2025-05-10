@@ -1,3 +1,4 @@
+using ABI.Windows.ApplicationModel.Activation;
 using Chess_UI.Models;
 using Chess_UI.Services;
 using Chess_UI.ViewModels;
@@ -84,6 +85,8 @@ namespace Chess_UI.Views
             if (name.Length == 0)
                 return;
 
+            mViewModel.LocalPlayerName = name;
+
             mViewModel.EnterServerMultiplayerMode();
         }
 
@@ -93,6 +96,8 @@ namespace Chess_UI.Views
             string name = LocalPlayerName.Text.Trim();
             if (name.Length == 0)
                 return;
+
+            mViewModel.LocalPlayerName = name;
 
             mViewModel.EnterClientMultiplayerMode();
         }
@@ -112,7 +117,7 @@ namespace Chess_UI.Views
         }
 
 
-        private void HostStartButton_Click(object sender, RoutedEventArgs e)
+        private void HostAcceptButton_Click(object sender, RoutedEventArgs e)
         {
             mViewModel.AcceptClientConnection();
         }

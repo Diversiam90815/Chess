@@ -78,7 +78,7 @@
             <TextBlock Text="Accept this request?" FontSize="20" HorizontalAlignment="Center"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Name="HostStartButton" Style="{StaticResource FontIconButtonStyle}" Click="HostStartButton_Click">
+                <Button Name="HostAcceptButton" Style="{StaticResource FontIconButtonStyle}" Click="HostAcceptButton_Click">
                     <FontIcon Glyph="&#xE8FB;"/>
                 </Button>
                 <Button Name="HostDeclineButton" Style="{StaticResource FontIconButtonStyle}" Click="HostDeclineButton_Click">

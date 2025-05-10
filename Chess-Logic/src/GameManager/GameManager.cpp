@@ -518,6 +518,15 @@ void GameManager::rejectConnectionRequest()
 }
 
 
+void GameManager::sendConnectionRequestToHost()
+{
+	if (!mMultiplayerManager)
+		return;
+
+	mMultiplayerManager->joinSession();
+}
+
+
 void GameManager::initObservers()
 {
 	this->attachObserver(mUiCommunicationLayer);
