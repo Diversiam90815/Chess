@@ -10,3 +10,7 @@
 	path = Chess-Logic/submodules/boost
 	url = git@github.com:boostorg/boost.git
 	branch = master
+[submodule "Chess-Logic/submodules/asio"]
+	path = Chess-Logic/submodules/asio
+	url = git@github.com:chriskohlhoff/asio.git
+	branch = master
