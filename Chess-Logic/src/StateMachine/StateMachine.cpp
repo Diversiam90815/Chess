@@ -461,8 +461,8 @@ bool StateMachine::handleExecutingMoveState()
 
 bool StateMachine::handlePawnPromotionState()
 {
-	// @TODO
-	return false;
+	mAwaitingPromotion = true;
+	return true;
 }
 
 

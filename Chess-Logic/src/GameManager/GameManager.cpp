@@ -318,7 +318,7 @@ bool GameManager::checkForPawnPromotionMove(const PossibleMove &move)
 	for (auto &possibleMove : mAllMovesForPosition)
 	{
 		if (move == possibleMove)
-			return (move.type & MoveType::PawnPromotion) == MoveType::PawnPromotion;
+			return (possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion;
 	}
 	return false;
 }

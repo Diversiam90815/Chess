@@ -134,72 +134,76 @@ namespace Chess_UI.Views
 
         private async Task<PieceTypeInstance?> OnShowPawnPromotionPieces()
         {
-            var dialog = new ContentDialog
-            {
-                Title = "Pawn Promotion",
-                XamlRoot = this.Content.XamlRoot
-            };
+            TaskCompletionSource<PieceTypeInstance?> tcs = new();
 
-            // Customize the dialog to include all four options
-            // Since ContentDialog has limited buttons, we'll use a custom Content
-            var stackPanel = new StackPanel
+            DispatcherQueue.TryEnqueue(() =>
             {
-                Orientation = Orientation.Horizontal,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            PlayerColor currentPlayer = ViewModel.CurrentPlayer;
-
-            // Helper method to create a button with an image
-            Button CreatePieceButton(PieceTypeInstance pieceType)
-            {
-                var button = new Button
+                var dialog = new ContentDialog
                 {
-                    Tag = pieceType,
-                    Margin = new Thickness(5),
-                    Padding = new Thickness(0),
-                    Width = 80,
-                    Height = 80
+                    Title = "Pawn Promotion",
+                    XamlRoot = this.Content.XamlRoot
                 };
 
-                var image = new Image
+                // Customize the dialog to include all four options
+                // Since ContentDialog has limited buttons, we'll use a custom Content
+                var stackPanel = new StackPanel
                 {
-                    Source = Images.GetPieceImage(Images.PieceTheme.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
-                    Stretch = Stretch.Uniform
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
                 };
 
-                button.Content = image;
+                PlayerColor currentPlayer = ViewModel.CurrentPlayer;
 
-                button.Click += (s, e) =>
+                // Helper method to create a button with an image
+                Button CreatePieceButton(PieceTypeInstance pieceType)
                 {
-                    dialog.Hide();
-                    ViewModelSelectedPiece = pieceType;
-                };
+                    var button = new Button
+                    {
+                        Tag = pieceType,
+                        Margin = new Thickness(5),
+                        Padding = new Thickness(0),
+                        Width = 80,
+                        Height = 80
+                    };
 
-                return button;
-            }
+                    var image = new Image
+                    {
+                        Source = Images.GetPieceImage(Images.PieceTheme.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
+                        Stretch = Stretch.Uniform
+                    };
 
-            // Create buttons for each promotion option
-            var queenButton = CreatePieceButton(PieceTypeInstance.Queen);
-            var rookButton = CreatePieceButton(PieceTypeInstance.Rook);
-            var bishopButton = CreatePieceButton(PieceTypeInstance.Bishop);
-            var knightButton = CreatePieceButton(PieceTypeInstance.Knight);
+                    button.Content = image;
 
-            stackPanel.Children.Add(queenButton);
-            stackPanel.Children.Add(rookButton);
-            stackPanel.Children.Add(bishopButton);
-            stackPanel.Children.Add(knightButton);
+                    button.Click += (s, e) =>
+                    {
+                        dialog.Hide();
+                        ViewModelSelectedPiece = pieceType;
+                    };
 
-            dialog.Content = stackPanel;
+                    return button;
+                }
 
-            ViewModelSelectedPiece = null;
+                // Create buttons for each promotion option
+                var queenButton = CreatePieceButton(PieceTypeInstance.Queen);
+                var rookButton = CreatePieceButton(PieceTypeInstance.Rook);
+                var bishopButton = CreatePieceButton(PieceTypeInstance.Bishop);
+                var knightButton = CreatePieceButton(PieceTypeInstance.Knight);
 
-            // Show the dialog and wait for it to close
-            var result = await dialog.ShowAsync();
+                stackPanel.Children.Add(queenButton);
+                stackPanel.Children.Add(rookButton);
+                stackPanel.Children.Add(bishopButton);
+                stackPanel.Children.Add(knightButton);
 
-            // Check if the user selected a piece
-            return ViewModelSelectedPiece;
+                dialog.Content = stackPanel;
+
+                ViewModelSelectedPiece = null;
+
+                // Show the dialog and wait for it to close
+                _ = dialog.ShowAsync().AsTask().ContinueWith(t => { tcs.SetResult(ViewModelSelectedPiece); });
+            });
+
+            return await tcs.Task;
         }
 
     }

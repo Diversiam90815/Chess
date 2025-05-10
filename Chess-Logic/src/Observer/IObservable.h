@@ -125,9 +125,9 @@ class IDiscoveryObservable : public ObservableBase<IDiscoveryObserver>
 public:
 	virtual ~IDiscoveryObservable() {};
 
-	virtual void remoteFound(const Endpoint &remote)		   = 0;
-	//virtual void remoteSelected(const std::string &remoteName) = 0;
-	//virtual void remoteRemoved(const std::string &remoteName)  = 0;
+	virtual void remoteFound(const Endpoint &remote) = 0;
+	// virtual void remoteSelected(const std::string &remoteName) = 0;
+	// virtual void remoteRemoved(const std::string &remoteName)  = 0;
 };
 
 
