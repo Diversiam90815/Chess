@@ -38,7 +38,6 @@ namespace Chess_UI.ViewModels
 
         public void AddMove(string move)
         {
-
             // Find the column with the least number of moves
             var minColumn = MoveHistoryColumns.OrderBy(col => col.Count).First();
 
@@ -74,6 +73,5 @@ namespace Chess_UI.ViewModels
                 }
             });
         }
-
     }
 }

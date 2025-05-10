@@ -76,7 +76,7 @@ void StateMachine::onPawnPromotionChosen(PieceType promotion)
 	if (getCurrentGameState() == GameState::PawnPromotion)
 	{
 		mCurrentPossibleMove.promotionPiece = promotion;
-		mAwaitingPromotion = false;
+		mAwaitingPromotion					= false;
 	}
 	gameStateChanged(GameState::ExecutingMove);
 }
@@ -398,6 +398,17 @@ void StateMachine::resetCurrentPossibleMove()
 	mCurrentPossibleMove.start = {};
 	mCurrentPossibleMove.end   = {};
 	mCurrentPossibleMove.type  = MoveType::Normal;
+}
+
+
+void StateMachine::reactToUndoMove()
+{
+	// Remove the last move from the history and board
+	GameManager::GetInstance()->undoMove();
+
+	// Recalculate the new state (Changing player happening in WaitingForInputState)
+	mWaitingForTargetStart = false;
+	gameStateChanged(GameState::WaitingForInput);
 }
 
 

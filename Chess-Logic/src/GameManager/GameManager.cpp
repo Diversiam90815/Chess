@@ -270,7 +270,6 @@ void GameManager::undoMove()
 	piece->decreaseMoveCounter();
 
 	mMoveExecution->removeLastMove();
-	switchTurns();
 }
 
 

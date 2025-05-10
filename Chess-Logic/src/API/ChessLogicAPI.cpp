@@ -185,7 +185,7 @@ CHESS_API void ResetGame()
 
 CHESS_API void UndoMove()
 {
-	GameManager::GetInstance()->undoMove();
+	StateMachine::GetInstance()->reactToUndoMove();
 }
 
 

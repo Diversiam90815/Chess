@@ -44,6 +44,7 @@ public:
 	void	  setInitialized(const bool value);
 
 	void	  resetGame();
+	void	  reactToUndoMove();
 
 private:
 	StateMachine();
