@@ -347,6 +347,12 @@ CHESS_API void SendConnectionRequestToHost()
 }
 
 
+CHESS_API void StoppedMultiplayer()
+{
+	GameManager::GetInstance()->stoppedMultiplayer();
+}
+
+
 CHESS_API int GetNetworkAdapterCount()
 {
 	GameManager *manager	 = GameManager::GetInstance();

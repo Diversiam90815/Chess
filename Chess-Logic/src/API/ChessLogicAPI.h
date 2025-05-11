@@ -48,7 +48,7 @@ extern "C"
 
 	CHESS_API int	GetEndgameState();
 
-	CHESS_API bool	GetBoardState(int* boardstate);
+	CHESS_API bool	GetBoardState(int *boardstate);
 
 
 	CHESS_API void	StartedMultiplayer();
@@ -68,6 +68,8 @@ extern "C"
 	CHESS_API void	RejectConnectionRequest();
 
 	CHESS_API void	SendConnectionRequestToHost();
+
+	CHESS_API void	StoppedMultiplayer();
 
 
 	CHESS_API void	LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber);

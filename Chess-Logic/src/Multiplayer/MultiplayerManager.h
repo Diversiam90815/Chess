@@ -25,6 +25,8 @@ public:
 
 	void						init();
 
+	void						reset();
+
 	bool						hostSession();
 
 	void						joinSession();

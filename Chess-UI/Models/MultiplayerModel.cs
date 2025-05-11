@@ -132,6 +132,12 @@ namespace Chess_UI.Models
         }
 
 
+        public void ResetToInit()
+        {
+            ChessLogicAPI.StoppedMultiplayer();
+        }
+
+
         public void StartMultiplerGame(MultiplayerMode mode)
         {
             switch (mode)

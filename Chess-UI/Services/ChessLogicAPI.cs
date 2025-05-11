@@ -108,6 +108,9 @@ namespace Chess_UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SendConnectionRequestToHost", CharSet = CharSet.Unicode)]
         public static extern void SendConnectionRequestToHost();
 
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StoppedMultiplayer", CharSet = CharSet.Unicode)]
+        public static extern void StoppedMultiplayer();
+
         #endregion // Multiplayer
 
 

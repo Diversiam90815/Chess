@@ -88,6 +88,7 @@ public:
 	void						disconnectMultiplayerGame();
 
 	void						startedMultiplayer();
+	void						stoppedMultiplayer();
 
 	bool						isMultiplayerActive() const;
 

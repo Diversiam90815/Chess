@@ -464,6 +464,12 @@ void GameManager::startedMultiplayer()
 }
 
 
+void GameManager::stoppedMultiplayer()
+{
+	mMultiplayerManager->reset();
+}
+
+
 bool GameManager::isMultiplayerActive() const
 {
 	return mIsMultiplayerMode;

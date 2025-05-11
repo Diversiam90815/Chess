@@ -59,6 +59,14 @@ bool DiscoveryService::init(const std::string &playerName, std::string localIPv4
 void DiscoveryService::deinit()
 {
 	asio::error_code ec;
+
+	// Cancel any pending async operations on the socket
+	mSocket.cancel(ec);
+	if (ec)
+	{
+		LOG_ERROR("Error cancelling socket operations: {}", ec.message().c_str());
+	}
+
 	mSocket.close(ec);
 	if (ec)
 	{
@@ -90,7 +98,7 @@ void DiscoveryService::startDiscovery(DiscoveryMode mode)
 		return;
 	}
 
-	run();
+	start();
 }
 
 

@@ -254,6 +254,7 @@ namespace Chess_UI.ViewModels
             // Setting local player name in UI if saved earlier
             // Display Init view
 
+            mModel.ResetToInit();
             DisplayInitView();
         }
 

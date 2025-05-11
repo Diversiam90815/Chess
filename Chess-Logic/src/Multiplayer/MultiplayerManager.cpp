@@ -40,17 +40,26 @@ void MultiplayerManager::init()
 }
 
 
+void MultiplayerManager::reset()
+{
+	// Stop discovery if running
+	mDiscovery->stop();
+
+	// TODO: Reset server / client
+}
+
+
 bool MultiplayerManager::hostSession()
 {
+	if (mLocalIPv4.empty())
+		return false;
+
 	mServer = std::make_unique<TCPServer>(mIoContext);
 
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
 	mServer->setConnectionRequestHandler([this](const std::string &remoteIPv4) { pendingHostApproval(remoteIPv4); }); // Notify observers that we have a connection request
 
 	mServer->startAccept();
-
-	if (mLocalIPv4.empty())
-		return false;
 
 	const int port	  = mServer->getBoundPort();
 	bool	  success = startServerDiscovery(mLocalIPv4, port);
@@ -125,6 +134,9 @@ void MultiplayerManager::onNetworkAdapterChanged(const NetworkAdapter &adapter)
 
 bool MultiplayerManager::startServerDiscovery(const std::string IPv4, const int port)
 {
+	if (mDiscovery)
+		mDiscovery->deinit();
+
 	mDiscovery.reset(new DiscoveryService(mIoContext));
 
 	bool bindingSucceeded = mDiscovery->init(getLocalPlayerName(), IPv4, port);
@@ -145,6 +157,9 @@ bool MultiplayerManager::startServerDiscovery(const std::string IPv4, const int 
 
 void MultiplayerManager::startClientDiscovery()
 {
+	if (mDiscovery)
+		mDiscovery->deinit();
+
 	mDiscovery.reset(new DiscoveryService(mIoContext));
 	bool bindingSucceeded = mDiscovery->init(getLocalPlayerName());
 
