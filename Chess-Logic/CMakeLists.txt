@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.0.0.403)
+set(CHESS_VERSION 1.0.0.404)
 
 project(Chess-Logic VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
@@ -204,7 +204,7 @@ set(LOGGER_INCLUDE_FILE   ${SUBMODULES_DIR}/Logger/include)
 
 # Asio
 
-set(ASIO_ROOT ${SUBMODULES_DIR}/asio/asio)
+set(ASIO_ROOT ${SUBMODULES_DIR}/asio-standalone/asio)
 set(Asio_INCLUDE_DIR ${ASIO_ROOT}/include)
 
 
