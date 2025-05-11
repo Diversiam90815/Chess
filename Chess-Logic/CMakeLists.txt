@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.0.0.330)
+set(CHESS_VERSION 1.0.0.406)
 
 project(Chess-Logic VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
@@ -202,11 +202,10 @@ add_subdirectory(${SUBMODULES_DIR}/Logger)
 set(LOGGER_INCLUDE_FILE   ${SUBMODULES_DIR}/Logger/include)
 
 
-# Boost
+# Asio
 
-set(BOOST_ROOT ${SUBMODULES_DIR}/boost)
-set(Boost_INCLUDE_DIR ${SUBMODULES_DIR}/boost)
-find_package(Boost REQUIRED thread system atomic)
+set(ASIO_ROOT ${SUBMODULES_DIR}/asio-standalone/asio)
+set(Asio_INCLUDE_DIR ${ASIO_ROOT}/include)
 
 
 # NLOHMANN JSON
@@ -278,7 +277,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 		${ALL_PROJECT_DIRS}
 		${LOGGER_INCLUDE_FILE}
 		${JSON_SINGLE_FILE}
-		${BOOST_ASIO_INCLUDE_DIRS}
+		${Asio_INCLUDE_DIR}
 )
 
 
@@ -286,12 +285,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 #   LINK LIBRARIES
 ###########################################
 
-set(PROJECT_LIBS    Logger
-					Boost::boost
-					Boost::thread
-					Boost::system
-					Boost::atomic
-)
+set(PROJECT_LIBS Logger)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_LIBS})
 

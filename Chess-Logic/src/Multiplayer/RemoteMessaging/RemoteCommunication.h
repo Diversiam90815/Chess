@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <boost/thread.hpp>
-
 #include "MultiplayerMessageStruct.h"
 #include "TCPConnection/TCPSession.h"
 #include "CommunicationThreads.h"
@@ -20,7 +18,7 @@ public:
 	RemoteCommunication()  = default;
 	~RemoteCommunication() = default;
 
-	bool init(boost::shared_ptr<TCPSession> session);
+	bool init(std::shared_ptr<TCPSession> session);
 	void deinit();
 
 	void start();
@@ -42,7 +40,7 @@ private:
 
 	std::atomic<bool>					  mIsInitialized{false};
 
-	boost::shared_ptr<TCPSession>		  mTCPSession;
+	std::shared_ptr<TCPSession>			  mTCPSession;
 
 	std::shared_ptr<SendThread>			  mSendThread;
 	std::shared_ptr<ReceiveThread>		  mReceiveThread;

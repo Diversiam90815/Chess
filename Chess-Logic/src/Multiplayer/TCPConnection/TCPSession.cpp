@@ -8,7 +8,7 @@
 #include "TCPSession.h"
 
 
-TCPSession::TCPSession(boost::asio::io_context &ioContext) : mSocket(ioContext)
+TCPSession::TCPSession(asio::io_context &ioContext) : mSocket(ioContext)
 {
 	mSocket.open(tcp::v4());						  // Open the socket
 	mSocket.bind(tcp::endpoint(tcp::v4(), 0));		  // Bind to a OS assigned port
@@ -28,26 +28,26 @@ void TCPSession::readHeaderAsync()
 	const size_t headerSize = sizeof(RemoteComSecret) + sizeof(MultiplayerMessageType) + sizeof(size_t);
 
 	// Start async read for message header
-	boost::asio::async_read(mSocket, boost::asio::buffer(mReceiveBuffer, headerSize), boost::asio::transfer_exactly(headerSize),
-							[this](const boost::system::error_code &ec, size_t bytesTransfered)
-							{
-								if (!mAsyncReadActive)
-									return;
+	asio::async_read(mSocket, asio::buffer(mReceiveBuffer, headerSize), asio::transfer_exactly(headerSize),
+					 [this](const asio::error_code &ec, size_t bytesTransfered)
+					 {
+						 if (!mAsyncReadActive)
+							 return;
 
-								if (ec)
-								{
-									LOG_ERROR("Error reading message header : {}", ec.message().c_str());
+						 if (ec)
+						 {
+							 LOG_ERROR("Error reading message header : {}", ec.message().c_str());
 
-									// If connection is still active, try reading again
-									if (isConnected() && mAsyncReadActive)
-										readHeaderAsync();
+							 // If connection is still active, try reading again
+							 if (isConnected() && mAsyncReadActive)
+								 readHeaderAsync();
 
-									return;
-								}
+							 return;
+						 }
 
-								// Process the header
-								processHeader(bytesTransfered);
-							});
+						 // Process the header
+						 processHeader(bytesTransfered);
+					 });
 }
 
 
@@ -56,35 +56,35 @@ void TCPSession::readMessageBodyAsync(size_t dataLength, MultiplayerMessageType 
 	if (!mAsyncReadActive || !isConnected())
 		return;
 
-	boost::asio::async_read(mSocket, boost::asio::buffer(mReceiveBuffer, dataLength), boost::asio::transfer_exactly(dataLength),
-							[this, dataLength, messageType](const boost::system::error_code &ec, size_t bytesTransfered)
-							{
-								if (!mAsyncReadActive)
-									return;
+	asio::async_read(mSocket, asio::buffer(mReceiveBuffer, dataLength), asio::transfer_exactly(dataLength),
+					 [this, dataLength, messageType](const asio::error_code &ec, size_t bytesTransfered)
+					 {
+						 if (!mAsyncReadActive)
+							 return;
 
-								if (ec)
-								{
-									LOG_ERROR("Error reading message body: {}", ec.message().c_str());
+						 if (ec)
+						 {
+							 LOG_ERROR("Error reading message body: {}", ec.message().c_str());
 
-									// If still active, read next message
-									if (mAsyncReadActive && isConnected())
-										readHeaderAsync();
+							 // If still active, read next message
+							 if (mAsyncReadActive && isConnected())
+								 readHeaderAsync();
 
-									return;
-								}
+							 return;
+						 }
 
-								// Create complete message
-								MultiplayerMessageStruct message;
-								message.type = messageType;
-								message.data.assign(mReceiveBuffer, mReceiveBuffer + dataLength);
+						 // Create complete message
+						 MultiplayerMessageStruct message;
+						 message.type = messageType;
+						 message.data.assign(mReceiveBuffer, mReceiveBuffer + dataLength);
 
-								// Deliver message
-								if (mMessageReceivedCallback)
-									mMessageReceivedCallback(message);
+						 // Deliver message
+						 if (mMessageReceivedCallback)
+							 mMessageReceivedCallback(message);
 
-								// Continue reading the next message
-								readHeaderAsync();
-							});
+						 // Continue reading the next message
+						 readHeaderAsync();
+					 });
 }
 
 
@@ -192,8 +192,8 @@ bool TCPSession::sendMessage(MultiplayerMessageStruct &message)
 
 	try
 	{
-		boost::system::error_code ec;
-		boost::asio::write(mSocket, boost::asio::buffer(mSendBuffer, offset), ec);
+		asio::error_code ec;
+		asio::write(mSocket, asio::buffer(mSendBuffer, offset), ec);
 
 		if (ec)
 		{

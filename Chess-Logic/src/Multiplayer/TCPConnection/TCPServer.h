@@ -8,16 +8,16 @@
 
 #pragma once
 
-#include <boost/asio.hpp>
+#include <asio.hpp>
 #include <functional>
 
 #include "TCPSession.h"
 #include "Logging.h"
 
 
-using boost::asio::ip::tcp;
+using asio::ip::tcp;
 
-using SessionHandler		   = std::function<void(boost::shared_ptr<TCPSession> session)>; // Callback invoked when a new session is accepted
+using SessionHandler		   = std::function<void(std::shared_ptr<TCPSession> session)>; // Callback invoked when a new session is accepted
 
 using ConnectionRequestHandler = std::function<void(const std::string &remoteIPv4)>;
 
@@ -25,7 +25,7 @@ using ConnectionRequestHandler = std::function<void(const std::string &remoteIPv
 class TCPServer
 {
 public:
-	TCPServer(boost::asio::io_context &ioContext);
+	TCPServer(asio::io_context &ioContext);
 	~TCPServer();
 
 	void	  startAccept();
@@ -39,17 +39,17 @@ public:
 
 
 private:
-	void						  handleAccept(boost::shared_ptr<TCPSession> session, const boost::system::error_code &error);
+	void						handleAccept(std::shared_ptr<TCPSession> session, const asio::error_code &error);
 
 
-	boost::asio::io_context		 &mIoContext;
+	asio::io_context		   &mIoContext;
 
-	tcp::acceptor				  mAcceptor;
+	tcp::acceptor				mAcceptor;
 
-	int							  mBoundPort{0};
+	int							mBoundPort{0};
 
-	boost::shared_ptr<TCPSession> mPendingSession;
+	std::shared_ptr<TCPSession> mPendingSession;
 
-	SessionHandler				  mSessionHandler;
-	ConnectionRequestHandler	  mConnectionRequestHandler;
+	SessionHandler				mSessionHandler;
+	ConnectionRequestHandler	mConnectionRequestHandler;
 };

@@ -50,29 +50,29 @@ public:
 	void				onRemoteFound(const Endpoint &remote) override;
 
 private:
-	TCPSession::pointer														 mSession = nullptr;
+	TCPSession::pointer										   mSession = nullptr;
 
-	std::unique_ptr<TCPServer>												 mServer;
-	std::unique_ptr<TCPClient>												 mClient;
-	std::unique_ptr<DiscoveryService>										 mDiscovery;
+	std::unique_ptr<TCPServer>								   mServer;
+	std::unique_ptr<TCPClient>								   mClient;
+	std::unique_ptr<DiscoveryService>						   mDiscovery;
 
-	std::shared_ptr<RemoteCommunication>									 mRemoteCom;
-	std::shared_ptr<RemoteReceiver>											 mRemoteReceiver;
-	std::shared_ptr<RemoteSender>											 mRemoteSender;
+	std::shared_ptr<RemoteCommunication>					   mRemoteCom;
+	std::shared_ptr<RemoteReceiver>							   mRemoteReceiver;
+	std::shared_ptr<RemoteSender>							   mRemoteSender;
 
-	boost::asio::io_context													 mIoContext;
-	boost::asio::executor_work_guard<boost::asio::io_context::executor_type> mWorkGuard;
-	std::thread																 mWorkerThread;
+	asio::io_context										   mIoContext;
+	asio::executor_work_guard<asio::io_context::executor_type> mWorkGuard;
+	std::thread												   mWorkerThread;
 
-	std::string																 mLocalPlayerName{};
+	std::string												   mLocalPlayerName{};
 
-	std::string																 mLocalIPv4{};
+	std::string												   mLocalIPv4{};
 
-	Endpoint																 mRemoteEndpoint;
+	Endpoint												   mRemoteEndpoint;
 
-	std::mutex																 mSessionMutex;
+	std::mutex												   mSessionMutex;
 
-	std::atomic<ConnectionState>											 mConnectionState{ConnectionState::Disconnected};
+	std::atomic<ConnectionState>							   mConnectionState{ConnectionState::Disconnected};
 
 	friend class GameManager;
 };

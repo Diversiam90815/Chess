@@ -8,7 +8,7 @@
 #include "TCPServer.h"
 
 
-TCPServer::TCPServer(boost::asio::io_context &ioContext) : mIoContext(ioContext), mAcceptor(ioContext, tcp::endpoint(tcp::v4(), 0)) {}
+TCPServer::TCPServer(asio::io_context &ioContext) : mIoContext(ioContext), mAcceptor(ioContext, tcp::endpoint(tcp::v4(), 0)) {}
 
 
 TCPServer::~TCPServer() {}
@@ -19,11 +19,11 @@ void TCPServer::startAccept()
 	auto session = TCPSession::create(mIoContext);
 	mBoundPort	 = session->getBoundPort();
 
-	mAcceptor.async_accept(session->socket(), [this, session](const boost::system::error_code &error) { handleAccept(session, error); });
+	mAcceptor.async_accept(session->socket(), [this, session](const asio::error_code &error) { handleAccept(session, error); });
 }
 
 
-void TCPServer::handleAccept(boost::shared_ptr<TCPSession> session, const boost::system::error_code &error)
+void TCPServer::handleAccept(std::shared_ptr<TCPSession> session, const asio::error_code &error)
 {
 	if (!error)
 	{
@@ -81,7 +81,7 @@ void TCPServer::respondToConnectionRequest(bool accepted)
 		LOG_INFO("Rejecting connection from {}", mPendingSession->socket().remote_endpoint().address().to_string().c_str());
 
 		// Close the socket
-		boost::system::error_code ec;
+		asio::error_code ec;
 		mPendingSession->socket().close(ec);
 	}
 

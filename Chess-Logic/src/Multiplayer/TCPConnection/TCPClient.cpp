@@ -8,7 +8,7 @@
 #include "TCPClient.h"
 
 
-TCPClient::TCPClient(boost::asio::io_context &ioContext) : mIoContext(ioContext) {}
+TCPClient::TCPClient(asio::io_context &ioContext) : mIoContext(ioContext) {}
 
 
 void TCPClient::connect(const std::string &host, unsigned short port)
@@ -17,12 +17,12 @@ void TCPClient::connect(const std::string &host, unsigned short port)
 	auto session = TCPSession::create(mIoContext); // TCPSession constructor binds the socket to a port
 
 	// Create timer for the connection timeout
-	auto timer	 = std::make_shared<boost::asio::steady_timer>(mIoContext);
+	auto timer	 = std::make_shared<asio::steady_timer>(mIoContext);
 	timer->expires_after(std::chrono::seconds(mTimeoutInSeconds));
 
 	// Start timeout timer
 	timer->async_wait(
-		[this, timer](const boost::system::error_code &ec)
+		[this, timer](const asio::error_code &ec)
 		{
 			if (!ec)
 			{
@@ -38,8 +38,8 @@ void TCPClient::connect(const std::string &host, unsigned short port)
 	tcp::resolver resolver(mIoContext);
 	auto		  endpoints = resolver.resolve(host, std::to_string(port));
 
-	boost::asio::async_connect(session->socket(), endpoints,
-							   [session, timer, this](const boost::system::error_code &error, const tcp::endpoint &endpoint)
+	asio::async_connect(session->socket(), endpoints,
+							   [session, timer, this](const asio::error_code &error, const tcp::endpoint &endpoint)
 							   {
 								   // Cancel timeout timer
 								   timer->cancel();
@@ -58,7 +58,7 @@ void TCPClient::connect(const std::string &host, unsigned short port)
 									   LOG_ERROR("TCPClient connect error : {}!", error.message().c_str());
 
 									   // Call the timeout handler if it is a timeout-related error
-									   if (error == boost::asio::error::timed_out || error == boost::asio::error::connection_refused)
+									   if (error == asio::error::timed_out || error == asio::error::connection_refused)
 									   {
 										   if (mConnectTimeoutHandler)
 											   mConnectTimeoutHandler();

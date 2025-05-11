@@ -9,7 +9,7 @@
 
 
 
-MultiplayerManager::MultiplayerManager() : mWorkGuard(boost::asio::make_work_guard(mIoContext))
+MultiplayerManager::MultiplayerManager() : mWorkGuard(asio::make_work_guard(mIoContext))
 {
 	// Start the IO Context in a dedicated thread
 	mWorkerThread	= std::thread([this]() { mIoContext.run(); });
