@@ -51,6 +51,8 @@ extern "C"
 	CHESS_API bool	GetBoardState(int* boardstate);
 
 
+	CHESS_API void	StartedMultiplayer();
+
 	CHESS_API void	StartMultiplayerGame(bool isHost);
 
 	CHESS_API void	StartRemoteDiscovery(bool isHost);

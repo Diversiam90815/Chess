@@ -29,6 +29,11 @@ namespace Chess_UI.Models
         private List<NetworkAdapter> mAdapters = new();
 
 
+        public MultiplayerModel()
+        {
+            ChessLogicAPI.StartedMultiplayer();
+        }
+
         public void Init()
         {
             var logicCommunication = App.Current.ChessLogicCommunication as ChessLogicCommunicationLayer;
@@ -123,7 +128,7 @@ namespace Chess_UI.Models
 
         public void ConnectToHost()
         {
-            
+
         }
 
 

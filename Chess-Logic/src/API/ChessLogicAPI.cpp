@@ -226,6 +226,12 @@ CHESS_API bool GetBoardState(int *boardState)
 }
 
 
+CHESS_API void StartedMultiplayer()
+{
+	GameManager::GetInstance()->startedMultiplayer();
+}
+
+
 CHESS_API void StartMultiplayerGame(bool isHost)
 {
 	StateMachine::GetInstance()->onMultiplayerGameStarted(isHost);

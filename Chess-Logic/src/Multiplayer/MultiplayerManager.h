@@ -14,40 +14,47 @@
 #include "RemoteMessaging/RemoteSender.h"
 #include "RemoteMessaging/RemoteCommunication.h"
 #include "IObserver.h"
+#include "NetworkManager.h"
 
 
-class MultiplayerManager : public INetworkObserver, public IConnectionStatusObservable, public IDiscoveryObserver
+class MultiplayerManager : public INetworkObserver, public IConnectionStatusObservable, public IDiscoveryObserver, public std::enable_shared_from_this<MultiplayerManager>
 {
 public:
 	MultiplayerManager();
 	~MultiplayerManager();
 
-	bool				hostSession();
+	void						init();
 
-	void				joinSession();
+	bool						hostSession();
 
-	void				setTCPSession(TCPSession::pointer session);
-	TCPSession::pointer getActiveSession();
+	void						joinSession();
 
-	void				disconnect();
+	void						setTCPSession(TCPSession::pointer session);
+	TCPSession::pointer			getActiveSession();
 
-	void				setLocalPlayerName(const std::string name) { mLocalPlayerName = name; }
-	std::string			getLocalPlayerName() const { return mLocalPlayerName; }
+	void						disconnect();
 
-	void				onNetworkAdapterChanged(const NetworkAdapter &adapter) override;
+	void						setLocalPlayerName(const std::string name) { mLocalPlayerName = name; }
+	std::string					getLocalPlayerName() const { return mLocalPlayerName; }
 
-	bool				startServerDiscovery(const std::string IPv4, const int port);
-	void				startClientDiscovery();
+	void						onNetworkAdapterChanged(const NetworkAdapter &adapter) override;
 
-	void				setInternalObservers();
+	bool						startServerDiscovery(const std::string IPv4, const int port);
+	void						startClientDiscovery();
 
-	void				approveConnectionRequest();
-	void				rejectConnectionRequest();
+	void						setInternalObservers();
 
-	void				connectionStatusChanged(ConnectionState state, const std::string &errorMessage = "") override;
-	void				pendingHostApproval(const std::string &remoteIPv4) override;
+	void						approveConnectionRequest();
+	void						rejectConnectionRequest();
 
-	void				onRemoteFound(const Endpoint &remote) override;
+	void						connectionStatusChanged(ConnectionState state, const std::string &errorMessage = "") override;
+	void						pendingHostApproval(const std::string &remoteIPv4) override;
+
+	void						onRemoteFound(const Endpoint &remote) override;
+
+	std::vector<NetworkAdapter> getNetworkAdapters();
+	bool						changeCurrentNetworkAdapter(int ID);
+	int							getCurrentNetworkAdapterID();
 
 private:
 	TCPSession::pointer										   mSession = nullptr;
@@ -63,6 +70,8 @@ private:
 	asio::io_context										   mIoContext;
 	asio::executor_work_guard<asio::io_context::executor_type> mWorkGuard;
 	std::thread												   mWorkerThread;
+
+	std::unique_ptr<NetworkManager>							   mNetwork;
 
 	std::string												   mLocalPlayerName{};
 

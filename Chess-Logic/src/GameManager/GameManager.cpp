@@ -53,9 +53,6 @@ bool GameManager::init()
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
 
-	mNetwork = std::make_unique<NetworkManager>();
-	mNetwork->init();
-
 	initObservers();
 
 	return true;
@@ -331,29 +328,19 @@ bool GameManager::checkForPawnPromotionMove(const PossibleMove &move)
 
 std::vector<NetworkAdapter> GameManager::getNetworkAdapters()
 {
-	return mNetwork->getAvailableNetworkAdapters();
+	return mMultiplayerManager->getNetworkAdapters();
 }
 
 
 bool GameManager::changeCurrentNetworkAdapter(int ID)
 {
-	auto adapters = mNetwork->getAvailableNetworkAdapters();
-
-	for (auto &adapter : adapters)
-	{
-		if (adapter.ID != ID)
-			continue;
-
-		mNetwork->networkAdapterChanged(adapter);
-		return true;
-	}
-	return false;
+	return mMultiplayerManager->changeCurrentNetworkAdapter(ID);
 }
 
 
 int GameManager::getCurrentNetworkAdapterID()
 {
-	return mNetwork->getCurrentNetworkAdapterID();
+	return mMultiplayerManager->getCurrentNetworkAdapterID();
 }
 
 
@@ -428,10 +415,8 @@ EndGameState GameManager::checkForEndGameConditions()
 
 bool GameManager::startMultiplayerGame(bool isHost)
 {
-	mIsMultiplayerMode	= true;
-	mIsHost				= isHost;
-
-	mMultiplayerManager = std::make_shared<MultiplayerManager>(); // Create the multiplayer manager
+	mIsMultiplayerMode = true;
+	mIsHost			   = isHost;
 
 	// Initialize the game & board
 	clearState();
@@ -451,7 +436,7 @@ bool GameManager::startMultiplayerGame(bool isHost)
 		mBlackPlayer.setIsLocalPlayer(true);
 	}
 
-	mMultiplayerManager->setInternalObservers(); // Set the internal multiplayer observers
+	// mMultiplayerManager->setInternalObservers(); // Set the internal multiplayer observers
 
 	return true;
 }
@@ -465,6 +450,17 @@ void GameManager::disconnectMultiplayerGame()
 
 	mIsMultiplayerMode = false;
 	resetGame(); // Reset to single player
+}
+
+
+void GameManager::startedMultiplayer()
+{
+	// The player clicked on the Multiplayer menu button and started the multiplayer
+
+	mMultiplayerManager = std::make_shared<MultiplayerManager>(); // Create the multiplayer manager
+
+	mMultiplayerManager->setInternalObservers();				  // First set the observers, so
+	mMultiplayerManager->init();								  // the modules already receive notifications on init
 }
 
 
@@ -540,8 +536,6 @@ void GameManager::initObservers()
 	mBlackPlayer.attachObserver(mUiCommunicationLayer);
 
 	mMoveExecution->attachObserver(mUiCommunicationLayer);
-
-	mNetwork->attachObserver(mMultiplayerManager);
 
 	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer);
 }

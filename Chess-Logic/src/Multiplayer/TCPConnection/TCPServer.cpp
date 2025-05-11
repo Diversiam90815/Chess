@@ -30,7 +30,7 @@ void TCPServer::handleAccept(std::shared_ptr<TCPSession> session, const asio::er
 		LOG_INFO("TCP accepted connection from {}", session->socket().remote_endpoint().address().to_string().c_str());
 
 		// Store pending session
-		mPendingSession			= session;
+		mPendingSession				  = session;
 
 		const std::string &remoteIPv4 = mPendingSession->socket().remote_endpoint().address().to_string();
 
@@ -39,13 +39,12 @@ void TCPServer::handleAccept(std::shared_ptr<TCPSession> session, const asio::er
 		{
 			mConnectionRequestHandler(remoteIPv4);
 		}
+		startAccept(); // Start accepting new conection
 	}
 	else
 	{
 		LOG_ERROR("TCPServer accept error {}!", error.message().c_str());
 	}
-
-	startAccept(); // Start accepting new conection
 }
 
 

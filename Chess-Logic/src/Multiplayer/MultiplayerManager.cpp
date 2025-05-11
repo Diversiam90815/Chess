@@ -17,6 +17,8 @@ MultiplayerManager::MultiplayerManager() : mWorkGuard(asio::make_work_guard(mIoC
 	mRemoteCom		= std::make_shared<RemoteCommunication>();
 	mRemoteReceiver = std::make_shared<RemoteReceiver>();
 	mRemoteSender	= std::make_shared<RemoteSender>();
+
+	mNetwork		= std::make_unique<NetworkManager>();
 }
 
 
@@ -29,6 +31,12 @@ MultiplayerManager::~MultiplayerManager()
 	{
 		mWorkerThread.join();
 	}
+}
+
+
+void MultiplayerManager::init()
+{
+	mNetwork->init();
 }
 
 
@@ -162,6 +170,8 @@ void MultiplayerManager::setInternalObservers()
 	// Remote Communication and Sender/Receiver Connection
 	mRemoteCom->attachObserver(mRemoteReceiver);
 	mRemoteSender->attachObserver(mRemoteCom);
+
+	mNetwork->attachObserver(shared_from_this());
 }
 
 
@@ -217,4 +227,32 @@ void MultiplayerManager::pendingHostApproval(const std::string &remoteIPv4)
 void MultiplayerManager::onRemoteFound(const Endpoint &remote)
 {
 	mRemoteEndpoint = remote;
+}
+
+
+std::vector<NetworkAdapter> MultiplayerManager::getNetworkAdapters()
+{
+	return mNetwork->getAvailableNetworkAdapters();
+}
+
+
+bool MultiplayerManager::changeCurrentNetworkAdapter(int ID)
+{
+	auto adapters = mNetwork->getAvailableNetworkAdapters();
+
+	for (auto &adapter : adapters)
+	{
+		if (adapter.ID != ID)
+			continue;
+
+		mNetwork->networkAdapterChanged(adapter);
+		return true;
+	}
+	return false;
+}
+
+
+int MultiplayerManager::getCurrentNetworkAdapterID()
+{
+	return mNetwork->getCurrentNetworkAdapterID();
 }

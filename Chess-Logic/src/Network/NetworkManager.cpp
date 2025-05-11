@@ -65,8 +65,7 @@ bool NetworkManager::presetNetworkAdapter()
 
 	auto adapter = mNetworkInfo.getFirstEligibleAdapter();
 
-	mNetworkInfo.setCurrentNetworkAdapter(adapter);
-	FileManager::GetInstance()->setSelectedNetworkAdapter(adapter);
+	networkAdapterChanged(adapter);
 
 	return true;
 }
@@ -86,7 +85,7 @@ bool NetworkManager::setNetworkAdapterFromConfig()
 	if (!mNetworkInfo.isAdapterCurrentlyAvailable(userSetAdapter))
 		return false;
 
-	mNetworkInfo.setCurrentNetworkAdapter(userSetAdapter);
+	networkAdapterChanged(userSetAdapter);
 
 	return true;
 }

@@ -87,6 +87,8 @@ public:
 
 	void						disconnectMultiplayerGame();
 
+	void						startedMultiplayer();
+
 	bool						isMultiplayerActive() const;
 
 	bool						isLocalPlayerTurn();
@@ -96,6 +98,7 @@ public:
 	void						approveConnectionRequest();
 	void						rejectConnectionRequest();
 	void						sendConnectionRequestToHost();
+
 
 private:
 	GameManager() = default;
@@ -126,7 +129,7 @@ private:
 
 	std::shared_ptr<UICommunication>	mUiCommunicationLayer;
 
-	std::shared_ptr<NetworkManager>		mNetwork;
+	//std::shared_ptr<NetworkManager>		mNetwork;
 
 	std::shared_ptr<MultiplayerManager> mMultiplayerManager;
 
