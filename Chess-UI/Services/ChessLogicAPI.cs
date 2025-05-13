@@ -174,26 +174,6 @@ namespace Chess_UI.Services
         #endregion // DLL Defines
 
 
-        #region Delegate
-
-        //[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        //public delegate void APIDelegate(int message, nint data);
-
-        //public enum DelegateMessage
-        //{
-        //    EndGameState = 1,
-        //    PlayerScoreUpdated = 2,
-        //    PlayerCapturedPiece = 3,
-        //    PlayerChanged = 4,
-        //    GameStateChanged = 5,
-        //    MoveHistoryAdded = 6,
-        //    ConnectionStateChanged = 7,
-        //    ClientRequestedConnection = 8
-        //}
-
-        #endregion  // Delegate
-
-
         #region Structures & Enums
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
