@@ -2,6 +2,7 @@ using Chess_UI.Services;
 using Chess_UI.Themes;
 using Chess_UI.ViewModels;
 using Chess_UI.Views;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -24,7 +25,7 @@ namespace Chess_UI
 
         public ChessBoardViewModel ChessBoardViewModel { get; private set; }
 
-        public SettingsWindow SettingsWindow;
+        public SettingsWindow _settingsWindow;
 
         public MultiplayerWindow MultiplayerWindow;
 
@@ -40,7 +41,6 @@ namespace Chess_UI
             themeManager = new ThemeManager();
 
             ViewModel = new MainMenuViewModel(DispatcherQueue);
-            SettingsViewModel = new SettingsViewModel(DispatcherQueue, themeManager);
             ChessBoardViewModel = new ChessBoardViewModel(DispatcherQueue, themeManager);
 
             this.RootGrid.DataContext = ViewModel;
@@ -78,8 +78,8 @@ namespace Chess_UI
 
         private void SettingsWindowClosed(object sender, WindowEventArgs args)
         {
-            SettingsWindow.Closed -= SettingsWindowClosed;
-            SettingsWindow = null;
+            _settingsWindow.Closed -= SettingsWindowClosed;
+            _settingsWindow = null;
             this.Activate();
         }
 
@@ -112,16 +112,16 @@ namespace Chess_UI
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SettingsWindow == null)
+            if (_settingsWindow == null)
             {
-                SettingsWindow = new SettingsWindow(SettingsViewModel);
-                SettingsWindow.Activate();
-                SettingsWindow.Closed += SettingsWindowClosed;
+                _settingsWindow = App.Current.Services.GetService<SettingsWindow>();
+                _settingsWindow.Activate();
+                _settingsWindow.Closed += SettingsWindowClosed;
                 this.AppWindow.Hide();
             }
             else
             {
-                SettingsWindow.Activate();
+                _settingsWindow.Activate();
             }
         }
 

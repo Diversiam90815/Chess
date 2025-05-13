@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using Chess_UI.Themes;
 using Chess_UI.Settings;
+using Chess_UI.Wrappers;
+using Chess_UI.Themes.Interfaces;
 
 
 namespace Chess_UI.ViewModels
@@ -17,25 +19,25 @@ namespace Chess_UI.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly DispatcherQueue DispatcherQueue;
+        private readonly IDispatcherQueueWrapper _dispatcherQueueWrapper;
 
-        private ThemeLoader ThemeLoader;
+        private ThemeLoader _themeLoader;
 
-        private readonly ThemeManager themeManager;
+        private readonly IThemeManager _themeManager;
 
         public ObservableCollection<BoardTheme> BoardThemes { get; }
 
         public ObservableCollection<PieceTheme> PieceThemes { get; }
 
 
-        public SettingsViewModel(DispatcherQueue dispatcherQueue, ThemeManager themeManager)
+        public SettingsViewModel(IDispatcherQueueWrapper dispatcherQueue, IThemeManager themeManager)
         {
-            this.DispatcherQueue = dispatcherQueue;
-            ThemeLoader = new();
-            this.themeManager = themeManager;
+            _dispatcherQueueWrapper = dispatcherQueue;
+            _themeLoader = new();
+            _themeManager = themeManager;
 
-            BoardThemes = new ObservableCollection<BoardTheme>(ThemeLoader.LoadBoardThemes());
-            PieceThemes = new ObservableCollection<PieceTheme>(ThemeLoader.LoadPieceThemes());
+            BoardThemes = new ObservableCollection<BoardTheme>(_themeLoader.LoadBoardThemes());
+            PieceThemes = new ObservableCollection<PieceTheme>(_themeLoader.LoadPieceThemes());
 
             SelectedBoardTheme = GetCurrentSelectedBoardTheme();
             SelectedPieceTheme = GetCurrentSelectedPieceTheme();
@@ -75,7 +77,7 @@ namespace Chess_UI.ViewModels
 
                     // Update ThemeManager’s board theme
                     // This triggers property change events in the manager
-                    themeManager.CurrentBoardTheme = value.BoardThemeID;
+                    _themeManager.CurrentBoardTheme = value.BoardThemeID;
                 }
             }
         }
@@ -95,7 +97,7 @@ namespace Chess_UI.ViewModels
                     OnPropertyChanged();
 
                     // Update ThemeManager’s piece theme
-                    themeManager.CurrentPieceTheme = value.PieceThemeID;
+                    _themeManager.CurrentPieceTheme = value.PieceThemeID;
                 }
             }
         }
@@ -103,7 +105,7 @@ namespace Chess_UI.ViewModels
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            DispatcherQueue.TryEnqueue(() =>
+            _dispatcherQueueWrapper.TryEnqueue(() =>
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             });

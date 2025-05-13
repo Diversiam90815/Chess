@@ -1,5 +1,6 @@
 using Chess_UI.Services;
 using Chess_UI.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -21,24 +22,20 @@ using Windows.Foundation.Collections;
 
 namespace Chess_UI.Views
 {
-	/// <summary>
-	/// An empty window that can be used on its own or navigated to within a Frame.
-	/// </summary>
 	public sealed partial class SettingsWindow : Window
 	{
 		private OverlappedPresenter Presenter;
 
-		private SettingsViewModel ViewModel;
+		private readonly SettingsViewModel _viewModel;
 
 
-		public SettingsWindow(SettingsViewModel viewModel)
+		public SettingsWindow()
 		{
 			this.InitializeComponent();
 
-			this.ViewModel = viewModel;
+			_viewModel = App.Current.Services.GetService<SettingsViewModel>();
 
-			this.RootGrid.DataContext = ViewModel;
-
+			this.RootGrid.DataContext = _viewModel;
 
 			Init();
 			SetWindowSize(430, 470);
