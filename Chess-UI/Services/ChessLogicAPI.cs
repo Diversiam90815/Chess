@@ -6,7 +6,6 @@ namespace Chess_UI.Services
 {
     public class ChessLogicAPI
     {
-
         #region DLL Defines
 
         #region Defines
@@ -14,7 +13,7 @@ namespace Chess_UI.Services
         private const string LOGIC_API_PATH = @"Chess-Logic.dll";
         public const int BOARD_SIZE = 8;
 
-        #endregion
+        #endregion // Defines
 
 
         #region Program
@@ -35,7 +34,7 @@ namespace Chess_UI.Services
         public static extern void SetUnvirtualizedAppDataPath([In()][MarshalAs(UnmanagedType.LPStr)] string appDataPath);
 
 
-        #endregion
+        #endregion // Program
 
 
         #region Moves
@@ -46,7 +45,7 @@ namespace Chess_UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetPossibleMoveAtIndex", CharSet = CharSet.Unicode)]
         public static extern bool GetPossibleMoveAtIndex(uint index, out PossibleMoveInstance move);
 
-        #endregion
+        #endregion // Moves
 
 
         #region Board
@@ -54,7 +53,7 @@ namespace Chess_UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetBoardState", CharSet = CharSet.Unicode)]
         public static extern bool GetBoardState([Out, MarshalAs(UnmanagedType.LPArray, SizeConst = 64)] int[] boardState);
 
-        #endregion
+        #endregion // Board
 
 
         #region Game
@@ -68,14 +67,51 @@ namespace Chess_UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "UndoMove", CharSet = CharSet.Unicode)]
         public static extern void UndoMove();
 
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ChangeMoveState", CharSet = CharSet.Unicode)]
-        public static extern void ChangeMoveState(int state);
-
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "HandleMoveStateChanged", CharSet = CharSet.Unicode)]
-        public static extern void HandleMoveStateChanged(PossibleMoveInstance move);
+        #endregion // Game
 
 
-        #endregion
+        #region State Machine
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "OnSquareSelected", CharSet = CharSet.Unicode)]
+        public static extern void OnSquareSelected(PositionInstance position);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "OnPawnPromotionChosen", CharSet = CharSet.Unicode)]
+        public static extern void OnPawnPromotionChosen(PieceTypeInstance promotion);
+
+
+        #endregion  // State Machine
+
+
+        #region Multiplayer
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartedMultiplayer", CharSet = CharSet.Unicode)]
+        public static extern void StartedMultiplayer();
+        
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartMultiplayerGame", CharSet = CharSet.Unicode)]
+        public static extern void StartMultiplayerGame(bool isHost);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartRemoteDiscovery", CharSet = CharSet.Unicode)]
+        public static extern void StartRemoteDiscovery(bool isHost);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "DisconnectMultiplayerGame", CharSet = CharSet.Unicode)]
+        public static extern void DisconnectMultiplayerGame();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "IsMultiplayerActive", CharSet = CharSet.Unicode)]
+        public static extern bool IsMultiplayerActive();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ApproveConnectionRequest", CharSet = CharSet.Unicode)]
+        public static extern void ApproveConnectionRequest();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "RejectConnectionRequest", CharSet = CharSet.Unicode)]
+        public static extern void RejectConnectionRequest();
+        
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SendConnectionRequestToHost", CharSet = CharSet.Unicode)]
+        public static extern void SendConnectionRequestToHost();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StoppedMultiplayer", CharSet = CharSet.Unicode)]
+        public static extern void StoppedMultiplayer();
+
+        #endregion // Multiplayer
 
 
         #region Logging
@@ -89,8 +125,7 @@ namespace Chess_UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "LogWarningWithCaller", CharSet = CharSet.Unicode)]
         public static extern void LogWarningWithCaller([In()][MarshalAs(UnmanagedType.LPStr)] string message, [In()][MarshalAs(UnmanagedType.LPStr)] string functionName, [In()][MarshalAs(UnmanagedType.LPStr)] string className, int lineNumber);
 
-
-        #endregion
+        #endregion // Logging
 
 
         #region User Config
@@ -101,7 +136,7 @@ namespace Chess_UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetCurrentBoardTheme", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string GetCurrentBoardTheme();
-        
+
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetCurrentPieceTheme", CharSet = CharSet.Unicode)]
         public static extern void SetCurrentPieceTheme([In()][MarshalAs(UnmanagedType.LPStr)] string theme);
 
@@ -109,11 +144,34 @@ namespace Chess_UI.Services
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string GetCurrentPieceTheme();
 
+        #endregion // User Config
 
-        #endregion
 
-        #endregion
+        #region Network / Multiplayer
 
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetLocalPlayerName", CharSet = CharSet.Unicode)]
+        public static extern void SetLocalPlayerName([In()][MarshalAs(UnmanagedType.LPStr)] string name);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetRemotePlayerName", CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string GetRemotePlayerName();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetNetworkAdapterCount", CharSet = CharSet.Unicode)]
+        public static extern int GetNetworkAdapterCount();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetNetworkAdapterAtIndex", CharSet = CharSet.Unicode)]
+        public static extern bool GetNetworkAdapterAtIndex(uint index, out NetworkAdapter adapter);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetSavedAdapterID", CharSet = CharSet.Unicode)]
+        public static extern int GetSavedAdapterID();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ChangeCurrentAdapter", CharSet = CharSet.Unicode)]
+        public static extern void ChangeCurrentAdapter(int ID);
+
+        #endregion // Network / Multiplayer
+
+
+        #endregion // DLL Defines
 
 
         #region Delegate
@@ -123,18 +181,17 @@ namespace Chess_UI.Services
 
         public enum DelegateMessage
         {
-            PlayerHasWon = 1,
-            InitiateMove,
-            PlayerScoreUpdate,
-            PlayerCapturedPiece,
-            MoveExecuted,
-            PlayerChanged,
-            GameStateChanged,
-            MoveHistoryAdded
+            EndGameState = 1,
+            PlayerScoreUpdated = 2,
+            PlayerCapturedPiece = 3,
+            PlayerChanged = 4,
+            GameStateChanged = 5,
+            MoveHistoryAdded = 6,
+            ConnectionStateChanged = 7,
+            ClientRequestedConnection = 8
         }
 
-        #endregion
-
+        #endregion  // Delegate
 
 
         #region Structures & Enums
@@ -210,22 +267,40 @@ namespace Chess_UI.Services
         }
 
 
-        public enum GameState
+        public enum ConnectionState
         {
-            Init = 1,
-            OnGoing,
-            Paused,
-            Checkmate,
-            Stalemate,
-            Draw
+            Disconnected = 1,
+            HostingSession = 2,
+            WaitingForARemote = 3,
+            Connecting = 4,
+            Connected = 5,
+            Disconnecting = 6,
+            Error = 7
         }
 
 
-        public enum MoveState
+        public enum GameState
         {
-            NoMove = 1,
-            InitiateMove,
-            ExecuteMove
+            Undefined = 0,
+            Init = 1,
+            InitSucceeded = 2,
+            WaitingForInput = 3,
+            MoveInitiated = 4,
+            WaitingForTarget = 5,
+            ValidatingMove = 6,
+            ExecutingMove = 7,
+            PawnPromotion = 8,
+            WaitingForRemoteMove = 9,
+            GameOver = 10
+        }
+
+
+        public enum EndGameState
+        {
+            OnGoing = 1,
+            Checkmate = 2,
+            StaleMate = 3,
+            Reset = 4
         }
 
 
@@ -243,7 +318,6 @@ namespace Chess_UI.Services
             MoveType_Check = 1 << 7, // 128
             MoveType_Checkmate = 1 << 8, // 256
         }
-
 
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
@@ -306,7 +380,23 @@ namespace Chess_UI.Services
         };
 
 
-        #endregion
+        [StructLayout(LayoutKind.Sequential)]
+        public struct ConnectionStatusEvent
+        {
+            public ConnectionState ConnectionState;
+            public string ErrorMessage;
+        };
 
+
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct NetworkAdapter
+        {
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 250)]
+            public string name;
+            public int id;
+        }
+
+        #endregion  // Structures and Enums
     }
 }

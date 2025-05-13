@@ -18,6 +18,11 @@
 #include "UserSettings.h"
 #include "IObservable.h"
 #include "UICommunication.h"
+#include "NetworkManager.h"
+#include "MultiplayerManager.h"
+
+
+class StateMachine;
 
 
 class GameManager : public IGameObservable
@@ -25,90 +30,111 @@ class GameManager : public IGameObservable
 public:
 	~GameManager();
 
-	static GameManager		  *GetInstance();
-	static void				   ReleaseInstance();
+	static GameManager		   *GetInstance();
+	static void					ReleaseInstance();
 
-	void					   init();
+	bool						init();
 
-	void					   startGame();
+	bool						startGame();
 
-	void					   executeMove(PossibleMove &move);
+	void						executeMove(PossibleMove &tmpMove);
 
-	void					   undoMove();
+	void						undoMove();
 
-	void					   gameStateChanged(GameState state) override;
-	GameState				   getCurrentGameState() const;
+	void						resetGame();
 
-	void					   setCurrentMoveState(MoveState state);
-	MoveState				   getCurrentMoveState() const;
+	void						endGame(EndGameState state, PlayerColor player) override;
 
-	void					   resetGame();
+	std::optional<PlayerColor>	getWinner() const;
 
-	void					   endGame(PlayerColor player) override;
+	void						clearState();
 
-	std::optional<PlayerColor> getWinner() const;
+	void						setDelegate(PFN_CALLBACK pDelegate);
 
-	void					   clearState();
+	PieceType					getCurrentPieceTypeAtPosition(const Position position);
 
-	void					   setDelegate(PFN_CALLBACK pDelegate);
+	std::vector<PossibleMove>	getPossibleMoveForPosition();
 
-	PieceType				   getCurrentPieceTypeAtPosition(const Position position);
+	bool						getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE]);
 
-	std::vector<PossibleMove>  getPossibleMoveForPosition();
+	bool						checkForValidMoves(const PossibleMove &move);
+	bool						checkForPawnPromotionMove(const PossibleMove &move);
 
-	bool					   getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE]);
+	std::vector<NetworkAdapter> getNetworkAdapters();
+	bool						changeCurrentNetworkAdapter(int ID);
+	int							getCurrentNetworkAdapterID();
 
-	void					   handleMoveStateChanges(PossibleMove &move);
+	void						setLocalPlayerName(std::string name);
 
-	void					   moveStateInitiated() override; // Let the UI know moves for current round are ready -> handling need to be refactored later!
+	void						changeCurrentPlayer(PlayerColor player) override;
+	PlayerColor					getCurrentPlayer() const;
 
-	void					   changeCurrentPlayer(PlayerColor player) override;
-	PlayerColor				   getCurrentPlayer() const;
+	void						setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
+	std::string					getBoardTheme() const { return mUserSettings.getCurrentBoardTheme(); }
 
-	void					   setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
-	std::string				   getBoardTheme() const { return mUserSettings.getCurrentBoardTheme(); }
+	void						setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
+	std::string					getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
 
-	void					   setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
-	std::string				   getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
+	void						switchTurns();
 
-	void					   attachObserver(IGameObserver *observer) override;
-	void					   detachObserver(IGameObserver *observer) override;
+	bool						calculateAllMovesForPlayer();
+
+	bool						initiateMove(const Position &startPosition);
+
+	EndGameState				checkForEndGameConditions();
+
+	bool						startMultiplayerGame(bool isHost);
+
+	void						disconnectMultiplayerGame();
+
+	void						startedMultiplayer();
+	void						stoppedMultiplayer();
+
+	bool						isMultiplayerActive() const;
+
+	bool						isLocalPlayerTurn();
+
+	void						startRemoteDiscovery(bool isHost);
+
+	void						approveConnectionRequest();
+	void						rejectConnectionRequest();
+	void						sendConnectionRequestToHost();
+
 
 private:
-	GameManager();
+	GameManager() = default;
 
-	void							 switchTurns();
-
-	void							 checkForEndGameConditions();
-
-	void							 initObservers();
-	void							 deinitObservers();
+	void								initObservers();
+	void								initMultiplayerObservers();
+	void								deinitObservers();
 
 
-	Logging							 mLog;
+	Logging								mLog;
 
-	bool							 mMovesGeneratedForCurrentTurn = false;
+	UserSettings						mUserSettings;
 
-	Player							 mWhitePlayer;
-	Player							 mBlackPlayer;
+	bool								mMovesGeneratedForCurrentTurn = false;
 
-	PlayerColor						 mCurrentPlayer	   = PlayerColor::NoColor;
+	Player								mWhitePlayer;
+	Player								mBlackPlayer;
 
-	GameState						 mCurrentState	   = GameState::Init;
+	PlayerColor							mCurrentPlayer = PlayerColor::NoColor;
 
-	MoveState						 mCurrentMoveState = MoveState::NoMove;
+	std::vector<PossibleMove>			mAllMovesForPosition;
 
-	std::vector<PossibleMove>		 mAllMovesForPosition;
+	std::shared_ptr<ChessBoard>			mChessBoard;
 
-	std::shared_ptr<ChessBoard>		 mChessBoard;
+	std::shared_ptr<MoveGeneration>		mMoveGeneration;
+	std::shared_ptr<MoveValidation>		mMoveValidation;
+	std::shared_ptr<MoveExecution>		mMoveExecution;
 
-	std::shared_ptr<MoveGeneration>	 mMoveGeneration;
-	std::shared_ptr<MoveValidation>	 mMoveValidation;
-	std::shared_ptr<MoveExecution>	 mMoveExecution;
+	std::shared_ptr<UICommunication>	mUiCommunicationLayer;
 
-	std::unique_ptr<UICommunication> mUiCommunicationLayer;
+	//std::shared_ptr<NetworkManager>		mNetwork;
 
-	UserSettings					 mUserSettings;
+	std::shared_ptr<MultiplayerManager> mMultiplayerManager;
 
-	std::vector<IGameObserver *>	 mObservers;
+
+	bool								mIsMultiplayerMode{false};
+	bool								mIsHost{false};
 };

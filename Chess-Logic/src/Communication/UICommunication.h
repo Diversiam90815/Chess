@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <combaseapi.h>
 #include <strsafe.h>
 
 #include "IObserver.h"
@@ -16,15 +17,16 @@
 
 enum class MessageType
 {
-	PlayerHasWon		= 1,
-	InitiateMove		= 2,
-	PlayerScoreUpdated	= 3,
-	PlayerCapturedPiece = 4,
-	MoveExecuted		= 5,
-	PlayerChanged		= 6,
-	GameStateChanged	= 7,
-	MoveHistoryAdded	= 8
+	EndGameState			  = 1,
+	PlayerScoreUpdated		  = 2,
+	PlayerCapturedPiece		  = 3,
+	PlayerChanged			  = 4,
+	GameStateChanged		  = 5,
+	MoveHistoryAdded		  = 6,
+	ConnectionStateChanged	  = 7,
+	ClientRequestedConnection = 8
 };
+
 
 struct PlayerCapturedPieceEvent
 {
@@ -34,7 +36,14 @@ struct PlayerCapturedPieceEvent
 };
 
 
-class UICommunication : public IMoveObserver, public IGameObserver, public IPlayerObserver
+struct ConnectionEvent
+{
+	ConnectionState state{ConnectionState::Disconnected};
+	char			errorMessage[MAX_STRING_LENGTH];
+};
+
+
+class UICommunication : public IMoveObserver, public IGameObserver, public IPlayerObserver, public IGameStateObserver, public IConnectionStatusObserver
 {
 public:
 	UICommunication()  = default;
@@ -46,16 +55,20 @@ public:
 	void onAddCapturedPiece(PlayerColor player, PieceType captured) override;
 	void onRemoveLastCapturedPiece(PlayerColor player, PieceType captured) override;
 
-	void onExecuteMove() override;
+	void onExecuteMove(const PossibleMove &move) override {}
 	void onAddToMoveHistory(Move &move) override;
 
 	void onGameStateChanged(GameState state) override;
-	void onEndGame(PlayerColor winner) override;
+	void onEndGame(EndGameState state, PlayerColor winner) override;
 	void onChangeCurrentPlayer(PlayerColor player) override;
-	void onMoveStateInitiated() override;
+
+	void onConnectionStateChanged(ConnectionState state, const std::string &errorMessage = "") override;
+	void onPendingHostApproval(const std::string &remotePlayerName) override;
+
 
 private:
-	bool		 communicateToUI(MessageType type, void *message) const;
+	bool			   communicateToUI(MessageType type, void *message) const;
 
-	PFN_CALLBACK mDelegate = nullptr;
+	PFN_CALLBACK	   mDelegate = nullptr;
+	mutable std::mutex mDelegateMutex;
 };

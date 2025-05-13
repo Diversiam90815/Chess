@@ -12,9 +12,6 @@
 MoveExecution::MoveExecution(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation) : mChessBoard(board), mValidation(validation) {}
 
 
-MoveExecution::~MoveExecution() {}
-
-
 Move MoveExecution::executeMove(PossibleMove &possibleMove)
 {
 	// Store positions in Move from executed PossibleMove
@@ -107,12 +104,10 @@ Move MoveExecution::executeMove(PossibleMove &possibleMove)
 
 	executedMove.notation = mMoveNotation->generateStandardAlgebraicNotation(executedMove);
 
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onExecuteMove();
-		}
+		if (auto obs = observer.lock())
+			obs->onExecuteMove(possibleMove);
 	}
 
 	addMoveToHistory(executedMove);
@@ -210,12 +205,10 @@ void MoveExecution::addMoveToHistory(Move &move)
 	move.number = mMoveHistory.size() + 1; // Set the move number based on history size
 	mMoveHistory.insert(move);
 
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onAddToMoveHistory(move);
-		}
+		if (auto obs = observer.lock())
+			obs->onAddToMoveHistory(move);
 	}
 }
 
@@ -228,14 +221,3 @@ void MoveExecution::removeLastMove()
 	}
 }
 
-
-void MoveExecution::attachObserver(IMoveObserver *observer)
-{
-	mObservers.push_back(observer);
-}
-
-
-void MoveExecution::detachObserver(IMoveObserver *observer)
-{
-	mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
-}

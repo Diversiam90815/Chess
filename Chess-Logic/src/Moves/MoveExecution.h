@@ -22,7 +22,7 @@ class MoveExecution : public IMoveObservable
 {
 public:
 	MoveExecution(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation);
-	~MoveExecution();
+	~MoveExecution() = default;
 
 	Move		executeMove(PossibleMove &executedMove) override;
 
@@ -38,18 +38,13 @@ public:
 
 	void		removeLastMove();
 
-	void		attachObserver(IMoveObserver* observer) override;
-	void		detachObserver(IMoveObserver* observer) override;
-
 
 private:
-	std::shared_ptr<ChessBoard>			mChessBoard;
+	std::shared_ptr<ChessBoard>				  mChessBoard;
 
-	std::shared_ptr<MoveValidation>		mValidation;
+	std::shared_ptr<MoveValidation>			  mValidation;
 
-	std::shared_ptr<MoveNotationHelper> mMoveNotation;
+	std::shared_ptr<MoveNotationHelper>		  mMoveNotation;
 
-	std::set<Move>						mMoveHistory;
-
-	std::vector<IMoveObserver*> mObservers;
+	std::set<Move>							  mMoveHistory;
 };

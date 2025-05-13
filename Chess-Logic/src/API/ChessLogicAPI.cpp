@@ -6,10 +6,12 @@
 */
 
 #include <strsafe.h>
+#include <combaseapi.h>
 
 #include "ChessLogicAPI.h"
 #include "GameManager.h"
 #include "FileManager.h"
+#include "StateMachine.h"
 
 
 
@@ -132,71 +134,65 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleM
 
 	auto		 moves	 = manager->getPossibleMoveForPosition();
 
-	Position	 start{-1, -1};
-	Position	 end{-1, -1};
-	MoveType	 type	 = MoveType::None;
+	if (index < 0 || index >= static_cast<int>(moves.size()))
+		return false;
 
-	int			 counter = -1;
+	// auto it = moves.begin();
+	// std::advance(it, index); // Get the iterator to the desired element
 
-	for (auto &move : moves)
-	{
-		counter++;
-		if (counter == index)
-		{
-			start = move.start;
-			end	  = move.end;
-			type  = move.type;
-			break;
-		}
-	}
+	PossibleMove tmpMove = moves.at(index);
 
-	if ((start != Position{-1, -1}) && (end != Position{-1, -1}) && (type != MoveType::None))
-	{
-		PositionInstance startPos	= MapToPositionInstance(start);
-		PositionInstance endPos		= MapToPositionInstance(end);
+	if (tmpMove.isEmpty())
+		return false;
 
-		possibleMoveInstance->start = startPos;
-		possibleMoveInstance->end	= endPos;
-		possibleMoveInstance->type	= static_cast<MoveTypeInstance>(type);
-		return true;
-	}
-	return false;
+	PositionInstance startPos	= MapToPositionInstance(tmpMove.start);
+	PositionInstance endPos		= MapToPositionInstance(tmpMove.end);
+
+	possibleMoveInstance->start = startPos;
+	possibleMoveInstance->end	= endPos;
+	possibleMoveInstance->type	= static_cast<MoveTypeInstance>(tmpMove.type);
+	return true;
 }
 
 
 CHESS_API void HandleMoveStateChanged(const PossibleMoveInstance &moveInstance)
 {
-	GameManager *manager = GameManager::GetInstance();
-	PossibleMove move	 = MapToPossibleMove(moveInstance);
-	manager->handleMoveStateChanges(move);
+	// GameManager *manager = GameManager::GetInstance();
+	// PossibleMove move	 = MapToPossibleMove(moveInstance);
+	// manager->handleMoveStateChanges(move);
 }
 
 
 CHESS_API void ChangeMoveState(int moveState)
 {
-	GameManager *manager = GameManager::GetInstance();
-	MoveState	 state	 = (MoveState)moveState;
-	manager->setCurrentMoveState(state);
+	// GameManager *manager = GameManager::GetInstance();
+	// MoveState	 state	 = (MoveState)moveState;
+	// manager->setCurrentMoveState(state);
 }
 
 
 CHESS_API void StartGame()
 {
-	GameManager *manager = GameManager::GetInstance();
-	manager->startGame();
+	StateMachine::GetInstance()->onGameStarted();
 }
 
 
 CHESS_API void ResetGame()
 {
-	GameManager *manager = GameManager::GetInstance();
-	manager->resetGame();
+	StateMachine::GetInstance()->resetGame();
 }
 
 
 CHESS_API void UndoMove()
 {
-	GameManager::GetInstance()->undoMove();
+	StateMachine::GetInstance()->reactToUndoMove();
+}
+
+
+CHESS_API int GetEndgameState()
+{
+	// TODO
+	return 0;
 }
 
 
@@ -227,6 +223,50 @@ CHESS_API bool GetBoardState(int *boardState)
 
 	LoggingHelper::logBoardState(boardState);
 	return true;
+}
+
+
+CHESS_API void StartedMultiplayer()
+{
+	GameManager::GetInstance()->startedMultiplayer();
+}
+
+
+CHESS_API void StartMultiplayerGame(bool isHost)
+{
+	StateMachine::GetInstance()->onMultiplayerGameStarted(isHost);
+}
+
+
+CHESS_API void StartRemoteDiscovery(bool isHost)
+{
+	GameManager::GetInstance()->startRemoteDiscovery(isHost);
+}
+
+
+CHESS_API void DisconnectMultiplayerGame()
+{
+	return GameManager::GetInstance()->disconnectMultiplayerGame();
+}
+
+
+CHESS_API bool IsMultiplayerActive()
+{
+	return GameManager::GetInstance()->isMultiplayerActive();
+}
+
+
+CHESS_API void OnSquareSelected(PositionInstance positionInstance)
+{
+	Position pos = MapToPosition(positionInstance);
+	StateMachine::GetInstance()->onSquareSelected(pos);
+}
+
+
+CHESS_API void OnPawnPromotionChosen(PieceTypeInstance promotionInstance)
+{
+	PieceType promotion = static_cast<PieceType>(promotionInstance);
+	StateMachine::GetInstance()->onPawnPromotionChosen(promotion);
 }
 
 
@@ -280,4 +320,89 @@ CHESS_API char *GetCurrentPieceTheme()
 	std::string	 theme	  = manager->getPieceTheme();
 	char		*themeTmp = StringToCharPtr(theme);
 	return themeTmp;
+}
+
+
+CHESS_API void SetLocalPlayerName(const char *name)
+{
+	return GameManager::GetInstance()->setLocalPlayerName(name);
+}
+
+
+CHESS_API void ApproveConnectionRequest()
+{
+	GameManager::GetInstance()->approveConnectionRequest();
+}
+
+
+CHESS_API void RejectConnectionRequest()
+{
+	GameManager::GetInstance()->rejectConnectionRequest();
+}
+
+
+CHESS_API void SendConnectionRequestToHost()
+{
+	GameManager::GetInstance()->sendConnectionRequestToHost();
+}
+
+
+CHESS_API void StoppedMultiplayer()
+{
+	GameManager::GetInstance()->stoppedMultiplayer();
+}
+
+
+CHESS_API int GetNetworkAdapterCount()
+{
+	GameManager *manager	 = GameManager::GetInstance();
+	auto		 adapters	 = manager->getNetworkAdapters();
+	size_t		 numAdapters = adapters.size();
+	return numAdapters;
+}
+
+
+CHESS_API bool GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInstance *adapter)
+{
+	GameManager *manager  = GameManager::GetInstance();
+	auto		 adapters = manager->getNetworkAdapters();
+
+	std::string	 name{};
+	int			 ID{0};
+	bool		 selectedByUser{0};
+	int			 counter{-1};
+
+	for (auto &adapter : adapters)
+	{
+		counter++;
+		if (counter == index)
+		{
+			name		   = adapter.description;
+			ID			   = adapter.ID;
+			selectedByUser = adapter.selected;
+			break;
+		}
+	}
+
+	if (name.empty() && ID == 0)
+		return false;
+
+	adapter->ID				= ID;
+	adapter->selectedByUser = selectedByUser;
+	StringCbCopyA(adapter->name, MAX_STRING_LENGTH, name.c_str());
+	return true;
+}
+
+
+CHESS_API int GetSavedAdapterID()
+{
+	return GameManager::GetInstance()->getCurrentNetworkAdapterID();
+}
+
+
+CHESS_API bool ChangeCurrentAdapter(int ID)
+{
+	GameManager *manager = GameManager::GetInstance();
+	bool		 result	 = manager->changeCurrentNetworkAdapter(ID);
+	return result;
 }

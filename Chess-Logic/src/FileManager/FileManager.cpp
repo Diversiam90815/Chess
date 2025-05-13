@@ -95,6 +95,7 @@ std::string FileManager::readSettingFromFile(const std::string &setting)
 	catch (const std::exception &e)
 	{
 		LOG_WARNING("Exception occured during reading from JSON: {}", e.what());
+		return "";
 	}
 }
 
@@ -138,6 +139,83 @@ bool FileManager::writeSettingToFile(const std::string &setting, const std::stri
 		return false;
 	}
 	return false;
+}
+
+
+std::optional<NetworkAdapter> FileManager::readSelectedNetworkAdapter()
+{
+	NetworkAdapter adapter{};
+	fs::path	   configPath = getSettingsPath() / UserSettingsFile;
+
+	if (fs::exists(configPath))
+	{
+		// Read the file in
+		std::ifstream jsonIN(configPath);
+		if (jsonIN)
+		{
+			nlohmann::json userConfig;
+			jsonIN >> userConfig;
+
+			// Set the adapter if available
+			if (userConfig.contains(SelectedAdapter))
+			{
+				adapter = userConfig[SelectedAdapter].get<NetworkAdapter>();
+				return adapter;
+			}
+		}
+		else
+		{
+			LOG_WARNING("Failed to open the config file!");
+		}
+	}
+	else
+	{
+		LOG_WARNING("Config file does not exist!");
+	}
+	return std::nullopt;
+}
+
+
+bool FileManager::setSelectedNetworkAdapter(const NetworkAdapter &adapter)
+{
+	try
+	{
+		fs::path configPath = getSettingsPath() / UserSettingsFile;
+		json	 config;
+
+		// Read the file in
+		if (fs::exists(configPath))
+		{
+			std::ifstream jsonIN(configPath);
+			if (jsonIN)
+			{
+				jsonIN >> config;
+			}
+			else
+			{
+				LOG_WARNING("Failed to open existing config file {}", configPath.string().c_str());
+				return false;
+			}
+		}
+
+		// Set the adapter (or add it)
+		config[SelectedAdapter] = adapter;
+
+		// Write the file
+		std::ofstream jsonOUT(configPath);
+		if (!jsonOUT)
+		{
+			LOG_WARNING("Failed to open file {} for writing", configPath.string().c_str());
+			return false;
+		}
+		jsonOUT << std::setw(4) << config;
+		return true;
+	}
+	catch (std::exception e)
+	{
+		LOG_WARNING("Exception occured during writing network adapter: {}", e.what());
+		return false;
+	}
 }
 
 

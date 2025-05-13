@@ -6,17 +6,10 @@
 */
 
 
-
 #include "Player.h"
 
 
-Player::Player() {}
-
-
 Player::Player(PlayerColor color) : mPlayerColor(color) {}
-
-
-Player::~Player() {}
 
 
 Score Player::getScore() const
@@ -55,12 +48,12 @@ void Player::addCapturedPiece(const PieceType piece)
 {
 	mCapturedPieces.push_back(piece);
 
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onAddCapturedPiece(getPlayerColor(), piece);
-		}
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onAddCapturedPiece(getPlayerColor(), piece);
 	}
 }
 
@@ -80,12 +73,12 @@ void Player::removeLastCapturedPiece()
 
 	updateScore();
 
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onRemoveLastCapturedPiece(getPlayerColor(), lastCapture);
-		}
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onRemoveLastCapturedPiece(getPlayerColor(), lastCapture);
 	}
 }
 
@@ -99,12 +92,12 @@ void Player::updateScore()
 	}
 	setScore(score);
 
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onScoreUpdate(mScore.player, mScore.value);
-		}
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onScoreUpdate(mScore.player, mScore.value);
 	}
 
 	LOG_INFO("Updated Score for {} : {}", LoggingHelper::playerColourToString(mPlayerColor).c_str(), score);
@@ -130,16 +123,4 @@ void Player::reset()
 {
 	setScore(0);
 	mCapturedPieces.clear();
-}
-
-
-void Player::attachObserver(IPlayerObserver *observer)
-{
-	mObservers.push_back(observer);
-}
-
-
-void Player::detachObserver(IPlayerObserver *observer)
-{
-	mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
 }

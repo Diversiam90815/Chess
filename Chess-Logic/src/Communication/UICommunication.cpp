@@ -10,6 +10,7 @@
 
 void UICommunication::setDelegate(PFN_CALLBACK pDelegate)
 {
+	std::lock_guard<std::mutex> lock(mDelegateMutex);
 	mDelegate = pDelegate;
 }
 
@@ -41,12 +42,6 @@ void UICommunication::onRemoveLastCapturedPiece(PlayerColor player, PieceType ca
 }
 
 
-void UICommunication::onExecuteMove()
-{
-	communicateToUI(MessageType::MoveExecuted, nullptr);
-}
-
-
 void UICommunication::onAddToMoveHistory(Move &move)
 {
 	std::string numberedNotation = std::to_string(move.number) + ". " + move.notation;
@@ -54,15 +49,15 @@ void UICommunication::onAddToMoveHistory(Move &move)
 	size_t		bufferSize		 = (len + 1) * sizeof(char);
 	char	   *strCopy			 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
 
-	if (strCopy != nullptr)
-	{
-		HRESULT hr = StringCbCopyA(strCopy, bufferSize, numberedNotation.c_str());
+	if (!strCopy)
+		return;
 
-		if (SUCCEEDED(hr))
-		{
-			communicateToUI(MessageType::MoveHistoryAdded, strCopy);
-		}
-	}
+	HRESULT hr = StringCbCopyA(strCopy, bufferSize, numberedNotation.c_str());
+
+	if (!SUCCEEDED(hr))
+		return;
+
+	communicateToUI(MessageType::MoveHistoryAdded, strCopy);
 }
 
 
@@ -72,9 +67,9 @@ void UICommunication::onGameStateChanged(GameState state)
 }
 
 
-void UICommunication::onEndGame(PlayerColor winner)
+void UICommunication::onEndGame(EndGameState state, PlayerColor winner)
 {
-	communicateToUI(MessageType::PlayerHasWon, &winner);
+	communicateToUI(MessageType::EndGameState, &state);
 }
 
 
@@ -84,18 +79,58 @@ void UICommunication::onChangeCurrentPlayer(PlayerColor player)
 }
 
 
-void UICommunication::onMoveStateInitiated()
+void UICommunication::onConnectionStateChanged(ConnectionState state, const std::string &errorMessage)
 {
-	communicateToUI(MessageType::InitiateMove, nullptr);
+	ConnectionEvent event{};
+	event.state = state;
+
+	if (state == ConnectionState::Error)
+	{
+		size_t	len		   = errorMessage.size();
+		size_t	bufferSize = (len + 1) * sizeof(char);
+
+		HRESULT hr		   = StringCbCopyA(event.errorMessage, bufferSize, errorMessage.c_str());
+
+		if (!SUCCEEDED(hr))
+			return;
+	}
+
+	communicateToUI(MessageType::ConnectionStateChanged, &event);
+}
+
+
+void UICommunication::onPendingHostApproval(const std::string &remotePlayerName)
+{
+	size_t len		  = remotePlayerName.size();
+	size_t bufferSize = (len + 1) * sizeof(char);
+	char  *strCopy	  = static_cast<char *>(CoTaskMemAlloc(bufferSize));
+
+	if (!strCopy)
+		return;
+
+	HRESULT hr = StringCbCopyA(strCopy, bufferSize, remotePlayerName.c_str());
+
+	if (!SUCCEEDED(hr))
+		return;
+
+	communicateToUI(MessageType::ClientRequestedConnection, &strCopy);
 }
 
 
 bool UICommunication::communicateToUI(MessageType type, void *message) const
 {
-	if (mDelegate)
+	PFN_CALLBACK delegate = nullptr;
 	{
-		mDelegate(static_cast<int>(type), message);
+		std::lock_guard<std::mutex> lock(mDelegateMutex);
+		delegate = mDelegate;
+	}
+
+	if (delegate)
+	{
+		delegate(static_cast<int>(type), message);
 		return true;
 	}
+
+	LOG_WARNING("Failed to communicate to UI. Error: Delegate is null");
 	return false;
 }

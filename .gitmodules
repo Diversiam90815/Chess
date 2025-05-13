@@ -6,3 +6,7 @@
 	path = Chess-Logic/submodules/json
 	url = git@github.com:nlohmann/json.git
 	branch = master
+[submodule "Chess-Logic/submodules/asio-standalone"]
+	path = Chess-Logic/submodules/asio-standalone
+	url = git@github.com:chriskohlhoff/asio.git
+	branch = master

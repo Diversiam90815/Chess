@@ -7,8 +7,7 @@
 
 #include "GameManager.h"
 
-
-GameManager::GameManager() {}
+#include "StateMachine.h"
 
 
 GameManager::~GameManager()
@@ -38,12 +37,12 @@ void GameManager::ReleaseInstance()
 }
 
 
-void GameManager::init()
+bool GameManager::init()
 {
 	mLog.initLogging();
 	mUserSettings.init();
 
-	mUiCommunicationLayer = std::make_unique<UICommunication>();
+	mUiCommunicationLayer = std::make_shared<UICommunication>();
 
 	mChessBoard			  = std::make_shared<ChessBoard>();
 
@@ -55,15 +54,18 @@ void GameManager::init()
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
 
 	initObservers();
+
+	return true;
 }
 
 
-void GameManager::startGame()
+bool GameManager::startGame()
 {
 	clearState();
 
-	mChessBoard->initializeBoard();			 // Reset the board
-	changeCurrentPlayer(PlayerColor::White); // Setting the player at the end, since this will trigger the move calculation
+	mChessBoard->initializeBoard(); // Reset the board
+
+	return true;
 }
 
 
@@ -71,8 +73,6 @@ void GameManager::clearState()
 {
 	changeCurrentPlayer(PlayerColor::NoColor);
 
-	gameStateChanged(GameState::Init);
-	setCurrentMoveState(MoveState::NoMove);
 	mAllMovesForPosition.clear();
 	mMovesGeneratedForCurrentTurn = false; // Reset flag
 }
@@ -139,8 +139,14 @@ bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 
 void GameManager::switchTurns()
 {
-	setCurrentMoveState(MoveState::NoMove);
-	mMovesGeneratedForCurrentTurn = false; // Reset flag for the new turn
+	mMovesGeneratedForCurrentTurn = false;			// Reset flag for the new turn
+
+	if (getCurrentPlayer() == PlayerColor::NoColor) // We are in init state and set the first round's player : white
+	{
+		LOG_INFO("Since we setup the game now, we select the white player as the current player!");
+		changeCurrentPlayer(PlayerColor::White);
+		return;
+	}
 
 	if (getCurrentPlayer() == PlayerColor::White)
 	{
@@ -156,9 +162,54 @@ void GameManager::switchTurns()
 }
 
 
-void GameManager::executeMove(PossibleMove &move)
+bool GameManager::calculateAllMovesForPlayer()
 {
-	Move executedMove = mMoveExecution->executeMove(move);
+	if (!mMovesGeneratedForCurrentTurn)
+	{
+		LOG_INFO("We start calculating this player's possible moves!");
+		bool result					  = mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer());
+		mMovesGeneratedForCurrentTurn = true;
+		return result;
+	}
+	return false;
+}
+
+
+bool GameManager::initiateMove(const Position &startPosition)
+{
+	LOG_INFO("We started to initate a move with starting position {}", LoggingHelper::positionToString(startPosition).c_str());
+
+	mAllMovesForPosition.clear();
+
+	auto possibleMoves = mMoveGeneration->getMovesForPosition(startPosition);
+
+	mAllMovesForPosition.reserve(possibleMoves.size());
+	mAllMovesForPosition = possibleMoves;
+
+	LOG_INFO("Number of possible moves for the current position is {}", mAllMovesForPosition.size());
+	return true;
+}
+
+
+void GameManager::executeMove(PossibleMove &tmpMove)
+{
+	PossibleMove moveToExecute{};
+	for (auto &move : mAllMovesForPosition)
+	{
+		if (move == tmpMove)
+		{
+			moveToExecute = move;
+
+			// On pawn promotion, assign the promotion piece type
+			if (moveToExecute.type == MoveType::PawnPromotion)
+			{
+				moveToExecute.promotionPiece = tmpMove.promotionPiece;
+			}
+			break;
+		}
+	}
+
+	Move executedMove = mMoveExecution->executeMove(moveToExecute);
 
 	LoggingHelper::logMove(executedMove);
 
@@ -216,45 +267,6 @@ void GameManager::undoMove()
 	piece->decreaseMoveCounter();
 
 	mMoveExecution->removeLastMove();
-	switchTurns();
-}
-
-
-void GameManager::gameStateChanged(GameState state)
-{
-	if (mCurrentState == state)
-		return;
-
-	mCurrentState = state;
-
-	for (auto observer : mObservers)
-	{
-		if (observer)
-		{
-			observer->onGameStateChanged(state);
-		}
-	}
-}
-
-
-GameState GameManager::getCurrentGameState() const
-{
-	return mCurrentState;
-}
-
-
-void GameManager::setCurrentMoveState(MoveState state)
-{
-	if (mCurrentMoveState != state)
-	{
-		mCurrentMoveState = state;
-	}
-}
-
-
-MoveState GameManager::getCurrentMoveState() const
-{
-	return mCurrentMoveState;
 }
 
 
@@ -270,83 +282,71 @@ void GameManager::resetGame()
 }
 
 
-void GameManager::endGame(PlayerColor player)
+void GameManager::endGame(EndGameState state, PlayerColor player)
 {
-	for (auto observer : mObservers)
+	for (auto &observer : mObservers)
 	{
-		if (observer)
-		{
-			observer->onEndGame(player);
-		}
+		auto obs = observer.lock();
+
+		if (obs)
+			obs->onEndGame(state, player);
 	}
 }
 
 
 std::optional<PlayerColor> GameManager::getWinner() const
 {
-	if (mCurrentState == GameState::Checkmate)
-		return getCurrentPlayer() == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
-
-	else if (mCurrentState == GameState::Stalemate)
-		return std::nullopt; // Draw in case of stalemate
-
 	return std::nullopt;
 }
 
 
-void GameManager::handleMoveStateChanges(PossibleMove &move)
+bool GameManager::checkForValidMoves(const PossibleMove &move)
 {
-	switch (mCurrentMoveState)
+	if (move.start == move.end)						// The user aborted the move by clicking the piece again
+		return false;
+
+	for (auto &possibleMove : mAllMovesForPosition) // Check if the move is a valid move
 	{
-	case (MoveState::NoMove):
-	{
-		if (!mMovesGeneratedForCurrentTurn)
-		{
-			LOG_INFO("Move State is NoMove -> We start calculating this player's possible moves!");
-			mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer());
-			mMovesGeneratedForCurrentTurn = true;
-		}
-		break;
+		if (move == possibleMove)
+			return true;
 	}
 
-	case (MoveState::InitiateMove):
-	{
-		LOG_INFO("We started to initate a move with starting position {}", LoggingHelper::positionToString(move.start).c_str());
-
-		mAllMovesForPosition.clear();
-
-		auto possibleMoves = mMoveGeneration->getMovesForPosition(move.start);
-
-		mAllMovesForPosition.reserve(possibleMoves.size());
-		mAllMovesForPosition = possibleMoves;
-
-		moveStateInitiated(); // Let the UI know the moves for current round are ready -> handling need to be refactored later!
-
-		LOG_INFO("Number of possible moves for the current position is {}", mAllMovesForPosition.size());
-
-		break;
-	}
-
-	case (MoveState::ExecuteMove):
-	{
-		LOG_INFO("Executing the move now!");
-		executeMove(move);
-		break;
-	}
-	default: break;
-	}
+	return false;
 }
 
 
-void GameManager::moveStateInitiated()
+bool GameManager::checkForPawnPromotionMove(const PossibleMove &move)
 {
-	for (auto observer : mObservers)
+	for (auto &possibleMove : mAllMovesForPosition)
 	{
-		if (observer)
-		{
-			observer->onMoveStateInitiated();
-		}
+		if (move == possibleMove)
+			return (possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion;
 	}
+	return false;
+}
+
+
+std::vector<NetworkAdapter> GameManager::getNetworkAdapters()
+{
+	return mMultiplayerManager->getNetworkAdapters();
+}
+
+
+bool GameManager::changeCurrentNetworkAdapter(int ID)
+{
+	return mMultiplayerManager->changeCurrentNetworkAdapter(ID);
+}
+
+
+int GameManager::getCurrentNetworkAdapterID()
+{
+	return mMultiplayerManager->getCurrentNetworkAdapterID();
+}
+
+
+void GameManager::setLocalPlayerName(std::string name)
+{
+	mMultiplayerManager->setLocalPlayerName(name);
 }
 
 
@@ -356,12 +356,12 @@ void GameManager::changeCurrentPlayer(PlayerColor player)
 	{
 		mCurrentPlayer = player;
 
-		for (auto observer : mObservers)
+		for (auto &observer : mObservers)
 		{
-			if (observer)
-			{
-				observer->onChangeCurrentPlayer(mCurrentPlayer);
-			}
+			auto obs = observer.lock();
+
+			if (obs)
+				obs->onChangeCurrentPlayer(mCurrentPlayer);
 		}
 	}
 }
@@ -373,8 +373,7 @@ PlayerColor GameManager::getCurrentPlayer() const
 }
 
 
-
-void GameManager::checkForEndGameConditions()
+EndGameState GameManager::checkForEndGameConditions()
 {
 	const Move *lastMove = mMoveExecution->getLastMove();
 
@@ -384,13 +383,12 @@ void GameManager::checkForEndGameConditions()
 		if (isCheckMate)
 		{
 			LOG_INFO("Detected a Checkmate!");
-			gameStateChanged(GameState::Checkmate);
 
 			auto winner = getWinner();
 			if (winner.has_value())
-				endGame(winner.value());
+				endGame(EndGameState::Checkmate, winner.value());
 
-			return;
+			return EndGameState::Checkmate;
 		}
 
 		mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer()); // Calculate all legal moves to check if we have a stalemate (no valid moves left)
@@ -398,55 +396,178 @@ void GameManager::checkForEndGameConditions()
 		if (isStaleMate)
 		{
 			LOG_INFO("Detected a Stalemate");
-			gameStateChanged(GameState::Stalemate);
 
 			auto winner = getWinner();
 			if (winner.has_value())
-				endGame(winner.value());
+				endGame(EndGameState::StaleMate, winner.value());
 
-			return;
+			return EndGameState::StaleMate;
 		}
 
 		LOG_INFO("Game is still on-going. We switch player's turns!");
-		gameStateChanged(GameState::OnGoing);
-		switchTurns();
-		return;
+		return EndGameState::OnGoing;
 	}
 
 	LOG_WARNING("Couldn't find the last move! Game is still on-going");
-	gameStateChanged(GameState::OnGoing);
+	return EndGameState::OnGoing;
+}
+
+
+bool GameManager::startMultiplayerGame(bool isHost)
+{
+	mIsMultiplayerMode = true;
+	mIsHost			   = isHost;
+
+	// Initialize the game & board
+	clearState();
+	mChessBoard->initializeBoard();
+
+	if (isHost)
+	{
+		changeCurrentPlayer(PlayerColor::White); // If we are the host, we are chosen to play as white -> TODO : Add UI selector in future
+		mWhitePlayer.setIsLocalPlayer(true);
+		mBlackPlayer.setIsLocalPlayer(false);
+	}
+	else
+	{
+		// Guests are black
+		changeCurrentPlayer(PlayerColor::White); // Game still starts with white
+		mWhitePlayer.setIsLocalPlayer(false);
+		mBlackPlayer.setIsLocalPlayer(true);
+	}
+
+	// mMultiplayerManager->setInternalObservers(); // Set the internal multiplayer observers
+
+	return true;
+}
+
+
+
+void GameManager::disconnectMultiplayerGame()
+{
+	if (mMultiplayerManager)
+		mMultiplayerManager->disconnect();
+
+	mIsMultiplayerMode = false;
+	resetGame(); // Reset to single player
+}
+
+
+void GameManager::startedMultiplayer()
+{
+	// The player clicked on the Multiplayer menu button and started the multiplayer
+
+	mMultiplayerManager = std::make_shared<MultiplayerManager>(); // Create the multiplayer manager
+
+	mMultiplayerManager->setInternalObservers();				  // First set the observers, so
+	mMultiplayerManager->init();								  // the modules already receive notifications on init
+}
+
+
+void GameManager::stoppedMultiplayer()
+{
+	mMultiplayerManager->reset();
+}
+
+
+bool GameManager::isMultiplayerActive() const
+{
+	return mIsMultiplayerMode;
+}
+
+
+bool GameManager::isLocalPlayerTurn()
+{
+	// If we're in single player mode, it is always our turn
+	if (!isMultiplayerActive())
+		return true;
+
+	PlayerColor currentPlayer	   = getCurrentPlayer();
+
+	bool		isWhitePlayerTurn  = currentPlayer == PlayerColor::White;
+	bool		isBlackPlayerTurn  = currentPlayer == PlayerColor::Black;
+
+	bool		isLocalPlayersTurn = (isWhitePlayerTurn && mWhitePlayer.isLocalPlayer() || isBlackPlayerTurn && mBlackPlayer.isLocalPlayer());
+	return isLocalPlayersTurn;
+}
+
+
+void GameManager::startRemoteDiscovery(bool isHost)
+{
+	if (isHost)
+	{
+		LOG_INFO("Starting to host a session..");
+		mMultiplayerManager->hostSession();
+	}
+	else
+	{
+		LOG_INFO("Starting to join a session..");
+		mMultiplayerManager->startClientDiscovery();
+	}
+}
+
+
+void GameManager::approveConnectionRequest()
+{
+	if (!mMultiplayerManager)
+		return;
+
+	mMultiplayerManager->approveConnectionRequest();
+}
+
+
+void GameManager::rejectConnectionRequest()
+{
+	if (!mMultiplayerManager)
+		return;
+
+	mMultiplayerManager->rejectConnectionRequest();
+}
+
+
+void GameManager::sendConnectionRequestToHost()
+{
+	if (!mMultiplayerManager)
+		return;
+
+	mMultiplayerManager->joinSession();
 }
 
 
 void GameManager::initObservers()
 {
-	this->attachObserver(mUiCommunicationLayer.get());
+	this->attachObserver(mUiCommunicationLayer);
 
-	mWhitePlayer.attachObserver(mUiCommunicationLayer.get());
-	mBlackPlayer.attachObserver(mUiCommunicationLayer.get());
+	mWhitePlayer.attachObserver(mUiCommunicationLayer);
+	mBlackPlayer.attachObserver(mUiCommunicationLayer);
 
-	mMoveExecution->attachObserver(mUiCommunicationLayer.get());
+	mMoveExecution->attachObserver(mUiCommunicationLayer);
+
+	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer);
+}
+
+
+void GameManager::initMultiplayerObservers()
+{
+	if (!mMultiplayerManager)
+	{
+		LOG_WARNING("Could not set up the observers, since the Multiplayer Manager is not set up yet!");
+		return;
+	}
+
+	mMoveExecution->attachObserver(mMultiplayerManager->mRemoteSender);				   // Moves will be sent to the remote
+	mMultiplayerManager->mRemoteReceiver->attachObserver(StateMachine::GetInstance()); // Received moves will be handled in the state machine
 }
 
 
 void GameManager::deinitObservers()
 {
-	this->detachObserver(mUiCommunicationLayer.get());
+	this->detachObserver(mUiCommunicationLayer);
 
-	mWhitePlayer.detachObserver(mUiCommunicationLayer.get());
-	mBlackPlayer.detachObserver(mUiCommunicationLayer.get());
+	mWhitePlayer.detachObserver(mUiCommunicationLayer);
+	mBlackPlayer.detachObserver(mUiCommunicationLayer);
 
-	mMoveExecution->detachObserver(mUiCommunicationLayer.get());
-}
+	mMoveExecution->detachObserver(mUiCommunicationLayer);
 
-
-void GameManager::attachObserver(IGameObserver *observer)
-{
-	mObservers.push_back(observer);
-}
-
-
-void GameManager::detachObserver(IGameObserver *observer)
-{
-	mObservers.erase(std::remove(mObservers.begin(), mObservers.end(), observer), mObservers.end());
+	StateMachine::GetInstance()->detachObserver(mUiCommunicationLayer);
 }

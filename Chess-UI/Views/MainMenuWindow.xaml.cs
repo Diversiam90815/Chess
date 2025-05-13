@@ -4,7 +4,7 @@ using Chess_UI.Views;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-
+using System;
 
 
 namespace Chess_UI
@@ -25,6 +25,8 @@ namespace Chess_UI
 
         public SettingsWindow SettingsWindow;
 
+        public MultiplayerWindow MultiplayerWindow;
+
         private readonly ThemeManager themeManager;
 
 
@@ -38,7 +40,7 @@ namespace Chess_UI
 
             ViewModel = new MainMenuViewModel(DispatcherQueue);
             SettingsViewModel = new SettingsViewModel(DispatcherQueue, themeManager);
-            ChessBoardViewModel = new ChessBoardViewModel(DispatcherQueue, this.ViewModel.Controller, themeManager);
+            ChessBoardViewModel = new ChessBoardViewModel(DispatcherQueue, themeManager);
 
             this.RootGrid.DataContext = ViewModel;
 
@@ -68,6 +70,7 @@ namespace Chess_UI
         {
             ChessBoardWindow.Closed -= BoardWindowClosed;
             ChessBoardWindow = null;
+            ChessBoardViewModel.ResetGame();
             this.Activate();
         }
 
@@ -80,15 +83,24 @@ namespace Chess_UI
         }
 
 
+        private void MultiplayerWindowClosed(object sender, WindowEventArgs args)
+        {
+            MultiplayerWindow.Closed -= MultiplayerWindowClosed;
+            MultiplayerWindow = null;
+            this.Activate();
+        }
+
+
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
             if (ChessBoardWindow == null)
             {
-                ChessBoardViewModel.ResetGame();
-                ChessBoardWindow = new ChessBoardWindow(ChessBoardViewModel, this.ViewModel.Controller, themeManager);
+                ChessBoardWindow = new ChessBoardWindow(ChessBoardViewModel, themeManager);
                 ChessBoardWindow.Activate();
                 ChessBoardWindow.Closed += BoardWindowClosed;
                 this.AppWindow.Hide();
+
+                ChessBoardViewModel.StartGame();
             }
             else
             {
@@ -113,9 +125,31 @@ namespace Chess_UI
         }
 
 
-        private void MultiplayerButton_Click(object sender, RoutedEventArgs e)
+        private async void MultiplayerButton_Click(object sender, RoutedEventArgs e)
         {
-            //Not yet implemented
+
+            var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+            {
+                Title = "Multiplayer Coming Soon",
+                Content = "Multiplayer is not yet implemented, but is being worked on.",
+                CloseButtonText = "OK",
+                XamlRoot = this.Content.XamlRoot
+            };
+
+            await dialog.ShowAsync();
+
+            //if (MultiplayerWindow == null)
+            //{
+            //    MultiplayerWindow = new MultiplayerWindow(DispatcherQueue);
+            //    MultiplayerWindow.Activate();
+            //    MultiplayerWindow.Closed += MultiplayerWindowClosed;
+            //    this.AppWindow.Hide();
+            //}
+            //else
+            //{
+            //    MultiplayerWindow.Activate();
+            //}
+
         }
 
 
