@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Chess_UI.Models;
 using System.Xml.Linq;
-
+using static Chess_UI.Services.ChessCoordinate;
 
 namespace Chess_UI.ViewModels
 {
@@ -85,27 +85,25 @@ namespace Chess_UI.ViewModels
                 int colorVal = (encoded >> 4) & 0xF;    // top 8 bits
                 int pieceVal = encoded & 0xF;          // bottom 8 bits
 
-                // The engine’s row=0 is bottom, row=7 is top,
-                // but the default i/8 loop is top..down. So flip:
-                int rowFromTop = i / BOARD_SIZE;   // 0..7 (top..bottom)
-                int col = i % BOARD_SIZE;
-                int rowUI = 7 - rowFromTop;   // invert the row
+
+                PositionInstance enginePos = ChessCoordinate.FromIndex(i);  // Get engine pos from index
+                PositionInstance displayPos = ChessCoordinate.ToDisplayCoordinates(enginePos); // Convert it to the UI pos
 
                 var square = new BoardSquare(
-                    x: col,
-                    y: rowUI,
+                    x: displayPos.x,
+                    y: displayPos.y,
                     (PieceTypeInstance)pieceVal,
                     (PlayerColor)colorVal,
                     DispatcherQueue,
                     themeManager
                 );
 
-                // Now compute where in Board[] it should go, so that rowUI=7 is stored first and rowUI=0 last row
-                int index = (7 - rowUI) * BOARD_SIZE + col;
+                // Calculate the index in the UI board array
+                int displayIndex = ChessCoordinate.ToIndex(displayPos, true);
 
                 DispatcherQueue.TryEnqueue(() =>
                 {
-                    Board[index] = square;
+                    Board[displayIndex] = square;
                     OnPropertyChanged(nameof(Board));
                 });
             }
@@ -180,12 +178,11 @@ namespace Chess_UI.ViewModels
 
         public void HandleSquareClick(BoardSquare square)
         {
-            int engineX = square.pos.x;
-            int engineY = 7 - square.pos.y;
+            PositionInstance enginePos = ChessCoordinate.FromDisplayCoordinates(square.pos);
 
-            Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{engineX}-Y{engineY}!");
+            Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{enginePos.x}-Y{enginePos.y}!");
 
-            ChessLogicAPI.OnSquareSelected(new PositionInstance(engineX, engineY));
+            ChessLogicAPI.OnSquareSelected(enginePos);
         }
 
 
@@ -195,11 +192,9 @@ namespace Chess_UI.ViewModels
 
             foreach (var pm in MoveModel.PossibleMoves)
             {
-                // we invert row with (7 - rowUI) in your code, so be consistent.
-                var targetX = pm.end.x;
-                var targetY = pm.end.y;
+                PositionInstance displayPos = ChessCoordinate.ToDisplayCoordinates(pm.end);
 
-                int index = targetY * 8 + targetX;
+                int index = ChessCoordinate.ToIndex(displayPos, true);
                 BoardSquare square = Board[index];
 
                 if (square != null)

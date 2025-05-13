@@ -11,7 +11,6 @@ namespace Chess_UI.Services
         #region Defines
 
         private const string LOGIC_API_PATH = @"Chess-Logic.dll";
-        public const int BOARD_SIZE = 8;
 
         #endregion // Defines
 
