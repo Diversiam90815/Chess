@@ -6,6 +6,17 @@ namespace Chess_UI.Services
     {
         public const int BOARD_SIZE = 8;
 
+
+
+        /// <summary>
+        /// Gets the number of board pieces on a chessboard
+        /// </summary>
+        public static int GetNumBoardSquares()
+        {
+            return BOARD_SIZE * BOARD_SIZE;
+        }
+
+
         /// <summary>
         /// Gets position from a 1D board index (engine coordinates)
         /// </summary>
@@ -14,6 +25,19 @@ namespace Chess_UI.Services
             int x = index % BOARD_SIZE;
             int y = index / BOARD_SIZE;
             return new PositionInstance(x, y);
+        }
+
+        /// <summary>
+        /// Calculates the 1D array index from position
+        /// </summary>
+        public static int ToIndex(PositionInstance pos, bool forDisplay = false)
+        {
+            if (forDisplay)
+            {
+                var displayPos = ToDisplayCoordinates(pos);
+                return displayPos.y * BOARD_SIZE + displayPos.x;
+            }
+            return pos.y * BOARD_SIZE + pos.x;
         }
 
         /// <summary>
@@ -34,19 +58,6 @@ namespace Chess_UI.Services
         public static PositionInstance FromDisplayCoordinates(PositionInstance displayPos)
         {
             return new PositionInstance(displayPos.x, 7 - displayPos.y);
-        }
-
-        /// <summary>
-        /// Calculates the 1D array index from position
-        /// </summary>
-        public static int ToIndex(PositionInstance pos, bool forDisplay = false)
-        {
-            if (forDisplay)
-            {
-                var displayPos = ToDisplayCoordinates(pos);
-                return displayPos.y * BOARD_SIZE + displayPos.x;
-            }
-            return pos.y * BOARD_SIZE + pos.x;
         }
     }
 }
