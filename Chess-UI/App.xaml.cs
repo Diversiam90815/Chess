@@ -12,6 +12,7 @@ using Chess_UI.Settings;
 using Chess_UI.Themes;
 using Chess_UI.Themes.Interfaces;
 using Chess_UI.ViewModels;
+using Chess_UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using System;
@@ -72,7 +73,7 @@ namespace Chess_UI
             services.AddTransient<IMoveHistoryModel, MoveHistoryModel>();
             services.AddTransient<IBoardModel, BoardModel>();
             services.AddTransient<IMultiplayerModel, MultiplayerModel>();
-
+            services.AddTransient<IDispatcherQueueWrapper, DispatcherQueueWrapper>();
 
             // Register View Models
             services.AddTransient<ChessBoardViewModel>();
