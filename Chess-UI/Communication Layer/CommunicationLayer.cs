@@ -15,6 +15,22 @@ namespace Chess_UI.Services
         private GCHandle _delegateHandle;
 
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void APIDelegate(int message, nint data);
+
+        public enum DelegateMessage
+        {
+            EndGameState = 1,
+            PlayerScoreUpdated = 2,
+            PlayerCapturedPiece = 3,
+            PlayerChanged = 4,
+            GameStateChanged = 5,
+            MoveHistoryAdded = 6,
+            ConnectionStateChanged = 7,
+            ClientRequestedConnection = 8
+        }
+
+
         public void Init()
         {
             ChessLogicAPI.SetUnvirtualizedAppDataPath(Project.AppDataDirectory);

@@ -12,6 +12,8 @@ using Microsoft.UI.Xaml.Media;
 using Chess_UI.Themes;
 using Chess_UI.Board;
 using Chess_UI.Images;
+using Chess_UI.Wrappers;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Chess_UI.Views
@@ -20,35 +22,28 @@ namespace Chess_UI.Views
     {
         private ChessBoardViewModel _viewModel;
 
-        private new readonly DispatcherQueue DispatcherQueue;
-
         private OverlappedPresenter Presenter;
 
         private PieceTypeInstance? ViewModelSelectedPiece { get; set; }
 
-        private readonly ImageServices _images;
+        private readonly IImageService _images;
 
-        public ChessBoardWindow(ChessBoardViewModel viewModel)
+
+        public ChessBoardWindow()
         {
             this.InitializeComponent();
-            DispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-            _viewModel = viewModel;
+            _images = App.Current.Services.GetService<IImageService>();
+            _viewModel = App.Current.Services.GetService<ChessBoardViewModel>();
             RootPanel.DataContext = _viewModel;
 
             _viewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
             _viewModel.ShowEndGameDialog += OnGameOverState;
 
-            _images = new ImageServices();
-
             Init();
             SetWindowSize(1100, 800);
         }
 
-        private Task<bool?> ViewModel_ShowEndGameDialog()
-        {
-            throw new NotImplementedException();
-        }
 
         private void SetWindowSize(double width, double height)
         {
