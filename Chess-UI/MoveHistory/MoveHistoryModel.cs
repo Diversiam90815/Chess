@@ -6,15 +6,15 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.Models
+namespace Chess_UI.MoveHistory
 {
-    public class MoveHistoryModel
+    public class MoveHistoryModel : IMoveHistoryModel
     {
-        public List<string> MoveHistory = new();
+        public List<string> MoveHistory { get; } = new();
 
         public MoveHistoryModel()
         {
-            var logicCommunication = App.Current.ChessLogicCommunication as ChessLogicCommunicationLayer;
+            var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
             logicCommunication.MoveHistoryUpdated += UpdateMoveHistory;
         }
 
@@ -31,8 +31,6 @@ namespace Chess_UI.Models
             MoveHistory.Remove(MoveHistory.LastOrDefault());
         }
 
-
-        public delegate void MoveHistoryUpdatedHandler();
-        public event MoveHistoryUpdatedHandler MoveHistoryUpdated;
+        public event Action MoveHistoryUpdated;
     }
 }

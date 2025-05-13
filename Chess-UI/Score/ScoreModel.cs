@@ -6,12 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using static Chess_UI.Services.ChessLogicAPI;
 
-namespace Chess_UI.Models
+namespace Chess_UI.Score
 {
-    public class ScoreModel
+    public class ScoreModel : IScoreModel
     {
 
-        public Dictionary<PieceTypeInstance, int> whiteCapturedPieces = new Dictionary<PieceTypeInstance, int>
+        public Dictionary<PieceTypeInstance, int> WhiteCapturedPieces { get; } = new Dictionary<PieceTypeInstance, int>
     {
         { PieceTypeInstance.Pawn, 0 },
         { PieceTypeInstance.Bishop, 0 },
@@ -20,7 +20,7 @@ namespace Chess_UI.Models
         { PieceTypeInstance.Queen, 0 }
     };
 
-        public Dictionary<PieceTypeInstance, int> blackCapturedPieces = new Dictionary<PieceTypeInstance, int>
+        public Dictionary<PieceTypeInstance, int> BlackCapturedPieces { get; } = new Dictionary<PieceTypeInstance, int>
     {
         { PieceTypeInstance.Pawn, 0 },
         { PieceTypeInstance.Bishop, 0 },
@@ -32,7 +32,7 @@ namespace Chess_UI.Models
 
         public ScoreModel()
         {
-            var logicCommunication = App.Current.ChessLogicCommunication as ChessLogicCommunicationLayer;
+            var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
             logicCommunication.PlayerCapturedPieceEvent += OnPlayerCapturedPiece;
             logicCommunication.PlayerScoreUpdated += HandlePlayerScoreUpdated;
 
@@ -45,17 +45,14 @@ namespace Chess_UI.Models
         }
 
 
-        private void HandlePlayerScoreUpdated(Score score)
+        private void HandlePlayerScoreUpdated(ChessLogicAPI.Score score)
         {
             PlayerScoreUpdated?.Invoke(score);
         }
 
 
-        public delegate void PlayerCapturedPieceHandler(PlayerCapturedPiece captureEvent);
-        public event PlayerCapturedPieceHandler PlayerCapturedPiece;
-
-        public delegate void PlayerScoreUpdatedHandler(Score score);
-        public event PlayerScoreUpdatedHandler PlayerScoreUpdated;
+        public event Action<PlayerCapturedPiece> PlayerCapturedPiece;
+        public event Action<ChessLogicAPI.Score> PlayerScoreUpdated;
 
     }
 }

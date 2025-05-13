@@ -1,4 +1,5 @@
-﻿using Chess_UI.Services;
+﻿using Chess_UI.Images;
+using Chess_UI.Services;
 using Chess_UI.Themes;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
@@ -14,16 +15,17 @@ using static Chess_UI.Services.ChessLogicAPI;
 
 namespace Chess_UI.Board
 {
-    public class BoardSquare : INotifyPropertyChanged
+    public class BoardSquare : IBoardSquare
     {
         private readonly Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Images.PieceTheme PieceTheme { get; private set; }
+        public ImageServices.PieceTheme PieceTheme { get; private set; }
 
         private readonly ThemeManager ThemeManager;
 
+        private ImageServices _images;
 
         public BoardSquare(Microsoft.UI.Dispatching.DispatcherQueue dispatcher, ThemeManager themeManager)
         {
@@ -62,7 +64,7 @@ namespace Chess_UI.Board
         }
 
 
-        private void UpdatePieceTheme(Images.PieceTheme pieceTheme)
+        public void UpdatePieceTheme(ImageServices.PieceTheme pieceTheme)
         {
             PieceTheme = pieceTheme;
         }
@@ -148,7 +150,8 @@ namespace Chess_UI.Board
                 if (piece == PieceTypeInstance.DefaultType || colour == PlayerColor.NoColor)
                     return null;
 
-                return Images.GetPieceImage(PieceTheme, colour, piece);
+                _images = new ImageServices();
+                return _images.GetPieceImage(PieceTheme, colour, piece);
             }
         }
 

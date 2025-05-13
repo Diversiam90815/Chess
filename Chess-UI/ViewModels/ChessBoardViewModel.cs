@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml.Media;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using static Chess_UI.Services.Images;
+using static Chess_UI.Images.ImageServices;
 using static Chess_UI.Services.ChessLogicAPI;
 using System.Collections.ObjectModel;
 using System;
@@ -18,6 +18,7 @@ using Chess_UI.Themes;
 using Chess_UI.Board;
 using Chess_UI.Moves;
 using Chess_UI.Coordinates;
+using Chess_UI.Images;
 
 
 namespace Chess_UI.ViewModels
@@ -45,7 +46,9 @@ namespace Chess_UI.ViewModels
 
 		private readonly ChessCoordinate mCoordinate;
 
-		public ChessBoardViewModel(DispatcherQueue dispatcherQueue, ThemeManager themeManager)
+		private readonly ImageServices ImageServices;
+
+        public ChessBoardViewModel(DispatcherQueue dispatcherQueue, ThemeManager themeManager)
 		{
 			this.DispatcherQueue = dispatcherQueue;
 			this.themeManager = themeManager;
@@ -56,6 +59,7 @@ namespace Chess_UI.ViewModels
 			MoveModel = new();
 			BoardModel = new();
 			mCoordinate = new();
+			ImageServices = new();
 
 			MoveModel.PossibleMovesCalculated += OnHighlightPossibleMoves;
 			MoveModel.PlayerChanged += OnHandlePlayerChanged;
@@ -159,7 +163,7 @@ namespace Chess_UI.ViewModels
 		}
 
 
-		private void UpdateBoardTheme(Images.BoardTheme boardTheme)
+		private void UpdateBoardTheme(ImageServices.BoardTheme boardTheme)
 		{
 			CurrentBoardTheme = boardTheme;
 		}
@@ -262,14 +266,14 @@ namespace Chess_UI.ViewModels
 		}
 
 
-		public Images.BoardTheme CurrentBoardTheme;
+		public ImageServices.BoardTheme CurrentBoardTheme;
 
 
 		public ImageSource BoardBackgroundImage
 		{
 			get
 			{
-				return Images.GetImage(CurrentBoardTheme);
+				return ImageServices.GetImage(CurrentBoardTheme);
 			}
 		}
 

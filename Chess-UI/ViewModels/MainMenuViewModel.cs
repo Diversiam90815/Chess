@@ -1,4 +1,5 @@
-﻿using Chess_UI.Services;
+﻿using Chess_UI.Images;
+using Chess_UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System;
@@ -18,14 +19,25 @@ namespace Chess_UI.ViewModels
 
         private readonly DispatcherQueue DispatcherQueue;
 
+        private readonly ImageServices ImageServices;
 
         public MainMenuViewModel(DispatcherQueue dispatcher)
         {
             DispatcherQueue = dispatcher;
+            ImageServices = new ImageServices();
+
+            Init();
         }
 
+        private void Init()
+        {
+            StartGameButtonImage = ImageServices.GetImage(ImageServices.MainMenuButton.StartGame);
+            SettingButtonImage = ImageServices.GetImage(ImageServices.MainMenuButton.Settings);
+            MultiplayerButtonImage = ImageServices.GetImage(ImageServices.MainMenuButton.Multiplayer);
+            EndGameButtonImage = ImageServices.GetImage(ImageServices.MainMenuButton.EndGame);
+        }
 
-        private ImageSource startGameButtonImage = Images.GetImage(Images.MainMenuButton.StartGame);
+        private ImageSource startGameButtonImage;
         public ImageSource StartGameButtonImage
         {
             get => startGameButtonImage;
@@ -40,7 +52,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private ImageSource settingButtonImage = Images.GetImage(Images.MainMenuButton.Settings);
+        private ImageSource settingButtonImage;
         public ImageSource SettingButtonImage
         {
             get => settingButtonImage;
@@ -55,7 +67,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private ImageSource multiplayerButtonImage = Images.GetImage(Images.MainMenuButton.Multiplayer);
+        private ImageSource multiplayerButtonImage;
         public ImageSource MultiplayerButtonImage
         {
             get => multiplayerButtonImage;
@@ -70,7 +82,7 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private ImageSource endGameButtonImage = Images.GetImage(Images.MainMenuButton.EndGame);
+        private ImageSource endGameButtonImage;
         public ImageSource EndGameButtonImage
         {
             get => endGameButtonImage;

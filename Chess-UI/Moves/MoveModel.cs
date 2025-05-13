@@ -19,7 +19,7 @@ namespace Chess_UI.Moves
 
         public MoveModel()
         {
-            var logicCommunication = App.Current.ChessLogicCommunication as ChessLogicCommunicationLayer;
+            var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
             logicCommunication.GameStateChanged += HandleGameStateChanged;
             logicCommunication.PlayerChanged += HandlePlayerChanged;
             logicCommunication.EndGameStateEvent += HandleEndGameState;

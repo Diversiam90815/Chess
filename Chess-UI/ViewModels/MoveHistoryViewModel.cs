@@ -1,4 +1,4 @@
-﻿using Chess_UI.Models;
+﻿using Chess_UI.MoveHistory;
 using Chess_UI.Services;
 using Microsoft.UI.Dispatching;
 using System;

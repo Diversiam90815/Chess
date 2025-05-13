@@ -36,7 +36,7 @@ namespace Chess_UI.Models
 
         public void Init()
         {
-            var logicCommunication = App.Current.ChessLogicCommunication as ChessLogicCommunicationLayer;
+            var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
             logicCommunication.ConnectionStatusEvent += HandleConnectionStatusUpdates;
             logicCommunication.ClientRequestedConnection += ClientRequestedConnection;
 

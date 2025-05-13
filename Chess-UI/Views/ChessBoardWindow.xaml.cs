@@ -11,6 +11,7 @@ using System;
 using Microsoft.UI.Xaml.Media;
 using Chess_UI.Themes;
 using Chess_UI.Board;
+using Chess_UI.Images;
 
 
 namespace Chess_UI.Views
@@ -27,8 +28,7 @@ namespace Chess_UI.Views
 
         private readonly ThemeManager themeManager;
 
-        private int ChessBoardWidth = 600;
-        private int ChessBoardHeight = 600;
+        private readonly ImageServices _images;
 
         public ChessBoardWindow(ChessBoardViewModel viewModel, ThemeManager themeManager)
         {
@@ -42,6 +42,7 @@ namespace Chess_UI.Views
             ViewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
             ViewModel.ShowEndGameDialog += OnGameOverState;
 
+            _images = new ImageServices();
 
             Init();
             SetWindowSize(1100, 800);
@@ -175,7 +176,7 @@ namespace Chess_UI.Views
 
                     var image = new Image
                     {
-                        Source = Images.GetPieceImage(Images.PieceTheme.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
+                        Source = _images.GetPieceImage(ImageServices.PieceTheme.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
                         Stretch = Stretch.Uniform
                     };
 
