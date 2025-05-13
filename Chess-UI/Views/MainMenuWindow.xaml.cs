@@ -4,6 +4,7 @@ using Chess_UI.Views;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using System;
 
 
 namespace Chess_UI
@@ -124,19 +125,30 @@ namespace Chess_UI
         }
 
 
-        private void MultiplayerButton_Click(object sender, RoutedEventArgs e)
+        private async void MultiplayerButton_Click(object sender, RoutedEventArgs e)
         {
-            if (MultiplayerWindow == null)
+
+            var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
             {
-                MultiplayerWindow = new MultiplayerWindow(DispatcherQueue);
-                MultiplayerWindow.Activate();
-                MultiplayerWindow.Closed += MultiplayerWindowClosed;
-                this.AppWindow.Hide();
-            }
-            else
-            {
-                MultiplayerWindow.Activate();
-            }
+                Title = "Multiplayer Coming Soon",
+                Content = "Multiplayer is not yet implemented, but is being worked on.",
+                CloseButtonText = "OK",
+                XamlRoot = this.Content.XamlRoot
+            };
+
+            await dialog.ShowAsync();
+
+            //if (MultiplayerWindow == null)
+            //{
+            //    MultiplayerWindow = new MultiplayerWindow(DispatcherQueue);
+            //    MultiplayerWindow.Activate();
+            //    MultiplayerWindow.Closed += MultiplayerWindowClosed;
+            //    this.AppWindow.Hide();
+            //}
+            //else
+            //{
+            //    MultiplayerWindow.Activate();
+            //}
 
         }
 
