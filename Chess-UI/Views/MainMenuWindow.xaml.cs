@@ -1,5 +1,6 @@
 using Chess_UI.Services;
 using Chess_UI.Themes;
+using Chess_UI.Themes.Interfaces;
 using Chess_UI.ViewModels;
 using Chess_UI.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,37 +14,27 @@ namespace Chess_UI
 {
     public sealed partial class MainMenuWindow : Window
     {
-        private new readonly DispatcherQueue DispatcherQueue;
-
         private OverlappedPresenter mPresenter;
 
-        private ChessBoardWindow ChessBoardWindow;
+        private ChessBoardWindow _chessBoardWindow;
 
-        public MainMenuViewModel ViewModel { get; private set; }
+        private MainMenuViewModel _viewModel { get; }
 
-        public SettingsViewModel SettingsViewModel { get; private set; }
+        private ChessBoardViewModel _chessBoardViewModel { get; }
 
-        public ChessBoardViewModel ChessBoardViewModel { get; private set; }
+        private SettingsWindow _settingsWindow;
 
-        public SettingsWindow _settingsWindow;
-
-        public MultiplayerWindow MultiplayerWindow;
-
-        private readonly ThemeManager themeManager;
+        private MultiplayerWindow _multiplayerWindow;
 
 
         public MainMenuWindow()
         {
             this.InitializeComponent();
 
-            DispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            _viewModel = App.Current.Services.GetService<MainMenuViewModel>();
+            _chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
 
-            themeManager = new ThemeManager();
-
-            ViewModel = new MainMenuViewModel(DispatcherQueue);
-            ChessBoardViewModel = new ChessBoardViewModel(DispatcherQueue, themeManager);
-
-            this.RootGrid.DataContext = ViewModel;
+            this.RootGrid.DataContext = _viewModel;
 
             Init();
             SetWindowSize(800, 750);
@@ -69,9 +60,9 @@ namespace Chess_UI
 
         private void BoardWindowClosed(object sender, WindowEventArgs args)
         {
-            ChessBoardWindow.Closed -= BoardWindowClosed;
-            ChessBoardWindow = null;
-            ChessBoardViewModel.ResetGame();
+            _chessBoardWindow.Closed -= BoardWindowClosed;
+            _chessBoardWindow = null;
+            _chessBoardViewModel.ResetGame();
             this.Activate();
         }
 
@@ -86,26 +77,26 @@ namespace Chess_UI
 
         private void MultiplayerWindowClosed(object sender, WindowEventArgs args)
         {
-            MultiplayerWindow.Closed -= MultiplayerWindowClosed;
-            MultiplayerWindow = null;
+            _multiplayerWindow.Closed -= MultiplayerWindowClosed;
+            _multiplayerWindow = null;
             this.Activate();
         }
 
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ChessBoardWindow == null)
+            if (_chessBoardWindow == null)
             {
-                ChessBoardWindow = new ChessBoardWindow(ChessBoardViewModel, themeManager);
-                ChessBoardWindow.Activate();
-                ChessBoardWindow.Closed += BoardWindowClosed;
+                _chessBoardWindow = App.Current.Services.GetService<ChessBoardWindow>();
+                _chessBoardWindow.Activate();
+                _chessBoardWindow.Closed += BoardWindowClosed;
                 this.AppWindow.Hide();
 
-                ChessBoardViewModel.StartGame();
+                _chessBoardViewModel.StartGame();
             }
             else
             {
-                ChessBoardWindow.Activate();
+                _chessBoardWindow.Activate();
             }
         }
 

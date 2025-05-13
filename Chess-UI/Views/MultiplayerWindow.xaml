@@ -11,7 +11,7 @@
 
     <Grid Name="Rootgrid" Background="#0B0B0D">
 
-        <StackPanel Name="InitView" Visibility="{x:Bind mViewModel.InitView, Mode=OneWay}" Orientation="Vertical" Spacing="8">
+        <StackPanel Name="InitView" Visibility="{x:Bind _viewModel.InitView, Mode=OneWay}" Orientation="Vertical" Spacing="8">
 
             <!--Title-->
             <TextBlock Text="Multiplayer" Style="{StaticResource MPTitle}"/>
@@ -29,7 +29,7 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Text="Network" Style="{StaticResource MPSubTitle}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" ItemsSource="{x:Bind mViewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind mViewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="NetworkAdapterChanged" Style="{StaticResource ComboBoxStyle}"/>
+                        <ComboBox Grid.Column="1" HorizontalAlignment="Stretch" IsEnabled="{x:Bind _viewModel.SettingsEditable, Mode=TwoWay}" ItemsSource="{x:Bind _viewModel.NetworkAdapters, Mode=TwoWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind _viewModel.SelectedAdapter, Mode=TwoWay}" SelectionChanged="NetworkAdapterChanged" Style="{StaticResource ComboBoxStyle}"/>
 
                     </Grid>
 
@@ -47,7 +47,7 @@
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Text="Name" HorizontalAlignment="Left" Style="{StaticResource MPSubTitle}" VerticalAlignment="Center"/>
-                        <TextBox Name="LocalPlayerName" Grid.Column="1" Style="{StaticResource PlainTextEnter}" HorizontalAlignment="Stretch" TextChanging="PlayerName_TextChanging" TextChanged="LocalPlayerName_TextChanged" IsEnabled="{x:Bind mViewModel.SettingsEditable, Mode=TwoWay}" PlaceholderText="Set your name"/>
+                        <TextBox Name="LocalPlayerName" Grid.Column="1" Style="{StaticResource PlainTextEnter}" HorizontalAlignment="Stretch" TextChanging="PlayerName_TextChanging" TextChanged="LocalPlayerName_TextChanged" IsEnabled="{x:Bind _viewModel.SettingsEditable, Mode=TwoWay}" PlaceholderText="Set your name"/>
 
                     </Grid>
 
@@ -56,11 +56,11 @@
 
             </StackPanel>
 
-            <ProgressRing IsActive="{x:Bind mViewModel.Processing, Mode=TwoWay}" Margin="16"/>
+            <ProgressRing IsActive="{x:Bind _viewModel.Processing, Mode=TwoWay}" Margin="16"/>
 
             <StackPanel Orientation="Horizontal" Spacing="8" Height="40" HorizontalAlignment="Center">
-                <Button Name="HostGameButton" IsEnabled="{x:Bind mViewModel.HostGameButtonEnabled, Mode=TwoWay}" Content="Host a game" Style="{StaticResource MPStartButtonStyle}" Click="HostGameButton_Click"/>
-                <Button Name="JoinGameButton" IsEnabled="{x:Bind mViewModel.ClientGameButtonEnabled, Mode=TwoWay}" Content="Join a game"  Style="{StaticResource MPStartButtonStyle}" Click="JoinGameButton_Click"/>
+                <Button Name="HostGameButton" IsEnabled="{x:Bind _viewModel.HostGameButtonEnabled, Mode=TwoWay}" Content="Host a game" Style="{StaticResource MPStartButtonStyle}" Click="HostGameButton_Click"/>
+                <Button Name="JoinGameButton" IsEnabled="{x:Bind _viewModel.ClientGameButtonEnabled, Mode=TwoWay}" Content="Join a game"  Style="{StaticResource MPStartButtonStyle}" Click="JoinGameButton_Click"/>
 
                 <Button Name="ReturnButton" HorizontalAlignment="Center" Click="ReturnButton_Click" Style="{StaticResource FontIconButtonStyle}" >
                     <FontIcon Glyph="&#xEB97;"/>
@@ -71,9 +71,9 @@
         </StackPanel>
 
 
-        <StackPanel Name="ClientRequestedConnectionView" Visibility="{x:Bind mViewModel.ClientRequestedConnectionView, Mode=OneWay}" Orientation="Vertical" Spacing="32" VerticalAlignment="Center">
+        <StackPanel Name="ClientRequestedConnectionView" Visibility="{x:Bind _viewModel.ClientRequestedConnectionView, Mode=OneWay}" Orientation="Vertical" Spacing="32" VerticalAlignment="Center">
 
-            <TextBlock Text="{x:Bind mViewModel.RemotePlayerName, Mode=OneWay}" FontSize="25" HorizontalAlignment="Center" />
+            <TextBlock Text="{x:Bind _viewModel.RemotePlayerName, Mode=OneWay}" FontSize="25" HorizontalAlignment="Center" />
             <TextBlock Text="wants to join." FontSize="20" HorizontalAlignment="Center"/>
             <TextBlock Text="Accept this request?" FontSize="20" HorizontalAlignment="Center"/>
 
@@ -88,10 +88,10 @@
         </StackPanel>
 
 
-        <StackPanel Name="ClientFoundHostView" Visibility="{x:Bind mViewModel.ClientFoundHostView, Mode=TwoWay}" Orientation="Vertical" Spacing="32" VerticalAlignment="Center">
+        <StackPanel Name="ClientFoundHostView" Visibility="{x:Bind _viewModel.ClientFoundHostView, Mode=TwoWay}" Orientation="Vertical" Spacing="32" VerticalAlignment="Center">
 
             <TextBlock Text="Found" HorizontalAlignment="Center" FontSize="20"/>
-            <TextBlock Text="{x:Bind mViewModel.RemotePlayerName, Mode=OneWay}" HorizontalAlignment="Center" FontSize="25"/>
+            <TextBlock Text="{x:Bind _viewModel.RemotePlayerName, Mode=OneWay}" HorizontalAlignment="Center" FontSize="25"/>
             <TextBlock Text="on the network" HorizontalAlignment="Center" FontSize="20"/>
 
             <TextBlock Text="Do you want to join?" HorizontalAlignment="Center" FontSize="20"/>
@@ -109,10 +109,10 @@
         </StackPanel>
 
 
-        <StackPanel Name="ClientWaitingForResponeView" Visibility="{x:Bind mViewModel.ClientWaitingForResponseView, Mode=TwoWay}" Orientation="Vertical" HorizontalAlignment="Center">
+        <StackPanel Name="ClientWaitingForResponeView" Visibility="{x:Bind _viewModel.ClientWaitingForResponseView, Mode=TwoWay}" Orientation="Vertical" HorizontalAlignment="Center">
 
             <TextBlock Text="Waiting for a response from" Margin="20,50,20,10" FontSize="22"/>
-            <TextBlock Text="{x:Bind mViewModel.RemotePlayerName}" Margin="20,10,20,10" HorizontalAlignment="Center" FontSize="25"/>
+            <TextBlock Text="{x:Bind _viewModel.RemotePlayerName}" Margin="20,10,20,10" HorizontalAlignment="Center" FontSize="25"/>
             <ProgressRing Height="50" Width="50" Margin="20,20,20,0"/>
 
             <Button Name="AbortWaitButton" Style="{StaticResource FontIconButtonStyle}" Click="AbortWaitButton_Click" Margin="20,70,20,10" HorizontalAlignment="Center">

@@ -16,10 +16,10 @@
 
         <Grid x:Name="BoardGrid" Height="600" Width="600" HorizontalAlignment="Left" Margin="30">
             <Grid.Background>
-                <ImageBrush ImageSource="{x:Bind ViewModel.BoardBackgroundImage, Mode=OneWay}"/>
+                <ImageBrush ImageSource="{x:Bind _viewModel.BoardBackgroundImage, Mode=OneWay}"/>
             </Grid.Background>
 
-            <ItemsRepeater x:Name="ChessBoardRepeater" ItemsSource="{x:Bind ViewModel.Board, Mode=TwoWay}">
+            <ItemsRepeater x:Name="ChessBoardRepeater" ItemsSource="{x:Bind _viewModel.Board, Mode=TwoWay}">
                 <ItemsRepeater.Layout>
                     <UniformGridLayout MaximumRowsOrColumns="8" />
                 </ItemsRepeater.Layout>
@@ -55,47 +55,47 @@
 
                     <StackPanel Name="WhiteScoreValue" Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
                         <TextBlock Text="White" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
-                        <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteScoreValue, Mode=TwoWay}" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Right" Margin="8,0,0,0"/>
+                        <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteScoreValue, Mode=TwoWay}" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Right" Margin="8,0,0,0"/>
                     </StackPanel>
 
                     <StackPanel Name="BlackScoreValue" Grid.Row="1" Grid.Column="1"  Orientation="Horizontal">
                         <TextBlock Text="Black" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
-                        <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackScoreValue, Mode=TwoWay}" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Right" Margin="8,0,0,0"/>
+                        <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackScoreValue, Mode=TwoWay}" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Right" Margin="8,0,0,0"/>
                     </StackPanel>
 
                     <StackPanel Name="WhiteCapturedPieces" Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
                         <StackPanel Name="WCapturedPiecesImages" Orientation="Vertical" HorizontalAlignment="Left">
-                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedBlackPawnImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedBlackBishopImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedBlackKnightImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedBlackRookImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedBlackQueenImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                            <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedBlackPawnImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                            <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedBlackBishopImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                            <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedBlackKnightImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                            <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedBlackRookImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                            <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedBlackQueenImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
                         </StackPanel>
 
                         <StackPanel Name="WNumCapturedPiece" Orientation="Vertical" HorizontalAlignment="Center">
-                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteCapturedPawn, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteCapturedBishop, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteCapturedKnight, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteCapturedRook, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.WhiteCapturedQueen, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                            <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteCapturedPawn, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                            <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteCapturedBishop, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                            <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteCapturedKnight, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                            <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteCapturedRook, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                            <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteCapturedQueen, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
                         </StackPanel>
                     </StackPanel>
 
                     <StackPanel Name="BlackCapturedPieces" Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
                         <StackPanel Name="BCapturedPiecesImages" Orientation="Vertical" HorizontalAlignment="Left">
-                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedWhitePawnImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedWhiteBishopImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedWhiteKnightImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedWhiteRookImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                            <Image Source="{x:Bind ViewModel.ScoreViewModel.CapturedWhiteQueenImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                            <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedWhitePawnImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                            <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedWhiteBishopImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                            <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedWhiteKnightImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                            <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedWhiteRookImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                            <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedWhiteQueenImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
                         </StackPanel>
 
                         <StackPanel Name="BNumCapturedPiece" Orientation="Vertical" HorizontalAlignment="Center">
-                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackCapturedPawn, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackCapturedBishop, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackCapturedKnight, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackCapturedRook, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                            <TextBlock Text="{x:Bind ViewModel.ScoreViewModel.BlackCapturedQueen, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                            <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackCapturedPawn, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                            <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackCapturedBishop, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                            <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackCapturedKnight, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                            <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackCapturedRook, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                            <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackCapturedQueen, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>
@@ -110,7 +110,7 @@
 
                     <!-- Moves with Wrapping Columns -->
                     <ScrollViewer Grid.Row="1" Margin="8,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl x:Name="MovesColumns" ItemsSource="{x:Bind ViewModel.MoveHistoryViewModel.MoveHistoryColumns, Mode=OneWay}" Background="#1E1E21" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <ItemsControl x:Name="MovesColumns" ItemsSource="{x:Bind _viewModel._moveHistoryViewModel.MoveHistoryColumns, Mode=OneWay}" Background="#1E1E21" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Orientation="Horizontal"/>

@@ -50,6 +50,7 @@ bool DiscoveryService::init(const std::string &playerName, std::string localIPv4
 
 	// Turn broadcast on
 	mSocket.set_option(asio::socket_base::broadcast(true));
+	mSocket.set_option(asio::socket_base::reuse_address(true));
 
 	mInitialized.store(true);
 	return true;

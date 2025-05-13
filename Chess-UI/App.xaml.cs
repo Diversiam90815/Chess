@@ -6,6 +6,7 @@ using Chess_UI.Models.Interfaces;
 using Chess_UI.MoveHistory;
 using Chess_UI.Moves;
 using Chess_UI.Multiplayer;
+using Chess_UI.Score;
 using Chess_UI.Services;
 using Chess_UI.Services.Interfaces;
 using Chess_UI.Settings;
@@ -71,6 +72,7 @@ namespace Chess_UI
             services.AddSingleton<ISettings, SettingsViewModel>();
 
             services.AddTransient<IMoveModel, MoveModel>();
+            services.AddTransient<IScoreModel, ScoreModel>();
             services.AddTransient<IMoveHistoryModel, MoveHistoryModel>();
             services.AddTransient<IBoardModel, BoardModel>();
             services.AddTransient<IMultiplayerModel, MultiplayerModel>();

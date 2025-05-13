@@ -2,6 +2,7 @@ using ABI.Windows.ApplicationModel.Activation;
 using Chess_UI.Models;
 using Chess_UI.Services;
 using Chess_UI.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -28,15 +29,15 @@ namespace Chess_UI.Views
     {
         private OverlappedPresenter Presenter;
 
-        private MultiplayerViewModel mViewModel;
+        private MultiplayerViewModel _viewModel;
 
 
-        public MultiplayerWindow(DispatcherQueue dispatcher)
+        public MultiplayerWindow()
         {
             this.InitializeComponent();
-            mViewModel = new(dispatcher);
+            _viewModel = App.Current.Services.GetService<MultiplayerViewModel>();
 
-            this.Rootgrid.DataContext = mViewModel;
+            this.Rootgrid.DataContext = _viewModel;
 
             Init();
             SetWindowSize(600, 400);
@@ -73,7 +74,7 @@ namespace Chess_UI.Views
                 NetworkAdapter selectedAdapter = (NetworkAdapter)e.AddedItems[0];
                 if (selectedAdapter != null)
                 {
-                    mViewModel.SelectedAdapter = selectedAdapter;
+                    _viewModel.SelectedAdapter = selectedAdapter;
                 }
             }
         }
@@ -85,9 +86,9 @@ namespace Chess_UI.Views
             if (name.Length == 0)
                 return;
 
-            mViewModel.LocalPlayerName = name;
+            _viewModel.LocalPlayerName = name;
 
-            mViewModel.EnterServerMultiplayerMode();
+            _viewModel.EnterServerMultiplayerMode();
         }
 
 
@@ -97,17 +98,17 @@ namespace Chess_UI.Views
             if (name.Length == 0)
                 return;
 
-            mViewModel.LocalPlayerName = name;
+            _viewModel.LocalPlayerName = name;
 
-            mViewModel.EnterClientMultiplayerMode();
+            _viewModel.EnterClientMultiplayerMode();
         }
 
 
         private void ReturnButton_Click(object sender, RoutedEventArgs e)
         {
-            if (mViewModel.Processing)
+            if (_viewModel.Processing)
             {
-                mViewModel.EnterInitMode();
+                _viewModel.EnterInitMode();
             }
 
             else
@@ -119,37 +120,37 @@ namespace Chess_UI.Views
 
         private void HostAcceptButton_Click(object sender, RoutedEventArgs e)
         {
-            mViewModel.AcceptClientConnection();
+            _viewModel.AcceptClientConnection();
         }
 
 
         private void HostDeclineButton_Click(object sender, RoutedEventArgs e)
         {
-            mViewModel.DeclineClientConnection();
+            _viewModel.DeclineClientConnection();
         }
 
 
         private void JoinAcceptButton_Click(object sender, RoutedEventArgs e)
         {
-            mViewModel.AcceptConnectingToHost();
+            _viewModel.AcceptConnectingToHost();
         }
 
 
         private void JoinDiscardButton_Click(object sender, RoutedEventArgs e)
         {
-            mViewModel.DeclineConnectingToHost();
+            _viewModel.DeclineConnectingToHost();
         }
 
 
         private void AbortWaitButton_Click(object sender, RoutedEventArgs e)
         {
-            mViewModel.DisplayClientView();
+            _viewModel.DisplayClientView();
         }
 
 
         private void LocalPlayerName_TextChanged(object sender, TextChangedEventArgs e)
         {
-            mViewModel.UpdateMPButtons(MultiplayerMode.Init);
+            _viewModel.UpdateMPButtons(MultiplayerMode.Init);
         }
 
 

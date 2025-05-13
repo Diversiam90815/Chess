@@ -1,5 +1,7 @@
 ﻿using Chess_UI.MoveHistory;
 using Chess_UI.Services;
+using Chess_UI.Wrappers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
@@ -19,20 +21,21 @@ namespace Chess_UI.ViewModels
 
         public ObservableCollection<ObservableCollection<string>> MoveHistoryColumns { get; } = [];
 
-        public MoveHistoryModel Model { get; } = new MoveHistoryModel();
+        private IMoveHistoryModel _model { get; }
 
-        private readonly Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue;
+        private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
 
-        public MoveHistoryViewModel(DispatcherQueue dispatcher)
+        public MoveHistoryViewModel(IDispatcherQueueWrapper dispatcher)
         {
-            DispatcherQueue = dispatcher;
+            _dispatcherQueue = dispatcher;
+            _model = App.Current.Services.GetService<IMoveHistoryModel>();
 
             for (int i = 0; i < MovesMaxColumns; i++)
             {
                 MoveHistoryColumns.Add(new ObservableCollection<string>());
             }
-            Model.MoveHistoryUpdated += OnHandleMoveHistoryUpdated;
+            _model.MoveHistoryUpdated += OnHandleMoveHistoryUpdated;
         }
 
 
@@ -56,18 +59,18 @@ namespace Chess_UI.ViewModels
 
         public void RemoveLastMove()
         {
-            Model.RemoveLastMove();
+            _model.RemoveLastMove();
             OnHandleMoveHistoryUpdated();
         }
 
 
         private void OnHandleMoveHistoryUpdated()
         {
-            DispatcherQueue.TryEnqueue(() =>
+            _dispatcherQueue.TryEnqueue(() =>
             {
                 ClearMoveHistory();
 
-                foreach (var moveNotation in Model.MoveHistory)
+                foreach (var moveNotation in _model.MoveHistory)
                 {
                     AddMove(moveNotation);
                 }

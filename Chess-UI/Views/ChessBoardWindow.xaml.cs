@@ -18,7 +18,7 @@ namespace Chess_UI.Views
 {
     public sealed partial class ChessBoardWindow : Window
     {
-        private ChessBoardViewModel ViewModel;
+        private ChessBoardViewModel _viewModel;
 
         private new readonly DispatcherQueue DispatcherQueue;
 
@@ -26,21 +26,18 @@ namespace Chess_UI.Views
 
         private PieceTypeInstance? ViewModelSelectedPiece { get; set; }
 
-        private readonly ThemeManager themeManager;
-
         private readonly ImageServices _images;
 
-        public ChessBoardWindow(ChessBoardViewModel viewModel, ThemeManager themeManager)
+        public ChessBoardWindow(ChessBoardViewModel viewModel)
         {
             this.InitializeComponent();
             DispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-            this.ViewModel = viewModel;
-            this.themeManager = themeManager;
-            this.RootPanel.DataContext = ViewModel;
+            _viewModel = viewModel;
+            RootPanel.DataContext = _viewModel;
 
-            ViewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
-            ViewModel.ShowEndGameDialog += OnGameOverState;
+            _viewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
+            _viewModel.ShowEndGameDialog += OnGameOverState;
 
             _images = new ImageServices();
 
@@ -74,14 +71,14 @@ namespace Chess_UI.Views
 
         private void UndoMove_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.UndoLastMove();
+            _viewModel.UndoLastMove();
         }
 
 
         private void ResetGame_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.ResetGame();
-            ViewModel.StartGame();
+            _viewModel.ResetGame();
+            _viewModel.StartGame();
         }
 
 
@@ -97,7 +94,7 @@ namespace Chess_UI.Views
             var square = grid.DataContext as BoardSquare;
 
             // Handle the move
-            ViewModel.HandleSquareClick(square);
+            _viewModel.HandleSquareClick(square);
         }
 
 
@@ -119,12 +116,12 @@ namespace Chess_UI.Views
 
                     if (result == ContentDialogResult.Primary)
                     {
-                        ViewModel.ResetGame();
-                        ViewModel.StartGame();
+                        _viewModel.ResetGame();
+                        _viewModel.StartGame();
                     }
                     else
                     {
-                        ViewModel.ResetGame();
+                        _viewModel.ResetGame();
                         this.Close();
                     }
                     break;
@@ -160,7 +157,7 @@ namespace Chess_UI.Views
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                PlayerColor currentPlayer = ViewModel.CurrentPlayer;
+                PlayerColor currentPlayer = _viewModel.CurrentPlayer;
 
                 // Helper method to create a button with an image
                 Button CreatePieceButton(PieceTypeInstance pieceType)

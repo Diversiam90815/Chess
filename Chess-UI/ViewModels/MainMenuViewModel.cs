@@ -1,5 +1,7 @@
 ﻿using Chess_UI.Images;
 using Chess_UI.Services;
+using Chess_UI.Wrappers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System;
@@ -17,24 +19,25 @@ namespace Chess_UI.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly DispatcherQueue DispatcherQueue;
+        private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
-        private readonly ImageServices ImageServices;
+        private readonly IImageService _imageServices;
 
-        public MainMenuViewModel(DispatcherQueue dispatcher)
+        public MainMenuViewModel(IDispatcherQueueWrapper dispatcher)
         {
-            DispatcherQueue = dispatcher;
-            ImageServices = new ImageServices();
+            _dispatcherQueue = dispatcher;
+            _imageServices = App.Current.Services.GetService<IImageService>();
 
             Init();
         }
 
+
         private void Init()
         {
-            StartGameButtonImage = ImageServices.GetImage(ImageServices.MainMenuButton.StartGame);
-            SettingButtonImage = ImageServices.GetImage(ImageServices.MainMenuButton.Settings);
-            MultiplayerButtonImage = ImageServices.GetImage(ImageServices.MainMenuButton.Multiplayer);
-            EndGameButtonImage = ImageServices.GetImage(ImageServices.MainMenuButton.EndGame);
+            StartGameButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.StartGame);
+            SettingButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.Settings);
+            MultiplayerButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.Multiplayer);
+            EndGameButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.EndGame);
         }
 
         private ImageSource startGameButtonImage;
@@ -99,7 +102,7 @@ namespace Chess_UI.ViewModels
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            DispatcherQueue.TryEnqueue(() =>
+            _dispatcherQueue.TryEnqueue(() =>
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             });
