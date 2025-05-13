@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chess_UI.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Chess_UI.Services
+namespace Chess_UI.Themes
 {
 	public class BoardTheme
 	{

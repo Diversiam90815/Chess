@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Chess_UI.Services;
+using Chess_UI.Themes.Interfaces;
+using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Chess_UI.Services
+namespace Chess_UI.Themes
 {
-    public class ThemeManager : INotifyPropertyChanged
+    public class ThemeManager : IThemeManager
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

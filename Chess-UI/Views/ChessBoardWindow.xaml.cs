@@ -9,28 +9,12 @@ using static Chess_UI.Services.ChessLogicAPI;
 using System.Threading.Tasks;
 using System;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Data;
+using Chess_UI.Themes;
+using Chess_UI.Board;
 
 
 namespace Chess_UI.Views
 {
-
-    public class DivideByEightConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            if (value is double d)
-                return d / 8;
-            return 0;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-
     public sealed partial class ChessBoardWindow : Window
     {
         private ChessBoardViewModel ViewModel;
@@ -43,6 +27,8 @@ namespace Chess_UI.Views
 
         private readonly ThemeManager themeManager;
 
+        private int ChessBoardWidth = 600;
+        private int ChessBoardHeight = 600;
 
         public ChessBoardWindow(ChessBoardViewModel viewModel, ThemeManager themeManager)
         {

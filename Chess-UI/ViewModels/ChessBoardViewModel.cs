@@ -13,8 +13,11 @@ using Windows.UI.Popups;
 using Microsoft.UI.Xaml;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Chess_UI.Models;
 using System.Xml.Linq;
+using Chess_UI.Themes;
+using Chess_UI.Board;
+using Chess_UI.Moves;
+using Chess_UI.Coordinates;
 
 
 namespace Chess_UI.ViewModels
@@ -40,6 +43,7 @@ namespace Chess_UI.ViewModels
 
 		private BoardModel BoardModel;
 
+		private readonly ChessCoordinate mCoordinate;
 
 		public ChessBoardViewModel(DispatcherQueue dispatcherQueue, ThemeManager themeManager)
 		{
@@ -51,6 +55,7 @@ namespace Chess_UI.ViewModels
 			ScoreViewModel = new(DispatcherQueue);
 			MoveModel = new();
 			BoardModel = new();
+			mCoordinate = new();
 
 			MoveModel.PossibleMovesCalculated += OnHighlightPossibleMoves;
 			MoveModel.PlayerChanged += OnHandlePlayerChanged;
@@ -66,7 +71,7 @@ namespace Chess_UI.ViewModels
 
 			Board = new ObservableCollection<BoardSquare>();
 
-			for (int i = 0; i < ChessCoordinate.GetNumBoardSquares() ; i++)
+			for (int i = 0; i < mCoordinate.GetNumBoardSquares() ; i++)
 			{
 				Board.Add(new(dispatcherQueue, themeManager));
 			}
@@ -85,8 +90,8 @@ namespace Chess_UI.ViewModels
 				int colorVal = (encoded >> 4) & 0xF;    // top 8 bits
 				int pieceVal = encoded & 0xF;          // bottom 8 bits
 
-				PositionInstance enginePos = ChessCoordinate.FromIndex(i);  // Get engine pos from index
-				PositionInstance displayPos = ChessCoordinate.ToDisplayCoordinates(enginePos); // Convert it to the UI pos
+				PositionInstance enginePos = mCoordinate.FromIndex(i);  // Get engine pos from index
+				PositionInstance displayPos = mCoordinate.ToDisplayCoordinates(enginePos); // Convert it to the UI pos
 
 				var square = new BoardSquare(
 					x: displayPos.x,
@@ -98,7 +103,7 @@ namespace Chess_UI.ViewModels
 				);
 
 				// Calculate the index in the UI board array
-				int displayIndex = ChessCoordinate.ToIndex(displayPos, true);
+				int displayIndex = mCoordinate.ToIndex(displayPos, true);
 
 				DispatcherQueue.TryEnqueue(() =>
 				{
@@ -124,7 +129,7 @@ namespace Chess_UI.ViewModels
 			MoveHistoryViewModel.ClearMoveHistory();
 
 			Board.Clear();
-			for (int i = 0; i < ChessCoordinate.GetNumBoardSquares(); i++)
+			for (int i = 0; i < mCoordinate.GetNumBoardSquares(); i++)
 			{
 				Board.Add(new BoardSquare(DispatcherQueue, themeManager));
 			}
@@ -177,7 +182,7 @@ namespace Chess_UI.ViewModels
 
 		public void HandleSquareClick(BoardSquare square)
 		{
-			PositionInstance enginePos = ChessCoordinate.FromDisplayCoordinates(square.pos);
+			PositionInstance enginePos = mCoordinate.FromDisplayCoordinates(square.pos);
 
 			Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{enginePos.x}-Y{enginePos.y}!");
 
@@ -191,9 +196,9 @@ namespace Chess_UI.ViewModels
 
 			foreach (var pm in MoveModel.PossibleMoves)
 			{
-				PositionInstance displayPos = ChessCoordinate.ToDisplayCoordinates(pm.end);
+				PositionInstance displayPos = mCoordinate.ToDisplayCoordinates(pm.end);
 
-				int index = ChessCoordinate.ToIndex(displayPos, true);
+				int index = mCoordinate.ToIndex(displayPos, true);
 				BoardSquare square = Board[index];
 
 				if (square != null)

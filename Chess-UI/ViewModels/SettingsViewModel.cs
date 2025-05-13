@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Chess_UI.Services;
 using System.Collections.ObjectModel;
+using Chess_UI.Themes;
 
 
 namespace Chess_UI.ViewModels

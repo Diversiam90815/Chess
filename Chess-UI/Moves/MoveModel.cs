@@ -1,4 +1,5 @@
-﻿using Chess_UI.Services;
+﻿using Chess_UI.Models.Interfaces;
+using Chess_UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +8,13 @@ using System.Threading.Tasks;
 using static Chess_UI.Services.ChessLogicAPI;
 
 
-namespace Chess_UI.Models
+namespace Chess_UI.Moves
 {
-    public class MoveModel
+    public class MoveModel : IMoveModel
     {
-        public List<PossibleMoveInstance> PossibleMoves = [];
+        private List<PossibleMoveInstance> possibleMoves = [];
+
+        public List<PossibleMoveInstance> PossibleMoves => possibleMoves;
 
 
         public MoveModel()
@@ -84,10 +87,10 @@ namespace Chess_UI.Models
 
             PossibleMoves.Clear();
 
-            int numMoves = ChessLogicAPI.GetNumPossibleMoves();
+            int numMoves = GetNumPossibleMoves();
             for (int i = 0; i < numMoves; i++)
             {
-                if (ChessLogicAPI.GetPossibleMoveAtIndex((uint)i, out var move))
+                if (GetPossibleMoveAtIndex((uint)i, out var move))
                 {
                     PossibleMoves.Add(move);
                 }
@@ -99,7 +102,7 @@ namespace Chess_UI.Models
         public void SetPromotionPieceType(PieceTypeInstance pieceType)
         {
             Logger.LogInfo("Promoting to " + pieceType.ToString());
-            ChessLogicAPI.OnPawnPromotionChosen(pieceType);
+            OnPawnPromotionChosen(pieceType);
         }
 
 
@@ -109,22 +112,11 @@ namespace Chess_UI.Models
         }
 
 
-        public delegate void PossibleMovesCalculatedDelegate();
-        public event PossibleMovesCalculatedDelegate PossibleMovesCalculated;
-
-        public delegate void PlayerChangedHandler(PlayerColor newPlayer);
-        public event PlayerChangedHandler PlayerChanged;
-
-        public delegate void PawnPromotionEventhander();
-        public event PawnPromotionEventhander PawnPromotionEvent;
-
-        public delegate void GameOverEventHandler(EndGameState endgame);
-        public event GameOverEventHandler GameOverEvent;
-
-        public delegate void GameStateInitSucceededHandler();
-        public event GameStateInitSucceededHandler GameStateInitSucceeded;
-
-        public delegate void NewBoardFromBackendHandler();
-        public event NewBoardFromBackendHandler NewBoardFromBackendEvent;
+        public event Action PossibleMovesCalculated;
+        public event Action<PlayerColor> PlayerChanged;
+        public event Action GameStateInitSucceeded;
+        public event Action<EndGameState> GameOverEvent;
+        public event Action NewBoardFromBackendEvent;
+        public event Action PawnPromotionEvent;
     }
 }

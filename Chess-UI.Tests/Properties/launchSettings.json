@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Chess-UI.Tests (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Chess-UI.Tests (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

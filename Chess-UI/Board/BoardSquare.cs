@@ -1,4 +1,6 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using Chess_UI.Services;
+using Chess_UI.Themes;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 using Windows.System;
 using static Chess_UI.Services.ChessLogicAPI;
 
-namespace Chess_UI.Services
+namespace Chess_UI.Board
 {
     public class BoardSquare : INotifyPropertyChanged
     {
@@ -25,29 +27,29 @@ namespace Chess_UI.Services
 
         public BoardSquare(Microsoft.UI.Dispatching.DispatcherQueue dispatcher, ThemeManager themeManager)
         {
-            this.pos = new PositionInstance(0, 0);
-            this.piece = PieceTypeInstance.DefaultType;
-            this.colour = PlayerColor.NoColor;
+            pos = new PositionInstance(0, 0);
+            piece = PieceTypeInstance.DefaultType;
+            colour = PlayerColor.NoColor;
 
-            this.DispatcherQueue = dispatcher;
-            this.ThemeManager = themeManager;
-            this.ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+            DispatcherQueue = dispatcher;
+            ThemeManager = themeManager;
+            ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
-            this.PieceTheme = themeManager.CurrentPieceTheme;
+            PieceTheme = themeManager.CurrentPieceTheme;
         }
 
 
         public BoardSquare(int x, int y, PieceTypeInstance pieceTypeInstance, PlayerColor color, Microsoft.UI.Dispatching.DispatcherQueue dispatcher, ThemeManager themeManager)
         {
-            this.pos = new PositionInstance(x, y);
-            this.piece = pieceTypeInstance;
-            this.colour = color;
+            pos = new PositionInstance(x, y);
+            piece = pieceTypeInstance;
+            colour = color;
 
-            this.DispatcherQueue = dispatcher;
-            this.ThemeManager = themeManager;
-            this.ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+            DispatcherQueue = dispatcher;
+            ThemeManager = themeManager;
+            ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
-            this.PieceTheme = themeManager.CurrentPieceTheme;
+            PieceTheme = themeManager.CurrentPieceTheme;
         }
 
 
@@ -62,7 +64,7 @@ namespace Chess_UI.Services
 
         private void UpdatePieceTheme(Images.PieceTheme pieceTheme)
         {
-            this.PieceTheme = pieceTheme;
+            PieceTheme = pieceTheme;
         }
 
 
