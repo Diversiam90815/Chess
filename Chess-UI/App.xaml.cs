@@ -69,8 +69,8 @@ namespace Chess_UI
             services.AddSingleton<IChessCoordinate, ChessCoordinate>();
             services.AddSingleton<IThemeManager, ThemeManager>();
             services.AddSingleton<IImageService, ImageServices>();
-            services.AddSingleton<ISettings, SettingsViewModel>();
 
+            services.AddTransient<ISettings, SettingsViewModel>();
             services.AddTransient<IMoveModel, MoveModel>();
             services.AddTransient<IScoreModel, ScoreModel>();
             services.AddTransient<IMoveHistoryModel, MoveHistoryModel>();
