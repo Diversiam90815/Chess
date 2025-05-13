@@ -53,6 +53,7 @@ namespace Chess_UI.Images
         }
 
 
+
         private void Init()
         {
             BoardBackgroundImages = new()

@@ -1,4 +1,5 @@
-﻿using Chess_UI.Services;
+﻿using Chess_UI.Multiplayer;
+using Chess_UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,8 +25,9 @@ namespace Chess_UI.Models
     }
 
 
-    public class MultiplayerModel
+    public class MultiplayerModel : IMultiplayerModel
     {
+
         private List<NetworkAdapter> mAdapters = new();
 
 
@@ -33,6 +35,7 @@ namespace Chess_UI.Models
         {
             ChessLogicAPI.StartedMultiplayer();
         }
+
 
         public void Init()
         {
@@ -174,13 +177,8 @@ namespace Chess_UI.Models
         }
 
 
-        public delegate void ConnectionErrorOccured(string message);
-        public event ConnectionErrorOccured OnConnectionErrorOccured;
-
-        public delegate void ConnectionStatusChanged(ConnectionState newState);
-        public event ConnectionStatusChanged OnConnectionStatusChanged;
-
-        public delegate void ClientRequestedConnectionHandler(string clientName);
-        public event ClientRequestedConnectionHandler OnClientRequestedConnection;
+        public event Action<string> OnConnectionErrorOccured;
+        public event Action<ConnectionState> OnConnectionStatusChanged;
+        public event Action<string> OnClientRequestedConnection;
     }
 }

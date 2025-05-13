@@ -151,6 +151,7 @@ namespace Chess_UI.Board
                     return null;
 
                 _images = new ImageServices();
+
                 return _images.GetPieceImage(PieceTheme, colour, piece);
             }
         }

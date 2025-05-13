@@ -6,14 +6,14 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Chess_UI.Services;
 using System.Collections.ObjectModel;
 using Chess_UI.Themes;
+using Chess_UI.Settings;
 
 
 namespace Chess_UI.ViewModels
 {
-    public class SettingsViewModel : INotifyPropertyChanged
+    public class SettingsViewModel : ISettings
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -42,17 +42,17 @@ namespace Chess_UI.ViewModels
         }
 
 
-        private BoardTheme GetCurrentSelectedBoardTheme()
+        public BoardTheme GetCurrentSelectedBoardTheme()
         {
-            string currentThemeName = Configuration.CurrentBoardTheme;
+            string currentThemeName = Settings.Settings.CurrentBoardTheme;
             BoardTheme theme = BoardThemes.FirstOrDefault(b => string.Equals(b.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
             return theme;
         }
 
 
-        private PieceTheme GetCurrentSelectedPieceTheme()
+        public PieceTheme GetCurrentSelectedPieceTheme()
         {
-            string currentThemeName = Configuration.CurrentPieceTheme;
+            string currentThemeName = Settings.Settings.CurrentPieceTheme;
             PieceTheme theme = PieceThemes.FirstOrDefault(p => string.Equals(p.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
             return theme;
         }
@@ -69,7 +69,7 @@ namespace Chess_UI.ViewModels
                     selectedBoardTheme = value;
 
                     if (value != null)
-                        Configuration.CurrentBoardTheme = value.Name;
+                        Settings.Settings.CurrentBoardTheme = value.Name;
 
                     OnPropertyChanged();
 
@@ -91,7 +91,7 @@ namespace Chess_UI.ViewModels
                 {
                     selectedPieceTheme = value;
                     if (value != null)
-                        Configuration.CurrentPieceTheme = value.Name;
+                        Settings.Settings.CurrentPieceTheme = value.Name;
                     OnPropertyChanged();
 
                     // Update ThemeManager’s piece theme

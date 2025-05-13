@@ -1,9 +1,9 @@
-﻿using Chess_UI.Services;
-using Chess_UI.Themes.Interfaces;
+﻿using Chess_UI.Themes.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Chess_UI.Images;
+using Chess_UI.Settings;
 
 namespace Chess_UI.Themes
 {
@@ -14,8 +14,8 @@ namespace Chess_UI.Themes
 
         public ThemeManager()
         {
-            string configPieceTheme = Configuration.CurrentPieceTheme;
-            string configBoardTheme = Configuration.CurrentBoardTheme;
+            string configPieceTheme = Settings.Settings.CurrentPieceTheme;
+            string configBoardTheme = Settings.Settings.CurrentBoardTheme;
 
             // Try to parse the config themes to enum values
             if (!Enum.TryParse<ImageServices.PieceTheme>(configPieceTheme, out var parsedPieceTheme))

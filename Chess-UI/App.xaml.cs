@@ -1,11 +1,17 @@
 ﻿using Chess_UI.Board;
 using Chess_UI.Coordinates;
+using Chess_UI.Images;
+using Chess_UI.Models;
 using Chess_UI.Models.Interfaces;
+using Chess_UI.MoveHistory;
 using Chess_UI.Moves;
+using Chess_UI.Multiplayer;
 using Chess_UI.Services;
 using Chess_UI.Services.Interfaces;
+using Chess_UI.Settings;
 using Chess_UI.Themes;
 using Chess_UI.Themes.Interfaces;
+using Chess_UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using System;
@@ -51,7 +57,7 @@ namespace Chess_UI
             Logger.LogInfo("App initialized!");
         }
 
-        
+
         private IServiceProvider ConfigureServices()
         {
             var services = new ServiceCollection();
@@ -59,13 +65,21 @@ namespace Chess_UI
             // Register Services
             services.AddSingleton<IChessCoordinate, ChessCoordinate>();
             services.AddSingleton<IThemeManager, ThemeManager>();
+            services.AddSingleton<IImageService, ImageServices>();
+            services.AddSingleton<ISettings, SettingsViewModel>();
+
             services.AddTransient<IMoveModel, MoveModel>();
+            services.AddTransient<IMoveHistoryModel, MoveHistoryModel>();
             services.AddTransient<IBoardModel, BoardModel>();
+            services.AddTransient<IMultiplayerModel, MultiplayerModel>();
+
 
             // Register View Models
-            services.AddTransient<ViewModels.ChessBoardViewModel>();
-            services.AddTransient<ViewModels.ScoreViewModel>();
-            services.AddTransient<ViewModels.MoveHistoryViewModel>();
+            services.AddTransient<ChessBoardViewModel>();
+            services.AddTransient<ScoreViewModel>();
+            services.AddTransient<MoveHistoryViewModel>();
+            services.AddTransient<MainMenuViewModel>();
+            services.AddTransient<MultiplayerViewModel>();
 
             return services.BuildServiceProvider();
         }
