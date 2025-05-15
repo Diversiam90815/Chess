@@ -6,23 +6,6 @@ using System;
 
 namespace Chess_UI.Test.Helpers
 {
-    //public class TestDispatcherQueueWrapper : IDispatcherQueueWrapper
-    //{
-    //    public bool TryEnqueue(DispatcherQueueHandler callback)
-    //    {
-    //        // Execute the callback synchronously for testing
-    //        callback.Invoke();
-    //        return true;
-    //    }
-
-    //    public bool TryDequeue(DispatcherQueuePriority priority, DispatcherQueueHandler callback)
-    //    {
-    //        // Execute the callback synchronously for testing
-    //        callback.Invoke();
-    //        return true;
-    //    }
-    //}
-
     public class MockThemeLoader : IThemeLoader
     {
         public List<BoardTheme> LoadBoardThemes()

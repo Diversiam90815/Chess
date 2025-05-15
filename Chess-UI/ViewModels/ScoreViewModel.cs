@@ -25,11 +25,11 @@ namespace Chess_UI.ViewModels
 
         private readonly IImageService _images;
 
-        public ScoreViewModel(IDispatcherQueueWrapper dispatcherQueue)
+        public ScoreViewModel(IDispatcherQueueWrapper dispatcherQueue, IScoreModel model, IImageService images)
         {
             _dispatcherQueue = dispatcherQueue;
-            _scoreModel = App.Current.Services.GetService<IScoreModel>();
-            _images = App.Current.Services.GetService<IImageService>();
+            _scoreModel = model;
+            _images = images;
 
             Init();
 
