@@ -24,7 +24,15 @@ namespace Chess_UI.Themes
 	}
 
 
-	public class ThemeLoader
+	public interface IThemeLoader
+	{
+		public List<BoardTheme> LoadBoardThemes();
+
+		public List<PieceTheme> LoadPieceThemes();
+
+    }
+
+    public class ThemeLoader : IThemeLoader
 	{
 
 		private static readonly string baseDir = AppDomain.CurrentDomain.BaseDirectory;

@@ -26,10 +26,10 @@ namespace Chess_UI.ViewModels
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
 
-        public MoveHistoryViewModel(IDispatcherQueueWrapper dispatcher)
+        public MoveHistoryViewModel(IDispatcherQueueWrapper dispatcher, IMoveHistoryModel model)
         {
             _dispatcherQueue = dispatcher;
-            _model = App.Current.Services.GetService<IMoveHistoryModel>();
+            _model = model;
 
             for (int i = 0; i < MovesMaxColumns; i++)
             {
