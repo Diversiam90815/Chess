@@ -8,14 +8,7 @@
 #include <gtest/gtest.h>
 
 #include "MoveValidation.h"
-
-// Helper to create a default board
-std::shared_ptr<ChessBoard> CreateDefaultBoard()
-{
-	auto board = std::make_shared<ChessBoard>();
-	board->initializeBoard();
-	return board;
-}
+#include "TestHelper.h"
 
 
 TEST(MoveValidationTest, ConstructionAndInit)

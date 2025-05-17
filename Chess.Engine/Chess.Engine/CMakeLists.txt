@@ -287,5 +287,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 set(PROJECT_LIBS Logger)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_LIBS})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_LIBS})
 

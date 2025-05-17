@@ -25,6 +25,7 @@ set(Test_Files
 
 add_executable(${PROJECT_NAME}
     source/main.cpp
+    source/TestHelper.h
     ${Test_Files}
 )
 
