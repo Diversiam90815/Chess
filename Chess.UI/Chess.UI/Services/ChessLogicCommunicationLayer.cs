@@ -4,9 +4,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.ChessLogicAPI;
 
-namespace Chess_UI.Services
+namespace Chess.UI.Services
 {
     public class ChessLogicCommunicationLayer
     {

@@ -1,13 +1,13 @@
-using Chess_UI.Services;
-using Chess_UI.ViewModels;
-using Chess_UI.Views;
+using Chess.UI.Services;
+using Chess.UI.ViewModels;
+using Chess.UI.Views;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using System;
 
 
-namespace Chess_UI
+namespace Chess.UI
 {
     public sealed partial class MainMenuWindow : Window
     {

@@ -6,11 +6,11 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using Chess_UI.Services;
+using Chess.UI.Services;
 using System.Collections.ObjectModel;
 
 
-namespace Chess_UI.ViewModels
+namespace Chess.UI.ViewModels
 {
     public class SettingsViewModel : INotifyPropertyChanged
     {

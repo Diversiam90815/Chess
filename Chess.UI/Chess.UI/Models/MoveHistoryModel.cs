@@ -1,4 +1,4 @@
-﻿using Chess_UI.Services;
+﻿using Chess.UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.Models
+namespace Chess.UI.Models
 {
     public class MoveHistoryModel
     {

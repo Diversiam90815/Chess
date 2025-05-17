@@ -1,5 +1,5 @@
-using Chess_UI.Services;
-using Chess_UI.ViewModels;
+using Chess.UI.Services;
+using Chess.UI.ViewModels;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -19,7 +19,7 @@ using Windows.Foundation.Collections;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace Chess_UI.Views
+namespace Chess.UI.Views
 {
 	/// <summary>
 	/// An empty window that can be used on its own or navigated to within a Frame.

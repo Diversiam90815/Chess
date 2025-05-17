@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Application
-    x:Class="Chess_UI.App"
+    x:Class="Chess.UI.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Chess_UI" 
-    xmlns:views="using:Chess_UI.Views">
+    xmlns:local="using:Chess.UI" 
+    xmlns:views="using:Chess.UI.Views">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

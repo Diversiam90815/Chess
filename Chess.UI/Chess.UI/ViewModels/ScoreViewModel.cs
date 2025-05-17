@@ -1,16 +1,16 @@
-﻿using Chess_UI.Models;
-using Chess_UI.Services;
+﻿using Chess.UI.Models;
+using Chess.UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using static Chess_UI.Services.ChessLogicAPI;
-using static Chess_UI.Services.Images;
+using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.Images;
 
 
-namespace Chess_UI.ViewModels
+namespace Chess.UI.ViewModels
 {
     public class ScoreViewModel : INotifyPropertyChanged
     {

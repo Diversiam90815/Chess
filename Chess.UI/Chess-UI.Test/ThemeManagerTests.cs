@@ -1,10 +1,10 @@
-using Chess_UI.Images;
-using Chess_UI.Themes;
-using Chess_UI.Themes.Interfaces;
+using Chess.UI.Images;
+using Chess.UI.Themes;
+using Chess.UI.Themes.Interfaces;
 using System.ComponentModel;
 using Windows.Devices.Display;
 
-namespace Chess_UI.Test
+namespace Chess.UI.Test
 {
     public class ThemeManagerTests
     {

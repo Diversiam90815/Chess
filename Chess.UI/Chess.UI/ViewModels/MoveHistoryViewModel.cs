@@ -1,5 +1,5 @@
-﻿using Chess_UI.Models;
-using Chess_UI.Services;
+﻿using Chess.UI.Models;
+using Chess.UI.Services;
 using Microsoft.UI.Dispatching;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 
-namespace Chess_UI.ViewModels
+namespace Chess.UI.ViewModels
 {
     public class MoveHistoryViewModel
     {

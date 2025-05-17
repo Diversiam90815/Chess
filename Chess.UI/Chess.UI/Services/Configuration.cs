@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.Services
+namespace Chess.UI.Services
 {
     public class Configuration
     {

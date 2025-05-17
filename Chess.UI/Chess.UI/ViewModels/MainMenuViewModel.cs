@@ -1,4 +1,4 @@
-﻿using Chess_UI.Services;
+﻿using Chess.UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System;
@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Chess_UI.ViewModels
+namespace Chess.UI.ViewModels
 {
     public class MainMenuViewModel : INotifyPropertyChanged
     {

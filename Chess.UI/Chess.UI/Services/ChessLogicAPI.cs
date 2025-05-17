@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 
-namespace Chess_UI.Services
+namespace Chess.UI.Services
 {
     public class ChessLogicAPI
     {

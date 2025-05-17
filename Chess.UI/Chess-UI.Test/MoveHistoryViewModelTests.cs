@@ -1,7 +1,7 @@
-﻿using Chess_UI.MoveHistory;
-using Chess_UI.Test.Helpers;
-using Chess_UI.ViewModels;
-using Chess_UI.Wrappers;
+﻿using Chess.UI.MoveHistory;
+using Chess.UI.Test.Helpers;
+using Chess.UI.ViewModels;
+using Chess.UI.Wrappers;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.Test
+namespace Chess.UI.Test
 {
     public class MoveHistoryViewModelTests
     {

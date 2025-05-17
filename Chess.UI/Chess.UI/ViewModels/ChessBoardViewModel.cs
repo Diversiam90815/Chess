@@ -1,11 +1,11 @@
-﻿using Chess_UI.Services;
+﻿using Chess.UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using static Chess_UI.Services.Images;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.Images;
+using static Chess.UI.Services.ChessLogicAPI;
 using System.Collections.ObjectModel;
 using System;
 using Microsoft.UI.Composition.Interactions;
@@ -13,11 +13,11 @@ using Windows.UI.Popups;
 using Microsoft.UI.Xaml;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Chess_UI.Models;
+using Chess.UI.Models;
 using System.Xml.Linq;
 
 
-namespace Chess_UI.ViewModels
+namespace Chess.UI.ViewModels
 {
 	public class ChessBoardViewModel : INotifyPropertyChanged
 	{

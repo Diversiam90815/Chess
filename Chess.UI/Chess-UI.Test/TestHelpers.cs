@@ -1,10 +1,10 @@
-﻿using Chess_UI.Images;
-using Chess_UI.Themes;
-using Chess_UI.Wrappers;
+﻿using Chess.UI.Images;
+using Chess.UI.Themes;
+using Chess.UI.Wrappers;
 using Microsoft.UI.Dispatching;
 using System;
 
-namespace Chess_UI.Test.Helpers
+namespace Chess.UI.Test.Helpers
 {
     public class MockThemeLoader : IThemeLoader
     {

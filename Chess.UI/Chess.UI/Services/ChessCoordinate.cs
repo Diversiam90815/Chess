@@ -1,6 +1,6 @@
-﻿using static Chess_UI.Services.ChessLogicAPI;
+﻿using static Chess.UI.Services.ChessLogicAPI;
 
-namespace Chess_UI.Services
+namespace Chess.UI.Services
 {
     public static class ChessCoordinate
     {

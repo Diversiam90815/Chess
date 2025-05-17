@@ -1,8 +1,8 @@
-﻿using Chess_UI.Services;
+﻿using Chess.UI.Services;
 using Microsoft.UI.Xaml;
 
 
-namespace Chess_UI
+namespace Chess.UI
 {
     public partial class App : Application
     {

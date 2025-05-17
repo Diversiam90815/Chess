@@ -1,8 +1,8 @@
-﻿using Chess_UI.Services;
+﻿using Chess.UI.Services;
 using Xunit;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.ChessLogicAPI;
 
-namespace Chess_UI.Test
+namespace Chess.UI.Test
 {
     public class ChessCoordinateTests
     {

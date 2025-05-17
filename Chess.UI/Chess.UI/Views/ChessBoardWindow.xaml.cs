@@ -1,18 +1,18 @@
-using Chess_UI.Services;
-using Chess_UI.ViewModels;
+using Chess.UI.Services;
+using Chess.UI.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.ChessLogicAPI;
 using System.Threading.Tasks;
 using System;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Data;
 
 
-namespace Chess_UI.Views
+namespace Chess.UI.Views
 {
 
     public class DivideByEightConverter : IValueConverter

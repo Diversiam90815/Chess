@@ -1,11 +1,11 @@
-﻿using Chess_UI.MoveHistory;
+﻿using Chess.UI.MoveHistory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.Test
+namespace Chess.UI.Test
 {
     public class MoveHistoryModelTests
     {

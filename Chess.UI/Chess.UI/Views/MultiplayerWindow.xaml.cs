@@ -1,7 +1,7 @@
 using ABI.Windows.ApplicationModel.Activation;
-using Chess_UI.Models;
-using Chess_UI.Services;
-using Chess_UI.ViewModels;
+using Chess.UI.Models;
+using Chess.UI.Services;
+using Chess.UI.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -22,7 +22,7 @@ using Windows.Foundation.Collections;
 using Windows.Media;
 
 
-namespace Chess_UI.Views
+namespace Chess.UI.Views
 {
     public sealed partial class MultiplayerWindow : Window
     {

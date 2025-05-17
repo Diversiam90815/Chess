@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace Chess_UI.Services
+namespace Chess.UI.Services
 {
 	public class BoardTheme
 	{

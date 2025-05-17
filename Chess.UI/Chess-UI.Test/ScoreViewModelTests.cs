@@ -1,8 +1,8 @@
-﻿using Chess_UI.Images;
-using Chess_UI.Score;
-using Chess_UI.Services;
-using Chess_UI.ViewModels;
-using Chess_UI.Wrappers;
+﻿using Chess.UI.Images;
+using Chess.UI.Score;
+using Chess.UI.Services;
+using Chess.UI.ViewModels;
+using Chess.UI.Wrappers;
 using Microsoft.UI.Xaml.Media;
 using Moq;
 using System;
@@ -11,9 +11,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.ChessLogicAPI;
 
-namespace Chess_UI.Test
+namespace Chess.UI.Test
 {
     public class ScoreViewModelTests
     {
