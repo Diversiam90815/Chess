@@ -1,4 +1,5 @@
-﻿using Chess.UI.Services;
+﻿using Chess.UI.Coordinates;
+using Chess.UI.Services;
 using Xunit;
 using static Chess.UI.Services.ChessLogicAPI;
 

@@ -1,6 +1,6 @@
-﻿using Chess_UI.Images;
-using Chess_UI.Services;
-using Chess_UI.Wrappers;
+﻿using Chess.UI.Images;
+using Chess.UI.Services;
+using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Chess_UI.ViewModels
+namespace Chess.UI.ViewModels
 {
     public class MainMenuViewModel : INotifyPropertyChanged
     {

@@ -1,14 +1,14 @@
-﻿using Chess_UI.Communication_Layer.Interfaces;
+﻿using Chess.UI.Communication_Layer.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.ChessLogicAPI;
 
 
-namespace Chess_UI.Services
+namespace Chess.UI.Services
 {
     public class CommunicationLayer : ICommunicationLayer
     {

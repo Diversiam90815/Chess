@@ -1,11 +1,11 @@
-﻿using Chess_UI.Services;
+﻿using Chess.UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using static Chess_UI.Images.ImageServices;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Images.ImageServices;
+using static Chess.UI.Services.ChessLogicAPI;
 using System.Collections.ObjectModel;
 using System;
 using Microsoft.UI.Composition.Interactions;
@@ -14,19 +14,19 @@ using Microsoft.UI.Xaml;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using Chess_UI.Themes;
-using Chess_UI.Board;
-using Chess_UI.Moves;
-using Chess_UI.Coordinates;
-using Chess_UI.Images;
-using Chess_UI.Wrappers;
-using Chess_UI.Themes.Interfaces;
-using Chess_UI.Services.Interfaces;
+using Chess.UI.Themes;
+using Chess.UI.Board;
+using Chess.UI.Moves;
+using Chess.UI.Coordinates;
+using Chess.UI.Images;
+using Chess.UI.Wrappers;
+using Chess.UI.Themes.Interfaces;
+using Chess.UI.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using Chess_UI.Models.Interfaces;
+using Chess.UI.Models.Interfaces;
 
 
-namespace Chess_UI.ViewModels
+namespace Chess.UI.ViewModels
 {
     public class ChessBoardViewModel : INotifyPropertyChanged
     {

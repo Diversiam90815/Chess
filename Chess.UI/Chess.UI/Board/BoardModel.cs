@@ -1,11 +1,11 @@
-﻿using Chess_UI.Services;
+﻿using Chess.UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.Board
+namespace Chess.UI.Board
 {
     public class BoardModel : IBoardModel
     {

@@ -1,14 +1,14 @@
-﻿using Chess_UI.Models.Interfaces;
-using Chess_UI.Services;
+﻿using Chess.UI.Models.Interfaces;
+using Chess.UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.ChessLogicAPI;
 
 
-namespace Chess_UI.Moves
+namespace Chess.UI.Moves
 {
     public class MoveModel : IMoveModel
     {

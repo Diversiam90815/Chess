@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Chess_UI.Board
+namespace Chess.UI.Board
 {
     public interface IBoardModel
     {

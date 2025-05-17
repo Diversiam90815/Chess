@@ -1,5 +1,5 @@
-using Chess_UI.Services;
-using Chess_UI.ViewModels;
+using Chess.UI.Services;
+using Chess.UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -18,7 +18,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 
 
-namespace Chess_UI.Views
+namespace Chess.UI.Views
 {
 	public sealed partial class SettingsWindow : Window
 	{

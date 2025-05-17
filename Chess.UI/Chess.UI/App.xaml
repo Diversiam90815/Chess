@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Chess.UI" 
-    xmlns:views="using:Chess.UI.Views">
+    xmlns:views="using:Chess.UI.UI">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -14,8 +14,6 @@
                 <ResourceDictionary Source="ms-appx:///Views/Styles.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
-            <!-- Other app resources here -->
-            <views:DivideByEightConverter x:Key="DivideByEightConverter"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

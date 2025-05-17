@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.Wrappers
+namespace Chess.UI.Wrappers
 {
     public interface IDispatcherQueueWrapper
     {

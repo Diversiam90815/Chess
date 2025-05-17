@@ -1,6 +1,6 @@
 ﻿using Windows.Storage;
 
-namespace Chess_UI.Services
+namespace Chess.UI.Services
 {
     internal static class Project
     {

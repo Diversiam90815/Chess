@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.UI
+namespace Chess.UI.UI
 {
     public class Converter
     {

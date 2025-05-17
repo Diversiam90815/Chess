@@ -1,5 +1,5 @@
-﻿using Chess_UI.Images;
-using Chess_UI.Services;
+﻿using Chess.UI.Images;
+using Chess.UI.Services;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
@@ -7,10 +7,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.ChessLogicAPI;
 
 
-namespace Chess_UI.Board
+namespace Chess.UI.Board
 {
     public interface IBoardSquare : INotifyPropertyChanged
     {

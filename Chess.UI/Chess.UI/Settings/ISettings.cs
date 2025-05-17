@@ -1,4 +1,4 @@
-﻿using Chess_UI.Themes;
+﻿using Chess.UI.Themes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.Settings
+namespace Chess.UI.Settings
 {
     public interface ISettings : INotifyPropertyChanged
     {

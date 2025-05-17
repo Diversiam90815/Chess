@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.ChessLogicAPI;
 
 
-namespace Chess_UI.Models.Interfaces
+namespace Chess.UI.Models.Interfaces
 {
     public interface IMoveModel
     {

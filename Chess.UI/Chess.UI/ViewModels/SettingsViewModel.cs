@@ -7,13 +7,13 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
-using Chess_UI.Themes;
-using Chess_UI.Settings;
-using Chess_UI.Wrappers;
-using Chess_UI.Themes.Interfaces;
+using Chess.UI.Themes;
+using Chess.UI.Settings;
+using Chess.UI.Wrappers;
+using Chess.UI.Themes.Interfaces;
 
 
-namespace Chess_UI.ViewModels
+namespace Chess.UI.ViewModels
 {
     public class SettingsViewModel : ISettings
     {

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.Services
+namespace Chess.UI.Services
 {
     public static class Logger
     {

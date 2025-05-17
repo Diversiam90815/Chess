@@ -1,6 +1,6 @@
-﻿using Chess_UI.Models;
-using Chess_UI.Services;
-using Chess_UI.Wrappers;
+﻿using Chess.UI.Models;
+using Chess.UI.Services;
+using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 using Windows.Media.Playback;
 
 
-namespace Chess_UI.ViewModels
+namespace Chess.UI.ViewModels
 {
     public class MultiplayerViewModel : INotifyPropertyChanged
     {

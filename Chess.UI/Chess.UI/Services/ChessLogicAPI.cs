@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using static Chess_UI.Services.CommunicationLayer;
+using static Chess.UI.Services.CommunicationLayer;
 
 
-namespace Chess_UI.Services
+namespace Chess.UI.Services
 {
     public class ChessLogicAPI
     {

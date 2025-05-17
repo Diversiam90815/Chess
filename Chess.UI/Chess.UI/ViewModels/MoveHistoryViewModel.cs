@@ -1,6 +1,6 @@
-﻿using Chess_UI.MoveHistory;
-using Chess_UI.Services;
-using Chess_UI.Wrappers;
+﻿using Chess.UI.MoveHistory;
+using Chess.UI.Services;
+using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using System;
@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 
 
-namespace Chess_UI.ViewModels
+namespace Chess.UI.ViewModels
 {
     public class MoveHistoryViewModel
     {

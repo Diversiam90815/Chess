@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.ChessLogicAPI;
 
 
-namespace Chess_UI.Communication_Layer.Interfaces
+namespace Chess.UI.Communication_Layer.Interfaces
 {
     public interface ICommunicationLayer
     {

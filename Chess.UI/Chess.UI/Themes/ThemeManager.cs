@@ -1,11 +1,11 @@
-﻿using Chess_UI.Themes.Interfaces;
+﻿using Chess.UI.Themes.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Chess_UI.Images;
-using Chess_UI.Settings;
+using Chess.UI.Images;
+using Chess.UI.Settings;
 
-namespace Chess_UI.Themes
+namespace Chess.UI.Themes
 {
     public class ThemeManager : IThemeManager
     {

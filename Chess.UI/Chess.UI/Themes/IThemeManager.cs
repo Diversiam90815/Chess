@@ -1,4 +1,4 @@
-﻿using Chess_UI.Images;
+﻿using Chess.UI.Images;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Chess_UI.Themes.Interfaces
+namespace Chess.UI.Themes.Interfaces
 {
     public interface IThemeManager : INotifyPropertyChanged
     {

@@ -1,7 +1,7 @@
-﻿using Chess_UI.Services.Interfaces;
-using static Chess_UI.Services.ChessLogicAPI;
+﻿using Chess.UI.Services.Interfaces;
+using static Chess.UI.Services.ChessLogicAPI;
 
-namespace Chess_UI.Coordinates
+namespace Chess.UI.Coordinates
 {
     public class ChessCoordinate : IChessCoordinate
     {

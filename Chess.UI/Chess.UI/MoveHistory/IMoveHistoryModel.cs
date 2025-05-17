@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.MoveHistory
+namespace Chess.UI.MoveHistory
 {
     public interface IMoveHistoryModel
     {

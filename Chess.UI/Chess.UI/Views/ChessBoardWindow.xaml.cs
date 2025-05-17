@@ -1,22 +1,22 @@
-using Chess_UI.Services;
-using Chess_UI.ViewModels;
+using Chess.UI.Services;
+using Chess.UI.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using static Chess_UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.ChessLogicAPI;
 using System.Threading.Tasks;
 using System;
 using Microsoft.UI.Xaml.Media;
-using Chess_UI.Themes;
-using Chess_UI.Board;
-using Chess_UI.Images;
-using Chess_UI.Wrappers;
+using Chess.UI.Themes;
+using Chess.UI.Board;
+using Chess.UI.Images;
+using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 
 
-namespace Chess_UI.Views
+namespace Chess.UI.Views
 {
     public sealed partial class ChessBoardWindow : Window
     {

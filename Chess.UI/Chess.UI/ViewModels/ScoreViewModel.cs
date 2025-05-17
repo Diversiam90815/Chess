@@ -4,16 +4,16 @@ using Microsoft.UI.Xaml.Media;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using static Chess_UI.Services.ChessLogicAPI;
-using static Chess_UI.Images.ImageServices;
-using Chess_UI.Score;
+using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Images.ImageServices;
+using Chess.UI.Score;
 using Microsoft.Windows.Management.Deployment;
-using Chess_UI.Images;
-using Chess_UI.Wrappers;
+using Chess.UI.Images;
+using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 
 
-namespace Chess_UI.ViewModels
+namespace Chess.UI.ViewModels
 {
     public class ScoreViewModel : INotifyPropertyChanged
     {

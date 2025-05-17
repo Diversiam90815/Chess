@@ -1,11 +1,11 @@
-﻿using Chess_UI.Models;
+﻿using Chess.UI.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess_UI.Multiplayer
+namespace Chess.UI.Multiplayer
 {
     public interface IMultiplayerModel
     {
