@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess_UI.Services.ChessLogicAPI;
 
 
-namespace Chess.UI.Services
+namespace Chess_UI.Images
 {
-    public static class Images
+    public class ImageServices : IImageService
     {
         public enum MainMenuButton
         {
@@ -38,18 +38,36 @@ namespace Chess.UI.Services
         }
 
 
-        public static readonly Dictionary<BoardTheme, ImageSource> BoardBackgroundImages = new()
+        public Dictionary<BoardTheme, ImageSource> BoardBackgroundImages;
+
+        public Dictionary<MainMenuButton, ImageSource> MainMenutImages;
+
+        public Dictionary<PieceTypeInstance, ImageSource> CapturedWhitePiecesImages;
+
+        public Dictionary<PieceTypeInstance, ImageSource> CapturedBlackPiecesImages;
+
+
+        public ImageServices()
         {
-        {BoardTheme.Wood, LoadImage("/Assets/Board/Wood.png") },
-        {BoardTheme.Wood2, LoadImage("/Assets/Board/Wood2.png") },
-        {BoardTheme.Plain, LoadImage("/Assets/Board/Plain.png") },
-        {BoardTheme.Plastic, LoadImage("/Assets/Board/Plastic.png") },
-        {BoardTheme.Marble, LoadImage("/Assets/Board/Marble.png") },
-        {BoardTheme.Marble2, LoadImage("/Assets/Board/Marble2.png") },
-        {BoardTheme.Glass, LoadImage("/Assets/Board/Glass.png") }
+            Init();
+        }
+
+
+
+        private void Init()
+        {
+            BoardBackgroundImages = new()
+        {
+            { BoardTheme.Wood, LoadImage("/Assets/Board/Wood.png") },
+            { BoardTheme.Wood2, LoadImage("/Assets/Board/Wood2.png") },
+            { BoardTheme.Plain, LoadImage("/Assets/Board/Plain.png") },
+            { BoardTheme.Plastic, LoadImage("/Assets/Board/Plastic.png") },
+            { BoardTheme.Marble, LoadImage("/Assets/Board/Marble.png") },
+            { BoardTheme.Marble2, LoadImage("/Assets/Board/Marble2.png") },
+            { BoardTheme.Glass, LoadImage("/Assets/Board/Glass.png") }
         };
 
-        public static readonly Dictionary<MainMenuButton, ImageSource> MainMenutImages = new()
+            MainMenutImages = new()
         {
         {MainMenuButton.StartGame, LoadImage("/Assets/Buttons/pawn.png") },
         {MainMenuButton.Settings, LoadImage("/Assets/Buttons/rook.png") },
@@ -57,7 +75,7 @@ namespace Chess.UI.Services
         {MainMenuButton.EndGame, LoadImage("/Assets/Buttons/horse.png") }
         };
 
-        public static readonly Dictionary<PieceTypeInstance, ImageSource> CapturedWhitePiecesImages = new()
+            CapturedWhitePiecesImages = new()
         {
         {PieceTypeInstance.Pawn, LoadImage("/Assets/Pieces/Standard/PawnW.png") },
         {PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Standard/BishopW.png") },
@@ -67,7 +85,7 @@ namespace Chess.UI.Services
         {PieceTypeInstance.King, LoadImage("/Assets/Pieces/Standard/KingW.png") }
         };
 
-        public static readonly Dictionary<PieceTypeInstance, ImageSource> CapturedBlackPiecesImages = new()
+            CapturedBlackPiecesImages = new()
         {
         {PieceTypeInstance.Pawn, LoadImage("/Assets/Pieces/Standard/PawnB.png") },
         {PieceTypeInstance.Bishop, LoadImage("/Assets/Pieces/Standard/BishopB.png") },
@@ -76,10 +94,11 @@ namespace Chess.UI.Services
         {PieceTypeInstance.Knight, LoadImage("/Assets/Pieces/Standard/KnightB.png") },
         {PieceTypeInstance.King, LoadImage("/Assets/Pieces/Standard/KingB.png") }
         };
-        
+        }
+
 
         // Dynamic piece image loading based on theme, color, and type
-        public static ImageSource GetPieceImage(PieceTheme theme, PlayerColor color, PieceTypeInstance pieceType)
+        public ImageSource GetPieceImage(PieceTheme theme, PlayerColor color, PieceTypeInstance pieceType)
         {
             // Convert enum values to strings that match folder and file naming conventions
             string themeName = theme.ToString();
@@ -93,18 +112,18 @@ namespace Chess.UI.Services
         }
 
 
-        public static ImageSource LoadImage(string relativeFilePath)
+        public ImageSource LoadImage(string relativeFilePath)
         {
             return new BitmapImage(new Uri($"ms-appx:///{relativeFilePath.TrimStart('/')}"));
         }
 
 
-        public static ImageSource GetImage(MainMenuButton button) => MainMenutImages[button];
+        public ImageSource GetImage(MainMenuButton button) => MainMenutImages[button];
 
-        public static ImageSource GetImage(BoardTheme background) => BoardBackgroundImages[background];
+        public ImageSource GetImage(BoardTheme background) => BoardBackgroundImages[background];
 
 
-        public static ImageSource GetCapturedPieceImage(PlayerColor player, PieceTypeInstance pieceTypeInstance)
+        public ImageSource GetCapturedPieceImage(PlayerColor player, PieceTypeInstance pieceTypeInstance)
         {
             return player switch
             {

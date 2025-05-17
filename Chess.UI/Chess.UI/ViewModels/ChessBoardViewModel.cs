@@ -1,11 +1,11 @@
-﻿using Chess.UI.Services;
+﻿using Chess_UI.Services;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using static Chess.UI.Services.Images;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess_UI.Images.ImageServices;
+using static Chess_UI.Services.ChessLogicAPI;
 using System.Collections.ObjectModel;
 using System;
 using Microsoft.UI.Composition.Interactions;
@@ -13,268 +13,281 @@ using Windows.UI.Popups;
 using Microsoft.UI.Xaml;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Chess.UI.Models;
 using System.Xml.Linq;
+using Chess_UI.Themes;
+using Chess_UI.Board;
+using Chess_UI.Moves;
+using Chess_UI.Coordinates;
+using Chess_UI.Images;
+using Chess_UI.Wrappers;
+using Chess_UI.Themes.Interfaces;
+using Chess_UI.Services.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
+using Chess_UI.Models.Interfaces;
 
 
-namespace Chess.UI.ViewModels
+namespace Chess_UI.ViewModels
 {
-	public class ChessBoardViewModel : INotifyPropertyChanged
-	{
-		public event PropertyChangedEventHandler PropertyChanged;
+    public class ChessBoardViewModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
 
-		private readonly DispatcherQueue DispatcherQueue;
+        private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
-		public ObservableCollection<BoardSquare> Board { get; set; }
+        public ObservableCollection<BoardSquare> Board { get; set; }
 
-		public event Func<EndGameState, Task> ShowEndGameDialog;
+        public event Func<EndGameState, Task> ShowEndGameDialog;
 
-		public event Func<Task<PieceTypeInstance?>> ShowPawnPromotionDialogRequested;
+        public event Func<Task<PieceTypeInstance?>> ShowPawnPromotionDialogRequested;
 
-		public ScoreViewModel ScoreViewModel { get; }
-		public MoveHistoryViewModel MoveHistoryViewModel { get; set; }
+        public ScoreViewModel _scoreViewModel { get; }
 
-		private readonly ThemeManager themeManager;
+        public MoveHistoryViewModel _moveHistoryViewModel { get; set; }
 
-		private MoveModel MoveModel;
+        private readonly IThemeManager _themeManager;
 
-		private BoardModel BoardModel;
+        private IMoveModel _moveModel;
 
+        private IBoardModel _boardModel;
 
-		public ChessBoardViewModel(DispatcherQueue dispatcherQueue, ThemeManager themeManager)
-		{
-			this.DispatcherQueue = dispatcherQueue;
-			this.themeManager = themeManager;
+        private readonly IChessCoordinate _coordinate;
 
-			MoveHistoryViewModel = new(DispatcherQueue);
+        private readonly IImageService _imageServices;
 
-			ScoreViewModel = new(DispatcherQueue);
-			MoveModel = new();
-			BoardModel = new();
 
-			MoveModel.PossibleMovesCalculated += OnHighlightPossibleMoves;
-			MoveModel.PlayerChanged += OnHandlePlayerChanged;
-			MoveModel.GameStateInitSucceeded += OnGameStateInitSucceeded;
-			MoveModel.GameOverEvent += OnEndGameState;
-			MoveModel.NewBoardFromBackendEvent += OnBoardFromBackendUpdated;
+        public ChessBoardViewModel(IDispatcherQueueWrapper dispatcherQueue)
+        {
+            _dispatcherQueue = dispatcherQueue;
 
-			this.themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+            _moveHistoryViewModel = App.Current.Services.GetService<MoveHistoryViewModel>();
+            _scoreViewModel = App.Current.Services.GetService<ScoreViewModel>();
+            _moveModel = App.Current.Services.GetService<IMoveModel>();
+            _boardModel = App.Current.Services.GetService<IBoardModel>();
+            _coordinate = App.Current.Services.GetService<IChessCoordinate>();
+            _imageServices = App.Current.Services.GetService<IImageService>();
+            _themeManager = App.Current.Services.GetService<IThemeManager>();
 
-			MoveModel.PawnPromotionEvent += OnPromotionPiece;
+            _moveModel.PossibleMovesCalculated += OnHighlightPossibleMoves;
+            _moveModel.PlayerChanged += OnHandlePlayerChanged;
+            _moveModel.GameStateInitSucceeded += OnGameStateInitSucceeded;
+            _moveModel.GameOverEvent += OnEndGameState;
+            _moveModel.NewBoardFromBackendEvent += OnBoardFromBackendUpdated;
 
-			this.CurrentBoardTheme = themeManager.CurrentBoardTheme;
+            _themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
-			Board = new ObservableCollection<BoardSquare>();
+            _moveModel.PawnPromotionEvent += OnPromotionPiece;
 
-			for (int i = 0; i < ChessCoordinate.GetNumBoardSquares() ; i++)
-			{
-				Board.Add(new(dispatcherQueue, themeManager));
-			}
-		}
+            this.CurrentBoardTheme = _themeManager.CurrentBoardTheme;
 
+            Board = new ObservableCollection<BoardSquare>();
 
-		public void LoadBoardFromNative()
-		{
-			var boardState = BoardModel.GetBoardStateFromNative();
+            for (int i = 0; i < _coordinate.GetNumBoardSquares(); i++)
+            {
+                Board.Add(new());
+            }
+        }
 
-			for (int i = 0; i < boardState.Length; i++)
-			{
-				int encoded = boardState[i];
 
-				// Decode color and piece
-				int colorVal = (encoded >> 4) & 0xF;    // top 8 bits
-				int pieceVal = encoded & 0xF;          // bottom 8 bits
+        public void LoadBoardFromNative()
+        {
+            var boardState = _boardModel.GetBoardStateFromNative();
 
-				PositionInstance enginePos = ChessCoordinate.FromIndex(i);  // Get engine pos from index
-				PositionInstance displayPos = ChessCoordinate.ToDisplayCoordinates(enginePos); // Convert it to the UI pos
+            for (int i = 0; i < boardState.Length; i++)
+            {
+                int encoded = boardState[i];
 
-				var square = new BoardSquare(
-					x: displayPos.x,
-					y: displayPos.y,
-					(PieceTypeInstance)pieceVal,
-					(PlayerColor)colorVal,
-					DispatcherQueue,
-					themeManager
-				);
+                // Decode color and piece
+                int colorVal = (encoded >> 4) & 0xF;    // top 8 bits
+                int pieceVal = encoded & 0xF;          // bottom 8 bits
 
-				// Calculate the index in the UI board array
-				int displayIndex = ChessCoordinate.ToIndex(displayPos, true);
+                PositionInstance enginePos = _coordinate.FromIndex(i);  // Get engine pos from index
+                PositionInstance displayPos = _coordinate.ToDisplayCoordinates(enginePos); // Convert it to the UI pos
 
-				DispatcherQueue.TryEnqueue(() =>
-				{
-					Board[displayIndex] = square;
-					OnPropertyChanged(nameof(Board));
-				});
-			}
-		}
+                var square = new BoardSquare(
+                    x: displayPos.x,
+                    y: displayPos.y,
+                    (PieceTypeInstance)pieceVal,
+                    (PlayerColor)colorVal
+                );
 
+                // Calculate the index in the UI board array
+                int displayIndex = _coordinate.ToIndex(displayPos, true);
 
-		private void OnBoardFromBackendUpdated()
-		{
-			DispatcherQueue.TryEnqueue(() =>
-			{
-				LoadBoardFromNative();
-			});
-		}
+                _dispatcherQueue.TryEnqueue(() =>
+                {
+                    Board[displayIndex] = square;
+                    OnPropertyChanged(nameof(Board));
+                });
+            }
+        }
 
 
-		public void ResetGame()
-		{
-			ChessLogicAPI.ResetGame();
-			MoveHistoryViewModel.ClearMoveHistory();
+        private void OnBoardFromBackendUpdated()
+        {
+            _dispatcherQueue.TryEnqueue(() =>
+            {
+                LoadBoardFromNative();
+            });
+        }
 
-			Board.Clear();
-			for (int i = 0; i < ChessCoordinate.GetNumBoardSquares(); i++)
-			{
-				Board.Add(new BoardSquare(DispatcherQueue, themeManager));
-			}
-			ScoreViewModel.ReinitScoreValues();
-		}
-
 
-		public void StartGame()
-		{
-			ChessLogicAPI.StartGame();  // Start the game and thus the StateMachine
-		}
-
+        public void ResetGame()
+        {
+            ChessLogicAPI.ResetGame();
+            _moveHistoryViewModel.ClearMoveHistory();
 
-		public void OnGameStateInitSucceeded()
-		{
-			// Once the board is ready calculated, we load it from native
-			LoadBoardFromNative();
-		}
+            Board.Clear();
+            for (int i = 0; i < _coordinate.GetNumBoardSquares(); i++)
+            {
+                Board.Add(new BoardSquare());
+            }
+            _scoreViewModel.ReinitScoreValues();
+        }
 
 
-		private void OnThemeManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
-		{
-			if (e.PropertyName == nameof(ThemeManager.CurrentBoardTheme))
-			{
-				UpdateBoardTheme(this.themeManager.CurrentBoardTheme);
-			}
-		}
-
-
-		private void UpdateBoardTheme(Images.BoardTheme boardTheme)
-		{
-			CurrentBoardTheme = boardTheme;
-		}
-
+        public void StartGame()
+        {
+            ChessLogicAPI.StartGame();  // Start the game and thus the StateMachine
+        }
 
-		private async void OnPromotionPiece()
-		{
-			var promotionPiece = await RequestPawnPromotionAsync();
-			if (promotionPiece.HasValue)
-			{
-				MoveModel.SetPromotionPieceType(promotionPiece.Value);
-			}
-			else
-			{
-				// Pawn Promotion has been cancelled
-				ResetHighlightsOnBoard();
-			}
-		}
-
-
-		public void HandleSquareClick(BoardSquare square)
-		{
-			PositionInstance enginePos = ChessCoordinate.FromDisplayCoordinates(square.pos);
-
-			Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{enginePos.x}-Y{enginePos.y}!");
-
-			ChessLogicAPI.OnSquareSelected(enginePos);
-		}
-
-
-		public void OnHighlightPossibleMoves()
-		{
-			ResetHighlightsOnBoard();
-
-			foreach (var pm in MoveModel.PossibleMoves)
-			{
-				PositionInstance displayPos = ChessCoordinate.ToDisplayCoordinates(pm.end);
-
-				int index = ChessCoordinate.ToIndex(displayPos, true);
-				BoardSquare square = Board[index];
-
-				if (square != null)
-				{
-					square.IsHighlighted = true;
-				}
-			}
-		}
-
-
-		public void ResetHighlightsOnBoard()
-		{
-			foreach (var square in Board)
-			{
-				square.IsHighlighted = false;
-			}
-		}
-
-
-		public void UndoLastMove()
-		{
-			ChessLogicAPI.UndoMove();
-			LoadBoardFromNative();
-			MoveHistoryViewModel.RemoveLastMove();
-		}
-
-
-		private Task<PieceTypeInstance?> RequestPawnPromotionAsync()
-		{
-			if (ShowPawnPromotionDialogRequested != null)
-			{
-				return ShowPawnPromotionDialogRequested.Invoke();
-			}
-			return null;
-		}
-
-
-		private void OnEndGameState(EndGameState state)
-		{
-			ShowEndGameDialog?.Invoke(state);
-		}
-
-
-		private void OnHandlePlayerChanged(PlayerColor player)
-		{
-			CurrentPlayer = player;
-		}
-
-
-		private PlayerColor currentPlayer;
-		public PlayerColor CurrentPlayer
-		{
-			get => currentPlayer;
-			set
-			{
-				if (value != currentPlayer)
-				{
-					currentPlayer = value;
-				}
-			}
-		}
-
-
-		public Images.BoardTheme CurrentBoardTheme;
-
-
-		public ImageSource BoardBackgroundImage
-		{
-			get
-			{
-				return Images.GetImage(CurrentBoardTheme);
-			}
-		}
-
-
-		protected void OnPropertyChanged([CallerMemberName] string name = null)
-		{
-			DispatcherQueue.TryEnqueue(() =>
-			{
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-			});
-		}
-	}
+
+        public void OnGameStateInitSucceeded()
+        {
+            // Once the board is ready calculated, we load it from native
+            LoadBoardFromNative();
+        }
+
+
+        private void OnThemeManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(ThemeManager.CurrentBoardTheme))
+            {
+                UpdateBoardTheme(_themeManager.CurrentBoardTheme);
+            }
+        }
+
+
+        private void UpdateBoardTheme(ImageServices.BoardTheme boardTheme)
+        {
+            CurrentBoardTheme = boardTheme;
+        }
+
+
+        private async void OnPromotionPiece()
+        {
+            var promotionPiece = await RequestPawnPromotionAsync();
+            if (promotionPiece.HasValue)
+            {
+                _moveModel.SetPromotionPieceType(promotionPiece.Value);
+            }
+            else
+            {
+                // Pawn Promotion has been cancelled
+                ResetHighlightsOnBoard();
+            }
+        }
+
+
+        public void HandleSquareClick(BoardSquare square)
+        {
+            PositionInstance enginePos = _coordinate.FromDisplayCoordinates(square.pos);
+
+            Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{enginePos.x}-Y{enginePos.y}!");
+
+            ChessLogicAPI.OnSquareSelected(enginePos);
+        }
+
+
+        public void OnHighlightPossibleMoves()
+        {
+            ResetHighlightsOnBoard();
+
+            foreach (var pm in _moveModel.PossibleMoves)
+            {
+                PositionInstance displayPos = _coordinate.ToDisplayCoordinates(pm.end);
+
+                int index = _coordinate.ToIndex(displayPos, true);
+                BoardSquare square = Board[index];
+
+                if (square != null)
+                {
+                    square.IsHighlighted = true;
+                }
+            }
+        }
+
+
+        public void ResetHighlightsOnBoard()
+        {
+            foreach (var square in Board)
+            {
+                square.IsHighlighted = false;
+            }
+        }
+
+
+        public void UndoLastMove()
+        {
+            ChessLogicAPI.UndoMove();
+            LoadBoardFromNative();
+            _moveHistoryViewModel.RemoveLastMove();
+        }
+
+
+        private Task<PieceTypeInstance?> RequestPawnPromotionAsync()
+        {
+            if (ShowPawnPromotionDialogRequested != null)
+            {
+                return ShowPawnPromotionDialogRequested.Invoke();
+            }
+            return null;
+        }
+
+
+        private void OnEndGameState(EndGameState state)
+        {
+            ShowEndGameDialog?.Invoke(state);
+        }
+
+
+        private void OnHandlePlayerChanged(PlayerColor player)
+        {
+            CurrentPlayer = player;
+        }
+
+
+        private PlayerColor currentPlayer;
+        public PlayerColor CurrentPlayer
+        {
+            get => currentPlayer;
+            set
+            {
+                if (value != currentPlayer)
+                {
+                    currentPlayer = value;
+                }
+            }
+        }
+
+
+        public ImageServices.BoardTheme CurrentBoardTheme;
+
+
+        public ImageSource BoardBackgroundImage
+        {
+            get
+            {
+                return _imageServices.GetImage(CurrentBoardTheme);
+            }
+        }
+
+
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            _dispatcherQueue.TryEnqueue(() =>
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            });
+        }
+    }
 }

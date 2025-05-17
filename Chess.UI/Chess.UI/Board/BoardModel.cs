@@ -1,15 +1,14 @@
-﻿using Chess.UI.Services;
+﻿using Chess_UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess.UI.Models
+namespace Chess_UI.Board
 {
-    public class BoardModel
+    public class BoardModel : IBoardModel
     {
-
         public int[] GetBoardStateFromNative()
         {
             int[] board = new int[64]; // pre-allocated array

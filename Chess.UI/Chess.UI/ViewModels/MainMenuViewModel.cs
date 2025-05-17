@@ -1,4 +1,7 @@
-﻿using Chess.UI.Services;
+﻿using Chess_UI.Images;
+using Chess_UI.Services;
+using Chess_UI.Wrappers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System;
@@ -10,22 +13,34 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Chess.UI.ViewModels
+namespace Chess_UI.ViewModels
 {
     public class MainMenuViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly DispatcherQueue DispatcherQueue;
+        private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
+        private readonly IImageService _imageServices;
 
-        public MainMenuViewModel(DispatcherQueue dispatcher)
+        public MainMenuViewModel(IDispatcherQueueWrapper dispatcher)
         {
-            DispatcherQueue = dispatcher;
+            _dispatcherQueue = dispatcher;
+            _imageServices = App.Current.Services.GetService<IImageService>();
+
+            Init();
         }
 
 
-        private ImageSource startGameButtonImage = Images.GetImage(Images.MainMenuButton.StartGame);
+        private void Init()
+        {
+            StartGameButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.StartGame);
+            SettingButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.Settings);
+            MultiplayerButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.Multiplayer);
+            EndGameButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.EndGame);
+        }
+
+        private ImageSource startGameButtonImage;
         public ImageSource StartGameButtonImage
         {
             get => startGameButtonImage;
@@ -40,7 +55,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private ImageSource settingButtonImage = Images.GetImage(Images.MainMenuButton.Settings);
+        private ImageSource settingButtonImage;
         public ImageSource SettingButtonImage
         {
             get => settingButtonImage;
@@ -55,7 +70,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private ImageSource multiplayerButtonImage = Images.GetImage(Images.MainMenuButton.Multiplayer);
+        private ImageSource multiplayerButtonImage;
         public ImageSource MultiplayerButtonImage
         {
             get => multiplayerButtonImage;
@@ -70,7 +85,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private ImageSource endGameButtonImage = Images.GetImage(Images.MainMenuButton.EndGame);
+        private ImageSource endGameButtonImage;
         public ImageSource EndGameButtonImage
         {
             get => endGameButtonImage;
@@ -87,7 +102,7 @@ namespace Chess.UI.ViewModels
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            DispatcherQueue.TryEnqueue(() =>
+            _dispatcherQueue.TryEnqueue(() =>
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             });

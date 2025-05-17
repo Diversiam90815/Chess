@@ -1,26 +1,24 @@
-﻿using static Chess.UI.Services.ChessLogicAPI;
+﻿using Chess_UI.Services.Interfaces;
+using static Chess_UI.Services.ChessLogicAPI;
 
-namespace Chess.UI.Services
+namespace Chess_UI.Coordinates
 {
-    public static class ChessCoordinate
+    public class ChessCoordinate : IChessCoordinate
     {
         public const int BOARD_SIZE = 8;
-
-
 
         /// <summary>
         /// Gets the number of board pieces on a chessboard
         /// </summary>
-        public static int GetNumBoardSquares()
+        public int GetNumBoardSquares()
         {
             return BOARD_SIZE * BOARD_SIZE;
         }
 
-
         /// <summary>
         /// Gets position from a 1D board index (engine coordinates)
         /// </summary>
-        public static PositionInstance FromIndex(int index)
+        public PositionInstance FromIndex(int index)
         {
             int x = index % BOARD_SIZE;
             int y = index / BOARD_SIZE;
@@ -30,7 +28,7 @@ namespace Chess.UI.Services
         /// <summary>
         /// Calculates the 1D array index from position
         /// </summary>
-        public static int ToIndex(PositionInstance pos, bool forDisplay = false)
+        public int ToIndex(PositionInstance pos, bool forDisplay = false)
         {
             if (forDisplay)
             {
@@ -45,7 +43,7 @@ namespace Chess.UI.Services
         /// Engine: (0,0) is bottom-left
         /// UI: (0,0) is top-left
         /// </summary>
-        public static PositionInstance ToDisplayCoordinates(PositionInstance enginePos)
+        public PositionInstance ToDisplayCoordinates(PositionInstance enginePos)
         {
             return new PositionInstance(enginePos.x, 7 - enginePos.y);
         }
@@ -55,7 +53,7 @@ namespace Chess.UI.Services
         /// UI: (0,0) is top-left
         /// Engine: (0,0) is bottom-left
         /// </summary>
-        public static PositionInstance FromDisplayCoordinates(PositionInstance displayPos)
+        public PositionInstance FromDisplayCoordinates(PositionInstance displayPos)
         {
             return new PositionInstance(displayPos.x, 7 - displayPos.y);
         }

@@ -1,12 +1,13 @@
-﻿using Chess.UI.Services;
+﻿using Chess_UI.Multiplayer;
+using Chess_UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess_UI.Services.ChessLogicAPI;
 
-namespace Chess.UI.Models
+namespace Chess_UI.Models
 {
     public record NetworkAdapter
     {
@@ -24,8 +25,9 @@ namespace Chess.UI.Models
     }
 
 
-    public class MultiplayerModel
+    public class MultiplayerModel : IMultiplayerModel
     {
+
         private List<NetworkAdapter> mAdapters = new();
 
 
@@ -34,9 +36,10 @@ namespace Chess.UI.Models
             ChessLogicAPI.StartedMultiplayer();
         }
 
+
         public void Init()
         {
-            var logicCommunication = App.Current.ChessLogicCommunication as ChessLogicCommunicationLayer;
+            var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
             logicCommunication.ConnectionStatusEvent += HandleConnectionStatusUpdates;
             logicCommunication.ClientRequestedConnection += ClientRequestedConnection;
 
@@ -174,13 +177,8 @@ namespace Chess.UI.Models
         }
 
 
-        public delegate void ConnectionErrorOccured(string message);
-        public event ConnectionErrorOccured OnConnectionErrorOccured;
-
-        public delegate void ConnectionStatusChanged(ConnectionState newState);
-        public event ConnectionStatusChanged OnConnectionStatusChanged;
-
-        public delegate void ClientRequestedConnectionHandler(string clientName);
-        public event ClientRequestedConnectionHandler OnClientRequestedConnection;
+        public event Action<string> OnConnectionErrorOccured;
+        public event Action<ConnectionState> OnConnectionStatusChanged;
+        public event Action<string> OnClientRequestedConnection;
     }
 }

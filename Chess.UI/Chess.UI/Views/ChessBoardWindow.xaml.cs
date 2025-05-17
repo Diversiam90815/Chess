@@ -1,70 +1,49 @@
-using Chess.UI.Services;
-using Chess.UI.ViewModels;
+using Chess_UI.Services;
+using Chess_UI.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess_UI.Services.ChessLogicAPI;
 using System.Threading.Tasks;
 using System;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Data;
+using Chess_UI.Themes;
+using Chess_UI.Board;
+using Chess_UI.Images;
+using Chess_UI.Wrappers;
+using Microsoft.Extensions.DependencyInjection;
 
 
-namespace Chess.UI.Views
+namespace Chess_UI.Views
 {
-
-    public class DivideByEightConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            if (value is double d)
-                return d / 8;
-            return 0;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-
     public sealed partial class ChessBoardWindow : Window
     {
-        private ChessBoardViewModel ViewModel;
-
-        private new readonly DispatcherQueue DispatcherQueue;
+        private ChessBoardViewModel _viewModel;
 
         private OverlappedPresenter Presenter;
 
         private PieceTypeInstance? ViewModelSelectedPiece { get; set; }
 
-        private readonly ThemeManager themeManager;
+        private readonly IImageService _images;
 
 
-        public ChessBoardWindow(ChessBoardViewModel viewModel, ThemeManager themeManager)
+        public ChessBoardWindow()
         {
             this.InitializeComponent();
-            DispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
-            this.ViewModel = viewModel;
-            this.themeManager = themeManager;
-            this.RootPanel.DataContext = ViewModel;
+            _images = App.Current.Services.GetService<IImageService>();
+            _viewModel = App.Current.Services.GetService<ChessBoardViewModel>();
+            RootPanel.DataContext = _viewModel;
 
-            ViewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
-            ViewModel.ShowEndGameDialog += OnGameOverState;
-
+            _viewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
+            _viewModel.ShowEndGameDialog += OnGameOverState;
 
             Init();
             SetWindowSize(1100, 800);
         }
 
-        private Task<bool?> ViewModel_ShowEndGameDialog()
-        {
-            throw new NotImplementedException();
-        }
 
         private void SetWindowSize(double width, double height)
         {
@@ -87,14 +66,14 @@ namespace Chess.UI.Views
 
         private void UndoMove_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.UndoLastMove();
+            _viewModel.UndoLastMove();
         }
 
 
         private void ResetGame_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.ResetGame();
-            ViewModel.StartGame();
+            _viewModel.ResetGame();
+            _viewModel.StartGame();
         }
 
 
@@ -110,7 +89,7 @@ namespace Chess.UI.Views
             var square = grid.DataContext as BoardSquare;
 
             // Handle the move
-            ViewModel.HandleSquareClick(square);
+            _viewModel.HandleSquareClick(square);
         }
 
 
@@ -132,12 +111,12 @@ namespace Chess.UI.Views
 
                     if (result == ContentDialogResult.Primary)
                     {
-                        ViewModel.ResetGame();
-                        ViewModel.StartGame();
+                        _viewModel.ResetGame();
+                        _viewModel.StartGame();
                     }
                     else
                     {
-                        ViewModel.ResetGame();
+                        _viewModel.ResetGame();
                         this.Close();
                     }
                     break;
@@ -173,7 +152,7 @@ namespace Chess.UI.Views
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                PlayerColor currentPlayer = ViewModel.CurrentPlayer;
+                PlayerColor currentPlayer = _viewModel.CurrentPlayer;
 
                 // Helper method to create a button with an image
                 Button CreatePieceButton(PieceTypeInstance pieceType)
@@ -189,7 +168,7 @@ namespace Chess.UI.Views
 
                     var image = new Image
                     {
-                        Source = Images.GetPieceImage(Images.PieceTheme.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
+                        Source = _images.GetPieceImage(ImageServices.PieceTheme.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
                         Stretch = Stretch.Uniform
                     };
 

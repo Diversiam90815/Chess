@@ -1,5 +1,7 @@
-﻿using Chess.UI.Models;
-using Chess.UI.Services;
+﻿using Chess_UI.Models;
+using Chess_UI.Services;
+using Chess_UI.Wrappers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using System;
@@ -16,30 +18,31 @@ using System.Threading.Tasks;
 using Windows.Media.Playback;
 
 
-namespace Chess.UI.ViewModels
+namespace Chess_UI.ViewModels
 {
     public class MultiplayerViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly DispatcherQueue DispatcherQueue;
+        private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
-        public readonly MultiplayerModel mModel;
+        private readonly MultiplayerModel _model;
 
         public MultiplayerMode MPMode { get; private set; }
 
 
-        public MultiplayerViewModel(DispatcherQueue dispatcher)
+        public MultiplayerViewModel(IDispatcherQueueWrapper dispatcher)
         {
-            this.DispatcherQueue = dispatcher;
+            _dispatcherQueue = dispatcher;
+
             NetworkAdapters = new();
 
-            mModel = new MultiplayerModel();
-            mModel.Init();
+            _model = App.Current.Services.GetService<MultiplayerModel>();
+            _model.Init();
 
-            mModel.OnConnectionErrorOccured += HandleConnectionError;
-            mModel.OnConnectionStatusChanged += HandleConnectionStatusUpdated;
-            mModel.OnClientRequestedConnection += HandleClientRequestConnection;
+            _model.OnConnectionErrorOccured += HandleConnectionError;
+            _model.OnConnectionStatusChanged += HandleConnectionStatusUpdated;
+            _model.OnClientRequestedConnection += HandleClientRequestConnection;
 
             UpdateAdapterBox();
         }
@@ -69,7 +72,7 @@ namespace Chess.UI.ViewModels
                 if (selectedAdapter != value)
                 {
                     selectedAdapter = value;
-                    mModel.ChangeNetworkAdapter(SelectedAdapter.ID);
+                    _model.ChangeNetworkAdapter(SelectedAdapter.ID);
                     OnPropertyChanged();
                 }
             }
@@ -161,7 +164,7 @@ namespace Chess.UI.ViewModels
                 if (localPlayerName != value)
                 {
                     localPlayerName = value;
-                    mModel.SetLocalPlayerName(value);
+                    _model.SetLocalPlayerName(value);
                 }
             }
         }
@@ -234,7 +237,7 @@ namespace Chess.UI.ViewModels
         public void EnterServerMultiplayerMode()
         {
             MPMode = MultiplayerMode.Server;
-            mModel.StartGameServer();
+            _model.StartGameServer();
             DisplayServerView();
         }
 
@@ -242,7 +245,7 @@ namespace Chess.UI.ViewModels
         public void EnterClientMultiplayerMode()
         {
             MPMode = MultiplayerMode.Client;
-            mModel.StartGameClient();
+            _model.StartGameClient();
             DisplayClientView();
         }
 
@@ -254,7 +257,7 @@ namespace Chess.UI.ViewModels
             // Setting local player name in UI if saved earlier
             // Display Init view
 
-            mModel.ResetToInit();
+            _model.ResetToInit();
             DisplayInitView();
         }
 
@@ -264,14 +267,14 @@ namespace Chess.UI.ViewModels
             if (MPMode == MultiplayerMode.None || MPMode == MultiplayerMode.Init)
                 return;
 
-            mModel.StartMultiplerGame(MPMode);
+            _model.StartMultiplerGame(MPMode);
         }
 
 
         public void AcceptConnectingToHost()
         {
             //We are the client and accepted a connection to the host
-            mModel.ConnectToHost();
+            _model.ConnectToHost();
         }
 
 
@@ -285,14 +288,14 @@ namespace Chess.UI.ViewModels
         public void AcceptClientConnection()
         {
             //We are the host and accepted a connection try from the client
-            mModel.AcceptConnectionRequest();
+            _model.AcceptConnectionRequest();
         }
 
 
         public void DeclineClientConnection()
         {
             //We are the host and declined a connection try from the client
-            mModel.RejectConnectionRequest();
+            _model.RejectConnectionRequest();
 
             EnterInitMode();
         }
@@ -347,7 +350,7 @@ namespace Chess.UI.ViewModels
 
         public void SelectPresavedNetworkAdapter()
         {
-            int savedAdapterID = mModel.GetSelectedNetworkAdapterID();
+            int savedAdapterID = _model.GetSelectedNetworkAdapterID();
 
             if (savedAdapterID != 0)
             {
@@ -366,10 +369,10 @@ namespace Chess.UI.ViewModels
 
         public void UpdateAdapterBox()
         {
-            DispatcherQueue.TryEnqueue(() =>
+            _dispatcherQueue.TryEnqueue(() =>
             {
                 NetworkAdapters.Clear();
-                var adapters = mModel.GetNetworkAdapters();
+                var adapters = _model.GetNetworkAdapters();
 
                 foreach (var adapter in adapters)
                 {
@@ -423,7 +426,7 @@ namespace Chess.UI.ViewModels
 
         private void SetLocalPlayerName(string name)
         {
-            mModel.SetLocalPlayerName(name);
+            _model.SetLocalPlayerName(name);
             SettingsEditable = true;
         }
 
@@ -508,7 +511,7 @@ namespace Chess.UI.ViewModels
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
-            DispatcherQueue.TryEnqueue(() =>
+            _dispatcherQueue.TryEnqueue(() =>
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             });

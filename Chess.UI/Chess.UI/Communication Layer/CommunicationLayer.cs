@@ -1,16 +1,34 @@
-﻿using System;
+﻿using Chess_UI.Communication_Layer.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess_UI.Services.ChessLogicAPI;
 
-namespace Chess.UI.Services
+
+namespace Chess_UI.Services
 {
-    public class ChessLogicCommunicationLayer
+    public class CommunicationLayer : ICommunicationLayer
     {
         private GCHandle _delegateHandle;
+
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void APIDelegate(int message, nint data);
+
+        public enum DelegateMessage
+        {
+            EndGameState = 1,
+            PlayerScoreUpdated = 2,
+            PlayerCapturedPiece = 3,
+            PlayerChanged = 4,
+            GameStateChanged = 5,
+            MoveHistoryAdded = 6,
+            ConnectionStateChanged = 7,
+            ClientRequestedConnection = 8
+        }
 
 
         public void Init()
@@ -89,7 +107,7 @@ namespace Chess.UI.Services
 
         private void HandlePlayerScoreUpdate(nint data)
         {
-            Score score = (Score)Marshal.PtrToStructure(data, typeof(Score));
+            ChessLogicAPI.Score score = (ChessLogicAPI.Score)Marshal.PtrToStructure(data, typeof(ChessLogicAPI.Score));
             PlayerScoreUpdated?.Invoke(score);
         }
 
@@ -149,29 +167,14 @@ namespace Chess.UI.Services
 
         #region ViewModel Delegates
 
-        public delegate void PlayerChangedHandler(PlayerColor player);
-        public event PlayerChangedHandler PlayerChanged;
-
-        public delegate void GameStateChangedHandler(GameState state);
-        public event GameStateChangedHandler GameStateChanged;
-
-        public delegate void MoveHistoryUpdatedHandler(string moveNotation);
-        public event MoveHistoryUpdatedHandler MoveHistoryUpdated;
-
-        public delegate void PlayerCaputeredPieceHandler(PlayerCapturedPiece capturedPiece);
-        public event PlayerCaputeredPieceHandler PlayerCapturedPieceEvent;
-
-        public delegate void PlayerScoreUpdatedHandler(Score score);
-        public event PlayerScoreUpdatedHandler PlayerScoreUpdated;
-
-        public delegate void EndGameStateHandler(EndGameState state);
-        public event EndGameStateHandler EndGameStateEvent;
-
-        public delegate void ConnectionStatusEventHandler(ConnectionStatusEvent connectionStatus);
-        public event ConnectionStatusEventHandler ConnectionStatusEvent;
-
-        public delegate void ClientRequestedConnectionHandler(string clientName);
-        public event ClientRequestedConnectionHandler ClientRequestedConnection;
+        public event Action<PlayerColor> PlayerChanged;
+        public event Action<GameState> GameStateChanged;
+        public event Action<string> MoveHistoryUpdated;
+        public event Action<PlayerCapturedPiece> PlayerCapturedPieceEvent;
+        public event Action<ChessLogicAPI.Score> PlayerScoreUpdated;
+        public event Action<EndGameState> EndGameStateEvent;
+        public event Action<ConnectionStatusEvent> ConnectionStatusEvent;
+        public event Action<string> ClientRequestedConnection;
 
         #endregion
 

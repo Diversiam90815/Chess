@@ -1,28 +1,38 @@
-﻿using System;
+﻿using Chess_UI.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Chess_UI.Images;
 
-namespace Chess.UI.Services
+namespace Chess_UI.Themes
 {
 	public class BoardTheme
 	{
 		public string Name { get; set; }
-		public Images.BoardTheme BoardThemeID { get; set; }
+		public ImageServices.BoardTheme BoardThemeID { get; set; }
 	}
 
 
 	public class PieceTheme
 	{
 		public string Name { get; set; }
-		public Images.PieceTheme PieceThemeID { get; set; }
+		public ImageServices.PieceTheme PieceThemeID { get; set; }
 	}
 
 
-	public class ThemeLoader
+	public interface IThemeLoader
+	{
+		public List<BoardTheme> LoadBoardThemes();
+
+		public List<PieceTheme> LoadPieceThemes();
+
+    }
+
+    public class ThemeLoader : IThemeLoader
 	{
 
 		private static readonly string baseDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -31,21 +41,21 @@ namespace Chess.UI.Services
 
 		private readonly string piecesPath = Path.Combine(baseDir, "Assets", "Pieces");
 
-		private static readonly Dictionary<string, Images.BoardTheme> BoardThemeMapping = new()
+		private static readonly Dictionary<string, ImageServices.BoardTheme> BoardThemeMapping = new()
 		{
-			{ "Wood",    Images.BoardTheme.Wood },
-			{ "Wood2",   Images.BoardTheme.Wood2 },
-			{ "Plain",   Images.BoardTheme.Plain },
-			{ "Plastic", Images.BoardTheme.Plastic },
-			{ "Marble",  Images.BoardTheme.Marble },
-			{ "Marble2", Images.BoardTheme.Marble2 },
-			{ "Glass",   Images.BoardTheme.Glass }
+			{ "Wood",    ImageServices.BoardTheme.Wood },
+			{ "Wood2",   ImageServices.BoardTheme.Wood2 },
+			{ "Plain",   ImageServices.BoardTheme.Plain },
+			{ "Plastic", ImageServices.BoardTheme.Plastic },
+			{ "Marble",  ImageServices.BoardTheme.Marble },
+			{ "Marble2", ImageServices.BoardTheme.Marble2 },
+			{ "Glass",   ImageServices.BoardTheme.Glass }
 		};
 
-		private static readonly Dictionary<string, Images.PieceTheme> PieceThemeMapping = new()
+		private static readonly Dictionary<string, ImageServices.PieceTheme> PieceThemeMapping = new()
 		{
-			{ "Basic",    Images.PieceTheme.Basic },
-			{ "Standard", Images.PieceTheme.Standard }
+			{ "Basic",    ImageServices.PieceTheme.Basic },
+			{ "Standard", ImageServices.PieceTheme.Standard }
 		};
 
 

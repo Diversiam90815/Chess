@@ -1,40 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Chess_UI.Themes.Interfaces;
+using System;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using Chess_UI.Images;
+using Chess_UI.Settings;
 
-namespace Chess.UI.Services
+namespace Chess_UI.Themes
 {
-    public class ThemeManager : INotifyPropertyChanged
+    public class ThemeManager : IThemeManager
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
 
         public ThemeManager()
         {
-            string configPieceTheme = Configuration.CurrentPieceTheme;
-            string configBoardTheme = Configuration.CurrentBoardTheme;
+            string configPieceTheme = Settings.Settings.CurrentPieceTheme;
+            string configBoardTheme = Settings.Settings.CurrentBoardTheme;
 
             // Try to parse the config themes to enum values
-            if (!Enum.TryParse<Images.PieceTheme>(configPieceTheme, out var parsedPieceTheme))
+            if (!Enum.TryParse<ImageServices.PieceTheme>(configPieceTheme, out var parsedPieceTheme))
             {
-                parsedPieceTheme = Images.PieceTheme.Standard;
+                parsedPieceTheme = ImageServices.PieceTheme.Standard;
             }
             CurrentPieceTheme = parsedPieceTheme;
 
-            if (!Enum.TryParse<Images.BoardTheme>(configBoardTheme, out var parsedBoardTheme))
+            if (!Enum.TryParse<ImageServices.BoardTheme>(configBoardTheme, out var parsedBoardTheme))
             {
-                parsedBoardTheme = Images.BoardTheme.Wood;
+                parsedBoardTheme = ImageServices.BoardTheme.Wood;
             }
             CurrentBoardTheme = parsedBoardTheme;
         }
 
 
-        private Images.BoardTheme currentBoardTheme;
-        public Images.BoardTheme CurrentBoardTheme
+        private ImageServices.BoardTheme currentBoardTheme;
+        public ImageServices.BoardTheme CurrentBoardTheme
         {
             get => currentBoardTheme;
             set
@@ -48,8 +47,8 @@ namespace Chess.UI.Services
         }
 
 
-        private Images.PieceTheme currentPieceTheme;
-        public Images.PieceTheme CurrentPieceTheme
+        private ImageServices.PieceTheme currentPieceTheme;
+        public ImageServices.PieceTheme CurrentPieceTheme
         {
             get => currentPieceTheme;
             set

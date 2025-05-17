@@ -1,4 +1,10 @@
-﻿using Microsoft.UI.Dispatching;
+﻿using Chess_UI.Images;
+using Chess_UI.Services;
+using Chess_UI.Themes;
+using Chess_UI.Themes.Interfaces;
+using Chess_UI.Wrappers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.Collections.Generic;
@@ -8,46 +14,49 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.System;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess_UI.Services.ChessLogicAPI;
 
-namespace Chess.UI.Services
+namespace Chess_UI.Board
 {
-    public class BoardSquare : INotifyPropertyChanged
+    public class BoardSquare : IBoardSquare
     {
-        private readonly Microsoft.UI.Dispatching.DispatcherQueue DispatcherQueue;
+        private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public Images.PieceTheme PieceTheme { get; private set; }
+        public ImageServices.PieceTheme PieceTheme { get; private set; }
 
-        private readonly ThemeManager ThemeManager;
+        private readonly IThemeManager _themeManager;
 
+        private IImageService _images;
 
-        public BoardSquare(Microsoft.UI.Dispatching.DispatcherQueue dispatcher, ThemeManager themeManager)
+        public BoardSquare()
         {
-            this.pos = new PositionInstance(0, 0);
-            this.piece = PieceTypeInstance.DefaultType;
-            this.colour = PlayerColor.NoColor;
+            pos = new PositionInstance(0, 0);
+            piece = PieceTypeInstance.DefaultType;
+            colour = PlayerColor.NoColor;
 
-            this.DispatcherQueue = dispatcher;
-            this.ThemeManager = themeManager;
-            this.ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+            _dispatcherQueue = App.Current.Services.GetService<IDispatcherQueueWrapper>();
+            _themeManager = App.Current.Services.GetService<IThemeManager>();
 
-            this.PieceTheme = themeManager.CurrentPieceTheme;
+            _themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+
+            PieceTheme = _themeManager.CurrentPieceTheme;
         }
 
 
-        public BoardSquare(int x, int y, PieceTypeInstance pieceTypeInstance, PlayerColor color, Microsoft.UI.Dispatching.DispatcherQueue dispatcher, ThemeManager themeManager)
+        public BoardSquare(int x, int y, PieceTypeInstance pieceTypeInstance, PlayerColor color)
         {
-            this.pos = new PositionInstance(x, y);
-            this.piece = pieceTypeInstance;
-            this.colour = color;
+            pos = new PositionInstance(x, y);
+            piece = pieceTypeInstance;
+            colour = color;
 
-            this.DispatcherQueue = dispatcher;
-            this.ThemeManager = themeManager;
-            this.ThemeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+            _dispatcherQueue = App.Current.Services.GetService<IDispatcherQueueWrapper>();
+            _themeManager = App.Current.Services.GetService<IThemeManager>();
 
-            this.PieceTheme = themeManager.CurrentPieceTheme;
+            _themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+
+            PieceTheme = _themeManager.CurrentPieceTheme;
         }
 
 
@@ -55,14 +64,14 @@ namespace Chess.UI.Services
         {
             if (e.PropertyName == nameof(ThemeManager.CurrentPieceTheme))
             {
-                UpdatePieceTheme(ThemeManager.CurrentPieceTheme);
+                UpdatePieceTheme(_themeManager.CurrentPieceTheme);
             }
         }
 
 
-        private void UpdatePieceTheme(Images.PieceTheme pieceTheme)
+        public void UpdatePieceTheme(ImageServices.PieceTheme pieceTheme)
         {
-            this.PieceTheme = pieceTheme;
+            PieceTheme = pieceTheme;
         }
 
 
@@ -146,14 +155,16 @@ namespace Chess.UI.Services
                 if (piece == PieceTypeInstance.DefaultType || colour == PlayerColor.NoColor)
                     return null;
 
-                return Images.GetPieceImage(PieceTheme, colour, piece);
+                _images = new ImageServices();
+
+                return _images.GetPieceImage(PieceTheme, colour, piece);
             }
         }
 
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            DispatcherQueue?.TryEnqueue(() =>
+            _dispatcherQueue?.TryEnqueue(() =>
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             });

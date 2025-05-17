@@ -1,16 +1,17 @@
-﻿using System;
+﻿using Chess_UI.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Chess.UI.Services
+namespace Chess_UI.Settings
 {
-    public class Configuration
+    public class Settings
     {
         #region Configuration
 
-        public Configuration()
+        public Settings()
         {
 
         }
