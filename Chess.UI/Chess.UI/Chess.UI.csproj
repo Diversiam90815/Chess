@@ -47,8 +47,8 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Release'">..\..\Chess.Engine\Chess.Engine\build\Release</LocalChessLogicFiles>
-		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Debug'">..\..\Chess.Engine\Chess.Engine\build\Debug</LocalChessLogicFiles>
+		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Release'">..\..\Chess.Engine\build\Chess.Engine\Release</LocalChessLogicFiles>
+		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Debug'">..\..\Chess.Engine\build\Chess.Engine\Debug</LocalChessLogicFiles>
 		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
 		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
 		<PackageCertificateThumbprint>1E78FA83BFB0BB085640F0BA80FFCBE6725475EA</PackageCertificateThumbprint>
@@ -71,9 +71,8 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
-
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Chess.Engine\Chess.Engine\build\Chess.Engine.vcxproj" />
+	  <ProjectReference Include="..\..\Chess.Engine\build\Chess.Engine\Chess.Engine.vcxproj" />
 	</ItemGroup>
 
 

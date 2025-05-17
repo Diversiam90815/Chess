@@ -11,7 +11,7 @@ namespace Chess.UI.Services
 
         #region Defines
 
-        private const string LOGIC_API_PATH = @"Chess-Logic.dll";
+        private const string LOGIC_API_PATH = @"Chess.Engine.dll";
 
         #endregion // Defines
 

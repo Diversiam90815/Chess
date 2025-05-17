@@ -1,11 +1,11 @@
 ###########################################
-#   Chess
+#   Chess Engine
 #       by Jens W. Langenberg
 ###########################################
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.0.0.440)
+set(CHESS_VERSION 1.0.0.444)
 
 project(Chess.Engine VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
