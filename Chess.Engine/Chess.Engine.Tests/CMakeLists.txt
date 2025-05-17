@@ -9,11 +9,23 @@ project(Chess.Engine.Tests)
 
 enable_testing()
 
+set(MoveTest_Dir source/MoveTests)
+
+set(MoveTest_Files
+    ${MoveTest_Dir}/MoveGenerationTests.cpp
+    ${MoveTest_Dir}/MoveValidationTests.cpp
+    ${MoveTest_Dir}/MoveExecutionTests.cpp
+)
+
+
+set(Test_Files
+    ${MoveTest_Files}
+    source/ChessboardTests.cpp
+)
 
 add_executable(${PROJECT_NAME}
     source/main.cpp
-    source/MovesTests.cpp
-    source/ChessboardTests.cpp
+    ${Test_Files}
 )
 
 
@@ -30,6 +42,10 @@ target_link_libraries(${PROJECT_NAME}
         )
 
 include(GoogleTest)
+
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Test_Files})
+
 
 ## Discover GTests
 if (CMAKE_GENERATOR STREQUAL Xcode)
