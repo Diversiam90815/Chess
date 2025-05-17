@@ -8,12 +8,13 @@
 #include <gtest/gtest.h>
 
 #include "MoveValidation.h"
-#include "TestHelper.h"
 
 
 TEST(MoveValidationTest, ConstructionAndInit)
 {
-	auto		   board = CreateDefaultBoard();
+	auto board = std::make_shared<ChessBoard>();
+	board->initializeBoard();
+
 	MoveValidation validation;
 	validation.init(board);
 
@@ -24,7 +25,9 @@ TEST(MoveValidationTest, ConstructionAndInit)
 
 TEST(MoveValidationTest, ValidateMoveReturnsTrueForLegalMove)
 {
-	auto		   board = CreateDefaultBoard();
+	auto board = std::make_shared<ChessBoard>();
+	board->initializeBoard();
+
 	MoveValidation validation(board);
 
 	// Move white pawn from e2 to e4
@@ -38,7 +41,9 @@ TEST(MoveValidationTest, ValidateMoveReturnsTrueForLegalMove)
 
 TEST(MoveValidationTest, IsKingInCheckReturnsFalseOnInitialBoardForWhite)
 {
-	auto		   board = CreateDefaultBoard();
+	auto board = std::make_shared<ChessBoard>();
+	board->initializeBoard();
+
 	MoveValidation validation(board);
 	PlayerColor	   currentPlayer = PlayerColor::White;
 
@@ -50,7 +55,9 @@ TEST(MoveValidationTest, IsKingInCheckReturnsFalseOnInitialBoardForWhite)
 
 TEST(MoveValidationTest, IsKingInCheckReturnsFalseOnInitialBoardForBlack)
 {
-	auto		   board = CreateDefaultBoard();
+	auto board = std::make_shared<ChessBoard>();
+	board->initializeBoard();
+
 	MoveValidation validation(board);
 	PlayerColor	   currentPlayer = PlayerColor::Black;
 
@@ -63,7 +70,9 @@ TEST(MoveValidationTest, IsKingInCheckReturnsFalseOnInitialBoardForBlack)
 
 TEST(MoveValidationTest, IsCheckmateReturnsFalseOnInitialBoardForWhite)
 {
-	auto		   board = CreateDefaultBoard();
+	auto board = std::make_shared<ChessBoard>();
+	board->initializeBoard();
+
 	MoveValidation validation(board);
 
 	EXPECT_FALSE(validation.isCheckmate(PlayerColor::White));
@@ -72,7 +81,9 @@ TEST(MoveValidationTest, IsCheckmateReturnsFalseOnInitialBoardForWhite)
 
 TEST(MoveValidationTest, IsCheckmateReturnsFalseOnInitialBoardForBlack)
 {
-	auto		   board = CreateDefaultBoard();
+	auto board = std::make_shared<ChessBoard>();
+	board->initializeBoard();
+
 	MoveValidation validation(board);
 
 	EXPECT_FALSE(validation.isCheckmate(PlayerColor::Black));
@@ -81,7 +92,9 @@ TEST(MoveValidationTest, IsCheckmateReturnsFalseOnInitialBoardForBlack)
 
 TEST(MoveValidationTest, IsStaleMateReturnsFalseOnInitialBoardForBlack)
 {
-	auto		   board = CreateDefaultBoard();
+	auto board = std::make_shared<ChessBoard>();
+	board->initializeBoard();
+
 	MoveValidation validation(board);
 
 	EXPECT_FALSE(validation.isStalemate(PlayerColor::Black));

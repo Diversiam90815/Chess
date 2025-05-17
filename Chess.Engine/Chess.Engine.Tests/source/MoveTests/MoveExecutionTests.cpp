@@ -10,7 +10,14 @@
 #include "MoveExecution.h"
 #include "MoveValidation.h"
 
-#include "TestHelper.h"
+
+// Helper to create a basic chessboard
+std::shared_ptr<ChessBoard> CreateDefaultBoard()
+{
+	auto board = std::make_shared<ChessBoard>();
+	board->initializeBoard();
+	return board;
+}
 
 
 TEST(MoveExecutionTest, Constructor)
