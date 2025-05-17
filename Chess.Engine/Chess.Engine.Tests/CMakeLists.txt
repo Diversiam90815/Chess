@@ -6,10 +6,12 @@
 cmake_minimum_required(VERSION 3.25)
 
 project(Chess.Engine.Tests)
+set(CMAKE_CXX_STANDARD 20)
 
 enable_testing()
 
 set(MoveTest_Dir source/MoveTests)
+set(HelperFiles_Dir source/Helper)
 
 set(MoveTest_Files
     ${MoveTest_Dir}/MoveGenerationTests.cpp
@@ -25,7 +27,6 @@ set(Test_Files
 
 add_executable(${PROJECT_NAME}
     source/main.cpp
-    source/TestHelper.h
     ${Test_Files}
 )
 
@@ -33,6 +34,7 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${GOOGLETEST_SOURCE_DIR}/googletest/include
+        ${HelperFiles_Dir}
 )
 
 
