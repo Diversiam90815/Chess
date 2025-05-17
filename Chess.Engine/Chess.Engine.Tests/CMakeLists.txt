@@ -10,9 +10,10 @@ project(Chess.Engine.Tests)
 enable_testing()
 
 
-
 add_executable(${PROJECT_NAME}
-    source/Chess.Engine.Tests.cpp
+    source/main.cpp
+    source/MovesTests.cpp
+    source/ChessboardTests.cpp
 )
 
 
