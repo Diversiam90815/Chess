@@ -29,9 +29,10 @@ void Logging::initLogging()
 
 	logging::setLoggerName(mLoggerName);
 
+	std::string fileName = log.string();
 
 	logging::addFileOutput()
-		.setFilename(log.string())
+		.setFilename(fileName)
 		.setLevel(LogLevel::Info)
 		.setMaxFileSize(10_MB)
 		.setMaxFiles(10)

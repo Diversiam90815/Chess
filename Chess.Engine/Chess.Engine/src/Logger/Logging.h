@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "Logger/Logger.h"
+#include "Logger.h"
 
 #include <string>
 
