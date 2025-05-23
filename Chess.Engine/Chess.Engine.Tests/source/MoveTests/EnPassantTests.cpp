@@ -47,7 +47,7 @@ TEST_F(EnPassantTests, EnPassantAvailableAfterDoublePawnMove)
 	// Execute double pawn push with black pawn from d7 to d5
 	PossibleMove doublePawnMove;
 	doublePawnMove.start = blackPawnPos;
-	doublePawnMove.end	 = {3, 1}; // d5
+	doublePawnMove.end	 = {3, 3}; // d5
 	doublePawnMove.type	 = MoveType::DoublePawnPush;
 
 	mExecution->executeMove(doublePawnMove);
