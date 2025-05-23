@@ -9,15 +9,8 @@
 
 #include "MoveExecution.h"
 #include "MoveValidation.h"
+#include "TestHelper.h"
 
-
-// Helper to create a basic chessboard
-std::shared_ptr<ChessBoard> CreateDefaultBoard()
-{
-	auto board = std::make_shared<ChessBoard>();
-	board->initializeBoard();
-	return board;
-}
 
 
 TEST(MoveExecutionTest, Constructor)
@@ -36,8 +29,8 @@ TEST(MoveExecutionTest, ExecuteMoveUpdatesBoard)
 	MoveExecution execution(board, validation);
 
 	// Move white pawn e2 to e4
-	Position	  start = {4, 1};
-	Position	  end	= {4, 3};
+	Position	  start = {4, 6};
+	Position	  end	= {4, 4};
 	PossibleMove  move{start, end, MoveType::Normal, PieceType::DefaultType};
 
 	auto		  result = execution.executeMove(move);
@@ -47,7 +40,7 @@ TEST(MoveExecutionTest, ExecuteMoveUpdatesBoard)
 
 	ASSERT_NE(piece, nullptr);						  // Check if there is a piece
 	EXPECT_EQ(piece->getType(), PieceType::Pawn);	  // Check for piece type
-	EXPECT_EQ(piece->getColor(), PlayerColor::Black); // Check for piece color
+	EXPECT_EQ(piece->getColor(), PlayerColor::White); // Check for piece color
 }
 
 

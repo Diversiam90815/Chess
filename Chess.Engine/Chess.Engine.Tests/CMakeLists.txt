@@ -13,7 +13,13 @@ enable_testing()
 
 
 set(MoveTest_Dir source/MoveTests)
+
+
 set(HelperFiles_Dir source/Helper)
+
+set(HelperFiles
+    ${HelperFiles_Dir}/TestHelper.h   ${HelperFiles_Dir}/TestHelper.cpp
+)
 
 
 set(MoveTest_Files
@@ -31,6 +37,7 @@ set(Test_Files
 add_executable(${PROJECT_NAME}
     source/main.cpp
     ${Test_Files}
+    ${HelperFiles}
 )
 
 

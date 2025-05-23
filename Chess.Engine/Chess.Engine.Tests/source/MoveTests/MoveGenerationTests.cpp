@@ -10,13 +10,13 @@
 #include "MoveGeneration.h"
 #include "MoveValidation.h"
 #include "MoveExecution.h"
-
+#include "TestHelper.h"
 
 
 TEST(MoveGenerationTest, Construction)
 {
-	auto board = std::make_shared<ChessBoard>();
-	board->initializeBoard();
+	auto board		= CreateDefaultBoard();
+
 
 	auto validation = std::make_shared<MoveValidation>(board);
 	auto execution	= std::make_shared<MoveExecution>(board, validation);
@@ -27,8 +27,8 @@ TEST(MoveGenerationTest, Construction)
 
 TEST(MoveGenerationTest, GetMovesForPositionReturnsLegalMoves)
 {
-	auto board = std::make_shared<ChessBoard>();
-	board->initializeBoard();
+	auto		   board	  = CreateDefaultBoard();
+
 
 	auto		   validation = std::make_shared<MoveValidation>(board);
 	auto		   execution  = std::make_shared<MoveExecution>(board, validation);
@@ -47,8 +47,8 @@ TEST(MoveGenerationTest, GetMovesForPositionReturnsLegalMoves)
 
 TEST(MoveGenerationTest, CalculateAllLegalBasicMovesReturnsTrue)
 {
-	auto board = std::make_shared<ChessBoard>();
-	board->initializeBoard();
+	auto		   board	  = CreateDefaultBoard();
+
 
 	auto		   validation = std::make_shared<MoveValidation>(board);
 	auto		   execution  = std::make_shared<MoveExecution>(board, validation);

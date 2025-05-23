@@ -5,11 +5,12 @@
   ==============================================================================
 */
 
-#pragma once
-#include <memory>
-
-#include "ChessBoard.h"
+#include "TestHelper.h"
 
 
-// Helper to create a default board
-std::shared_ptr<ChessBoard> CreateDefaultBoard();
+std::shared_ptr<ChessBoard> CreateDefaultBoard()
+{
+	auto board = std::make_shared<ChessBoard>();
+	board->initializeBoard();
+	return board;
+}
