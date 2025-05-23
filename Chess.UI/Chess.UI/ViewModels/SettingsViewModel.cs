@@ -15,7 +15,7 @@ using Chess.UI.Themes.Interfaces;
 
 namespace Chess.UI.ViewModels
 {
-    public class SettingsViewModel : ISettings
+    public class SettingsViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

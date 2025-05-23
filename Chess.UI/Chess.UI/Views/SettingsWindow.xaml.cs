@@ -1,4 +1,5 @@
 using Chess.UI.Services;
+using Chess.UI.Settings;
 using Chess.UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;

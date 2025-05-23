@@ -69,7 +69,6 @@ namespace Chess.UI
             services.AddSingleton<IThemeManager, ThemeManager>();
             services.AddSingleton<IImageService, ImageServices>();
 
-            services.AddTransient<ISettings, SettingsViewModel>();
             services.AddTransient<IMoveModel, MoveModel>();
             services.AddTransient<IScoreModel, ScoreModel>();
             services.AddTransient<IMoveHistoryModel, MoveHistoryModel>();
@@ -83,6 +82,7 @@ namespace Chess.UI
             services.AddTransient<MoveHistoryViewModel>();
             services.AddTransient<MainMenuViewModel>();
             services.AddTransient<MultiplayerViewModel>();
+            services.AddTransient<SettingsViewModel>();
 
             services.AddTransient<MainMenuWindow>();
             services.AddTransient<ChessBoardWindow>();
