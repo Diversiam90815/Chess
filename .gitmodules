@@ -1,12 +1,12 @@
 [submodule "Chess-Logic/submodules/Logger"]
-	path = Chess-Logic/submodules/Logger
+	path = Chess.Engine/Chess.Engine/submodule/Logger
 	url = git@github.com:Diversiam90815/Logger.git
 	branch = main
 [submodule "Chess-Logic/submodules/json"]
-	path = Chess-Logic/submodules/json
+	path = Chess.Engine/Chess.Engine/submodule/json
 	url = git@github.com:nlohmann/json.git
 	branch = master
 [submodule "Chess-Logic/submodules/asio-standalone"]
-	path = Chess-Logic/submodules/asio-standalone
+	path = Chess.Engine/Chess.Engine/submodule/asio-standalone
 	url = git@github.com:chriskohlhoff/asio.git
 	branch = master
