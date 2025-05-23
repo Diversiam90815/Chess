@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.0.0.450)
+set(CHESS_VERSION 1.0.0.453)
 
 project(Chess.Engine VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
@@ -219,8 +219,12 @@ add_subdirectory(${JSON_DIR})
 #   CREATE TARGET
 ###########################################
 
+add_library(${PROJECT_NAME}.Core STATIC   
+  ${ALL_FILES}
+)
+
 add_library(${PROJECT_NAME} SHARED
-	${ALL_FILES}
+  ${ALL_FILES}
 )
 
 
@@ -237,6 +241,17 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 #   COMPILE DEFINITIONS
 ###########################################
 
+target_compile_definitions(${PROJECT_NAME}.Core PUBLIC
+	-DENV_DEVELOPMENT
+	_CRT_SECURE_NO_WARNINGS
+
+	_WINDOWS
+	WIN32_LEAN_AND_MEAN
+	_WINSOCK_DEPRECATED_NO_WARNING
+	_WIN32_WINNT=0x0A00
+
+)
+
 target_compile_definitions(${PROJECT_NAME} PUBLIC
 	-DENV_DEVELOPMENT
 	_CRT_SECURE_NO_WARNINGS
@@ -252,6 +267,20 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 ###########################################
 #   COMPILE OPTIONS
 ###########################################
+
+target_compile_options(${PROJECT_NAME}.Core PRIVATE
+	$<$<CONFIG:Release>:
+		/Oi
+		/Gy
+	>
+	$<$<CONFIG:Debug>:
+		/Od
+		/Z7
+	>
+	/sdl
+	/MP
+	/WX-        # Don't treat warnings as errors
+)
 
 target_compile_options(${PROJECT_NAME} PRIVATE
 	$<$<CONFIG:Release>:
@@ -272,13 +301,16 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 #   TARGET INCLUDE DIRECTORIES
 ###########################################
 
-target_include_directories(${PROJECT_NAME} PUBLIC
+set(Include_Dirs 
 		${PROJECT_BINARY_DIR}
 		${ALL_PROJECT_DIRS}
 		${LOGGER_INCLUDE_FILE}
 		${JSON_SINGLE_FILE}
 		${Asio_INCLUDE_DIR}
 )
+
+target_include_directories(${PROJECT_NAME}.Core PUBLIC ${Include_Dirs})
+target_include_directories(${PROJECT_NAME} PUBLIC ${Include_Dirs})
 
 
 ###########################################
@@ -287,5 +319,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 set(PROJECT_LIBS Logger)
 
+target_link_libraries(${PROJECT_NAME}.Core PUBLIC ${PROJECT_LIBS})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_LIBS})
 

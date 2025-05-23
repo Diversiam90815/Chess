@@ -10,8 +10,11 @@ set(CMAKE_CXX_STANDARD 20)
 
 enable_testing()
 
+
+
 set(MoveTest_Dir source/MoveTests)
 set(HelperFiles_Dir source/Helper)
+
 
 set(MoveTest_Files
     ${MoveTest_Dir}/MoveGenerationTests.cpp
@@ -40,9 +43,10 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
       PRIVATE
-        Chess.Engine        
+        Chess.Engine.Core
         GTest::gtest_main
         )
+
 
 include(GoogleTest)
 
