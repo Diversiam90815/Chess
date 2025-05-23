@@ -1,7 +1,7 @@
-###########################################
+#==========================================
 #   Chess Engine
 #       by Jens W. Langenberg
-###########################################
+#==========================================
 
 cmake_minimum_required(VERSION 3.25)
 
@@ -10,9 +10,9 @@ set(CHESS_VERSION 1.0.0.455)
 project(Chess.Engine VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
 
-###########################################
+#==========================================
 #   CPP AND PROJECT STANDARDS
-###########################################
+#==========================================
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,9 +20,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 
-###########################################
+#==========================================
 #   PROJECT DIRECTORIES
-###########################################
+#==========================================
 
 set (SOURCE_DIR             ${PROJECT_SOURCE_DIR}/src)
 set (SUBMODULES_DIR         ${PROJECT_SOURCE_DIR}/submodule)
@@ -44,9 +44,9 @@ set (MULTIPLAYER_DIR        ${SOURCE_DIR}/Multiplayer)
 set (STATEMACHINE_DIR       ${SOURCE_DIR}/StateMachine)
 
 
-###########################################
+#==========================================
 #   INCLUDE DIRECTORIES
-###########################################
+#==========================================
 
 set(ALL_PROJECT_DIRS 
 			${PIECE_DIR}
@@ -70,9 +70,9 @@ set(ALL_PROJECT_DIRS
 include_directories(${ALL_PROJECT_DIRS})
 
 
-###########################################
+#==========================================
 #   SET THE FILES
-###########################################
+#==========================================
 
 set(API_FILES
 	${API_DIR}/ChessLogicAPI.h    ${API_DIR}/ChessLogicAPI.cpp
@@ -185,16 +185,16 @@ set(ALL_FILES
 )
 
 
-###########################################
+#==========================================
 #   SOURCE GROUPS
-###########################################
+#==========================================
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ALL_FILES})
 
 
-###########################################
+#==========================================
 #   SUBMODULES
-###########################################
+#==========================================
 
 # Logger
 
@@ -215,9 +215,9 @@ set(JSON_SINGLE_FILE ${JSON_DIR}/single_include/nlohmann)
 add_subdirectory(${JSON_DIR})
 
 
-###########################################
+#==========================================
 #   CREATE TARGET
-###########################################
+#==========================================
 
 add_library(${PROJECT_NAME}.Core STATIC   
   ${ALL_FILES}
@@ -228,18 +228,18 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 
-###########################################
+#==========================================
 #   OUTPUT PROPERTIES
-###########################################
+#==========================================
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
 	OUTPUT_NAME "${PROJECT_NAME}"
 )
 
 
-###########################################
+#==========================================
 #   COMPILE DEFINITIONS
-###########################################
+#==========================================
 
 target_compile_definitions(${PROJECT_NAME}.Core PUBLIC
 	-DENV_DEVELOPMENT
@@ -264,9 +264,9 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 )
 
 
-###########################################
+#==========================================
 #   COMPILE OPTIONS
-###########################################
+#==========================================
 
 target_compile_options(${PROJECT_NAME}.Core PRIVATE
 	$<$<CONFIG:Release>:
@@ -297,9 +297,9 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 )
 
 
-###########################################
+#==========================================
 #   TARGET INCLUDE DIRECTORIES
-###########################################
+#==========================================
 
 set(Include_Dirs 
 		${PROJECT_BINARY_DIR}
@@ -313,9 +313,9 @@ target_include_directories(${PROJECT_NAME}.Core PUBLIC ${Include_Dirs})
 target_include_directories(${PROJECT_NAME} PUBLIC ${Include_Dirs})
 
 
-###########################################
+#==========================================
 #   LINK LIBRARIES
-###########################################
+#==========================================
 
 set(PROJECT_LIBS Logger)
 
