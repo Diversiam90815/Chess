@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 	Module:			Move Execution Tests
-	Description:    Testing the move execution module from the chess engine
+	Description:    Testing the general move execution module from the chess engine
   ==============================================================================
 */
 

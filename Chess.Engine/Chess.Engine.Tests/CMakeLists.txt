@@ -32,6 +32,8 @@ set(MoveTest_Files
     ${MoveTest_Dir}/MoveGenerationTests.cpp
     ${MoveTest_Dir}/MoveValidationTests.cpp
     ${MoveTest_Dir}/MoveExecutionTests.cpp
+    ${MoveTest_Dir}/CastlingTests.cpp
+    ${MoveTest_Dir}/EnPassantTests.cpp
 )
 
 set(Test_Files

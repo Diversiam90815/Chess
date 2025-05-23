@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 	Module:			Move Validation Tests
-	Description:    Testing the move validation module from the chess engine
+	Description:    Testing the general move validation module from the chess engine
   ==============================================================================
 */
 

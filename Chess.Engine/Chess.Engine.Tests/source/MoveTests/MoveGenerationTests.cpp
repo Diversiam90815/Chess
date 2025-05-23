@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 	Module:			Move Generation Tests
-	Description:    Testing the move generation module from the chess engine
+	Description:    Testing the general move generation module from the chess engine
   ==============================================================================
 */
 
