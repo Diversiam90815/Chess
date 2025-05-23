@@ -47,7 +47,7 @@ TEST(MoveExecutionTest, ExecuteMoveUpdatesBoard)
 
 	ASSERT_NE(piece, nullptr);						  // Check if there is a piece
 	EXPECT_EQ(piece->getType(), PieceType::Pawn);	  // Check for piece type
-	EXPECT_EQ(piece->getColor(), PlayerColor::White); // Check for piece color
+	EXPECT_EQ(piece->getColor(), PlayerColor::Black); // Check for piece color
 }
 
 

@@ -72,7 +72,7 @@ TEST(ChessBoardTest, GetKingsPosition)
 	Position blackKing = board.getKingsPosition(PlayerColor::Black);
 
 	EXPECT_EQ(whiteKing.x, 4);
-	EXPECT_EQ(whiteKing.y, 0);
+	EXPECT_EQ(whiteKing.y, 7);
 	EXPECT_EQ(blackKing.x, 4);
-	EXPECT_EQ(blackKing.y, 7);
+	EXPECT_EQ(blackKing.y, 0);
 }

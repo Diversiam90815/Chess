@@ -36,8 +36,9 @@ TEST(MoveGenerationTest, GetMovesForPositionReturnsLegalMoves)
 	MoveGeneration generation(board, validation, execution);
 
 	// e2 pawn
-	Position	   pawnPos = {4, 1};
-	auto		   moves   = generation.getMovesForPosition(pawnPos);
+	Position	   pawnPos = {4, 6};
+	generation.calculateAllLegalBasicMoves(PlayerColor::White);
+	auto moves = generation.getMovesForPosition(pawnPos);
 
 	// Should have at least one move (e2-e3, e2-e4)
 	EXPECT_FALSE(moves.empty());
