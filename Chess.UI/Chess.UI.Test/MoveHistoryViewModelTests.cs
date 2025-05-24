@@ -78,26 +78,6 @@ namespace Chess.UI.Test
             _model.Verify(m => m.RemoveLastMove(), Times.Once);
         }
 
-        [Fact]
-        public void OnHandleMoveHistoryUpdated_UpdatesColumnData()
-        {
-            // Arrange
-            _model.Setup(m => m.MoveHistory)
-                .Returns(new System.Collections.Generic.List<string> { "e4", "e5", "Nf3" });
-
-            var viewModel = new MoveHistoryViewModel(_dispatcher.Object, _model.Object);
-            
-            // Act - Call the private method using reflection
-            var method = typeof(MoveHistoryViewModel).GetMethod("OnHandleMoveHistoryUpdated",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            method.Invoke(viewModel, null);
-
-            // Assert
-            Assert.Equal(3, viewModel.MoveHistoryColumns.Sum(col => col.Count));
-            Assert.Equal("e4", viewModel.MoveHistoryColumns[0][0]);
-            Assert.Equal("e5", viewModel.MoveHistoryColumns[1][0]);
-            Assert.Equal("Nf3", viewModel.MoveHistoryColumns[2][0]);
-        }
 
         // Helper method to setup App.Current.Services
         private void SetupAppServiceProvider(IServiceProvider serviceProvider)

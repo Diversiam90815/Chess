@@ -83,12 +83,17 @@ TEST_F(MoveGenerationTest, PawnCapturesCalculatedCorrectly)
 {
 	mBoard->removeAllPiecesFromBoard();
 
+	// Create pawn & increase move counter of the pawn to prohibit double pawn push
+	auto pawn = ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::White);
+	pawn->increaseMoveCounter();
+
 	// Set up position with white pawn at e4 and black pieces at d5 and f5
-	mBoard->setPiece({4, 4}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::White));
+	Position pawnPos = Position{4, 4};
+	mBoard->setPiece(pawnPos, pawn);
 	mBoard->setPiece({3, 3}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
 	mBoard->setPiece({5, 3}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
 
-	Position pawnPos = Position{4, 4};
+	// Generate moves
 	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
 	auto moves = mGeneration->getMovesForPosition(pawnPos);
 
@@ -478,7 +483,7 @@ TEST_F(MoveGenerationTest, PiecesCannotMoveIntoCheck)
 	}
 
 	EXPECT_TRUE(canMoveNorth) << "King should be able to escape check by moving north";
-	EXPECT_TRUE(canBlockCheck) << "King should be able to block check by moving to f1";
+	EXPECT_FALSE(canBlockCheck) << "King should not be able move in check by moving to f1";
 }
 
 
