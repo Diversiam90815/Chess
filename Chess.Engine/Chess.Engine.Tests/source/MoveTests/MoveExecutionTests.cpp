@@ -9,7 +9,6 @@
 
 #include "MoveExecution.h"
 #include "MoveValidation.h"
-#include "TestHelper.h"
 
 
 class MoveExecutionTest : public ::testing::Test

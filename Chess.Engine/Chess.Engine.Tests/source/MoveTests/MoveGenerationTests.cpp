@@ -10,7 +10,7 @@
 #include "MoveGeneration.h"
 #include "MoveValidation.h"
 #include "MoveExecution.h"
-#include "TestHelper.h"
+
 
 class MoveGenerationTest : public ::testing::Test
 {

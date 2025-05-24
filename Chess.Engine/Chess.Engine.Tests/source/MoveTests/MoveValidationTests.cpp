@@ -8,7 +8,6 @@
 #include <gtest/gtest.h>
 
 #include "MoveValidation.h"
-#include "TestHelper.h"
 
 
 class MoveValidationTest : public ::testing::Test
