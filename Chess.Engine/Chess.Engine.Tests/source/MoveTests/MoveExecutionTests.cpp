@@ -12,55 +12,85 @@
 #include "TestHelper.h"
 
 
-
-TEST(MoveExecutionTest, Constructor)
+class MoveExecutionTest : public ::testing::Test
 {
-	auto board		= CreateDefaultBoard();
-	auto validation = std::make_shared<MoveValidation>(board);
+protected:
+	std::shared_ptr<ChessBoard>		mBoard;
+	std::shared_ptr<MoveValidation> mValidation;
+	std::shared_ptr<MoveExecution>	mExecution;
 
-	EXPECT_NO_THROW({ MoveExecution exec(board, validation); });
-}
+	void							SetUp() override
+	{
+		mBoard = std::make_shared<ChessBoard>();
+		mBoard->initializeBoard();
+		mValidation = std::make_shared<MoveValidation>(mBoard);
+		mExecution	= std::make_shared<MoveExecution>(mBoard, mValidation);
+	}
+};
 
 
-TEST(MoveExecutionTest, ExecuteMoveUpdatesBoard)
+TEST_F(MoveExecutionTest, ExecuteMoveUpdatesBoard)
 {
-	auto		  board		 = CreateDefaultBoard();
-	auto		  validation = std::make_shared<MoveValidation>(board);
-	MoveExecution execution(board, validation);
-
 	// Move white pawn e2 to e4
-	Position	  start = {4, 6};
-	Position	  end	= {4, 4};
-	PossibleMove  move{start, end, MoveType::Normal, PieceType::DefaultType};
+	Position	 start = {4, 6};
+	Position	 end   = {4, 4};
+	PossibleMove move{start, end, MoveType::Normal, PieceType::DefaultType};
 
-	auto		  result = execution.executeMove(move);
+	auto		 result = mExecution->executeMove(move);
 
 	// The pawn should now be at e4
-	auto		  piece	 = board->getPiece(end);
+	auto		 piece	= mBoard->getPiece(end);
 
-	ASSERT_NE(piece, nullptr);						  // Check if there is a piece
-	EXPECT_EQ(piece->getType(), PieceType::Pawn);	  // Check for piece type
-	EXPECT_EQ(piece->getColor(), PlayerColor::White); // Check for piece color
+	ASSERT_NE(piece, nullptr) << "Expected a piece at the destination";
+	EXPECT_EQ(piece->getType(), PieceType::Pawn) << "Expected a pawn at the destination";
+	EXPECT_EQ(piece->getColor(), PlayerColor::White) << "Expected a white piece at the destination";
 }
 
 
-TEST(MoveExecutionTest, AddAndRemoveFromMoveHistory)
+TEST_F(MoveExecutionTest, ExecuteCaptureMove)
 {
-	auto		  board		 = CreateDefaultBoard();
-	auto		  validation = std::make_shared<MoveValidation>(board);
-	MoveExecution execution(board, validation);
+	mBoard->removeAllPiecesFromBoard();
 
+	// Place white knight at e4, black pawn at f5
+	Position whiteKnightPos = {4, 4}; // e4
+	Position blackPawnPos	= {5, 3}; // f5
+
+	mBoard->setPiece(whiteKnightPos, ChessPiece::CreatePiece(PieceType::Knight, PlayerColor::White));
+	mBoard->setPiece(blackPawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
+
+	// Execute capture move
+	PossibleMove captureMove{whiteKnightPos, blackPawnPos, MoveType::Capture, PieceType::DefaultType};
+	auto		 result	   = mExecution->executeMove(captureMove);
+
+	// Verify: White knight now at f5, no piece at e4
+	auto		 pieceAtF5 = mBoard->getPiece(blackPawnPos);
+	ASSERT_NE(pieceAtF5, nullptr) << "Expected the capturing knight at destination";
+	EXPECT_EQ(pieceAtF5->getType(), PieceType::Knight) << "Expected a knight at the destination";
+	EXPECT_EQ(pieceAtF5->getColor(), PlayerColor::White) << "Expected a white piece at the destination";
+	EXPECT_TRUE(mBoard->isEmpty(whiteKnightPos)) << "Original position should be empty after capture";
+
+	// Verify: capture was recorded in the move
+	const Move *lastMove = mExecution->getLastMove();
+	ASSERT_NE(lastMove, nullptr) << "Expected a move in the history";
+	EXPECT_EQ(lastMove->capturedPiece, PieceType::Pawn) << "Move should record the captured pawn";
+}
+
+
+TEST_F(MoveExecutionTest, AddAndRemoveFromMoveHistory)
+{
 	// Execute the move
-	Position	  start = {4, 1};
-	Position	  end	= {4, 3};
-	PossibleMove  move{start, end, MoveType::Normal, PieceType::DefaultType};
-	Move		  executedMove(move);
+	Position	 start = {4, 1};
+	Position	 end   = {4, 3};
+	PossibleMove move{start, end, MoveType::Normal, PieceType::DefaultType};
+	Move		 executedMove(move);
 
 	// Check for move added to move history
-	execution.addMoveToHistory(executedMove);
-	EXPECT_NE(execution.getLastMove(), nullptr);
+	mExecution->addMoveToHistory(executedMove);
+	EXPECT_NE(mExecution->getLastMove(), nullptr) << "Last move should not be null after adding to history";
 
 	// Check for removing the move
-	execution.removeLastMove();
-	EXPECT_EQ(execution.getLastMove(), nullptr);
+	mExecution->removeLastMove();
+	EXPECT_EQ(mExecution->getLastMove(), nullptr) << "Last move should be null after removing from history";
 }
+
+
