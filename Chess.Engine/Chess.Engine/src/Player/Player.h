@@ -31,18 +31,14 @@ class Player : public IPlayerObservable
 {
 public:
 	Player() = default;
-
 	Player(PlayerColor color);
-
 	~Player() = default;
-
 
 	Score		  getScore() const;
 	void		  setScore(int value);
 
 	PlayerColor	  getPlayerColor() const;
 	void		  setPlayerColor(PlayerColor value);
-
 
 	void		  addCapturedPiece(const PieceType piece) override;
 	void		  removeLastCapturedPiece() override;

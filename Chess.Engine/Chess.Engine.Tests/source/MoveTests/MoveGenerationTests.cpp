@@ -17,7 +17,6 @@ TEST(MoveGenerationTest, Construction)
 {
 	auto board		= CreateDefaultBoard();
 
-
 	auto validation = std::make_shared<MoveValidation>(board);
 	auto execution	= std::make_shared<MoveExecution>(board, validation);
 
@@ -28,7 +27,6 @@ TEST(MoveGenerationTest, Construction)
 TEST(MoveGenerationTest, GetMovesForPositionReturnsLegalMoves)
 {
 	auto		   board	  = CreateDefaultBoard();
-
 
 	auto		   validation = std::make_shared<MoveValidation>(board);
 	auto		   execution  = std::make_shared<MoveExecution>(board, validation);
@@ -48,7 +46,6 @@ TEST(MoveGenerationTest, GetMovesForPositionReturnsLegalMoves)
 TEST(MoveGenerationTest, CalculateAllLegalBasicMovesReturnsTrue)
 {
 	auto		   board	  = CreateDefaultBoard();
-
 
 	auto		   validation = std::make_shared<MoveValidation>(board);
 	auto		   execution  = std::make_shared<MoveExecution>(board, validation);

@@ -27,7 +27,6 @@ TEST(MoveValidationTest, ValidateMoveReturnsTrueForLegalMove)
 {
 	auto		   board = CreateDefaultBoard();
 
-
 	MoveValidation validation(board);
 
 	// Move white pawn from e2 to e4
@@ -42,7 +41,6 @@ TEST(MoveValidationTest, ValidateMoveReturnsTrueForLegalMove)
 TEST(MoveValidationTest, IsKingInCheckReturnsFalseOnInitialBoardForWhite)
 {
 	auto		   board = CreateDefaultBoard();
-
 
 	MoveValidation validation(board);
 	PlayerColor	   currentPlayer = PlayerColor::White;
@@ -71,7 +69,6 @@ TEST(MoveValidationTest, IsCheckmateReturnsFalseOnInitialBoardForWhite)
 {
 	auto		   board = CreateDefaultBoard();
 
-
 	MoveValidation validation(board);
 
 	EXPECT_FALSE(validation.isCheckmate(PlayerColor::White));
@@ -82,7 +79,6 @@ TEST(MoveValidationTest, IsCheckmateReturnsFalseOnInitialBoardForBlack)
 {
 	auto		   board = CreateDefaultBoard();
 
-
 	MoveValidation validation(board);
 
 	EXPECT_FALSE(validation.isCheckmate(PlayerColor::Black));
@@ -92,7 +88,6 @@ TEST(MoveValidationTest, IsCheckmateReturnsFalseOnInitialBoardForBlack)
 TEST(MoveValidationTest, IsStaleMateReturnsFalseOnInitialBoardForBlack)
 {
 	auto		   board = CreateDefaultBoard();
-
 
 	MoveValidation validation(board);
 
