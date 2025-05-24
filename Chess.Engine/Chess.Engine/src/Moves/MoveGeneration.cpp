@@ -160,8 +160,7 @@ bool MoveGeneration::canCastle(const Position &kingposition, PlayerColor player,
 	if (king->hasMoved())
 		return false;
 
-	Position tmpKingPosition = kingposition;
-	if(mValidation->isKingInCheck(tmpKingPosition, player))
+	if(mValidation->isKingInCheck(kingposition, player))
 		return false;
 
 	// Define the y-coordinate and king's x-coordinate

@@ -36,7 +36,7 @@ bool MoveValidation::validateMove(Move &move, PlayerColor playerColor)
 }
 
 
-bool MoveValidation::isKingInCheck(Position &ourKing, PlayerColor playerColor)
+bool MoveValidation::isKingInCheck(const Position &ourKing, PlayerColor playerColor)
 {
 	PlayerColor opponentColor = playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
 	return isSquareAttacked(ourKing, opponentColor);

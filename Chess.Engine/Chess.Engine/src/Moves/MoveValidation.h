@@ -26,7 +26,7 @@ public:
 
 	bool validateMove(Move &move, PlayerColor playerColor);
 
-	bool isKingInCheck(Position &ourKing, PlayerColor playerColor);
+	bool isKingInCheck(const Position &ourKing, PlayerColor playerColor);
 
 	bool isCheckmate(PlayerColor player);
 
