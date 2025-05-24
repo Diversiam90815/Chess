@@ -121,7 +121,7 @@ TEST_F(CastlingTests, CastlingBlockedByPieces)
 	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
 	auto moves				 = mGeneration->getMovesForPosition(Position{4, 7});
 
-	// Verify: Kingside casling move is not available
+	// Check the moves for kingside castling
 	bool hasKingsideCastling = false;
 	for (const auto &move : moves)
 	{
@@ -160,3 +160,137 @@ TEST_F(CastlingTests, CastlingBlockedByPieces)
 }
 
 
+TEST_F(CastlingTests, CastlingNotAvailableAfterKingMoves)
+{
+	SetupCastlingPosition(PlayerColor::White);
+
+	// Move the king
+	PossibleMove kingMove;
+	kingMove.start = Position{4, 7}; // e1
+	kingMove.end   = Position{4, 6}; // e2
+	kingMove.type  = MoveType::Normal;
+
+	mExecution->executeMove(kingMove);
+
+	// Move the king back
+	PossibleMove kingMoveBack;
+	kingMoveBack.start = Position{4, 6}; // e2
+	kingMoveBack.end   = Position{4, 7}; // e1
+	kingMoveBack.type  = MoveType::Normal;
+
+	mExecution->executeMove(kingMoveBack);
+
+	// Get moves for king position
+	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
+	auto moves		 = mGeneration->getMovesForPosition(Position{4, 7});
+
+	// Check the moves for kingside castling
+	bool hasCastling = false;
+	for (const auto &move : moves)
+	{
+		if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
+		{
+			hasCastling = true;
+			break;
+		}
+	}
+
+	// Verify: Castling not available
+	EXPECT_FALSE(hasCastling) << "Castling should not be available after king has moved";
+}
+
+
+TEST_F(CastlingTests, CastlingNotAvailableAfterRookMoves)
+{
+	SetupCastlingPosition(PlayerColor::White);
+
+	// Move the kingside rook
+	PossibleMove rookMove;
+	rookMove.start = Position{7, 7}; // h1
+	rookMove.end   = Position{7, 6}; // h2
+	rookMove.type  = MoveType::Normal;
+
+	mExecution->executeMove(rookMove);
+
+	// Move the rook back
+	PossibleMove rookMoveBack;
+	rookMoveBack.start = Position{7, 6}; // h2
+	rookMoveBack.end   = Position{7, 7}; // h1
+	rookMoveBack.type  = MoveType::Normal;
+
+	mExecution->executeMove(rookMoveBack);
+
+	// Get moves for king position
+	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
+	auto moves				 = mGeneration->getMovesForPosition(Position{4, 7});
+
+	// Check the moves for kingside castling
+	bool hasKingsideCastling = false;
+	for (const auto &move : moves)
+	{
+		if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside)
+		{
+			hasKingsideCastling = true;
+			break;
+		}
+	}
+
+	// Verify: Kingside castling move not available
+	EXPECT_FALSE(hasKingsideCastling) << "Kingside castling should not be available after rook has moved";
+}
+
+
+TEST_F(CastlingTests, CastlingNotAllowedThroughCheck)
+{
+	SetupCastlingPosition(PlayerColor::White);
+
+	// Place an opponent piece that attacks a square the king must pass through
+	// Black rook at f3 which controls f1, preventing kingside castling
+	mBoard->setPiece(Position{5, 5}, ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::Black));
+
+	// Get moves for king position
+	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
+	auto moves				 = mGeneration->getMovesForPosition(Position{4, 7});
+
+	// Check that kingside castling is not available
+	bool hasKingsideCastling = false;
+	for (const auto &move : moves)
+	{
+		if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside)
+		{
+			hasKingsideCastling = true;
+			break;
+		}
+	}
+
+	// Verify: Castling move not available
+	EXPECT_FALSE(hasKingsideCastling) << "Kingside castling should not be allowed through check";
+}
+
+
+TEST_F(CastlingTests, CastlingNotAllowedWhenKingInCheck)
+{
+	SetupCastlingPosition(PlayerColor::White);
+
+	// Place an opponent piece that attacks the king
+	// Black rook at e3 which checks the king on e1
+	mBoard->setPiece(Position{4, 5}, ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::Black));
+
+	// Get moves for king position
+	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
+	auto moves		 = mGeneration->getMovesForPosition(Position{4, 7});
+
+	// Check that no castling is available
+	bool hasCastling = false;
+	for (const auto &move : moves)
+	{
+		if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
+		{
+			hasCastling = true;
+			break;
+		}
+	}
+
+	// Verify: Castling should not be available
+	EXPECT_FALSE(hasCastling) << "Castling should not be allowed when king is in check";
+}
