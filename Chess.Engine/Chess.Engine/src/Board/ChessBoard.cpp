@@ -40,9 +40,7 @@ ChessBoard::ChessBoard(const ChessBoard &other)
 }
 
 
-ChessBoard::~ChessBoard()
-{
-}
+ChessBoard::~ChessBoard() {}
 
 
 Square &ChessBoard::getSquare(Position pos)
@@ -81,6 +79,11 @@ std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PlayerColor playerColor
 
 std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos)
 {
+	static std::shared_ptr<ChessPiece> nullPiece = nullptr;
+
+	if (!pos.isValid())
+		return nullPiece;
+
 	return squares[pos.y][pos.x].piece;
 }
 
@@ -94,6 +97,9 @@ void ChessBoard::removePiece(Position pos)
 
 bool ChessBoard::movePiece(Position start, Position end)
 {
+	if (!start.isValid() || !end.isValid())
+		return false;
+
 	auto &piece = getPiece(start);
 	if (!piece)
 		return false;

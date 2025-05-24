@@ -143,13 +143,10 @@ TEST_F(ChessBoardTest, IsEmpty)
 }
 
 
-TEST(ChessBoardTest, GetKingsPosition)
+TEST_F(ChessBoardTest, GetKingsPosition)
 {
-	ChessBoard board;
-	board.initializeBoard();
-
-	Position whiteKing = board.getKingsPosition(PlayerColor::White);
-	Position blackKing = board.getKingsPosition(PlayerColor::Black);
+	Position whiteKing = mBoard.getKingsPosition(PlayerColor::White);
+	Position blackKing = mBoard.getKingsPosition(PlayerColor::Black);
 
 	EXPECT_EQ(whiteKing.x, 4) << "White king's X position should be correct";
 	EXPECT_EQ(whiteKing.y, 7) << "White king's Y position should be correct";

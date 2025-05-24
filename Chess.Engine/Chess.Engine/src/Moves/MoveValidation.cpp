@@ -23,9 +23,27 @@ void MoveValidation::init(std::shared_ptr<ChessBoard> board)
 
 bool MoveValidation::validateMove(Move &move, PlayerColor playerColor)
 {
-	auto kingPosition = mChessBoard->getKingsPosition(playerColor);
+	// 1. Verify the piece exists and belongs to the player
+	auto &piece = mChessBoard->getPiece(move.startingPosition);
+	if (!piece || piece->getColor() != playerColor)
+		return false;
 
-	//  Still in check after the move? -> Invalid
+	// 2. Verify the move is valid for the piece type
+	bool moveIsValid = false;
+	auto validMoves	 = piece->getPossibleMoves(move.startingPosition, *mChessBoard);
+	for (const auto &validMove : validMoves)
+	{
+		if (validMove.end == move.endingPosition)
+		{
+			moveIsValid = true;
+			break;
+		}
+	}
+
+	if (!moveIsValid)
+		return false;
+
+	// 3. Check if king would be in check after move
 	if (wouldKingBeInCheckAfterMove(move, playerColor))
 	{
 		LOG_INFO("Move could not be validated, since the king would be in check after this move!");
