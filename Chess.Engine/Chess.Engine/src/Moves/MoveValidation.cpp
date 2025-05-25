@@ -140,11 +140,16 @@ bool MoveValidation::wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerC
 	// Simulate the move
 	boardCopy.movePiece(move.startingPosition, move.endingPosition);
 
-	// Update King's position if if this is the king
-	Position kingPosition = boardCopy.getKingsPosition(playerColor);
+	// Update King's position if it's the king
+	Position kingPosition;
 	if (isKing)
 	{
 		kingPosition = move.endingPosition;
+		boardCopy.updateKingsPosition(kingPosition, playerColor); // Ensure board copy knows where the king is
+	}
+	else
+	{
+		kingPosition = boardCopy.getKingsPosition(playerColor);
 	}
 
 	// Check if King is under attack (isSquareUnderAttack)

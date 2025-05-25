@@ -28,12 +28,12 @@ protected:
 
 TEST_F(MoveValidationTest, ValidateMoveReturnsTrueForLegalMove)
 {
-	// Move white pawn from e2 to e4
+	// Move white pawn from e2 to e3
 	Position start = {4, 1};
-	Position end   = {4, 3};
+	Position end   = {4, 2};
 	Move	 move(start, end, PieceType::Pawn);
 
-	bool	 result = mValidation->validateMove(move, PlayerColor::White);
+	bool	 result = mValidation->validateMove(move, PlayerColor::Black);
 
 	EXPECT_TRUE(result) << "Valid move should return true";
 }
@@ -130,23 +130,22 @@ TEST_F(MoveValidationTest, DetectsKingInCheckFromPawn)
 	EXPECT_TRUE(isKingInCheck) << " King should be in check from pawn's diagonal attack";
 }
 
-
 TEST_F(MoveValidationTest, DetectScholarsMateCheckmate)
 {
 	mBoard->removeAllPiecesFromBoard();
 
-	// Setup scholar's mate position:
-	// Black king at e8, black pawns at standard positions
-	// Wite queen at h5 (delivering checkmate)
+	// Setup proper scholar's mate position
+	Position blackKingPos = {4, 0}; // e8
 
-	Position blackKingPos = {4, 0};															  // e8
-
+	// Black pieces
 	mBoard->setPiece(blackKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::Black));
-	mBoard->setPiece({3, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // d7
-	mBoard->setPiece({4, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // e7
-	mBoard->setPiece({5, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // f7
-	mBoard->setPiece({7, 3}, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White));  // h5
-	mBoard->setPiece({5, 2}, ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::White)); // f6
+	mBoard->setPiece({4, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black)); // e7
+	mBoard->setPiece({5, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black)); // f7
+	mBoard->setPiece({6, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black)); // g7
+
+	// White pieces - queen delivers checkmate at f7
+	mBoard->setPiece({5, 1}, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White));  // f7
+	mBoard->setPiece({2, 4}, ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::White)); // c4 (supports queen)
 
 	mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
 
@@ -155,6 +154,29 @@ TEST_F(MoveValidationTest, DetectScholarsMateCheckmate)
 
 	// Verify: Black king is in checkmate
 	EXPECT_TRUE(isBlackInCheckmate) << "Scholar's mate should be detected as checkmate";
+}
+
+
+TEST_F(MoveValidationTest, DetectsSimpleBackRankCheckmate)
+{
+	mBoard->removeAllPiecesFromBoard();
+
+	// Setup simple back rank mate: black king at h8, white rook at h1
+	Position blackKingPos = {7, 0}; // h8
+	Position whiteRookPos = {7, 7}; // h1
+
+	mBoard->setPiece(blackKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::Black));
+	mBoard->setPiece(whiteRookPos, ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::White));
+	// Add blocking pawns to prevent king escape
+	mBoard->setPiece({6, 0}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black)); // g8
+	mBoard->setPiece({6, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black)); // g7
+	mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
+
+	// Check for checkmate
+	bool isBlackInCheckmate = mValidation->isCheckmate(PlayerColor::Black);
+
+	// Verify: Black king is in checkmate
+	EXPECT_TRUE(isBlackInCheckmate) << "Simple back rank mate should be detected as checkmate";
 }
 
 
