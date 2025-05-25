@@ -12,17 +12,6 @@ enable_testing()
 
 
 #==========================================
-#   Helper Files
-#==========================================
-
-set(HelperFiles_Dir source/Helper)
-
-set(HelperFiles
-    ${HelperFiles_Dir}/TestHelper.h   ${HelperFiles_Dir}/TestHelper.cpp
-)
-
-
-#==========================================
 #   Test Files
 #==========================================
 
@@ -32,11 +21,14 @@ set(MoveTest_Files
     ${MoveTest_Dir}/MoveGenerationTests.cpp
     ${MoveTest_Dir}/MoveValidationTests.cpp
     ${MoveTest_Dir}/MoveExecutionTests.cpp
+    ${MoveTest_Dir}/CastlingTests.cpp
+    ${MoveTest_Dir}/EnPassantTests.cpp
 )
 
 set(Test_Files
     ${MoveTest_Files}
     source/ChessboardTests.cpp
+    source/PawnPromotionTests.cpp
 )
 
 
@@ -54,7 +46,6 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Test_Files})
 add_executable(${PROJECT_NAME}
     source/main.cpp
     ${Test_Files}
-    ${HelperFiles}
 )
 
 
@@ -65,7 +56,6 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${GOOGLETEST_SOURCE_DIR}/googletest/include
-        ${HelperFiles_Dir}
 )
 
 include(GoogleTest)

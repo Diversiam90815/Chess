@@ -21,38 +21,21 @@ class ChessBoard;
 class ChessPiece
 {
 public:
-	ChessPiece(PieceType type, PlayerColor color) : type(type), color(color)
-	{
-	}
+	ChessPiece(PieceType type, PlayerColor color) : type(type), color(color) {}
 
-	virtual ~ChessPiece()
-	{
-	}
+	virtual ~ChessPiece() {}
 
-	PieceType getType() const
-	{
-		return type;
-	}
+	PieceType						   getType() const { return type; }
 
-	PlayerColor getColor() const
-	{
-		return color;
-	}
+	PlayerColor						   getColor() const { return color; }
 
-	bool hasMoved() const
-	{
-		return moveCounter != 0;
-	}
+	bool							   hasMoved() const { return moveCounter != 0; }
 
-	void increaseMoveCounter()
-	{
-		moveCounter++;
-	}
+	int								   getMoveCounter() const { return moveCounter; }
 
-	void decreaseMoveCounter()
-	{
-		moveCounter--;
-	}
+	void							   increaseMoveCounter() { moveCounter++; }
+
+	void							   decreaseMoveCounter() { moveCounter--; }
 
 	static std::shared_ptr<ChessPiece> CreatePiece(PieceType type, PlayerColor color);
 

@@ -20,6 +20,8 @@ struct Position
 	int	 x = 0;
 	int	 y = 0;
 
+	bool isValid() const { return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE; }
+
 	bool operator==(const Position &other) const { return x == other.x && y == other.y; }
 };
 

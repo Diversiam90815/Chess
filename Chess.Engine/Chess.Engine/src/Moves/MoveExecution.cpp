@@ -78,7 +78,7 @@ Move MoveExecution::executeMove(PossibleMove &possibleMove)
 	{
 		executedMove.type |= MoveType::Checkmate;
 	}
-	else if (mValidation->isKingInCheck(opponentKing, player))
+	else if (mValidation->isKingInCheck(opponentKing, opponent))
 	{
 		executedMove.type |= MoveType::Check;
 	}

@@ -23,9 +23,27 @@ void MoveValidation::init(std::shared_ptr<ChessBoard> board)
 
 bool MoveValidation::validateMove(Move &move, PlayerColor playerColor)
 {
-	auto kingPosition = mChessBoard->getKingsPosition(playerColor);
+	// 1. Verify the piece exists and belongs to the player
+	auto &piece = mChessBoard->getPiece(move.startingPosition);
+	if (!piece || piece->getColor() != playerColor)
+		return false;
 
-	//  Still in check after the move? -> Invalid
+	// 2. Verify the move is valid for the piece type
+	bool moveIsValid = false;
+	auto validMoves	 = piece->getPossibleMoves(move.startingPosition, *mChessBoard);
+	for (const auto &validMove : validMoves)
+	{
+		if (validMove.end == move.endingPosition)
+		{
+			moveIsValid = true;
+			break;
+		}
+	}
+
+	if (!moveIsValid)
+		return false;
+
+	// 3. Check if king would be in check after move
 	if (wouldKingBeInCheckAfterMove(move, playerColor))
 	{
 		LOG_INFO("Move could not be validated, since the king would be in check after this move!");
@@ -36,7 +54,7 @@ bool MoveValidation::validateMove(Move &move, PlayerColor playerColor)
 }
 
 
-bool MoveValidation::isKingInCheck(Position &ourKing, PlayerColor playerColor)
+bool MoveValidation::isKingInCheck(const Position &ourKing, PlayerColor playerColor)
 {
 	PlayerColor opponentColor = playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
 	return isSquareAttacked(ourKing, opponentColor);
@@ -122,11 +140,16 @@ bool MoveValidation::wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerC
 	// Simulate the move
 	boardCopy.movePiece(move.startingPosition, move.endingPosition);
 
-	// Update King's position if if this is the king
-	Position kingPosition = boardCopy.getKingsPosition(playerColor);
+	// Update King's position if it's the king
+	Position kingPosition;
 	if (isKing)
 	{
 		kingPosition = move.endingPosition;
+		boardCopy.updateKingsPosition(kingPosition, playerColor); // Ensure board copy knows where the king is
+	}
+	else
+	{
+		kingPosition = boardCopy.getKingsPosition(playerColor);
 	}
 
 	// Check if King is under attack (isSquareUnderAttack)
