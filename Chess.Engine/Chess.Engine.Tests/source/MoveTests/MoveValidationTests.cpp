@@ -95,9 +95,9 @@ TEST_F(MoveValidationTest, DetectsKingInCheckFromKnight)
 {
 	mBoard->removeAllPiecesFromBoard();
 
-	// Setup white king at e1, black queen at c5 (in check)
+	// Setup white king at e1, black knight at c5 (in check)
 	Position whiteKingPos	= {4, 7}; // e1
-	Position blackKnightPos = {2, 3}; // c5
+	Position blackKnightPos = {2, 6}; // c2
 
 	mBoard->setPiece(whiteKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
 	mBoard->setPiece(blackKnightPos, ChessPiece::CreatePiece(PieceType::Knight, PlayerColor::Black));
@@ -117,7 +117,7 @@ TEST_F(MoveValidationTest, DetectsKingInCheckFromPawn)
 
 	// Setup white king at e1, black queen at c5 (in check)
 	Position whiteKingPos = {4, 7}; // e1
-	Position blackPawnPos = {3, 3}; // d5
+	Position blackPawnPos = {3, 6}; // d2
 
 	mBoard->setPiece(whiteKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
 	mBoard->setPiece(blackPawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
@@ -139,9 +139,11 @@ TEST_F(MoveValidationTest, DetectScholarsMateCheckmate)
 
 	// Black pieces
 	mBoard->setPiece(blackKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::Black));
-	mBoard->setPiece({4, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black)); // e7
-	mBoard->setPiece({5, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black)); // f7
-	mBoard->setPiece({6, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black)); // g7
+	mBoard->setPiece({3, 0}, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::Black));  // d8
+	mBoard->setPiece({5, 0}, ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::Black)); // f8
+	mBoard->setPiece({3, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // d7
+	mBoard->setPiece({4, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // e7
+	mBoard->setPiece({6, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // g7
 
 	// White pieces - queen delivers checkmate at f7
 	mBoard->setPiece({5, 1}, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White));  // f7
@@ -259,9 +261,9 @@ TEST_F(MoveValidationTest, CanCaptureCheckingPiece)
 {
 	mBoard->removeAllPiecesFromBoard();
 
-	// Setup: White king at e1, white bishop at f2, black rook at e8 (checking the king)
+	// Setup: White king at e1, white bishop at d3, black rook at e8 (checking the king)
 	Position kingPos   = {4, 7}; // e1
-	Position bishopPos = {5, 6}; // f2
+	Position bishopPos = {3, 5}; // d3
 	Position rookPos   = {4, 0}; // e8
 
 	mBoard->setPiece(kingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
@@ -277,7 +279,7 @@ TEST_F(MoveValidationTest, CanCaptureCheckingPiece)
 	captureMoveByBishop.capturedPiece = PieceType::Rook;
 
 	// Try to block the check with the bishop
-	Move blockMove(bishopPos, {4, 3}, PieceType::Bishop); // f2 to e5
+	Move blockMove(bishopPos, {4, 4}, PieceType::Bishop); // f2 to e4
 
 	// Check for capturing checking pieces
 	bool isCaptureMoveValid	 = mValidation->validateMove(captureMoveByBishop, PlayerColor::White);
