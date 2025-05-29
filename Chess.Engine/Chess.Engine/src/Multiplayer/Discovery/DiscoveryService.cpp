@@ -194,6 +194,10 @@ void DiscoveryService::addRemoteToList(Endpoint remote)
 		if (ep == remote)
 			return;
 	}
+
+	if (mLocalIPv4 == remote.IPAddress)	// Don't add this device
+		return;
+
 	mRemoteDevices.push_back(remote);
 	remoteFound(remote);
 }
