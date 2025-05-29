@@ -129,7 +129,7 @@ namespace Chess.UI.Models
 
         public void ConnectToHost()
         {
-
+            ChessLogicAPI.SendConnectionRequestToHost();
         }
 
 
