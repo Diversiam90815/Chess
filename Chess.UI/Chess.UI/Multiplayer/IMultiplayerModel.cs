@@ -9,6 +9,8 @@ namespace Chess.UI.Multiplayer
 {
     public interface IMultiplayerModel
     {
+        void Init();
+
         void ResetToInit();
 
         void StartGameServer();

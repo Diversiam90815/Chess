@@ -1,4 +1,5 @@
 ﻿using Chess.UI.Models;
+using Chess.UI.Multiplayer;
 using Chess.UI.Services;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +27,7 @@ namespace Chess.UI.ViewModels
 
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
-        private readonly MultiplayerModel _model;
+        private readonly IMultiplayerModel _model;
 
         public MultiplayerMode MPMode { get; private set; }
 
@@ -37,7 +38,7 @@ namespace Chess.UI.ViewModels
 
             NetworkAdapters = new();
 
-            _model = App.Current.Services.GetService<MultiplayerModel>();
+            _model = App.Current.Services.GetService<IMultiplayerModel>();
             _model.Init();
 
             _model.OnConnectionErrorOccured += HandleConnectionError;
