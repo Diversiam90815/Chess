@@ -459,6 +459,8 @@ void GameManager::startedMultiplayer()
 
 	mMultiplayerManager = std::make_shared<MultiplayerManager>(); // Create the multiplayer manager
 
+	mMultiplayerManager->attachObserver(mUiCommunicationLayer);	  // Set the UI Communication as a connection observer
+
 	mMultiplayerManager->setInternalObservers();				  // First set the observers, so
 	mMultiplayerManager->init();								  // the modules already receive notifications on init
 }

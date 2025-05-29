@@ -184,9 +184,6 @@ void DiscoveryService::handleReceive(const asio::error_code &error, size_t bytes
 	{
 		LOG_WARNING("Receive error occurred: {}", error.message().c_str());
 	}
-
-	// Continue receiving packages
-	receivePackage();
 }
 
 
