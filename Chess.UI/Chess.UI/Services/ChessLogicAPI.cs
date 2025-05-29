@@ -363,12 +363,15 @@ namespace Chess.UI.Services
         };
 
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct ConnectionStatusEvent
         {
             public ConnectionState ConnectionState;
-            public string RemoteName;
-            public string ErrorMessage;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 250)]
+            public string remoteName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 250)]
+            public string errorMessage;
         };
 
 

@@ -52,13 +52,11 @@ namespace Chess.UI.Models
 
             if (connectionState == ConnectionState.Error)
             {
-                string errorMessage = connectionStatusEvent.ErrorMessage;
-                OnConnectionErrorOccured?.Invoke(errorMessage);
+                OnConnectionErrorOccured?.Invoke(connectionStatusEvent.errorMessage);
                 return;
             }
-            string remotePlayerName = connectionStatusEvent.RemoteName;
 
-            OnConnectionStatusChanged?.Invoke(connectionState, remotePlayerName);
+            OnConnectionStatusChanged?.Invoke(connectionState, connectionStatusEvent.remoteName);
         }
 
 
