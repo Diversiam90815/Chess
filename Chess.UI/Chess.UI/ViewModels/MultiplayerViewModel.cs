@@ -308,7 +308,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private void HandleConnectionStatusUpdated(ChessLogicAPI.ConnectionState state)
+        private void HandleConnectionStatusUpdated(ChessLogicAPI.ConnectionState state, string remotePlayerName)
         {
             // TODO: Implement reactive UI
             switch (state)

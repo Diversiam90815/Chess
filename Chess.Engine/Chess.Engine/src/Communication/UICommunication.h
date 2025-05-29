@@ -36,10 +36,11 @@ struct PlayerCapturedPieceEvent
 };
 
 
-struct ConnectionEvent
+struct CConnectionEvent
 {
-	ConnectionState state{ConnectionState::Disconnected};
-	char			errorMessage[MAX_STRING_LENGTH];
+	int	 state;
+	char remoteName[MAX_STRING_LENGTH];
+	char errorMessage[MAX_STRING_LENGTH];
 };
 
 
@@ -62,12 +63,13 @@ public:
 	void onEndGame(EndGameState state, PlayerColor winner) override;
 	void onChangeCurrentPlayer(PlayerColor player) override;
 
-	void onConnectionStateChanged(ConnectionState state, const std::string &errorMessage = "") override;
-	void onPendingHostApproval(const std::string &remotePlayerName) override;
+	void onConnectionStateChanged(const ConnectionStatusEvent event) override;
 
 
 private:
 	bool			   communicateToUI(MessageType type, void *message) const;
+
+	CConnectionEvent   convertToCStyleConnectionStateEvent(const ConnectionStatusEvent state);
 
 	PFN_CALLBACK	   mDelegate = nullptr;
 	mutable std::mutex mDelegateMutex;

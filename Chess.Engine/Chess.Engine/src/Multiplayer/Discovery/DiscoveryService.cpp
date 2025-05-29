@@ -104,11 +104,11 @@ void DiscoveryService::startDiscovery(DiscoveryMode mode)
 
 void DiscoveryService::run()
 {
-	// Start the first async receive operation
-	receivePackage();
-
 	while (isRunning())
 	{
+		// Start the first async receive operation
+		receivePackage();
+
 		// If in Server mode, periodically send discovery packages
 		if (mDiscoveryMode == DiscoveryMode::Server)
 		{

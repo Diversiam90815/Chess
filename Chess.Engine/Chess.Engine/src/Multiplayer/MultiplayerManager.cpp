@@ -57,7 +57,9 @@ bool MultiplayerManager::hostSession()
 	mServer = std::make_unique<TCPServer>(mIoContext);
 
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
-	mServer->setConnectionRequestHandler([this](const std::string &remoteIPv4) { pendingHostApproval(remoteIPv4); }); // Notify observers that we have a connection request
+
+	// TODO
+	mServer->setConnectionRequestHandler([this](const std::string &remoteIPv4) { /*pendingHostApproval(remoteIPv4);*/ }); // Notify observers that we have a connection request
 
 	mServer->startAccept();
 
@@ -78,7 +80,7 @@ void MultiplayerManager::joinSession()
 	mClient = std::make_unique<TCPClient>(mIoContext);
 
 	mClient->setConnectHandler([this](TCPSession::pointer session) { setTCPSession(session); });
-	mClient->setConnectTimeoutHandler([this]() { connectionStatusChanged(ConnectionState::Error, "Connection request timed out or was rejected!"); });
+	mClient->setConnectTimeoutHandler([this]() { connectionStatusChanged({ConnectionState::Error, "Connection request timed out or was rejected!"}); });
 
 	mClient->connect(mRemoteEndpoint.IPAddress, mRemoteEndpoint.tcpPort);
 }
@@ -143,11 +145,14 @@ bool MultiplayerManager::startServerDiscovery(const std::string IPv4, const int 
 
 	if (!bindingSucceeded)
 	{
-		connectionStatusChanged(ConnectionState::Error, "Failed to bind the discovery socket!");
+		ConnectionStatusEvent state = {ConnectionState::Error, "Failed to bind the discovery socket!"};
+		connectionStatusChanged(state);
 		return false;
 	}
 
 	mDiscovery->startDiscovery(DiscoveryMode::Server);
+
+	mDiscovery->attachObserver(shared_from_this());
 
 	connectionStatusChanged(ConnectionState::HostingSession);
 
@@ -165,11 +170,16 @@ void MultiplayerManager::startClientDiscovery()
 
 	if (!bindingSucceeded)
 	{
-		connectionStatusChanged(ConnectionState::Error, "Failed to bind socket in client discovery!");
+		ConnectionStatusEvent state = {ConnectionState::Error, "Failed to bind socket in client discovery!"};
+
+		connectionStatusChanged(state);
 		return;
 	}
 
 	mDiscovery->startDiscovery(DiscoveryMode::Client);
+
+	mDiscovery->attachObserver(shared_from_this());
+
 	connectionStatusChanged(ConnectionState::WaitingForARemote);
 }
 
@@ -208,33 +218,19 @@ void MultiplayerManager::rejectConnectionRequest()
 }
 
 
-void MultiplayerManager::connectionStatusChanged(ConnectionState state, const std::string &errorMessage)
+void MultiplayerManager::connectionStatusChanged(const ConnectionStatusEvent event)
 {
-	if (mConnectionState == state)
+	if (mConnectionState == event)
 		return;
 
 	// Update the connection state
-	mConnectionState.store(state);
+	mConnectionState = event;
 
 	// Notify all observers about the connection state change
 	for (auto &observer : mObservers)
 	{
 		if (auto obs = observer.lock())
-			obs->onConnectionStateChanged(state, errorMessage);
-	}
-}
-
-
-void MultiplayerManager::pendingHostApproval(const std::string &remoteIPv4)
-{
-	// If the client requests to connect to the host, we let the UI know
-	if (mRemoteEndpoint.IPAddress == remoteIPv4)
-	{
-		for (auto &observer : mObservers)
-		{
-			if (auto obs = observer.lock())
-				obs->onPendingHostApproval(mRemoteEndpoint.playerName);
-		}
+			obs->onConnectionStateChanged(event);
 	}
 }
 
@@ -242,6 +238,7 @@ void MultiplayerManager::pendingHostApproval(const std::string &remoteIPv4)
 void MultiplayerManager::onRemoteFound(const Endpoint &remote)
 {
 	mRemoteEndpoint = remote;
+	connectionStatusChanged({ConnectionState::ClientFoundHost, remote});
 }
 
 

@@ -57,8 +57,6 @@ private:
 	bool				   isInitialized() const { return mInitialized.load(); }
 
 	void				   remoteFound(const Endpoint &remote) override;
-	//void				   remoteSelected(const std::string &remoteName) override {};
-	//void				   remoteRemoved(const std::string &remoteName) override {};
 
 	const int			   mDiscoveryPort = 5555; // TODO: needs to be set from config later
 

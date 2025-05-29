@@ -255,7 +255,10 @@ namespace Chess.UI.Services
             Connecting = 4,
             Connected = 5,
             Disconnecting = 6,
-            Error = 7
+            Error = 7,
+            ConnectionRequested = 8, // Client has requested a connection to the host
+            PendingHostApproval = 9, // Waiting for the host to approve the connection
+            ClientFoundHost = 10 // Client found a host
         }
 
 
@@ -364,6 +367,7 @@ namespace Chess.UI.Services
         public struct ConnectionStatusEvent
         {
             public ConnectionState ConnectionState;
+            public string RemoteName;
             public string ErrorMessage;
         };
 

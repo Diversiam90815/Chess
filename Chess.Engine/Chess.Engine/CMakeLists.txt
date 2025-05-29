@@ -152,6 +152,7 @@ set(COMMUNICATION_FILES
 )
 
 set(MULTIPLAYER_FILES
+	${MULTIPLAYER_DIR}/ConnectionStatus.h
 	${MULTIPLAYER_DIR}/Discovery/DiscoveryEndpoint.h
 	${MULTIPLAYER_DIR}/RemoteMessaging/MultiplayerMessageStruct.h
 	${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.h		${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.cpp

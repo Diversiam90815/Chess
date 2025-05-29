@@ -57,8 +57,9 @@ namespace Chess.UI.Models
                 OnConnectionErrorOccured?.Invoke(errorMessage);
                 return;
             }
+            string remotePlayerName = connectionStatusEvent.RemoteName;
 
-            OnConnectionStatusChanged?.Invoke(connectionState);
+            OnConnectionStatusChanged?.Invoke(connectionState, remotePlayerName);
         }
 
 
@@ -178,7 +179,7 @@ namespace Chess.UI.Models
 
 
         public event Action<string> OnConnectionErrorOccured;
-        public event Action<ConnectionState> OnConnectionStatusChanged;
+        public event Action<ConnectionState, string> OnConnectionStatusChanged;
         public event Action<string> OnClientRequestedConnection;
     }
 }

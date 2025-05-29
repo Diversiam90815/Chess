@@ -49,8 +49,7 @@ public:
 	void						approveConnectionRequest();
 	void						rejectConnectionRequest();
 
-	void						connectionStatusChanged(ConnectionState state, const std::string &errorMessage = "") override;
-	void						pendingHostApproval(const std::string &remoteIPv4) override;
+	void						connectionStatusChanged(const ConnectionStatusEvent event) override;
 
 	void						onRemoteFound(const Endpoint &remote) override;
 
@@ -83,7 +82,7 @@ private:
 
 	std::mutex												   mSessionMutex;
 
-	std::atomic<ConnectionState>							   mConnectionState{ConnectionState::Disconnected};
+	ConnectionStatusEvent									   mConnectionState{ConnectionState::None};
 
 	friend class GameManager;
 };

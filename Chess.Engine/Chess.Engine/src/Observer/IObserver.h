@@ -13,7 +13,8 @@
 #include "Parameters.h"
 #include "NetworkAdapter.h"
 #include "Multiplayer/RemoteMessaging/MultiplayerMessageStruct.h"
-#include "Discovery/DiscoveryEndpoint.h"
+#include "Multiplayer/ConnectionStatus.h"
+
 
 class IPlayerObserver
 {
@@ -97,9 +98,7 @@ class IDiscoveryObserver
 public:
 	virtual ~IDiscoveryObserver() {};
 
-	virtual void onRemoteFound(const Endpoint &remote)			 = 0;
-	//virtual void onRemoteSelected(const std::string &remoteName) = 0;
-	//virtual void onRemoteRemoved(const std::string &remoteName)	 = 0;
+	virtual void onRemoteFound(const Endpoint &remote) = 0;
 };
 
 
@@ -108,6 +107,5 @@ class IConnectionStatusObserver
 public:
 	virtual ~IConnectionStatusObserver() {};
 
-	virtual void onConnectionStateChanged(ConnectionState state, const std::string &errorMessage = "") = 0;
-	virtual void onPendingHostApproval(const std::string &remotePlayerName)							   = 0;
+	virtual void onConnectionStateChanged(const ConnectionStatusEvent event) = 0;
 };
