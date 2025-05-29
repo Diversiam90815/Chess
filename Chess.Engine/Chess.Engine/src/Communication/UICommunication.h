@@ -24,7 +24,6 @@ enum class MessageType
 	GameStateChanged		  = 5,
 	MoveHistoryAdded		  = 6,
 	ConnectionStateChanged	  = 7,
-	ClientRequestedConnection = 8
 };
 
 

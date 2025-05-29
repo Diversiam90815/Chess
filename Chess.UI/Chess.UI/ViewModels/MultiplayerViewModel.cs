@@ -43,7 +43,6 @@ namespace Chess.UI.ViewModels
 
             _model.OnConnectionErrorOccured += HandleConnectionError;
             _model.OnConnectionStatusChanged += HandleConnectionStatusUpdated;
-            _model.OnClientRequestedConnection += HandleClientRequestConnection;
 
             UpdateAdapterBox();
         }
@@ -337,15 +336,14 @@ namespace Chess.UI.ViewModels
                     {
                         break;
                     }
+                case ChessLogicAPI.ConnectionState.ClientFoundHost:
+                    {
+                        RemotePlayerName = remotePlayerName;
+                        DisplayClientFoundHostView();
+                        break;
+                    }
                 default: break;
             }
-        }
-
-
-        private void HandleClientRequestConnection(string remotePlayerName)
-        {
-            RemotePlayerName = remotePlayerName;
-
         }
 
 

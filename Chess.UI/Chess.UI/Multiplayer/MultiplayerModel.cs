@@ -41,7 +41,6 @@ namespace Chess.UI.Models
         {
             var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
             logicCommunication.ConnectionStatusEvent += HandleConnectionStatusUpdates;
-            logicCommunication.ClientRequestedConnection += ClientRequestedConnection;
 
             SetNetworkAdapters();
         }
@@ -172,14 +171,7 @@ namespace Chess.UI.Models
         }
 
 
-        public void ClientRequestedConnection(string clientName)
-        {
-            OnClientRequestedConnection?.Invoke(clientName);
-        }
-
-
         public event Action<string> OnConnectionErrorOccured;
         public event Action<ConnectionState, string> OnConnectionStatusChanged;
-        public event Action<string> OnClientRequestedConnection;
     }
 }

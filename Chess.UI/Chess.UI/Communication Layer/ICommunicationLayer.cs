@@ -25,6 +25,5 @@ namespace Chess.UI.Communication_Layer.Interfaces
         event Action<Services.ChessLogicAPI.Score> PlayerScoreUpdated;
         event Action<EndGameState> EndGameStateEvent;
         event Action<ConnectionStatusEvent> ConnectionStatusEvent;
-        event Action<string> ClientRequestedConnection;
     }
 }

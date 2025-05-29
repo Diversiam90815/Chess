@@ -27,7 +27,6 @@ namespace Chess.UI.Services
             GameStateChanged = 5,
             MoveHistoryAdded = 6,
             ConnectionStateChanged = 7,
-            ClientRequestedConnection = 8
         }
 
 
@@ -94,11 +93,6 @@ namespace Chess.UI.Services
                         HandleConnectionStatusChanged(data);
                         break;
                     }
-                case DelegateMessage.ClientRequestedConnection:
-                    {
-                        HandleClientRequestedConnection(data);
-                        break;
-                    }
 
                 default: break;
             }
@@ -158,13 +152,6 @@ namespace Chess.UI.Services
         }
 
 
-        private void HandleClientRequestedConnection(nint data)
-        {
-            string clientName = Marshal.PtrToStringUTF8(data);
-            ClientRequestedConnection?.Invoke(clientName);
-        }
-
-
         #region ViewModel Delegates
 
         public event Action<PlayerColor> PlayerChanged;
@@ -174,7 +161,6 @@ namespace Chess.UI.Services
         public event Action<ChessLogicAPI.Score> PlayerScoreUpdated;
         public event Action<EndGameState> EndGameStateEvent;
         public event Action<ConnectionStatusEvent> ConnectionStatusEvent;
-        public event Action<string> ClientRequestedConnection;
 
         #endregion
 

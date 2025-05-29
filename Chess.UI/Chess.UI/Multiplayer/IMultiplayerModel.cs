@@ -36,7 +36,5 @@ namespace Chess.UI.Multiplayer
         event Action<string> OnConnectionErrorOccured;
 
         event Action<Services.ChessLogicAPI.ConnectionState, string> OnConnectionStatusChanged;
-
-        event Action<string> OnClientRequestedConnection;
     }
 }
