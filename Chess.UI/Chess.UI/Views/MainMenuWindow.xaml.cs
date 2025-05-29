@@ -117,30 +117,30 @@ namespace Chess.UI
         }
 
 
-        private async void MultiplayerButton_Click(object sender, RoutedEventArgs e)
+        private void MultiplayerButton_Click(object sender, RoutedEventArgs e)
         {
 
-            var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+            //var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+            //{
+            //    Title = "Multiplayer Coming Soon",
+            //    Content = "Multiplayer is not yet implemented, but is being worked on.",
+            //    CloseButtonText = "OK",
+            //    XamlRoot = this.Content.XamlRoot
+            //};
+
+            //await dialog.ShowAsync();
+
+            if (_multiplayerWindow == null)
             {
-                Title = "Multiplayer Coming Soon",
-                Content = "Multiplayer is not yet implemented, but is being worked on.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-
-            await dialog.ShowAsync();
-
-            //if (MultiplayerWindow == null)
-            //{
-            //    MultiplayerWindow = new MultiplayerWindow(DispatcherQueue);
-            //    MultiplayerWindow.Activate();
-            //    MultiplayerWindow.Closed += MultiplayerWindowClosed;
-            //    this.AppWindow.Hide();
-            //}
-            //else
-            //{
-            //    MultiplayerWindow.Activate();
-            //}
+                _multiplayerWindow = App.Current.Services.GetService<MultiplayerWindow>();
+                _multiplayerWindow.Activate();
+                _multiplayerWindow.Closed += MultiplayerWindowClosed;
+                this.AppWindow.Hide();
+            }
+            else
+            {
+                _multiplayerWindow.Activate();
+            }
 
         }
 
