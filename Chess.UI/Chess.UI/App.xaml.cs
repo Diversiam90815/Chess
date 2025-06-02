@@ -89,6 +89,8 @@ namespace Chess.UI
             services.AddTransient<MultiplayerWindow>();
             services.AddTransient<SettingsWindow>();
 
+            services.AddTransient<PreferencesView>();
+
             return services.BuildServiceProvider();
         }
     }

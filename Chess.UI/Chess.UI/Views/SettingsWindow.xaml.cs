@@ -21,40 +21,35 @@ using Windows.Foundation.Collections;
 
 namespace Chess.UI.Views
 {
-	public sealed partial class SettingsWindow : Window
-	{
-		private OverlappedPresenter Presenter;
+    public sealed partial class SettingsWindow : Page
+    {
+        private OverlappedPresenter Presenter;
 
-		private readonly SettingsViewModel _viewModel;
-
-
-		public SettingsWindow()
-		{
-			this.InitializeComponent();
-
-			_viewModel = App.Current.Services.GetService<SettingsViewModel>();
-
-			this.RootGrid.DataContext = _viewModel;
-
-			Init();
-			SetWindowSize(430, 470);
-		}
+        private readonly SettingsViewModel _viewModel;
 
 
-		private void SetWindowSize(double width, double height)
-		{
-			var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-			float scalingFactor = ChessLogicAPI.GetWindowScalingFactor(hwnd);
-			int scaledWidth = (int)(width * scalingFactor);
-			int scaledHeight = (int)(height * scalingFactor);
-			AppWindow.Resize(new(scaledWidth, scaledHeight));
-		}
+        public SettingsWindow()
+        {
+            this.InitializeComponent();
+
+            _viewModel = App.Current.Services.GetService<SettingsViewModel>();
+
+            this.RootGrid.DataContext = _viewModel;
+
+            //SetWindowSize(430, 470);
+            Width = 470;
+            Height = 430;
+        }
 
 
-		private void Init()
-		{
-			Presenter = AppWindow.Presenter as OverlappedPresenter;
-			Presenter.IsResizable = false;
-		}
-	}
+        //private void SetWindowSize(double width, double height)
+        //{
+        //	var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
+        //	float scalingFactor = ChessLogicAPI.GetWindowScalingFactor(hwnd);
+        //	int scaledWidth = (int)(width * scalingFactor);
+        //	int scaledHeight = (int)(height * scalingFactor);
+        //	SetWindowSize(scaledWidth, scaledHeight);
+        //}
+
+    }
 }
