@@ -15,7 +15,7 @@ using Chess.UI.Themes.Interfaces;
 
 namespace Chess.UI.ViewModels
 {
-    public class SettingsViewModel
+    public class ThemePreferencesViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -30,7 +30,7 @@ namespace Chess.UI.ViewModels
         public ObservableCollection<PieceTheme> PieceThemes { get; }
 
 
-        public SettingsViewModel(IDispatcherQueueWrapper dispatcherQueue, IThemeManager themeManager)
+        public ThemePreferencesViewModel(IDispatcherQueueWrapper dispatcherQueue, IThemeManager themeManager)
         {
             _dispatcherQueueWrapper = dispatcherQueue;
             _themeLoader = new();

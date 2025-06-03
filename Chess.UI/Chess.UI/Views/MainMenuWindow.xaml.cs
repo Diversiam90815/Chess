@@ -27,7 +27,7 @@ namespace Chess.UI
 
         private ChessBoardViewModel _chessBoardViewModel { get; }
 
-        //private SettingsWindow _settingsWindow;
+        //private ThemePreferencesView _settingsWindow;
 
         private MultiplayerWindow _multiplayerWindow;
 
@@ -114,7 +114,7 @@ namespace Chess.UI
         {
             //if (_settingsWindow == null)
             //{
-            //    _settingsWindow = App.Current.Services.GetService<SettingsWindow>();
+            //    _settingsWindow = App.Current.Services.GetService<ThemePreferencesView>();
             //    _settingsWindow.Activate();
             //    _settingsWindow.Closed += SettingsWindowClosed;
             //    this.AppWindow.Hide();
@@ -165,8 +165,9 @@ namespace Chess.UI
         {
             await ShowDialogAsync<PreferencesView>(this, (p) =>
             {
-                
-                p.AddPreferencesTab("General", typeof(SettingsWindow));
+                p.Width = 650;
+                p.Height = 750;
+                p.AddPreferencesTab("Styles", typeof(ThemePreferencesView));
 
             });
 

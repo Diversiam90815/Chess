@@ -21,24 +21,22 @@ using Windows.Foundation.Collections;
 
 namespace Chess.UI.Views
 {
-    public sealed partial class SettingsWindow : Page
+    public sealed partial class ThemePreferencesView : Page
     {
         private OverlappedPresenter Presenter;
 
-        private readonly SettingsViewModel _viewModel;
+        private readonly ThemePreferencesViewModel _viewModel;
 
 
-        public SettingsWindow()
+        public ThemePreferencesView()
         {
             this.InitializeComponent();
 
-            _viewModel = App.Current.Services.GetService<SettingsViewModel>();
-
-            this.RootGrid.DataContext = _viewModel;
+            _viewModel = App.Current.Services.GetService<ThemePreferencesViewModel>();
 
             //SetWindowSize(430, 470);
-            Width = 470;
-            Height = 430;
+            Width = 350;
+            Height = 400;
         }
 
 

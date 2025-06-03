@@ -26,14 +26,14 @@ namespace Chess.UI.Views
 
         private readonly Dictionary<string, object> _viewmodels = new();
 
-        private readonly SettingsViewModel _settingsViewModel;
+        private readonly ThemePreferencesViewModel _settingsViewModel;
 
 
         public PreferencesView()
         {
             this.InitializeComponent();
 
-            _settingsViewModel = App.Current.Services.GetRequiredService<SettingsViewModel>();
+            _settingsViewModel = App.Current.Services.GetRequiredService<ThemePreferencesViewModel>();
         }
 
 
