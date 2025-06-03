@@ -16,6 +16,7 @@
         </Grid.RowDefinitions>
 
         <NavigationView x:Name="NavigationView"
+        Grid.Row="0"
         AlwaysShowHeader="False"
         Background="Transparent"
         IsBackButtonVisible="Collapsed"
@@ -24,12 +25,14 @@
         IsSettingsVisible="False"
         PaneDisplayMode="Left"
         OpenPaneLength="150"
-        SelectionChanged="OnSelectionChanged"
-        >
+        SelectionChanged="OnSelectionChanged" >
+
             <Frame x:Name="NavigationViewFrame"/>
-
-
         </NavigationView>
+
+        <Button Grid.Row="1" Style="{ThemeResource PreferncesButtonStyle}" Click="ReturnButtonClick" HorizontalAlignment="Right">
+            <FontIcon Glyph="&#xEB97;"/>
+        </Button>
 
     </Grid>
 </ContentDialog>

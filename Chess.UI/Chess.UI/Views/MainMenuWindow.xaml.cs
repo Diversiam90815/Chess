@@ -110,22 +110,6 @@ namespace Chess.UI
         }
 
 
-        private void SettingsButton_Click(object sender, RoutedEventArgs e)
-        {
-            //if (_settingsWindow == null)
-            //{
-            //    _settingsWindow = App.Current.Services.GetService<ThemePreferencesView>();
-            //    _settingsWindow.Activate();
-            //    _settingsWindow.Closed += SettingsWindowClosed;
-            //    this.AppWindow.Hide();
-            //}
-            //else
-            //{
-            //    _settingsWindow.Activate();
-            //}
-        }
-
-
         private async void MultiplayerButton_Click(object sender, RoutedEventArgs e)
         {
 
@@ -168,10 +152,7 @@ namespace Chess.UI
                 p.Width = 650;
                 p.Height = 750;
                 p.AddPreferencesTab("Styles", typeof(ThemePreferencesView));
-
             });
-
-
         }
 
         private async Task<ContentDialogResult> ShowDialogAsync<T>(Window ownwerWindow, Action<T>? initAction = null) where T : ContentDialog
@@ -179,15 +160,10 @@ namespace Chess.UI
             var dialog = App.Current.Services.GetRequiredService<T>();
             dialog.XamlRoot = ownwerWindow.Content.XamlRoot;
 
-            dialog.MinWidth = 800;
-            dialog.MaxWidth = 800;
-            dialog.MaxHeight = 600;
-
             initAction?.Invoke(dialog);
 
             var result = await dialog.ShowAsync();
             return result;
-
         }
     }
 }

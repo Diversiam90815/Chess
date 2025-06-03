@@ -34,20 +34,8 @@ namespace Chess.UI.Views
 
             _viewModel = App.Current.Services.GetService<ThemePreferencesViewModel>();
 
-            //SetWindowSize(430, 470);
             Width = 350;
             Height = 400;
         }
-
-
-        //private void SetWindowSize(double width, double height)
-        //{
-        //	var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-        //	float scalingFactor = ChessLogicAPI.GetWindowScalingFactor(hwnd);
-        //	int scaledWidth = (int)(width * scalingFactor);
-        //	int scaledHeight = (int)(height * scalingFactor);
-        //	SetWindowSize(scaledWidth, scaledHeight);
-        //}
-
     }
 }

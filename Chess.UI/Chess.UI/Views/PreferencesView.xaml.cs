@@ -71,5 +71,10 @@ namespace Chess.UI.Views
                 NavigationViewFrame.Navigate(viewType, viewModel);
             }
         }
+
+        private void ReturnButtonClick(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+        }
     }
 }

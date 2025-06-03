@@ -136,6 +136,12 @@
         <Setter Property="CornerRadius" Value="8" />
     </Style>
 
+    <Style x:Key="PreferncesButtonStyle" TargetType="Button">
+        <Setter Property="Width" Value="50" />
+        <Setter Property="Height" Value="40" />
+        <Setter Property="CornerRadius" Value="8" />
+    </Style>
+
     <Style x:Key="MPStartButtonStyle" TargetType="Button">
         <Setter Property="Width" Value="150" />
         <Setter Property="Height" Value="40" />
