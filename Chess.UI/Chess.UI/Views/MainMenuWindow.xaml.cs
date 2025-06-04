@@ -76,14 +76,6 @@ namespace Chess.UI
         }
 
 
-        //private void SettingsWindowClosed(object sender, WindowEventArgs args)
-        //{
-        //    _settingsWindow.Closed -= SettingsWindowClosed;
-        //    _settingsWindow = null;
-        //    this.Activate();
-        //}
-
-
         private void MultiplayerWindowClosed(object sender, WindowEventArgs args)
         {
             _multiplayerWindow.Closed -= MultiplayerWindowClosed;
@@ -151,8 +143,8 @@ namespace Chess.UI
             {
                 p.Width = 650;
                 p.Height = 750;
-                p.AddPreferencesTab("General", typeof(GeneralPreferencesView));
-                p.AddPreferencesTab("Styles", typeof(ThemePreferencesView));
+                //p.AddPreferencesTab("General", typeof(GeneralPreferencesView));
+                p.AddPreferencesTab("Styles", typeof(ThemePreferencesView), "\uE790");
             });
         }
 

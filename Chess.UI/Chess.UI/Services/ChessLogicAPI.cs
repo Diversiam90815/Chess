@@ -360,7 +360,7 @@ namespace Chess.UI.Services
         };
 
 
-        [StructLayout(LayoutKind.Sequential)]
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct MoveHistoryEvent
         {
             public bool added;

@@ -9,7 +9,7 @@
 	mc:Ignorable="d">
 
 
-    <StackPanel Margin="16" Spacing="28" Orientation="Vertical">
+    <StackPanel Margin="16" Spacing="28" Orientation="Vertical" Width="Auto" Height="Auto">
 
         <!--  Category: Themes  -->
         <TextBlock Style="{StaticResource SettingsTitle}" Text="Styles" />

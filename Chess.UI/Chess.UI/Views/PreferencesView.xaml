@@ -16,18 +16,21 @@
         </Grid.RowDefinitions>
 
         <NavigationView x:Name="NavigationView"
-        Grid.Row="0"
-        AlwaysShowHeader="False"
-        Background="Transparent"
-        IsBackButtonVisible="Collapsed"
-        IsBackEnabled="False"
-        IsPaneToggleButtonVisible="False"
-        IsSettingsVisible="False"
-        PaneDisplayMode="Left"
-        OpenPaneLength="150"
-        SelectionChanged="OnSelectionChanged" >
+                        Grid.Row="0"
+                        AlwaysShowHeader="False"
+                        Background="Transparent"
+                        IsBackButtonVisible="Collapsed"
+                        IsBackEnabled="False"
+                        IsPaneToggleButtonVisible="False"
+                        IsSettingsVisible="False"
+                        PaneDisplayMode="Left"
+                        OpenPaneLength="150"
+                        Width="500"
+                        Height="450"
+                        CornerRadius="8"
+                        SelectionChanged="OnSelectionChanged" >
 
-            <Frame x:Name="NavigationViewFrame"/>
+            <Frame x:Name="NavigationViewFrame" CornerRadius="8"/>
         </NavigationView>
 
         <Button Grid.Row="1" Style="{ThemeResource PreferncesButtonStyle}" Click="ReturnButtonClick" HorizontalAlignment="Right">

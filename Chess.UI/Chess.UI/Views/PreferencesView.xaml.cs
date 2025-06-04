@@ -6,14 +6,9 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+
 
 namespace Chess.UI.Views
 {
@@ -47,7 +42,6 @@ namespace Chess.UI.Views
             if (!string.IsNullOrEmpty(fontIconGlyph))
                 item.Icon = new FontIcon() { Glyph = fontIconGlyph };
 
-            // Simply add to the collection instead of trying to insert at a calculated position
             NavigationView.MenuItems.Add(item);
 
             // If this is the first item, select it

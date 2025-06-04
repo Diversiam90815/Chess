@@ -23,8 +23,6 @@ namespace Chess.UI.Views
 {
     public sealed partial class ThemePreferencesView : Page
     {
-        private OverlappedPresenter Presenter;
-
         private readonly ThemePreferencesViewModel _viewModel;
 
 
@@ -33,9 +31,6 @@ namespace Chess.UI.Views
             this.InitializeComponent();
 
             _viewModel = App.Current.Services.GetService<ThemePreferencesViewModel>();
-
-            Width = 350;
-            Height = 400;
         }
     }
 }
