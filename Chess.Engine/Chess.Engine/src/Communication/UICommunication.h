@@ -22,7 +22,7 @@ enum class MessageType
 	PlayerCapturedPiece		  = 3,
 	PlayerChanged			  = 4,
 	GameStateChanged		  = 5,
-	MoveHistoryAdded		  = 6,
+	MoveHistoryUpdated		  = 6,
 	ConnectionStateChanged	  = 7,
 	ClientRequestedConnection = 8
 };
@@ -42,6 +42,12 @@ struct ConnectionEvent
 	char			errorMessage[MAX_STRING_LENGTH];
 };
 
+struct MoveHistoryEvent
+{
+	bool added;							  // false if cleared
+	char moveNotation[MAX_STRING_LENGTH]; // If move is being added, this is the move notation
+};
+
 
 class UICommunication : public IMoveObserver, public IGameObserver, public IPlayerObserver, public IGameStateObserver, public IConnectionStatusObserver
 {
@@ -57,6 +63,7 @@ public:
 
 	void onExecuteMove(const PossibleMove &move) override {}
 	void onAddToMoveHistory(Move &move) override;
+	void onClearMoveHistory() override;
 
 	void onGameStateChanged(GameState state) override;
 	void onEndGame(EndGameState state, PlayerColor winner) override;

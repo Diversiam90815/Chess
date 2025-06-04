@@ -44,20 +44,26 @@ void UICommunication::onRemoveLastCapturedPiece(PlayerColor player, PieceType ca
 
 void UICommunication::onAddToMoveHistory(Move &move)
 {
+	MoveHistoryEvent event{};
+	event.added					 = true;
+
 	std::string numberedNotation = std::to_string(move.number) + ". " + move.notation;
-	size_t		len				 = numberedNotation.size();
-	size_t		bufferSize		 = (len + 1) * sizeof(char);
-	char	   *strCopy			 = static_cast<char *>(CoTaskMemAlloc(bufferSize));
 
-	if (!strCopy)
-		return;
-
-	HRESULT hr = StringCbCopyA(strCopy, bufferSize, numberedNotation.c_str());
+	HRESULT		hr				 = StringCbCopyA(event.moveNotation, MAX_STRING_LENGTH, numberedNotation.c_str());
 
 	if (!SUCCEEDED(hr))
 		return;
 
-	communicateToUI(MessageType::MoveHistoryAdded, strCopy);
+	communicateToUI(MessageType::MoveHistoryUpdated, &event);
+}
+
+
+void UICommunication::onClearMoveHistory()
+{
+	MoveHistoryEvent event{};
+	event.added = false;
+
+	communicateToUI(MessageType::MoveHistoryUpdated, &event);
 }
 
 

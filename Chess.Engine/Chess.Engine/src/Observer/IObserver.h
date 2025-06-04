@@ -33,6 +33,7 @@ public:
 
 	virtual void onExecuteMove(const PossibleMove &move) = 0;
 	virtual void onAddToMoveHistory(Move &move)			 = 0;
+	virtual void onClearMoveHistory()					 = 0;
 };
 
 
@@ -97,9 +98,9 @@ class IDiscoveryObserver
 public:
 	virtual ~IDiscoveryObserver() {};
 
-	virtual void onRemoteFound(const Endpoint &remote)			 = 0;
-	//virtual void onRemoteSelected(const std::string &remoteName) = 0;
-	//virtual void onRemoteRemoved(const std::string &remoteName)	 = 0;
+	virtual void onRemoteFound(const Endpoint &remote) = 0;
+	// virtual void onRemoteSelected(const std::string &remoteName) = 0;
+	// virtual void onRemoteRemoved(const std::string &remoteName)	 = 0;
 };
 
 

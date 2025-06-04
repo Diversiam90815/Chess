@@ -213,6 +213,18 @@ void MoveExecution::addMoveToHistory(Move &move)
 }
 
 
+void MoveExecution::clearMoveHistory()
+{
+	mMoveHistory.clear();
+
+	for (auto &observer : mObservers)
+	{
+		if (auto obs = observer.lock())
+			obs->onClearMoveHistory();
+	}
+}
+
+
 void MoveExecution::removeLastMove()
 {
 	if (!mMoveHistory.empty())
@@ -220,4 +232,3 @@ void MoveExecution::removeLastMove()
 		mMoveHistory.erase(std::prev(mMoveHistory.end()));
 	}
 }
-

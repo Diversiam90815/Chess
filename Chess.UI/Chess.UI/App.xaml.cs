@@ -82,12 +82,14 @@ namespace Chess.UI
             services.AddTransient<MoveHistoryViewModel>();
             services.AddTransient<MainMenuViewModel>();
             services.AddTransient<MultiplayerViewModel>();
-            services.AddTransient<SettingsViewModel>();
+            services.AddTransient<ThemePreferencesViewModel>();
 
             services.AddTransient<MainMenuWindow>();
             services.AddTransient<ChessBoardWindow>();
             services.AddTransient<MultiplayerWindow>();
-            services.AddTransient<SettingsWindow>();
+            services.AddTransient<ThemePreferencesView>();
+
+            services.AddTransient<PreferencesView>();
 
             return services.BuildServiceProvider();
         }

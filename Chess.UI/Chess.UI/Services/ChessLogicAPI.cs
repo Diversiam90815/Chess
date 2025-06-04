@@ -86,7 +86,7 @@ namespace Chess.UI.Services
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartedMultiplayer", CharSet = CharSet.Unicode)]
         public static extern void StartedMultiplayer();
-        
+
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartMultiplayerGame", CharSet = CharSet.Unicode)]
         public static extern void StartMultiplayerGame(bool isHost);
 
@@ -104,7 +104,7 @@ namespace Chess.UI.Services
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "RejectConnectionRequest", CharSet = CharSet.Unicode)]
         public static extern void RejectConnectionRequest();
-        
+
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SendConnectionRequestToHost", CharSet = CharSet.Unicode)]
         public static extern void SendConnectionRequestToHost();
 
@@ -358,6 +358,17 @@ namespace Chess.UI.Services
             public PieceTypeInstance pieceType;
             public bool captured;
         };
+
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct MoveHistoryEvent
+        {
+            public bool added;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 250)]
+            public string moveNotation;
+        };
+
 
 
         [StructLayout(LayoutKind.Sequential)]

@@ -36,15 +36,17 @@ public:
 
 	void		addMoveToHistory(Move &move) override;
 
+	void		clearMoveHistory() override;
+
 	void		removeLastMove();
 
 
 private:
-	std::shared_ptr<ChessBoard>				  mChessBoard;
+	std::shared_ptr<ChessBoard>			mChessBoard;
 
-	std::shared_ptr<MoveValidation>			  mValidation;
+	std::shared_ptr<MoveValidation>		mValidation;
 
-	std::shared_ptr<MoveNotationHelper>		  mMoveNotation;
+	std::shared_ptr<MoveNotationHelper> mMoveNotation;
 
-	std::set<Move>							  mMoveHistory;
+	std::set<Move>						mMoveHistory;
 };

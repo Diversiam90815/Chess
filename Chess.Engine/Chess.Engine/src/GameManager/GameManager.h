@@ -130,8 +130,6 @@ private:
 
 	std::shared_ptr<UICommunication>	mUiCommunicationLayer;
 
-	//std::shared_ptr<NetworkManager>		mNetwork;
-
 	std::shared_ptr<MultiplayerManager> mMultiplayerManager;
 
 

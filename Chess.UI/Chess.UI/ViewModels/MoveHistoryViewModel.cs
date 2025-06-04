@@ -54,6 +54,7 @@ namespace Chess.UI.ViewModels
             {
                 column.Clear();
             }
+            // TODO: Clear move history in backend
         }
 
 
