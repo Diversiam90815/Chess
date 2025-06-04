@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using static Chess.UI.Images.ImageServices;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.EngineAPI;
 using System.Collections.ObjectModel;
 using System;
 using Microsoft.UI.Composition.Interactions;
@@ -138,7 +138,7 @@ namespace Chess.UI.ViewModels
 
         public void ResetGame()
         {
-            ChessLogicAPI.ResetGame();
+            EngineAPI.ResetGame();
 
             Board.Clear();
             for (int i = 0; i < _coordinate.GetNumBoardSquares(); i++)
@@ -151,7 +151,7 @@ namespace Chess.UI.ViewModels
 
         public void StartGame()
         {
-            ChessLogicAPI.StartGame();  // Start the game and thus the StateMachine
+            EngineAPI.StartGame();  // Start the game and thus the StateMachine
         }
 
 
@@ -198,7 +198,7 @@ namespace Chess.UI.ViewModels
 
             Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{enginePos.x}-Y{enginePos.y}!");
 
-            ChessLogicAPI.OnSquareSelected(enginePos);
+            EngineAPI.OnSquareSelected(enginePos);
         }
 
 
@@ -232,7 +232,7 @@ namespace Chess.UI.ViewModels
 
         public void UndoLastMove()
         {
-            ChessLogicAPI.UndoMove();
+            EngineAPI.UndoMove();
             LoadBoardFromNative();
             _moveHistoryViewModel.RemoveLastMove();
         }

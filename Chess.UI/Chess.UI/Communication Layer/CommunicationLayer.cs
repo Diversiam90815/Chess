@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.EngineAPI;
 
 
 namespace Chess.UI.Services
@@ -33,15 +33,15 @@ namespace Chess.UI.Services
 
         public void Init()
         {
-            ChessLogicAPI.SetUnvirtualizedAppDataPath(Project.AppDataDirectory);
-            ChessLogicAPI.Init();
+            EngineAPI.SetUnvirtualizedAppDataPath(Project.AppDataDirectory);
+            EngineAPI.Init();
             SetDelegate();
         }
 
 
         public void Deinit()
         {
-            ChessLogicAPI.Deinit();
+            EngineAPI.Deinit();
             _delegateHandle.Free();
         }
 
@@ -50,7 +50,7 @@ namespace Chess.UI.Services
         {
             APIDelegate mDelegate = new(DelegateHandler);
             _delegateHandle = GCHandle.Alloc(mDelegate);
-            ChessLogicAPI.SetDelegate(mDelegate);
+            EngineAPI.SetDelegate(mDelegate);
         }
 
 
@@ -107,7 +107,7 @@ namespace Chess.UI.Services
 
         private void HandlePlayerScoreUpdate(nint data)
         {
-            ChessLogicAPI.Score score = (ChessLogicAPI.Score)Marshal.PtrToStructure(data, typeof(ChessLogicAPI.Score));
+            EngineAPI.Score score = (EngineAPI.Score)Marshal.PtrToStructure(data, typeof(EngineAPI.Score));
             PlayerScoreUpdated?.Invoke(score);
         }
 
@@ -171,7 +171,7 @@ namespace Chess.UI.Services
         public event Action<GameState> GameStateChanged;
         public event Action<MoveHistoryEvent> MoveHistoryUpdated;
         public event Action<PlayerCapturedPiece> PlayerCapturedPieceEvent;
-        public event Action<ChessLogicAPI.Score> PlayerScoreUpdated;
+        public event Action<EngineAPI.Score> PlayerScoreUpdated;
         public event Action<EndGameState> EndGameStateEvent;
         public event Action<ConnectionStatusEvent> ConnectionStatusEvent;
         public event Action<string> ClientRequestedConnection;

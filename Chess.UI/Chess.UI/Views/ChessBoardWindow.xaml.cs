@@ -5,7 +5,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.EngineAPI;
 using System.Threading.Tasks;
 using System;
 using Microsoft.UI.Xaml.Media;
@@ -48,7 +48,7 @@ namespace Chess.UI.Views
         private void SetWindowSize(double width, double height)
         {
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            float scalingFactor = ChessLogicAPI.GetWindowScalingFactor(hwnd);
+            float scalingFactor = EngineAPI.GetWindowScalingFactor(hwnd);
 
             int scaledWidth = (int)(width * scalingFactor);
             int scaledHeight = (int)(height * scalingFactor);

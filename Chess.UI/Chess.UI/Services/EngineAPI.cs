@@ -5,7 +5,7 @@ using static Chess.UI.Services.CommunicationLayer;
 
 namespace Chess.UI.Services
 {
-    public class ChessLogicAPI
+    public class EngineAPI
     {
         #region DLL Defines
 

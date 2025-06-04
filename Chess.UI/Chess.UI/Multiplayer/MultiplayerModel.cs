@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.EngineAPI;
 
 namespace Chess.UI.Models
 {
@@ -33,7 +33,7 @@ namespace Chess.UI.Models
 
         public MultiplayerModel()
         {
-            ChessLogicAPI.StartedMultiplayer();
+            EngineAPI.StartedMultiplayer();
         }
 
 
@@ -65,12 +65,12 @@ namespace Chess.UI.Models
         private bool SetNetworkAdapters()
         {
             mAdapters.Clear();
-            int adapterCount = ChessLogicAPI.GetNetworkAdapterCount();
+            int adapterCount = EngineAPI.GetNetworkAdapterCount();
 
             for (uint i = 0; i < adapterCount; ++i)
             {
-                ChessLogicAPI.NetworkAdapter adapter;
-                ChessLogicAPI.GetNetworkAdapterAtIndex(i, out adapter);
+                EngineAPI.NetworkAdapter adapter;
+                EngineAPI.GetNetworkAdapterAtIndex(i, out adapter);
 
                 NetworkAdapter networkAdapter = new();
                 networkAdapter.Name = adapter.name;
@@ -95,37 +95,37 @@ namespace Chess.UI.Models
 
         public int GetSelectedNetworkAdapterID()
         {
-            return ChessLogicAPI.GetSavedAdapterID();
+            return EngineAPI.GetSavedAdapterID();
         }
 
 
         public void ChangeNetworkAdapter(int ID)
         {
-            ChessLogicAPI.ChangeCurrentAdapter(ID);
+            EngineAPI.ChangeCurrentAdapter(ID);
         }
 
 
         public string GetRemotePlayerName()
         {
-            return ChessLogicAPI.GetRemotePlayerName();
+            return EngineAPI.GetRemotePlayerName();
         }
 
 
         public void SetLocalPlayerName(string name)
         {
-            ChessLogicAPI.SetLocalPlayerName(name);
+            EngineAPI.SetLocalPlayerName(name);
         }
 
 
         public void StartGameServer()
         {
-            ChessLogicAPI.StartRemoteDiscovery(true);
+            EngineAPI.StartRemoteDiscovery(true);
         }
 
 
         public void StartGameClient()
         {
-            ChessLogicAPI.StartRemoteDiscovery(false);
+            EngineAPI.StartRemoteDiscovery(false);
         }
 
 
@@ -137,7 +137,7 @@ namespace Chess.UI.Models
 
         public void ResetToInit()
         {
-            ChessLogicAPI.StoppedMultiplayer();
+            EngineAPI.StoppedMultiplayer();
         }
 
 
@@ -147,12 +147,12 @@ namespace Chess.UI.Models
             {
                 case MultiplayerMode.Client:
                     {
-                        ChessLogicAPI.StartMultiplayerGame(false);
+                        EngineAPI.StartMultiplayerGame(false);
                         break;
                     }
                 case MultiplayerMode.Server:
                     {
-                        ChessLogicAPI.StartMultiplayerGame(true);
+                        EngineAPI.StartMultiplayerGame(true);
                         break;
                     }
                 default: break;
@@ -161,13 +161,13 @@ namespace Chess.UI.Models
 
         public void AcceptConnectionRequest()
         {
-            ChessLogicAPI.ApproveConnectionRequest();
+            EngineAPI.ApproveConnectionRequest();
         }
 
 
         public void RejectConnectionRequest()
         {
-            ChessLogicAPI.RejectConnectionRequest();
+            EngineAPI.RejectConnectionRequest();
         }
 
 

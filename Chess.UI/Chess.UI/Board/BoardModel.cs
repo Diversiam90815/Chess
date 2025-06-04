@@ -13,7 +13,7 @@ namespace Chess.UI.Board
         {
             int[] board = new int[64]; // pre-allocated array
 
-            ChessLogicAPI.GetBoardState(board);
+            EngineAPI.GetBoardState(board);
             return board;
         }
     }

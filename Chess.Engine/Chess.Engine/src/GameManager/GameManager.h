@@ -9,7 +9,7 @@
 
 #include <optional>
 
-#include "ChessLogicAPIDefines.h"
+#include "EngineAPIDefines.h"
 #include "MoveExecution.h"
 #include "MoveGeneration.h"
 #include "MoveValidation.h"

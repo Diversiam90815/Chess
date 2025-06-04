@@ -14,7 +14,7 @@ namespace Chess.UI.Services
             string fullMethodName = GetMethodName(memberName, filePath);
             string className = GetClassName(filePath);
 
-            ChessLogicAPI.LogInfoWithCaller(message, fullMethodName, className, lineNumber);
+            EngineAPI.LogInfoWithCaller(message, fullMethodName, className, lineNumber);
         }
 
 
@@ -23,7 +23,7 @@ namespace Chess.UI.Services
             string fullMethodName = GetMethodName(memberName, filePath);
             string className = GetClassName(filePath);
 
-            ChessLogicAPI.LogErrorWithCaller(message, fullMethodName, className, lineNumber);
+            EngineAPI.LogErrorWithCaller(message, fullMethodName, className, lineNumber);
         }
 
 
@@ -32,7 +32,7 @@ namespace Chess.UI.Services
             string fullMethodName = GetMethodName(memberName, filePath);
             string className = GetClassName(filePath);
 
-            ChessLogicAPI.LogWarningWithCaller(message, fullMethodName, className, lineNumber);
+            EngineAPI.LogWarningWithCaller(message, fullMethodName, className, lineNumber);
         }
 
 

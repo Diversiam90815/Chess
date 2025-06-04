@@ -11,7 +11,7 @@
 #include <strsafe.h>
 
 #include "IObserver.h"
-#include "ChessLogicAPIDefines.h"
+#include "EngineAPIDefines.h"
 #include "Player.h"
 
 

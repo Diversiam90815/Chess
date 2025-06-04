@@ -55,7 +55,7 @@ namespace Chess.UI.Views
         private void SetWindowSize(double width, double height)
         {
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            float scalingFactor = ChessLogicAPI.GetWindowScalingFactor(hwnd);
+            float scalingFactor = EngineAPI.GetWindowScalingFactor(hwnd);
             int scaledWidth = (int)(width * scalingFactor);
             int scaledHeight = (int)(height * scalingFactor);
             AppWindow.Resize(new(scaledWidth, scaledHeight));

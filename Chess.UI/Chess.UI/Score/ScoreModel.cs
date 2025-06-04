@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.EngineAPI;
 
 namespace Chess.UI.Score
 {
@@ -45,14 +45,14 @@ namespace Chess.UI.Score
         }
 
 
-        private void HandlePlayerScoreUpdated(ChessLogicAPI.Score score)
+        private void HandlePlayerScoreUpdated(EngineAPI.Score score)
         {
             PlayerScoreUpdated?.Invoke(score);
         }
 
 
         public event Action<PlayerCapturedPiece> PlayerCapturedPiece;
-        public event Action<ChessLogicAPI.Score> PlayerScoreUpdated;
+        public event Action<EngineAPI.Score> PlayerScoreUpdated;
 
     }
 }

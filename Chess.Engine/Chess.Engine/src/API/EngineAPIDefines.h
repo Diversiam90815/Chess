@@ -6,7 +6,8 @@
 */
 
 #pragma once
-#include "Windows.h"
+
+#include <Windows.h>
 
 #include "Parameters.h"
 
@@ -14,7 +15,7 @@
 typedef void(CALLBACK *PFN_CALLBACK)(int messageId, void *pContext);
 
 
-#define CHESS_API		  __declspec(dllexport)
+#define Engine_API		  __declspec(dllexport)
 
 #define MAX_STRING_LENGTH 250
 
