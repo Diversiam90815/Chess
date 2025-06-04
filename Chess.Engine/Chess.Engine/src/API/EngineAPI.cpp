@@ -156,22 +156,6 @@ Engine_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possible
 }
 
 
-Engine_API void HandleMoveStateChanged(const PossibleMoveInstance &moveInstance)
-{
-	// GameManager *manager = GameManager::GetInstance();
-	// PossibleMove move	 = MapToPossibleMove(moveInstance);
-	// manager->handleMoveStateChanges(move);
-}
-
-
-Engine_API void ChangeMoveState(int moveState)
-{
-	// GameManager *manager = GameManager::GetInstance();
-	// MoveState	 state	 = (MoveState)moveState;
-	// manager->setCurrentMoveState(state);
-}
-
-
 Engine_API void StartGame()
 {
 	StateMachine::GetInstance()->onGameStarted();

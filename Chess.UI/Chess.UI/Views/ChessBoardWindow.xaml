@@ -14,20 +14,20 @@
 
     <StackPanel x:Name="RootPanel" Orientation="Horizontal" Background="#0B0B0D">
 
-        <Grid x:Name="BoardGrid" Height="600" Width="600" HorizontalAlignment="Left" Margin="30">
+        <Grid x:Name="BoardGrid" Height="600" Width="600" HorizontalAlignment="Left" Margin="30" XYFocusKeyboardNavigation="Enabled">
             <Grid.Background>
                 <ImageBrush ImageSource="{x:Bind _viewModel.BoardBackgroundImage, Mode=OneWay}"/>
             </Grid.Background>
 
             <ItemsRepeater x:Name="ChessBoardRepeater" ItemsSource="{x:Bind _viewModel.Board, Mode=TwoWay}">
                 <ItemsRepeater.Layout>
-                    <UniformGridLayout MaximumRowsOrColumns="8" />
+                    <UniformGridLayout MinItemHeight="75" MinItemWidth="75" MaximumRowsOrColumns="8" />
                 </ItemsRepeater.Layout>
 
                 <ItemsRepeater.ItemTemplate >
                     <DataTemplate x:DataType="vm:BoardSquare" >
-                        <Grid Tapped="ChessPiece_Clicked" DataContext="{x:Bind}" Background="{x:Bind BackgroundBrush, Mode=OneWay}" Width="{x:Bind converter:Converter.DivideByEight(600)}"  Height="{x:Bind converter:Converter.DivideByEight(600)}" >
-                            <Image Source="{x:Bind PieceImage, Mode=OneWay}" Stretch="Uniform"/>
+                        <Grid Tapped="ChessPiece_Clicked" DataContext="{x:Bind}" Background="{x:Bind BackgroundBrush, Mode=OneWay}">
+                            <Image Source="{x:Bind PieceImage, Mode=OneWay}" Stretch="Uniform" />
                         </Grid>
                     </DataTemplate>
                 </ItemsRepeater.ItemTemplate>
