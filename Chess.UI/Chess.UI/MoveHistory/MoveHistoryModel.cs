@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using static Chess.UI.Services.ChessLogicAPI;
 
 namespace Chess.UI.MoveHistory
 {
@@ -19,9 +20,18 @@ namespace Chess.UI.MoveHistory
         }
 
 
-        private void UpdateMoveHistory(string moveNotation)
+        private void UpdateMoveHistory(MoveHistoryEvent moveHistoryEvent)
         {
-            MoveHistory.Add(moveNotation);
+            if (moveHistoryEvent.added)
+            {
+                string moveNotation = moveHistoryEvent.moveNotation;
+                MoveHistory.Add(moveNotation);
+            }
+            else
+            {
+                MoveHistory.Clear();
+            }
+
             MoveHistoryUpdated?.Invoke();
         }
 
@@ -31,6 +41,8 @@ namespace Chess.UI.MoveHistory
             MoveHistory.Remove(MoveHistory.LastOrDefault());
         }
 
+
         public event Action MoveHistoryUpdated;
+        public event Action MoveHistoryCleared;
     }
 }

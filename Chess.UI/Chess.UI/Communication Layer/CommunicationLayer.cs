@@ -25,7 +25,7 @@ namespace Chess.UI.Services
             PlayerCapturedPiece = 3,
             PlayerChanged = 4,
             GameStateChanged = 5,
-            MoveHistoryAdded = 6,
+            MoveHistoryUpdated = 6,
             ConnectionStateChanged = 7,
             ClientRequestedConnection = 8
         }
@@ -79,9 +79,9 @@ namespace Chess.UI.Services
                         HandleGameStateChanges(data);
                         break;
                     }
-                case DelegateMessage.MoveHistoryAdded:
+                case DelegateMessage.MoveHistoryUpdated:
                     {
-                        HandleMoveNotationAdded(data);
+                        HandleMoveHistoryUpdated(data);
                         break;
                     }
                 case DelegateMessage.PlayerCapturedPiece:
@@ -112,10 +112,10 @@ namespace Chess.UI.Services
         }
 
 
-        private void HandleMoveNotationAdded(nint data)
+        private void HandleMoveHistoryUpdated(nint data)
         {
-            string notation = Marshal.PtrToStringUTF8(data);
-            MoveHistoryUpdated?.Invoke(notation);
+            MoveHistoryEvent moveHistoryEvent = (MoveHistoryEvent)Marshal.PtrToStructure(data, typeof(MoveHistoryEvent));
+            MoveHistoryUpdated?.Invoke(moveHistoryEvent);
         }
 
 
@@ -169,7 +169,7 @@ namespace Chess.UI.Services
 
         public event Action<PlayerColor> PlayerChanged;
         public event Action<GameState> GameStateChanged;
-        public event Action<string> MoveHistoryUpdated;
+        public event Action<MoveHistoryEvent> MoveHistoryUpdated;
         public event Action<PlayerCapturedPiece> PlayerCapturedPieceEvent;
         public event Action<ChessLogicAPI.Score> PlayerScoreUpdated;
         public event Action<EndGameState> EndGameStateEvent;

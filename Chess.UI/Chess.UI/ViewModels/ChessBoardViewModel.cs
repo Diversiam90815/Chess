@@ -90,7 +90,12 @@ namespace Chess.UI.ViewModels
 
         public void LoadBoardFromNative()
         {
+            if (_boardModel == null)
+                return;
+
             var boardState = _boardModel.GetBoardStateFromNative();
+            if (boardState == null)
+                return;
 
             for (int i = 0; i < boardState.Length; i++)
             {
@@ -134,7 +139,6 @@ namespace Chess.UI.ViewModels
         public void ResetGame()
         {
             ChessLogicAPI.ResetGame();
-            _moveHistoryViewModel.ClearMoveHistory();
 
             Board.Clear();
             for (int i = 0; i < _coordinate.GetNumBoardSquares(); i++)
@@ -240,7 +244,7 @@ namespace Chess.UI.ViewModels
             {
                 return ShowPawnPromotionDialogRequested.Invoke();
             }
-            return null;
+            return Task.FromResult<PieceTypeInstance?>(null);
         }
 
 
@@ -248,7 +252,6 @@ namespace Chess.UI.ViewModels
         {
             ShowEndGameDialog?.Invoke(state);
         }
-
 
         private void OnHandlePlayerChanged(PlayerColor player)
         {

@@ -156,6 +156,7 @@ namespace Chess.UI
             });
         }
 
+
         private async Task<ContentDialogResult> ShowDialogAsync<T>(Window ownwerWindow, Action<T>? initAction = null) where T : ContentDialog
         {
             var dialog = App.Current.Services.GetRequiredService<T>();
