@@ -31,6 +31,11 @@
         <Setter Property="Height" Value="20" />
     </Style>
 
+    <Style x:Key="CurrentPlayerImageStyle" TargetType="Image">
+        <Setter Property="Width" Value="60" />
+        <Setter Property="Height" Value="60" />
+    </Style>
+
     <Style x:Key="MainMenuImageStyle" TargetType="Image">
         <Setter Property="Stretch" Value="Uniform" />
         <Setter Property="Height" Value="90" />
@@ -125,7 +130,7 @@
     </Style>
 
     <Style x:Key="GameButtonStyle" TargetType="Button">
-        <Setter Property="Width" Value="230" />
+        <Setter Property="Width" Value="80" />
         <Setter Property="Height" Value="50" />
         <Setter Property="CornerRadius" Value="8" />
     </Style>

@@ -14,7 +14,7 @@
 
     <StackPanel x:Name="RootPanel" Orientation="Horizontal" Background="#0B0B0D">
 
-        <Grid x:Name="BoardGrid" Height="600" Width="600" HorizontalAlignment="Left" Margin="30" XYFocusKeyboardNavigation="Enabled">
+        <Grid x:Name="BoardGrid" Height="600" Width="600" HorizontalAlignment="Left" Margin="24" XYFocusKeyboardNavigation="Enabled">
             <Grid.Background>
                 <ImageBrush ImageSource="{x:Bind _viewModel.BoardBackgroundImage, Mode=OneWay}"/>
             </Grid.Background>
@@ -36,32 +36,24 @@
         </Grid>
 
 
-        <Grid x:Name="InfoGrid" HorizontalAlignment="Right">
+        <Grid x:Name="InfoGrid" Margin="24" VerticalAlignment="Center">
 
             <StackPanel Orientation="Vertical">
 
-                <Grid x:Name="Score" VerticalAlignment="Top" Width="200" Height="170" CornerRadius="8" Margin="20,40,20,0" Background="#1E1E21" HorizontalAlignment="Center">
+                <Grid x:Name="Score" Width="160" Height="170" CornerRadius="8" Margin="20,30" Background="#1E1E21" HorizontalAlignment="Center">
                     <Grid.RowDefinitions>
-                        <RowDefinition x:Name="ScoreTitle" Height="30"/>
-                        <RowDefinition x:Name="BlackWhiteTitle" Height="35" />
-                        <RowDefinition x:Name="Pieces" Height="100"/>
+                        <RowDefinition x:Name="ScoreTitle" Height="Auto"/>
+                        <RowDefinition x:Name="BlackWhiteTitle" Height="Auto" />
+                        <RowDefinition x:Name="Pieces" Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition x:Name="White" Width="100"/>
-                        <ColumnDefinition x:Name="Black" Width="100"/>
+                        <ColumnDefinition x:Name="White" Width="80"/>
+                        <ColumnDefinition x:Name="Black" Width="80"/>
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="Score" FontSize="24" Foreground="#E0E0E0" HorizontalAlignment="Center"/>
-
-                    <StackPanel Name="WhiteScoreValue" Grid.Row="1" Grid.Column="0" Orientation="Horizontal">
-                        <TextBlock Text="White" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
-                        <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteScoreValue, Mode=TwoWay}" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Right" Margin="8,0,0,0"/>
-                    </StackPanel>
-
-                    <StackPanel Name="BlackScoreValue" Grid.Row="1" Grid.Column="1"  Orientation="Horizontal">
-                        <TextBlock Text="Black" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
-                        <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackScoreValue, Mode=TwoWay}" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Right" Margin="8,0,0,0"/>
-                    </StackPanel>
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="White" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="Black" FontSize="20" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="8,0,0,0"/>
 
                     <StackPanel Name="WhiteCapturedPieces" Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
                         <StackPanel Name="WCapturedPiecesImages" Orientation="Vertical" HorizontalAlignment="Left">
@@ -100,7 +92,7 @@
                     </StackPanel>
                 </Grid>
 
-                <Grid x:Name="MoveHistory" VerticalAlignment="Center" Width="250" Height="220" Background="#1E1E21" CornerRadius="8" Margin="20,10,20,45" HorizontalAlignment="Center">
+                <Grid x:Name="MoveHistory" VerticalAlignment="Center" Width="220" Height="220" Background="#1E1E21" CornerRadius="8" Margin="20" HorizontalAlignment="Center">
                     <Grid.RowDefinitions>
                         <RowDefinition x:Name="Title" Height="40"/>
                         <RowDefinition x:Name="Moves" Height="165"/>
@@ -109,7 +101,7 @@
                     <TextBlock Grid.Row="0" Text="Move History" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
 
                     <!-- Moves with Wrapping Columns -->
-                    <ScrollViewer Grid.Row="1" Margin="8,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                         <ItemsControl x:Name="MovesColumns" ItemsSource="{x:Bind _viewModel._moveHistoryViewModel.MoveHistoryColumns, Mode=OneWay}" Background="#1E1E21" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -123,7 +115,7 @@
                                         <ItemsControl ItemsSource="{Binding}">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <TextBlock Text="{Binding}" FontSize="14" Foreground="#E0E0E0" Margin="0,2"/>
+                                                    <TextBlock Text="{Binding}" Width="40" FontSize="14" Foreground="#E0E0E0" HorizontalAlignment="Left" Margin="2"/>
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
@@ -134,19 +126,16 @@
                     </ScrollViewer>
                 </Grid>
 
+                <StackPanel x:Name="CurrentPlayer" Background="#1E1E21" Height="Auto" Margin="16" Orientation="Horizontal" >
+                    <TextBlock Text="Current Player" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24"/>
+                    <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedWhitePawnImage}" Style="{StaticResource CurrentPlayerImageStyle}"/>
+                </StackPanel>
 
-                <Grid x:Name="Buttons" Width="230" Height="200" VerticalAlignment="Bottom" HorizontalAlignment="Center" >
-                    <Grid.RowDefinitions>
-                        <RowDefinition x:Name="UndoMoveBtn" Height="50"/>
-                        <RowDefinition x:Name="Spacing2" Height="20"/>
-                        <RowDefinition x:Name="ResetGameBtn" Height="50"/>
-                        <RowDefinition x:Name="Spacing3" Height="20"/>
-                        <RowDefinition x:Name="EndGameBtn" Height="50"/>
-                    </Grid.RowDefinitions>
-                    <Button x:Name="UndoMove" Content="Undo Move" Click="UndoMove_Click" Style="{StaticResource GameButtonStyle}" Grid.Row="0"/>
-                    <Button x:Name="ResetGame" Content="Reset Game" Click="ResetGame_Click" Style="{StaticResource GameButtonStyle}" Grid.Row="2"/>
-                    <Button x:Name="EndGame" Content="End Game" Click="EndGame_Click" Style="{StaticResource GameButtonStyle}" Grid.Row="4"/>
-                </Grid>
+                <StackPanel x:Name="Buttons" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                    <Button x:Name="UndoMove" Content="Undo" Click="UndoMove_Click" Style="{StaticResource GameButtonStyle}"/>
+                    <Button x:Name="ResetGame" Content="Reset" Click="ResetGame_Click" Style="{StaticResource GameButtonStyle}" />
+                    <Button x:Name="EndGame" Content="End" Click="EndGame_Click" Style="{StaticResource GameButtonStyle}"/>
+                </StackPanel>
 
             </StackPanel>
         </Grid>
