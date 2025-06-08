@@ -275,6 +275,8 @@ void GameManager::resetGame()
 	mChessBoard->removeAllPiecesFromBoard();
 	mChessBoard->initializeBoard();
 
+	mMoveExecution->clearMoveHistory();
+
 	mWhitePlayer.reset();
 	mBlackPlayer.reset();
 

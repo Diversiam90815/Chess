@@ -22,6 +22,7 @@ public:
 
 	void onExecuteMove(const PossibleMove &move) override;
 	void onAddToMoveHistory(Move &move) override {}
+	void onClearMoveHistory() override {}
 
 private:
 	std::vector<uint8_t> convertDataToByteVector(json &source);

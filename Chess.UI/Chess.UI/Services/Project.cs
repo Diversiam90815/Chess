@@ -10,6 +10,9 @@ namespace Chess.UI.Services
 
         public static readonly string AppDataDirectory = ApplicationData.Current.LocalFolder.Path;  // %LOCALAPPDATA%\Packages\Chess-Game_wt5qqggg8cjge\LocalState
 
+        public static readonly string IconPath = "Assets/Logo/Chess.ico";
+
+
         #endregion
         
     }

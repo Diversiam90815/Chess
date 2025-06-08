@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml.Media;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.EngineAPI;
 using static Chess.UI.Images.ImageServices;
 using Chess.UI.Score;
 using Microsoft.Windows.Management.Deployment;
@@ -53,7 +53,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        public void OnPlayerScoreUpdated(Services.ChessLogicAPI.Score score)
+        public void OnPlayerScoreUpdated(Services.EngineAPI.Score score)
         {
             int value = score.score;
             PlayerColor player = score.player;

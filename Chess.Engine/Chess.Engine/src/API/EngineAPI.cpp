@@ -8,7 +8,8 @@
 #include <strsafe.h>
 #include <combaseapi.h>
 
-#include "ChessLogicAPI.h"
+#include "EngineAPI.h"
+
 #include "GameManager.h"
 #include "FileManager.h"
 #include "StateMachine.h"
@@ -81,28 +82,28 @@ static char *StringToCharPtr(std::string string)
 //			CHESS API
 //=============================================
 
-CHESS_API void Init()
+Engine_API void Init()
 {
 	GameManager *manager = GameManager::GetInstance();
 	manager->init();
 }
 
 
-CHESS_API void Deinit()
+Engine_API void Deinit()
 {
 	GameManager::ReleaseInstance();
 	FileManager::ReleaseInstance();
 }
 
 
-CHESS_API void SetDelegate(PFN_CALLBACK pDelegate)
+Engine_API void SetDelegate(PFN_CALLBACK pDelegate)
 {
 	GameManager *manager = GameManager::GetInstance();
 	manager->setDelegate(pDelegate);
 }
 
 
-CHESS_API float GetWindowScalingFactor(HWND hwnd)
+Engine_API float GetWindowScalingFactor(HWND hwnd)
 {
 	int	  dpi			= GetDpiForWindow(hwnd);
 	float scalingFactor = (float)dpi / 96;
@@ -110,14 +111,14 @@ CHESS_API float GetWindowScalingFactor(HWND hwnd)
 }
 
 
-CHESS_API void SetUnvirtualizedAppDataPath(const char *appDataPath)
+Engine_API void SetUnvirtualizedAppDataPath(const char *appDataPath)
 {
 	FileManager *fmg = FileManager::GetInstance();
 	fmg->setAppDataPath(appDataPath);
 }
 
 
-CHESS_API int GetNumPossibleMoves()
+Engine_API int GetNumPossibleMoves()
 {
 	GameManager *manager  = GameManager::GetInstance();
 
@@ -128,7 +129,7 @@ CHESS_API int GetNumPossibleMoves()
 
 
 // Needs to be called when delegate message received that calculation of possible moves is done (GameManager.cpp l211)
-CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleMoveInstance)
+Engine_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleMoveInstance)
 {
 	GameManager *manager = GameManager::GetInstance();
 
@@ -155,48 +156,32 @@ CHESS_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possibleM
 }
 
 
-CHESS_API void HandleMoveStateChanged(const PossibleMoveInstance &moveInstance)
-{
-	// GameManager *manager = GameManager::GetInstance();
-	// PossibleMove move	 = MapToPossibleMove(moveInstance);
-	// manager->handleMoveStateChanges(move);
-}
-
-
-CHESS_API void ChangeMoveState(int moveState)
-{
-	// GameManager *manager = GameManager::GetInstance();
-	// MoveState	 state	 = (MoveState)moveState;
-	// manager->setCurrentMoveState(state);
-}
-
-
-CHESS_API void StartGame()
+Engine_API void StartGame()
 {
 	StateMachine::GetInstance()->onGameStarted();
 }
 
 
-CHESS_API void ResetGame()
+Engine_API void ResetGame()
 {
 	StateMachine::GetInstance()->resetGame();
 }
 
 
-CHESS_API void UndoMove()
+Engine_API void UndoMove()
 {
 	StateMachine::GetInstance()->reactToUndoMove();
 }
 
 
-CHESS_API int GetEndgameState()
+Engine_API int GetEndgameState()
 {
 	// TODO
 	return 0;
 }
 
 
-CHESS_API bool GetBoardState(int *boardState)
+Engine_API bool GetBoardState(int *boardState)
 {
 	if (!boardState)
 		return false;
@@ -226,79 +211,79 @@ CHESS_API bool GetBoardState(int *boardState)
 }
 
 
-CHESS_API void StartedMultiplayer()
+Engine_API void StartedMultiplayer()
 {
 	GameManager::GetInstance()->startedMultiplayer();
 }
 
 
-CHESS_API void StartMultiplayerGame(bool isHost)
+Engine_API void StartMultiplayerGame(bool isHost)
 {
 	StateMachine::GetInstance()->onMultiplayerGameStarted(isHost);
 }
 
 
-CHESS_API void StartRemoteDiscovery(bool isHost)
+Engine_API void StartRemoteDiscovery(bool isHost)
 {
 	GameManager::GetInstance()->startRemoteDiscovery(isHost);
 }
 
 
-CHESS_API void DisconnectMultiplayerGame()
+Engine_API void DisconnectMultiplayerGame()
 {
 	return GameManager::GetInstance()->disconnectMultiplayerGame();
 }
 
 
-CHESS_API bool IsMultiplayerActive()
+Engine_API bool IsMultiplayerActive()
 {
 	return GameManager::GetInstance()->isMultiplayerActive();
 }
 
 
-CHESS_API void OnSquareSelected(PositionInstance positionInstance)
+Engine_API void OnSquareSelected(PositionInstance positionInstance)
 {
 	Position pos = MapToPosition(positionInstance);
 	StateMachine::GetInstance()->onSquareSelected(pos);
 }
 
 
-CHESS_API void OnPawnPromotionChosen(PieceTypeInstance promotionInstance)
+Engine_API void OnPawnPromotionChosen(PieceTypeInstance promotionInstance)
 {
 	PieceType promotion = static_cast<PieceType>(promotionInstance);
 	StateMachine::GetInstance()->onPawnPromotionChosen(promotion);
 }
 
 
-CHESS_API void LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
+Engine_API void LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
 {
 	spdlog::source_loc loc(className, lineNumber, method);
 	logging::log(LogLevel::Info, loc, message);
 }
 
 
-CHESS_API void LogErrorWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
+Engine_API void LogErrorWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
 {
 	spdlog::source_loc loc(className, lineNumber, method);
 	logging::log(LogLevel::Error, loc, message);
 }
 
 
-CHESS_API void LogWarningWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
+Engine_API void LogWarningWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
 {
 	spdlog::source_loc loc(className, lineNumber, method);
 	logging::log(LogLevel::Warn, loc, message);
 }
 
 
-CHESS_API void SetCurrentBoardTheme(const char *theme)
+Engine_API void SetCurrentBoardTheme(const char *theme)
 {
 	GameManager *manager = GameManager::GetInstance();
 	manager->setBoardTheme(theme);
 }
 
 
-CHESS_API char *GetCurrentBoardTheme()
+Engine_API char *GetCurrentBoardTheme()
 {
 	GameManager *manager  = GameManager::GetInstance();
 	std::string	 theme	  = manager->getBoardTheme();
@@ -307,14 +292,14 @@ CHESS_API char *GetCurrentBoardTheme()
 }
 
 
-CHESS_API void SetCurrentPieceTheme(const char *theme)
+Engine_API void SetCurrentPieceTheme(const char *theme)
 {
 	GameManager *manager = GameManager::GetInstance();
 	manager->setPieceTheme(theme);
 }
 
 
-CHESS_API char *GetCurrentPieceTheme()
+Engine_API char *GetCurrentPieceTheme()
 {
 	GameManager *manager  = GameManager::GetInstance();
 	std::string	 theme	  = manager->getPieceTheme();
@@ -323,37 +308,37 @@ CHESS_API char *GetCurrentPieceTheme()
 }
 
 
-CHESS_API void SetLocalPlayerName(const char *name)
+Engine_API void SetLocalPlayerName(const char *name)
 {
 	return GameManager::GetInstance()->setLocalPlayerName(name);
 }
 
 
-CHESS_API void ApproveConnectionRequest()
+Engine_API void ApproveConnectionRequest()
 {
 	GameManager::GetInstance()->approveConnectionRequest();
 }
 
 
-CHESS_API void RejectConnectionRequest()
+Engine_API void RejectConnectionRequest()
 {
 	GameManager::GetInstance()->rejectConnectionRequest();
 }
 
 
-CHESS_API void SendConnectionRequestToHost()
+Engine_API void SendConnectionRequestToHost()
 {
 	GameManager::GetInstance()->sendConnectionRequestToHost();
 }
 
 
-CHESS_API void StoppedMultiplayer()
+Engine_API void StoppedMultiplayer()
 {
 	GameManager::GetInstance()->stoppedMultiplayer();
 }
 
 
-CHESS_API int GetNetworkAdapterCount()
+Engine_API int GetNetworkAdapterCount()
 {
 	GameManager *manager	 = GameManager::GetInstance();
 	auto		 adapters	 = manager->getNetworkAdapters();
@@ -362,7 +347,7 @@ CHESS_API int GetNetworkAdapterCount()
 }
 
 
-CHESS_API bool GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInstance *adapter)
+Engine_API bool GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInstance *adapter)
 {
 	GameManager *manager  = GameManager::GetInstance();
 	auto		 adapters = manager->getNetworkAdapters();
@@ -394,13 +379,13 @@ CHESS_API bool GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInstan
 }
 
 
-CHESS_API int GetSavedAdapterID()
+Engine_API int GetSavedAdapterID()
 {
 	return GameManager::GetInstance()->getCurrentNetworkAdapterID();
 }
 
 
-CHESS_API bool ChangeCurrentAdapter(int ID)
+Engine_API bool ChangeCurrentAdapter(int ID)
 {
 	GameManager *manager = GameManager::GetInstance();
 	bool		 result	 = manager->changeCurrentNetworkAdapter(ID);

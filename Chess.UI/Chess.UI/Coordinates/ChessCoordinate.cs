@@ -1,5 +1,5 @@
 ﻿using Chess.UI.Services.Interfaces;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.EngineAPI;
 
 namespace Chess.UI.Coordinates
 {

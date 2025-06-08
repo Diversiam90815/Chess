@@ -5,7 +5,7 @@ using static Chess.UI.Services.CommunicationLayer;
 
 namespace Chess.UI.Services
 {
-    public class ChessLogicAPI
+    public class EngineAPI
     {
         #region DLL Defines
 
@@ -86,7 +86,7 @@ namespace Chess.UI.Services
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartedMultiplayer", CharSet = CharSet.Unicode)]
         public static extern void StartedMultiplayer();
-        
+
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartMultiplayerGame", CharSet = CharSet.Unicode)]
         public static extern void StartMultiplayerGame(bool isHost);
 
@@ -104,7 +104,7 @@ namespace Chess.UI.Services
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "RejectConnectionRequest", CharSet = CharSet.Unicode)]
         public static extern void RejectConnectionRequest();
-        
+
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SendConnectionRequestToHost", CharSet = CharSet.Unicode)]
         public static extern void SendConnectionRequestToHost();
 
@@ -364,6 +364,17 @@ namespace Chess.UI.Services
 
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
+        public struct MoveHistoryEvent
+        {
+            public bool added;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 250)]
+            public string moveNotation;
+        };
+
+
+
+        [StructLayout(LayoutKind.Sequential)]
         public struct ConnectionStatusEvent
         {
             public ConnectionState ConnectionState;

@@ -12,7 +12,7 @@
 #include "Parameters.h"
 #include "Logging.h"
 
-#include "ChessLogicAPIDefines.h"
+#include "EngineAPIDefines.h"
 #include "IObservable.h"
 
 

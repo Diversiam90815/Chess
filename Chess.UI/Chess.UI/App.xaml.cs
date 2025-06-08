@@ -65,6 +65,8 @@ namespace Chess.UI
         {
             var services = new ServiceCollection();
 
+            services.AddSingleton<IDispatcherQueueWrapper, DispatcherQueueWrapper>();
+
             services.AddSingleton<IChessCoordinate, ChessCoordinate>();
             services.AddSingleton<IThemeManager, ThemeManager>();
             services.AddSingleton<IImageService, ImageServices>();
@@ -74,7 +76,6 @@ namespace Chess.UI
             services.AddTransient<IMoveHistoryModel, MoveHistoryModel>();
             services.AddTransient<IBoardModel, BoardModel>();
             services.AddTransient<IMultiplayerModel, MultiplayerModel>();
-            services.AddTransient<IDispatcherQueueWrapper, DispatcherQueueWrapper>();
 
             // Register view models
             services.AddTransient<ChessBoardViewModel>();
@@ -82,12 +83,14 @@ namespace Chess.UI
             services.AddTransient<MoveHistoryViewModel>();
             services.AddTransient<MainMenuViewModel>();
             services.AddTransient<MultiplayerViewModel>();
-            services.AddTransient<SettingsViewModel>();
+            services.AddTransient<ThemePreferencesViewModel>();
 
             services.AddTransient<MainMenuWindow>();
             services.AddTransient<ChessBoardWindow>();
             services.AddTransient<MultiplayerWindow>();
-            services.AddTransient<SettingsWindow>();
+            services.AddTransient<ThemePreferencesView>();
+
+            services.AddTransient<PreferencesView>();
 
             return services.BuildServiceProvider();
         }

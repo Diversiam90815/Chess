@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.0.0.485)
+set(CHESS_VERSION 1.0.0.502)
 
 project(Chess.Engine VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
@@ -75,8 +75,8 @@ include_directories(${ALL_PROJECT_DIRS})
 #==========================================
 
 set(API_FILES
-	${API_DIR}/ChessLogicAPI.h    ${API_DIR}/ChessLogicAPI.cpp
-	${API_DIR}/ChessLogicAPIDefines.h
+	${API_DIR}/EngineAPI.h    ${API_DIR}/EngineAPI.cpp
+	${API_DIR}/EngineAPIDefines.h
 )
 
 set(STATEMACHINE_FILES
