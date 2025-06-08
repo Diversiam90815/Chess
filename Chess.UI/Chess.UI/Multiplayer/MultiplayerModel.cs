@@ -171,5 +171,7 @@ namespace Chess.UI.Models
 
         public event Action<string> OnConnectionErrorOccured;
         public event Action<ConnectionState, string> OnConnectionStatusChanged;
+        public event Action<string> OnClientRequestedConnection;
+
     }
 }

@@ -307,7 +307,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private void HandleConnectionStatusUpdated(ChessLogicAPI.ConnectionState state, string remotePlayerName)
+        private void HandleConnectionStatusUpdated(EngineAPI.ConnectionState state, string remotePlayerName)
         {
             // TODO: Implement reactive UI
             switch (state)
@@ -336,7 +336,7 @@ namespace Chess.UI.ViewModels
                     {
                         break;
                     }
-                case ChessLogicAPI.ConnectionState.ClientFoundHost:
+                case EngineAPI.ConnectionState.ClientFoundHost:
                     {
                         RemotePlayerName = remotePlayerName;
                         DisplayClientFoundHostView();
