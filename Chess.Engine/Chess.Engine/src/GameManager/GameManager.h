@@ -9,7 +9,7 @@
 
 #include <optional>
 
-#include "ChessLogicAPIDefines.h"
+#include "EngineAPIDefines.h"
 #include "MoveExecution.h"
 #include "MoveGeneration.h"
 #include "MoveValidation.h"
@@ -129,8 +129,6 @@ private:
 	std::shared_ptr<MoveExecution>		mMoveExecution;
 
 	std::shared_ptr<UICommunication>	mUiCommunicationLayer;
-
-	//std::shared_ptr<NetworkManager>		mNetwork;
 
 	std::shared_ptr<MultiplayerManager> mMultiplayerManager;
 

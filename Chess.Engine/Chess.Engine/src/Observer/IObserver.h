@@ -34,6 +34,7 @@ public:
 
 	virtual void onExecuteMove(const PossibleMove &move) = 0;
 	virtual void onAddToMoveHistory(Move &move)			 = 0;
+	virtual void onClearMoveHistory()					 = 0;
 };
 
 

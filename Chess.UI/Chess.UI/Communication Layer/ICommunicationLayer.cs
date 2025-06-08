@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.EngineAPI;
 
 
 namespace Chess.UI.Communication_Layer.Interfaces
@@ -20,9 +20,9 @@ namespace Chess.UI.Communication_Layer.Interfaces
         // Events for notifying UI components
         event Action<PlayerColor> PlayerChanged;
         event Action<GameState> GameStateChanged;
-        event Action<string> MoveHistoryUpdated;
+        event Action<MoveHistoryEvent> MoveHistoryUpdated;
         event Action<PlayerCapturedPiece> PlayerCapturedPieceEvent;
-        event Action<Services.ChessLogicAPI.Score> PlayerScoreUpdated;
+        event Action<Services.EngineAPI.Score> PlayerScoreUpdated;
         event Action<EndGameState> EndGameStateEvent;
         event Action<ConnectionStatusEvent> ConnectionStatusEvent;
     }

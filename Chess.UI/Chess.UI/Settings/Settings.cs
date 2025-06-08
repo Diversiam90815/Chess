@@ -28,14 +28,14 @@ namespace Chess.UI.Settings
 
         static public string CurrentPieceTheme
         {
-            get => ChessLogicAPI.GetCurrentPieceTheme();
-            set => ChessLogicAPI.SetCurrentPieceTheme(value);
+            get => EngineAPI.GetCurrentPieceTheme();
+            set => EngineAPI.SetCurrentPieceTheme(value);
         }
 
         static public string CurrentBoardTheme
         {
-            get => ChessLogicAPI.GetCurrentBoardTheme();
-            set => ChessLogicAPI.SetCurrentBoardTheme(value);
+            get => EngineAPI.GetCurrentBoardTheme();
+            set => EngineAPI.SetCurrentBoardTheme(value);
         }
 
         #endregion

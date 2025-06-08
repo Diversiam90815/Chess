@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using static Chess.UI.Images.ImageServices;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.EngineAPI;
 using System.Collections.ObjectModel;
 using System;
 using Microsoft.UI.Composition.Interactions;
@@ -88,30 +88,41 @@ namespace Chess.UI.ViewModels
         }
 
 
-        public void LoadBoardFromNative()
+        public void InitializeBoardFromNative()
         {
             var boardState = _boardModel.GetBoardStateFromNative();
 
-            for (int i = 0; i < boardState.Length; i++)
+            for (int i = 0; i < _coordinate.GetNumBoardSquares(); i++)
             {
-                int encoded = boardState[i];
-
-                // Decode color and piece
-                int colorVal = (encoded >> 4) & 0xF;    // top 8 bits
-                int pieceVal = encoded & 0xF;          // bottom 8 bits
-
-                PositionInstance enginePos = _coordinate.FromIndex(i);  // Get engine pos from index
-                PositionInstance displayPos = _coordinate.ToDisplayCoordinates(enginePos); // Convert it to the UI pos
-
-                var square = new BoardSquare(
-                    x: displayPos.x,
-                    y: displayPos.y,
-                    (PieceTypeInstance)pieceVal,
-                    (PlayerColor)colorVal
-                );
+                BoardSquare square = _boardModel.DecodeBoardState(i, boardState);
 
                 // Calculate the index in the UI board array
-                int displayIndex = _coordinate.ToIndex(displayPos, true);
+                int displayIndex = _coordinate.ToIndex(square.pos, true);
+
+                _dispatcherQueue.TryEnqueue(() =>
+                {
+                    Board[displayIndex] = square;
+                    OnPropertyChanged(nameof(Board));
+                });
+            }
+        }
+
+
+        public void UpdateBoardFromNative()
+        {
+            ResetHighlightsOnBoard();
+
+            var (changedSquares, newBoardState) = _boardModel.UpdateBoardState();
+
+            foreach (var kvp in changedSquares)
+            {
+                int boardIndex = kvp.Key;      // The index on the chess board
+                int encodedState = kvp.Value;  // The encoded state value
+
+                BoardSquare square = _boardModel.DecodeBoardState(boardIndex, newBoardState);
+
+                // Calculate the index in the UI board array
+                int displayIndex = _coordinate.ToIndex(square.pos, true);
 
                 _dispatcherQueue.TryEnqueue(() =>
                 {
@@ -126,15 +137,14 @@ namespace Chess.UI.ViewModels
         {
             _dispatcherQueue.TryEnqueue(() =>
             {
-                LoadBoardFromNative();
+                UpdateBoardFromNative();
             });
         }
 
 
         public void ResetGame()
         {
-            ChessLogicAPI.ResetGame();
-            _moveHistoryViewModel.ClearMoveHistory();
+            EngineAPI.ResetGame();
 
             Board.Clear();
             for (int i = 0; i < _coordinate.GetNumBoardSquares(); i++)
@@ -147,14 +157,14 @@ namespace Chess.UI.ViewModels
 
         public void StartGame()
         {
-            ChessLogicAPI.StartGame();  // Start the game and thus the StateMachine
+            EngineAPI.StartGame();  // Start the game and thus the StateMachine
         }
 
 
         public void OnGameStateInitSucceeded()
         {
             // Once the board is ready calculated, we load it from native
-            LoadBoardFromNative();
+            InitializeBoardFromNative();
         }
 
 
@@ -194,7 +204,7 @@ namespace Chess.UI.ViewModels
 
             Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{enginePos.x}-Y{enginePos.y}!");
 
-            ChessLogicAPI.OnSquareSelected(enginePos);
+            EngineAPI.OnSquareSelected(enginePos);
         }
 
 
@@ -228,8 +238,8 @@ namespace Chess.UI.ViewModels
 
         public void UndoLastMove()
         {
-            ChessLogicAPI.UndoMove();
-            LoadBoardFromNative();
+            EngineAPI.UndoMove();
+            UpdateBoardFromNative();
             _moveHistoryViewModel.RemoveLastMove();
         }
 
@@ -240,7 +250,7 @@ namespace Chess.UI.ViewModels
             {
                 return ShowPawnPromotionDialogRequested.Invoke();
             }
-            return null;
+            return Task.FromResult<PieceTypeInstance?>(null);
         }
 
 
@@ -248,7 +258,6 @@ namespace Chess.UI.ViewModels
         {
             ShowEndGameDialog?.Invoke(state);
         }
-
 
         private void OnHandlePlayerChanged(PlayerColor player)
         {
@@ -265,6 +274,7 @@ namespace Chess.UI.ViewModels
                 if (value != currentPlayer)
                 {
                     currentPlayer = value;
+                    OnPropertyChanged();
                 }
             }
         }

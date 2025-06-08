@@ -61,6 +61,7 @@ public:
 
 	virtual Move executeMove(PossibleMove &move) = 0;
 	virtual void addMoveToHistory(Move &move)	 = 0;
+	virtual void clearMoveHistory()				 = 0;
 };
 
 

@@ -11,7 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using static Chess.UI.Services.ChessLogicAPI;
+using static Chess.UI.Services.EngineAPI;
 
 namespace Chess.UI.Test
 {
@@ -70,13 +70,13 @@ namespace Chess.UI.Test
             SetPrivateField(viewModel, "_scoreModel", _model.Object);
 
             // Act
-            viewModel.OnPlayerScoreUpdated(new ChessLogicAPI.Score { player = PlayerColor.White, score = 5 });
+            viewModel.OnPlayerScoreUpdated(new EngineAPI.Score { player = PlayerColor.White, score = 5 });
 
             // Assert
             Assert.Equal(5, viewModel.WhiteScoreValue);
 
             // Act again with Black's score
-            viewModel.OnPlayerScoreUpdated(new ChessLogicAPI.Score { player = PlayerColor.Black, score = 3 });
+            viewModel.OnPlayerScoreUpdated(new EngineAPI.Score { player = PlayerColor.Black, score = 3 });
 
             // Assert again
             Assert.Equal(3, viewModel.BlackScoreValue);

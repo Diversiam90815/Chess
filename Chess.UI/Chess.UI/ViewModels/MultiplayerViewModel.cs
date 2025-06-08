@@ -312,27 +312,27 @@ namespace Chess.UI.ViewModels
             // TODO: Implement reactive UI
             switch (state)
             {
-                case ChessLogicAPI.ConnectionState.HostingSession:
+                case EngineAPI.ConnectionState.HostingSession:
                     {
                         break;
                     }
-                case ChessLogicAPI.ConnectionState.Connecting:
+                case EngineAPI.ConnectionState.Connecting:
                     {
                         break;
                     }
-                case ChessLogicAPI.ConnectionState.Connected:
+                case EngineAPI.ConnectionState.Connected:
                     {
                         break;
                     }
-                case ChessLogicAPI.ConnectionState.WaitingForARemote:
+                case EngineAPI.ConnectionState.WaitingForARemote:
                     {
                         break;
                     }
-                case ChessLogicAPI.ConnectionState.Disconnecting:
+                case EngineAPI.ConnectionState.Disconnecting:
                     {
                         break;
                     }
-                case ChessLogicAPI.ConnectionState.Disconnected:
+                case EngineAPI.ConnectionState.Disconnected:
                     {
                         break;
                     }
