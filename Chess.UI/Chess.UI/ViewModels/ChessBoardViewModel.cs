@@ -88,35 +88,39 @@ namespace Chess.UI.ViewModels
         }
 
 
-        public void LoadBoardFromNative()
+        public void InitializeBoardFromNative()
         {
-            if (_boardModel == null)
-                return;
-
-            var boardState = _boardModel.GetBoardStateFromNative();
-            if (boardState == null)
-                return;
-
-            for (int i = 0; i < boardState.Length; i++)
+            for (int i = 0; i < _coordinate.GetNumBoardSquares(); i++)
             {
-                int encoded = boardState[i];
-
-                // Decode color and piece
-                int colorVal = (encoded >> 4) & 0xF;    // top 8 bits
-                int pieceVal = encoded & 0xF;          // bottom 8 bits
-
-                PositionInstance enginePos = _coordinate.FromIndex(i);  // Get engine pos from index
-                PositionInstance displayPos = _coordinate.ToDisplayCoordinates(enginePos); // Convert it to the UI pos
-
-                var square = new BoardSquare(
-                    x: displayPos.x,
-                    y: displayPos.y,
-                    (PieceTypeInstance)pieceVal,
-                    (PlayerColor)colorVal
-                );
+                BoardSquare square = _boardModel.DecodeBoardState(i);
 
                 // Calculate the index in the UI board array
-                int displayIndex = _coordinate.ToIndex(displayPos, true);
+                int displayIndex = _coordinate.ToIndex(square.pos, true);
+
+                _dispatcherQueue.TryEnqueue(() =>
+                {
+                    Board[displayIndex] = square;
+                    OnPropertyChanged(nameof(Board));
+                });
+            }
+        }
+
+
+        public void UpdateBoardFromNative()
+        {
+            ResetHighlightsOnBoard();
+            
+            var changedSquares = _boardModel.UpdateBoardState();
+
+            foreach (var kvp in changedSquares)
+            {
+                int boardIndex = kvp.Key;      // The index on the chess board
+                int encodedState = kvp.Value;  // The encoded state value
+
+                BoardSquare square = _boardModel.DecodeBoardState(boardIndex);
+
+                // Calculate the index in the UI board array
+                int displayIndex = _coordinate.ToIndex(square.pos, true);
 
                 _dispatcherQueue.TryEnqueue(() =>
                 {
@@ -131,7 +135,7 @@ namespace Chess.UI.ViewModels
         {
             _dispatcherQueue.TryEnqueue(() =>
             {
-                LoadBoardFromNative();
+                UpdateBoardFromNative();
             });
         }
 
@@ -158,7 +162,7 @@ namespace Chess.UI.ViewModels
         public void OnGameStateInitSucceeded()
         {
             // Once the board is ready calculated, we load it from native
-            LoadBoardFromNative();
+            InitializeBoardFromNative();
         }
 
 
@@ -233,7 +237,7 @@ namespace Chess.UI.ViewModels
         public void UndoLastMove()
         {
             EngineAPI.UndoMove();
-            LoadBoardFromNative();
+            UpdateBoardFromNative();
             _moveHistoryViewModel.RemoveLastMove();
         }
 
@@ -268,6 +272,7 @@ namespace Chess.UI.ViewModels
                 if (value != currentPlayer)
                 {
                     currentPlayer = value;
+                    OnPropertyChanged();
                 }
             }
         }

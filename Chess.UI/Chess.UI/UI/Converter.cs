@@ -1,17 +1,16 @@
-﻿using Microsoft.UI.Xaml.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Chess.UI.Images;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml.Media;
+using static Chess.UI.Services.EngineAPI;
 
 namespace Chess.UI.UI
 {
     public class Converter
     {
-        public static double DivideByEight(double value)
+        public static ImageSource PlayerToPawnImage(PlayerColor player)
         {
-            return value / 8;
+            IImageService imageService = App.Current.Services.GetService<IImageService>();
+            return imageService.GetCapturedPieceImage(player, PieceTypeInstance.Pawn);
         }
     }
 }

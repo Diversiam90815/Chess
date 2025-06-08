@@ -10,5 +10,8 @@ namespace Chess.UI.Board
     public interface IBoardModel
     {
         int[] GetBoardStateFromNative();
+        BoardSquare DecodeBoardState(int index);
+        Dictionary<int, int> UpdateBoardState();
+
     }
 }
