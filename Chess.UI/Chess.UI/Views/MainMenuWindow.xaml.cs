@@ -36,6 +36,8 @@ namespace Chess.UI
         {
             this.InitializeComponent();
 
+            AppWindow.SetIcon(Project.IconPath);
+
             _viewModel = App.Current.Services.GetService<MainMenuViewModel>();
             _chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
 

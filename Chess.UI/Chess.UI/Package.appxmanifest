@@ -8,7 +8,7 @@
   <Properties>
     <DisplayName>Chess</DisplayName>
     <PublisherDisplayName>Diversiam</PublisherDisplayName>
-    <Logo>Assets\StoreLogo.png</Logo>
+    <Logo>Assets\Logo\Chess_Logo.png</Logo>
   </Properties>
 
   <Dependencies>
@@ -22,9 +22,9 @@
 
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
-      <uap:VisualElements DisplayName="Chess" Description="Chess" BackgroundColor="transparent" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
-        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+      <uap:VisualElements DisplayName="Chess" Description="Chess" BackgroundColor="transparent" Square150x150Logo="Assets\Logo\Chess_Logo.png" Square44x44Logo="Assets\Logo\Chess_Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Logo\Chess_Logo.png" />
+        <uap:SplashScreen Image="Assets\Logo\Chess_Logo.png" />
       </uap:VisualElements>
     </Application>
   </Applications>

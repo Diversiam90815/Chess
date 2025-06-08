@@ -20,7 +20,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Content Include="Assets\*">
+		<Content Include="Assets\**\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 	</ItemGroup>
@@ -62,6 +62,8 @@
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
 		<AppxBundle>Never</AppxBundle>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+		<PackageIcon>Assets\Logo\Chess.ico</PackageIcon>
+		<ApplicationIcon>Assets\Logo\Chess.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<!-- Add the Chess Logic DLL library to project -->
@@ -81,6 +83,25 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Chess.Engine\build\Chess.Engine\Chess.Engine.vcxproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Properties\Resources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Resources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="Assets\Logo\Chess_Logo.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	</ItemGroup>
 	<ItemGroup>
 	  <Page Update="Views\GeneralPreferencesView.xaml">

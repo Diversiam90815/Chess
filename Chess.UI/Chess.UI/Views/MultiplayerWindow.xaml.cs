@@ -34,7 +34,9 @@ namespace Chess.UI.Views
 
         public MultiplayerWindow()
         {
-            this.InitializeComponent();
+            this.InitializeComponent(); 
+            AppWindow.SetIcon(Project.IconPath);
+
             _viewModel = App.Current.Services.GetService<MultiplayerViewModel>();
 
             this.Rootgrid.DataContext = _viewModel;
