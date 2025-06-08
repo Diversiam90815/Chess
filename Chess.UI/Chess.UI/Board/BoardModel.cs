@@ -13,6 +13,7 @@ namespace Chess.UI.Board
     public class BoardModel : IBoardModel
     {
         private int[] _currentBoardState;
+
         private readonly IChessCoordinate _coordinate;
 
 
@@ -31,7 +32,7 @@ namespace Chess.UI.Board
         }
 
 
-        public Dictionary<int, int> UpdateBoardState()
+        public (Dictionary<int, int>, int[]) UpdateBoardState()
         {
             int[] newBoardState = GetBoardStateFromNative();    // Get the latest board state
 
@@ -59,14 +60,12 @@ namespace Chess.UI.Board
                     }
                 }
             }
-            return changedSquares;
+            return (changedSquares, newBoardState);
         }
 
 
-        public BoardSquare DecodeBoardState(int index)
+        public BoardSquare DecodeBoardState(int index, int[] boardState)
         {
-            var boardState = GetBoardStateFromNative();
-
             int encoded = boardState[index];
 
             // Decode color and piece

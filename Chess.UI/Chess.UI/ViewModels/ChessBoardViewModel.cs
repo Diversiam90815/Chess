@@ -90,9 +90,11 @@ namespace Chess.UI.ViewModels
 
         public void InitializeBoardFromNative()
         {
+            var boardState = _boardModel.GetBoardStateFromNative();
+
             for (int i = 0; i < _coordinate.GetNumBoardSquares(); i++)
             {
-                BoardSquare square = _boardModel.DecodeBoardState(i);
+                BoardSquare square = _boardModel.DecodeBoardState(i, boardState);
 
                 // Calculate the index in the UI board array
                 int displayIndex = _coordinate.ToIndex(square.pos, true);
@@ -109,15 +111,15 @@ namespace Chess.UI.ViewModels
         public void UpdateBoardFromNative()
         {
             ResetHighlightsOnBoard();
-            
-            var changedSquares = _boardModel.UpdateBoardState();
+
+            var (changedSquares, newBoardState) = _boardModel.UpdateBoardState();
 
             foreach (var kvp in changedSquares)
             {
                 int boardIndex = kvp.Key;      // The index on the chess board
                 int encodedState = kvp.Value;  // The encoded state value
 
-                BoardSquare square = _boardModel.DecodeBoardState(boardIndex);
+                BoardSquare square = _boardModel.DecodeBoardState(boardIndex, newBoardState);
 
                 // Calculate the index in the UI board array
                 int displayIndex = _coordinate.ToIndex(square.pos, true);
