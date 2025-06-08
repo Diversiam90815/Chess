@@ -37,28 +37,28 @@
                 <Button Style="{StaticResource MainMenuButtonStyle}" Click="StartGameButton_Click">
                     <Image Source="{x:Bind _viewModel.StartGameButtonImage}" Style="{StaticResource MainMenuImageStyle}"/>
                 </Button>
-                <TextBlock Text="Start Game" Style="{ThemeResource MainMenuTitleStyles}"/>
+                <TextBlock Text="Start Game" Style="{StaticResource MainMenuTitleStyles}"/>
             </StackPanel>
 
             <StackPanel Name="SettingsButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                 <Button Style="{StaticResource MainMenuButtonStyle}" Command="{x:Bind OpenPreferencesCommand}">
                     <Image Source="{x:Bind _viewModel.SettingButtonImage}" Style="{StaticResource MainMenuImageStyle}"/>
                 </Button>
-                <TextBlock Text="Settings" Style="{ThemeResource MainMenuTitleStyles}" />
+                <TextBlock Text="Settings" Style="{StaticResource MainMenuTitleStyles}" />
             </StackPanel>
 
             <StackPanel Name="MultiplayerButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Top">
                 <Button Style="{StaticResource MainMenuButtonStyle}" Click="MultiplayerButton_Click">
                     <Image Source="{x:Bind _viewModel.MultiplayerButtonImage}" Style="{StaticResource MainMenuImageStyle}"/>
                 </Button>
-                <TextBlock Text="Multiplayer" Style="{ThemeResource MainMenuTitleStyles}" />
+                <TextBlock Text="Multiplayer" Style="{StaticResource MainMenuTitleStyles}" />
             </StackPanel>
 
             <StackPanel Name="QuitButton" Grid.Row="1" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Bottom">
                 <Button Style="{StaticResource MainMenuButtonStyle}" Click="QuitButton_Click">
                     <Image Source="{x:Bind _viewModel.EndGameButtonImage}" Style="{StaticResource MainMenuImageStyle}"/>
                 </Button>
-                <TextBlock Text="Quit" Style="{ThemeResource MainMenuTitleStyles}"/>
+                <TextBlock Text="Quit" Style="{StaticResource MainMenuTitleStyles}"/>
             </StackPanel>
         </Grid>
     </Grid>

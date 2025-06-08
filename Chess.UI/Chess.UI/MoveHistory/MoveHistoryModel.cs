@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
 
 namespace Chess.UI.MoveHistory
@@ -12,6 +9,7 @@ namespace Chess.UI.MoveHistory
     public class MoveHistoryModel : IMoveHistoryModel
     {
         public List<string> MoveHistory { get; } = new();
+
 
         public MoveHistoryModel()
         {
@@ -43,6 +41,5 @@ namespace Chess.UI.MoveHistory
 
 
         public event Action MoveHistoryUpdated;
-        public event Action MoveHistoryCleared;
     }
 }

@@ -32,6 +32,8 @@ namespace Chess.UI.Views
         public ChessBoardWindow()
         {
             this.InitializeComponent();
+            AppWindow.SetIcon(Project.IconPath);
+
 
             _images = App.Current.Services.GetService<IImageService>();
             _viewModel = App.Current.Services.GetService<ChessBoardViewModel>();

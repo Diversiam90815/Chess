@@ -27,8 +27,6 @@ namespace Chess.UI
 
         private ChessBoardViewModel _chessBoardViewModel { get; }
 
-        //private ThemePreferencesView _settingsWindow;
-
         private MultiplayerWindow _multiplayerWindow;
 
         public IAsyncRelayCommand OpenPreferencesCommand { get; }
@@ -37,6 +35,8 @@ namespace Chess.UI
         public MainMenuWindow()
         {
             this.InitializeComponent();
+
+            AppWindow.SetIcon(Project.IconPath);
 
             _viewModel = App.Current.Services.GetService<MainMenuViewModel>();
             _chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();

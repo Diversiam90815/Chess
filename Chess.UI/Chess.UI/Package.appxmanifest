@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='utf-8'?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap rescap">
 
-  <Identity Name="Chess-Game" Publisher="CN=Diversiam" Version="1.0.0.481" />
+  <Identity Name="Chess-Game" Publisher="CN=Diversiam" Version="1.0.0.502" />
 
   <mp:PhoneIdentity PhoneProductId="40cfcc97-f573-4dfb-b3dc-ff8678bf625c" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
 
   <Properties>
     <DisplayName>Chess</DisplayName>
     <PublisherDisplayName>Diversiam</PublisherDisplayName>
-    <Logo>Assets\StoreLogo.png</Logo>
+    <Logo>Assets\Logo\Chess_Logo.png</Logo>
   </Properties>
 
   <Dependencies>
@@ -22,9 +22,9 @@
 
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="$targetentrypoint$">
-      <uap:VisualElements DisplayName="Chess" Description="Chess" BackgroundColor="transparent" Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png">
-        <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png" />
-        <uap:SplashScreen Image="Assets\SplashScreen.png" />
+      <uap:VisualElements DisplayName="Chess" Description="Chess" BackgroundColor="transparent" Square150x150Logo="Assets\Logo\Chess_Logo.png" Square44x44Logo="Assets\Logo\Chess_Logo.png">
+        <uap:DefaultTile Wide310x150Logo="Assets\Logo\Chess_Logo.png" />
+        <uap:SplashScreen Image="Assets\Logo\Chess_Logo.png" />
       </uap:VisualElements>
     </Application>
   </Applications>
