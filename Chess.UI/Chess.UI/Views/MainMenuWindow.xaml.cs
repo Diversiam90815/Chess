@@ -27,8 +27,6 @@ namespace Chess.UI
 
         private ChessBoardViewModel _chessBoardViewModel { get; }
 
-        //private ThemePreferencesView _settingsWindow;
-
         private MultiplayerWindow _multiplayerWindow;
 
         public IAsyncRelayCommand OpenPreferencesCommand { get; }
