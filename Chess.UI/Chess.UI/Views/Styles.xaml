@@ -145,7 +145,7 @@
         <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}"/>
     </Style>
 
-    <Style x:Key="PreferncesButtonStyle" TargetType="Button">
+    <Style x:Key="PreferencesButtonStyle" TargetType="Button">
         <Setter Property="Width" Value="50" />
         <Setter Property="Height" Value="40" />
         <Setter Property="CornerRadius" Value="8" />
