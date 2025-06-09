@@ -27,8 +27,6 @@ void Logging::initLogging()
 	auto		 logPath = fmg->getLoggingPath();
 	auto		 log	 = logPath / LogFile;
 
-	logging::setLoggerName(mLoggerName);
-
 	std::string fileName = log.string();
 
 	logging::addFileOutput()

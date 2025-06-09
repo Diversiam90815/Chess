@@ -13,7 +13,7 @@
 #include "GameManager.h"
 #include "FileManager.h"
 #include "StateMachine.h"
-
+#include "Logging.h"
 
 
 //=============================================
@@ -257,22 +257,19 @@ Engine_API void OnPawnPromotionChosen(PieceTypeInstance promotionInstance)
 
 Engine_API void LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
 {
-	spdlog::source_loc loc(className, lineNumber, method);
-	logging::log(LogLevel::Info, loc, message);
+	logging::log(LogLevel::Info,className,lineNumber,method, message);
 }
 
 
 Engine_API void LogErrorWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
 {
-	spdlog::source_loc loc(className, lineNumber, method);
-	logging::log(LogLevel::Error, loc, message);
+	logging::log(LogLevel::Error, className, lineNumber, method, message);
 }
 
 
 Engine_API void LogWarningWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
 {
-	spdlog::source_loc loc(className, lineNumber, method);
-	logging::log(LogLevel::Warn, loc, message);
+	logging::log(LogLevel::Warn, className, lineNumber, method, message);
 }
 
 

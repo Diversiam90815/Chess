@@ -65,7 +65,7 @@ bool MultiplayerManager::hostSession()
 
 	const int port	  = mServer->getBoundPort();
 	bool	  success = startServerDiscovery(mLocalIPv4, port);
-
+	
 	return success;
 }
 

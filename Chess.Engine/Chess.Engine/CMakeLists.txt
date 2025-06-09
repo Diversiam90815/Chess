@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.0.0.502)
+set(CHESS_VERSION 1.0.0.519)
 
 project(Chess.Engine VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
@@ -213,7 +213,7 @@ set(Asio_INCLUDE_DIR ${ASIO_ROOT}/include)
 
 set(JSON_DIR ${SUBMODULES_DIR}/json/)
 set(JSON_SINGLE_FILE ${JSON_DIR}/single_include/nlohmann)
-add_subdirectory(${JSON_DIR})
+#add_subdirectory(${JSON_DIR})
 
 
 #==========================================
@@ -245,6 +245,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_compile_definitions(${PROJECT_NAME}.Core PUBLIC
 	-DENV_DEVELOPMENT
 	_CRT_SECURE_NO_WARNINGS
+	_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
 
 	_WINDOWS
 	WIN32_LEAN_AND_MEAN
@@ -256,6 +257,8 @@ target_compile_definitions(${PROJECT_NAME}.Core PUBLIC
 target_compile_definitions(${PROJECT_NAME} PUBLIC
 	-DENV_DEVELOPMENT
 	_CRT_SECURE_NO_WARNINGS
+	_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING 
+
 
 	_WINDOWS
 	WIN32_LEAN_AND_MEAN

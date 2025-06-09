@@ -9,6 +9,7 @@
 
 #include <combaseapi.h>
 #include <strsafe.h>
+#include <mutex>
 
 #include "IObserver.h"
 #include "EngineAPIDefines.h"
