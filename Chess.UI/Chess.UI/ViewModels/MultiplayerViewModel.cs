@@ -316,6 +316,12 @@ namespace Chess.UI.ViewModels
                     {
                         break;
                     }
+                case EngineAPI.ConnectionState.ConnectionRequested:
+                    {
+                        RemotePlayerName = remotePlayerName;
+                        DisplayClientRequestedConnectionView();
+                        break;
+                    }
                 case EngineAPI.ConnectionState.Connecting:
                     {
                         break;
