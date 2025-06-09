@@ -19,6 +19,13 @@ TCPSession::TCPSession(asio::io_context &ioContext) : mSocket(ioContext)
 }
 
 
+TCPSession::TCPSession(tcp::socket&& socket) : mSocket(std::move(socket))  
+{  
+    mSendBuffer      = new uint8_t[PackageBufferSize];  
+    mReceiveBuffer   = new uint8_t[PackageBufferSize];  
+}
+
+
 void TCPSession::readHeaderAsync()
 {
 	if (!mAsyncReadActive || !isConnected())

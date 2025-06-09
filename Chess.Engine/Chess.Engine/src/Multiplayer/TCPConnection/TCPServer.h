@@ -39,8 +39,6 @@ public:
 
 
 private:
-	void						handleAccept(std::shared_ptr<TCPSession> session, const asio::error_code &error);
-
 
 	asio::io_context		   &mIoContext;
 

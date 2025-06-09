@@ -30,6 +30,10 @@ public:
 
 	static pointer						  create(asio::io_context &io_context) { return pointer(new TCPSession(io_context)); }
 
+    static pointer create(tcp::socket socket) {  
+        return pointer(new TCPSession(std::move(socket)));  
+    }  
+
 	tcp::socket							 &socket();
 
 	const int							  getBoundPort() const { return mBoundPort; }
@@ -43,6 +47,7 @@ public:
 
 private:
 	explicit TCPSession(asio::io_context &ioContext);
+	explicit TCPSession(tcp::socket &&socket);
 
 	void		readHeaderAsync();
 	void		readMessageBodyAsync(size_t dataLength, MultiplayerMessageType messageType);
