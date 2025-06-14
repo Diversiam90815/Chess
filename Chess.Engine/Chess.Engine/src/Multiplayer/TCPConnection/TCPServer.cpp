@@ -32,13 +32,17 @@ void TCPServer::startAccept()
 				auto			   newSession = TCPSession::create(std::move(socket));
 				mPendingSession				  = newSession;
 
-				const std::string &remoteIPv4 = mPendingSession->socket().remote_endpoint().address().to_string();
+				//const std::string &remoteIPv4 = mPendingSession->socket().remote_endpoint().address().to_string();
 
-				// Notify that we have a connection request
-				if (mConnectionRequestHandler)
-				{
-					mConnectionRequestHandler(remoteIPv4);
-				}
+				//// Notify that we have a connection request
+				//if (mConnectionRequestHandler)
+				//{
+				//	mConnectionRequestHandler(remoteIPv4);
+				//}
+
+				if (mSessionHandler)
+					mSessionHandler(mPendingSession);
+
 				startAccept(); // Start accepting new conection
 			}
 		});
