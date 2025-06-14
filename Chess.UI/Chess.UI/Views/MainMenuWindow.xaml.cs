@@ -5,6 +5,7 @@ using Chess.UI.Themes.Interfaces;
 using Chess.UI.UI;
 using Chess.UI.ViewModels;
 using Chess.UI.Views;
+using Chess.UI.Wrappers;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
@@ -33,12 +34,15 @@ namespace Chess.UI
 
         public IAsyncRelayCommand OpenPreferencesCommand { get; }
 
+        private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
         public MainMenuWindow()
         {
             this.InitializeComponent();
 
             AppWindow.SetIcon(Project.IconPath);
+
+            _dispatcherQueue = App.Current.Services.GetRequiredService<IDispatcherQueueWrapper>();
 
             _viewModel = App.Current.Services.GetService<MainMenuViewModel>();
             _chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
@@ -148,21 +152,24 @@ namespace Chess.UI
 
         private void OpenChessboardView(bool Multiplayer)
         {
-            if (_chessBoardWindow == null)
+            _dispatcherQueue.TryEnqueue(() =>
             {
-                _chessBoardWindow = App.Current.Services.GetService<ChessBoardWindow>();
-                _chessBoardWindow.Activate();
-                _chessBoardWindow.Closed += BoardWindowClosed;
-                this.AppWindow.Hide();
+                if (_chessBoardWindow == null)
+                {
+                    _chessBoardWindow = App.Current.Services.GetService<ChessBoardWindow>();
+                    _chessBoardWindow.Activate();
+                    _chessBoardWindow.Closed += BoardWindowClosed;
+                    this.AppWindow.Hide();
 
-                // If we start a MP game, the game is started from the MP VM
-                if (!Multiplayer)
-                    _chessBoardViewModel.StartGame();
-            }
-            else
-            {
-                _chessBoardWindow.Activate();
-            }
+                    // If we start a MP game, the game is started from the MP VM
+                    if (!Multiplayer)
+                        _chessBoardViewModel.StartGame();
+                }
+                else
+                {
+                    _chessBoardWindow.Activate();
+                }
+            });
         }
     }
 }
