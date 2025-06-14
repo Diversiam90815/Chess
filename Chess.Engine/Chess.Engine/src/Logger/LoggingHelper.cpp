@@ -49,6 +49,7 @@ std::string LoggingHelper::gameStateToString(GameState state)
 	{
 	case GameState::Undefined: return "Undefined";
 	case GameState::Init: return "Init";
+	case GameState::InitSucceeded: return "Init Succeeded";
 	case GameState::MoveInitiated: return "Move Initiated";
 	case GameState::ExecutingMove: return "Executing Move";
 	case GameState::ValidatingMove: return "Validating Move";

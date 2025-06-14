@@ -438,7 +438,7 @@ bool GameManager::startMultiplayerGame(bool isHost)
 		mBlackPlayer.setIsLocalPlayer(true);
 	}
 
-	// mMultiplayerManager->setInternalObservers(); // Set the internal multiplayer observers
+	mMultiplayerManager->setInternalObservers(); // Set the internal multiplayer observers
 
 	return true;
 }

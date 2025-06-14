@@ -44,7 +44,7 @@ namespace Chess.UI.Views
             _viewModel.RequestNavigationToChessboard += () =>
             {
                 // If we enter the Multiplayer Game, we hide this window
-                this.AppWindow.Hide();
+                //this.AppWindow.Hide();
             };
 
             Init();
