@@ -29,6 +29,8 @@ namespace Chess.UI
 
         private MultiplayerWindow _multiplayerWindow;
 
+        private MultiplayerViewModel _multiplayerViewModel { get; }
+
         public IAsyncRelayCommand OpenPreferencesCommand { get; }
 
 
@@ -40,10 +42,17 @@ namespace Chess.UI
 
             _viewModel = App.Current.Services.GetService<MainMenuViewModel>();
             _chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
+            _multiplayerViewModel = App.Current.Services.GetService<MultiplayerViewModel>();
 
             this.RootGrid.DataContext = _viewModel;
 
             OpenPreferencesCommand = new AsyncRelayCommand(OpenPreferencesView);
+
+            _multiplayerViewModel.RequestNavigationToChessboard += () =>
+            {
+                // We enter the Multiplayer Game, so we show the Chessboard
+                OpenChessboardView(true);
+            };
 
             Init();
             SetWindowSize(800, 750);
@@ -86,19 +95,7 @@ namespace Chess.UI
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_chessBoardWindow == null)
-            {
-                _chessBoardWindow = App.Current.Services.GetService<ChessBoardWindow>();
-                _chessBoardWindow.Activate();
-                _chessBoardWindow.Closed += BoardWindowClosed;
-                this.AppWindow.Hide();
-
-                _chessBoardViewModel.StartGame();
-            }
-            else
-            {
-                _chessBoardWindow.Activate();
-            }
+            OpenChessboardView(false);
         }
 
 
@@ -115,7 +112,6 @@ namespace Chess.UI
             {
                 _multiplayerWindow.Activate();
             }
-
         }
 
 
@@ -147,6 +143,26 @@ namespace Chess.UI
 
             var result = await dialog.ShowAsync();
             return result;
+        }
+
+
+        private void OpenChessboardView(bool Multiplayer)
+        {
+            if (_chessBoardWindow == null)
+            {
+                _chessBoardWindow = App.Current.Services.GetService<ChessBoardWindow>();
+                _chessBoardWindow.Activate();
+                _chessBoardWindow.Closed += BoardWindowClosed;
+                this.AppWindow.Hide();
+
+                // If we start a MP game, the game is started from the MP VM
+                if (!Multiplayer)
+                    _chessBoardViewModel.StartGame();
+            }
+            else
+            {
+                _chessBoardWindow.Activate();
+            }
         }
     }
 }

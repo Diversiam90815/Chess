@@ -31,6 +31,8 @@ namespace Chess.UI.ViewModels
 
         public MultiplayerMode MPMode { get; private set; }
 
+        public event Action RequestNavigationToChessboard;
+
 
         public MultiplayerViewModel(IDispatcherQueueWrapper dispatcher)
         {
@@ -328,6 +330,12 @@ namespace Chess.UI.ViewModels
                     }
                 case EngineAPI.ConnectionState.Connected:
                     {
+                        // Start the multiplayer game
+                        EnterMultiplayerGame();
+
+                        // Navigate to chessboard window
+                        RequestNavigationToChessboard?.Invoke();
+
                         break;
                     }
                 case EngineAPI.ConnectionState.WaitingForARemote:
