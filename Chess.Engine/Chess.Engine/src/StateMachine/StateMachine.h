@@ -22,7 +22,6 @@ class GameManager;
 class StateMachine : public IGameStateObservable,
 					 public ThreadBase,
 					 public IRemoteMessagesObserver,
-					 public IConnectionStatusObserver,
 					 public std::enable_shared_from_this<StateMachine>
 {
 public:
@@ -42,8 +41,6 @@ public:
 
 	void	  onRemoteMoveReceived(const PossibleMove &remoteMove) override;
 	void	  onRemoteChatMessageReceived(const std::string &mesage) override {}
-
-	void	  onConnectionStateChanged(const ConnectionStatusEvent event) override;
 
 	bool	  isInitialized() const;
 	void	  setInitialized(const bool value);

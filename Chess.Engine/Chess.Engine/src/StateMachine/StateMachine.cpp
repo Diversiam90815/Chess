@@ -139,15 +139,6 @@ void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
 }
 
 
-void StateMachine::onConnectionStateChanged(const ConnectionStatusEvent event)
-{
-	if (event.state == ConnectionState::Connected)
-	{
-		// TODO: Start MP game
-	}
-}
-
-
 bool StateMachine::isInitialized() const
 {
 	return mInitialized.load();
