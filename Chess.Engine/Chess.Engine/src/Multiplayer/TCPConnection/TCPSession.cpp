@@ -19,10 +19,10 @@ TCPSession::TCPSession(asio::io_context &ioContext) : mSocket(ioContext)
 }
 
 
-TCPSession::TCPSession(tcp::socket&& socket) : mSocket(std::move(socket))  
-{  
-    mSendBuffer      = new uint8_t[PackageBufferSize];  
-    mReceiveBuffer   = new uint8_t[PackageBufferSize];  
+TCPSession::TCPSession(tcp::socket &&socket) : mSocket(std::move(socket))
+{
+	mSendBuffer	   = new uint8_t[PackageBufferSize];
+	mReceiveBuffer = new uint8_t[PackageBufferSize];
 }
 
 
@@ -98,7 +98,7 @@ void TCPSession::readMessageBodyAsync(size_t dataLength, MultiplayerMessageType 
 void TCPSession::processHeader(size_t bytesTransfered)
 {
 	// Validate the secret identifier
-	if (memcmp(mReceiveBuffer, RemoteComSecret, sizeof(RemoteComSecret)) != 0)
+	if (memcmp(mReceiveBuffer, RemoteComSecret, strlen(RemoteComSecret) + 1) != 0)
 	{
 		LOG_ERROR("Invalid message format: Secret identifier mismatch");
 		readHeaderAsync(); // Continue listening for next message
