@@ -19,10 +19,7 @@
 class GameManager;
 
 
-class StateMachine : public IGameStateObservable,
-					 public ThreadBase,
-					 public IRemoteMessagesObserver,
-					 public std::enable_shared_from_this<StateMachine>
+class StateMachine : public IGameStateObservable, public ThreadBase, public IRemoteMessagesObserver, public std::enable_shared_from_this<StateMachine>
 {
 public:
 	static std::shared_ptr<StateMachine> GetInstance();
@@ -86,8 +83,8 @@ private:
 
 	EndGameState		   mEndgameState{EndGameState::OnGoing};
 
-	bool				   mIsMultiplayerGame{false};
-	bool				   mIsLocalHost{false};
+	std::atomic<bool>	   mIsMultiplayerGame{false};
+	std::atomic<bool>	   mIsLocalHost{false};
 
 	std::mutex			   mStateChangedMutex;
 	bool				   mHasPendingStateChange{false};

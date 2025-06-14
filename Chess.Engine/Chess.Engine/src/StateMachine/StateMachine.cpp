@@ -49,8 +49,9 @@ void StateMachine::onGameStarted()
 
 void StateMachine::onMultiplayerGameStarted(bool isHost)
 {
-	mIsMultiplayerGame = true;
-	mIsLocalHost	   = isHost;
+	LOG_INFO("Starting a Multiplayer Game!");
+	mIsMultiplayerGame.store(true);
+	mIsLocalHost.store(isHost);
 
 	onGameStarted();
 }
@@ -355,22 +356,28 @@ void StateMachine::switchToNextState()
 			mWaitingForTargetEnd   = false;
 
 			// If we're in multiplayer mode, check who's turn it is
-			if (mIsMultiplayerGame)
+			if (mIsMultiplayerGame.load())
 			{
 				bool isLocalPlayerTurn = GameManager::GetInstance()->isLocalPlayerTurn();
 				if (isLocalPlayerTurn)
 				{
+					LOG_INFO("Local Player's turn, so we wait for the input!");
 					gameStateChanged(GameState::WaitingForInput);
 				}
 				else
 				{
+					LOG_INFO("Remote Player's turn, so we wait until we get a move from the remote!");
 					// If it's not local player's turn, switch to WaitForRemoteMove state!
 					gameStateChanged(GameState::WaitingForRemoteMove);
 				}
 			}
+			else
+			{
+				LOG_INFO("We are in single player mode, so we wait for the next input");
 
-			// Single player moves always switch to Waiting For Input!
-			gameStateChanged(GameState::WaitingForInput);
+				// Single player moves always switch to Waiting For Input!
+				gameStateChanged(GameState::WaitingForInput);
+			}
 		}
 		else
 		{

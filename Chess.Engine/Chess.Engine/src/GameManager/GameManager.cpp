@@ -439,6 +439,7 @@ bool GameManager::startMultiplayerGame(bool isHost)
 	}
 
 	mMultiplayerManager->setInternalObservers(); // Set the internal multiplayer observers
+	initMultiplayerObservers();
 
 	return true;
 }
