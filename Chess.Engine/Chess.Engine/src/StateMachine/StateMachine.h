@@ -19,7 +19,11 @@
 class GameManager;
 
 
-class StateMachine : public IGameStateObservable, public ThreadBase, public IRemoteMessagesObserver, public std::enable_shared_from_this<StateMachine>
+class StateMachine : public IGameStateObservable,
+					 public ThreadBase,
+					 public IRemoteMessagesObserver,
+					 public IConnectionStatusObserver,
+					 public std::enable_shared_from_this<StateMachine>
 {
 public:
 	static std::shared_ptr<StateMachine> GetInstance();
@@ -38,6 +42,8 @@ public:
 
 	void	  onRemoteMoveReceived(const PossibleMove &remoteMove) override;
 	void	  onRemoteChatMessageReceived(const std::string &mesage) override {}
+
+	void	  onConnectionStateChanged(const ConnectionStatusEvent event) override;
 
 	bool	  isInitialized() const;
 	void	  setInitialized(const bool value);
@@ -64,6 +70,7 @@ private:
 	bool				   isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
 
 	void				   resetCurrentPossibleMove();
+
 
 	std::atomic<bool>	   mInitialized{false};
 

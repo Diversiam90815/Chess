@@ -561,6 +561,8 @@ void GameManager::initMultiplayerObservers()
 
 	mMoveExecution->attachObserver(mMultiplayerManager->mRemoteSender);				   // Moves will be sent to the remote
 	mMultiplayerManager->mRemoteReceiver->attachObserver(StateMachine::GetInstance()); // Received moves will be handled in the state machine
+
+	mMultiplayerManager->attachObserver(StateMachine::GetInstance());				   // React to Connection State Changes
 }
 
 
