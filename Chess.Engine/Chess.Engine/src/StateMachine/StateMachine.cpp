@@ -38,11 +38,19 @@ StateMachine::~StateMachine()
 
 void StateMachine::onGameStarted()
 {
-	if (getCurrentGameState() == GameState::Undefined)
+	GameState currentState = getCurrentGameState();
+
+	if (currentState == GameState::Undefined)
 	{
 		gameStateChanged(GameState::Init);
 		start();
 		triggerEvent();
+	}
+	else
+	{
+		int iCurrentState = static_cast<int>(currentState);
+
+		LOG_WARNING("Game Start called, but our state is wrong/not set up! Our current state is {0} ({1})", LoggingHelper::gameStateToString(currentState).c_str(), iCurrentState);
 	}
 }
 
@@ -136,6 +144,12 @@ void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
 			mPendingState		   = GameState::ExecutingMove;
 		}
 		triggerEvent();
+	}
+
+	else
+	{
+		LOG_WARNING("Received a move from the remote endpoint, but we are not in the wrong state! Our state is {}",
+					LoggingHelper::gameStateToString(getCurrentGameState()).c_str());
 	}
 }
 

@@ -24,6 +24,8 @@ public:
 
 	static std::string boardStateToString(const int *boardState);
 
+	static std::string boolToString(const bool value);
+
 	static void		   logMove(Move &move);
 	static void		   logBoardState(const int *boardState);
 

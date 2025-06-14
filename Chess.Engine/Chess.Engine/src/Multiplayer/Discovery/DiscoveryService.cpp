@@ -151,7 +151,7 @@ void DiscoveryService::sendPackage()
 	}
 	else
 	{
-		LOG_INFO("Discovery package sent ({} bytes)!", bytesSent);
+		LOG_DEBUG("Discovery package sent ({} bytes)!", bytesSent);
 	}
 }
 
@@ -197,6 +197,8 @@ void DiscoveryService::addRemoteToList(Endpoint remote)
 
 	if (mLocalIPv4 == remote.IPAddress)	// Don't add this device
 		return;
+
+	LOG_INFO("Found remote: IPv4 : {0}, Port: {1}, Name: {2}", remote.IPAddress.c_str(), remote.tcpPort, remote.playerName.c_str());
 
 	mRemoteDevices.push_back(remote);
 	remoteFound(remote);

@@ -54,6 +54,8 @@ bool MultiplayerManager::hostSession()
 	if (mLocalIPv4.empty())
 		return false;
 
+	LOG_INFO("Hosting a session..");
+
 	mServer = std::make_unique<TCPServer>(mIoContext);
 
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
@@ -84,6 +86,8 @@ void MultiplayerManager::joinSession()
 {
 	if (!mRemoteEndpoint.isValid())
 		return;
+
+	LOG_INFO("Joining session..");
 
 	connectionStatusChanged(ConnectionState::PendingHostApproval);
 
@@ -203,6 +207,8 @@ void MultiplayerManager::setInternalObservers()
 		LOG_ERROR("Could not set the observers, since the modules are not set up yet!");
 		return;
 	}
+
+	LOG_INFO("Internal multiplayer observers set");
 
 	// Remote Communication and Sender/Receiver Connection
 	mRemoteCom->attachObserver(mRemoteReceiver);

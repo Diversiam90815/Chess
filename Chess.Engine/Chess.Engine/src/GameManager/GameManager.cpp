@@ -201,7 +201,7 @@ void GameManager::executeMove(PossibleMove &tmpMove)
 			moveToExecute = move;
 
 			// On pawn promotion, assign the promotion piece type
-			if (moveToExecute.type == MoveType::PawnPromotion)
+			if ((moveToExecute.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
 			{
 				moveToExecute.promotionPiece = tmpMove.promotionPiece;
 			}
@@ -417,6 +417,8 @@ EndGameState GameManager::checkForEndGameConditions()
 
 bool GameManager::startMultiplayerGame(bool isHost)
 {
+	LOG_INFO("Game started in Multiplayer mode..");
+
 	mIsMultiplayerMode = true;
 	mIsHost			   = isHost;
 
@@ -426,12 +428,16 @@ bool GameManager::startMultiplayerGame(bool isHost)
 
 	if (isHost)
 	{
+		LOG_INFO("We start as white player");
+
 		changeCurrentPlayer(PlayerColor::White); // If we are the host, we are chosen to play as white -> TODO : Add UI selector in future
 		mWhitePlayer.setIsLocalPlayer(true);
 		mBlackPlayer.setIsLocalPlayer(false);
 	}
 	else
 	{
+		LOG_INFO("We start as black player!");
+
 		// Guests are black
 		changeCurrentPlayer(PlayerColor::White); // Game still starts with white
 		mWhitePlayer.setIsLocalPlayer(false);
@@ -443,7 +449,6 @@ bool GameManager::startMultiplayerGame(bool isHost)
 
 	return true;
 }
-
 
 
 void GameManager::disconnectMultiplayerGame()
@@ -459,6 +464,8 @@ void GameManager::disconnectMultiplayerGame()
 void GameManager::startedMultiplayer()
 {
 	// The player clicked on the Multiplayer menu button and started the multiplayer
+
+	LOG_INFO("Multiplayer started..");
 
 	mMultiplayerManager = std::make_shared<MultiplayerManager>(); // Create the multiplayer manager
 
@@ -493,6 +500,11 @@ bool GameManager::isLocalPlayerTurn()
 	bool		isBlackPlayerTurn  = currentPlayer == PlayerColor::Black;
 
 	bool		isLocalPlayersTurn = (isWhitePlayerTurn && mWhitePlayer.isLocalPlayer() || isBlackPlayerTurn && mBlackPlayer.isLocalPlayer());
+
+	LOG_INFO("Local Player's turn: {}", LoggingHelper::boolToString(isLocalPlayersTurn).c_str());
+	LOG_DEBUG("White Player's turn: {}", LoggingHelper::boolToString(isWhitePlayerTurn).c_str());
+	LOG_DEBUG("Black Player's turn: {}", LoggingHelper::boolToString(isBlackPlayerTurn).c_str());
+
 	return isLocalPlayersTurn;
 }
 
@@ -517,6 +529,7 @@ void GameManager::approveConnectionRequest()
 	if (!mMultiplayerManager)
 		return;
 
+	LOG_DEBUG("Approving connection request..");
 	mMultiplayerManager->approveConnectionRequest();
 }
 
@@ -526,6 +539,7 @@ void GameManager::rejectConnectionRequest()
 	if (!mMultiplayerManager)
 		return;
 
+	LOG_DEBUG("Rejecting connection request..");
 	mMultiplayerManager->rejectConnectionRequest();
 }
 
@@ -535,6 +549,7 @@ void GameManager::sendConnectionRequestToHost()
 	if (!mMultiplayerManager)
 		return;
 
+	LOG_DEBUG("Sending connection request to the host..");
 	mMultiplayerManager->joinSession();
 }
 
@@ -562,6 +577,8 @@ void GameManager::initMultiplayerObservers()
 
 	mMoveExecution->attachObserver(mMultiplayerManager->mRemoteSender);				   // Moves will be sent to the remote
 	mMultiplayerManager->mRemoteReceiver->attachObserver(StateMachine::GetInstance()); // Received moves will be handled in the state machine
+
+	LOG_DEBUG("Mulitplayer observers set up!");
 }
 
 

@@ -43,6 +43,11 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 			return;
 		}
 
+		LOG_INFO("Received move from remote:");
+		LOG_INFO("\tStart: {0},{1}", remoteMove.start.x, remoteMove.start.y);
+		LOG_INFO("\tStart: {0},{1}", remoteMove.end.x, remoteMove.end.y);
+		LOG_INFO("\tType: {0}", LoggingHelper::moveTypeToString(remoteMove.type));
+
 		remoteMoveReceived(remoteMove);
 		break;
 	}
@@ -57,10 +62,17 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 			return;
 		}
 
+		LOG_INFO("Received Chat message");
+
 		remoteChatMessageReceived(chatMessage);
 		break;
 	}
-	default: break;
+	default:
+	{
+		int iType = static_cast<int>(type);
+		LOG_WARNING("Could not decode message type. Received type: {}", iType);
+		break;
+	}
 	}
 }
 

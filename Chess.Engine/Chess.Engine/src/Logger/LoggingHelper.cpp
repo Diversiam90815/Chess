@@ -144,6 +144,12 @@ std::string LoggingHelper::boardStateToString(const int *boardState)
 }
 
 
+std::string LoggingHelper::boolToString(const bool value)
+{
+	return value ? "True" : "False";
+}
+
+
 void LoggingHelper::logMove(Move &move)
 {
 	LOG_INFO("----- Move Number {} -----", move.number);
