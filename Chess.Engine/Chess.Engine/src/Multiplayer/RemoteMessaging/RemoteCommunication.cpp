@@ -106,18 +106,6 @@ void RemoteCommunication::write(MultiplayerMessageType type, std::vector<uint8_t
 }
 
 
-void RemoteCommunication::notifyObservers()
-{
-	MultiplayerMessageType type;
-	std::vector<uint8_t>   data;
-
-	while (read(type, data))
-	{
-		receivedMessage(type, data);
-	}
-}
-
-
 void RemoteCommunication::receivedMessage(MultiplayerMessageType type, std::vector<uint8_t> &message)
 {
 	for (auto &observer : mObservers)

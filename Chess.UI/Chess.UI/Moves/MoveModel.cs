@@ -63,6 +63,11 @@ namespace Chess.UI.Moves
                         PawnPromotionEvent?.Invoke();
                         break;
                     }
+                case GameState.WaitingForRemoteMove:
+                    {
+                        HandleRemotePlayersTurn();
+                        break;
+                    }
                 default:
                     break;
             }
@@ -106,6 +111,11 @@ namespace Chess.UI.Moves
         }
 
 
+        private void HandleRemotePlayersTurn()
+        {
+            RemotePlayersTurn?.Invoke();
+        }
+
         public void HandlePlayerChanged(PlayerColor player)
         {
             PlayerChanged?.Invoke(player);
@@ -114,6 +124,7 @@ namespace Chess.UI.Moves
 
         public event Action PossibleMovesCalculated;
         public event Action<PlayerColor> PlayerChanged;
+        public event Action RemotePlayersTurn;
         public event Action GameStateInitSucceeded;
         public event Action<EndGameState> GameOverEvent;
         public event Action NewBoardFromBackendEvent;

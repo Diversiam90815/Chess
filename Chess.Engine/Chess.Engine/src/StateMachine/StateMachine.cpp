@@ -288,7 +288,7 @@ void StateMachine::run()
 		}
 		case GameState::WaitingForRemoteMove:
 		{
-			// This state is passive -> we are waiting for onREmoteMoveReceieved to be called
+			// This state is passive -> we are waiting for onRemoteMoveReceieved to be called
 			// Maybe implement a timeout later? (-> TODO?)
 			break;
 		}

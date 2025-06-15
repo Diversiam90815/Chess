@@ -34,7 +34,6 @@ namespace Chess.UI.Views
             this.InitializeComponent();
             AppWindow.SetIcon(Project.IconPath);
 
-
             _images = App.Current.Services.GetService<IImageService>();
             _viewModel = App.Current.Services.GetService<ChessBoardViewModel>();
             RootPanel.DataContext = _viewModel;

@@ -7,17 +7,6 @@
 
 
 #include "Logging.h"
-#include <iostream>
-
-
-Logging::Logging()
-{
-}
-
-
-Logging::~Logging()
-{
-}
 
 
 void Logging::initLogging()

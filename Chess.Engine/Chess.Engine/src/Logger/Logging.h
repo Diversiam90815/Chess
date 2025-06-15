@@ -20,8 +20,8 @@
 class Logging
 {
 public:
-	Logging();
-	~Logging();
+	Logging()  = default;
+	~Logging() = default;
 
 	void initLogging();
 

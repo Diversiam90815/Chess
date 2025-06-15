@@ -35,7 +35,6 @@ public:
 	bool sendMessages();
 
 private:
-	void								  notifyObservers();
 	void								  receivedMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) override;
 
 	std::atomic<bool>					  mIsInitialized{false};
