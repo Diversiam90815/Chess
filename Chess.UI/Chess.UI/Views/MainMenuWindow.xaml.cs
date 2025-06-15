@@ -166,11 +166,6 @@ namespace Chess.UI
                         // If we start a MP game, the game is started from the MP VM
                         _chessBoardViewModel.StartGame();
                     }
-                    else
-                    {
-                        // When starting MP, we need to explicitly initialize the board
-                        _chessBoardViewModel.InitializeBoardFromNative();
-                    }
                 }
                 else
                 {
