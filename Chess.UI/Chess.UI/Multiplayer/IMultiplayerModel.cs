@@ -19,6 +19,8 @@ namespace Chess.UI.Multiplayer
 
         void StartMultiplerGame(MultiplayerMode mode);
 
+        void StartMultiplayer();
+
         void SetLocalPlayerName(string playerName);
 
         int GetSelectedNetworkAdapterID();

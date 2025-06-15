@@ -57,6 +57,8 @@ namespace Chess.UI.Views
             Presenter = AppWindow.Presenter as OverlappedPresenter;
             Presenter.IsResizable = false;
             Presenter.IsMaximizable = false;
+
+            _viewModel.StartMultiplayerSetup();
         }
 
 

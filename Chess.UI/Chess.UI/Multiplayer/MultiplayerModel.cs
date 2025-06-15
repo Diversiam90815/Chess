@@ -41,13 +41,13 @@ namespace Chess.UI.Models
             var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
             logicCommunication.ConnectionStatusEvent += HandleConnectionStatusUpdates;
 
-            SetNetworkAdapters();
         }
 
 
         public void StartMultiplayer()
         {
             EngineAPI.StartedMultiplayer();
+            SetNetworkAdapters();
         }
 
 
