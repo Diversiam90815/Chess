@@ -112,7 +112,7 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 
 	mRemoteCom->init(mSession);
 
-	setInternalObservers();
+	//setInternalObservers();
 
 	mRemoteCom->start();
 
