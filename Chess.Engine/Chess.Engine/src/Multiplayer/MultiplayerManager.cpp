@@ -24,8 +24,7 @@ MultiplayerManager::MultiplayerManager() : mWorkGuard(asio::make_work_guard(mIoC
 
 MultiplayerManager::~MultiplayerManager()
 {
-	closeDiscovery();
-	closeTCPServerOrClient();
+	disconnect();
 
 	// Stop the IO context
 	mWorkGuard.reset();

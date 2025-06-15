@@ -29,7 +29,6 @@ public:
 	void						reset();
 
 	bool						hostSession();
-
 	void						joinSession();
 
 	void						setTCPSession(TCPSession::pointer session);
