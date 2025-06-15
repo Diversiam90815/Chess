@@ -382,6 +382,8 @@ void StateMachine::switchToNextState()
 		mEndgameState = GameManager::GetInstance()->checkForEndGameConditions();
 		if (isGameOngoing())
 		{
+			GameManager::GetInstance()->switchTurns();
+
 			resetCurrentPossibleMove();
 			mMovesCalulated		   = false;
 			mWaitingForTargetStart = false;
@@ -472,7 +474,7 @@ bool StateMachine::handleWaitingForInputState()
 
 	resetCurrentPossibleMove();
 
-	GameManager::GetInstance()->switchTurns(); // Sets the player
+	//GameManager::GetInstance()->switchTurns(); // Sets the player
 
 	mMovesCalulated = GameManager::GetInstance()->calculateAllMovesForPlayer();
 	return mMovesCalulated;
