@@ -33,7 +33,6 @@ namespace Chess.UI.Models
 
         public MultiplayerModel()
         {
-            EngineAPI.StartedMultiplayer();
         }
 
 
@@ -43,6 +42,12 @@ namespace Chess.UI.Models
             logicCommunication.ConnectionStatusEvent += HandleConnectionStatusUpdates;
 
             SetNetworkAdapters();
+        }
+
+
+        public void StartMultiplayer()
+        {
+            EngineAPI.StartedMultiplayer();
         }
 
 
