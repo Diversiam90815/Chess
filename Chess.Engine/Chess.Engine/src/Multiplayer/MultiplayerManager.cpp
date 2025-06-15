@@ -24,9 +24,13 @@ MultiplayerManager::MultiplayerManager() : mWorkGuard(asio::make_work_guard(mIoC
 
 MultiplayerManager::~MultiplayerManager()
 {
+	closeDiscovery();
+	closeTCPServerOrClient();
+
 	// Stop the IO context
 	mWorkGuard.reset();
 	mIoContext.stop();
+
 	if (mWorkerThread.joinable())
 	{
 		mWorkerThread.join();
@@ -108,10 +112,14 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 	}
 
 	mRemoteCom->init(mSession);
-	
+
 	setInternalObservers();
-	
+
 	mRemoteCom->start();
+
+	// As we now have a connection, we can close the Discovery and the TCPServer/TCPClient
+	closeDiscovery();
+	closeTCPServerOrClient();
 
 	connectionStatusChanged(ConnectionState::Connected);
 }
@@ -128,19 +136,38 @@ void MultiplayerManager::disconnect()
 {
 	connectionStatusChanged(ConnectionState::Disconnecting);
 
-	if (mDiscovery)
-	{
-		mDiscovery->stop();
-		mDiscovery.reset();
-	}
+	closeDiscovery();
+
+	closeTCPServerOrClient();
 
 	mSession.reset();
-	mClient.reset();
-	mServer.reset();
 
 	connectionStatusChanged(ConnectionState::Disconnected);
 
 	LOG_INFO("Network Connection closed.");
+}
+
+
+void MultiplayerManager::closeDiscovery()
+{
+	if (mDiscovery)
+	{
+		mDiscovery->deinit();
+		mDiscovery.reset();
+	}
+}
+
+
+void MultiplayerManager::closeTCPServerOrClient()
+{
+	if (mClient)
+	{
+		mClient.reset();
+	}
+	if (mServer)
+	{
+		mServer.reset();
+	}
 }
 
 

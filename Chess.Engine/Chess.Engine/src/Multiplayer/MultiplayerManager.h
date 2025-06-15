@@ -1,4 +1,5 @@
 /*
+/*
   ==============================================================================
 	Module:         MultiplayerManager
 	Description:    Managing the multiplayer game mode
@@ -35,6 +36,9 @@ public:
 	TCPSession::pointer			getActiveSession();
 
 	void						disconnect();
+
+	void						closeDiscovery();
+	void						closeTCPServerOrClient();
 
 	void						setLocalPlayerName(const std::string name) { mLocalPlayerName = name; }
 	std::string					getLocalPlayerName() const { return mLocalPlayerName; }
