@@ -323,7 +323,25 @@ void StateMachine::switchToNextState()
 	}
 	case GameState::InitSucceeded:
 	{
-		gameStateChanged(GameState::WaitingForInput);
+		if (mIsMultiplayerGame.load())
+		{
+			bool isLocalPlayerTurn = GameManager::GetInstance()->isLocalPlayerTurn();
+			if (isLocalPlayerTurn)
+			{
+				LOG_INFO("Initial State: Local Player's turn");
+				gameStateChanged(GameState::WaitingForInput);
+			}
+			else
+			{
+				LOG_INFO("Initial State: Remote Player's turn, waiting for remote move");
+				gameStateChanged(GameState::WaitingForRemoteMove);
+			}
+		}
+		else
+		{
+			LOG_INFO("Single Player mode. We switch to WaitingForInput");
+			gameStateChanged(GameState::WaitingForInput);
+		}
 		break;
 	}
 	case GameState::WaitingForInput:

@@ -101,6 +101,47 @@ void TCPSession::processHeader(size_t bytesTransfered)
 	if (memcmp(mReceiveBuffer, RemoteComSecret, strlen(RemoteComSecret) + 1) != 0)
 	{
 		LOG_ERROR("Invalid message format: Secret identifier mismatch");
+
+		{
+			LOG_ERROR("\tHeader received ({} bytes)", bytesTransfered);
+
+			// 2. Log the received and expected values separately
+			std::string received;
+			for (size_t i = 0; i < sizeof(RemoteComSecret); ++i)
+			{
+				char hex[8];
+				snprintf(hex, sizeof(hex), "%02X ", mReceiveBuffer[i]);
+				received += hex;
+			}
+			LOG_ERROR("\tReceived bytes: {}", received.c_str());
+
+			std::string	   expected;
+			const uint8_t *secretPtr = reinterpret_cast<const uint8_t *>(RemoteComSecret);
+			for (size_t i = 0; i < sizeof(RemoteComSecret); ++i)
+			{
+				char hex[8];
+				snprintf(hex, sizeof(hex), "%02X ", secretPtr[i]);
+				expected += hex;
+			}
+			LOG_ERROR("\tExpected bytes: {}", expected.c_str());
+
+			// 3. Also print ASCII representation if possible
+			std::string ascii;
+			for (size_t i = 0; i < sizeof(RemoteComSecret); ++i)
+			{
+				char c = static_cast<char>(mReceiveBuffer[i]);
+				if (c >= 32 && c <= 126)
+				{ // printable ASCII range
+					ascii += c;
+				}
+				else
+				{
+					ascii += '.';
+				}
+			}
+			LOG_ERROR("\tASCII received: {}", ascii.c_str());
+		}
+
 		readHeaderAsync(); // Continue listening for next message
 		return;
 	}
