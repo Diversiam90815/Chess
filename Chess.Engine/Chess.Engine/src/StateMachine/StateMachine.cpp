@@ -117,15 +117,15 @@ void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
 		// Setting the current move
 		mCurrentPossibleMove = remoteMove;
 
-		// Is it valid?
-		mIsValidMove		 = GameManager::GetInstance()->checkForValidMoves(mCurrentPossibleMove);
+		//// Is it valid?
+		//mIsValidMove		 = GameManager::GetInstance()->checkForValidMoves(mCurrentPossibleMove);
 
-		if (!mIsValidMove)
-		{
-			LOG_WARNING("Invalid remote move received! This could indicate synchronisation issues!");
-			resetCurrentPossibleMove();
-			return;
-		}
+		//if (!mIsValidMove)
+		//{
+		//	LOG_WARNING("Invalid remote move received! This could indicate synchronisation issues!");
+		//	resetCurrentPossibleMove();
+		//	return;
+		//}
 
 		// Check if a pawn promotion is needed!
 		bool isPawnPromotion = GameManager::GetInstance()->checkForPawnPromotionMove(mCurrentPossibleMove);
