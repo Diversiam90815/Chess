@@ -203,15 +203,7 @@ namespace Chess.UI.ViewModels
             PositionInstance enginePos = _coordinate.FromDisplayCoordinates(square.pos);
             Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{enginePos.x}-Y{enginePos.y}!");
 
-            if (EngineAPI.IsMultiplayerActive())
-            {
-                // do nothing
-                Logger.LogWarning("It is the remote's player turn! We will ignore this call!");
-            }
-            else
-            {
-                EngineAPI.OnSquareSelected(enginePos);
-            }
+            EngineAPI.OnSquareSelected(enginePos);
         }
 
 
