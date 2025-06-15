@@ -71,11 +71,11 @@ namespace Chess.UI
             services.AddSingleton<IThemeManager, ThemeManager>();
             services.AddSingleton<IImageService, ImageServices>();
 
-            services.AddSingleton<IMoveModel, MoveModel>();
-            services.AddSingleton<IScoreModel, ScoreModel>();
-            services.AddSingleton<IMoveHistoryModel, MoveHistoryModel>();
-            services.AddSingleton<IBoardModel, BoardModel>();
-            services.AddSingleton<IMultiplayerModel, MultiplayerModel>();
+            services.AddTransient<IMoveModel, MoveModel>();
+            services.AddTransient<IScoreModel, ScoreModel>();
+            services.AddTransient<IMoveHistoryModel, MoveHistoryModel>();
+            services.AddTransient<IBoardModel, BoardModel>();
+            services.AddTransient<IMultiplayerModel, MultiplayerModel>();
 
             // Register view models
             services.AddTransient<ChessBoardViewModel>();
