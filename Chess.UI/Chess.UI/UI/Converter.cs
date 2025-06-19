@@ -23,6 +23,11 @@ namespace Chess.UI.UI
         {
             return value ? Visibility.Collapsed : Visibility.Visible;
         }
+
+        public static SolidColorBrush BoolToColor(bool value)
+        {
+            return value ? new SolidColorBrush(Microsoft.UI.Colors.Green) : new SolidColorBrush(Microsoft.UI.Colors.Red);
+        }
     }
 
 

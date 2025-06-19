@@ -38,9 +38,9 @@
 
         </Border>
 
-        <Border x:Name="BorderSinglePlayer" Style="{ThemeResource BackgroundBorder}">
+        <Border Style="{ThemeResource BackgroundBorder}">
 
-            <Grid x:Name="InfoGridSinglePlayer" Margin="30" VerticalAlignment="Top">
+            <Grid x:Name="InfoGrid" Margin="30" VerticalAlignment="Top">
 
                 <StackPanel Orientation="Vertical">
 
@@ -53,6 +53,7 @@
                     <StackPanel x:Name="CurrentPlayerMP" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Height="Auto" Margin="16" Orientation="Horizontal" CornerRadius="8" Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.IsMultiplayerGame), Mode=OneTime}" >
                         <TextBlock Text="Local Player" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" FontSize="24" Margin="8"/>
                         <Image Source="{x:Bind converter:Converter.PlayerToPawnImage(_viewModel._multiplayerViewModel.LocalPlayer), Mode=OneTime}" Style="{StaticResource CurrentPlayerImageStyle}"/>
+                        <Ellipse Width="10" Height="10" Fill="{x:Bind converter:Converter.BoolToColor(_viewModel._multiplayerViewModel.IsLocalPlayersTurn), Mode=OneWay}" VerticalAlignment="Center" Margin="8,0,0,0"/>
                     </StackPanel>
 
                     <Grid x:Name="Score" Width="160" Height="170" CornerRadius="8" Margin="16" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" HorizontalAlignment="Center">

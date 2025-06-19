@@ -88,6 +88,21 @@ namespace Chess.UI.ViewModels
         }
 
 
+        private bool isLocalPlayersTurn = false;
+        public bool IsLocalPlayersTurn
+        {
+            get => isLocalPlayersTurn;
+            set
+            {
+                if (isLocalPlayersTurn != value)
+                {
+                    isLocalPlayersTurn = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
         private bool processing = false;
         public bool Processing
         {
