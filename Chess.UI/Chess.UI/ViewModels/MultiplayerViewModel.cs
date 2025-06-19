@@ -149,6 +149,21 @@ namespace Chess.UI.ViewModels
         }
 
 
+        private EngineAPI.PlayerColor localPlayer;
+        public EngineAPI.PlayerColor LocalPlayer
+        {
+            get => localPlayer;
+            set
+            {
+                if (localPlayer != value)
+                {
+                    localPlayer = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
         private string remotePlayerName;
         public string RemotePlayerName
         {
@@ -275,6 +290,8 @@ namespace Chess.UI.ViewModels
         {
             if (MPMode == MultiplayerMode.None || MPMode == MultiplayerMode.Init)
                 return;
+
+            LocalPlayer = MPMode == MultiplayerMode.Server ? EngineAPI.PlayerColor.White : EngineAPI.PlayerColor.White;     // Server / Host mode starts with white for now
 
             _model.StartMultiplerGame(MPMode);
         }

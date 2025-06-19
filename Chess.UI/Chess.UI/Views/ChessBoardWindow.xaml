@@ -38,15 +38,21 @@
 
         </Border>
 
-        <Border Style="{ThemeResource BackgroundBorder}">
+        <Border x:Name="BorderSinglePlayer" Style="{ThemeResource BackgroundBorder}">
 
-            <Grid x:Name="InfoGrid" Margin="30" VerticalAlignment="Top">
+            <Grid x:Name="InfoGridSinglePlayer" Margin="30" VerticalAlignment="Top">
 
                 <StackPanel Orientation="Vertical">
 
-                    <StackPanel x:Name="CurrentPlayer" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Height="Auto" Margin="16" Orientation="Horizontal" CornerRadius="8" >
+                    <StackPanel x:Name="CurrentPlayerSP" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Height="Auto" Margin="16" Orientation="Horizontal" CornerRadius="8" Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneTime}" >
                         <TextBlock Text="Current Player" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" FontSize="24" Margin="8"/>
                         <Image Source="{x:Bind converter:Converter.PlayerToPawnImage(_viewModel.CurrentPlayer), Mode=OneWay}" Style="{StaticResource CurrentPlayerImageStyle}"/>
+                    </StackPanel>
+
+
+                    <StackPanel x:Name="CurrentPlayerMP" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Height="Auto" Margin="16" Orientation="Horizontal" CornerRadius="8" Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.IsMultiplayerGame), Mode=OneTime}" >
+                        <TextBlock Text="Local Player" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" FontSize="24" Margin="8"/>
+                        <Image Source="{x:Bind converter:Converter.PlayerToPawnImage(_viewModel._multiplayerViewModel.LocalPlayer), Mode=OneTime}" Style="{StaticResource CurrentPlayerImageStyle}"/>
                     </StackPanel>
 
                     <Grid x:Name="Score" Width="160" Height="170" CornerRadius="8" Margin="16" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" HorizontalAlignment="Center">
@@ -136,16 +142,14 @@
                     </Grid>
 
                     <StackPanel x:Name="Buttons" Orientation="Horizontal" Spacing="12" Margin="0,16" HorizontalAlignment="Center">
-                        <Button x:Name="UndoMove" Content="Undo" Click="UndoMove_Click" Style="{StaticResource GameButtonStyle}"/>
-                        <Button x:Name="ResetGame" Content="Reset" Click="ResetGame_Click" Style="{StaticResource GameButtonStyle}" />
-                        <Button x:Name="EndGame" Content="End" Click="EndGame_Click" Style="{StaticResource GameButtonStyle}"/>
+                        <Button x:Name="UndoMove" Content="Undo" Click="UndoMove_Click" Style="{StaticResource GameButtonStyle}" Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneTime}"/>
+                        <Button x:Name="ResetGame" Content="Reset" Click="ResetGame_Click" Style="{StaticResource GameButtonStyle}" Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneTime}"/>
+                        <Button x:Name="EndGame" Content="End" Click="EndGame_Click" Style="{StaticResource GameButtonStyle}" Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.IsMultiplayerGame), Mode=OneTime}"/>
                     </StackPanel>
 
                 </StackPanel>
             </Grid>
-
         </Border>
-
 
     </StackPanel>
 </Window>

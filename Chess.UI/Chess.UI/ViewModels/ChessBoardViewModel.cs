@@ -44,6 +44,8 @@ namespace Chess.UI.ViewModels
 
         public MoveHistoryViewModel _moveHistoryViewModel { get; set; }
 
+        public MultiplayerViewModel _multiplayerViewModel { get; }
+
         private readonly IThemeManager _themeManager;
 
         private IMoveModel _moveModel;
@@ -66,6 +68,7 @@ namespace Chess.UI.ViewModels
             _coordinate = App.Current.Services.GetService<IChessCoordinate>();
             _imageServices = App.Current.Services.GetService<IImageService>();
             _themeManager = App.Current.Services.GetService<IThemeManager>();
+            _multiplayerViewModel = App.Current.Services.GetService<MultiplayerViewModel>();
 
             _moveModel.PossibleMovesCalculated += OnHighlightPossibleMoves;
             _moveModel.PlayerChanged += OnHandlePlayerChanged;
@@ -273,6 +276,21 @@ namespace Chess.UI.ViewModels
                 if (value != currentPlayer)
                 {
                     currentPlayer = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private bool isMultiplayerGame;
+        public bool IsMultiplayerGame
+        {
+            get => isMultiplayerGame;
+            set
+            {
+                if (value != isMultiplayerGame)
+                {
+                    isMultiplayerGame = value;
                     OnPropertyChanged();
                 }
             }
