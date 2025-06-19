@@ -52,7 +52,7 @@ private:
 	void		readHeaderAsync();
 	void		readMessageBodyAsync(size_t dataLength, MultiplayerMessageType messageType);
 
-	void		processHeader(size_t bytesTransfered);
+	void		processHeader();
 
 
 	tcp::socket mSocket;

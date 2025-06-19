@@ -44,6 +44,22 @@ void RemoteCommunication::start()
 	mTCPSession->startReadAsync(
 		[this](MultiplayerMessageStruct message)
 		{
+			// Validate and process the received message body
+			if (message.data.size() < sizeof(RemoteComSecret))
+			{
+				LOG_ERROR("Received message is too small to contain secret identifier.");
+				return;
+			}
+
+			if (memcmp(message.data.data(), RemoteComSecret, sizeof(RemoteComSecret)) != 0)
+			{
+				LOG_ERROR("Invalid message format: Secret identifier mismatch in body.");
+				return;
+			}
+
+			// The secret is valid. Strip it from the data.
+			message.data.erase(message.data.begin(), message.data.begin() + sizeof(RemoteComSecret));
+
 			// Queue the message
 			{
 				std::lock_guard<std::mutex> lock(mIncomingListMutex);
