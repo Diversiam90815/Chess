@@ -163,9 +163,13 @@ namespace Chess.UI
 
                     if (!Multiplayer)
                     {
+                        _chessBoardViewModel.IsMultiplayerGame = false;
                         // If we start a MP game, the game is started from the MP VM
                         _chessBoardViewModel.StartGame();
+                        return;
                     }
+                  
+                    _chessBoardViewModel.IsMultiplayerGame = true;
                 }
                 else
                 {

@@ -143,9 +143,9 @@
                     </Grid>
 
                     <StackPanel x:Name="Buttons" Orientation="Horizontal" Spacing="12" Margin="0,16" HorizontalAlignment="Center">
-                        <Button x:Name="UndoMove" Content="Undo" Click="UndoMove_Click" Style="{StaticResource GameButtonStyle}" Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneTime}"/>
-                        <Button x:Name="ResetGame" Content="Reset" Click="ResetGame_Click" Style="{StaticResource GameButtonStyle}" Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneTime}"/>
-                        <Button x:Name="EndGame" Content="End" Click="EndGame_Click" Style="{StaticResource GameButtonStyle}" Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.IsMultiplayerGame), Mode=OneTime}"/>
+                        <Button x:Name="UndoMove" Content="Undo" Click="UndoMove_Click" Style="{StaticResource GameButtonStyle}" Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneWay}"/>
+                        <Button x:Name="ResetGame" Content="Reset" Click="ResetGame_Click" Style="{StaticResource GameButtonStyle}" Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneWay}"/>
+                        <Button x:Name="EndGame" Content="End" Click="EndGame_Click" Style="{StaticResource GameButtonStyle}"/>
                     </StackPanel>
 
                 </StackPanel>
