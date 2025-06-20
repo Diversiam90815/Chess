@@ -27,7 +27,7 @@ namespace Chess.UI.Multiplayer
 
         void ChangeNetworkAdapter(int adapterID);
 
-        List<NetworkAdapter> GetNetworkAdapters();
+        List<Models.NetworkAdapter> GetNetworkAdapters();
 
         void ConnectToHost();
 
@@ -40,5 +40,7 @@ namespace Chess.UI.Multiplayer
         event Action<Services.EngineAPI.ConnectionState, string> OnConnectionStatusChanged;
 
         event Action<string> OnClientRequestedConnection;
+
+        event Action<Services.EngineAPI.PlayerColor> OnPlayerChanged;
     }
 }

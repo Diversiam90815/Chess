@@ -100,7 +100,6 @@ public:
 	void						rejectConnectionRequest();
 	void						sendConnectionRequestToHost();
 
-
 private:
 	GameManager() = default;
 

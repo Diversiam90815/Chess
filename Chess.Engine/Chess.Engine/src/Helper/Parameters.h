@@ -85,6 +85,11 @@ constexpr auto		  LogFile			= "Chess.log";
 constexpr auto		  UserSettingsFile	= "Config.json";
 constexpr auto		  SettingsFolder	= "Settings";
 
+
+//============================================================
+//			Config File Settings
+//============================================================
+
 constexpr auto		  BoardTheme		= "BoardTheme";
 constexpr auto		  PieceTheme		= "PieceTheme";
 constexpr auto		  SelectedAdapter	= "Selected_Adapter";

@@ -45,6 +45,12 @@ void TCPSession::readHeaderAsync()
 						 {
 							 LOG_ERROR("Error reading message header : {}", ec.message().c_str());
 
+							 if (asio::error::eof == ec || asio::error::connection_reset == ec)
+							 {
+								 mAsyncReadActive = false;
+								 return;
+							 }
+
 							 // If connection is still active, try reading again
 							 if (isConnected() && mAsyncReadActive)
 								 readHeaderAsync();

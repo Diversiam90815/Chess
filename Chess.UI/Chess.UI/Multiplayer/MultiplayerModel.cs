@@ -40,6 +40,7 @@ namespace Chess.UI.Models
         {
             var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
             logicCommunication.ConnectionStatusEvent += HandleConnectionStatusUpdates;
+            logicCommunication.PlayerChanged += HandlePlayerChanged;
 
         }
 
@@ -49,6 +50,13 @@ namespace Chess.UI.Models
             EngineAPI.StartedMultiplayer();
             SetNetworkAdapters();
         }
+
+
+        public void HandlePlayerChanged(PlayerColor player)
+        {
+            OnPlayerChanged?.Invoke(player);
+        }
+
 
 
         private void HandleConnectionStatusUpdates(ConnectionStatusEvent connectionStatusEvent)
@@ -177,6 +185,7 @@ namespace Chess.UI.Models
         public event Action<string> OnConnectionErrorOccured;
         public event Action<ConnectionState, string> OnConnectionStatusChanged;
         public event Action<string> OnClientRequestedConnection;
+        public event Action<PlayerColor> OnPlayerChanged;
 
     }
 }

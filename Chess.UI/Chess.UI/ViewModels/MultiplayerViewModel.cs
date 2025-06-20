@@ -45,6 +45,7 @@ namespace Chess.UI.ViewModels
 
             _model.OnConnectionErrorOccured += HandleConnectionError;
             _model.OnConnectionStatusChanged += HandleConnectionStatusUpdated;
+            _model.OnPlayerChanged += HandlePlayerChanged;
 
             //UpdateAdapterBox();
         }
@@ -273,6 +274,12 @@ namespace Chess.UI.ViewModels
         #endregion
 
 
+        public void HandlePlayerChanged(Services.EngineAPI.PlayerColor player)
+        {
+            IsLocalPlayersTurn = player == LocalPlayer;
+        }
+
+
         public void EnterServerMultiplayerMode()
         {
             MPMode = MultiplayerMode.Server;
@@ -408,7 +415,7 @@ namespace Chess.UI.ViewModels
             {
                 for (int i = 0; i < NetworkAdapters.Count; i++)
                 {
-                    NetworkAdapter adapter = NetworkAdapters[i];
+                    Models.NetworkAdapter adapter = NetworkAdapters[i];
                     if (adapter != null && adapter.ID == savedAdapterID)
                     {
                         SelectedAdapter = adapter;
