@@ -65,8 +65,6 @@ void RemoteCommunication::start()
 				std::lock_guard<std::mutex> lock(mIncomingListMutex);
 				mIncomingMessages.push_back(message);
 			};
-
-			mReceiveThread->triggerEvent();
 		});
 
 	mSendThread->start();

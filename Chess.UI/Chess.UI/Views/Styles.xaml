@@ -214,7 +214,6 @@
     <Style x:Key="MPTitle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
         <Setter Property="FontSize" Value="24" />
-        <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}"/>
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="TextAlignment" Value="Center" />

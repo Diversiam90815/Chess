@@ -44,13 +44,13 @@
 
                 <StackPanel Orientation="Vertical">
 
-                    <StackPanel x:Name="CurrentPlayerSP" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Height="Auto" Margin="16" Orientation="Horizontal" CornerRadius="8" Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneTime}" >
+                    <StackPanel x:Name="CurrentPlayerSP" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Height="Auto" Margin="16" Orientation="Horizontal" CornerRadius="8" Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneWay}" >
                         <TextBlock Text="Current Player" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" FontSize="24" Margin="8"/>
                         <Image Source="{x:Bind converter:Converter.PlayerToPawnImage(_viewModel.CurrentPlayer), Mode=OneWay}" Style="{StaticResource CurrentPlayerImageStyle}"/>
                     </StackPanel>
 
 
-                    <StackPanel x:Name="CurrentPlayerMP" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Height="Auto" Margin="16" Orientation="Horizontal" CornerRadius="8" Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.IsMultiplayerGame), Mode=OneTime}" >
+                    <StackPanel x:Name="CurrentPlayerMP" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Height="Auto" Margin="16" Orientation="Horizontal" CornerRadius="8" Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.IsMultiplayerGame), Mode=OneWay}" >
                         <TextBlock Text="Local Player" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" FontSize="24" Margin="8"/>
                         <Image Source="{x:Bind converter:Converter.PlayerToPawnImage(_viewModel._multiplayerViewModel.LocalPlayer), Mode=OneTime}" Style="{StaticResource CurrentPlayerImageStyle}"/>
                         <Ellipse Width="10" Height="10" Fill="{x:Bind converter:Converter.BoolToColor(_viewModel._multiplayerViewModel.IsLocalPlayersTurn), Mode=OneWay}" VerticalAlignment="Center" Margin="8,0,0,0"/>
