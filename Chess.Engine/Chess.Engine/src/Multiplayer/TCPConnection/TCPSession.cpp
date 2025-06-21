@@ -43,7 +43,6 @@ void TCPSession::readHeaderAsync()
 
 						 if (ec)
 						 {
-
 							 if (asio::error::eof == ec || asio::error::connection_reset == ec)
 							 {
 								 LOG_WARNING("Remote socket closed or lost connection. We turn off async read for now!");

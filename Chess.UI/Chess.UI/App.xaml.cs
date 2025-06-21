@@ -79,11 +79,11 @@ namespace Chess.UI
 
             // Register view models
             services.AddSingleton<ChessBoardViewModel>();
-            services.AddTransient<ScoreViewModel>();
-            services.AddTransient<MoveHistoryViewModel>();
-            services.AddTransient<MainMenuViewModel>();
-            services.AddTransient<MultiplayerViewModel>();
-            services.AddTransient<ThemePreferencesViewModel>();
+            services.AddSingleton<ScoreViewModel>();
+            services.AddSingleton<MoveHistoryViewModel>();
+            services.AddSingleton<MainMenuViewModel>();
+            services.AddSingleton<MultiplayerViewModel>();
+            services.AddSingleton<ThemePreferencesViewModel>();
 
             services.AddTransient<MainMenuWindow>();
             services.AddTransient<ChessBoardWindow>();
