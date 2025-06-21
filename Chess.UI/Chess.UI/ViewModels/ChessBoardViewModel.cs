@@ -261,6 +261,7 @@ namespace Chess.UI.ViewModels
             ShowEndGameDialog?.Invoke(state);
         }
 
+
         private void OnHandlePlayerChanged(PlayerColor player)
         {
             CurrentPlayer = player;

@@ -78,7 +78,7 @@ namespace Chess.UI
             services.AddTransient<IMultiplayerModel, MultiplayerModel>();
 
             // Register view models
-            services.AddTransient<ChessBoardViewModel>();
+            services.AddSingleton<ChessBoardViewModel>();
             services.AddTransient<ScoreViewModel>();
             services.AddTransient<MoveHistoryViewModel>();
             services.AddTransient<MainMenuViewModel>();

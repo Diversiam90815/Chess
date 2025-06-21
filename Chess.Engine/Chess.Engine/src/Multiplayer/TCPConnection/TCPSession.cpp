@@ -32,7 +32,7 @@ void TCPSession::readHeaderAsync()
 		return;
 
 	// Calculate Header size
-	const size_t headerSize = sizeof(RemoteComSecret) + sizeof(MultiplayerMessageType) + sizeof(size_t);
+	const size_t headerSize = sizeof(MultiplayerMessageType) + sizeof(size_t);
 
 	// Start async read for message header
 	asio::async_read(mSocket, asio::buffer(mReceiveBuffer, headerSize), asio::transfer_exactly(headerSize),
@@ -43,13 +43,15 @@ void TCPSession::readHeaderAsync()
 
 						 if (ec)
 						 {
-							 LOG_ERROR("Error reading message header : {}", ec.message().c_str());
 
 							 if (asio::error::eof == ec || asio::error::connection_reset == ec)
 							 {
+								 LOG_WARNING("Remote socket closed or lost connection. We turn off async read for now!");
 								 mAsyncReadActive = false;
 								 return;
 							 }
+
+							 LOG_ERROR("Error reading message header : {}", ec.message().c_str());
 
 							 // If connection is still active, try reading again
 							 if (isConnected() && mAsyncReadActive)
