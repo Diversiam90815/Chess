@@ -266,7 +266,9 @@ void GameManager::undoMove()
 	}
 
 	auto &piece = mChessBoard->getPiece(lastMove->startingPosition);
-	piece->decreaseMoveCounter();
+
+	if (piece)
+		piece->decreaseMoveCounter();
 
 	mMoveExecution->removeLastMove();
 }
@@ -447,7 +449,7 @@ bool GameManager::startMultiplayerGame(bool isHost)
 		mBlackPlayer.setIsLocalPlayer(true);
 	}
 
-	//mMultiplayerManager->setInternalObservers(); // Set the internal multiplayer observers
+	// mMultiplayerManager->setInternalObservers(); // Set the internal multiplayer observers
 	initMultiplayerObservers();
 
 	return true;

@@ -224,7 +224,6 @@
     <Style x:Key="MPSubTitle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
         <Setter Property="FontSize" Value="20" />
-        <Setter Property="Foreground" Value="#EEE9DA" />
         <Setter Property="TextAlignment" Value="Center" />
         <Setter Property="CharacterSpacing" Value="16" />
     </Style>
@@ -232,7 +231,6 @@
     <Style x:Key="MPDesc" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="Foreground" Value="#EEE9DA" />
     </Style>
 
 
