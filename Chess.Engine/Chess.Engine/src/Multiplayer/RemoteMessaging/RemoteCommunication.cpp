@@ -115,7 +115,11 @@ void RemoteCommunication::write(MultiplayerMessageType type, std::vector<uint8_t
 
 	MultiplayerMessageStruct	message;
 	message.type = type;
-	message.data = data;
+
+	// Prepend the secret to the message data
+	message.data.reserve(sizeof(RemoteComSecret) + data.size());
+	message.data.insert(message.data.end(), RemoteComSecret, RemoteComSecret + sizeof(RemoteComSecret));
+	message.data.insert(message.data.end(), data.begin(), data.end());
 
 	mOutgoingMessages.push_back(message);
 	mSendThread->triggerEvent();
