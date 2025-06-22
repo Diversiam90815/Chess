@@ -144,6 +144,69 @@ void TCPSession::processHeader()
 }
 
 
+void TCPSession::readFullMessageAsync()
+{
+	if (!mAsyncReadActive || !isConnected())
+		return;
+
+	// Read full package of fixed size
+	asio::async_read(mSocket, asio::buffer(mReceiveBuffer, PackageBufferSize), asio::transfer_at_least(sizeof(MultiplayerMessageType) + sizeof(size_t)),
+					 [this](const asio::error_code &ec, size_t bytes_transfered)
+					 {
+						 if (!mAsyncReadActive)
+							 return;
+
+						 if (ec)
+						 {
+							 if (asio::error::eof == ec || asio::error::connection_reset == ec)
+							 {
+								 LOG_WARNING("Remote Socket closed or lost connection. We turn off async read for now!");
+								 mAsyncReadActive = false;
+								 return;
+							 }
+
+							 LOG_ERROR("Error reading message: {}", ec.message().c_str());
+
+							 // If Connection still active, try reading again
+							 if (isConnected() && mAsyncReadActive)
+								 readFullMessageAsync();
+
+							 return;
+						 }
+
+						 MultiplayerMessageStruct message;
+
+						 // Extract message type
+						 memcpy(&message.type, mReceiveBuffer, sizeof(MultiplayerMessageType));
+
+						 // Extract the message size
+						 size_t dataSize = 0;
+						 memcpy(&dataSize, mReceiveBuffer + sizeof(MultiplayerMessageType), sizeof(size_t));
+
+						 // Validate and limit data size to prevent buffer overflow
+						 if (dataSize > PackageBufferSize - sizeof(MultiplayerMessageType) - sizeof(size_t))
+						 {
+							 LOG_ERROR("Received data size ({} bytes) exceeds maximum allowed!", dataSize);
+							 readFullMessageAsync(); // Continue reading next message
+							 return;
+						 }
+
+						 // Copy the actual message data
+						 if (dataSize > 0)
+						 {
+							 message.data.assign(mReceiveBuffer + sizeof(MultiplayerMessageType) + sizeof(size_t),
+												 mReceiveBuffer + sizeof(MultiplayerMessageType) + sizeof(size_t) + dataSize);
+						 }
+
+						 // Deliver message
+						 if (mMessageReceivedCallback)
+							 mMessageReceivedCallback(message);
+
+						 readFullMessageAsync();
+					 });
+}
+
+
 TCPSession::~TCPSession()
 {
 	delete[] mSendBuffer;
@@ -212,6 +275,7 @@ bool TCPSession::sendMessage(MultiplayerMessageStruct &message)
 }
 
 
+
 void TCPSession::startReadAsync(MessageReceivedCallback callback)
 {
 	if (!isConnected())
@@ -225,7 +289,8 @@ void TCPSession::startReadAsync(MessageReceivedCallback callback)
 	mAsyncReadActive		 = true;
 
 	// Start the read chain
-	readHeaderAsync();
+	// readHeaderAsync();
+	readFullMessageAsync();
 }
 
 

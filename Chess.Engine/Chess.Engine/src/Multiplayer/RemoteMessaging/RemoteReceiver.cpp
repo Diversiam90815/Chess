@@ -45,7 +45,7 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 
 		LOG_INFO("Received move from remote:");
 		LOG_INFO("\tStart: {0},{1}", remoteMove.start.x, remoteMove.start.y);
-		LOG_INFO("\tStart: {0},{1}", remoteMove.end.x, remoteMove.end.y);
+		LOG_INFO("\tEnd: {0},{1}", remoteMove.end.x, remoteMove.end.y);
 		LOG_INFO("\tType: {0}", LoggingHelper::moveTypeToString(remoteMove.type));
 
 		remoteMoveReceived(remoteMove);

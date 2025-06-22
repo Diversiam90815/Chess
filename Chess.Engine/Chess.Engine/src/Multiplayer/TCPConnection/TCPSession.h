@@ -54,6 +54,8 @@ private:
 
 	void		processHeader();
 
+	void		readFullMessageAsync();
+
 
 	tcp::socket mSocket;
 
