@@ -58,6 +58,7 @@ private:
 	bool				   handleExecutingMoveState();
 	bool				   handlePawnPromotionState();
 	bool				   handleGameOverState();
+	bool				   handleWaitingForRemoteState();
 
 	void				   switchToNextState();
 

@@ -288,8 +288,7 @@ void StateMachine::run()
 		}
 		case GameState::WaitingForRemoteMove:
 		{
-			// This state is passive -> we are waiting for onRemoteMoveReceieved to be called
-			// Maybe implement a timeout later? (-> TODO?)
+			handleWaitingForRemoteState();
 			break;
 		}
 		case GameState::GameOver:
@@ -521,4 +520,13 @@ bool StateMachine::handleGameOverState()
 {
 	// @TODO: Let UI know of EndGameState -> Checkmate or Stalemate
 	return false;
+}
+
+
+bool StateMachine::handleWaitingForRemoteState()
+{
+	// State change will happen in onRemoteMoveReceived()
+	// but to validate the remote's move, we want to calculate the possible moves for the remote
+
+	return GameManager::GetInstance()->calculateAllMovesForPlayer();
 }
