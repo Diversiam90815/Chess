@@ -79,28 +79,52 @@ enum SettingsType
 //			File Manager
 //============================================================
 
-constexpr auto		  LoggingFolder		= "Logs";
-constexpr auto		  LogFile			= "Chess.log";
+constexpr auto		  LoggingFolder			   = "Logs";
+constexpr auto		  LogFile				   = "Chess.log";
 
-constexpr auto		  UserSettingsFile	= "Config.json";
-constexpr auto		  SettingsFolder	= "Settings";
+constexpr auto		  UserSettingsFile		   = "Config.json";
+constexpr auto		  SettingsFolder		   = "Settings";
 
 
 //============================================================
 //			Config File Settings
 //============================================================
 
-constexpr auto		  BoardTheme		= "BoardTheme";
-constexpr auto		  PieceTheme		= "PieceTheme";
-constexpr auto		  SelectedAdapter	= "Selected_Adapter";
+constexpr auto		  BoardTheme			   = "BoardTheme";
+constexpr auto		  PieceTheme			   = "PieceTheme";
+constexpr auto		  SelectedAdapter		   = "Selected_Adapter";
 
 
 //============================================================
 //			Multiplayer - Network Communication
 //============================================================
 
-constexpr int		  PackageBufferSize = 65536;
-constexpr const char *RemoteComSecret	= "316";
+constexpr int		  PackageBufferSize		   = 65536;
+constexpr const char *RemoteComSecret		   = "316";
 
-constexpr auto		  MoveKey			= "Move";
-constexpr auto		  ChatMessageKey	= "Chat";
+constexpr auto		  MoveKey				   = "Move";
+constexpr auto		  ChatMessageKey		   = "Chat";
+
+
+//============================================================
+//			JSON Conversion
+//============================================================
+
+constexpr auto		  jNetworkAdapterID		   = "ID";
+constexpr auto		  jNetworkAdapterDesc	   = "description";
+constexpr auto		  jNetworkAdapterIP		   = "IPv4";
+constexpr auto		  jNetworkAdapterISubnet   = "subnet";
+constexpr auto		  jNetworkAdapterIEligible = "eligible";
+constexpr auto		  jNetworkAdapterISelected = "selected";
+
+constexpr auto		  jPositionX			   = "x";
+constexpr auto		  jPositionY			   = "y";
+
+constexpr auto		  jMoveStart			   = "start";
+constexpr auto		  jMoveEnd				   = "end";
+constexpr auto		  jMoveType				   = "type";
+constexpr auto		  jMovePromotion		   = "promotion";
+
+constexpr auto		  jDiscoveryIP			   = "IPAddress";
+constexpr auto		  jDiscoveryPort		   = "tcpPort";
+constexpr auto		  jDiscoveryName		   = "player";

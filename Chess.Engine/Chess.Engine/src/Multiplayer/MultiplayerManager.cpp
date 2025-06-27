@@ -63,19 +63,6 @@ bool MultiplayerManager::hostSession()
 
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
 
-	//// TODO
-	// mServer->setConnectionRequestHandler(
-	//	[this](const std::string &remoteIPv4)
-	//	{
-	//		ConnectionStatusEvent event{};
-	//		event.state						= ConnectionState::ConnectionRequested;
-	//		event.remoteEndpoint.IPAddress	= remoteIPv4;
-	//		event.remoteEndpoint.tcpPort	= 1;		  // Leave 1 for now
-	//		event.remoteEndpoint.playerName = remoteIPv4; // Use IPv4 as remote player name for now (@TODO)
-
-	//		connectionStatusChanged(event);				  // Notify observers that we have a connection request
-	//	});
-
 	mServer->startAccept();
 
 	const int port	  = mServer->getBoundPort();
@@ -111,8 +98,6 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 	}
 
 	mRemoteCom->init(mSession);
-
-	//setInternalObservers();
 
 	mRemoteCom->start();
 

@@ -94,9 +94,8 @@ PieceType GameManager::getCurrentPieceTypeAtPosition(const Position position)
 	auto &chessPiece = mChessBoard->getPiece(position);
 
 	if (chessPiece)
-	{
 		return chessPiece->getType();
-	}
+	
 	return PieceType::DefaultType;
 }
 
@@ -443,7 +442,6 @@ bool GameManager::startMultiplayerGame(bool isHost)
 	{
 		LOG_INFO("We start as white player");
 
-		// changeCurrentPlayer(PlayerColor::White); // If we are the host, we are chosen to play as white -> TODO : Add UI selector in future
 		mWhitePlayer.setIsLocalPlayer(true);
 		mBlackPlayer.setIsLocalPlayer(false);
 	}
@@ -452,12 +450,10 @@ bool GameManager::startMultiplayerGame(bool isHost)
 		LOG_INFO("We start as black player!");
 
 		// Guests are black
-		// changeCurrentPlayer(PlayerColor::White); // Game still starts with white
 		mWhitePlayer.setIsLocalPlayer(false);
 		mBlackPlayer.setIsLocalPlayer(true);
 	}
 
-	// mMultiplayerManager->setInternalObservers(); // Set the internal multiplayer observers
 	initMultiplayerObservers();
 
 	return true;
