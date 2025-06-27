@@ -196,6 +196,14 @@ bool GameManager::initiateMove(const Position &startPosition)
 void GameManager::executeMove(PossibleMove &tmpMove, bool fromRemote)
 {
 	PossibleMove moveToExecute{};
+
+	if (fromRemote)
+	{
+		// Initiate move first to get all moves for current position
+		Position startPosition = tmpMove.start;
+		initiateMove(startPosition);
+	}
+
 	for (auto &move : mAllMovesForPosition)
 	{
 		if (move == tmpMove)
