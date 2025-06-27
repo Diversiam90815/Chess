@@ -115,20 +115,12 @@ void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
 		LOG_INFO("Remote move received!");
 
 		// Setting the current move
-		mCurrentPossibleMove = remoteMove;
+		mCurrentPossibleMove	= remoteMove;
 
-		//// Is it valid?
-		//mIsValidMove		 = GameManager::GetInstance()->checkForValidMoves(mCurrentPossibleMove);
-
-		//if (!mIsValidMove)
-		//{
-		//	LOG_WARNING("Invalid remote move received! This could indicate synchronisation issues!");
-		//	resetCurrentPossibleMove();
-		//	return;
-		//}
+		mReceivedMoveFromRemote = true; // Set flag to true to avoid echo effect
 
 		// Check if a pawn promotion is needed!
-		bool isPawnPromotion = GameManager::GetInstance()->checkForPawnPromotionMove(mCurrentPossibleMove);
+		bool isPawnPromotion	= GameManager::GetInstance()->checkForPawnPromotionMove(mCurrentPossibleMove);
 
 		if (isPawnPromotion && mCurrentPossibleMove.promotionPiece == PieceType::DefaultType)
 		{
@@ -379,6 +371,7 @@ void StateMachine::switchToNextState()
 	case GameState::ExecutingMove:
 	{
 		mEndgameState = GameManager::GetInstance()->checkForEndGameConditions();
+
 		if (isGameOngoing())
 		{
 			GameManager::GetInstance()->switchTurns();
@@ -473,7 +466,7 @@ bool StateMachine::handleWaitingForInputState()
 
 	resetCurrentPossibleMove();
 
-	//GameManager::GetInstance()->switchTurns(); // Sets the player
+	// GameManager::GetInstance()->switchTurns(); // Sets the player
 
 	mMovesCalulated = GameManager::GetInstance()->calculateAllMovesForPlayer();
 	return mMovesCalulated;
@@ -504,7 +497,8 @@ bool StateMachine::handleValidatingMoveState()
 
 bool StateMachine::handleExecutingMoveState()
 {
-	GameManager::GetInstance()->executeMove(mCurrentPossibleMove);
+	GameManager::GetInstance()->executeMove(mCurrentPossibleMove, mReceivedMoveFromRemote);
+	mReceivedMoveFromRemote = false; // Reset remote flag
 	return true;
 }
 

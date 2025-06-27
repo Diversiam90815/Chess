@@ -32,9 +32,9 @@ class IMoveObserver
 public:
 	virtual ~IMoveObserver() {};
 
-	virtual void onExecuteMove(const PossibleMove &move) = 0;
-	virtual void onAddToMoveHistory(Move &move)			 = 0;
-	virtual void onClearMoveHistory()					 = 0;
+	virtual void onExecuteMove(const PossibleMove &move, bool fromRemote) = 0;
+	virtual void onAddToMoveHistory(Move &move)									  = 0;
+	virtual void onClearMoveHistory()											  = 0;
 };
 
 

@@ -62,7 +62,7 @@ public:
 	void onAddCapturedPiece(PlayerColor player, PieceType captured) override;
 	void onRemoveLastCapturedPiece(PlayerColor player, PieceType captured) override;
 
-	void onExecuteMove(const PossibleMove &move) override {}
+	void onExecuteMove(const PossibleMove &move, bool fromRemote = false) override {}
 	void onAddToMoveHistory(Move &move) override;
 	void onClearMoveHistory() override;
 

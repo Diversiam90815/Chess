@@ -59,9 +59,9 @@ class IMoveObservable : public ObservableBase<IMoveObserver>
 public:
 	virtual ~IMoveObservable() {};
 
-	virtual Move executeMove(PossibleMove &move) = 0;
-	virtual void addMoveToHistory(Move &move)	 = 0;
-	virtual void clearMoveHistory()				 = 0;
+	virtual Move executeMove(PossibleMove &move, bool fromRemote) = 0;
+	virtual void addMoveToHistory(Move &move)					  = 0;
+	virtual void clearMoveHistory()								  = 0;
 };
 
 
@@ -135,5 +135,5 @@ class IConnectionStatusObservable : public ObservableBase<IConnectionStatusObser
 public:
 	virtual ~IConnectionStatusObservable() {};
 
-	virtual void connectionStatusChanged(const ConnectionStatusEvent event)							  = 0;
+	virtual void connectionStatusChanged(const ConnectionStatusEvent event) = 0;
 };

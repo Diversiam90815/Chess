@@ -18,8 +18,11 @@ void RemoteSender::sendMessage(MultiplayerMessageType type, std::vector<uint8_t>
 }
 
 
-void RemoteSender::onExecuteMove(const PossibleMove &move)
+void RemoteSender::onExecuteMove(const PossibleMove &move, bool fromRemote)
 {
+	if (fromRemote)
+		return;		// This move came from the remote, so we do not need to send it
+
 	sendMove(move);
 }
 

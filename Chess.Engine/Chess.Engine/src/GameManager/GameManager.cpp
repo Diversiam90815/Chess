@@ -193,7 +193,7 @@ bool GameManager::initiateMove(const Position &startPosition)
 }
 
 
-void GameManager::executeMove(PossibleMove &tmpMove)
+void GameManager::executeMove(PossibleMove &tmpMove, bool fromRemote)
 {
 	PossibleMove moveToExecute{};
 	for (auto &move : mAllMovesForPosition)
@@ -211,7 +211,7 @@ void GameManager::executeMove(PossibleMove &tmpMove)
 		}
 	}
 
-	Move executedMove = mMoveExecution->executeMove(moveToExecute);
+	Move executedMove = mMoveExecution->executeMove(moveToExecute, fromRemote);
 
 	LoggingHelper::logMove(executedMove);
 

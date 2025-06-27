@@ -20,7 +20,7 @@ public:
 
 	void sendMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) override;
 
-	void onExecuteMove(const PossibleMove &move) override;
+	void onExecuteMove(const PossibleMove &move, bool fromRemote = false) override;
 	void onAddToMoveHistory(Move &move) override {}
 	void onClearMoveHistory() override {}
 

@@ -37,7 +37,7 @@ public:
 
 	bool						startGame();
 
-	void						executeMove(PossibleMove &tmpMove);
+	void						executeMove(PossibleMove &tmpMove, bool fromRemote = false);
 
 	void						undoMove();
 

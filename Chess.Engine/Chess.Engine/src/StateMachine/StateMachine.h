@@ -81,6 +81,7 @@ private:
 	bool				   mIsValidMove{false};
 
 	bool				   mAwaitingPromotion{false};
+	bool				   mReceivedMoveFromRemote{false};
 
 	EndGameState		   mEndgameState{EndGameState::OnGoing};
 

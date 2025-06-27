@@ -12,7 +12,7 @@
 MoveExecution::MoveExecution(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation) : mChessBoard(board), mValidation(validation) {}
 
 
-Move MoveExecution::executeMove(PossibleMove &possibleMove)
+Move MoveExecution::executeMove(PossibleMove &possibleMove, bool fromRemote)
 {
 	// Store positions in Move from executed PossibleMove
 	Move  executedMove		= Move(possibleMove);
@@ -107,7 +107,7 @@ Move MoveExecution::executeMove(PossibleMove &possibleMove)
 	for (auto &observer : mObservers)
 	{
 		if (auto obs = observer.lock())
-			obs->onExecuteMove(possibleMove);
+			obs->onExecuteMove(possibleMove, fromRemote);
 	}
 
 	addMoveToHistory(executedMove);
