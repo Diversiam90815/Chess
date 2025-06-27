@@ -60,7 +60,9 @@ public:
 	bool						changeCurrentNetworkAdapter(int ID);
 	int							getCurrentNetworkAdapterID();
 
+
 private:
+	
 	TCPSession::pointer										   mSession = nullptr;
 
 	std::unique_ptr<TCPServer>								   mServer;

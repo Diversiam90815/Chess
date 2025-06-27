@@ -45,7 +45,9 @@ public:
 	void	  resetGame();
 	void	  reactToUndoMove();
 
+
 private:
+	
 	StateMachine();
 
 	void				   run() override;

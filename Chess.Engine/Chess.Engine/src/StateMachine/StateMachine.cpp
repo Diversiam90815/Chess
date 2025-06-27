@@ -128,7 +128,7 @@ void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
 			return;
 		}
 
-		// If the move is valid and set correctly, we will enter the execute move state!
+		// We will enter the execute move state!
 
 		{
 			std::lock_guard<std::mutex> lock(mStateChangedMutex);
@@ -465,8 +465,6 @@ bool StateMachine::handleWaitingForInputState()
 	LOG_INFO("Handling waiting for input state");
 
 	resetCurrentPossibleMove();
-
-	// GameManager::GetInstance()->switchTurns(); // Sets the player
 
 	mMovesCalulated = GameManager::GetInstance()->calculateAllMovesForPlayer();
 	return mMovesCalulated;

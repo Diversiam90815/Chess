@@ -83,7 +83,6 @@ Move MoveExecution::executeMove(PossibleMove &possibleMove, bool fromRemote)
 		executedMove.type |= MoveType::Check;
 	}
 
-
 	// Increment or reset the halfMoveClock
 
 	int previousHalfMoveClock = 0;
@@ -171,9 +170,7 @@ bool MoveExecution::executePawnPromotion(const PossibleMove &move, PlayerColor p
 
 	// Validate promoted piece
 	if ((promotedPieceType != PieceType::Queen) && (promotedPieceType != PieceType::Rook) && (promotedPieceType != PieceType::Knight) && (promotedPieceType != PieceType::Bishop))
-	{
 		return false;
-	}
 
 	mChessBoard->removePiece(move.start);
 
