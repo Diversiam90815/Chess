@@ -33,8 +33,8 @@ public:
 	virtual ~IMoveObserver() {};
 
 	virtual void onExecuteMove(const PossibleMove &move, bool fromRemote) = 0;
-	virtual void onAddToMoveHistory(Move &move)									  = 0;
-	virtual void onClearMoveHistory()											  = 0;
+	virtual void onAddToMoveHistory(Move &move)							  = 0;
+	virtual void onClearMoveHistory()									  = 0;
 };
 
 
@@ -80,8 +80,9 @@ class IRemoteMessagesObserver
 public:
 	virtual ~IRemoteMessagesObserver() {};
 
-	virtual void onRemoteMoveReceived(const PossibleMove &remoteMove)	= 0;
-	virtual void onRemoteChatMessageReceived(const std::string &mesage) = 0;
+	virtual void onRemoteConnectionStateReceived(const ConnectionState &state) = 0;
+	virtual void onRemoteMoveReceived(const PossibleMove &remoteMove)		   = 0;
+	virtual void onRemoteChatMessageReceived(const std::string &mesage)		   = 0;
 };
 
 

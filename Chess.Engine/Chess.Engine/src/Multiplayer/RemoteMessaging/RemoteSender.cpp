@@ -21,10 +21,13 @@ void RemoteSender::sendMessage(MultiplayerMessageType type, std::vector<uint8_t>
 void RemoteSender::onExecuteMove(const PossibleMove &move, bool fromRemote)
 {
 	if (fromRemote)
-		return;		// This move came from the remote, so we do not need to send it
+		return; // This move came from the remote, so we do not need to send it
 
 	sendMove(move);
 }
+
+
+void				 RemoteSender::onConnectionStateChanged(const ConnectionStatusEvent event) {}
 
 
 std::vector<uint8_t> RemoteSender::convertDataToByteVector(json &source)
@@ -51,6 +54,17 @@ void RemoteSender::sendMove(const PossibleMove &move)
 	auto data  = convertDataToByteVector(j);
 
 	sendMessage(MultiplayerMessageType::Move, data);
+}
+
+
+void RemoteSender::sendConnectionState(const ConnectionState &state)
+{
+	json j;
+	j[ConnectionStateKey] = state;
+
+	auto data	= convertDataToByteVector(j);
+
+	sendMessage(MultiplayerMessageType::ConnectionState, data);
 }
 
 

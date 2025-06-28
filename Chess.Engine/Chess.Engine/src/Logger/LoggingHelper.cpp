@@ -150,6 +150,28 @@ std::string LoggingHelper::boolToString(const bool value)
 }
 
 
+std::string LoggingHelper::connectionStateToString(const ConnectionState &state)
+{
+	switch (state)
+	{
+	case ConnectionState::None: return "None";
+	case ConnectionState::Disconnecting: return "Disconnecting";
+	case ConnectionState::Disconnected: return "Disconnects";
+	case ConnectionState::HostingSession: return "Hosting Session";
+	case ConnectionState::WaitingForARemote: return "Waiting for a remote";
+	case ConnectionState::Connecting: return "Connecting";
+	case ConnectionState::Connected: return "Connected";
+	case ConnectionState::Error: return "Error";
+	case ConnectionState::ConnectionRequested: return "Connection requested";
+	case ConnectionState::PendingHostApproval: return "Pending host approval";
+	case ConnectionState::ClientFoundHost: return "Client found host";
+	case ConnectionState::SetPlayerColor: return "Set player color";
+	case ConnectionState::GameStarted: return "Game Started";
+	default: return "Unknown ConnectionState";
+	}
+}
+
+
 void LoggingHelper::logMove(Move &move)
 {
 	LOG_INFO("----- Move Number {} -----", move.number);

@@ -18,7 +18,11 @@
 #include "NetworkManager.h"
 
 
-class MultiplayerManager : public INetworkObserver, public IConnectionStatusObservable, public IDiscoveryObserver, public std::enable_shared_from_this<MultiplayerManager>
+class MultiplayerManager : public INetworkObserver,
+						   public IConnectionStatusObservable,
+						   public IDiscoveryObserver,
+						   public IRemoteMessagesObserver,
+						   public std::enable_shared_from_this<MultiplayerManager>
 {
 public:
 	MultiplayerManager();
@@ -58,6 +62,10 @@ public:
 	int							getCurrentNetworkAdapterID();
 
 
+	void						onRemoteMoveReceived(const PossibleMove &remoteMove) override {}
+	void						onRemoteChatMessageReceived(const std::string &mesage) override {}
+	void						onRemoteConnectionStateReceived(const ConnectionState &state) override;
+
 private:
 	void													   closeDiscovery();
 	void													   closeTCPServerOrClient();
@@ -91,6 +99,7 @@ private:
 	std::mutex												   mSessionMutex;
 
 	ConnectionStatusEvent									   mConnectionState{ConnectionState::None};
+	ConnectionStatusEvent									   mRemoteConnectionState{ConnectionState::None};
 
 	friend class GameManager;
 };

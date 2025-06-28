@@ -20,6 +20,8 @@ public:
 
 	void onMessageReceived(MultiplayerMessageType type, std::vector<uint8_t> &message) override;
 
+	void remoteConnectionStateReceived(const ConnectionState &state) override;
+
 	void remoteMoveReceived(const PossibleMove &move) override;
 
 	void remoteChatMessageReceived(const std::string &message) override;

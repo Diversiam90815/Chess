@@ -12,7 +12,7 @@
 #include "Logging.h"
 
 
-class RemoteSender : public IRemoteSenderObservable, public IMoveObserver
+class RemoteSender : public IRemoteSenderObservable, public IMoveObserver, public IConnectionStatusObserver
 {
 public:
 	RemoteSender()	= default;
@@ -24,10 +24,15 @@ public:
 	void onAddToMoveHistory(Move &move) override {}
 	void onClearMoveHistory() override {}
 
+	void onConnectionStateChanged(const ConnectionStatusEvent event) override;
+
+
 private:
 	std::vector<uint8_t> convertDataToByteVector(json &source);
 
 	void				 sendMove(const PossibleMove &move);
+
+	void				 sendConnectionState(const ConnectionState &state);
 
 	void				 sendChatMessage(std::string &message);
 };

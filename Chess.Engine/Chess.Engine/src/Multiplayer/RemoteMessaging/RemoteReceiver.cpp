@@ -33,6 +33,14 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 		break;
 	}
 
+	case MultiplayerMessageType::ConnectionState:
+	{
+		ConnectionState state = tryGetContentFromMessage<ConnectionState>(jMessage, ConnectionStateKey);
+
+		LOG_INFO("Received a connection state from remote: {}", LoggingHelper::connectionStateToString(state).c_str());
+		break;
+	}
+
 	case MultiplayerMessageType::Move:
 	{
 		PossibleMove remoteMove = tryGetContentFromMessage<PossibleMove>(jMessage, MoveKey);
@@ -73,6 +81,16 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 		LOG_WARNING("Could not decode message type. Received type: {}", iType);
 		break;
 	}
+	}
+}
+
+
+void RemoteReceiver::remoteConnectionStateReceived(const ConnectionState &state)
+{
+	for (auto &observer : mObservers)
+	{
+		if (auto obs = observer.lock())
+			obs->onRemoteConnectionStateReceived(state);
 	}
 }
 

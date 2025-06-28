@@ -107,8 +107,9 @@ class IRemoteMessagesObservable : public ObservableBase<IRemoteMessagesObserver>
 public:
 	virtual ~IRemoteMessagesObservable() {};
 
-	virtual void remoteMoveReceived(const PossibleMove &move)		   = 0;
-	virtual void remoteChatMessageReceived(const std::string &message) = 0;
+	virtual void remoteConnectionStateReceived(const ConnectionState &state) = 0;
+	virtual void remoteMoveReceived(const PossibleMove &move)				 = 0;
+	virtual void remoteChatMessageReceived(const std::string &message)		 = 0;
 };
 
 

@@ -13,12 +13,10 @@
 
 enum class MultiplayerMessageType : uint32_t
 {
-	Default				= 0,
-	ConnectionRequested = 1,
-	ConnectionAccepted	= 2,
-	ConnectionRejected	= 3,
-	Move				= 4,
-	Chat				= 5
+	Default			= 0,
+	ConnectionState = 1,
+	Move			= 2,
+	Chat			= 3
 };
 
 

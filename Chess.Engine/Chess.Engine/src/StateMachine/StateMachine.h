@@ -38,6 +38,7 @@ public:
 
 	void	  onRemoteMoveReceived(const PossibleMove &remoteMove) override;
 	void	  onRemoteChatMessageReceived(const std::string &mesage) override {}
+	void	  onRemoteConnectionStateReceived(const ConnectionState &state) override {}
 
 	bool	  isInitialized() const;
 	void	  setInitialized(const bool value);
@@ -47,7 +48,6 @@ public:
 
 
 private:
-	
 	StateMachine();
 
 	void				   run() override;
