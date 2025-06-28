@@ -26,7 +26,6 @@ TCPSession::TCPSession(tcp::socket &&socket) : mSocket(std::move(socket))
 }
 
 
-
 TCPSession::~TCPSession()
 {
 	delete[] mSendBuffer;
