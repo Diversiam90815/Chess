@@ -36,9 +36,6 @@ public:
 
 	void						disconnect();
 
-	void						closeDiscovery();
-	void						closeTCPServerOrClient();
-
 	void						setLocalPlayerName(const std::string name) { mLocalPlayerName = name; }
 	std::string					getLocalPlayerName() const { return mLocalPlayerName; }
 
@@ -62,7 +59,11 @@ public:
 
 
 private:
-	
+	void													   closeDiscovery();
+	void													   closeTCPServerOrClient();
+	void													   closeRemoteCommunication();
+
+
 	TCPSession::pointer										   mSession = nullptr;
 
 	std::unique_ptr<TCPServer>								   mServer;

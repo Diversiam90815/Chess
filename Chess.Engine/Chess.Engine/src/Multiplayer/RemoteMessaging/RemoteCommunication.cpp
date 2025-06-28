@@ -74,8 +74,11 @@ void RemoteCommunication::start()
 
 void RemoteCommunication::stop()
 {
-	mSendThread->stop();
-	mReceiveThread->stop();
+	if (mSendThread)
+		mSendThread->stop();
+
+	if (mReceiveThread)
+		mReceiveThread->stop();
 }
 
 

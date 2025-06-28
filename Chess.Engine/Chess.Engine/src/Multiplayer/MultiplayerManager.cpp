@@ -102,8 +102,8 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 	mRemoteCom->start();
 
 	//// As we now have a connection, we can close the Discovery and the TCPServer/TCPClient
-	//closeDiscovery();
-	//closeTCPServerOrClient();
+	// closeDiscovery();
+	// closeTCPServerOrClient();
 
 	connectionStatusChanged(ConnectionState::Connected);
 }
@@ -121,7 +121,7 @@ void MultiplayerManager::disconnect()
 	connectionStatusChanged(ConnectionState::Disconnecting);
 
 	closeDiscovery();
-
+	closeRemoteCommunication();
 	closeTCPServerOrClient();
 
 	mSession.reset();
@@ -151,6 +151,16 @@ void MultiplayerManager::closeTCPServerOrClient()
 	if (mServer)
 	{
 		mServer.reset();
+	}
+}
+
+
+void MultiplayerManager::closeRemoteCommunication()
+{
+	if (mRemoteCom)
+	{
+		mRemoteCom->deinit();
+		mRemoteCom.reset();
 	}
 }
 
