@@ -210,6 +210,81 @@ namespace Chess.UI.ViewModels
         }
 
 
+        private bool isReady = false;
+        public bool IsReady
+        {
+            get => isReady;
+            set
+            {
+                if (isReady != value)
+                {
+                    isReady = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private bool remotePlayerReady = false;
+        public bool RemotePlayerReady
+        {
+            get => remotePlayerReady;
+            set
+            {
+                if (remotePlayerReady != value)
+                {
+                    remotePlayerReady = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private EngineAPI.PlayerColor selectedPlayerColor = EngineAPI.PlayerColor.NoColor;
+        public EngineAPI.PlayerColor SelectedPlayerColor
+        {
+            get => selectedPlayerColor;
+            set
+            {
+                if (selectedPlayerColor != value)
+                {
+                    selectedPlayerColor = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private bool readyButtonEnabled;
+        public bool ReadyButtonEnabled
+        {
+            get => readyButtonEnabled;
+            set
+            {
+                if (readyButtonEnabled != value)
+                {
+                    readyButtonEnabled = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
+        private Visibility waitingForRemoteVisibility = Visibility.Collapsed;
+        public Visibility WaitingForRemoteVisibility
+        {
+            get => waitingForRemoteVisibility;
+            set
+            {
+                if (waitingForRemoteVisibility != value)
+                {
+                    waitingForRemoteVisibility = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+
         #region Visibilities
 
         private Visibility initView = Visibility.Visible;
@@ -270,6 +345,22 @@ namespace Chess.UI.ViewModels
                 }
             }
         }
+
+
+        private Visibility settingLocalPlayerView = Visibility.Collapsed;
+        public Visibility SettingLocalPlayerView
+        {
+            get => settingLocalPlayerView;
+            set
+            {
+                if (settingLocalPlayerView != value)
+                {
+                    settingLocalPlayerView = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
         #endregion
 
@@ -349,6 +440,21 @@ namespace Chess.UI.ViewModels
         }
 
 
+        public void SelectPlayerColor(EngineAPI.PlayerColor color)
+        {
+            SelectedPlayerColor = color;
+            // Send color selection to backend
+            _model.SetLocalPlayerColor(color);
+        }
+
+        public void SetPlayerReady()
+        {
+            IsReady = true;
+            // Send ready state to backend
+            _model.SetPlayerReady(true);
+        }
+
+
         private void HandleConnectionError(string errorMessage)
         {
             // TODO: Display error
@@ -376,7 +482,6 @@ namespace Chess.UI.ViewModels
                     }
                 case EngineAPI.ConnectionState.Connected:
                     {
-
                         break;
                     }
                 case EngineAPI.ConnectionState.WaitingForARemote:
@@ -399,6 +504,7 @@ namespace Chess.UI.ViewModels
                     }
                 case EngineAPI.ConnectionState.SetPlayerColor:
                     {
+                        DisplaySettingPlayerColorView();
                         break;
                     }
                 case EngineAPI.ConnectionState.GameStarted:
@@ -573,6 +679,24 @@ namespace Chess.UI.ViewModels
             ClientFoundHostView = Visibility.Collapsed;
             ClientRequestedConnectionView = Visibility.Visible;
             ClientWaitingForResponseView = Visibility.Collapsed;
+        }
+
+
+        public void DisplaySettingPlayerColorView()
+        {
+            InitView = Visibility.Collapsed;
+            ClientFoundHostView = Visibility.Collapsed;
+            ClientRequestedConnectionView = Visibility.Collapsed;
+            ClientWaitingForResponseView = Visibility.Collapsed;
+            SettingLocalPlayerView = Visibility.Visible;
+
+            // Reset selection state
+            SelectedPlayerColor = EngineAPI.PlayerColor.NoColor;
+            IsReady = false;
+            RemotePlayerReady = false;
+
+            Processing = false;
+            UpdateMPButtons(MultiplayerMode.None);
         }
 
 

@@ -164,6 +164,22 @@ namespace Chess.UI.Views
         }
 
 
+        private void SelectWhiteButton_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.SelectPlayerColor(EngineAPI.PlayerColor.White);
+        }
+
+        private void SelectBlackButton_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.SelectPlayerColor(EngineAPI.PlayerColor.Black);
+        }
+
+        private void ReadyButton_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.SetPlayerReady();
+        }
+
+
         private void PlayerName_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
             var newText = sender.Text;

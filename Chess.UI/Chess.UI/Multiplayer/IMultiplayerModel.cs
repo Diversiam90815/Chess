@@ -1,4 +1,5 @@
 ﻿using Chess.UI.Models;
+using Chess.UI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,11 @@ namespace Chess.UI.Multiplayer
         void AcceptConnectionRequest();
 
         void RejectConnectionRequest();
+
+        void SetLocalPlayerColor(EngineAPI.PlayerColor color);
+        
+        void SetPlayerReady(bool ready);
+
 
         event Action<string> OnConnectionErrorOccured;
 

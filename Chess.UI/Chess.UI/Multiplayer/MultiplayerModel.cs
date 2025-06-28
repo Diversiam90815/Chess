@@ -152,6 +152,20 @@ namespace Chess.UI.Models
         }
 
 
+        public void SetLocalPlayerColor(EngineAPI.PlayerColor color)
+        {
+
+
+        }
+
+
+        public void SetPlayerReady(bool value)
+        {
+
+        }
+
+
+
         public void StartMultiplerGame(MultiplayerMode mode)
         {
             switch (mode)
