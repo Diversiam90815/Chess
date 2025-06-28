@@ -13,6 +13,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 
@@ -35,6 +36,9 @@ namespace Chess.UI
         public IAsyncRelayCommand OpenPreferencesCommand { get; }
 
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
+
+        private bool _multiplayerWindowClosedProgrammatically = false;
+
 
         public MainMenuWindow()
         {
@@ -93,7 +97,27 @@ namespace Chess.UI
         {
             _multiplayerWindow.Closed -= MultiplayerWindowClosed;
             _multiplayerWindow = null;
-            this.Activate();
+
+            // Only reactivate main menu if window was closed by user (not programmatically)
+            if (!_multiplayerWindowClosedProgrammatically)
+            {
+                try
+                {
+                    // Only try to activate if the window is still valid and not closing
+                    if (this.AppWindow != null && this.Visible)
+                    {
+                        this.Activate();
+                    }
+                }
+                catch (COMException)
+                {
+                    // Window may already be closed during application shutdown
+                    // Just ignore the exception as we don't need to activate a closing window
+                }
+            }
+
+            // Reset the flag for next time
+            _multiplayerWindowClosedProgrammatically = false;
         }
 
 
@@ -161,6 +185,14 @@ namespace Chess.UI
                     _chessBoardWindow.Closed += BoardWindowClosed;
                     this.AppWindow.Hide();
 
+                    // Close multiplayer window when opening chessboard from multiplayer
+                    if (Multiplayer && _multiplayerWindow != null)
+                    {
+                        // Set flag to indicate programmatic closure
+                        _multiplayerWindowClosedProgrammatically = true;
+                        _multiplayerWindow.Close();
+                    }
+
                     if (!Multiplayer)
                     {
                         _chessBoardViewModel.IsMultiplayerGame = false;
@@ -168,7 +200,7 @@ namespace Chess.UI
                         _chessBoardViewModel.StartGame();
                         return;
                     }
-                  
+
                     _chessBoardViewModel.IsMultiplayerGame = true;
                 }
                 else

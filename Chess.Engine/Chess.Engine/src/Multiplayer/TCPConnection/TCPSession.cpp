@@ -42,7 +42,18 @@ tcp::socket &TCPSession::socket()
 
 bool TCPSession::isConnected() const
 {
-	return mSocket.is_open() && !mSocket.remote_endpoint().address().is_unspecified();
+	if (!mSocket.is_open())
+		return false;
+
+	try
+	{
+		return !mSocket.remote_endpoint().address().is_unspecified();
+	}
+	catch (const std::exception &)
+	{
+		// If we can't get the remote endpoint, the connection is not valid
+		return false;
+	}
 }
 
 
