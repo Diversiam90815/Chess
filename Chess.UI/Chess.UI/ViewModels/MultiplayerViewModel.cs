@@ -376,11 +376,6 @@ namespace Chess.UI.ViewModels
                     }
                 case EngineAPI.ConnectionState.Connected:
                     {
-                        // Start the multiplayer game
-                        EnterMultiplayerGame();
-
-                        // Navigate to chessboard window
-                        RequestNavigationToChessboard?.Invoke();
 
                         break;
                     }
@@ -400,6 +395,19 @@ namespace Chess.UI.ViewModels
                     {
                         RemotePlayerName = remotePlayerName;
                         DisplayClientFoundHostView();
+                        break;
+                    }
+                case EngineAPI.ConnectionState.SetPlayerColor:
+                    {
+                        break;
+                    }
+                case EngineAPI.ConnectionState.GameStarted:
+                    {
+                        // Start the multiplayer game
+                        EnterMultiplayerGame();
+
+                        // Navigate to chessboard window
+                        RequestNavigationToChessboard?.Invoke();
                         break;
                     }
                 default: break;

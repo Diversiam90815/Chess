@@ -62,12 +62,20 @@ bool MultiplayerManager::hostSession()
 	mServer = std::make_unique<TCPServer>(mIoContext);
 
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
+	mServer->setConnectionRequestHandler([this](const std::string &remoteIPv4) { receivedInviteFromClient(remoteIPv4); });
 
 	mServer->startAccept();
 
 	const int port	  = mServer->getBoundPort();
-	bool	  success = startServerDiscovery(mLocalIPv4, port);
+	bool	  success = startDiscovery(mLocalIPv4, port, DiscoveryMode::Server);
 
+	return success;
+}
+
+
+bool MultiplayerManager::startClient()
+{
+	bool success = startDiscovery(mLocalIPv4, 0, DiscoveryMode::Client);
 	return success;
 }
 
@@ -165,13 +173,34 @@ void MultiplayerManager::closeRemoteCommunication()
 }
 
 
+void MultiplayerManager::receivedInviteFromClient(const std::string remoteIPv4)
+{
+	// Get remote endpoint
+	Endpoint remoteEndpoint = mDiscovery->getEndpointFromIP(remoteIPv4);
+
+	// Check if the endpoint is valid
+	if (!remoteEndpoint.isValid())
+	{
+		LOG_ERROR("Could not get a remote endpoint from Discovery that matches the IPv4 we received a connect request from! IPv4 : {}", remoteIPv4.c_str());
+		return;
+	}
+
+	// Set the connection event and status
+	ConnectionStatusEvent event{};
+	event.state			 = ConnectionState::ConnectionRequested;
+	event.remoteEndpoint = remoteEndpoint;
+
+	connectionStatusChanged(event);
+}
+
+
 void MultiplayerManager::onNetworkAdapterChanged(const NetworkAdapter &adapter)
 {
 	mLocalIPv4 = adapter.IPv4;
 }
 
 
-bool MultiplayerManager::startServerDiscovery(const std::string IPv4, const int port)
+bool MultiplayerManager::startDiscovery(const std::string IPv4, const int port, DiscoveryMode mode)
 {
 	if (mDiscovery)
 		mDiscovery->deinit();
@@ -187,37 +216,11 @@ bool MultiplayerManager::startServerDiscovery(const std::string IPv4, const int 
 		return false;
 	}
 
-	mDiscovery->startDiscovery(DiscoveryMode::Server);
-
 	mDiscovery->attachObserver(shared_from_this());
 
-	connectionStatusChanged(ConnectionState::HostingSession);
+	mDiscovery->startDiscovery(mode);
 
-	return bindingSucceeded;
-}
-
-
-void MultiplayerManager::startClientDiscovery()
-{
-	if (mDiscovery)
-		mDiscovery->deinit();
-
-	mDiscovery.reset(new DiscoveryService(mIoContext));
-	bool bindingSucceeded = mDiscovery->init(getLocalPlayerName());
-
-	if (!bindingSucceeded)
-	{
-		ConnectionStatusEvent state = {ConnectionState::Error, "Failed to bind socket in client discovery!"};
-
-		connectionStatusChanged(state);
-		return;
-	}
-
-	mDiscovery->startDiscovery(DiscoveryMode::Client);
-
-	mDiscovery->attachObserver(shared_from_this());
-
-	connectionStatusChanged(ConnectionState::WaitingForARemote);
+	connectionStatusChanged(mode == DiscoveryMode::Server ? ConnectionState::HostingSession : ConnectionState::WaitingForARemote);
 }
 
 

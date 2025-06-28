@@ -29,6 +29,7 @@ public:
 	void						reset();
 
 	bool						hostSession();
+	bool						startClient();
 	void						joinSession();
 
 	void						setTCPSession(TCPSession::pointer session);
@@ -41,8 +42,7 @@ public:
 
 	void						onNetworkAdapterChanged(const NetworkAdapter &adapter) override;
 
-	bool						startServerDiscovery(const std::string IPv4, const int port);
-	void						startClientDiscovery();
+	bool						startDiscovery(const std::string IPv4, const int port, DiscoveryMode mode);
 
 	void						setInternalObservers();
 
@@ -62,6 +62,8 @@ private:
 	void													   closeDiscovery();
 	void													   closeTCPServerOrClient();
 	void													   closeRemoteCommunication();
+
+	void													   receivedInviteFromClient(const std::string remoteIPv4);
 
 
 	TCPSession::pointer										   mSession = nullptr;

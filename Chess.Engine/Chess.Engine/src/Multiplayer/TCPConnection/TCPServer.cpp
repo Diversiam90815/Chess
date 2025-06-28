@@ -29,21 +29,17 @@ void TCPServer::startAccept()
 				LOG_INFO("TCP accepted connection from {}", socket.remote_endpoint().address().to_string().c_str());
 
 				// Store pending session
-				auto			   newSession = TCPSession::create(std::move(socket));
-				mPendingSession				  = newSession;
-
-				//const std::string &remoteIPv4 = mPendingSession->socket().remote_endpoint().address().to_string();
-
-				//// Notify that we have a connection request
-				//if (mConnectionRequestHandler)
-				//{
-				//	mConnectionRequestHandler(remoteIPv4);
-				//}
+				auto newSession = TCPSession::create(std::move(socket));
+				mPendingSession = newSession;
 
 				if (mSessionHandler)
 					mSessionHandler(mPendingSession);
 
-				startAccept(); // Start accepting new conection
+				const std::string &remoteIPv4 = mPendingSession->socket().remote_endpoint().address().to_string();
+
+				// Notify that we have a connection request
+				if (mConnectionRequestHandler)
+					mConnectionRequestHandler(remoteIPv4);
 			}
 		});
 }

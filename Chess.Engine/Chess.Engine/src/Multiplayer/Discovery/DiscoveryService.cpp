@@ -22,12 +22,14 @@ DiscoveryService::~DiscoveryService()
 
 bool DiscoveryService::init(const std::string &playerName, std::string localIPv4, unsigned short tcpPort)
 {
-	if (tcpPort != 0 && !localIPv4.empty())
+	if (localIPv4.empty())
 	{
-		mTcpPort   = tcpPort;
-		mLocalIPv4 = localIPv4;
+		assert(false);
+		return false;
 	}
 
+	mTcpPort	= tcpPort;
+	mLocalIPv4	= localIPv4;
 	mPlayerName = playerName;
 
 	mSocket.open(udp::v4());
@@ -102,6 +104,17 @@ void DiscoveryService::startDiscovery(DiscoveryMode mode)
 }
 
 
+Endpoint DiscoveryService::getEndpointFromIP(const std::string &IPv4)
+{
+	for (auto &endpoint : mRemoteDevices)
+	{
+		if (endpoint.IPAddress == IPv4)
+			return endpoint;
+	}
+	return {};
+}
+
+
 void DiscoveryService::run()
 {
 	while (isRunning())
@@ -109,11 +122,11 @@ void DiscoveryService::run()
 		// Start the first async receive operation
 		receivePackage();
 
-		// If in Server mode, periodically send discovery packages
-		if (mDiscoveryMode == DiscoveryMode::Server)
-		{
-			sendPackage();
-		}
+		//// If in Server mode, periodically send discovery packages
+		// if (mDiscoveryMode == DiscoveryMode::Server)
+		//{
+		sendPackage();
+		//}
 
 		// Run IO context for processing async operations
 		mIoContext->run_for(std::chrono::milliseconds(500));
@@ -195,13 +208,15 @@ void DiscoveryService::addRemoteToList(Endpoint remote)
 			return;
 	}
 
-	if (mLocalIPv4 == remote.IPAddress)	// Don't add this device
+	if (mLocalIPv4 == remote.IPAddress) // Don't add this device
 		return;
 
 	LOG_INFO("Found remote: IPv4 : {0}, Port: {1}, Name: {2}", remote.IPAddress.c_str(), remote.tcpPort, remote.playerName.c_str());
 
 	mRemoteDevices.push_back(remote);
-	remoteFound(remote);
+
+	if (mDiscoveryMode == DiscoveryMode::Client) //	Notify Observers only in Client mode
+		remoteFound(remote);
 }
 
 

@@ -249,6 +249,7 @@ namespace Chess.UI.Services
 
         public enum ConnectionState
         {
+            None = 0,
             Disconnected = 1,
             HostingSession = 2,
             WaitingForARemote = 3,
@@ -256,9 +257,11 @@ namespace Chess.UI.Services
             Connected = 5,
             Disconnecting = 6,
             Error = 7,
-            ConnectionRequested = 8, // Client has requested a connection to the host
-            PendingHostApproval = 9, // Waiting for the host to approve the connection
-            ClientFoundHost = 10 // Client found a host
+            ConnectionRequested = 8,  // Client has requested a connection to the host
+            PendingHostApproval = 9,  // Waiting for the host to approve the connection
+            ClientFoundHost = 10, // Client found a host
+            SetPlayerColor = 11,
+            GameStarted = 12
         }
 
 

@@ -37,17 +37,18 @@ public:
 	DiscoveryService(asio::io_context &ioContext);
 	~DiscoveryService();
 
-	bool init(const std::string &playerName, std::string localIPv4 = "", unsigned short tcpPort = 0);
+	bool	 init(const std::string &playerName, std::string localIPv4, unsigned short tcpPort);
+	void	 deinit();
 
-	void deinit();
+	void	 startDiscovery(DiscoveryMode mode);
 
-	void startDiscovery(DiscoveryMode mode);
+	Endpoint getEndpointFromIP(const std::string &IPv4);
+
 
 private:
 	void				   run() override;
 
 	void				   sendPackage();
-
 	void				   receivePackage();
 
 	void				   handleReceive(const asio::error_code &error, size_t bytesReceived);
@@ -57,6 +58,7 @@ private:
 	bool				   isInitialized() const { return mInitialized.load(); }
 
 	void				   remoteFound(const Endpoint &remote) override;
+
 
 	const int			   mDiscoveryPort = 5555; // TODO: needs to be set from config later
 

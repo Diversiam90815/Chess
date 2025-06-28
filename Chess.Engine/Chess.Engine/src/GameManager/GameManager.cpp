@@ -528,7 +528,7 @@ void GameManager::startRemoteDiscovery(bool isHost)
 	else
 	{
 		LOG_INFO("Starting to join a session..");
-		mMultiplayerManager->startClientDiscovery();
+		mMultiplayerManager->startClient();
 	}
 }
 
