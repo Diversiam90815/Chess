@@ -35,11 +35,7 @@ void TCPServer::startAccept()
 				if (mSessionHandler)
 					mSessionHandler(mPendingSession);
 
-				const std::string &remoteIPv4 = mPendingSession->socket().remote_endpoint().address().to_string();
-
-				// Notify that we have a connection request
-				if (mConnectionRequestHandler)
-					mConnectionRequestHandler(remoteIPv4);
+				// We start waiting for invitation message
 			}
 		});
 }

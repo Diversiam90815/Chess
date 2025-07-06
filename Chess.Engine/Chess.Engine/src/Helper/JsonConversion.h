@@ -10,6 +10,7 @@
 #include "json.hpp"
 #include "NetworkAdapter.h"
 #include "Move.h"
+#include "RemoteMessaging/MultiplayerMessageStruct.h"
 #include "Discovery/DiscoveryEndpoint.h"
 
 using json = nlohmann::json;
@@ -93,4 +94,37 @@ inline void from_json(const json &j, Endpoint &ep)
 	j.at(jDiscoveryIP).get_to(ep.IPAddress);
 	j.at(jDiscoveryPort).get_to(ep.tcpPort);
 	j.at(jDiscoveryName).get_to(ep.playerName);
+}
+
+
+//==============================================================================
+//			Invitation Request
+//==============================================================================
+
+inline void to_json(json &j, const InvitationRequest &inv)
+{
+	j = json{{jInvitationPlayerName, inv.playerName}, {jInvitationVersion, inv.version}};
+}
+
+inline void from_json(const json &j, InvitationRequest &inv)
+{
+	j.at(jInvitationPlayerName).get_to(inv.playerName);
+	j.at(jInvitationVersion).get_to(inv.version);
+}
+
+
+//==============================================================================
+//			Invitation Response
+//==============================================================================
+
+inline void to_json(json &j, const InvitationResponse &response)
+{
+	j = json{{jInvitationPlayerName, response.playerName}, {jInvitationAccepted, response.accepted}, {jInvitationReason, response.reason}};
+}
+
+inline void from_json(const json &j, InvitationResponse &response)
+{
+	j.at(jInvitationPlayerName).get_to(response.playerName);
+	j.at(jInvitationAccepted).get_to(response.accepted);
+	j.at(jInvitationReason).get_to(response.reason);
 }

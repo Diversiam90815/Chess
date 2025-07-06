@@ -80,9 +80,11 @@ class IRemoteMessagesObserver
 public:
 	virtual ~IRemoteMessagesObserver() {};
 
-	virtual void onRemoteConnectionStateReceived(const ConnectionState &state) = 0;
-	virtual void onRemoteMoveReceived(const PossibleMove &remoteMove)		   = 0;
-	virtual void onRemoteChatMessageReceived(const std::string &mesage)		   = 0;
+	virtual void onRemoteConnectionStateReceived(const ConnectionState &state)			= 0;
+	virtual void onRemoteMoveReceived(const PossibleMove &remoteMove)					= 0;
+	virtual void onRemoteChatMessageReceived(const std::string &mesage)					= 0;
+	virtual void onRemoteInvitationReceived(const InvitationRequest &invite)			= 0;
+	virtual void onRemoteInvitationResponseReceived(const InvitationResponse &response) = 0;
 };
 
 

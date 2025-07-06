@@ -75,6 +75,25 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 		remoteChatMessageReceived(chatMessage);
 		break;
 	}
+
+	case MultiplayerMessageType::InvitationRequest:
+	{
+		InvitationRequest invite = tryGetContentFromMessage<InvitationRequest>(jMessage, InvitationMessageKey);
+		LOG_INFO("Received invitation request from {}", invite.playerName);
+		remoteInvitationReceived(invite);
+
+		break;
+	}
+
+	case MultiplayerMessageType::InvitationResponse:
+	{
+		InvitationResponse invResponse = tryGetContentFromMessage<InvitationResponse>(jMessage, InvitationResponseMessageKey);
+		LOG_INFO("Received invitation request from {}", invResponse.playerName);
+		remoteInvitationResponseReceived(invResponse);
+
+		break;
+	}
+
 	default:
 	{
 		int iType = static_cast<int>(type);
@@ -113,6 +132,27 @@ void RemoteReceiver::remoteChatMessageReceived(const std::string &message)
 			obs->onRemoteChatMessageReceived(message);
 	}
 }
+
+
+void RemoteReceiver::remoteInvitationReceived(const InvitationRequest &invite)
+{
+	for (auto &observer : mObservers)
+	{
+		if (auto obs = observer.lock())
+			obs->onRemoteInvitationReceived(invite);
+	}
+}
+
+
+void RemoteReceiver::remoteInvitationResponseReceived(const InvitationResponse &response)
+{
+	for (auto &observer : mObservers)
+	{
+		if (auto obs = observer.lock())
+			obs->onRemoteInvitationResponseReceived(response);
+	}
+}
+
 
 
 template <typename T>

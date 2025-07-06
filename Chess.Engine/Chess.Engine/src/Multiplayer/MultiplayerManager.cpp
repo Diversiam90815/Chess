@@ -162,6 +162,10 @@ void MultiplayerManager::onRemoteConnectionStateReceived(const ConnectionState &
 	}
 }
 
+void MultiplayerManager::onRemoteInvitationReceived(const InvitationRequest &invite) {}
+
+void MultiplayerManager::onRemoteInvitationResponseReceived(const InvitationResponse &response) {}
+
 
 void MultiplayerManager::closeDiscovery()
 {
