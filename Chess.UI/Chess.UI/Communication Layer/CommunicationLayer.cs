@@ -14,9 +14,9 @@ namespace Chess.UI.Services
     {
         private GCHandle _delegateHandle;
 
-
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         public delegate void APIDelegate(int message, nint data);
+
 
         public enum DelegateMessage
         {
