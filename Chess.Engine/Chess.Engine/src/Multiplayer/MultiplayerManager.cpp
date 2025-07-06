@@ -142,27 +142,39 @@ void MultiplayerManager::disconnect()
 
 void MultiplayerManager::onRemoteConnectionStateReceived(const ConnectionState &state)
 {
-	// We received a connection status change event from the remote
-	mRemoteConnectionState = state;
+	//// We received a connection status change event from the remote
+	// mRemoteConnectionState = state;
 
-	if (mConnectionState == ConnectionState::Connected && state == ConnectionState::Connected)
-	{
-		// We both are connected, so we switch into setCurrentPlayer state
-		connectionStatusChanged(ConnectionState::SetPlayerColor);
-	}
+	// if (mConnectionState == ConnectionState::Connected && state == ConnectionState::Connected)
+	//{
+	//	// We both are connected, so we switch into setCurrentPlayer state
+	//	connectionStatusChanged(ConnectionState::SetPlayerColor);
+	// }
 
-	else if (state == ConnectionState::SetPlayerColor)
-	{
-		connectionStatusChanged(ConnectionState::SetPlayerColor);
-	}
+	// else if (state == ConnectionState::SetPlayerColor)
+	//{
+	//	connectionStatusChanged(ConnectionState::SetPlayerColor);
+	// }
 
-	else if (state == ConnectionState::GameStarted)
-	{
-		connectionStatusChanged(ConnectionState::GameStarted);
-	}
+	// else if (state == ConnectionState::GameStarted)
+	//{
+	//	connectionStatusChanged(ConnectionState::GameStarted);
+	// }
 }
 
-void MultiplayerManager::onRemoteInvitationReceived(const InvitationRequest &invite) {}
+
+void MultiplayerManager::onRemoteInvitationReceived(const InvitationRequest &invite)
+{
+	ConnectionStatusEvent event;
+	Endpoint			  ep;
+	ep.playerName = invite.playerName;
+	event.state	  = ConnectionState::ConnectionRequested;
+
+	// TODO: Pre-Filter for version missmatch
+
+	connectionStatusChanged(event);
+}
+
 
 void MultiplayerManager::onRemoteInvitationResponseReceived(const InvitationResponse &response) {}
 
@@ -269,21 +281,22 @@ void MultiplayerManager::setInternalObservers()
 }
 
 
+
 void MultiplayerManager::approveConnectionRequest()
 {
-	if (!mServer)
-		return;
-
-	mServer->respondToConnectionRequest(true);
+//	if (!mServer)
+//		return;
+//
+//	mServer->respondToConnectionRequest(true);
 }
 
 
 void MultiplayerManager::rejectConnectionRequest()
 {
-	if (!mServer)
-		return;
-
-	mServer->respondToConnectionRequest(false);
+//	if (!mServer)
+//		return;
+//
+//	mServer->respondToConnectionRequest(false);
 }
 
 

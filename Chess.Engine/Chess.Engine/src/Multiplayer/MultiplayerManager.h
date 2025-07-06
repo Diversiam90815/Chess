@@ -61,7 +61,6 @@ public:
 	bool						changeCurrentNetworkAdapter(int ID);
 	int							getCurrentNetworkAdapterID();
 
-
 	void						onRemoteMoveReceived(const PossibleMove &remoteMove) override {}
 	void						onRemoteChatMessageReceived(const std::string &mesage) override {}
 	void						onRemoteConnectionStateReceived(const ConnectionState &state) override;
