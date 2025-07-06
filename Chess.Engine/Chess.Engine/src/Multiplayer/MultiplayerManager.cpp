@@ -329,6 +329,9 @@ void MultiplayerManager::sendConnectResponse(bool accepted, std::string reason)
 	response.playerName = mLocalPlayerName;
 	response.reason		= reason;
 
+	if (accepted)
+		connectionStatusChanged(ConnectionState::Connected);
+
 	mRemoteSender->sendConnectionResponse(response);
 }
 
