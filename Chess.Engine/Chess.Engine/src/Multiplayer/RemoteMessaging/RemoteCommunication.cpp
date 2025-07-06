@@ -12,6 +12,12 @@ bool RemoteCommunication::init(std::shared_ptr<TCPSession> session)
 {
 	mTCPSession = session;
 
+	if (mSendThread)
+		mSendThread->stop();
+
+	if (mReceiveThread)
+		mReceiveThread->stop();
+
 	mSendThread.reset(new SendThread(this));
 	mReceiveThread.reset(new ReceiveThread(this));
 
