@@ -74,7 +74,7 @@ void RemoteSender::onLocalPlayerChosen(const PlayerColor localPlayer)
 void RemoteSender::onLocalReadyFlagSet(const bool flag)
 {
 	json j;
-	j[LocalPlayerReadyFlagKey] = flag;
+	j[PlayerReadyFlagKey]	   = flag;
 
 	auto data				   = convertDataToByteVector(j);
 

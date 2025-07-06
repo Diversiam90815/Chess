@@ -96,6 +96,26 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 		break;
 	}
 
+	case MultiplayerMessageType::LocalPlayer:
+	{
+		PlayerColor remotePlayer = tryGetContentFromMessage<PlayerColor>(jMessage, PlayerChosenKey);
+
+		LOG_INFO("Received player chosen from remote message Remote Player : {}", LoggingHelper::playerColourToString(remotePlayer));
+		remotePlayerChosenReceived(remotePlayer);
+
+		break;
+	}
+
+	case MultiplayerMessageType::PlayerReadyForGameFlag:
+	{
+		bool flag = tryGetContentFromMessage<bool>(jMessage, PlayerReadyFlagKey);
+
+		LOG_INFO("Received player ready for game flag : {}", LoggingHelper::boolToString(flag));
+		remotePlayerReadyFlagReceived(flag);
+
+		break;
+	}
+
 	default:
 	{
 		int iType = static_cast<int>(type);
