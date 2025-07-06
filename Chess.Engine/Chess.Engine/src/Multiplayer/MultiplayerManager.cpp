@@ -206,7 +206,7 @@ void MultiplayerManager::onRemotePlayerChosenReceived(const PlayerColor player)
 	LOG_INFO("Received a player chosen message from the remote. Player = {}", LoggingHelper::playerColourToString(player));
 
 	// The remote chose that player, so we switch locally to the corresponding oppsosite playercolor
-	PlayerColor localPlayer = player == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
+	PlayerColor localPlayer = player == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
 
 	LOG_INFO("So we set ourselves to Player {}", LoggingHelper::playerColourToString(localPlayer));
 
