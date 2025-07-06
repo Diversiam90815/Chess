@@ -57,9 +57,17 @@ void RemoteCommunication::start()
 				return;
 			}
 
-			if (memcmp(message.data.data(), RemoteComSecret, sizeof(RemoteComSecret)) != 0)
+			// Get the secret length (excluding null terminator)
+			const size_t secretLength = strlen(RemoteComSecret);
+
+			if (memcmp(message.data.data(), RemoteComSecret, secretLength) != 0)
 			{
 				LOG_ERROR("Invalid message format: Secret identifier mismatch in body.");
+
+				std::string expected(RemoteComSecret, secretLength);
+				std::string received(message.data.begin(), message.data.begin() + std::min(secretLength, message.data.size()));
+				LOG_ERROR("Expected secret: '{}' (length: {})", expected, secretLength);
+				LOG_ERROR("Received secret: '{}' (length: {})", received, message.data.size());
 				return;
 			}
 
@@ -123,10 +131,13 @@ void RemoteCommunication::write(MultiplayerMessageType type, std::vector<uint8_t
 	std::lock_guard<std::mutex> lock(mOutgoingListMutex);
 
 	MultiplayerMessageStruct	message;
-	message.type = type;
+	message.type			  = type;
+
+	// Get the secret length (excluding null terminator)
+	const size_t secretLength = strlen(RemoteComSecret);
 
 	// Prepend the secret to the message data
-	message.data.reserve(sizeof(RemoteComSecret) + data.size());
+	message.data.reserve(secretLength + data.size());
 	message.data.insert(message.data.end(), RemoteComSecret, RemoteComSecret + sizeof(RemoteComSecret));
 	message.data.insert(message.data.end(), data.begin(), data.end());
 
