@@ -423,8 +423,9 @@ namespace Chess.UI.ViewModels
         {
             SelectedPlayerColor = local;
             _model.SetLocalPlayerColor(local);
-
             IsReady = false;
+
+            ReadyButtonEnabled = true;
         }
 
 
