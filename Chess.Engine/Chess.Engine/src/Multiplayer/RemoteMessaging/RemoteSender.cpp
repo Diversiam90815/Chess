@@ -49,7 +49,15 @@ void RemoteSender::sendConnectionInvite(const InvitationRequest &invite)
 }
 
 
-void				 RemoteSender::onConnectionStateChanged(const ConnectionStatusEvent event) {}
+void RemoteSender::onConnectionStateChanged(const ConnectionStatusEvent event)
+{
+	json j;
+	j[ConnectionStateKey] = event;
+
+	auto data			  = convertDataToByteVector(j);
+
+	sendMessage(MultiplayerMessageType::ConnectionState, data);
+}
 
 
 std::vector<uint8_t> RemoteSender::convertDataToByteVector(json &source)

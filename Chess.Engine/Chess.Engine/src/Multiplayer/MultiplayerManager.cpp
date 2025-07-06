@@ -147,24 +147,24 @@ void MultiplayerManager::disconnect()
 
 void MultiplayerManager::onRemoteConnectionStateReceived(const ConnectionState &state)
 {
-	//// We received a connection status change event from the remote
-	// mRemoteConnectionState = state;
+	// We received a connection status change event from the remote
+	mRemoteConnectionState = state;
 
-	// if (mConnectionState == ConnectionState::Connected && state == ConnectionState::Connected)
-	//{
-	//	// We both are connected, so we switch into setCurrentPlayer state
-	//	connectionStatusChanged(ConnectionState::SetPlayerColor);
-	// }
+	if (mConnectionState == ConnectionState::Connected && state == ConnectionState::Connected)
+	{
+		// We both are connected, so we switch into setCurrentPlayer state
+		connectionStatusChanged(ConnectionState::SetPlayerColor);
+	}
 
-	// else if (state == ConnectionState::SetPlayerColor)
-	//{
-	//	connectionStatusChanged(ConnectionState::SetPlayerColor);
-	// }
+	else if (state == ConnectionState::SetPlayerColor)
+	{
+		connectionStatusChanged(ConnectionState::SetPlayerColor);
+	}
 
-	// else if (state == ConnectionState::GameStarted)
-	//{
-	//	connectionStatusChanged(ConnectionState::GameStarted);
-	// }
+	else if (state == ConnectionState::GameStarted)
+	{
+		connectionStatusChanged(ConnectionState::GameStarted);
+	}
 }
 
 
@@ -183,7 +183,23 @@ void MultiplayerManager::onRemoteInvitationReceived(const InvitationRequest &inv
 }
 
 
-void MultiplayerManager::onRemoteInvitationResponseReceived(const InvitationResponse &response) {}
+void MultiplayerManager::onRemoteInvitationResponseReceived(const InvitationResponse &response)
+{
+	LOG_INFO("Invitation was {}", response.accepted ? "Accepted" : "Declined");
+
+	ConnectionStatusEvent event;
+
+	if (response.accepted)
+	{
+		event.state = ConnectionState::Connected;
+	}
+	else
+	{
+		event.state = ConnectionState::Disconnected; // For now just change to disconnected
+	}
+
+	connectionStatusChanged(event);
+}
 
 
 void MultiplayerManager::closeDiscovery()
@@ -307,9 +323,9 @@ void MultiplayerManager::sendConnectRequest()
 void MultiplayerManager::sendConnectResponse(bool accepted, std::string reason)
 {
 	InvitationResponse response;
-	response.accepted = accepted;
+	response.accepted	= accepted;
 	response.playerName = mLocalPlayerName;
-	response.reason = reason;
+	response.reason		= reason;
 
 	mRemoteSender->sendConnectionResponse(response);
 }

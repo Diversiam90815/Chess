@@ -12,6 +12,8 @@
 #include "Move.h"
 #include "RemoteMessaging/MultiplayerMessageStruct.h"
 #include "Discovery/DiscoveryEndpoint.h"
+#include "ConnectionStatus.h"
+
 
 using json = nlohmann::json;
 
@@ -94,6 +96,23 @@ inline void from_json(const json &j, Endpoint &ep)
 	j.at(jDiscoveryIP).get_to(ep.IPAddress);
 	j.at(jDiscoveryPort).get_to(ep.tcpPort);
 	j.at(jDiscoveryName).get_to(ep.playerName);
+}
+
+//==============================================================================
+//			Connection Status Event
+//==============================================================================
+
+
+inline void to_json(json &j, const ConnectionStatusEvent &event)
+{
+	j = json{{jConnectEventType, event.state}, {jConnectEventError, event.errorMessage}, {jConnectEventEndpoint, event.remoteEndpoint}};
+}
+
+inline void from_json(const json &j, ConnectionStatusEvent &event)
+{
+	j.at(jConnectEventType).get_to(event.state);
+	j.at(jConnectEventError).get_to(event.errorMessage);
+	j.at(jConnectEventEndpoint).get_to(event.remoteEndpoint);
 }
 
 

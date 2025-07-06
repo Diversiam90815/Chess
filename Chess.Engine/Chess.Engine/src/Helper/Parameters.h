@@ -136,3 +136,7 @@ constexpr auto		  jInvitationPlayerName		   = "PlayerName";
 constexpr auto		  jInvitationVersion		   = "Version";
 constexpr auto		  jInvitationAccepted		   = "Accepted";
 constexpr auto		  jInvitationReason			   = "Reason";
+
+constexpr auto		  jConnectEventType			   = "Type";
+constexpr auto		  jConnectEventError		   = "Error";
+constexpr auto		  jConnectEventEndpoint		   = "Endpoint";
