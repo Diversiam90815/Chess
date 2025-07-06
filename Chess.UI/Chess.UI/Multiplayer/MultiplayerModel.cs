@@ -184,16 +184,12 @@ namespace Chess.UI.Models
             }
         }
 
-        public void AcceptConnectionRequest()
+
+        public void AnswerConnectionInvitation(bool accepted)
         {
-            EngineAPI.ApproveConnectionRequest();
+            EngineAPI.AnswerConnectionInvitation(accepted);
         }
 
-
-        public void RejectConnectionRequest()
-        {
-            EngineAPI.RejectConnectionRequest();
-        }
 
 
         public event Action<string> OnConnectionErrorOccured;

@@ -427,14 +427,14 @@ namespace Chess.UI.ViewModels
         public void AcceptClientConnection()
         {
             //We are the host and accepted a connection try from the client
-            _model.AcceptConnectionRequest();
+            _model.AnswerConnectionInvitation(true);
         }
 
 
         public void DeclineClientConnection()
         {
             //We are the host and declined a connection try from the client
-            _model.RejectConnectionRequest();
+            _model.AnswerConnectionInvitation(false);
 
             EnterInitMode();
         }

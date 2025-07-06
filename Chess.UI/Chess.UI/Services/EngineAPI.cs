@@ -99,11 +99,8 @@ namespace Chess.UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "IsMultiplayerActive", CharSet = CharSet.Unicode)]
         public static extern bool IsMultiplayerActive();
 
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ApproveConnectionRequest", CharSet = CharSet.Unicode)]
-        public static extern void ApproveConnectionRequest();
-
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "RejectConnectionRequest", CharSet = CharSet.Unicode)]
-        public static extern void RejectConnectionRequest();
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "AnswerConnectionInvitation", CharSet = CharSet.Unicode)]
+        public static extern void AnswerConnectionInvitation(bool accepted);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SendConnectionRequestToHost", CharSet = CharSet.Unicode)]
         public static extern void SendConnectionRequestToHost();

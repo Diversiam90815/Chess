@@ -59,9 +59,7 @@ extern "C"
 
 	Engine_API void	 SetLocalPlayerName(const char *name);
 
-	Engine_API void	 ApproveConnectionRequest();
-
-	Engine_API void	 RejectConnectionRequest();
+	Engine_API void	 AnswerConnectionInvitation(bool accept);
 
 	Engine_API void	 SendConnectionRequestToHost();
 

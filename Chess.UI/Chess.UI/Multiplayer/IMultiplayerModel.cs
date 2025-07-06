@@ -32,9 +32,7 @@ namespace Chess.UI.Multiplayer
 
         void ConnectToHost();
 
-        void AcceptConnectionRequest();
-
-        void RejectConnectionRequest();
+        void AnswerConnectionInvitation(bool accept);
 
         void SetLocalPlayerColor(EngineAPI.PlayerColor color);
         

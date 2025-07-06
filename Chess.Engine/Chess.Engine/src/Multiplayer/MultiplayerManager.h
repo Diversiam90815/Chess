@@ -49,10 +49,9 @@ public:
 	bool						startDiscovery(const std::string IPv4, const int port, DiscoveryMode mode);
 
 	void						setInternalObservers();
-	
+
 	void						sendConnectRequest();
-	void						approveConnectionRequest();
-	void						rejectConnectionRequest();
+	void						sendConnectResponse(bool accepted, std::string reason = "");
 
 	void						connectionStatusChanged(const ConnectionStatusEvent event) override;
 

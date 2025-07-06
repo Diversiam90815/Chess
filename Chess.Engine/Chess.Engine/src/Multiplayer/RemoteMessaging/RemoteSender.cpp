@@ -27,11 +27,22 @@ void RemoteSender::onExecuteMove(const PossibleMove &move, bool fromRemote)
 }
 
 
+void RemoteSender::sendConnectionResponse(const InvitationResponse &response)
+{
+	json j;
+	j[InvitationResponseMessageKey] = response;
+
+	auto data						= convertDataToByteVector(j);
+
+	sendMessage(MultiplayerMessageType::InvitationResponse, data);
+}
+
+
 void RemoteSender::sendConnectionInvite(const InvitationRequest &invite)
 {
 	json j;
 	j[InvitationMessageKey] = invite;
-	
+
 	auto data				= convertDataToByteVector(j);
 
 	sendMessage(MultiplayerMessageType::InvitationRequest, data);

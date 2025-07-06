@@ -95,7 +95,7 @@ PieceType GameManager::getCurrentPieceTypeAtPosition(const Position position)
 
 	if (chessPiece)
 		return chessPiece->getType();
-	
+
 	return PieceType::DefaultType;
 }
 
@@ -533,23 +533,17 @@ void GameManager::startRemoteDiscovery(bool isHost)
 }
 
 
-void GameManager::approveConnectionRequest()
+void GameManager::answerConnectionInvitation(bool accepted)
 {
 	if (!mMultiplayerManager)
 		return;
 
-	LOG_DEBUG("Approving connection request..");
-	mMultiplayerManager->approveConnectionRequest();
-}
+	std::string reason = "";
 
+	if (!accepted)
+		reason = "User declined invitation!";
 
-void GameManager::rejectConnectionRequest()
-{
-	if (!mMultiplayerManager)
-		return;
-
-	LOG_DEBUG("Rejecting connection request..");
-	mMultiplayerManager->rejectConnectionRequest();
+	mMultiplayerManager->sendConnectResponse(accepted, reason);
 }
 
 

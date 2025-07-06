@@ -96,8 +96,9 @@ public:
 
 	void						startRemoteDiscovery(bool isHost);
 
-	void						approveConnectionRequest();
-	void						rejectConnectionRequest();
+	void						answerConnectionInvitation(bool accepted);
+	// void						approveConnectionRequest();
+	// void						rejectConnectionRequest();
 	void						sendConnectionRequestToHost();
 
 private:

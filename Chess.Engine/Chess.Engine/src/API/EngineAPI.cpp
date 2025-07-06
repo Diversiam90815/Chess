@@ -257,7 +257,7 @@ Engine_API void OnPawnPromotionChosen(PieceTypeInstance promotionInstance)
 
 Engine_API void LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
 {
-	logging::log(LogLevel::Info,className,lineNumber,method, message);
+	logging::log(LogLevel::Info, className, lineNumber, method, message);
 }
 
 
@@ -311,15 +311,9 @@ Engine_API void SetLocalPlayerName(const char *name)
 }
 
 
-Engine_API void ApproveConnectionRequest()
+Engine_API void AnswerConnectionInvitation(bool accept)
 {
-	GameManager::GetInstance()->approveConnectionRequest();
-}
-
-
-Engine_API void RejectConnectionRequest()
-{
-	GameManager::GetInstance()->rejectConnectionRequest();
+	GameManager::GetInstance()->answerConnectionInvitation(accept);
 }
 
 

@@ -24,6 +24,7 @@ public:
 	void onAddToMoveHistory(Move &move) override {}
 	void onClearMoveHistory() override {}
 
+	void sendConnectionResponse(const InvitationResponse &response);
 	void sendConnectionInvite(const InvitationRequest &invite);
 
 	void onConnectionStateChanged(const ConnectionStatusEvent event) override;

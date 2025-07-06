@@ -118,7 +118,7 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 	// closeDiscovery();
 	// closeTCPServerOrClient();
 
-	//connectionStatusChanged(ConnectionState::Connected);
+	// connectionStatusChanged(ConnectionState::Connected);
 }
 
 
@@ -304,21 +304,14 @@ void MultiplayerManager::sendConnectRequest()
 }
 
 
-void MultiplayerManager::approveConnectionRequest()
+void MultiplayerManager::sendConnectResponse(bool accepted, std::string reason)
 {
-	//	if (!mServer)
-	//		return;
-	//
-	//	mServer->respondToConnectionRequest(true);
-}
+	InvitationResponse response;
+	response.accepted = accepted;
+	response.playerName = mLocalPlayerName;
+	response.reason = reason;
 
-
-void MultiplayerManager::rejectConnectionRequest()
-{
-	//	if (!mServer)
-	//		return;
-	//
-	//	mServer->respondToConnectionRequest(false);
+	mRemoteSender->sendConnectionResponse(response);
 }
 
 
