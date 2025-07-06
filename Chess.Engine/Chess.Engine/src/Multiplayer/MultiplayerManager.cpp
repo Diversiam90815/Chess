@@ -118,7 +118,7 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 	// closeDiscovery();
 	// closeTCPServerOrClient();
 
-	connectionStatusChanged(ConnectionState::Connected);
+	//connectionStatusChanged(ConnectionState::Connected);
 }
 
 

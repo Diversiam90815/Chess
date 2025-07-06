@@ -125,7 +125,7 @@ CConnectionEvent UICommunication::convertToCStyleConnectionStateEvent(const Conn
 		StringCbCopyA(c_style_state.errorMessage, bufferSize, state.errorMessage.c_str());
 	}
 
-	if (state.remoteEndpoint.isValid())
+	if (!state.remoteEndpoint.playerName.empty())
 	{
 		size_t len		  = state.remoteEndpoint.playerName.size();
 		size_t bufferSize = (len + 1) * sizeof(char);
