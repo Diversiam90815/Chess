@@ -26,6 +26,10 @@ public:
 
 	void remoteChatMessageReceived(const std::string &message) override;
 
+	void remoteInvitationReceived(const InvitationRequest &invite) override;
+
+	void remoteInvitationResponseReceived(const InvitationResponse &response) override;
+
 private:
 	template <typename T>
 	T tryGetContentFromMessage(json message, std::string contentMessage);

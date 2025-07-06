@@ -39,6 +39,8 @@ public:
 	void	  onRemoteMoveReceived(const PossibleMove &remoteMove) override;
 	void	  onRemoteChatMessageReceived(const std::string &mesage) override {}
 	void	  onRemoteConnectionStateReceived(const ConnectionState &state) override {}
+	void	  onRemoteInvitationReceived(const InvitationRequest &invite) override {};
+	void	  onRemoteInvitationResponseReceived(const InvitationResponse &response) override {};
 
 	bool	  isInitialized() const;
 	void	  setInitialized(const bool value);
