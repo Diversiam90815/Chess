@@ -121,29 +121,33 @@
         </StackPanel>
 
 
-        <StackPanel Name="SettingPlayerColorView" Visibility="{x:Bind _viewModel.SettingLocalPlayerView, Mode=TwoWay}" Orientation="Vertical" HorizontalAlignment="Center">
+        <StackPanel Name="SettingPlayerColorView" Visibility="{x:Bind _viewModel.SettingLocalPlayerView, Mode=TwoWay}" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
 
-            <TextBlock Text="Select your player color" Margin="20,20,20,10" FontSize="24" HorizontalAlignment="Center"/>
+            <TextBlock Text="Select your player color" Margin="20,24" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="40">
+                
                 <!-- White King Button -->
-                <Button Name="SelectWhiteButton" Width="100" Height="100" Click="SelectWhiteButton_Click">
-                    <Image Source="ms-appx:///Assets/Pieces/Basic/White_King.png" Stretch="Uniform"/>
-                </Button>
-
+                <StackPanel>
+                    <Button Name="SelectWhiteButton" Width="100" Height="100" Click="SelectWhiteButton_Click" BorderBrush="Green" BorderThickness="1">
+                        <Image Source="ms-appx:///Assets/Pieces/Basic/KingW.png" Stretch="Uniform"/>
+                    </Button>
+                    <TextBlock Text="White" Margin="12,8" FontSize="18" HorizontalAlignment="Center"/>
+                </StackPanel>
+                
                 <!-- Black King Button -->
-                <Button Name="SelectBlackButton" Width="100" Height="100" Click="SelectBlackButton_Click">
-                    <Image Source="ms-appx:///Assets/Pieces/Basic/Black_King.png" Stretch="Uniform"/>
-                </Button>
-            </StackPanel>
+                <StackPanel>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
-                <TextBlock Text="White" FontSize="18" HorizontalAlignment="Center"/>
-                <TextBlock Text="Black" FontSize="18" HorizontalAlignment="Center"/>
+                    <Button Name="SelectBlackButton" Width="100" Height="100" Click="SelectBlackButton_Click" BorderBrush="Green" BorderThickness="1">
+                        <Image Source="ms-appx:///Assets/Pieces/Basic/KingB.png" Stretch="Uniform"/>
+                    </Button>
+                    <TextBlock Text="Black" Margin="12,8" FontSize="18" HorizontalAlignment="Center"/>
+                </StackPanel>
+            
             </StackPanel>
 
             <!-- Ready Button -->
-            <Button Name="ReadyButton" Content="I'm Ready!" IsEnabled="{x:Bind _viewModel.ReadyButtonEnabled, Mode=TwoWay}" Click="ReadyButton_Click" Style="{ThemeResource MPStartButtonStyle}" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+            <Button Name="ReadyButton" Content="I'm Ready!" IsEnabled="{x:Bind _viewModel.ReadyButtonEnabled, Mode=TwoWay}" Click="ReadyButton_Click" Style="{ThemeResource MPStartButtonStyle}" HorizontalAlignment="Center" Margin="0,12"/>
 
             <!-- Waiting for other player -->
             <StackPanel Visibility="{x:Bind _viewModel.WaitingForRemoteVisibility, Mode=OneWay}" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,20,0,0">
