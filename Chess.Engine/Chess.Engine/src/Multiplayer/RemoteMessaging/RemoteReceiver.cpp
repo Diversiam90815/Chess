@@ -88,7 +88,8 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 	case MultiplayerMessageType::InvitationResponse:
 	{
 		InvitationResponse invResponse = tryGetContentFromMessage<InvitationResponse>(jMessage, InvitationResponseMessageKey);
-		LOG_INFO("Received invitation request from {}", invResponse.playerName);
+		LOG_INFO("Received invitation response from {}", invResponse.playerName);
+		LOG_INFO("Invitation was {}", invResponse.accepted ? "Accepted" : "Declined");
 		remoteInvitationResponseReceived(invResponse);
 
 		break;
