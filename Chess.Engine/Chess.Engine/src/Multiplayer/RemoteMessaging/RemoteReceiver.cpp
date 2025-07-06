@@ -37,6 +37,8 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 	{
 		ConnectionState state = tryGetContentFromMessage<ConnectionState>(jMessage, ConnectionStateKey);
 
+		remoteConnectionStateReceived(state);
+
 		LOG_INFO("Received a connection state from remote: {}", LoggingHelper::connectionStateToString(state).c_str());
 		break;
 	}

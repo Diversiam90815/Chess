@@ -305,6 +305,8 @@ void MultiplayerManager::setInternalObservers()
 	mNetwork->attachObserver(shared_from_this());
 
 	mRemoteReceiver->attachObserver(shared_from_this());
+
+	this->attachObserver(mRemoteSender);
 }
 
 
