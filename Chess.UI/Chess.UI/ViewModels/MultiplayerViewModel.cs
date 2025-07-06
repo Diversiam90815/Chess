@@ -46,6 +46,7 @@ namespace Chess.UI.ViewModels
             _model.OnConnectionErrorOccured += HandleConnectionError;
             _model.OnConnectionStatusChanged += HandleConnectionStatusUpdated;
             _model.OnPlayerChanged += HandlePlayerChanged;
+            _model.OnMultiplayerPlayerSetFromRemote += SelectLocalPlayerFromRemote;
 
             //UpdateAdapterBox();
         }
