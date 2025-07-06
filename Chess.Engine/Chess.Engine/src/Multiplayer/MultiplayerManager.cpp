@@ -91,7 +91,12 @@ void MultiplayerManager::joinSession()
 
 	mClient = std::make_unique<TCPClient>(mIoContext);
 
-	mClient->setConnectHandler([this](TCPSession::pointer session) { setTCPSession(session); });
+	mClient->setConnectHandler(
+		[this](TCPSession::pointer session)
+		{
+			setTCPSession(session);
+			sendConnectRequest();
+		});
 	mClient->setConnectTimeoutHandler([this]() { connectionStatusChanged({ConnectionState::Error, "Connection request timed out or was rejected!"}); });
 
 	mClient->connect(mRemoteEndpoint.IPAddress, mRemoteEndpoint.tcpPort);
@@ -260,6 +265,8 @@ bool MultiplayerManager::startDiscovery(const std::string IPv4, const int port, 
 	mDiscovery->startDiscovery(mode);
 
 	connectionStatusChanged(mode == DiscoveryMode::Server ? ConnectionState::HostingSession : ConnectionState::WaitingForARemote);
+
+	return true;
 }
 
 
@@ -281,22 +288,33 @@ void MultiplayerManager::setInternalObservers()
 }
 
 
+void MultiplayerManager::sendConnectRequest()
+{
+	std::string		  localVersion = "1.0.0"; // TODO: For now leave it at 1.0.0 -> create project.h.in file for CMake
+
+	InvitationRequest invite;
+	invite.playerName = mLocalPlayerName;
+	invite.version	  = localVersion;
+
+	mRemoteSender->sendConnectionInvite(invite);
+}
+
 
 void MultiplayerManager::approveConnectionRequest()
 {
-//	if (!mServer)
-//		return;
-//
-//	mServer->respondToConnectionRequest(true);
+	//	if (!mServer)
+	//		return;
+	//
+	//	mServer->respondToConnectionRequest(true);
 }
 
 
 void MultiplayerManager::rejectConnectionRequest()
 {
-//	if (!mServer)
-//		return;
-//
-//	mServer->respondToConnectionRequest(false);
+	//	if (!mServer)
+	//		return;
+	//
+	//	mServer->respondToConnectionRequest(false);
 }
 
 

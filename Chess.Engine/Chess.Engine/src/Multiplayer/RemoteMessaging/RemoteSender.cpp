@@ -27,6 +27,17 @@ void RemoteSender::onExecuteMove(const PossibleMove &move, bool fromRemote)
 }
 
 
+void RemoteSender::sendConnectionInvite(const InvitationRequest &invite)
+{
+	json j;
+	j[InvitationMessageKey] = invite;
+	
+	auto data				= convertDataToByteVector(j);
+
+	sendMessage(MultiplayerMessageType::InvitationRequest, data);
+}
+
+
 void				 RemoteSender::onConnectionStateChanged(const ConnectionStatusEvent event) {}
 
 
@@ -62,7 +73,7 @@ void RemoteSender::sendConnectionState(const ConnectionState &state)
 	json j;
 	j[ConnectionStateKey] = state;
 
-	auto data	= convertDataToByteVector(j);
+	auto data			  = convertDataToByteVector(j);
 
 	sendMessage(MultiplayerMessageType::ConnectionState, data);
 }
