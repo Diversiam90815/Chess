@@ -28,6 +28,9 @@ public:
 	void sendConnectionInvite(const InvitationRequest &invite);
 
 	void onConnectionStateChanged(const ConnectionStatusEvent event) override;
+	void onLocalPlayerChosen(const PlayerColor localPlayer) override;
+	void onRemotePlayerChosen(const PlayerColor remote) override {}
+	void onLocalReadyFlagSet(const bool flag) override;
 
 
 private:

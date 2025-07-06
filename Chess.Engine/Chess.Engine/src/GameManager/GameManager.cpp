@@ -557,6 +557,18 @@ void GameManager::sendConnectionRequestToHost()
 }
 
 
+void GameManager::setLocalPlayerInMultiplayer(PlayerColor localPlayer)
+{
+	mMultiplayerManager->localPlayerChosen(localPlayer);
+}
+
+
+void GameManager::setLocalPlayerReady(const bool flag)
+{
+	mMultiplayerManager->localReadyFlagSet(flag);
+}
+
+
 void GameManager::initObservers()
 {
 	this->attachObserver(mUiCommunicationLayer);

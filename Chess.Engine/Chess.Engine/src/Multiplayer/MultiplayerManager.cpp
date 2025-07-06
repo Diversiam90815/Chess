@@ -201,6 +201,50 @@ void MultiplayerManager::onRemoteInvitationResponseReceived(const InvitationResp
 }
 
 
+void MultiplayerManager::onRemotePlayerChosenReceived(const PlayerColor player)
+{
+	LOG_INFO("Received a player chosen message from the remote. Player = {}", LoggingHelper::playerColourToString(player));
+
+	// The remote chose that player, so we switch locally to the corresponding oppsosite playercolor
+	PlayerColor localPlayer = player == PlayerColor::White ? PlayerColor::White : PlayerColor::Black;
+
+	LOG_INFO("So we set ourselves to Player {}", LoggingHelper::playerColourToString(localPlayer));
+
+	remotePlayerChosen(localPlayer);
+}
+
+
+void MultiplayerManager::onRemotePlayerReadyFlagReceived(const bool flag)
+{
+	LOG_INFO("Received a remote ready for game flag: {}", LoggingHelper::boolToString(flag));
+	setRemotePlayerReadyForGameFlag(flag);
+}
+
+
+void MultiplayerManager::setRemotePlayerReadyForGameFlag(const bool flag)
+{
+	mRemotePlayerReadyForGameFlag.store(flag);
+	checkIfReadyForGame();
+}
+
+
+bool MultiplayerManager::checkIfReadyForGame()
+{
+	if (mLocalPlayerReadyForGameFlag.load() && mRemotePlayerReadyForGameFlag.load())
+	{
+		// Both are ready for game
+		ConnectionStatusEvent event;
+		event.state = ConnectionState::GameStarted;
+
+		connectionStatusChanged(event);
+		return true;
+	}
+
+	LOG_INFO("Local Ready = {}, Remote Ready = {}", mLocalPlayerReadyForGameFlag.load(), mRemotePlayerReadyForGameFlag.load());
+	return false;
+}
+
+
 void MultiplayerManager::closeDiscovery()
 {
 	if (mDiscovery)
@@ -346,6 +390,48 @@ void MultiplayerManager::connectionStatusChanged(const ConnectionStatusEvent eve
 		if (auto obs = observer.lock())
 			obs->onConnectionStateChanged(event);
 	}
+}
+
+
+void MultiplayerManager::localPlayerChosen(const PlayerColor localPlayer)
+{
+	if (mLocalPlayerColor == localPlayer)
+		return;
+
+	mLocalPlayerColor = localPlayer;
+
+	for (auto &observer : mObservers)
+	{
+		if (auto obs = observer.lock())
+			obs->onLocalPlayerChosen(localPlayer);
+	}
+}
+
+
+void MultiplayerManager::remotePlayerChosen(const PlayerColor local)
+{
+	for (auto &observer : mObservers)
+	{
+		if (auto obs = observer.lock())
+			obs->onRemotePlayerChosen(local);
+	}
+}
+
+
+void MultiplayerManager::localReadyFlagSet(const bool flag)
+{
+	// Set the local ready flag
+	mLocalPlayerReadyForGameFlag.store(flag);
+
+	// Send local player ready to remote
+	for (auto &observer : mObservers)
+	{
+		if (auto obs = observer.lock())
+			obs->onLocalReadyFlagSet(flag);
+	}
+
+	// And check if both are ready
+	checkIfReadyForGame();
 }
 
 

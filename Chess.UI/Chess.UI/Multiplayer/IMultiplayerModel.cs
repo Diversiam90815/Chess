@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Chess.UI.Services.EngineAPI;
 
 namespace Chess.UI.Multiplayer
 {
@@ -38,6 +39,8 @@ namespace Chess.UI.Multiplayer
         
         void SetPlayerReady(bool ready);
 
+        void HandleLocalPlayerChosenByRemote(PlayerColor local);
+
 
         event Action<string> OnConnectionErrorOccured;
 
@@ -46,5 +49,7 @@ namespace Chess.UI.Multiplayer
         event Action<string> OnClientRequestedConnection;
 
         event Action<Services.EngineAPI.PlayerColor> OnPlayerChanged;
+
+        event Action<PlayerColor> OnMultiplayerPlayerSetFromRemote;
     }
 }

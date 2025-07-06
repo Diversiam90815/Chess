@@ -41,7 +41,7 @@ namespace Chess.UI.Models
             var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
             logicCommunication.ConnectionStatusEvent += HandleConnectionStatusUpdates;
             logicCommunication.PlayerChanged += HandlePlayerChanged;
-
+            logicCommunication.MultiPlayerChosenByRemote += HandleLocalPlayerChosenByRemote;
         }
 
 
@@ -154,16 +154,14 @@ namespace Chess.UI.Models
 
         public void SetLocalPlayerColor(EngineAPI.PlayerColor color)
         {
-
-
+            EngineAPI.SetLocalPlayer((int)color);
         }
 
 
-        public void SetPlayerReady(bool value)
+        public void SetPlayerReady(bool flag)
         {
-
+            EngineAPI.SetLocalPlayerReady(flag);
         }
-
 
 
         public void StartMultiplerGame(MultiplayerMode mode)
@@ -191,11 +189,18 @@ namespace Chess.UI.Models
         }
 
 
+        public void HandleLocalPlayerChosenByRemote(PlayerColor local)
+        {
+            OnMultiplayerPlayerSetFromRemote?.Invoke(local);
+        }
+
+
 
         public event Action<string> OnConnectionErrorOccured;
         public event Action<ConnectionState, string> OnConnectionStatusChanged;
         public event Action<string> OnClientRequestedConnection;
         public event Action<PlayerColor> OnPlayerChanged;
+        public event Action<PlayerColor> OnMultiplayerPlayerSetFromRemote;
 
     }
 }

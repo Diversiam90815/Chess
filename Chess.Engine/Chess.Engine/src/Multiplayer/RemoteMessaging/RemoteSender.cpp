@@ -60,6 +60,28 @@ void RemoteSender::onConnectionStateChanged(const ConnectionStatusEvent event)
 }
 
 
+void RemoteSender::onLocalPlayerChosen(const PlayerColor localPlayer)
+{
+	json j;
+	j[PlayerChosenKey] = localPlayer;
+
+	auto data		   = convertDataToByteVector(j);
+
+	sendMessage(MultiplayerMessageType::LocalPlayer, data);
+}
+
+
+void RemoteSender::onLocalReadyFlagSet(const bool flag)
+{
+	json j;
+	j[LocalPlayerReadyFlagKey] = flag;
+
+	auto data				   = convertDataToByteVector(j);
+
+	sendMessage(MultiplayerMessageType::PlayerReadyForGameFlag, data);
+}
+
+
 std::vector<uint8_t> RemoteSender::convertDataToByteVector(json &source)
 {
 	std::vector<uint8_t> data;

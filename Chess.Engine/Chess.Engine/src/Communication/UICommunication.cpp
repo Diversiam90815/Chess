@@ -93,6 +93,12 @@ void UICommunication::onConnectionStateChanged(const ConnectionStatusEvent event
 }
 
 
+void UICommunication::onRemotePlayerChosen(PlayerColor local)
+{
+	communicateToUI(MessageType::MultiplayerPlayerChosen, &local);
+}
+
+
 bool UICommunication::communicateToUI(MessageType type, void *message) const
 {
 	PFN_CALLBACK delegate = nullptr;

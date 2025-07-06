@@ -27,6 +27,7 @@ namespace Chess.UI.Services
             GameStateChanged = 5,
             MoveHistoryUpdated = 6,
             ConnectionStateChanged = 7,
+            MultiplayerPlayerChosen = 8,
         }
 
 
@@ -93,6 +94,11 @@ namespace Chess.UI.Services
                         HandleConnectionStatusChanged(data);
                         break;
                     }
+                case DelegateMessage.MultiplayerPlayerChosen:
+                    {
+                        HandlePlayerChosenForMultiplayerByRemote(data);
+                        break;
+                    }
 
                 default: break;
             }
@@ -115,7 +121,6 @@ namespace Chess.UI.Services
 
         private void HandlePlayerChanged(nint data)
         {
-            Logger.LogInfo("Due to delegate message PlayerChanged, we react to setting the current player.");
             int iPlayer = Marshal.ReadInt32(data);
             PlayerColor player = (PlayerColor)iPlayer;
             PlayerChanged?.Invoke(player);
@@ -152,6 +157,14 @@ namespace Chess.UI.Services
         }
 
 
+        private void HandlePlayerChosenForMultiplayerByRemote(nint data)
+        {
+            int iPlayer = Marshal.ReadInt32(data);
+            PlayerColor player = (PlayerColor)iPlayer;
+            MultiPlayerChosenByRemote?.Invoke(player);
+        }
+
+
         #region ViewModel Delegates
 
         public event Action<PlayerColor> PlayerChanged;
@@ -161,6 +174,7 @@ namespace Chess.UI.Services
         public event Action<EngineAPI.Score> PlayerScoreUpdated;
         public event Action<EndGameState> EndGameStateEvent;
         public event Action<ConnectionStatusEvent> ConnectionStatusEvent;
+        public event Action<PlayerColor> MultiPlayerChosenByRemote;
 
         #endregion
 

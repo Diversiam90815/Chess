@@ -54,6 +54,9 @@ public:
 	void						sendConnectResponse(bool accepted, std::string reason = "");
 
 	void						connectionStatusChanged(const ConnectionStatusEvent event) override;
+	void						localPlayerChosen(const PlayerColor localPlayer) override;
+	void						remotePlayerChosen(const PlayerColor local) override; // This is the already set to the localPlayer, but set if the remote chose a player
+	void						localReadyFlagSet(const bool flag) override;
 
 	void						onRemoteFound(const Endpoint &remote) override;
 
@@ -66,6 +69,11 @@ public:
 	void						onRemoteConnectionStateReceived(const ConnectionState &state) override;
 	void						onRemoteInvitationReceived(const InvitationRequest &invite) override;
 	void						onRemoteInvitationResponseReceived(const InvitationResponse &response) override;
+	void						onRemotePlayerChosenReceived(const PlayerColor player) override;
+	void						onRemotePlayerReadyFlagReceived(const bool flag) override;
+
+	void						setRemotePlayerReadyForGameFlag(const bool flag);
+	bool						checkIfReadyForGame();
 
 private:
 	void													   closeDiscovery();
@@ -92,6 +100,7 @@ private:
 	std::unique_ptr<NetworkManager>							   mNetwork;
 
 	std::string												   mLocalPlayerName{};
+	PlayerColor												   mLocalPlayerColor;
 
 	std::string												   mLocalIPv4{};
 
@@ -101,6 +110,9 @@ private:
 
 	ConnectionStatusEvent									   mConnectionState{ConnectionState::None};
 	ConnectionStatusEvent									   mRemoteConnectionState{ConnectionState::None};
+
+	std::atomic<bool>										   mLocalPlayerReadyForGameFlag{false};
+	std::atomic<bool>										   mRemotePlayerReadyForGameFlag{false};
 
 	friend class GameManager;
 };

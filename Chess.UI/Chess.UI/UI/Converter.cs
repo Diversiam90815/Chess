@@ -28,6 +28,22 @@ namespace Chess.UI.UI
         {
             return value ? new SolidColorBrush(Microsoft.UI.Colors.Green) : new SolidColorBrush(Microsoft.UI.Colors.Red);
         }
+
+        public static Thickness PlayerToWhiteBorderThickness(PlayerColor player)
+        {
+            int value = player == PlayerColor.White ? 1 : 0;
+
+            Thickness thicknessValue = new Thickness(value);
+            return thicknessValue;
+        }
+
+        public static Thickness PlayerToBlackBorderThickness(PlayerColor player)
+        {
+            int value = player == PlayerColor.Black ? 1 : 0;
+
+            Thickness thicknessValue = new Thickness(value);
+            return thicknessValue;
+        }
     }
 
 

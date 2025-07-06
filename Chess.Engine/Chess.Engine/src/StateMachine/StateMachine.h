@@ -41,6 +41,8 @@ public:
 	void	  onRemoteConnectionStateReceived(const ConnectionState &state) override {}
 	void	  onRemoteInvitationReceived(const InvitationRequest &invite) override {};
 	void	  onRemoteInvitationResponseReceived(const InvitationResponse &response) override {};
+	void	  onRemotePlayerChosenReceived(const PlayerColor player) override {};
+	void	  onRemotePlayerReadyFlagReceived(const bool flag) override {};
 
 	bool	  isInitialized() const;
 	void	  setInitialized(const bool value);

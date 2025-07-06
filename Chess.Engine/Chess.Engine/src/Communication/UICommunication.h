@@ -18,13 +18,14 @@
 
 enum class MessageType
 {
-	EndGameState			  = 1,
-	PlayerScoreUpdated		  = 2,
-	PlayerCapturedPiece		  = 3,
-	PlayerChanged			  = 4,
-	GameStateChanged		  = 5,
-	MoveHistoryUpdated		  = 6,
-	ConnectionStateChanged	  = 7,
+	EndGameState			= 1,
+	PlayerScoreUpdated		= 2,
+	PlayerCapturedPiece		= 3,
+	PlayerChanged			= 4,
+	GameStateChanged		= 5,
+	MoveHistoryUpdated		= 6,
+	ConnectionStateChanged	= 7,
+	MultiplayerPlayerChosen = 8,
 };
 
 
@@ -71,6 +72,9 @@ public:
 	void onChangeCurrentPlayer(PlayerColor player) override;
 
 	void onConnectionStateChanged(const ConnectionStatusEvent event) override;
+	void onLocalPlayerChosen(const PlayerColor localPlayer) {}
+	void onRemotePlayerChosen(PlayerColor local) override; // This is already the local player. This is called if the remote chose the player so we set it to the opposite
+	void onLocalReadyFlagSet(const bool flag) {}
 
 
 private:

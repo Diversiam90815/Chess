@@ -329,6 +329,19 @@ Engine_API void StoppedMultiplayer()
 }
 
 
+Engine_API void SetLocalPlayer(int iLocalPlayer)
+{
+	PlayerColor local = (PlayerColor)iLocalPlayer;
+	GameManager::GetInstance()->setLocalPlayerInMultiplayer(local);
+}
+
+
+Engine_API void SetLocalPlayerReady(bool ready)
+{
+	GameManager::GetInstance()->setLocalPlayerReady(ready);
+}
+
+
 Engine_API int GetNetworkAdapterCount()
 {
 	GameManager *manager	 = GameManager::GetInstance();

@@ -65,6 +65,10 @@ extern "C"
 
 	Engine_API void	 StoppedMultiplayer();
 
+	Engine_API void	 SetLocalPlayer(int iLocalPlayer);
+
+	Engine_API void	 SetLocalPlayerReady(bool ready);
+
 
 	Engine_API void	 LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber);
 

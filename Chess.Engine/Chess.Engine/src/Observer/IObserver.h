@@ -85,6 +85,8 @@ public:
 	virtual void onRemoteChatMessageReceived(const std::string &mesage)					= 0;
 	virtual void onRemoteInvitationReceived(const InvitationRequest &invite)			= 0;
 	virtual void onRemoteInvitationResponseReceived(const InvitationResponse &response) = 0;
+	virtual void onRemotePlayerChosenReceived(const PlayerColor player)					= 0;
+	virtual void onRemotePlayerReadyFlagReceived(const bool flag)						= 0;
 };
 
 
@@ -112,4 +114,7 @@ public:
 	virtual ~IConnectionStatusObserver() {};
 
 	virtual void onConnectionStateChanged(const ConnectionStatusEvent event) = 0;
+	virtual void onLocalPlayerChosen(const PlayerColor localPlayer)			 = 0;
+	virtual void onRemotePlayerChosen(PlayerColor remotePlayer)				 = 0;
+	virtual void onLocalReadyFlagSet(const bool flag)						 = 0;
 };

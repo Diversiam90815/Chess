@@ -30,6 +30,10 @@ public:
 
 	void remoteInvitationResponseReceived(const InvitationResponse &response) override;
 
+	void remotePlayerChosenReceived(const PlayerColor player) override;
+
+	void remotePlayerReadyFlagReceived(const bool flag) override;
+
 private:
 	template <typename T>
 	T tryGetContentFromMessage(json message, std::string contentMessage);

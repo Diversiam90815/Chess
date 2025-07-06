@@ -156,6 +156,26 @@ void RemoteReceiver::remoteInvitationResponseReceived(const InvitationResponse &
 }
 
 
+void RemoteReceiver::remotePlayerChosenReceived(const PlayerColor player)
+{
+	for (auto &observer : mObservers)
+	{
+		if (auto obs = observer.lock())
+			obs->onRemotePlayerChosenReceived(player);
+	}
+}
+
+
+void RemoteReceiver::remotePlayerReadyFlagReceived(const bool flag)
+{
+	for (auto &observer : mObservers)
+	{
+		if (auto obs = observer.lock())
+			obs->onRemotePlayerReadyFlagReceived(flag);
+	}
+}
+
+
 
 template <typename T>
 inline T RemoteReceiver::tryGetContentFromMessage(json message, std::string contentMessage)

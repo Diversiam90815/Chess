@@ -219,6 +219,8 @@ namespace Chess.UI.ViewModels
                 if (isReady != value)
                 {
                     isReady = value;
+                    _model.SetPlayerReady(value);
+
                     OnPropertyChanged();
                 }
             }
@@ -445,13 +447,23 @@ namespace Chess.UI.ViewModels
             SelectedPlayerColor = color;
             // Send color selection to backend
             _model.SetLocalPlayerColor(color);
+
+            ReadyButtonEnabled = true;
         }
+
+
+        public void SelectLocalPlayerFromRemote(EngineAPI.PlayerColor local)
+        {
+            SelectedPlayerColor = local;
+            _model.SetLocalPlayerColor(local);
+
+            IsReady = false;
+        }
+
 
         public void SetPlayerReady()
         {
             IsReady = true;
-            // Send ready state to backend
-            _model.SetPlayerReady(true);
         }
 
 

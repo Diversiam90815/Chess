@@ -97,9 +97,10 @@ public:
 	void						startRemoteDiscovery(bool isHost);
 
 	void						answerConnectionInvitation(bool accepted);
-	// void						approveConnectionRequest();
-	// void						rejectConnectionRequest();
 	void						sendConnectionRequestToHost();
+
+	void						setLocalPlayerInMultiplayer(PlayerColor localPlayer);
+	void						setLocalPlayerReady(const bool flag);
 
 private:
 	GameManager() = default;
