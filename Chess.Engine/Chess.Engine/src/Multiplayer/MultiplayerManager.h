@@ -37,7 +37,6 @@ public:
 	void						joinSession();
 
 	void						setTCPSession(TCPSession::pointer session);
-	TCPSession::pointer			getActiveSession();
 
 	void						disconnect();
 
@@ -80,8 +79,6 @@ private:
 	void													   closeTCPServerOrClient();
 	void													   closeRemoteCommunication();
 
-	void													   receivedInviteFromClient(const std::string remoteIPv4);
-
 
 	TCPSession::pointer										   mSession = nullptr;
 
@@ -100,7 +97,7 @@ private:
 	std::unique_ptr<NetworkManager>							   mNetwork;
 
 	std::string												   mLocalPlayerName{};
-	PlayerColor												   mLocalPlayerColor;
+	PlayerColor												   mLocalPlayerColor{};
 
 	std::string												   mLocalIPv4{};
 

@@ -28,7 +28,7 @@ public:
 	~StateMachine();
 
 	void	  onGameStarted();							  // Called from UI
-	void	  onMultiplayerGameStarted(bool isHost);	  // Called from UI
+	void	  onMultiplayerGameStarted();				  // Called from UI
 	void	  onSquareSelected(const Position &pos);	  // Called from UI
 	void	  onPawnPromotionChosen(PieceType promotion); // Called from UI
 
@@ -92,7 +92,6 @@ private:
 	EndGameState		   mEndgameState{EndGameState::OnGoing};
 
 	std::atomic<bool>	   mIsMultiplayerGame{false};
-	std::atomic<bool>	   mIsLocalHost{false};
 
 	std::mutex			   mStateChangedMutex;
 	bool				   mHasPendingStateChange{false};

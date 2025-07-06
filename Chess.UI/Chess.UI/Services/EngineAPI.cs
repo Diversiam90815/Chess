@@ -88,7 +88,7 @@ namespace Chess.UI.Services
         public static extern void StartedMultiplayer();
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartMultiplayerGame", CharSet = CharSet.Unicode)]
-        public static extern void StartMultiplayerGame(bool isHost);
+        public static extern void StartMultiplayerGame();
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartRemoteDiscovery", CharSet = CharSet.Unicode)]
         public static extern void StartRemoteDiscovery(bool isHost);

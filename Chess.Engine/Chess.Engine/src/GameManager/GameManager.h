@@ -83,7 +83,7 @@ public:
 
 	EndGameState				checkForEndGameConditions();
 
-	bool						startMultiplayerGame(bool isHost);
+	bool						startMultiplayerGame();
 
 	void						disconnectMultiplayerGame();
 
@@ -133,7 +133,5 @@ private:
 
 	std::shared_ptr<MultiplayerManager> mMultiplayerManager;
 
-
 	bool								mIsMultiplayerMode{false};
-	bool								mIsHost{false};
 };

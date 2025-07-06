@@ -1,14 +1,9 @@
-﻿using Microsoft.UI.Dispatching;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using Chess.UI.Themes;
-using Chess.UI.Settings;
 using Chess.UI.Wrappers;
 using Chess.UI.Themes.Interfaces;
 
@@ -21,7 +16,7 @@ namespace Chess.UI.ViewModels
 
         private readonly IDispatcherQueueWrapper _dispatcherQueueWrapper;
 
-        private ThemeLoader _themeLoader;
+        private readonly ThemeLoader _themeLoader;
 
         private readonly IThemeManager _themeManager;
 
@@ -60,15 +55,15 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private BoardTheme selectedBoardTheme;
+        private BoardTheme _selectedBoardTheme;
         public BoardTheme SelectedBoardTheme
         {
-            get => selectedBoardTheme;
+            get => _selectedBoardTheme;
             set
             {
-                if (selectedBoardTheme != value)
+                if (_selectedBoardTheme != value)
                 {
-                    selectedBoardTheme = value;
+                    _selectedBoardTheme = value;
 
                     if (value != null)
                         Settings.Settings.CurrentBoardTheme = value.Name;
@@ -83,15 +78,15 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private PieceTheme selectedPieceTheme;
+        private PieceTheme _selectedPieceTheme;
         public PieceTheme SelectedPieceTheme
         {
-            get => selectedPieceTheme;
+            get => _selectedPieceTheme;
             set
             {
-                if (selectedPieceTheme != value)
+                if (_selectedPieceTheme != value)
                 {
-                    selectedPieceTheme = value;
+                    _selectedPieceTheme = value;
                     if (value != null)
                         Settings.Settings.CurrentPieceTheme = value.Name;
                     OnPropertyChanged();

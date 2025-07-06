@@ -1,14 +1,9 @@
-using ABI.Windows.Foundation;
 using Chess.UI.Services;
-using Chess.UI.Themes;
-using Chess.UI.Themes.Interfaces;
-using Chess.UI.UI;
 using Chess.UI.ViewModels;
 using Chess.UI.Views;
 using Chess.UI.Wrappers;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -25,13 +20,13 @@ namespace Chess.UI
 
         private ChessBoardWindow _chessBoardWindow;
 
-        private MainMenuViewModel _viewModel { get; }
+        private MainMenuViewModel ViewModel { get; }
 
-        private ChessBoardViewModel _chessBoardViewModel { get; }
+        private ChessBoardViewModel ChessBoardViewModel { get; }
 
         private MultiplayerWindow _multiplayerWindow;
 
-        private MultiplayerViewModel _multiplayerViewModel { get; }
+        private MultiplayerViewModel MultiplayerViewModel { get; }
 
         public IAsyncRelayCommand OpenPreferencesCommand { get; }
 
@@ -48,15 +43,15 @@ namespace Chess.UI
 
             _dispatcherQueue = App.Current.Services.GetRequiredService<IDispatcherQueueWrapper>();
 
-            _viewModel = App.Current.Services.GetService<MainMenuViewModel>();
-            _chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
-            _multiplayerViewModel = App.Current.Services.GetService<MultiplayerViewModel>();
+            ViewModel = App.Current.Services.GetService<MainMenuViewModel>();
+            ChessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
+            MultiplayerViewModel = App.Current.Services.GetService<MultiplayerViewModel>();
 
-            this.RootGrid.DataContext = _viewModel;
+            this.RootGrid.DataContext = ViewModel;
 
             OpenPreferencesCommand = new AsyncRelayCommand(OpenPreferencesView);
 
-            _multiplayerViewModel.RequestNavigationToChessboard += () =>
+            MultiplayerViewModel.RequestNavigationToChessboard += () =>
             {
                 // We enter the Multiplayer Game, so we show the Chessboard
                 OpenChessboardView(true);
@@ -88,7 +83,7 @@ namespace Chess.UI
         {
             _chessBoardWindow.Closed -= BoardWindowClosed;
             _chessBoardWindow = null;
-            _chessBoardViewModel.ResetGame();
+            ChessBoardViewModel.ResetGame();
             this.Activate();
         }
 
@@ -195,13 +190,13 @@ namespace Chess.UI
 
                     if (!Multiplayer)
                     {
-                        _chessBoardViewModel.IsMultiplayerGame = false;
+                        ChessBoardViewModel.IsMultiplayerGame = false;
                         // If we start a MP game, the game is started from the MP VM
-                        _chessBoardViewModel.StartGame();
+                        ChessBoardViewModel.StartGame();
                         return;
                     }
 
-                    _chessBoardViewModel.IsMultiplayerGame = true;
+                    ChessBoardViewModel.IsMultiplayerGame = true;
                 }
                 else
                 {

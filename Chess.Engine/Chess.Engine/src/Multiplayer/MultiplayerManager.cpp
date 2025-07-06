@@ -62,7 +62,6 @@ bool MultiplayerManager::hostSession()
 	mServer = std::make_unique<TCPServer>(mIoContext);
 
 	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
-	mServer->setConnectionRequestHandler([this](const std::string &remoteIPv4) { receivedInviteFromClient(remoteIPv4); });
 
 	mServer->startAccept();
 
@@ -97,6 +96,7 @@ void MultiplayerManager::joinSession()
 			setTCPSession(session);
 			sendConnectRequest();
 		});
+
 	mClient->setConnectTimeoutHandler([this]() { connectionStatusChanged({ConnectionState::Error, "Connection request timed out or was rejected!"}); });
 
 	mClient->connect(mRemoteEndpoint.IPAddress, mRemoteEndpoint.tcpPort);
@@ -113,19 +113,6 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 	mRemoteCom->init(mSession);
 
 	mRemoteCom->start();
-
-	//// As we now have a connection, we can close the Discovery and the TCPServer/TCPClient
-	// closeDiscovery();
-	// closeTCPServerOrClient();
-
-	// connectionStatusChanged(ConnectionState::Connected);
-}
-
-
-TCPSession::pointer MultiplayerManager::getActiveSession()
-{
-	std::lock_guard<std::mutex> lock(mSessionMutex);
-	return mSession;
 }
 
 
@@ -275,27 +262,6 @@ void MultiplayerManager::closeRemoteCommunication()
 		mRemoteCom->deinit();
 		mRemoteCom.reset();
 	}
-}
-
-
-void MultiplayerManager::receivedInviteFromClient(const std::string remoteIPv4)
-{
-	// Get remote endpoint
-	Endpoint remoteEndpoint = mDiscovery->getEndpointFromIP(remoteIPv4);
-
-	// Check if the endpoint is valid
-	if (!remoteEndpoint.isValid())
-	{
-		LOG_ERROR("Could not get a remote endpoint from Discovery that matches the IPv4 we received a connect request from! IPv4 : {}", remoteIPv4.c_str());
-		return;
-	}
-
-	// Set the connection event and status
-	ConnectionStatusEvent event{};
-	event.state			 = ConnectionState::ConnectionRequested;
-	event.remoteEndpoint = remoteEndpoint;
-
-	connectionStatusChanged(event);
 }
 
 

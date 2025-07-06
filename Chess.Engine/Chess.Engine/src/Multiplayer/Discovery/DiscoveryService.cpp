@@ -122,14 +122,7 @@ void DiscoveryService::run()
 		// Start the first async receive operation
 		receivePackage();
 
-		//// If in Server mode, periodically send discovery packages
-		// if (mDiscoveryMode == DiscoveryMode::Server)
-		//{
 		sendPackage();
-		//}
-
-		// Run IO context for processing async operations
-		mIoContext->run_for(std::chrono::milliseconds(500));
 
 		// Sleep or wait for event
 		waitForEvent(200);

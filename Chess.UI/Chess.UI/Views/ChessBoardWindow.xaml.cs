@@ -9,10 +9,8 @@ using static Chess.UI.Services.EngineAPI;
 using System.Threading.Tasks;
 using System;
 using Microsoft.UI.Xaml.Media;
-using Chess.UI.Themes;
 using Chess.UI.Board;
 using Chess.UI.Images;
-using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -20,7 +18,7 @@ namespace Chess.UI.Views
 {
     public sealed partial class ChessBoardWindow : Window
     {
-        private ChessBoardViewModel _viewModel;
+        private readonly ChessBoardViewModel _viewModel;
 
         private OverlappedPresenter Presenter;
 

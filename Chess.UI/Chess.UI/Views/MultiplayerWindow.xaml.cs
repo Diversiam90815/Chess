@@ -29,7 +29,7 @@ namespace Chess.UI.Views
     {
         private OverlappedPresenter Presenter;
 
-        private MultiplayerViewModel _viewModel;
+        private readonly MultiplayerViewModel _viewModel;
 
 
         public MultiplayerWindow()
@@ -40,12 +40,6 @@ namespace Chess.UI.Views
             _viewModel = App.Current.Services.GetService<MultiplayerViewModel>();
 
             this.Rootgrid.DataContext = _viewModel;
-
-            _viewModel.RequestNavigationToChessboard += () =>
-            {
-                // If we enter the Multiplayer Game, we hide this window
-                //this.AppWindow.Hide();
-            };
 
             Init();
             SetWindowSize(600, 400);
@@ -169,10 +163,12 @@ namespace Chess.UI.Views
             _viewModel.SelectPlayerColor(EngineAPI.PlayerColor.White);
         }
 
+
         private void SelectBlackButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.SelectPlayerColor(EngineAPI.PlayerColor.Black);
         }
+
 
         private void ReadyButton_Click(object sender, RoutedEventArgs e)
         {

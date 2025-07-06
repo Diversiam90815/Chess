@@ -52,8 +52,8 @@
 
                     <StackPanel x:Name="CurrentPlayerMP" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" Height="Auto" Margin="16" Orientation="Horizontal" CornerRadius="8" Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.IsMultiplayerGame), Mode=OneWay}" >
                         <TextBlock Text="Local Player" HorizontalAlignment="Center" TextAlignment="Center" VerticalAlignment="Center" FontSize="24" Margin="8"/>
-                        <Image Source="{x:Bind converter:Converter.PlayerToPawnImage(_viewModel._multiplayerViewModel.LocalPlayer), Mode=OneWay}" Style="{StaticResource CurrentPlayerImageStyle}"/>
-                        <Ellipse Width="10" Height="10" Fill="{x:Bind converter:Converter.BoolToColor(_viewModel._multiplayerViewModel.IsLocalPlayersTurn), Mode=OneWay}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                        <Image Source="{x:Bind converter:Converter.PlayerToPawnImage(_viewModel.MultiplayerViewModel.LocalPlayer), Mode=OneWay}" Style="{StaticResource CurrentPlayerImageStyle}"/>
+                        <Ellipse Width="10" Height="10" Fill="{x:Bind converter:Converter.BoolToColor(_viewModel.MultiplayerViewModel.IsLocalPlayersTurn), Mode=OneWay}" VerticalAlignment="Center" Margin="8,0,0,0"/>
                     </StackPanel>
 
                     <Grid x:Name="Score" Width="160" Height="170" CornerRadius="8" Margin="16" Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}" HorizontalAlignment="Center">
@@ -73,37 +73,37 @@
 
                         <StackPanel Name="WhiteCapturedPieces" Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
                             <StackPanel Name="WCapturedPiecesImages" Orientation="Vertical" HorizontalAlignment="Left">
-                                <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedBlackPawnImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                                <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedBlackBishopImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                                <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedBlackKnightImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                                <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedBlackRookImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                                <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedBlackQueenImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                                <Image Source="{x:Bind _viewModel.ScoreViewModel.CapturedBlackPawnImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                                <Image Source="{x:Bind _viewModel.ScoreViewModel.CapturedBlackBishopImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                                <Image Source="{x:Bind _viewModel.ScoreViewModel.CapturedBlackKnightImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                                <Image Source="{x:Bind _viewModel.ScoreViewModel.CapturedBlackRookImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                                <Image Source="{x:Bind _viewModel.ScoreViewModel.CapturedBlackQueenImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
                             </StackPanel>
 
                             <StackPanel Name="WNumCapturedPiece" Orientation="Vertical" HorizontalAlignment="Center">
-                                <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteCapturedPawn, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                                <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteCapturedBishop, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                                <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteCapturedKnight, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                                <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteCapturedRook, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                                <TextBlock Text="{x:Bind _viewModel._scoreViewModel.WhiteCapturedQueen, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                                <TextBlock Text="{x:Bind _viewModel.ScoreViewModel.WhiteCapturedPawn, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                                <TextBlock Text="{x:Bind _viewModel.ScoreViewModel.WhiteCapturedBishop, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                                <TextBlock Text="{x:Bind _viewModel.ScoreViewModel.WhiteCapturedKnight, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                                <TextBlock Text="{x:Bind _viewModel.ScoreViewModel.WhiteCapturedRook, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                                <TextBlock Text="{x:Bind _viewModel.ScoreViewModel.WhiteCapturedQueen, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
                             </StackPanel>
                         </StackPanel>
 
                         <StackPanel Name="BlackCapturedPieces" Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
                             <StackPanel Name="BCapturedPiecesImages" Orientation="Vertical" HorizontalAlignment="Left">
-                                <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedWhitePawnImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                                <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedWhiteBishopImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                                <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedWhiteKnightImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                                <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedWhiteRookImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
-                                <Image Source="{x:Bind _viewModel._scoreViewModel.CapturedWhiteQueenImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                                <Image Source="{x:Bind _viewModel.ScoreViewModel.CapturedWhitePawnImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                                <Image Source="{x:Bind _viewModel.ScoreViewModel.CapturedWhiteBishopImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                                <Image Source="{x:Bind _viewModel.ScoreViewModel.CapturedWhiteKnightImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                                <Image Source="{x:Bind _viewModel.ScoreViewModel.CapturedWhiteRookImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
+                                <Image Source="{x:Bind _viewModel.ScoreViewModel.CapturedWhiteQueenImage}" Style="{StaticResource CapturedPieceImageStyle}"/>
                             </StackPanel>
 
                             <StackPanel Name="BNumCapturedPiece" Orientation="Vertical" HorizontalAlignment="Center">
-                                <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackCapturedPawn, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                                <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackCapturedBishop, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                                <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackCapturedKnight, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                                <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackCapturedRook, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
-                                <TextBlock Text="{x:Bind _viewModel._scoreViewModel.BlackCapturedQueen, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                                <TextBlock Text="{x:Bind _viewModel.ScoreViewModel.BlackCapturedPawn, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                                <TextBlock Text="{x:Bind _viewModel.ScoreViewModel.BlackCapturedBishop, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                                <TextBlock Text="{x:Bind _viewModel.ScoreViewModel.BlackCapturedKnight, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                                <TextBlock Text="{x:Bind _viewModel.ScoreViewModel.BlackCapturedRook, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
+                                <TextBlock Text="{x:Bind _viewModel.ScoreViewModel.BlackCapturedQueen, Mode=OneWay}" Style="{StaticResource CapturedPieceNumberStyle}" />
                             </StackPanel>
                         </StackPanel>
                     </Grid>
@@ -118,7 +118,7 @@
 
                         <!-- Moves with Wrapping Columns -->
                         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                            <ItemsControl x:Name="MovesColumns" ItemsSource="{x:Bind _viewModel._moveHistoryViewModel.MoveHistoryColumns, Mode=OneWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <ItemsControl x:Name="MovesColumns" ItemsSource="{x:Bind _viewModel.MoveHistoryViewModel.MoveHistoryColumns, Mode=OneWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel Orientation="Horizontal"/>

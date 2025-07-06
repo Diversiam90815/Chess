@@ -19,8 +19,6 @@ using asio::ip::tcp;
 
 using SessionHandler		   = std::function<void(std::shared_ptr<TCPSession> session)>; // Callback invoked when a new session is accepted
 
-using ConnectionRequestHandler = std::function<void(const std::string &remoteIPv4)>;
-
 
 class TCPServer
 {
@@ -33,7 +31,6 @@ public:
 	const int getBoundPort() const;
 
 	void	  setSessionHandler(SessionHandler handler);
-	void	  setConnectionRequestHandler(ConnectionRequestHandler handler);
 
 	void	  respondToConnectionRequest(bool accepted);
 
@@ -49,5 +46,4 @@ private:
 	std::shared_ptr<TCPSession> mPendingSession;
 
 	SessionHandler				mSessionHandler;
-	ConnectionRequestHandler	mConnectionRequestHandler;
 };

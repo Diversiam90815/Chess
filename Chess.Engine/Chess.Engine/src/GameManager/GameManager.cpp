@@ -426,26 +426,27 @@ EndGameState GameManager::checkForEndGameConditions()
 }
 
 
-bool GameManager::startMultiplayerGame(bool isHost)
+bool GameManager::startMultiplayerGame()
 {
 	LOG_INFO("Game started in Multiplayer mode..");
 
 	mIsMultiplayerMode = true;
-	mIsHost			   = isHost;
 
 	// Initialize the game & board
 	clearState();
 	switchTurns();
 	mChessBoard->initializeBoard();
 
-	if (isHost)
+	PlayerColor localPlayer = mMultiplayerManager->mLocalPlayerColor;
+
+	if (localPlayer == PlayerColor::White)
 	{
 		LOG_INFO("We start as white player");
 
 		mWhitePlayer.setIsLocalPlayer(true);
 		mBlackPlayer.setIsLocalPlayer(false);
 	}
-	else
+	else if (localPlayer == PlayerColor::Black)
 	{
 		LOG_INFO("We start as black player!");
 

@@ -217,9 +217,9 @@ Engine_API void StartedMultiplayer()
 }
 
 
-Engine_API void StartMultiplayerGame(bool isHost)
+Engine_API void StartMultiplayerGame()
 {
-	StateMachine::GetInstance()->onMultiplayerGameStarted(isHost);
+	StateMachine::GetInstance()->onMultiplayerGameStarted();
 }
 
 

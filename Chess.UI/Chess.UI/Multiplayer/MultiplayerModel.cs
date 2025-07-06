@@ -2,10 +2,8 @@
 using Chess.UI.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
+
 
 namespace Chess.UI.Models
 {
@@ -28,12 +26,7 @@ namespace Chess.UI.Models
     public class MultiplayerModel : IMultiplayerModel
     {
 
-        private List<NetworkAdapter> mAdapters = new();
-
-
-        public MultiplayerModel()
-        {
-        }
+        private readonly List<NetworkAdapter> _adapters = [];
 
 
         public void Init()
@@ -75,32 +68,33 @@ namespace Chess.UI.Models
 
         private bool SetNetworkAdapters()
         {
-            mAdapters.Clear();
+            _adapters.Clear();
             int adapterCount = EngineAPI.GetNetworkAdapterCount();
 
             for (uint i = 0; i < adapterCount; ++i)
             {
-                EngineAPI.NetworkAdapter adapter;
-                EngineAPI.GetNetworkAdapterAtIndex(i, out adapter);
+                EngineAPI.GetNetworkAdapterAtIndex(i, out EngineAPI.NetworkAdapter adapter);
 
-                NetworkAdapter networkAdapter = new();
-                networkAdapter.Name = adapter.name;
-                networkAdapter.ID = adapter.id;
+                NetworkAdapter networkAdapter = new()
+                {
+                    Name = adapter.name,
+                    ID = adapter.id
+                };
 
                 if (networkAdapter.ID == 0 && networkAdapter.Name == null)
                     continue;
 
-                mAdapters.Add(networkAdapter);
+                _adapters.Add(networkAdapter);
             }
 
-            bool result = mAdapters.Count > 0;
+            bool result = _adapters.Count > 0;
             return result;
         }
 
 
         public List<NetworkAdapter> GetNetworkAdapters()
         {
-            return mAdapters;
+            return _adapters;
         }
 
 
@@ -113,12 +107,6 @@ namespace Chess.UI.Models
         public void ChangeNetworkAdapter(int ID)
         {
             EngineAPI.ChangeCurrentAdapter(ID);
-        }
-
-
-        public string GetRemotePlayerName()
-        {
-            return EngineAPI.GetRemotePlayerName();
         }
 
 
@@ -164,22 +152,9 @@ namespace Chess.UI.Models
         }
 
 
-        public void StartMultiplerGame(MultiplayerMode mode)
+        public void StartMultiplerGame()
         {
-            switch (mode)
-            {
-                case MultiplayerMode.Client:
-                    {
-                        EngineAPI.StartMultiplayerGame(false);
-                        break;
-                    }
-                case MultiplayerMode.Server:
-                    {
-                        EngineAPI.StartMultiplayerGame(true);
-                        break;
-                    }
-                default: break;
-            }
+            EngineAPI.StartMultiplayerGame();
         }
 
 

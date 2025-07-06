@@ -49,7 +49,7 @@ extern "C"
 
 	Engine_API void	 StartedMultiplayer();
 
-	Engine_API void	 StartMultiplayerGame(bool isHost);
+	Engine_API void	 StartMultiplayerGame();
 
 	Engine_API void	 StartRemoteDiscovery(bool isHost);
 

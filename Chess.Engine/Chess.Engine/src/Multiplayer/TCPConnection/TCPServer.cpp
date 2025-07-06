@@ -47,12 +47,6 @@ void TCPServer::setSessionHandler(SessionHandler handler)
 }
 
 
-void TCPServer::setConnectionRequestHandler(ConnectionRequestHandler handler)
-{
-	mConnectionRequestHandler = handler;
-}
-
-
 void TCPServer::respondToConnectionRequest(bool accepted)
 {
 	if (!mPendingSession)

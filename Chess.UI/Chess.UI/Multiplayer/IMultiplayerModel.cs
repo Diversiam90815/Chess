@@ -19,7 +19,7 @@ namespace Chess.UI.Multiplayer
 
         void StartGameClient();
 
-        void StartMultiplerGame(MultiplayerMode mode);
+        void StartMultiplerGame();
 
         void StartMultiplayer();
 

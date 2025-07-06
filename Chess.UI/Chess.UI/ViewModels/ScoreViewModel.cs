@@ -1,21 +1,15 @@
-﻿using Microsoft.UI.Dispatching;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using System.Collections.Generic;
+﻿using Microsoft.UI.Xaml.Media;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using static Chess.UI.Services.EngineAPI;
-using static Chess.UI.Images.ImageServices;
 using Chess.UI.Score;
-using Microsoft.Windows.Management.Deployment;
 using Chess.UI.Images;
 using Chess.UI.Wrappers;
-using Microsoft.Extensions.DependencyInjection;
 
 
 namespace Chess.UI.ViewModels
 {
-    public class ScoreViewModel : INotifyPropertyChanged
+    public partial class ScoreViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

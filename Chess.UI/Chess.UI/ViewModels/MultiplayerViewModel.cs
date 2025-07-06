@@ -6,22 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Net.Security;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Media.Playback;
 
 
 namespace Chess.UI.ViewModels
 {
-    public class MultiplayerViewModel : INotifyPropertyChanged
+    public partial class MultiplayerViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -38,7 +30,7 @@ namespace Chess.UI.ViewModels
         {
             _dispatcherQueue = dispatcher;
 
-            NetworkAdapters = new();
+            NetworkAdapters = [];
 
             _model = App.Current.Services.GetService<IMultiplayerModel>();
             _model.Init();
@@ -47,8 +39,6 @@ namespace Chess.UI.ViewModels
             _model.OnConnectionStatusChanged += HandleConnectionStatusUpdated;
             _model.OnPlayerChanged += HandlePlayerChanged;
             _model.OnMultiplayerPlayerSetFromRemote += SelectLocalPlayerFromRemote;
-
-            //UpdateAdapterBox();
         }
 
 
@@ -59,30 +49,30 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private ObservableCollection<NetworkAdapter> networkAdapters;
+        private ObservableCollection<NetworkAdapter> _networkAdapters;
         public ObservableCollection<NetworkAdapter> NetworkAdapters
         {
-            get => networkAdapters;
+            get => _networkAdapters;
             set
             {
-                if (networkAdapters != value)
+                if (_networkAdapters != value)
                 {
-                    networkAdapters = value;
+                    _networkAdapters = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private NetworkAdapter selectedAdapter;
+        private NetworkAdapter _selectedAdapter;
         public NetworkAdapter SelectedAdapter
         {
-            get => selectedAdapter;
+            get => _selectedAdapter;
             set
             {
-                if (selectedAdapter != value)
+                if (_selectedAdapter != value)
                 {
-                    selectedAdapter = value;
+                    _selectedAdapter = value;
                     _model.ChangeNetworkAdapter(SelectedAdapter.ID);
                     OnPropertyChanged();
                 }
@@ -90,30 +80,30 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private bool isLocalPlayersTurn = false;
+        private bool _isLocalPlayersTurn = false;
         public bool IsLocalPlayersTurn
         {
-            get => isLocalPlayersTurn;
+            get => _isLocalPlayersTurn;
             set
             {
-                if (isLocalPlayersTurn != value)
+                if (_isLocalPlayersTurn != value)
                 {
-                    isLocalPlayersTurn = value;
+                    _isLocalPlayersTurn = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private bool processing = false;
+        private bool _processing = false;
         public bool Processing
         {
-            get => processing;
+            get => _processing;
             set
             {
-                if (processing != value)
+                if (_processing != value)
                 {
-                    processing = value;
+                    _processing = value;
                     SettingsEditable = !value;
                     OnPropertyChanged();
                 }
@@ -121,105 +111,105 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private bool settingsEditable = true;
+        private bool _settingsEditable = true;
         public bool SettingsEditable
         {
-            get => settingsEditable;
+            get => _settingsEditable;
             set
             {
-                if (settingsEditable != value)
+                if (_settingsEditable != value)
                 {
-                    settingsEditable = value;
+                    _settingsEditable = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private bool hostGameButtonEnabled = false;
+        private bool _hostGameButtonEnabled = false;
         public bool HostGameButtonEnabled
         {
-            get => hostGameButtonEnabled;
+            get => _hostGameButtonEnabled;
             set
             {
-                if (hostGameButtonEnabled != value)
+                if (_hostGameButtonEnabled != value)
                 {
-                    hostGameButtonEnabled = value;
+                    _hostGameButtonEnabled = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private bool clientGameButtonEnabled = false;
+        private bool _clientGameButtonEnabled = false;
         public bool ClientGameButtonEnabled
         {
-            get => clientGameButtonEnabled;
+            get => _clientGameButtonEnabled;
             set
             {
-                if (clientGameButtonEnabled != value)
+                if (_clientGameButtonEnabled != value)
                 {
-                    clientGameButtonEnabled = value;
+                    _clientGameButtonEnabled = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private EngineAPI.PlayerColor localPlayer;
+        private EngineAPI.PlayerColor _localPlayer;
         public EngineAPI.PlayerColor LocalPlayer
         {
-            get => localPlayer;
+            get => _localPlayer;
             set
             {
-                if (localPlayer != value)
+                if (_localPlayer != value)
                 {
-                    localPlayer = value;
+                    _localPlayer = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private string remotePlayerName;
+        private string _remotePlayerName;
         public string RemotePlayerName
         {
-            get => remotePlayerName;
+            get => _remotePlayerName;
             set
             {
-                if (remotePlayerName != value)
+                if (_remotePlayerName != value)
                 {
-                    remotePlayerName = value;
+                    _remotePlayerName = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private string localPlayerName;
+        private string _localPlayerName;
         public string LocalPlayerName
         {
-            get => localPlayerName;
+            get => _localPlayerName;
             set
             {
-                if (localPlayerName != value)
+                if (_localPlayerName != value)
                 {
-                    localPlayerName = value;
+                    _localPlayerName = value;
                     _model.SetLocalPlayerName(value);
                 }
             }
         }
 
 
-        private bool isReady = false;
+        private bool _isReady = false;
         public bool IsReady
         {
-            get => isReady;
+            get => _isReady;
             set
             {
-                if (isReady != value)
+                if (_isReady != value)
                 {
-                    isReady = value;
+                    _isReady = value;
                     _model.SetPlayerReady(value);
 
                     OnPropertyChanged();
@@ -228,60 +218,45 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private bool remotePlayerReady = false;
+        private bool _remotePlayerReady = false;
         public bool RemotePlayerReady
         {
-            get => remotePlayerReady;
+            get => _remotePlayerReady;
             set
             {
-                if (remotePlayerReady != value)
+                if (_remotePlayerReady != value)
                 {
-                    remotePlayerReady = value;
+                    _remotePlayerReady = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private EngineAPI.PlayerColor selectedPlayerColor = EngineAPI.PlayerColor.NoColor;
+        private EngineAPI.PlayerColor _selectedPlayerColor = EngineAPI.PlayerColor.NoColor;
         public EngineAPI.PlayerColor SelectedPlayerColor
         {
-            get => selectedPlayerColor;
+            get => _selectedPlayerColor;
             set
             {
-                if (selectedPlayerColor != value)
+                if (_selectedPlayerColor != value)
                 {
-                    selectedPlayerColor = value;
+                    _selectedPlayerColor = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private bool readyButtonEnabled;
+        private bool _readyButtonEnabled;
         public bool ReadyButtonEnabled
         {
-            get => readyButtonEnabled;
+            get => _readyButtonEnabled;
             set
             {
-                if (readyButtonEnabled != value)
+                if (_readyButtonEnabled != value)
                 {
-                    readyButtonEnabled = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-
-        private Visibility waitingForRemoteVisibility = Visibility.Collapsed;
-        public Visibility WaitingForRemoteVisibility
-        {
-            get => waitingForRemoteVisibility;
-            set
-            {
-                if (waitingForRemoteVisibility != value)
-                {
-                    waitingForRemoteVisibility = value;
+                    _readyButtonEnabled = value;
                     OnPropertyChanged();
                 }
             }
@@ -290,75 +265,75 @@ namespace Chess.UI.ViewModels
 
         #region Visibilities
 
-        private Visibility initView = Visibility.Visible;
+        private Visibility _initView = Visibility.Visible;
         public Visibility InitView
         {
-            get => initView;
+            get => _initView;
             set
             {
-                if (initView != value)
+                if (_initView != value)
                 {
-                    initView = value;
+                    _initView = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private Visibility clientFoundHostView = Visibility.Collapsed;
+        private Visibility _clientFoundHostView = Visibility.Collapsed;
         public Visibility ClientFoundHostView
         {
-            get => clientFoundHostView;
+            get => _clientFoundHostView;
             set
             {
-                if (clientFoundHostView != value)
+                if (_clientFoundHostView != value)
                 {
-                    clientFoundHostView = value;
+                    _clientFoundHostView = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private Visibility clientRequestedConnectionView = Visibility.Collapsed;
+        private Visibility _clientRequestedConnectionView = Visibility.Collapsed;
         public Visibility ClientRequestedConnectionView
         {
-            get => clientRequestedConnectionView;
+            get => _clientRequestedConnectionView;
             set
             {
-                if (clientRequestedConnectionView != value)
+                if (_clientRequestedConnectionView != value)
                 {
-                    clientRequestedConnectionView = value;
+                    _clientRequestedConnectionView = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private Visibility clientWaitingForResponseView = Visibility.Collapsed;
+        private Visibility _clientWaitingForResponseView = Visibility.Collapsed;
         public Visibility ClientWaitingForResponseView
         {
-            get => clientWaitingForResponseView;
+            get => _clientWaitingForResponseView;
             set
             {
-                if (clientWaitingForResponseView != value)
+                if (_clientWaitingForResponseView != value)
                 {
-                    clientWaitingForResponseView = value;
+                    _clientWaitingForResponseView = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        private Visibility settingLocalPlayerView = Visibility.Collapsed;
+        private Visibility _settingLocalPlayerView = Visibility.Collapsed;
         public Visibility SettingLocalPlayerView
         {
-            get => settingLocalPlayerView;
+            get => _settingLocalPlayerView;
             set
             {
-                if (settingLocalPlayerView != value)
+                if (_settingLocalPlayerView != value)
                 {
-                    settingLocalPlayerView = value;
+                    _settingLocalPlayerView = value;
                     OnPropertyChanged();
                 }
             }
@@ -392,11 +367,6 @@ namespace Chess.UI.ViewModels
 
         public void EnterInitMode()
         {
-            // TODO:
-            // Enter Init Mode Hosting game via Model
-            // Setting local player name in UI if saved earlier
-            // Display Init view
-
             _model.ResetToInit();
             DisplayInitView();
         }
@@ -404,12 +374,7 @@ namespace Chess.UI.ViewModels
 
         private void EnterMultiplayerGame()
         {
-            if (MPMode == MultiplayerMode.None || MPMode == MultiplayerMode.Init)
-                return;
-
-            LocalPlayer = MPMode == MultiplayerMode.Server ? EngineAPI.PlayerColor.White : EngineAPI.PlayerColor.Black;     // Server / Host mode starts with white for now
-
-            _model.StartMultiplerGame(MPMode);
+            _model.StartMultiplerGame();
         }
 
 
@@ -417,6 +382,7 @@ namespace Chess.UI.ViewModels
         {
             //We are the client and accepted a connection to the host
             _model.ConnectToHost();
+            DisplayClientWaitingForResponseView();
         }
 
 
@@ -479,34 +445,15 @@ namespace Chess.UI.ViewModels
             // TODO: Implement reactive UI
             switch (state)
             {
-                case EngineAPI.ConnectionState.HostingSession:
-                    {
-                        break;
-                    }
                 case EngineAPI.ConnectionState.ConnectionRequested:
                     {
                         RemotePlayerName = remotePlayerName;
                         DisplayClientRequestedConnectionView();
                         break;
                     }
-                case EngineAPI.ConnectionState.Connecting:
-                    {
-                        break;
-                    }
-                case EngineAPI.ConnectionState.Connected:
-                    {
-                        break;
-                    }
-                case EngineAPI.ConnectionState.WaitingForARemote:
-                    {
-                        break;
-                    }
-                case EngineAPI.ConnectionState.Disconnecting:
-                    {
-                        break;
-                    }
                 case EngineAPI.ConnectionState.Disconnected:
                     {
+                        EnterInitMode();
                         break;
                     }
                 case EngineAPI.ConnectionState.ClientFoundHost:
@@ -607,13 +554,6 @@ namespace Chess.UI.ViewModels
                         break;
                     }
             }
-        }
-
-
-        private void SetLocalPlayerName(string name)
-        {
-            _model.SetLocalPlayerName(name);
-            SettingsEditable = true;
         }
 
 

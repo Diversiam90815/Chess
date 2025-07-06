@@ -108,7 +108,7 @@ constexpr auto		  ChatMessageKey			   = "Chat";
 constexpr auto		  InvitationMessageKey		   = "Invitation";
 constexpr auto		  InvitationResponseMessageKey = "InvResponse";
 constexpr auto		  PlayerChosenKey			   = "PlayerChosen";
-constexpr auto		  PlayerReadyFlagKey	   = "PlayerReady";
+constexpr auto		  PlayerReadyFlagKey		   = "PlayerReady";
 
 
 //============================================================

@@ -55,11 +55,10 @@ void StateMachine::onGameStarted()
 }
 
 
-void StateMachine::onMultiplayerGameStarted(bool isHost)
+void StateMachine::onMultiplayerGameStarted()
 {
 	LOG_INFO("Starting a Multiplayer Game!");
 	mIsMultiplayerGame.store(true);
-	mIsLocalHost.store(isHost);
 
 	onGameStarted();
 }
@@ -451,7 +450,7 @@ bool StateMachine::handleInitState(bool multiplayer) const
 
 	if (multiplayer)
 	{
-		return GameManager::GetInstance()->startMultiplayerGame(mIsLocalHost);
+		return GameManager::GetInstance()->startMultiplayerGame();
 	}
 	else
 	{
