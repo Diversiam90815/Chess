@@ -170,10 +170,12 @@ void MultiplayerManager::onRemoteConnectionStateReceived(const ConnectionState &
 
 void MultiplayerManager::onRemoteInvitationReceived(const InvitationRequest &invite)
 {
-	ConnectionStatusEvent event;
-	Endpoint			  ep;
+	Endpoint ep;
 	ep.playerName = invite.playerName;
-	event.state	  = ConnectionState::ConnectionRequested;
+
+	ConnectionStatusEvent event;
+	event.remoteEndpoint = ep;
+	event.state			 = ConnectionState::ConnectionRequested;
 
 	// TODO: Pre-Filter for version missmatch
 
@@ -285,6 +287,8 @@ void MultiplayerManager::setInternalObservers()
 	mRemoteSender->attachObserver(mRemoteCom);
 
 	mNetwork->attachObserver(shared_from_this());
+
+	mRemoteReceiver->attachObserver(shared_from_this());
 }
 
 
