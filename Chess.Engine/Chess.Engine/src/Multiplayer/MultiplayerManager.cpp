@@ -150,9 +150,8 @@ void MultiplayerManager::onRemoteConnectionStateReceived(const ConnectionState &
 	// We received a connection status change event from the remote
 	mRemoteConnectionState = state;
 
-	if (mConnectionState == ConnectionState::Connected && state == ConnectionState::Connected)
+	if (mConnectionState == ConnectionState::ConnectionRequested && state == ConnectionState::Connected)
 	{
-		// We both are connected, so we switch into setCurrentPlayer state
 		connectionStatusChanged(ConnectionState::SetPlayerColor);
 	}
 
@@ -328,9 +327,6 @@ void MultiplayerManager::sendConnectResponse(bool accepted, std::string reason)
 	response.accepted	= accepted;
 	response.playerName = mLocalPlayerName;
 	response.reason		= reason;
-
-	if (accepted)
-		connectionStatusChanged(ConnectionState::Connected);
 
 	mRemoteSender->sendConnectionResponse(response);
 }
