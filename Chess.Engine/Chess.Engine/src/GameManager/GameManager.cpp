@@ -362,7 +362,9 @@ int GameManager::getCurrentNetworkAdapterID()
 
 void GameManager::setLocalPlayerName(std::string name)
 {
-	mMultiplayerManager->setLocalPlayerName(name);
+	// TODO: Set name in config
+
+	// mMultiplayerManager->setLocalPlayerName(name);
 }
 
 

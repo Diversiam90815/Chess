@@ -152,21 +152,6 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private string _localPlayerName;
-        public string LocalPlayerName
-        {
-            get => _localPlayerName;
-            set
-            {
-                if (_localPlayerName != value)
-                {
-                    _localPlayerName = value;
-                    _model.SetLocalPlayerName(value);
-                }
-            }
-        }
-
-
         private bool _isReady = false;
         public bool IsReady
         {

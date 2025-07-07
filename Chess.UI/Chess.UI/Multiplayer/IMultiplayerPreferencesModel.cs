@@ -13,5 +13,9 @@ namespace Chess.UI.Multiplayer
         void ChangeNetworkAdapter(int adapterID);
 
         List<Multiplayer.NetworkAdapter> GetNetworkAdapters();
+
+        void SetLocalPlayerName(string playerName);
+
+        string GetLocalPlayerName();
     }
 }

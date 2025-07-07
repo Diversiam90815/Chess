@@ -71,15 +71,6 @@
                             VerticalAlignment="Center"
                             Style="{ThemeResource MPSubTitle}"
                             Text="Name" />
-                        <TextBox
-                            Name="LocalPlayerName"
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            IsEnabled="{x:Bind _viewModel.SettingsEditable, Mode=TwoWay}"
-                            PlaceholderText="Set your name"
-                            Style="{ThemeResource PlainTextEnter}"
-                            TextChanged="LocalPlayerName_TextChanged"
-                            TextChanging="PlayerName_TextChanging" />
 
                     </Grid>
 

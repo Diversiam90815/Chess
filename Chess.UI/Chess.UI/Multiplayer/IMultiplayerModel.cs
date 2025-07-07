@@ -19,8 +19,6 @@ namespace Chess.UI.Multiplayer
 
         void StartMultiplayer();
 
-        void SetLocalPlayerName(string playerName);
-
         void ConnectToHost();
 
         void AnswerConnectionInvitation(bool accept);

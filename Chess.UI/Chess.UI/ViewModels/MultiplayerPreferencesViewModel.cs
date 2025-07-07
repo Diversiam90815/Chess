@@ -27,8 +27,11 @@ namespace Chess.UI.ViewModels
             _model.Init();
 
             UpdateAdapterBox();
+            SetLocalNameFromBackend();
         }
 
+
+        #region Network
 
         private ObservableCollection<NetworkAdapter> _networkAdapters;
         public ObservableCollection<NetworkAdapter> NetworkAdapters
@@ -97,6 +100,32 @@ namespace Chess.UI.ViewModels
                 SelectPresavedNetworkAdapter();
             });
         }
+        #endregion
+
+
+        #region Player Name
+
+
+        private string _localPlayerName;
+        public string LocalPlayerName
+        {
+            get => _localPlayerName;
+            set
+            {
+                if (_localPlayerName != value)
+                {
+                    _localPlayerName = value;
+                    _model.SetLocalPlayerName(value);
+                }
+            }
+        }
+
+        private void SetLocalNameFromBackend()
+        {
+            LocalPlayerName = _model.GetLocalPlayerName();
+        }
+
+        #endregion
 
 
         protected void OnPropertyChanged([CallerMemberName] string name = null)

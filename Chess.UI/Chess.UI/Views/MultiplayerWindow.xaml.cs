@@ -68,24 +68,12 @@ namespace Chess.UI.Views
 
         private void HostGameButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = LocalPlayerName.Text.Trim();
-            if (name.Length == 0)
-                return;
-
-            _viewModel.LocalPlayerName = name;
-
             _viewModel.EnterServerMultiplayerMode();
         }
 
 
         private void JoinGameButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = LocalPlayerName.Text.Trim();
-            if (name.Length == 0)
-                return;
-
-            _viewModel.LocalPlayerName = name;
-
             _viewModel.EnterClientMultiplayerMode();
         }
 
@@ -134,12 +122,6 @@ namespace Chess.UI.Views
         }
 
 
-        private void LocalPlayerName_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            _viewModel.UpdateMPButtons(MultiplayerMode.Init);
-        }
-
-
         private void SelectWhiteButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.SelectPlayerColor(EngineAPI.PlayerColor.White);
@@ -155,22 +137,6 @@ namespace Chess.UI.Views
         private void ReadyButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.SetPlayerReady();
-        }
-
-
-        private void PlayerName_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
-        {
-            var newText = sender.Text;
-
-            var filteredText = Regex.Replace(newText, "[^A-Za-z]", "");
-
-            if (newText != filteredText)
-            {
-                int oldCaretPos = sender.SelectionStart;
-                sender.Text = filteredText;
-
-                sender.SelectionStart = Math.Min(oldCaretPos, newText.Length);
-            }
         }
     }
 }

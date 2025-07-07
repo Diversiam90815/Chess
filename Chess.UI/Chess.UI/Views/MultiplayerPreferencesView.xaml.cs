@@ -1,6 +1,8 @@
 using Chess.UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
+using System;
+using System.Text.RegularExpressions;
 
 
 namespace Chess.UI.Views
@@ -35,6 +37,27 @@ namespace Chess.UI.Views
                     _viewModel.SelectedAdapter = selectedAdapter;
                 }
             }
+        }
+
+        private void LocalPlayerName_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void LocalPlayerName_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        {
+            var newText = sender.Text;
+
+            var filteredText = Regex.Replace(newText, "[^A-Za-z]", "");
+
+            if (newText != filteredText)
+            {
+                int oldCaretPos = sender.SelectionStart;
+                sender.Text = filteredText;
+
+                sender.SelectionStart = Math.Min(oldCaretPos, newText.Length);
+            }
+
         }
     }
 }

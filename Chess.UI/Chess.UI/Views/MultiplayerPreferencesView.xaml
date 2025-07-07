@@ -31,6 +31,7 @@
 
                 <ComboBox
                     Grid.Column="1"
+                    Width="200"
                     HorizontalAlignment="Stretch"
                     DisplayMemberPath="Name"
                     ItemsSource="{x:Bind _viewModel.NetworkAdapters}"
@@ -53,7 +54,15 @@
                 <!--  Local Player name  -->
                 <TextBlock Style="{StaticResource SettingsSubTitle}" Text="Player" />
 
-                <TextBox Grid.Column="1" HorizontalAlignment="Stretch" />
+                <TextBox
+                    Name="LocalPlayerName"
+                    Grid.Column="1"
+                    Width="200"
+                    HorizontalAlignment="Stretch"
+                    Style="{ThemeResource PlainTextEnter}"
+                    Text="{x:Bind _viewModel.LocalPlayerName, Mode=TwoWay}"
+                    TextChanged="LocalPlayerName_TextChanged"
+                    TextChanging="LocalPlayerName_TextChanging" />
 
             </Grid>
 

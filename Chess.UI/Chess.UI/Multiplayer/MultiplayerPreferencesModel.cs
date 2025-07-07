@@ -25,6 +25,8 @@ namespace Chess.UI.Multiplayer
         }
 
 
+        #region Network
+
         private bool SetNetworkAdapters()
         {
             _adapters.Clear();
@@ -67,6 +69,25 @@ namespace Chess.UI.Multiplayer
         {
             EngineAPI.ChangeCurrentAdapter(ID);
         }
+
+        #endregion
+
+
+        #region Player Name
+
+        public void SetLocalPlayerName(string name)
+        {
+            EngineAPI.SetLocalPlayerName(name);
+        }
+
+
+        public string GetLocalPlayerName()
+        {
+            string localPlayerName = "LocalPlayerPlaceholder";
+            return localPlayerName;
+        }
+
+        #endregion
 
     }
 }

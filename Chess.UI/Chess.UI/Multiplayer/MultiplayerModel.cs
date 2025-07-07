@@ -53,12 +53,6 @@ namespace Chess.UI.Models
         }
 
 
-        public void SetLocalPlayerName(string name)
-        {
-            EngineAPI.SetLocalPlayerName(name);
-        }
-
-
         public void StartGameServer()
         {
             EngineAPI.StartRemoteDiscovery(true);
