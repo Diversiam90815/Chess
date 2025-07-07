@@ -39,10 +39,6 @@ namespace Chess.UI.Views
             }
         }
 
-        private void LocalPlayerName_TextChanged(object sender, TextChangedEventArgs e)
-        {
-
-        }
 
         private void LocalPlayerName_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
         {
