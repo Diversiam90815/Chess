@@ -78,10 +78,6 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-	  <None Remove="Views\GeneralPreferencesView.xaml" />
-	  <None Remove="Views\PreferencesView.xaml" />
-	</ItemGroup>
-	<ItemGroup>
 	  <ProjectReference Include="..\..\Chess.Engine\build\Chess.Engine\Chess.Engine.vcxproj" />
 	</ItemGroup>
 	<ItemGroup>
