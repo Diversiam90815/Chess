@@ -30,8 +30,6 @@ namespace Chess.UI.ViewModels
         {
             _dispatcherQueue = dispatcher;
 
-            NetworkAdapters = [];
-
             _model = App.Current.Services.GetService<IMultiplayerModel>();
             _model.Init();
 
@@ -45,38 +43,6 @@ namespace Chess.UI.ViewModels
         public void StartMultiplayerSetup()
         {
             _model.StartMultiplayer();
-            UpdateAdapterBox();
-        }
-
-
-        private ObservableCollection<NetworkAdapter> _networkAdapters;
-        public ObservableCollection<NetworkAdapter> NetworkAdapters
-        {
-            get => _networkAdapters;
-            set
-            {
-                if (_networkAdapters != value)
-                {
-                    _networkAdapters = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-
-        private NetworkAdapter _selectedAdapter;
-        public NetworkAdapter SelectedAdapter
-        {
-            get => _selectedAdapter;
-            set
-            {
-                if (_selectedAdapter != value)
-                {
-                    _selectedAdapter = value;
-                    _model.ChangeNetworkAdapter(SelectedAdapter.ID);
-                    OnPropertyChanged();
-                }
-            }
         }
 
 
@@ -479,44 +445,6 @@ namespace Chess.UI.ViewModels
                     }
                 default: break;
             }
-        }
-
-
-        public void SelectPresavedNetworkAdapter()
-        {
-            int savedAdapterID = _model.GetSelectedNetworkAdapterID();
-
-            if (savedAdapterID != 0)
-            {
-                for (int i = 0; i < NetworkAdapters.Count; i++)
-                {
-                    Models.NetworkAdapter adapter = NetworkAdapters[i];
-                    if (adapter != null && adapter.ID == savedAdapterID)
-                    {
-                        SelectedAdapter = adapter;
-                        return;
-                    }
-                }
-            }
-        }
-
-
-        public void UpdateAdapterBox()
-        {
-            _dispatcherQueue.TryEnqueue(() =>
-            {
-                NetworkAdapters.Clear();
-                var adapters = _model.GetNetworkAdapters();
-
-                foreach (var adapter in adapters)
-                {
-                    if (!NetworkAdapters.Contains(adapter))
-                    {
-                        NetworkAdapters.Add(adapter);
-                    }
-                }
-                SelectPresavedNetworkAdapter();
-            });
         }
 
 

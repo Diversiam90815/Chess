@@ -1,19 +1,11 @@
 ﻿using Chess.UI.Multiplayer;
 using Chess.UI.Services;
 using System;
-using System.Collections.Generic;
 using static Chess.UI.Services.EngineAPI;
 
 
 namespace Chess.UI.Models
 {
-    public record NetworkAdapter
-    {
-        public string Name { get; set; }
-        public int ID { get; set; }
-    }
-
-
     public enum MultiplayerMode
     {
         None = 0,
@@ -25,10 +17,6 @@ namespace Chess.UI.Models
 
     public class MultiplayerModel : IMultiplayerModel
     {
-
-        private readonly List<NetworkAdapter> _adapters = [];
-
-
         public void Init()
         {
             var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
@@ -41,7 +29,6 @@ namespace Chess.UI.Models
         public void StartMultiplayer()
         {
             EngineAPI.StartedMultiplayer();
-            SetNetworkAdapters();
         }
 
 
@@ -63,50 +50,6 @@ namespace Chess.UI.Models
             }
 
             OnConnectionStatusChanged?.Invoke(connectionState, connectionStatusEvent.remoteName);
-        }
-
-
-        private bool SetNetworkAdapters()
-        {
-            _adapters.Clear();
-            int adapterCount = EngineAPI.GetNetworkAdapterCount();
-
-            for (uint i = 0; i < adapterCount; ++i)
-            {
-                EngineAPI.GetNetworkAdapterAtIndex(i, out EngineAPI.NetworkAdapter adapter);
-
-                NetworkAdapter networkAdapter = new()
-                {
-                    Name = adapter.name,
-                    ID = adapter.id
-                };
-
-                if (networkAdapter.ID == 0 && networkAdapter.Name == null)
-                    continue;
-
-                _adapters.Add(networkAdapter);
-            }
-
-            bool result = _adapters.Count > 0;
-            return result;
-        }
-
-
-        public List<NetworkAdapter> GetNetworkAdapters()
-        {
-            return _adapters;
-        }
-
-
-        public int GetSelectedNetworkAdapterID()
-        {
-            return EngineAPI.GetSavedAdapterID();
-        }
-
-
-        public void ChangeNetworkAdapter(int ID)
-        {
-            EngineAPI.ChangeCurrentAdapter(ID);
         }
 
 

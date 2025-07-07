@@ -66,24 +66,6 @@ namespace Chess.UI.Views
         }
 
 
-        private void NetworkAdapterChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.RemovedItems.Count == 0 || e.AddedItems.Count == 0)
-            {
-                // This is the first initialization of the Combobox
-                return;
-            }
-            else
-            {
-                NetworkAdapter selectedAdapter = (NetworkAdapter)e.AddedItems[0];
-                if (selectedAdapter != null)
-                {
-                    _viewModel.SelectedAdapter = selectedAdapter;
-                }
-            }
-        }
-
-
         private void HostGameButton_Click(object sender, RoutedEventArgs e)
         {
             string name = LocalPlayerName.Text.Trim();

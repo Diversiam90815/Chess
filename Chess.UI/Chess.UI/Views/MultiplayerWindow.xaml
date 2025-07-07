@@ -38,7 +38,7 @@
                             VerticalAlignment="Center"
                             Style="{ThemeResource MPSubTitle}"
                             Text="Network" />
-                        <ComboBox
+                        <!--<ComboBox
                             Grid.Column="1"
                             HorizontalAlignment="Stretch"
                             DisplayMemberPath="Name"
@@ -46,7 +46,7 @@
                             ItemsSource="{x:Bind _viewModel.NetworkAdapters, Mode=TwoWay}"
                             SelectedItem="{x:Bind _viewModel.SelectedAdapter, Mode=TwoWay}"
                             SelectionChanged="NetworkAdapterChanged"
-                            Style="{StaticResource ComboBoxStyle}" />
+                            Style="{StaticResource ComboBoxStyle}" />-->
 
                     </Grid>
 

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Page
+    x:Class="Chess.UI.Views.MultiplayerPreferencesView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Chess.UI.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+
+    <StackPanel
+        Width="Auto"
+        Height="Auto"
+        Margin="16"
+        Orientation="Vertical"
+        Spacing="28">
+
+        <!--  Category: Multiplayer  -->
+        <TextBlock Style="{StaticResource SettingsTitle}" Text="Multiplayer" />
+
+        <StackPanel Spacing="8">
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Network Adapter  -->
+                <TextBlock Style="{StaticResource SettingsSubTitle}" Text="Network" />
+
+                <ComboBox
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    DisplayMemberPath="Name"
+                    ItemsSource="{x:Bind _viewModel.NetworkAdapters}"
+                    SelectedItem="{x:Bind _viewModel.SelectedAdapter, Mode=TwoWay}"
+                    SelectionChanged="NetworkAdapterChanged"
+                    Style="{StaticResource SettingComboBoxStyle}" />
+
+            </Grid>
+
+            <TextBlock Style="{ThemeResource SettingsDescription}" Text="Choose your local network adapter" />
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Local Player name  -->
+                <TextBlock Style="{StaticResource SettingsSubTitle}" Text="Player" />
+
+                <TextBox Grid.Column="1" HorizontalAlignment="Stretch" />
+
+            </Grid>
+
+            <TextBlock Style="{ThemeResource SettingsDescription}" Text="Choose your local player name" />
+        </StackPanel>
+
+
+    </StackPanel>
+
+</Page>

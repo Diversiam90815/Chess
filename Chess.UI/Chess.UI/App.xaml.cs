@@ -76,6 +76,7 @@ namespace Chess.UI
             services.AddTransient<IMoveHistoryModel, MoveHistoryModel>();
             services.AddTransient<IBoardModel, BoardModel>();
             services.AddTransient<IMultiplayerModel, MultiplayerModel>();
+            services.AddTransient<IMultiplayerPreferencesModel, MultiplayerPreferencesModel>();
 
             // Register view models
             services.AddSingleton<ChessBoardViewModel>();
@@ -84,11 +85,13 @@ namespace Chess.UI
             services.AddSingleton<MainMenuViewModel>();
             services.AddSingleton<MultiplayerViewModel>();
             services.AddSingleton<ThemePreferencesViewModel>();
+            services.AddSingleton<MultiplayerPreferencesViewModel>();
 
             services.AddTransient<MainMenuWindow>();
             services.AddTransient<ChessBoardWindow>();
             services.AddTransient<MultiplayerWindow>();
             services.AddTransient<ThemePreferencesView>();
+            services.AddTransient<MultiplayerPreferencesView>();
 
             services.AddTransient<PreferencesView>();
 

@@ -1,11 +1,7 @@
-﻿using Chess.UI.Models;
-using Chess.UI.Services;
+﻿using Chess.UI.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
+
 
 namespace Chess.UI.Multiplayer
 {
@@ -24,12 +20,6 @@ namespace Chess.UI.Multiplayer
         void StartMultiplayer();
 
         void SetLocalPlayerName(string playerName);
-
-        int GetSelectedNetworkAdapterID();
-
-        void ChangeNetworkAdapter(int adapterID);
-
-        List<Models.NetworkAdapter> GetNetworkAdapters();
 
         void ConnectToHost();
 
