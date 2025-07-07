@@ -15,7 +15,6 @@
 #include "RemoteMessaging/RemoteSender.h"
 #include "RemoteMessaging/RemoteCommunication.h"
 #include "IObserver.h"
-#include "NetworkManager.h"
 
 
 class MultiplayerManager : public INetworkObserver,
@@ -28,7 +27,7 @@ public:
 	MultiplayerManager();
 	~MultiplayerManager();
 
-	void						init();
+	void						init(const std::string &localIPv4);
 
 	void						reset();
 
@@ -58,10 +57,6 @@ public:
 	void						localReadyFlagSet(const bool flag) override;
 
 	void						onRemoteFound(const Endpoint &remote) override;
-
-	std::vector<NetworkAdapter> getNetworkAdapters();
-	bool						changeCurrentNetworkAdapter(int ID);
-	int							getCurrentNetworkAdapterID();
 
 	void						onRemoteMoveReceived(const PossibleMove &remoteMove) override {}
 	void						onRemoteChatMessageReceived(const std::string &mesage) override {}
@@ -93,8 +88,6 @@ private:
 	asio::io_context										   mIoContext;
 	asio::executor_work_guard<asio::io_context::executor_type> mWorkGuard;
 	std::thread												   mWorkerThread;
-
-	std::unique_ptr<NetworkManager>							   mNetwork;
 
 	std::string												   mLocalPlayerName{};
 	PlayerColor												   mLocalPlayerColor{};

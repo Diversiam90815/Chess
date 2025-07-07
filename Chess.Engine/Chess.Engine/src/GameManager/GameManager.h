@@ -132,6 +132,7 @@ private:
 	std::shared_ptr<UICommunication>	mUiCommunicationLayer;
 
 	std::shared_ptr<MultiplayerManager> mMultiplayerManager;
+	std::unique_ptr<NetworkManager>		mNetwork;
 
 	bool								mIsMultiplayerMode{false};
 };

@@ -53,6 +53,9 @@ bool GameManager::init()
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
 
+	mNetwork = std::make_unique<NetworkManager>();
+	mNetwork->init();
+
 	initObservers();
 
 	return true;
@@ -341,19 +344,19 @@ bool GameManager::checkForPawnPromotionMove(const PossibleMove &move)
 
 std::vector<NetworkAdapter> GameManager::getNetworkAdapters()
 {
-	return mMultiplayerManager->getNetworkAdapters();
+	return mNetwork->getAvailableNetworkAdapters();
 }
 
 
 bool GameManager::changeCurrentNetworkAdapter(int ID)
 {
-	return mMultiplayerManager->changeCurrentNetworkAdapter(ID);
+	return mNetwork->changeCurrentNetworkAdapter(ID);
 }
 
 
 int GameManager::getCurrentNetworkAdapterID()
 {
-	return mMultiplayerManager->getCurrentNetworkAdapterID();
+	return mNetwork->getCurrentNetworkAdapterID();
 }
 
 
@@ -480,9 +483,12 @@ void GameManager::startedMultiplayer()
 	mMultiplayerManager = std::make_shared<MultiplayerManager>(); // Create the multiplayer manager
 
 	mMultiplayerManager->attachObserver(mUiCommunicationLayer);	  // Set the UI Communication as a connection observer
+	mNetwork->attachObserver(mMultiplayerManager);				  // Let the MultiplayerManager know of network changes
 
-	mMultiplayerManager->setInternalObservers();				  // First set the observers, so
-	mMultiplayerManager->init();								  // the modules already receive notifications on init
+	mMultiplayerManager->setInternalObservers();
+
+	std::string localIPv4 = mNetwork->getCurrentIPv4();
+	mMultiplayerManager->init(localIPv4);
 }
 
 
