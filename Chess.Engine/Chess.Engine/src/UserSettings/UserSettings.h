@@ -11,6 +11,13 @@
 #include "Logging.h"
 #include "Parameters.h"
 
+struct DefaultSettings
+{
+	const std::string BoardTheme = "Wood";
+	const std::string PieceTheme = "Basic";
+};
+
+
 class UserSettings
 {
 public:
@@ -23,22 +30,23 @@ public:
 
 	std::string readSetting(SettingsType setting);
 
-	void		initializeValues();
-	void		initializeConfigFile();
-
-	bool		doesConfigFileExist();
 
 	void		setCurrentBoardTheme(std::string theme);
-	std::string getCurrentBoardTheme() const;
+	std::string getCurrentBoardTheme();
 
 	void		setCurrentPieceTheme(std::string theme);
-	std::string getCurrentPieceTheme() const;
+	std::string getCurrentPieceTheme();
+
+	void		setLocalPlayerName(const std::string name);
+	std::string getLocalPlayerName();
 
 
 private:
-	std::string mCurrentBoardTheme = "Wood";
-				 
-	std::string mCurrentPieceTheme = "Basic";
+	bool			doesConfigFileExist();
 
-	bool		mInitialized	   = false;
+	bool			initializeConfigFile(DefaultSettings settings);
+
+	void			logUserSettings();
+
+	DefaultSettings mDefaultSettings;
 };

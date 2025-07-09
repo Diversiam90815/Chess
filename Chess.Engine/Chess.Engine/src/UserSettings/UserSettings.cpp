@@ -12,14 +12,15 @@ void UserSettings::init()
 {
 	bool configFileExists = doesConfigFileExist();
 
-	if (configFileExists)
+	if (!configFileExists)
 	{
-		LOG_INFO("User Config found");
-		initializeValues();
+		LOG_INFO("User Config not found, so we set up one!");
+		initializeConfigFile(mDefaultSettings);
 		return;
 	}
-	LOG_INFO("User Config not found, so we set up one!");
-	initializeConfigFile();
+
+	LOG_INFO("User Config found");
+	logUserSettings();
 }
 
 
@@ -29,16 +30,20 @@ void UserSettings::storeSetting(SettingsType setting, std::string value)
 	{
 	case (SettingsType::boardTheme):
 	{
-		LOG_INFO("Board theme setting set {}", value.c_str());
 		FileManager *fmg = FileManager::GetInstance();
 		fmg->writeSettingToFile(BoardTheme, value);
 		break;
 	}
 	case (SettingsType::piecesTheme):
 	{
-		LOG_INFO("Piece theme setting set {}", value.c_str());
 		FileManager *fmg = FileManager::GetInstance();
 		fmg->writeSettingToFile(PieceTheme, value);
+		break;
+	}
+	case (SettingsType::playerName):
+	{
+		FileManager *fmg = FileManager::GetInstance();
+		fmg->writeSettingToFile(PlayerNameSetting, value);
 		break;
 	}
 	default: break;
@@ -66,23 +71,17 @@ std::string UserSettings::readSetting(SettingsType setting)
 		LOG_INFO("Piece theme read from file : {}", value.c_str());
 		return value;
 	}
+	case (SettingsType::piecesTheme):
+	{
+		FileManager *fmg = FileManager::GetInstance();
+		value			 = fmg->readSettingFromFile(PlayerNameSetting);
+		LOG_INFO("Player name read from file : {}", value.c_str());
+		return value;
+	}
 	default: return value;
 	}
 }
 
-
-void UserSettings::initializeValues()
-{
-	mCurrentBoardTheme = readSetting(SettingsType::boardTheme);
-	mCurrentPieceTheme = readSetting(SettingsType::piecesTheme);
-}
-
-
-void UserSettings::initializeConfigFile()
-{
-	storeSetting(SettingsType::boardTheme, mCurrentBoardTheme);
-	storeSetting(SettingsType::piecesTheme, mCurrentPieceTheme);
-}
 
 
 bool UserSettings::doesConfigFileExist()
@@ -95,33 +94,59 @@ bool UserSettings::doesConfigFileExist()
 
 void UserSettings::setCurrentBoardTheme(std::string theme)
 {
-	if (mCurrentBoardTheme != theme)
-	{
-		mCurrentBoardTheme = theme;
-		storeSetting(SettingsType::boardTheme, theme);
-		LOG_INFO("Set the Board Theme to {}", theme.c_str());
-	}
+	storeSetting(SettingsType::boardTheme, theme);
+	LOG_INFO("Set the Board Theme to {}", theme.c_str());
 }
 
 
-std::string UserSettings::getCurrentBoardTheme() const
+std::string UserSettings::getCurrentBoardTheme()
 {
-	return mCurrentBoardTheme;
+	return readSetting(SettingsType::boardTheme);
 }
 
 
 void UserSettings::setCurrentPieceTheme(std::string theme)
 {
-	if (mCurrentPieceTheme != theme)
-	{
-		mCurrentPieceTheme = theme;
-		storeSetting(SettingsType::piecesTheme, theme);
-		LOG_INFO("Set the Piece Theme to {}", theme.c_str());
-	}
+	storeSetting(SettingsType::piecesTheme, theme);
+	LOG_INFO("Set the Piece Theme to {}", theme.c_str());
 }
 
 
-std::string UserSettings::getCurrentPieceTheme() const
+std::string UserSettings::getCurrentPieceTheme()
 {
-	return mCurrentPieceTheme;
+	return readSetting(SettingsType::piecesTheme);
+}
+
+
+void UserSettings::setLocalPlayerName(std::string theme)
+{
+	storeSetting(SettingsType::piecesTheme, theme);
+	LOG_INFO("Set the Piece Theme to {}", theme.c_str());
+}
+
+
+std::string UserSettings::getLocalPlayerName()
+{
+	return readSetting(SettingsType::playerName);
+}
+
+
+bool UserSettings::initializeConfigFile(DefaultSettings settings)
+{
+	storeSetting(SettingsType::boardTheme, settings.BoardTheme);
+	storeSetting(SettingsType::piecesTheme, settings.PieceTheme);
+}
+
+
+void UserSettings::logUserSettings()
+{
+	const std::string piecesTheme = getCurrentPieceTheme();
+	const std::string boardTheme  = getCurrentBoardTheme();
+	const std::string playerName  = getLocalPlayerName();
+
+	LOG_INFO("------------------ User Settings ------------------");
+	LOG_INFO("Board Theme :\t{}", boardTheme);
+	LOG_INFO("Board Theme :\t{}", piecesTheme);
+	LOG_INFO("Player Name :\t{}", playerName);
+	LOG_INFO("---------------------------------------------------");
 }
