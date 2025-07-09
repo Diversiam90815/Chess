@@ -164,6 +164,7 @@ set(MULTIPLAYER_FILES
 	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.h				${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.cpp
 	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.h				${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.cpp
 	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.h		${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.cpp
+	${MULTIPLAYER_DIR}/PlayerName/PlayerName.h						${MULTIPLAYER_DIR}/PlayerName/PlayerName.cpp
 )
 
 
