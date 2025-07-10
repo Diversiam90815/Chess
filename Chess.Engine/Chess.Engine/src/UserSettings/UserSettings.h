@@ -16,7 +16,7 @@
 
 struct DefaultSettings
 {
-	const std::string BoardStyle = "Wood";
+	const std::string BoardStyle	  = "Wood";
 	const std::string ChessPieceStyle = "Basic";
 };
 
@@ -34,7 +34,6 @@ public:
 
 	template <typename T>
 	T			readSetting(SettingsType setting);
-
 
 	void		setCurrentBoardTheme(std::string theme);
 	std::string getCurrentBoardTheme();
@@ -55,6 +54,7 @@ private:
 	void			initializeConfigFile(DefaultSettings settings);
 
 	void			logUserSettings();
+
 
 	DefaultSettings mDefaultSettings;
 };

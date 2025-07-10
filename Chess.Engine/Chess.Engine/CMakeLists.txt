@@ -113,7 +113,8 @@ set(GAME_MANAGER_FILES
 )
 
 set(PLAYER_FILES
-	${PLAYER_DIR}/Player.h      ${PLAYER_DIR}/Player.cpp
+	${PLAYER_DIR}/Player.h      	${PLAYER_DIR}/Player.cpp
+	${PLAYER_DIR}/PlayerName.h      ${PLAYER_DIR}/PlayerName.cpp
 )
 
 set(HELPER_FILES
@@ -164,9 +165,8 @@ set(MULTIPLAYER_FILES
 	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.h				${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.cpp
 	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.h				${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.cpp
 	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.h		${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.cpp
-	${MULTIPLAYER_DIR}/PlayerName/PlayerName.h						${MULTIPLAYER_DIR}/PlayerName/PlayerName.cpp
 )
-
+	
 
 set(ALL_FILES
 	${API_FILES}
