@@ -60,8 +60,7 @@
                     Width="200"
                     HorizontalAlignment="Stretch"
                     Style="{ThemeResource PlainTextEnter}"
-                    Text="{x:Bind _viewModel.LocalPlayerName, Mode=TwoWay}"
-                    TextChanging="LocalPlayerName_TextChanging" />
+                    Text="{x:Bind _viewModel.LocalPlayerName, Mode=TwoWay}" />
 
             </Grid>
 

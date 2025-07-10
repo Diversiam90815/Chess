@@ -38,22 +38,5 @@ namespace Chess.UI.Views
                 }
             }
         }
-
-
-        private void LocalPlayerName_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
-        {
-            var newText = sender.Text;
-
-            var filteredText = Regex.Replace(newText, "[^A-Za-z]", "");
-
-            if (newText != filteredText)
-            {
-                int oldCaretPos = sender.SelectionStart;
-                sender.Text = filteredText;
-
-                sender.SelectionStart = Math.Min(oldCaretPos, newText.Length);
-            }
-
-        }
     }
 }
