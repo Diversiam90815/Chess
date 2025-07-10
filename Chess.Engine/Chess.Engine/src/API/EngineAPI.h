@@ -57,8 +57,6 @@ extern "C"
 
 	Engine_API bool	 IsMultiplayerActive();
 
-	Engine_API void	 SetLocalPlayerName(const char *name);
-
 	Engine_API void	 AnswerConnectionInvitation(bool accept);
 
 	Engine_API void	 SendConnectionRequestToHost();
@@ -84,6 +82,10 @@ extern "C"
 	Engine_API void	 SetCurrentPieceTheme(const char *theme);
 
 	Engine_API char *GetCurrentPieceTheme();
+
+	Engine_API void	 SetLocalPlayerName(const char *name);
+
+	Engine_API char *GetLocalPlayerName();
 
 
 	Engine_API int	 GetNetworkAdapterCount();

@@ -142,18 +142,24 @@ namespace Chess.UI.Services
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetCurrentPieceTheme", CharSet = CharSet.Unicode)]
         public static extern void SetCurrentPieceTheme([In()][MarshalAs(UnmanagedType.LPStr)] string theme);
-
+    
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetCurrentPieceTheme", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string GetCurrentPieceTheme();
 
-        #endregion // User Config
-
-
-        #region Network / Multiplayer
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetLocalPlayerName", CharSet = CharSet.Unicode)]
         public static extern void SetLocalPlayerName([In()][MarshalAs(UnmanagedType.LPStr)] string name);
+
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetLocalPlayerName", CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string GetLocalPlayerName();
+
+        #endregion // User Config
+
+
+        #region Network
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetRemotePlayerName", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.LPStr)]
@@ -171,7 +177,7 @@ namespace Chess.UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ChangeCurrentAdapter", CharSet = CharSet.Unicode)]
         public static extern void ChangeCurrentAdapter(int ID);
 
-        #endregion // Network / Multiplayer
+        #endregion // Network
 
 
         #endregion // DLL Defines
