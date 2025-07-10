@@ -70,10 +70,10 @@ public:
 	PlayerColor					getCurrentPlayer() const;
 
 	void						setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
-	std::string					getBoardTheme() const { return mUserSettings.getCurrentBoardTheme(); }
+	std::string					getBoardTheme() { return mUserSettings.getCurrentBoardTheme(); }
 
 	void						setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
-	std::string					getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
+	std::string					getPieceTheme() { return mUserSettings.getCurrentPieceTheme(); }
 
 	void						switchTurns();
 

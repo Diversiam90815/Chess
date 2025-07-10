@@ -24,66 +24,6 @@ void UserSettings::init()
 }
 
 
-void UserSettings::storeSetting(SettingsType setting, std::string value)
-{
-	switch (setting)
-	{
-	case (SettingsType::boardTheme):
-	{
-		FileManager *fmg = FileManager::GetInstance();
-		fmg->writeSettingToFile(BoardTheme, value);
-		break;
-	}
-	case (SettingsType::piecesTheme):
-	{
-		FileManager *fmg = FileManager::GetInstance();
-		fmg->writeSettingToFile(PieceTheme, value);
-		break;
-	}
-	case (SettingsType::playerName):
-	{
-		FileManager *fmg = FileManager::GetInstance();
-		fmg->writeSettingToFile(PlayerNameSetting, value);
-		break;
-	}
-	default: break;
-	}
-}
-
-
-std::string UserSettings::readSetting(SettingsType setting)
-{
-	std::string value = "";
-
-	switch (setting)
-	{
-	case (SettingsType::boardTheme):
-	{
-		FileManager *fmg = FileManager::GetInstance();
-		value			 = fmg->readSettingFromFile(BoardTheme);
-		LOG_INFO("Board theme read from file {}", value.c_str());
-		return value;
-	}
-	case (SettingsType::piecesTheme):
-	{
-		FileManager *fmg = FileManager::GetInstance();
-		value			 = fmg->readSettingFromFile(PieceTheme);
-		LOG_INFO("Piece theme read from file : {}", value.c_str());
-		return value;
-	}
-	case (SettingsType::piecesTheme):
-	{
-		FileManager *fmg = FileManager::GetInstance();
-		value			 = fmg->readSettingFromFile(PlayerNameSetting);
-		LOG_INFO("Player name read from file : {}", value.c_str());
-		return value;
-	}
-	default: return value;
-	}
-}
-
-
-
 bool UserSettings::doesConfigFileExist()
 {
 	FileManager *fmg			  = FileManager::GetInstance();
@@ -94,47 +34,47 @@ bool UserSettings::doesConfigFileExist()
 
 void UserSettings::setCurrentBoardTheme(std::string theme)
 {
-	storeSetting(SettingsType::boardTheme, theme);
-	LOG_INFO("Set the Board Theme to {}", theme.c_str());
+	storeSetting(SettingsType::BoardStyle, theme);
+	LOG_INFO("Set the Board Style to {}", theme.c_str());
 }
 
 
 std::string UserSettings::getCurrentBoardTheme()
 {
-	return readSetting(SettingsType::boardTheme);
+	return readSetting<std::string>(SettingsType::BoardStyle);
 }
 
 
 void UserSettings::setCurrentPieceTheme(std::string theme)
 {
-	storeSetting(SettingsType::piecesTheme, theme);
-	LOG_INFO("Set the Piece Theme to {}", theme.c_str());
+	storeSetting(SettingsType::ChessPieceStyle, theme);
+	LOG_INFO("Set the Piece Style to {}", theme.c_str());
 }
 
 
 std::string UserSettings::getCurrentPieceTheme()
 {
-	return readSetting(SettingsType::piecesTheme);
+	return readSetting<std::string>(SettingsType::ChessPieceStyle);
 }
 
 
 void UserSettings::setLocalPlayerName(std::string theme)
 {
-	storeSetting(SettingsType::piecesTheme, theme);
-	LOG_INFO("Set the Piece Theme to {}", theme.c_str());
+	storeSetting(SettingsType::ChessPieceStyle, theme);
+	LOG_INFO("Set the ChessPiece Style to {}", theme.c_str());
 }
 
 
 std::string UserSettings::getLocalPlayerName()
 {
-	return readSetting(SettingsType::playerName);
+	return readSetting<std::string>(SettingsType::PlayerName);
 }
 
 
-bool UserSettings::initializeConfigFile(DefaultSettings settings)
+void UserSettings::initializeConfigFile(DefaultSettings settings)
 {
-	storeSetting(SettingsType::boardTheme, settings.BoardTheme);
-	storeSetting(SettingsType::piecesTheme, settings.PieceTheme);
+	storeSetting(SettingsType::BoardStyle, settings.BoardStyle);
+	storeSetting(SettingsType::ChessPieceStyle, settings.ChessPieceStyle);
 }
 
 

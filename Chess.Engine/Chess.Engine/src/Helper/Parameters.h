@@ -70,9 +70,9 @@ enum class GameState
 
 enum class SettingsType
 {
-	boardTheme,
-	piecesTheme,
-	playerName
+	BoardStyle,
+	ChessPieceStyle,
+	PlayerName
 };
 
 
@@ -91,8 +91,8 @@ constexpr auto		  SettingsFolder			   = "Settings";
 //			Config File Settings
 //============================================================
 
-constexpr auto		  BoardTheme				   = "BoardTheme";
-constexpr auto		  PieceTheme				   = "PieceTheme";
+constexpr auto		  BoardStyleSetting			   = "BoardStyle";
+constexpr auto		  PieceStyleSetting			   = "PieceStyle";
 constexpr auto		  SelectedAdapter			   = "Selected_Adapter";
 constexpr auto		  PlayerNameSetting			   = "PlayerName";
 
