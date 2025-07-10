@@ -8,10 +8,30 @@
 #include "PlayerName.h"
 
 
-void PlayerName::init() {}
+void PlayerName::init()
+{
+	std::string tmpName = mUserSettings.getLocalPlayerName();
+
+	if (tmpName.empty())
+	{
+		// If the name does not exist currently (eg. at first startup), we select this PC's name
+		// There is no name set in the config
+		tmpName = getComputerNameAsPlayerName();
+	}
+
+	setLocalPlayerName(tmpName);
+}
 
 
-void PlayerName::setLocalPlayerName(const std::string &name){mLocalPlayerName = name;
+void PlayerName::setLocalPlayerName(const std::string &name)
+{
+	if (mLocalPlayerName == name)
+		return;
+
+	mLocalPlayerName = name;
+	mUserSettings.setLocalPlayerName(name);
+
+	LOG_INFO("Local Player name has been set to : {}", name);
 }
 
 
@@ -35,4 +55,3 @@ std::string PlayerName::getComputerNameAsPlayerName()
 		return "Unknown";
 	}
 }
-

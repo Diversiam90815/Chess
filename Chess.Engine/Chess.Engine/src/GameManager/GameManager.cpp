@@ -42,6 +42,8 @@ bool GameManager::init()
 	mLog.initLogging();
 	mUserSettings.init();
 
+	mPlayerName.init();
+
 	mUiCommunicationLayer = std::make_shared<UICommunication>();
 
 	mChessBoard			  = std::make_shared<ChessBoard>();
@@ -362,9 +364,13 @@ int GameManager::getCurrentNetworkAdapterID()
 
 void GameManager::setLocalPlayerName(std::string name)
 {
-	// TODO: Set name in config
+	mPlayerName.setLocalPlayerName(name);
+}
 
-	// mMultiplayerManager->setLocalPlayerName(name);
+
+std::string GameManager::getLocalPlayerName()
+{
+	return mPlayerName.getLocalPlayerName();
 }
 
 

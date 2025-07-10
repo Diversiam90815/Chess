@@ -20,6 +20,7 @@
 #include "UICommunication.h"
 #include "NetworkManager.h"
 #include "MultiplayerManager.h"
+#include "PlayerName.h"
 
 
 class StateMachine;
@@ -65,6 +66,7 @@ public:
 	int							getCurrentNetworkAdapterID();
 
 	void						setLocalPlayerName(std::string name);
+	std::string					getLocalPlayerName();
 
 	void						changeCurrentPlayer(PlayerColor player) override;
 	PlayerColor					getCurrentPlayer() const;
@@ -113,6 +115,8 @@ private:
 	Logging								mLog;
 
 	UserSettings						mUserSettings;
+
+	PlayerName							mPlayerName;
 
 	bool								mMovesGeneratedForCurrentTurn = false;
 

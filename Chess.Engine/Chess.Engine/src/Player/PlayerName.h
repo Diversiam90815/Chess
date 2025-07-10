@@ -10,6 +10,7 @@
 #include <Windows.h>
 
 #include "UserSettings.h"
+#include "Logging.h"
 
 
 class PlayerName
