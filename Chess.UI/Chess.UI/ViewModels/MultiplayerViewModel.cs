@@ -92,7 +92,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private bool _hostGameButtonEnabled = false;
+        private bool _hostGameButtonEnabled = true;
         public bool HostGameButtonEnabled
         {
             get => _hostGameButtonEnabled;
@@ -107,7 +107,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private bool _clientGameButtonEnabled = false;
+        private bool _clientGameButtonEnabled = true;
         public bool ClientGameButtonEnabled
         {
             get => _clientGameButtonEnabled;

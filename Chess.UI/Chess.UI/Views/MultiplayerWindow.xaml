@@ -22,61 +22,16 @@
             <TextBlock Style="{ThemeResource MPTitle}" Text="Multiplayer" />
 
             <!--  Settings  -->
-            <StackPanel Margin="20,0,0,0" Orientation="Vertical">
-
-                <!--  Network adapter  -->
-                <StackPanel Margin="8" Orientation="Vertical">
-
-                    <Grid ColumnSpacing="16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="250" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Style="{ThemeResource MPSubTitle}"
-                            Text="Network" />
-                        <!--<ComboBox
-                            Grid.Column="1"
-                            HorizontalAlignment="Stretch"
-                            DisplayMemberPath="Name"
-                            IsEnabled="{x:Bind _viewModel.SettingsEditable, Mode=TwoWay}"
-                            ItemsSource="{x:Bind _viewModel.NetworkAdapters, Mode=TwoWay}"
-                            SelectedItem="{x:Bind _viewModel.SelectedAdapter, Mode=TwoWay}"
-                            SelectionChanged="NetworkAdapterChanged"
-                            Style="{StaticResource ComboBoxStyle}" />-->
-
-                    </Grid>
-
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Style="{ThemeResource MPDesc}"
-                        Text="Select your network adapter" />
-
-                </StackPanel>
-
-                <!--  Local Player Name  -->
-                <StackPanel Margin="8" Orientation="Vertical">
-
-                    <Grid ColumnSpacing="16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="250" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Center"
-                            Style="{ThemeResource MPSubTitle}"
-                            Text="Name" />
-
-                    </Grid>
-
-                    <TextBlock Style="{ThemeResource MPDesc}" Text="Chose your player name" />
-                </StackPanel>
-
+            <StackPanel Margin="20,0" Orientation="Vertical">
+                <TextBlock Style="{ThemeResource MPSubTitle}" Text="Your local name has been set to " />
+                <TextBlock
+                    Margin="0,20"
+                    Style="{ThemeResource MPSubTitle}"
+                    Text="Name Placeholder" />
+                <TextBlock
+                    Margin="20"
+                    Style="{ThemeResource MPDesc}"
+                    Text="You can change your name and network in the Multiplayer tab in the settings" />
             </StackPanel>
 
             <ProgressRing Margin="16" IsActive="{x:Bind _viewModel.Processing, Mode=TwoWay}" />

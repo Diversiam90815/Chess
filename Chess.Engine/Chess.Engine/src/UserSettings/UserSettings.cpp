@@ -58,10 +58,10 @@ std::string UserSettings::getCurrentPieceTheme()
 }
 
 
-void UserSettings::setLocalPlayerName(std::string theme)
+void UserSettings::setLocalPlayerName(std::string name)
 {
-	storeSetting(SettingsType::ChessPieceStyle, theme);
-	LOG_INFO("Set the ChessPiece Style to {}", theme.c_str());
+	storeSetting(SettingsType::PlayerName, name);
+	LOG_INFO("Set the ChessPiece Style to {}", name.c_str());
 }
 
 
@@ -85,8 +85,8 @@ void UserSettings::logUserSettings()
 	const std::string playerName  = getLocalPlayerName();
 
 	LOG_INFO("------------------ User Settings ------------------");
-	LOG_INFO("Board Theme :\t{}", boardTheme);
-	LOG_INFO("Board Theme :\t{}", piecesTheme);
+	LOG_INFO("Board Style :\t{}", boardTheme);
+	LOG_INFO("Board Style :\t{}", piecesTheme);
 	LOG_INFO("Player Name :\t{}", playerName);
 	LOG_INFO("---------------------------------------------------");
 }
