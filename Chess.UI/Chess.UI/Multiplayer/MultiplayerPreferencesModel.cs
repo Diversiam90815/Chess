@@ -83,7 +83,7 @@ namespace Chess.UI.Multiplayer
 
         public string GetLocalPlayerName()
         {
-            string localPlayerName = "LocalPlayerPlaceholder";
+            string localPlayerName = EngineAPI.GetLocalPlayerName();
             return localPlayerName;
         }
 
