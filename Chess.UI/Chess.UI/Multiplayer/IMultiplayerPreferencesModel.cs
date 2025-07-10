@@ -17,5 +17,8 @@ namespace Chess.UI.Multiplayer
         void SetLocalPlayerName(string playerName);
 
         string GetLocalPlayerName();
+
+
+        event Action<string> PlayerNameChanged;
     }
 }

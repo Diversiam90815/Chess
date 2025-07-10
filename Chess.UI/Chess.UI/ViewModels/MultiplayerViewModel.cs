@@ -9,6 +9,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using WinRT.Chess_GameVtableClasses;
 
 
 namespace Chess.UI.ViewModels
@@ -21,6 +22,9 @@ namespace Chess.UI.ViewModels
 
         private readonly IMultiplayerModel _model;
 
+        private readonly IMultiplayerPreferencesModel _preferencesModel;
+
+
         public MultiplayerMode MPMode { get; private set; }
 
         public event Action RequestNavigationToChessboard;
@@ -32,6 +36,10 @@ namespace Chess.UI.ViewModels
 
             _model = App.Current.Services.GetService<IMultiplayerModel>();
             _model.Init();
+
+            _preferencesModel = App.Current.Services.GetService<IMultiplayerPreferencesModel>();
+            _preferencesModel.PlayerNameChanged += HandlePlayerNameChanged; // Subscribe to player name changes
+            LocalPlayerName = _preferencesModel.GetLocalPlayerName();   // and also initialize the value at first
 
             _model.OnConnectionErrorOccured += HandleConnectionError;
             _model.OnConnectionStatusChanged += HandleConnectionStatusUpdated;
@@ -213,6 +221,20 @@ namespace Chess.UI.ViewModels
             }
         }
 
+        private string _localPlayerName;
+        public string LocalPlayerName
+        {
+            get => _localPlayerName;
+            set
+            {
+                if (_localPlayerName != value)
+                {
+                    _localPlayerName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
         #region Visibilities
 
@@ -292,6 +314,12 @@ namespace Chess.UI.ViewModels
 
 
         #endregion
+
+
+        private void HandlePlayerNameChanged(string newName)
+        {
+            LocalPlayerName = newName;
+        }
 
 
         public void HandlePlayerChanged(Services.EngineAPI.PlayerColor player)

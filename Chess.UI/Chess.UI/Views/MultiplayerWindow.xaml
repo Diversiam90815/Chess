@@ -27,7 +27,7 @@
                 <TextBlock
                     Margin="0,20"
                     Style="{ThemeResource MPSubTitle}"
-                    Text="Name Placeholder" />
+                    Text="{x:Bind _viewModel.LocalPlayerName, Mode=OneWay}" />
                 <TextBlock
                     Margin="20"
                     Style="{ThemeResource MPDesc}"

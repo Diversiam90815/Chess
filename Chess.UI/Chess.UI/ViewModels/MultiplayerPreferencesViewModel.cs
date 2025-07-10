@@ -116,9 +116,11 @@ namespace Chess.UI.ViewModels
                 {
                     _localPlayerName = value;
                     _model.SetLocalPlayerName(value);
+                    OnPropertyChanged();
                 }
             }
         }
+
 
         private void SetLocalNameFromBackend()
         {

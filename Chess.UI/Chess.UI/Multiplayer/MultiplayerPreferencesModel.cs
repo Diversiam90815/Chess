@@ -78,6 +78,7 @@ namespace Chess.UI.Multiplayer
         public void SetLocalPlayerName(string name)
         {
             EngineAPI.SetLocalPlayerName(name);
+            PlayerNameChanged?.Invoke(name);
         }
 
 
@@ -88,6 +89,8 @@ namespace Chess.UI.Multiplayer
         }
 
         #endregion
+
+        public event Action<string> PlayerNameChanged;
 
     }
 }
