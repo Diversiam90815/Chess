@@ -99,8 +99,9 @@ namespace Chess.UI
                 try
                 {
                     // Only try to activate if the window is still valid and not closing
-                    if (this.AppWindow != null && this.Visible)
+                    if (this.AppWindow != null)
                     {
+                        this.AppWindow.Show();
                         this.Activate();
                     }
                 }
