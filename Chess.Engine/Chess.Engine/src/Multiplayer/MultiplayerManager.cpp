@@ -37,7 +37,7 @@ MultiplayerManager::~MultiplayerManager()
 
 void MultiplayerManager::init(const std::string &localIPv4)
 {
-	//mNetwork->init();
+	// mNetwork->init();
 	mLocalIPv4 = localIPv4;
 }
 
@@ -45,7 +45,8 @@ void MultiplayerManager::init(const std::string &localIPv4)
 void MultiplayerManager::reset()
 {
 	// Stop discovery if running
-	mDiscovery->stop();
+	if (mDiscovery)
+		mDiscovery->stop();
 
 	// TODO: Reset server / client
 }
