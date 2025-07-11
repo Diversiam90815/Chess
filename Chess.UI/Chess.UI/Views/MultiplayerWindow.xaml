@@ -204,7 +204,7 @@
                         Width="100"
                         Height="100"
                         BorderBrush="Green"
-                        BorderThickness="{x:Bind converter:Converter.PlayerToWhiteBorderThickness(_viewModel.SelectedPlayerColor), Mode=OneWay}"
+                        BorderThickness="{x:Bind converter:Converter.PlayerToWhiteBorderThickness(_viewModel.LocalPlayer), Mode=OneWay}"
                         Click="SelectWhiteButton_Click">
                         <Image Source="ms-appx:///Assets/Pieces/Basic/KingW.png" Stretch="Uniform" />
                     </Button>
@@ -223,7 +223,7 @@
                         Width="100"
                         Height="100"
                         BorderBrush="Green"
-                        BorderThickness="{x:Bind converter:Converter.PlayerToBlackBorderThickness(_viewModel.SelectedPlayerColor), Mode=OneWay}"
+                        BorderThickness="{x:Bind converter:Converter.PlayerToBlackBorderThickness(_viewModel.LocalPlayer), Mode=OneWay}"
                         Click="SelectBlackButton_Click">
                         <Image Source="ms-appx:///Assets/Pieces/Basic/KingB.png" Stretch="Uniform" />
                     </Button>

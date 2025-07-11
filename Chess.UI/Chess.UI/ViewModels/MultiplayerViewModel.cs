@@ -24,7 +24,6 @@ namespace Chess.UI.ViewModels
 
         private readonly IMultiplayerPreferencesModel _preferencesModel;
 
-
         public MultiplayerMode MPMode { get; private set; }
 
         public event Action RequestNavigationToChessboard;
@@ -192,19 +191,19 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private EngineAPI.PlayerColor _selectedPlayerColor = EngineAPI.PlayerColor.NoColor;
-        public EngineAPI.PlayerColor SelectedPlayerColor
-        {
-            get => _selectedPlayerColor;
-            set
-            {
-                if (_selectedPlayerColor != value)
-                {
-                    _selectedPlayerColor = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
+        //private EngineAPI.PlayerColor _selectedPlayerColor = EngineAPI.PlayerColor.NoColor;
+        //public EngineAPI.PlayerColor SelectedPlayerColor
+        //{
+        //    get => _selectedPlayerColor;
+        //    set
+        //    {
+        //        if (_selectedPlayerColor != value)
+        //        {
+        //            _selectedPlayerColor = value;
+        //            OnPropertyChanged();
+        //        }
+        //    }
+        //}
 
 
         private bool _readyButtonEnabled;
@@ -390,7 +389,7 @@ namespace Chess.UI.ViewModels
 
         public void SelectPlayerColor(EngineAPI.PlayerColor color)
         {
-            SelectedPlayerColor = color;
+            LocalPlayer = color;
             // Send color selection to backend
             _model.SetLocalPlayerColor(color);
 
@@ -400,7 +399,7 @@ namespace Chess.UI.ViewModels
 
         public void SelectLocalPlayerFromRemote(EngineAPI.PlayerColor local)
         {
-            SelectedPlayerColor = local;
+            LocalPlayer = local;
             _model.SetLocalPlayerColor(local);
             IsReady = false;
 
@@ -585,7 +584,7 @@ namespace Chess.UI.ViewModels
             SettingLocalPlayerView = Visibility.Visible;
 
             // Reset selection state
-            SelectedPlayerColor = EngineAPI.PlayerColor.NoColor;
+            LocalPlayer = EngineAPI.PlayerColor.NoColor;
             IsReady = false;
             RemotePlayerReady = false;
 
