@@ -30,6 +30,7 @@
                     Text="{x:Bind _viewModel.LocalPlayerName, Mode=OneWay}" />
                 <TextBlock
                     Margin="20"
+                    HorizontalAlignment="Center"
                     Style="{ThemeResource MPDesc}"
                     Text="You can change your name and network in the Multiplayer tab in the settings" />
             </StackPanel>
@@ -40,7 +41,7 @@
                 Height="40"
                 HorizontalAlignment="Center"
                 Orientation="Horizontal"
-                Spacing="8">
+                Spacing="12">
                 <Button
                     Name="HostGameButton"
                     Click="HostGameButton_Click"
@@ -87,7 +88,7 @@
                 Style="{ThemeResource MPSubTitle}"
                 Text="Accept this request?" />
 
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="16">
                 <Button
                     Name="HostAcceptButton"
                     Click="HostAcceptButton_Click"
@@ -129,7 +130,7 @@
                 Style="{ThemeResource MPSubTitle}"
                 Text="Do you want to join?" />
 
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="16">
                 <Button
                     Name="JoinAcceptButton"
                     Click="JoinAcceptButton_Click"
