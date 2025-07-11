@@ -15,6 +15,7 @@
 #include "RemoteMessaging/RemoteSender.h"
 #include "RemoteMessaging/RemoteCommunication.h"
 #include "IObserver.h"
+#include "UserSettings.h"
 
 
 class MultiplayerManager : public INetworkObserver,
@@ -27,47 +28,46 @@ public:
 	MultiplayerManager();
 	~MultiplayerManager();
 
-	void						init(const std::string &localIPv4);
+	void		init(const std::string &localIPv4);
 
-	void						reset();
+	void		reset();
 
-	bool						hostSession();
-	bool						startClient();
-	void						joinSession();
+	bool		hostSession();
+	bool		startClient();
+	void		joinSession();
 
-	void						setTCPSession(TCPSession::pointer session);
+	void		setTCPSession(TCPSession::pointer session);
 
-	void						disconnect();
+	void		disconnect();
 
-	void						setLocalPlayerName(const std::string name) { mLocalPlayerName = name; }
-	std::string					getLocalPlayerName() const { return mLocalPlayerName; }
+	std::string getLocalPlayerName() { return mLocalPlayerName; }
 
-	void						onNetworkAdapterChanged(const NetworkAdapter &adapter) override;
+	void		onNetworkAdapterChanged(const NetworkAdapter &adapter) override;
 
-	bool						startDiscovery(const std::string IPv4, const int port, DiscoveryMode mode);
+	bool		startDiscovery(const std::string IPv4, const int port, DiscoveryMode mode);
 
-	void						setInternalObservers();
+	void		setInternalObservers();
 
-	void						sendConnectRequest();
-	void						sendConnectResponse(bool accepted, std::string reason = "");
+	void		sendConnectRequest();
+	void		sendConnectResponse(bool accepted, std::string reason = "");
 
-	void						connectionStatusChanged(const ConnectionStatusEvent event) override;
-	void						localPlayerChosen(const PlayerColor localPlayer) override;
-	void						remotePlayerChosen(const PlayerColor local) override; // This is the already set to the localPlayer, but set if the remote chose a player
-	void						localReadyFlagSet(const bool flag) override;
+	void		connectionStatusChanged(const ConnectionStatusEvent event) override;
+	void		localPlayerChosen(const PlayerColor localPlayer) override;
+	void		remotePlayerChosen(const PlayerColor local) override; // This is the already set to the localPlayer, but set if the remote chose a player
+	void		localReadyFlagSet(const bool flag) override;
 
-	void						onRemoteFound(const Endpoint &remote) override;
+	void		onRemoteFound(const Endpoint &remote) override;
 
-	void						onRemoteMoveReceived(const PossibleMove &remoteMove) override {}
-	void						onRemoteChatMessageReceived(const std::string &mesage) override {}
-	void						onRemoteConnectionStateReceived(const ConnectionState &state) override;
-	void						onRemoteInvitationReceived(const InvitationRequest &invite) override;
-	void						onRemoteInvitationResponseReceived(const InvitationResponse &response) override;
-	void						onRemotePlayerChosenReceived(const PlayerColor player) override;
-	void						onRemotePlayerReadyFlagReceived(const bool flag) override;
+	void		onRemoteMoveReceived(const PossibleMove &remoteMove) override {}
+	void		onRemoteChatMessageReceived(const std::string &mesage) override {}
+	void		onRemoteConnectionStateReceived(const ConnectionState &state) override;
+	void		onRemoteInvitationReceived(const InvitationRequest &invite) override;
+	void		onRemoteInvitationResponseReceived(const InvitationResponse &response) override;
+	void		onRemotePlayerChosenReceived(const PlayerColor player) override;
+	void		onRemotePlayerReadyFlagReceived(const bool flag) override;
 
-	void						setRemotePlayerReadyForGameFlag(const bool flag);
-	bool						checkIfReadyForGame();
+	void		setRemotePlayerReadyForGameFlag(const bool flag);
+	bool		checkIfReadyForGame();
 
 private:
 	void													   closeDiscovery();
@@ -89,9 +89,8 @@ private:
 	asio::executor_work_guard<asio::io_context::executor_type> mWorkGuard;
 	std::thread												   mWorkerThread;
 
-	std::string												   mLocalPlayerName{};
 	PlayerColor												   mLocalPlayerColor{};
-
+	std::string												   mLocalPlayerName;
 	std::string												   mLocalIPv4{};
 
 	Endpoint												   mRemoteEndpoint;
@@ -103,6 +102,8 @@ private:
 
 	std::atomic<bool>										   mLocalPlayerReadyForGameFlag{false};
 	std::atomic<bool>										   mRemotePlayerReadyForGameFlag{false};
+
+	UserSettings											   mUserSettings;
 
 	friend class GameManager;
 };

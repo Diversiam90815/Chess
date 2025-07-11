@@ -322,7 +322,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        public void HandlePlayerChanged(Services.EngineAPI.PlayerColor player)
+        public void HandlePlayerChanged(EngineAPI.PlayerColor player)
         {
             IsLocalPlayersTurn = player == LocalPlayer;
         }
@@ -422,7 +422,6 @@ namespace Chess.UI.ViewModels
 
         private void HandleConnectionStatusUpdated(EngineAPI.ConnectionState state, string remotePlayerName)
         {
-            // TODO: Implement reactive UI
             switch (state)
             {
                 case EngineAPI.ConnectionState.ConnectionRequested:

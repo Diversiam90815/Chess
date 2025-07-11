@@ -37,8 +37,8 @@ MultiplayerManager::~MultiplayerManager()
 
 void MultiplayerManager::init(const std::string &localIPv4)
 {
-	// mNetwork->init();
 	mLocalIPv4 = localIPv4;
+	mLocalPlayerName = mUserSettings.getLocalPlayerName();
 }
 
 
@@ -322,7 +322,7 @@ void MultiplayerManager::sendConnectRequest()
 	std::string		  localVersion = "1.0.0"; // TODO: For now leave it at 1.0.0 -> create project.h.in file for CMake
 
 	InvitationRequest invite;
-	invite.playerName = mLocalPlayerName;
+	invite.playerName = getLocalPlayerName();
 	invite.version	  = localVersion;
 
 	mRemoteSender->sendConnectionInvite(invite);
@@ -333,7 +333,7 @@ void MultiplayerManager::sendConnectResponse(bool accepted, std::string reason)
 {
 	InvitationResponse response;
 	response.accepted	= accepted;
-	response.playerName = mLocalPlayerName;
+	response.playerName = getLocalPlayerName();
 	response.reason		= reason;
 
 	mRemoteSender->sendConnectionResponse(response);
