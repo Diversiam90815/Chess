@@ -38,7 +38,6 @@ namespace Chess.UI.Models
         }
 
 
-
         private void HandleConnectionStatusUpdates(ConnectionStatusEvent connectionStatusEvent)
         {
             ConnectionState connectionState = connectionStatusEvent.ConnectionState;
@@ -92,6 +91,12 @@ namespace Chess.UI.Models
         public void StartMultiplerGame()
         {
             EngineAPI.StartMultiplayerGame();
+        }
+
+
+        public void DisconnectMultiplayer()
+        {
+            EngineAPI.DisconnectMultiplayerGame();
         }
 
 

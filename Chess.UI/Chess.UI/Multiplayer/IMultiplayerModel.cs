@@ -19,6 +19,8 @@ namespace Chess.UI.Multiplayer
 
         void StartMultiplayer();
 
+        void DisconnectMultiplayer();
+
         void ConnectToHost();
 
         void AnswerConnectionInvitation(bool accept);

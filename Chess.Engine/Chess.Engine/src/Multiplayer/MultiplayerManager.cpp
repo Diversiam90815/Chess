@@ -37,7 +37,7 @@ MultiplayerManager::~MultiplayerManager()
 
 void MultiplayerManager::init(const std::string &localIPv4)
 {
-	mLocalIPv4 = localIPv4;
+	mLocalIPv4		 = localIPv4;
 	mLocalPlayerName = mUserSettings.getLocalPlayerName();
 }
 
@@ -118,15 +118,13 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 
 void MultiplayerManager::disconnect()
 {
-	connectionStatusChanged(ConnectionState::Disconnecting);
+	connectionStatusChanged(ConnectionState::Disconnected);
 
 	closeDiscovery();
 	closeRemoteCommunication();
 	closeTCPServerOrClient();
 
 	mSession.reset();
-
-	connectionStatusChanged(ConnectionState::Disconnected);
 
 	LOG_INFO("Network Connection closed.");
 }
@@ -138,19 +136,19 @@ void MultiplayerManager::onRemoteConnectionStateReceived(const ConnectionState &
 	mRemoteConnectionState = state;
 
 	if (mConnectionState == ConnectionState::ConnectionRequested && state == ConnectionState::Connected)
-	{
 		connectionStatusChanged(ConnectionState::SetPlayerColor);
-	}
+	
 
 	else if (state == ConnectionState::SetPlayerColor)
-	{
 		connectionStatusChanged(ConnectionState::SetPlayerColor);
-	}
+	
 
 	else if (state == ConnectionState::GameStarted)
-	{
 		connectionStatusChanged(ConnectionState::GameStarted);
-	}
+	
+
+	else if (state == ConnectionState::Disconnected)
+		connectionStatusChanged(ConnectionState::Disconnected);
 }
 
 

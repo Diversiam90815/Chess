@@ -15,18 +15,16 @@
 enum class ConnectionState
 {
 	None				= 0,
-	Disconnected		= 1,
-	HostingSession		= 2,
-	WaitingForARemote	= 3,
-	Connecting			= 4,
-	Connected			= 5,
-	Disconnecting		= 6,
-	Error				= 7,
-	ConnectionRequested = 8,  // Client has requested a connection to the host
-	PendingHostApproval = 9,  // Waiting for the host to approve the connection
-	ClientFoundHost		= 10, // Client found a host
-	SetPlayerColor		= 11,
-	GameStarted			= 12
+	HostingSession		= 1,
+	WaitingForARemote	= 2,
+	Connected			= 3,
+	Disconnected		= 4,
+	Error				= 5,
+	ConnectionRequested = 6, // Client has requested a connection to the host
+	PendingHostApproval = 7, // Waiting for the host to approve the connection
+	ClientFoundHost		= 9, // Client found a host
+	SetPlayerColor		= 10,
+	GameStarted			= 11,
 };
 
 

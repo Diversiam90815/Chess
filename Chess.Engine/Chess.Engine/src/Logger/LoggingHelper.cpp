@@ -155,11 +155,9 @@ std::string LoggingHelper::connectionStateToString(const ConnectionState &state)
 	switch (state)
 	{
 	case ConnectionState::None: return "None";
-	case ConnectionState::Disconnecting: return "Disconnecting";
 	case ConnectionState::Disconnected: return "Disconnects";
 	case ConnectionState::HostingSession: return "Hosting Session";
 	case ConnectionState::WaitingForARemote: return "Waiting for a remote";
-	case ConnectionState::Connecting: return "Connecting";
 	case ConnectionState::Connected: return "Connected";
 	case ConnectionState::Error: return "Error";
 	case ConnectionState::ConnectionRequested: return "Connection requested";

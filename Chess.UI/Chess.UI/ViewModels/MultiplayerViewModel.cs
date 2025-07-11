@@ -53,6 +53,12 @@ namespace Chess.UI.ViewModels
         }
 
 
+        public void DisconnectMultiplayer()
+        {
+            _model.DisconnectMultiplayer();
+        }
+
+
         private bool _isLocalPlayersTurn = false;
         public bool IsLocalPlayersTurn
         {
@@ -189,21 +195,6 @@ namespace Chess.UI.ViewModels
                 }
             }
         }
-
-
-        //private EngineAPI.PlayerColor _selectedPlayerColor = EngineAPI.PlayerColor.NoColor;
-        //public EngineAPI.PlayerColor SelectedPlayerColor
-        //{
-        //    get => _selectedPlayerColor;
-        //    set
-        //    {
-        //        if (_selectedPlayerColor != value)
-        //        {
-        //            _selectedPlayerColor = value;
-        //            OnPropertyChanged();
-        //        }
-        //    }
-        //}
 
 
         private bool _readyButtonEnabled;

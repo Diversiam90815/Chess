@@ -84,6 +84,11 @@ namespace Chess.UI
             _chessBoardWindow.Closed -= BoardWindowClosed;
             _chessBoardWindow = null;
             ChessBoardViewModel.ResetGame();
+
+            // Disconnect Multiplayer if this is a MP game
+            if (ChessBoardViewModel.IsMultiplayerGame)
+                MultiplayerViewModel.DisconnectMultiplayer();
+
             this.Activate();
         }
 
