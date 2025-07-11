@@ -27,6 +27,7 @@ namespace Chess.UI.ViewModels
         public MultiplayerMode MPMode { get; private set; }
 
         public event Action RequestNavigationToChessboard;
+        public event Action RequestCloseChessboard;
 
 
         public MultiplayerViewModel(IDispatcherQueueWrapper dispatcher)
@@ -422,6 +423,7 @@ namespace Chess.UI.ViewModels
                     }
                 case EngineAPI.ConnectionState.Disconnected:
                     {
+                        RequestCloseChessboard?.Invoke();
                         EnterInitMode();
                         break;
                     }

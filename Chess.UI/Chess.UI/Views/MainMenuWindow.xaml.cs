@@ -57,6 +57,9 @@ namespace Chess.UI
                 OpenChessboardView(true);
             };
 
+            // Remote disconnected
+            MultiplayerViewModel.RequestCloseChessboard += () => { CloseChessboardWindow(); };
+
             Init();
             SetWindowSize(800, 750);
         }
@@ -119,6 +122,29 @@ namespace Chess.UI
 
             // Reset the flag for next time
             _multiplayerWindowClosedProgrammatically = false;
+        }
+
+
+        private void CloseChessboardWindow()
+        {
+            _dispatcherQueue.TryEnqueue(() =>
+            {
+                if (_chessBoardWindow != null)
+                {
+                    _chessBoardWindow.Closed -= BoardWindowClosed;
+
+                    // Close the window
+                    _chessBoardWindow.Close();
+                    _chessBoardWindow = null;
+
+                    // Reset the game state
+                    ChessBoardViewModel.ResetGame();
+
+                    // Show the main menu window again
+                    this.AppWindow.Show();
+                    this.Activate();
+                }
+            });
         }
 
 

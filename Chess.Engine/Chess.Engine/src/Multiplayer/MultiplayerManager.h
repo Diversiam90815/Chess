@@ -69,6 +69,7 @@ public:
 	void		setRemotePlayerReadyForGameFlag(const bool flag);
 	bool		checkIfReadyForGame();
 
+
 private:
 	void													   closeDiscovery();
 	void													   closeTCPServerOrClient();
