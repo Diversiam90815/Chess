@@ -118,7 +118,18 @@ void MultiplayerManager::setTCPSession(TCPSession::pointer session)
 
 void MultiplayerManager::disconnect()
 {
-	connectionStatusChanged(ConnectionState::Disconnected);
+	LOG_INFO("Starting Disconnect Sequence..");
+
+	// First, send disconnect notification to remote (if connected)
+	if (mSession && mSession->isConnected())
+	{
+		// Send disconnect state to remote before closing anything
+		ConnectionStatusEvent disconnectEvent{ConnectionState::Disconnected};
+		connectionStatusChanged(disconnectEvent);
+
+		// Give a brief moment for the message to be sent
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
 
 	closeRemoteCommunication();
 

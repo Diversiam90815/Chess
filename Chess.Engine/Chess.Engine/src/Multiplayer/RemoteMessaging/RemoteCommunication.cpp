@@ -28,6 +28,25 @@ bool RemoteCommunication::init(std::shared_ptr<TCPSession> session)
 
 void RemoteCommunication::deinit()
 {
+	if (mSendThread)
+		mSendThread->stop();
+
+	if (mReceiveThread)
+		mReceiveThread->stop();
+
+	// Try to send any remaining critical messages (like disconnect)
+	if (mTCPSession && mTCPSession->isConnected())
+	{
+		// Send remaining outgoing messages with a timeout
+		auto timeout = std::chrono::steady_clock::now() + std::chrono::milliseconds(200);
+		while (!mOutgoingMessages.empty() && std::chrono::steady_clock::now() < timeout)
+		{
+			if (!sendMessages())
+				break;
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
+	}
+
 	if (mTCPSession)
 	{
 		mTCPSession->stopReadAsync();
@@ -35,8 +54,7 @@ void RemoteCommunication::deinit()
 		mTCPSession = nullptr;
 	}
 
-	stop();
-
+	clearPendingMessages();
 	mIsInitialized.store(false);
 }
 
@@ -88,8 +106,6 @@ void RemoteCommunication::start()
 
 void RemoteCommunication::stop()
 {
-	clearPendingMessages();
-
 	if (mSendThread)
 		mSendThread->stop();
 
