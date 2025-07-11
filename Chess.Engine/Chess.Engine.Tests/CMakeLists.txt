@@ -16,6 +16,7 @@ enable_testing()
 #==========================================
 
 set(MoveTest_Dir source/MoveTests)
+set(MultiplayerTest_Dir source/MultiplayerTests)
 
 set(MoveTest_Files
     ${MoveTest_Dir}/MoveGenerationTests.cpp
@@ -25,8 +26,15 @@ set(MoveTest_Files
     ${MoveTest_Dir}/EnPassantTests.cpp
 )
 
+set(MultiplayerTest_Files
+    ${MultiplayerTest_Dir}/DiscoveryEndpointTests.cpp
+
+)
+
+
 set(Test_Files
     ${MoveTest_Files}
+    ${MultiplayerTest_Files}
     source/ChessboardTests.cpp
     source/PawnPromotionTests.cpp
 )
