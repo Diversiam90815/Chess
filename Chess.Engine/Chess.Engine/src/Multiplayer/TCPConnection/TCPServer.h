@@ -9,34 +9,31 @@
 #pragma once
 
 #include <asio.hpp>
-#include <functional>
 
+#include "TCPInterfaces.h"
 #include "TCPSession.h"
 #include "Logging.h"
 
 
 using asio::ip::tcp;
 
-using SessionHandler		   = std::function<void(std::shared_ptr<TCPSession> session)>; // Callback invoked when a new session is accepted
 
-
-class TCPServer
+class TCPServer : public ITCPServer
 {
 public:
 	TCPServer(asio::io_context &ioContext);
 	~TCPServer();
 
-	void	  startAccept();
+	void startAccept() override;
 
-	const int getBoundPort() const;
+	int	 getBoundPort() const override;
 
-	void	  setSessionHandler(SessionHandler handler);
+	void setSessionHandler(SessionHandler handler) override;
 
-	void	  respondToConnectionRequest(bool accepted);
+	void respondToConnectionRequest(bool accepted) override;
 
 
 private:
-
 	asio::io_context		   &mIoContext;
 
 	tcp::acceptor				mAcceptor;

@@ -57,9 +57,7 @@ void TCPServer::respondToConnectionRequest(bool accepted)
 		LOG_INFO("Accepting connection from: {}", mPendingSession->socket().remote_endpoint().address().to_string().c_str());
 
 		if (mSessionHandler)
-		{
 			mSessionHandler(mPendingSession);
-		}
 	}
 
 	else
@@ -76,7 +74,7 @@ void TCPServer::respondToConnectionRequest(bool accepted)
 }
 
 
-const int TCPServer::getBoundPort() const
+int TCPServer::getBoundPort() const
 {
 	return mBoundPort;
 }

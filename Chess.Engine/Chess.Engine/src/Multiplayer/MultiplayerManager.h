@@ -36,7 +36,7 @@ public:
 	bool		startClient();
 	void		joinSession();
 
-	void		setTCPSession(TCPSession::pointer session);
+	void		setTCPSession(ITCPSession::pointer session);
 
 	void		disconnect();
 
@@ -76,7 +76,7 @@ private:
 	void													   closeRemoteCommunication();
 
 
-	TCPSession::pointer										   mSession = nullptr;
+	ITCPSession::pointer									   mSession = nullptr;
 
 	std::unique_ptr<TCPServer>								   mServer;
 	std::unique_ptr<TCPClient>								   mClient;

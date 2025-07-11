@@ -61,7 +61,7 @@ bool MultiplayerManager::hostSession()
 
 	mServer = std::make_unique<TCPServer>(mIoContext);
 
-	mServer->setSessionHandler([this](TCPSession::pointer session) { setTCPSession(session); });
+	mServer->setSessionHandler([this](ITCPSession::pointer session) { setTCPSession(session); });
 
 	mServer->startAccept();
 
@@ -91,7 +91,7 @@ void MultiplayerManager::joinSession()
 	mClient = std::make_unique<TCPClient>(mIoContext);
 
 	mClient->setConnectHandler(
-		[this](TCPSession::pointer session)
+		[this](ITCPSession::pointer session)
 		{
 			setTCPSession(session);
 			sendConnectRequest();
@@ -103,7 +103,7 @@ void MultiplayerManager::joinSession()
 }
 
 
-void MultiplayerManager::setTCPSession(TCPSession::pointer session)
+void MultiplayerManager::setTCPSession(ITCPSession::pointer session)
 {
 	{
 		std::lock_guard<std::mutex> lock(mSessionMutex);

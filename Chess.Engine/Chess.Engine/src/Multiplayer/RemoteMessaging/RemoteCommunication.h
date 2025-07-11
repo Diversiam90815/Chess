@@ -18,7 +18,7 @@ public:
 	RemoteCommunication()  = default;
 	~RemoteCommunication() = default;
 
-	bool init(std::shared_ptr<TCPSession> session);
+	bool init(std::shared_ptr<ITCPSession> session);
 	void deinit();
 
 	void start();
@@ -42,7 +42,7 @@ private:
 
 	std::atomic<bool>					  mIsInitialized{false};
 
-	std::shared_ptr<TCPSession>			  mTCPSession;
+	std::shared_ptr<ITCPSession>		  mTCPSession;
 
 	std::shared_ptr<SendThread>			  mSendThread;
 	std::shared_ptr<ReceiveThread>		  mReceiveThread;

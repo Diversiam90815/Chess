@@ -8,9 +8,9 @@
 #pragma once
 
 #include <asio.hpp>
-#include <functional>
 #include <vector>
 
+#include "TCPInterfaces.h"
 #include "Logging.h"
 #include "IObservable.h"
 #include "RemoteMessaging/MultiPlayerMessageStruct.h"
@@ -26,12 +26,10 @@ struct AsyncReadState
 };
 
 
-class TCPSession : public std::enable_shared_from_this<TCPSession>
+class TCPSession : public ITCPSession, public std::enable_shared_from_this<TCPSession>
 {
 public:
 	~TCPSession();
-
-	using MessageReceivedCallback = std::function<void(MultiplayerMessageStruct &message)>;
 
 	typedef std::shared_ptr<TCPSession> pointer;
 
@@ -41,18 +39,17 @@ public:
 
 	tcp::socket						   &socket();
 
-	const int							getBoundPort() const { return mBoundPort; }
+	int									getBoundPort() const override { return mBoundPort; }
 
-	bool								isConnected() const;
+	bool								isConnected() const override;
 
-	bool								sendMessage(MultiplayerMessageStruct &message);
+	bool								sendMessage(MultiplayerMessageStruct &message) override;
 
-	void								startReadAsync(MessageReceivedCallback callback);
-	void								stopReadAsync();
+	void								startReadAsync(MessageReceivedCallback callback) override;
+	void								stopReadAsync() override;
 
 
 private:
-	
 	explicit TCPSession(asio::io_context &ioContext);
 	explicit TCPSession(tcp::socket &&socket);
 

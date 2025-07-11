@@ -8,7 +8,7 @@
 #include "RemoteCommunication.h"
 
 
-bool RemoteCommunication::init(std::shared_ptr<TCPSession> session)
+bool RemoteCommunication::init(std::shared_ptr<ITCPSession> session)
 {
 	mTCPSession = session;
 
