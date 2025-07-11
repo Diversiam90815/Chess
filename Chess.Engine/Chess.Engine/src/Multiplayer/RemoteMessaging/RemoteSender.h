@@ -32,7 +32,6 @@ public:
 	void onRemotePlayerChosen(const PlayerColor remote) override {}
 	void onLocalReadyFlagSet(const bool flag) override;
 
-
 private:
 	std::vector<uint8_t> convertDataToByteVector(json &source);
 

@@ -88,6 +88,8 @@ void RemoteCommunication::start()
 
 void RemoteCommunication::stop()
 {
+	clearPendingMessages();
+
 	if (mSendThread)
 		mSendThread->stop();
 
@@ -152,6 +154,20 @@ void RemoteCommunication::receivedMessage(MultiplayerMessageType type, std::vect
 	{
 		if (auto obs = observer.lock())
 			obs->onMessageReceived(type, message);
+	}
+}
+
+
+void RemoteCommunication::clearPendingMessages()
+{
+	{
+		std::lock_guard<std::mutex> lock(mIncomingListMutex);
+		mIncomingMessages.clear();
+	}
+
+	{
+		std::lock_guard<std::mutex> lock(mOutgoingListMutex);
+		mOutgoingMessages.clear();
 	}
 }
 

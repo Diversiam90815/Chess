@@ -120,11 +120,19 @@ void MultiplayerManager::disconnect()
 {
 	connectionStatusChanged(ConnectionState::Disconnected);
 
-	closeDiscovery();
 	closeRemoteCommunication();
+
+	closeDiscovery();
 	closeTCPServerOrClient();
 
-	mSession.reset();
+	{
+		std::lock_guard<std::mutex> lock(mSessionMutex);
+		if (mSession)
+		{
+			mSession->stopReadAsync();
+			mSession.reset();
+		}
+	}
 
 	LOG_INFO("Network Connection closed.");
 }
@@ -137,15 +145,15 @@ void MultiplayerManager::onRemoteConnectionStateReceived(const ConnectionState &
 
 	if (mConnectionState == ConnectionState::ConnectionRequested && state == ConnectionState::Connected)
 		connectionStatusChanged(ConnectionState::SetPlayerColor);
-	
+
 
 	else if (state == ConnectionState::SetPlayerColor)
 		connectionStatusChanged(ConnectionState::SetPlayerColor);
-	
+
 
 	else if (state == ConnectionState::GameStarted)
 		connectionStatusChanged(ConnectionState::GameStarted);
-	
+
 
 	else if (state == ConnectionState::Disconnected)
 		connectionStatusChanged(ConnectionState::Disconnected);
@@ -258,6 +266,7 @@ void MultiplayerManager::closeRemoteCommunication()
 	if (mRemoteCom)
 	{
 		mRemoteCom->deinit();
+		mRemoteCom->stop();
 		mRemoteCom.reset();
 	}
 }

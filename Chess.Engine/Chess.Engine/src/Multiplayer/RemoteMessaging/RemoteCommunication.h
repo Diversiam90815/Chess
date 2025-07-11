@@ -37,6 +37,9 @@ public:
 private:
 	void								  receivedMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) override;
 
+	void								  clearPendingMessages();
+
+
 	std::atomic<bool>					  mIsInitialized{false};
 
 	std::shared_ptr<TCPSession>			  mTCPSession;
