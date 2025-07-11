@@ -166,6 +166,7 @@ void StateMachine::resetGame()
 	mWaitingForTargetEnd   = false;
 	resetCurrentPossibleMove();
 	setCurrrentGameState(GameState::Undefined);
+	setInitialized(false);
 	GameManager::GetInstance()->resetGame();
 }
 
