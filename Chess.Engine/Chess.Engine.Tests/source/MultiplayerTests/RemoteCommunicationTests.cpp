@@ -71,4 +71,41 @@ TEST_F(RemoteCommunicationTests, InitializationWithValidSession)
 }
 
 
+
+TEST_F(RemoteCommunicationTests, InitializationWithNullSession)
+{
+	bool result = remoteCom->init(nullptr);
+
+	EXPECT_FALSE(result) << "Initialization should fail with null session";
+	EXPECT_FALSE(remoteCom->isInitialized()) << "Should not be initialized after failed init";
+}
+
+
+TEST_F(RemoteCommunicationTests, InitializationWithDisconnectedSession)
+{
+	EXPECT_CALL(*mockSession, isConnected()).WillOnce(::testing::Return(false));
+
+	bool result = remoteCom->init(mockSession);
+
+	EXPECT_FALSE(result) << "Initialization should fail with disconnected session";
+	EXPECT_FALSE(remoteCom->isInitialized()) << "Should not be initialized after failed init";
+}
+
+
+TEST_F(RemoteCommunicationTests, Deinitialization)
+{
+	EXPECT_CALL(*mockSession, isConnected()).WillOnce(::testing::Return(true));
+	EXPECT_CALL(*mockSession, stopReadAsync()).Times(1);
+
+	remoteCom->init(mockSession);
+	EXPECT_TRUE(remoteCom->isInitialized()) << "Should be initialized";
+
+	remoteCom->deinit();
+	EXPECT_FALSE(remoteCom->isInitialized()) << "Should not be initialized after deinit";
+}
+
+
+
+
+
 } // namespace MultiplayerTests
