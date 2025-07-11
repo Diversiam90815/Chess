@@ -31,6 +31,7 @@ set(MoveTest_Files
 
 set(MultiplayerTest_Files
     ${MultiplayerTest_Dir}/DiscoveryEndpointTests.cpp
+    ${MultiplayerTest_Dir}/MultiplayerMessageTests.cpp
 )
 
 
