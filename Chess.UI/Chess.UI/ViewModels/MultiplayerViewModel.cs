@@ -440,10 +440,7 @@ namespace Chess.UI.ViewModels
                     }
                 case EngineAPI.ConnectionState.GameStarted:
                     {
-                        // Start the multiplayer game
                         EnterMultiplayerGame();
-
-                        // Navigate to chessboard window
                         RequestNavigationToChessboard?.Invoke();
                         break;
                     }

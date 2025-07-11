@@ -228,12 +228,6 @@ Engine_API void DisconnectMultiplayerGame()
 }
 
 
-Engine_API bool IsMultiplayerActive()
-{
-	return GameManager::GetInstance()->isMultiplayerActive();
-}
-
-
 Engine_API void OnSquareSelected(PositionInstance positionInstance)
 {
 	Position pos = MapToPosition(positionInstance);

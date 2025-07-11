@@ -55,8 +55,6 @@ extern "C"
 
 	Engine_API void	 DisconnectMultiplayerGame();
 
-	Engine_API bool	 IsMultiplayerActive();
-
 	Engine_API void	 AnswerConnectionInvitation(bool accept);
 
 	Engine_API void	 SendConnectionRequestToHost();
