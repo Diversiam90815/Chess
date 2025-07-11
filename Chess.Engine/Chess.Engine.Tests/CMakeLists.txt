@@ -32,6 +32,7 @@ set(MoveTest_Files
 set(MultiplayerTest_Files
     ${MultiplayerTest_Dir}/DiscoveryEndpointTests.cpp
     ${MultiplayerTest_Dir}/MultiplayerMessageTests.cpp
+    ${MultiplayerTest_Dir}/RemoteCommunicationTests.cpp
 )
 
 
@@ -72,6 +73,7 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${GOOGLETEST_SOURCE_DIR}/googletest/include
+        ${GOOGLETEST_SOURCE_DIR}/googlemock/include
 )
 
 include(GoogleTest)
@@ -85,6 +87,7 @@ target_link_libraries(${PROJECT_NAME}
       PRIVATE
         Chess.Engine.Core
         GTest::gtest_main
+        GTest::gmock_main
 )
 
 
