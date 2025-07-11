@@ -52,6 +52,7 @@ namespace Chess.UI.Views
             Presenter.IsResizable = false;
             Presenter.IsMaximizable = false;
 
+            _viewModel.ResetViewState();
             _viewModel.StartMultiplayerSetup();
         }
 

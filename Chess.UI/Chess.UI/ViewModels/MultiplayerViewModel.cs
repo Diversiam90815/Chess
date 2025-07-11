@@ -490,6 +490,29 @@ namespace Chess.UI.ViewModels
         }
 
 
+        public void ResetViewState()
+        {
+            // Reset all view states to initial values
+            InitView = Visibility.Visible;
+            ClientFoundHostView = Visibility.Collapsed;
+            ClientRequestedConnectionView = Visibility.Collapsed;
+            ClientWaitingForResponseView = Visibility.Collapsed;
+            SettingLocalPlayerView = Visibility.Collapsed;
+
+            // Reset other properties to defaults
+            Processing = false;
+            LocalPlayer = EngineAPI.PlayerColor.NoColor;
+            IsReady = false;
+            RemotePlayerReady = false;
+            ReadyButtonEnabled = false;
+            RemotePlayerName = string.Empty;
+
+            // Reset to init mode
+            MPMode = MultiplayerMode.Init;
+            UpdateMPButtons(MultiplayerMode.Init);
+        }
+
+
         public void DisplayClientView()
         {
             InitView = Visibility.Visible;
