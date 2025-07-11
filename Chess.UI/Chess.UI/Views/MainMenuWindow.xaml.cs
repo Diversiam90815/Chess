@@ -181,8 +181,8 @@ namespace Chess.UI
         {
             await ShowDialogAsync<PreferencesView>(this, (p) =>
             {
-                p.Width = 650;
-                p.Height = 750;
+                p.Width = 700;
+                p.Height = 800;
                 p.AddPreferencesTab("Styles", typeof(ThemePreferencesView), "\uE790");
                 p.AddPreferencesTab("Multiplayer", typeof(MultiplayerPreferencesView), "\uE774");
             });
