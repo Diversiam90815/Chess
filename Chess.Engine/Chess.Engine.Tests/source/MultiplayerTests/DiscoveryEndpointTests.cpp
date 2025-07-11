@@ -10,6 +10,9 @@
 #include "Discovery/DiscoveryEndpoint.h"
 
 
+namespace MultiplayerTests
+{
+
 class EndpointTests : public ::testing::Test
 {
 protected:
@@ -161,3 +164,5 @@ TEST_F(EndpointTests, ValidPortNumbers)
 		EXPECT_TRUE(endpoint.isValid()) << "Port number " << port << " should be valid";
 	}
 }
+
+} // namespace MultiplayerTests

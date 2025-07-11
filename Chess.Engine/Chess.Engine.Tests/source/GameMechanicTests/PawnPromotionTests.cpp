@@ -13,6 +13,10 @@
 #include "StateMachine.h"
 
 
+namespace GameMechanicTests
+{
+
+
 class PawnPromotionTests : public ::testing::Test
 {
 protected:
@@ -25,9 +29,9 @@ protected:
 	{
 		mBoard = std::make_shared<ChessBoard>();
 		mBoard->removeAllPiecesFromBoard();
-		mValidation	  = std::make_shared<MoveValidation>(mBoard);
-		mExecution	  = std::make_shared<MoveExecution>(mBoard, mValidation);
-		mGeneration	  = std::make_shared<MoveGeneration>(mBoard, mValidation, mExecution);
+		mValidation = std::make_shared<MoveValidation>(mBoard);
+		mExecution	= std::make_shared<MoveExecution>(mBoard, mValidation);
+		mGeneration = std::make_shared<MoveGeneration>(mBoard, mValidation, mExecution);
 	}
 
 	void SetupWhitePawnPromotionPosition()
@@ -67,9 +71,9 @@ TEST_F(PawnPromotionTests, ExecutePawnPromotionToQueen)
 	SetupWhitePawnPromotionPosition();
 
 	// Setup pawn promotion move : white pawn a7->a8
-	Position start = {0, 1}; // a7
-	Position end   = {0, 0}; // a8
-	PossibleMove promotionMove {start, end, MoveType::PawnPromotion, PieceType::Queen};
+	Position	 start = {0, 1}; // a7
+	Position	 end   = {0, 0}; // a8
+	PossibleMove promotionMove{start, end, MoveType::PawnPromotion, PieceType::Queen};
 
 	// Execute promotion
 	bool		 result = mExecution->executePawnPromotion(promotionMove, PlayerColor::White);
@@ -221,3 +225,4 @@ TEST_F(PawnPromotionTests, InvalidPawnPromotion)
 }
 
 
+} // namespace GameMechanicTests

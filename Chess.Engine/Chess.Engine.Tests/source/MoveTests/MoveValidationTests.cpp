@@ -10,6 +10,10 @@
 #include "MoveValidation.h"
 
 
+namespace MoveTests
+{
+
+
 class MoveValidationTest : public ::testing::Test
 {
 protected:
@@ -334,3 +338,5 @@ TEST_F(MoveValidationTest, BlockingCheckmatePreventsCheckmate)
 	// Verify: No checkmate, since it can be blocked by the rook
 	EXPECT_FALSE(isCheckmate) << "Position should not be checkmate, because rook can block";
 }
+
+} // namespace MoveTests

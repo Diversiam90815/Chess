@@ -12,6 +12,10 @@
 #include "MoveExecution.h"
 
 
+namespace MoveTests
+{
+
+
 class MoveGenerationTest : public ::testing::Test
 {
 protected:
@@ -503,10 +507,12 @@ TEST_F(MoveGenerationTest, CheckmatePositionHasNoLegalMoves)
 	mBoard->updateKingsPosition(kingPos, PlayerColor::White);
 
 	// Calculate all legal moves for White
-	bool		   hasLegalMoves = mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
-	auto		   kingMoves	 = mGeneration->getMovesForPosition(kingPos);
+	bool hasLegalMoves = mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
+	auto kingMoves	   = mGeneration->getMovesForPosition(kingPos);
 
 	// In checkmate, there should be no legal moves
 	EXPECT_FALSE(hasLegalMoves) << "In checkmate position, calculating legal moves should return false";
 	EXPECT_TRUE(kingMoves.empty()) << "King in checkmate should have no legal moves";
 }
+
+} // namespace MoveTest

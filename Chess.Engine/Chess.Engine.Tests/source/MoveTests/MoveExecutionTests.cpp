@@ -11,6 +11,9 @@
 #include "MoveValidation.h"
 
 
+namespace MoveTests
+{
+
 class MoveExecutionTest : public ::testing::Test
 {
 protected:
@@ -295,3 +298,5 @@ TEST_F(MoveExecutionTest, ExecutingMoveGeneratesNotation)
 	EXPECT_FALSE(result.notation.empty()) << "Move notation should be generated";
 }
 
+
+} // namespace MoveTests

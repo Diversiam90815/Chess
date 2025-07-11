@@ -10,7 +10,10 @@
 #include "RemoteMessaging/MultiplayerMessageStruct.h"
 
 
-class MultiplayerMessageStructTests : public ::testing::Test
+namespace MultiplayerTests
+{
+
+class MultiplayerMessageTests : public ::testing::Test
 {
 protected:
 	void SetUp() override
@@ -23,7 +26,7 @@ protected:
 };
 
 
-TEST_F(MultiplayerMessageStructTests, DefaultConstruction)
+TEST_F(MultiplayerMessageTests, DefaultConstruction)
 {
 	MultiplayerMessageStruct message;
 
@@ -32,7 +35,7 @@ TEST_F(MultiplayerMessageStructTests, DefaultConstruction)
 }
 
 
-TEST_F(MultiplayerMessageStructTests, CopyConstruction)
+TEST_F(MultiplayerMessageTests, CopyConstruction)
 {
 	// Set up original message
 	testMessage.type			  = MultiplayerMessageType::LocalPlayer;
@@ -53,7 +56,7 @@ TEST_F(MultiplayerMessageStructTests, CopyConstruction)
 }
 
 
-TEST_F(MultiplayerMessageStructTests, AssignmentOperator)
+TEST_F(MultiplayerMessageTests, AssignmentOperator)
 {
 	// Set up original message
 	testMessage.type = MultiplayerMessageType::LocalPlayer;
@@ -71,7 +74,7 @@ TEST_F(MultiplayerMessageStructTests, AssignmentOperator)
 }
 
 
-TEST_F(MultiplayerMessageStructTests, InitializationWithType)
+TEST_F(MultiplayerMessageTests, InitializationWithType)
 {
 	MultiplayerMessageStruct message;
 	message.type = MultiplayerMessageType::Move;
@@ -81,7 +84,7 @@ TEST_F(MultiplayerMessageStructTests, InitializationWithType)
 }
 
 
-TEST_F(MultiplayerMessageStructTests, InitializationWithData)
+TEST_F(MultiplayerMessageTests, InitializationWithData)
 {
 	std::vector<uint8_t> testData = {0x01, 0x02, 0x03, 0x04, 0x05};
 
@@ -94,7 +97,7 @@ TEST_F(MultiplayerMessageStructTests, InitializationWithData)
 }
 
 
-TEST_F(MultiplayerMessageStructTests, EmptyDataVector)
+TEST_F(MultiplayerMessageTests, EmptyDataVector)
 {
 	testMessage.type = MultiplayerMessageType::Chat;
 	testMessage.data = std::vector<uint8_t>{};
@@ -104,7 +107,7 @@ TEST_F(MultiplayerMessageStructTests, EmptyDataVector)
 }
 
 
-TEST_F(MultiplayerMessageStructTests, LargeDataVector)
+TEST_F(MultiplayerMessageTests, LargeDataVector)
 {
 	// Create a large data vector
 	std::vector<uint8_t> largeData(1024, 0xAA);
@@ -123,7 +126,7 @@ TEST_F(MultiplayerMessageStructTests, LargeDataVector)
 }
 
 
-TEST_F(MultiplayerMessageStructTests, BinaryDataHandling)
+TEST_F(MultiplayerMessageTests, BinaryDataHandling)
 {
 	// Test with various binary data patterns
 	std::vector<uint8_t> binaryData = {
@@ -144,7 +147,7 @@ TEST_F(MultiplayerMessageStructTests, BinaryDataHandling)
 }
 
 
-TEST_F(MultiplayerMessageStructTests, DataVectorOperations)
+TEST_F(MultiplayerMessageTests, DataVectorOperations)
 {
 	testMessage.type = MultiplayerMessageType::Move;
 
@@ -170,7 +173,7 @@ TEST_F(MultiplayerMessageStructTests, DataVectorOperations)
 }
 
 
-TEST_F(MultiplayerMessageStructTests, MessageTypeEnumValues)
+TEST_F(MultiplayerMessageTests, MessageTypeEnumValues)
 {
 	// Test that we can assign all expected message types
 	std::vector<MultiplayerMessageType> types = {MultiplayerMessageType::Default,
@@ -190,4 +193,4 @@ TEST_F(MultiplayerMessageStructTests, MessageTypeEnumValues)
 }
 
 
-
+} // namespace MultiplayerTests

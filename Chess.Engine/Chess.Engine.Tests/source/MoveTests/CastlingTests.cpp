@@ -12,6 +12,9 @@
 #include "MoveValidation.h"
 
 
+namespace MoveTests
+{
+
 class CastlingTests : public ::testing::Test
 {
 protected:
@@ -294,3 +297,5 @@ TEST_F(CastlingTests, CastlingNotAllowedWhenKingInCheck)
 	// Verify: Castling should not be available
 	EXPECT_FALSE(hasCastling) << "Castling should not be allowed when king is in check";
 }
+
+} // namespace MoveTests
