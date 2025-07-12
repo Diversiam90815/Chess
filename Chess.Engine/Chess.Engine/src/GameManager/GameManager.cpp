@@ -312,6 +312,17 @@ void GameManager::endGame(EndGameState state, PlayerColor player)
 
 std::optional<PlayerColor> GameManager::getWinner() const
 {
+	const Move *lastMove = mMoveExecution->getLastMove();
+
+	if (!lastMove)
+		return std::nullopt;
+
+	// Check if the last move resulted in a checkmate
+	bool isCheckMate = (lastMove->type & MoveType::Checkmate) == MoveType::Checkmate;
+
+	if (isCheckMate)
+		return lastMove->player;
+
 	return std::nullopt;
 }
 
@@ -409,6 +420,8 @@ EndGameState GameManager::checkForEndGameConditions()
 			auto winner = getWinner();
 			if (winner.has_value())
 				endGame(EndGameState::Checkmate, winner.value());
+			else
+				endGame(EndGameState::Checkmate);
 
 			return EndGameState::Checkmate;
 		}
@@ -422,6 +435,8 @@ EndGameState GameManager::checkForEndGameConditions()
 			auto winner = getWinner();
 			if (winner.has_value())
 				endGame(EndGameState::StaleMate, winner.value());
+			else
+				endGame(EndGameState::StaleMate);
 
 			return EndGameState::StaleMate;
 		}

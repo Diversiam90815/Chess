@@ -44,7 +44,7 @@ public:
 
 	void						resetGame();
 
-	void						endGame(EndGameState state, PlayerColor player) override;
+	void						endGame(EndGameState state, PlayerColor player = PlayerColor::NoColor) override;
 
 	std::optional<PlayerColor>	getWinner() const;
 
