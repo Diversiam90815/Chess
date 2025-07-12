@@ -37,9 +37,10 @@ MultiplayerManager::~MultiplayerManager()
 
 bool MultiplayerManager::init(const std::string &localIPv4)
 {
-	mLocalIPv4		 = localIPv4;
-	mLocalPlayerName = mUserSettings.getLocalPlayerName();
+	if (localIPv4.empty())
+		return false;
 
+	mLocalIPv4 = localIPv4;
 	return true;
 }
 

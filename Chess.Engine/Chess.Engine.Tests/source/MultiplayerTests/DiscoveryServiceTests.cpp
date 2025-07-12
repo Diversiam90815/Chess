@@ -131,13 +131,17 @@ TEST_F(DiscoveryServiceTests, StartDiscoveryWithoutInitialization)
 	EXPECT_THROW(discoveryService->startDiscovery(DiscoveryMode::Server), std::exception) << "Starting discovery without initialization should throw";
 }
 
-
-
 TEST_F(DiscoveryServiceTests, GetEndpointFromValidIP)
 {
-	std::string testIP	 = "192.168.1.100";
+	// Add remote endpoint to the list
+	std::string testIP = "192.168.1.100";
+	Endpoint	ep;
+	ep.IPAddress  = testIP;
+	ep.playerName = "TestPlayer";
+	ep.tcpPort	  = 8080;
+	discoveryService->addRemoteToList(ep);
 
-	Endpoint	endpoint = discoveryService->getEndpointFromIP(testIP);
+	Endpoint endpoint = discoveryService->getEndpointFromIP(testIP);
 
 	EXPECT_EQ(endpoint.IPAddress, testIP) << "Returned endpoint should have the queried IP";
 }
@@ -147,7 +151,13 @@ TEST_F(DiscoveryServiceTests, GetEndpointFromInvalidIP)
 {
 	std::string invalidIP = "";
 
-	Endpoint	endpoint  = discoveryService->getEndpointFromIP(invalidIP);
+	Endpoint	ep;
+	ep.IPAddress  = invalidIP;
+	ep.playerName = "TestPlayer";
+	ep.tcpPort	  = 8080;
+	discoveryService->addRemoteToList(ep);
+
+	Endpoint endpoint = discoveryService->getEndpointFromIP(invalidIP);
 
 	EXPECT_FALSE(endpoint.isValid()) << "Should return invalid endpoint for empty IP";
 }

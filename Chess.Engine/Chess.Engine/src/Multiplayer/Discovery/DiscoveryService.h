@@ -44,6 +44,8 @@ public:
 
 	Endpoint getEndpointFromIP(const std::string &IPv4);
 
+	void	 addRemoteToList(Endpoint remote);
+
 
 private:
 	void				   run() override;
@@ -52,8 +54,6 @@ private:
 	void				   receivePackage();
 
 	void				   handleReceive(const asio::error_code &error, size_t bytesReceived);
-
-	void				   addRemoteToList(Endpoint remote);
 
 	bool				   isInitialized() const { return mInitialized.load(); }
 

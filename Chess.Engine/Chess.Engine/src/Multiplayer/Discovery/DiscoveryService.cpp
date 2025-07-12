@@ -81,6 +81,12 @@ void DiscoveryService::deinit()
 
 void DiscoveryService::startDiscovery(DiscoveryMode mode)
 {
+	if (!isInitialized())
+	{
+		throw std::runtime_error("Discovery Service has not been initialized but was called to start!");
+		return;
+	}
+
 	mDiscoveryMode = mode;
 
 	if (mDiscoveryMode == DiscoveryMode::Server)

@@ -40,7 +40,7 @@ public:
 
 	void		disconnect();
 
-	std::string getLocalPlayerName() { return mLocalPlayerName; }
+	std::string getLocalPlayerName() { return mUserSettings.getLocalPlayerName(); }
 
 	void		onNetworkAdapterChanged(const NetworkAdapter &adapter) override;
 
@@ -91,7 +91,6 @@ private:
 	std::thread												   mWorkerThread;
 
 	PlayerColor												   mLocalPlayerColor{};
-	std::string												   mLocalPlayerName;
 	std::string												   mLocalIPv4{};
 
 	Endpoint												   mRemoteEndpoint;
