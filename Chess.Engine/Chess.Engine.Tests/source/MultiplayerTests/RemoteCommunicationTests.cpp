@@ -105,7 +105,105 @@ TEST_F(RemoteCommunicationTests, Deinitialization)
 }
 
 
+TEST_F(RemoteCommunicationTests, StartAndStop)
+{
+	EXPECT_CALL(*mockSession, isConnected()).WillRepeatedly(::testing::Return(true));
+	EXPECT_CALL(*mockSession, startReadAsync(::testing::_)).Times(1);
+	EXPECT_CALL(*mockSession, stopReadAsync()).Times(::testing::AtLeast(1));
+
+	remoteCom->init(mockSession);
+
+	EXPECT_NO_THROW(remoteCom->start()) << "Start should not throw";
+	EXPECT_NO_THROW(remoteCom->stop()) << "Stop should not throw";
+}
 
 
+TEST_F(RemoteCommunicationTests, WriteMessage)
+{
+	EXPECT_CALL(*mockSession, isConnected()).WillRepeatedly(::testing::Return(true));
+	EXPECT_CALL(*mockSession, sendMessage(::testing::_)).WillOnce(::testing::Return(true));
+
+	remoteCom->init(mockSession);
+
+	std::vector<uint8_t> testData = {0x01, 0x02, 0x03};
+	EXPECT_NO_THROW(remoteCom->write(MultiplayerMessageType::Move, testData)) << "Write should not throw with valid data";
+}
+
+
+TEST_F(RemoteCommunicationTests, WriteMessageWhenNotInitialized)
+{
+	std::vector<uint8_t> testData = {0x01, 0x02, 0x03};
+
+	// Should not crash when not initialized
+	EXPECT_NO_THROW(remoteCom->write(MultiplayerMessageType::Move, testData)) << "Write should not throw even when not initialized";
+}
+
+
+TEST_F(RemoteCommunicationTests, OnSendMessageCallback)
+{
+	EXPECT_CALL(*mockSession, isConnected()).WillRepeatedly(::testing::Return(true));
+
+	remoteCom->init(mockSession);
+
+	std::vector<uint8_t> testData = {0x10, 0x20, 0x30};
+
+	EXPECT_NO_THROW(remoteCom->onSendMessage(MultiplayerMessageType::Chat, testData)) << "onSendMessage callback should not throw";
+}
+
+
+TEST_F(RemoteCommunicationTests, ReadMessageWhenEmpty)
+{
+	EXPECT_CALL(*mockSession, isConnected()).WillOnce(::testing::Return(true));
+
+	remoteCom->init(mockSession);
+
+	MultiplayerMessageType type;
+	std::vector<uint8_t>   data;
+
+	bool				   result = remoteCom->read(type, data);
+	EXPECT_FALSE(result) << "Read should return false when no messages available";
+}
+
+
+TEST_F(RemoteCommunicationTests, ReceiveMessagesWhenNotInitialized)
+{
+	bool result = remoteCom->receiveMessages();
+	EXPECT_FALSE(result) << "receiveMessages should return false when not initialized";
+}
+
+
+TEST_F(RemoteCommunicationTests, SendMessagesWhenNotInitialized)
+{
+	bool result = remoteCom->sendMessages();
+	EXPECT_FALSE(result) << "sendMessages should return false when not initialized";
+}
+
+
+TEST_F(RemoteCommunicationTests, MultipleInitializeAttempts)
+{
+	EXPECT_CALL(*mockSession, isConnected()).WillRepeatedly(::testing::Return(true));
+	EXPECT_CALL(*mockSession, stopReadAsync()).Times(::testing::AtLeast(1));
+
+	// First initialization
+	bool result1 = remoteCom->init(mockSession);
+	EXPECT_TRUE(result1) << "First initialization should succeed";
+	EXPECT_TRUE(remoteCom->isInitialized()) << "Should be initialized";
+
+	// Second initialization should replace the first
+	bool result2 = remoteCom->init(mockSession);
+	EXPECT_TRUE(result2) << "Second initialization should succeed";
+	EXPECT_TRUE(remoteCom->isInitialized()) << "Should still be initialized";
+}
+
+
+TEST_F(RemoteCommunicationTests, StopWithoutStart)
+{
+	EXPECT_CALL(*mockSession, isConnected()).WillOnce(::testing::Return(true));
+
+	remoteCom->init(mockSession);
+
+	// Should not crash when stopping without starting
+	EXPECT_NO_THROW(remoteCom->stop()) << "Stop should not throw even without start";
+}
 
 } // namespace MultiplayerTests
