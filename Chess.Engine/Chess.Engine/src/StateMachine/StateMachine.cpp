@@ -510,8 +510,11 @@ bool StateMachine::handlePawnPromotionState()
 
 bool StateMachine::handleGameOverState()
 {
-	// @TODO: Let UI know of EndGameState -> Checkmate or Stalemate
-	return false;
+	// Endgame state sent to UI via GameManager::checkForEndGameConditions
+	// We should reset and close the StateMachine
+
+	resetGame();
+	this->stop();
 }
 
 
