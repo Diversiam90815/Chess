@@ -438,6 +438,7 @@ void StateMachine::reactToUndoMove()
 {
 	// Remove the last move from the history and board
 	GameManager::GetInstance()->undoMove();
+	GameManager::GetInstance()->switchTurns(); // Switch back to the old player
 
 	// Recalculate the new state (Changing player happening in WaitingForInputState)
 	mWaitingForTargetStart = false;
@@ -513,8 +514,8 @@ bool StateMachine::handleGameOverState()
 	// Endgame state sent to UI via GameManager::checkForEndGameConditions
 	// We should reset and close the StateMachine
 
-	//resetGame();
-	//this->stop();
+	// resetGame();
+	// this->stop();
 	return true;
 }
 
