@@ -198,6 +198,9 @@ void DiscoveryService::handleReceive(const asio::error_code &error, size_t bytes
 
 void DiscoveryService::addRemoteToList(Endpoint remote)
 {
+	if (!remote.isValid())
+		return;
+
 	for (auto &ep : mRemoteDevices) // Detecting duplicates
 	{
 		if (ep == remote)
