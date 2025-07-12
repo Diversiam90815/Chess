@@ -515,6 +515,7 @@ bool StateMachine::handleGameOverState()
 
 	resetGame();
 	this->stop();
+	return true;
 }
 
 
