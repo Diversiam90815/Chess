@@ -33,6 +33,10 @@ set(MultiplayerTest_Files
     ${MultiplayerTest_Dir}/DiscoveryEndpointTests.cpp
     ${MultiplayerTest_Dir}/MultiplayerMessageTests.cpp
     ${MultiplayerTest_Dir}/RemoteCommunicationTests.cpp
+    ${MultiplayerTest_Dir}/DiscoveryServiceTests.cpp
+    ${MultiplayerTest_Dir}/MultiplayerManagerTests.cpp
+    ${MultiplayerTest_Dir}/TCPClientAndServerTests.cpp
+    ${MultiplayerTest_Dir}/TCPSessionTests.cpp
 )
 
 
