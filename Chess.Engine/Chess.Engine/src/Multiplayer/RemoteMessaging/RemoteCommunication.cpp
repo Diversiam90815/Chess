@@ -10,6 +10,17 @@
 
 bool RemoteCommunication::init(std::shared_ptr<ITCPSession> session)
 {
+	if (!session)
+	{
+		LOG_ERROR("TCPSession is not valid. We received a nullptr. Cannot initialize");
+		return false;
+	}
+	else if (!session->isConnected())
+	{
+		LOG_ERROR("Tried to init with a non-connected session.");
+		return false;
+	}
+
 	mTCPSession = session;
 
 	if (mSendThread)
@@ -146,6 +157,9 @@ bool RemoteCommunication::read(MultiplayerMessageType &type, std::vector<uint8_t
 
 void RemoteCommunication::write(MultiplayerMessageType type, std::vector<uint8_t> data)
 {
+	if (!isInitialized())
+		return;
+
 	std::lock_guard<std::mutex> lock(mOutgoingListMutex);
 
 	MultiplayerMessageStruct	message;
@@ -190,6 +204,9 @@ void RemoteCommunication::clearPendingMessages()
 
 bool RemoteCommunication::receiveMessages()
 {
+	if (!isInitialized())
+		return false;
+
 	// Get all messages from the queue
 	std::vector<MultiplayerMessageStruct> messages;
 
@@ -213,6 +230,9 @@ bool RemoteCommunication::receiveMessages()
 
 bool RemoteCommunication::sendMessages()
 {
+	if (!isInitialized())
+		return false;
+
 	for (auto &message : mOutgoingMessages)
 	{
 		bool success = mTCPSession->sendMessage(message);

@@ -22,11 +22,8 @@ DiscoveryService::~DiscoveryService()
 
 bool DiscoveryService::init(const std::string &playerName, std::string localIPv4, unsigned short tcpPort)
 {
-	if (localIPv4.empty())
-	{
-		assert(false);
+	if (localIPv4.empty() || playerName.empty())
 		return false;
-	}
 
 	mTcpPort	= tcpPort;
 	mLocalIPv4	= localIPv4;
