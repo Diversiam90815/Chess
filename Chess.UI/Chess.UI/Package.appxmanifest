@@ -22,7 +22,7 @@
 
 	<Extensions>
 		<ns2:Extension Category="windows.firewallRules">
-			<ns2:FirewallRules Executable="$targetnametoken$.exe">
+			<ns2:FirewallRules Executable="Chess.exe">
 				<ns2:Rule Direction="out" IPProtocol="UDP" Profile="all" />
 				<ns2:Rule Direction="in" IPProtocol="UDP" Profile="all" />
 				<ns2:Rule Direction="out" IPProtocol="TCP" Profile="all" />
