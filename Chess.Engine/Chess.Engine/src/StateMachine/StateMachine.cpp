@@ -513,8 +513,8 @@ bool StateMachine::handleGameOverState()
 	// Endgame state sent to UI via GameManager::checkForEndGameConditions
 	// We should reset and close the StateMachine
 
-	resetGame();
-	this->stop();
+	//resetGame();
+	//this->stop();
 	return true;
 }
 
