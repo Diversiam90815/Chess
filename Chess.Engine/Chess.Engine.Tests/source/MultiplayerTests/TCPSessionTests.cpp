@@ -14,6 +14,9 @@
 #include "TCPConnection/TCPSession.h"
 
 
+namespace MultiplayerTests
+{
+
 class TCPSessionTests : public ::testing::Test
 {
 protected:
@@ -138,3 +141,4 @@ TEST_F(TCPSessionTests, SocketAccess)
 }
 
 
+} // namespace MultiplayerTests
