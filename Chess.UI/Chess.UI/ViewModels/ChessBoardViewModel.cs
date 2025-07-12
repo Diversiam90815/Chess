@@ -26,7 +26,7 @@ namespace Chess.UI.ViewModels
 
         public ObservableCollection<BoardSquare> Board { get; set; }
 
-        public event Func<EndGameState, Task> ShowEndGameDialog;
+        public event Func<EndGameState, PlayerColor, Task> ShowEndGameDialog;
 
         public event Func<Task<PieceTypeInstance?>> ShowPawnPromotionDialogRequested;
 
@@ -248,9 +248,9 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private void OnEndGameState(EndGameState state)
+        private void OnEndGameState(EndGameState state, PlayerColor winner)
         {
-            ShowEndGameDialog?.Invoke(state);
+            ShowEndGameDialog?.Invoke(state, winner);
         }
 
 

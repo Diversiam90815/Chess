@@ -92,12 +92,12 @@ namespace Chess.UI.Views
         }
 
 
-        private async Task OnGameOverState(EndGameState endGameState)
+        private async Task OnGameOverState(EndGameState endGameState, PlayerColor winner)
         {
             switch (endGameState)
             {
                 case EndGameState.Checkmate:
-                    var dialog = new ContentDialog
+                    var checkMateDialog = new ContentDialog
                     {
                         Title = "Checkmate",
                         Content = "You have been checkmated!",
@@ -106,9 +106,9 @@ namespace Chess.UI.Views
                         XamlRoot = this.Content.XamlRoot
                     };
 
-                    var result = await dialog.ShowAsync();
+                    var checkMateResult = await checkMateDialog.ShowAsync();
 
-                    if (result == ContentDialogResult.Primary)
+                    if (checkMateResult == ContentDialogResult.Primary)
                     {
                         _viewModel.ResetGame();
                         _viewModel.StartGame();
@@ -121,7 +121,27 @@ namespace Chess.UI.Views
                     break;
 
                 case EndGameState.StaleMate:
-                    // Handle stalemate 
+                    var staleMateDialog = new ContentDialog
+                    {
+                        Title = "Stalemate",
+                        Content = "Stalemate detected!",
+                        PrimaryButtonText = "New Game",
+                        CloseButtonText = "Close",
+                        XamlRoot = this.Content.XamlRoot
+                    };
+
+                    var staleMateResult = await staleMateDialog.ShowAsync();
+
+                    if (staleMateResult == ContentDialogResult.Primary)
+                    {
+                        _viewModel.ResetGame();
+                        _viewModel.StartGame();
+                    }
+                    else
+                    {
+                        _viewModel.ResetGame();
+                        this.Close();
+                    }
                     break;
 
                 default:

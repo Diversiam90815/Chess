@@ -75,7 +75,11 @@ void UICommunication::onGameStateChanged(GameState state)
 
 void UICommunication::onEndGame(EndGameState state, PlayerColor winner)
 {
-	communicateToUI(MessageType::EndGameState, &state);
+	EndgameStateEvent event{};
+	event.state	 = state;
+	event.winner = winner;
+
+	communicateToUI(MessageType::EndGameState, &event);
 }
 
 

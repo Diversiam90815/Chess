@@ -24,7 +24,7 @@ namespace Chess.UI.Communication_Layer.Interfaces
         event Action<MoveHistoryEvent> MoveHistoryUpdated;
         event Action<PlayerCapturedPiece> PlayerCapturedPieceEvent;
         event Action<EngineAPI.Score> PlayerScoreUpdated;
-        event Action<EndGameState> EndGameStateEvent;
+        event Action<EndGameStateEvent> EndGameStateEvent;
         event Action<ConnectionStatusEvent> ConnectionStatusEvent;
         event Action<PlayerColor> MultiPlayerChosenByRemote;
     }
