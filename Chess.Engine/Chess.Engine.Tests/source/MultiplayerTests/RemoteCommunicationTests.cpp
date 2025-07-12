@@ -62,7 +62,7 @@ TEST_F(RemoteCommunicationTests, DefaultConstruction)
 
 TEST_F(RemoteCommunicationTests, InitializationWithValidSession)
 {
-	EXPECT_CALL(*mockSession, isConnected()).WillOnce(::testing::Return(true));
+	EXPECT_CALL(*mockSession, isConnected()).WillRepeatedly(::testing::Return(true));
 
 	bool result = remoteCom->init(mockSession);
 
@@ -94,7 +94,7 @@ TEST_F(RemoteCommunicationTests, InitializationWithDisconnectedSession)
 
 TEST_F(RemoteCommunicationTests, Deinitialization)
 {
-	EXPECT_CALL(*mockSession, isConnected()).WillOnce(::testing::Return(true));
+	EXPECT_CALL(*mockSession, isConnected()).WillRepeatedly(::testing::Return(true));
 	EXPECT_CALL(*mockSession, stopReadAsync()).Times(1);
 
 	remoteCom->init(mockSession);
@@ -153,7 +153,7 @@ TEST_F(RemoteCommunicationTests, OnSendMessageCallback)
 
 TEST_F(RemoteCommunicationTests, ReadMessageWhenEmpty)
 {
-	EXPECT_CALL(*mockSession, isConnected()).WillOnce(::testing::Return(true));
+	EXPECT_CALL(*mockSession, isConnected()).WillRepeatedly(::testing::Return(true));
 
 	remoteCom->init(mockSession);
 
@@ -198,7 +198,7 @@ TEST_F(RemoteCommunicationTests, MultipleInitializeAttempts)
 
 TEST_F(RemoteCommunicationTests, StopWithoutStart)
 {
-	EXPECT_CALL(*mockSession, isConnected()).WillOnce(::testing::Return(true));
+	EXPECT_CALL(*mockSession, isConnected()).WillRepeatedly(::testing::Return(true));
 
 	remoteCom->init(mockSession);
 
