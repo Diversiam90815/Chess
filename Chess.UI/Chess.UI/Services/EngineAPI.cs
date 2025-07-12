@@ -88,7 +88,7 @@ namespace Chess.UI.Services
         public static extern void StartedMultiplayer();
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartMultiplayerGame", CharSet = CharSet.Unicode)]
-        public static extern void StartMultiplayerGame(bool isHost);
+        public static extern void StartMultiplayerGame();
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartRemoteDiscovery", CharSet = CharSet.Unicode)]
         public static extern void StartRemoteDiscovery(bool isHost);
@@ -96,20 +96,20 @@ namespace Chess.UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "DisconnectMultiplayerGame", CharSet = CharSet.Unicode)]
         public static extern void DisconnectMultiplayerGame();
 
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "IsMultiplayerActive", CharSet = CharSet.Unicode)]
-        public static extern bool IsMultiplayerActive();
-
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ApproveConnectionRequest", CharSet = CharSet.Unicode)]
-        public static extern void ApproveConnectionRequest();
-
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "RejectConnectionRequest", CharSet = CharSet.Unicode)]
-        public static extern void RejectConnectionRequest();
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "AnswerConnectionInvitation", CharSet = CharSet.Unicode)]
+        public static extern void AnswerConnectionInvitation(bool accepted);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SendConnectionRequestToHost", CharSet = CharSet.Unicode)]
         public static extern void SendConnectionRequestToHost();
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StoppedMultiplayer", CharSet = CharSet.Unicode)]
         public static extern void StoppedMultiplayer();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetLocalPlayer", CharSet = CharSet.Unicode)]
+        public static extern void SetLocalPlayer(int iLocalPlayer);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetLocalPlayerReady", CharSet = CharSet.Unicode)]
+        public static extern void SetLocalPlayerReady(bool ready);
 
         #endregion // Multiplayer
 
@@ -139,22 +139,22 @@ namespace Chess.UI.Services
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetCurrentPieceTheme", CharSet = CharSet.Unicode)]
         public static extern void SetCurrentPieceTheme([In()][MarshalAs(UnmanagedType.LPStr)] string theme);
-
+    
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetCurrentPieceTheme", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string GetCurrentPieceTheme();
 
-        #endregion // User Config
-
-
-        #region Network / Multiplayer
-
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetLocalPlayerName", CharSet = CharSet.Unicode)]
         public static extern void SetLocalPlayerName([In()][MarshalAs(UnmanagedType.LPStr)] string name);
 
-        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetRemotePlayerName", CharSet = CharSet.Unicode)]
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetLocalPlayerName", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.LPStr)]
-        public static extern string GetRemotePlayerName();
+        public static extern string GetLocalPlayerName();
+
+        #endregion // User Config
+
+
+        #region Network
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetNetworkAdapterCount", CharSet = CharSet.Unicode)]
         public static extern int GetNetworkAdapterCount();
@@ -168,7 +168,7 @@ namespace Chess.UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ChangeCurrentAdapter", CharSet = CharSet.Unicode)]
         public static extern void ChangeCurrentAdapter(int ID);
 
-        #endregion // Network / Multiplayer
+        #endregion // Network
 
 
         #endregion // DLL Defines
@@ -249,13 +249,17 @@ namespace Chess.UI.Services
 
         public enum ConnectionState
         {
-            Disconnected = 1,
-            HostingSession = 2,
-            WaitingForARemote = 3,
-            Connecting = 4,
-            Connected = 5,
-            Disconnecting = 6,
-            Error = 7
+            None = 0,
+            HostingSession = 1,
+            WaitingForARemote = 2,
+            Connected = 3,
+            Disconnected = 4,
+            Error = 5,
+            ConnectionRequested = 6, // Client has requested a connection to the host
+            PendingHostApproval = 7, // Waiting for the host to approve the connection
+            ClientFoundHost = 9, // Client found a host
+            SetPlayerColor = 10,
+            GameStarted = 11,
         }
 
 
@@ -375,7 +379,11 @@ namespace Chess.UI.Services
         public struct ConnectionStatusEvent
         {
             public ConnectionState ConnectionState;
-            public string ErrorMessage;
+
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 250)]
+            public string remoteName;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 250)]
+            public string errorMessage;
         };
 
 

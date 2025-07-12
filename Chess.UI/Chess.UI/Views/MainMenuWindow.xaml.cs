@@ -1,17 +1,14 @@
-using ABI.Windows.Foundation;
 using Chess.UI.Services;
-using Chess.UI.Themes;
-using Chess.UI.Themes.Interfaces;
-using Chess.UI.UI;
 using Chess.UI.ViewModels;
 using Chess.UI.Views;
+using Chess.UI.Wrappers;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 
@@ -23,13 +20,19 @@ namespace Chess.UI
 
         private ChessBoardWindow _chessBoardWindow;
 
-        private MainMenuViewModel _viewModel { get; }
+        private MainMenuViewModel ViewModel { get; }
 
-        private ChessBoardViewModel _chessBoardViewModel { get; }
+        private ChessBoardViewModel ChessBoardViewModel { get; }
 
         private MultiplayerWindow _multiplayerWindow;
 
+        private MultiplayerViewModel MultiplayerViewModel { get; }
+
         public IAsyncRelayCommand OpenPreferencesCommand { get; }
+
+        private readonly IDispatcherQueueWrapper _dispatcherQueue;
+
+        private bool _multiplayerWindowClosedProgrammatically = false;
 
 
         public MainMenuWindow()
@@ -38,12 +41,24 @@ namespace Chess.UI
 
             AppWindow.SetIcon(Project.IconPath);
 
-            _viewModel = App.Current.Services.GetService<MainMenuViewModel>();
-            _chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
+            _dispatcherQueue = App.Current.Services.GetRequiredService<IDispatcherQueueWrapper>();
 
-            this.RootGrid.DataContext = _viewModel;
+            ViewModel = App.Current.Services.GetService<MainMenuViewModel>();
+            ChessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
+            MultiplayerViewModel = App.Current.Services.GetService<MultiplayerViewModel>();
+
+            this.RootGrid.DataContext = ViewModel;
 
             OpenPreferencesCommand = new AsyncRelayCommand(OpenPreferencesView);
+
+            MultiplayerViewModel.RequestNavigationToChessboard += () =>
+            {
+                // We enter the Multiplayer Game, so we show the Chessboard
+                OpenChessboardView(true);
+            };
+
+            // Remote disconnected
+            MultiplayerViewModel.RequestCloseChessboard += () => { CloseChessboardWindow(); };
 
             Init();
             SetWindowSize(800, 750);
@@ -71,7 +86,12 @@ namespace Chess.UI
         {
             _chessBoardWindow.Closed -= BoardWindowClosed;
             _chessBoardWindow = null;
-            _chessBoardViewModel.ResetGame();
+            ChessBoardViewModel.ResetGame();
+
+            // Disconnect Multiplayer if this is a MP game
+            if (ChessBoardViewModel.IsMultiplayerGame)
+                MultiplayerViewModel.DisconnectMultiplayer();
+
             this.Activate();
         }
 
@@ -80,53 +100,73 @@ namespace Chess.UI
         {
             _multiplayerWindow.Closed -= MultiplayerWindowClosed;
             _multiplayerWindow = null;
-            this.Activate();
+
+            // Only reactivate main menu if window was closed by user (not programmatically)
+            if (!_multiplayerWindowClosedProgrammatically)
+            {
+                try
+                {
+                    // Only try to activate if the window is still valid and not closing
+                    if (this.AppWindow != null)
+                    {
+                        this.AppWindow.Show();
+                        this.Activate();
+                    }
+                }
+                catch (COMException)
+                {
+                    // Window may already be closed during application shutdown
+                    // Just ignore the exception as we don't need to activate a closing window
+                }
+            }
+
+            // Reset the flag for next time
+            _multiplayerWindowClosedProgrammatically = false;
+        }
+
+
+        private void CloseChessboardWindow()
+        {
+            _dispatcherQueue.TryEnqueue(() =>
+            {
+                if (_chessBoardWindow != null)
+                {
+                    _chessBoardWindow.Closed -= BoardWindowClosed;
+
+                    // Close the window
+                    _chessBoardWindow.Close();
+                    _chessBoardWindow = null;
+
+                    // Reset the game state
+                    ChessBoardViewModel.ResetGame();
+
+                    // Show the main menu window again
+                    this.AppWindow.Show();
+                    this.Activate();
+                }
+            });
         }
 
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_chessBoardWindow == null)
-            {
-                _chessBoardWindow = App.Current.Services.GetService<ChessBoardWindow>();
-                _chessBoardWindow.Activate();
-                _chessBoardWindow.Closed += BoardWindowClosed;
-                this.AppWindow.Hide();
-
-                _chessBoardViewModel.StartGame();
-            }
-            else
-            {
-                _chessBoardWindow.Activate();
-            }
+            OpenChessboardView(false);
         }
 
 
-        private async void MultiplayerButton_Click(object sender, RoutedEventArgs e)
+        private void MultiplayerButton_Click(object sender, RoutedEventArgs e)
         {
-
-            var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
+            if (_multiplayerWindow == null)
             {
-                Title = "Multiplayer Coming Soon",
-                Content = "Multiplayer is not yet implemented, but is being worked on.",
-                CloseButtonText = "OK",
-                XamlRoot = this.Content.XamlRoot
-            };
-
-            await dialog.ShowAsync();
-
-            //if (MultiplayerWindow == null)
-            //{
-            //    MultiplayerWindow = new MultiplayerWindow(DispatcherQueue);
-            //    MultiplayerWindow.Activate();
-            //    MultiplayerWindow.Closed += MultiplayerWindowClosed;
-            //    this.AppWindow.Hide();
-            //}
-            //else
-            //{
-            //    MultiplayerWindow.Activate();
-            //}
-
+                _multiplayerWindow = App.Current.Services.GetService<MultiplayerWindow>();
+                _multiplayerWindow.Activate();
+                _multiplayerWindow.Closed += MultiplayerWindowClosed;
+                this.AppWindow.Hide();
+            }
+            else
+            {
+                _multiplayerWindow.Activate();
+            }
         }
 
 
@@ -141,10 +181,10 @@ namespace Chess.UI
         {
             await ShowDialogAsync<PreferencesView>(this, (p) =>
             {
-                p.Width = 650;
-                p.Height = 750;
-                //p.AddPreferencesTab("General", typeof(GeneralPreferencesView));
+                p.Width = 700;
+                p.Height = 800;
                 p.AddPreferencesTab("Styles", typeof(ThemePreferencesView), "\uE790");
+                p.AddPreferencesTab("Multiplayer", typeof(MultiplayerPreferencesView), "\uE774");
             });
         }
 
@@ -158,6 +198,43 @@ namespace Chess.UI
 
             var result = await dialog.ShowAsync();
             return result;
+        }
+
+
+        private void OpenChessboardView(bool Multiplayer)
+        {
+            _dispatcherQueue.TryEnqueue(() =>
+            {
+                if (_chessBoardWindow == null)
+                {
+                    _chessBoardWindow = App.Current.Services.GetService<ChessBoardWindow>();
+                    _chessBoardWindow.Activate();
+                    _chessBoardWindow.Closed += BoardWindowClosed;
+                    this.AppWindow.Hide();
+
+                    // Close multiplayer window when opening chessboard from multiplayer
+                    if (Multiplayer && _multiplayerWindow != null)
+                    {
+                        // Set flag to indicate programmatic closure
+                        _multiplayerWindowClosedProgrammatically = true;
+                        _multiplayerWindow.Close();
+                    }
+
+                    if (!Multiplayer)
+                    {
+                        ChessBoardViewModel.IsMultiplayerGame = false;
+                        // If we start a MP game, the game is started from the MP VM
+                        ChessBoardViewModel.StartGame();
+                        return;
+                    }
+
+                    ChessBoardViewModel.IsMultiplayerGame = true;
+                }
+                else
+                {
+                    _chessBoardWindow.Activate();
+                }
+            });
         }
     }
 }

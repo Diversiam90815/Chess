@@ -1,21 +1,11 @@
 ﻿using Chess.UI.Multiplayer;
 using Chess.UI.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
+
 
 namespace Chess.UI.Models
 {
-    public record NetworkAdapter
-    {
-        public string Name { get; set; }
-        public int ID { get; set; }
-    }
-
-
     public enum MultiplayerMode
     {
         None = 0,
@@ -27,23 +17,24 @@ namespace Chess.UI.Models
 
     public class MultiplayerModel : IMultiplayerModel
     {
+        public void Init()
+        {
+            var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
+            logicCommunication.ConnectionStatusEvent += HandleConnectionStatusUpdates;
+            logicCommunication.PlayerChanged += HandlePlayerChanged;
+            logicCommunication.MultiPlayerChosenByRemote += HandleLocalPlayerChosenByRemote;
+        }
 
-        private List<NetworkAdapter> mAdapters = new();
 
-
-        public MultiplayerModel()
+        public void StartMultiplayer()
         {
             EngineAPI.StartedMultiplayer();
         }
 
 
-        public void Init()
+        public void HandlePlayerChanged(PlayerColor player)
         {
-            var logicCommunication = App.Current.ChessLogicCommunication as CommunicationLayer;
-            logicCommunication.ConnectionStatusEvent += HandleConnectionStatusUpdates;
-            logicCommunication.ClientRequestedConnection += ClientRequestedConnection;
-
-            SetNetworkAdapters();
+            OnPlayerChanged?.Invoke(player);
         }
 
 
@@ -53,67 +44,11 @@ namespace Chess.UI.Models
 
             if (connectionState == ConnectionState.Error)
             {
-                string errorMessage = connectionStatusEvent.ErrorMessage;
-                OnConnectionErrorOccured?.Invoke(errorMessage);
+                OnConnectionErrorOccured?.Invoke(connectionStatusEvent.errorMessage);
                 return;
             }
 
-            OnConnectionStatusChanged?.Invoke(connectionState);
-        }
-
-
-        private bool SetNetworkAdapters()
-        {
-            mAdapters.Clear();
-            int adapterCount = EngineAPI.GetNetworkAdapterCount();
-
-            for (uint i = 0; i < adapterCount; ++i)
-            {
-                EngineAPI.NetworkAdapter adapter;
-                EngineAPI.GetNetworkAdapterAtIndex(i, out adapter);
-
-                NetworkAdapter networkAdapter = new();
-                networkAdapter.Name = adapter.name;
-                networkAdapter.ID = adapter.id;
-
-                if (networkAdapter.ID == 0 && networkAdapter.Name == null)
-                    continue;
-
-                mAdapters.Add(networkAdapter);
-            }
-
-            bool result = mAdapters.Count > 0;
-            return result;
-        }
-
-
-        public List<NetworkAdapter> GetNetworkAdapters()
-        {
-            return mAdapters;
-        }
-
-
-        public int GetSelectedNetworkAdapterID()
-        {
-            return EngineAPI.GetSavedAdapterID();
-        }
-
-
-        public void ChangeNetworkAdapter(int ID)
-        {
-            EngineAPI.ChangeCurrentAdapter(ID);
-        }
-
-
-        public string GetRemotePlayerName()
-        {
-            return EngineAPI.GetRemotePlayerName();
-        }
-
-
-        public void SetLocalPlayerName(string name)
-        {
-            EngineAPI.SetLocalPlayerName(name);
+            OnConnectionStatusChanged?.Invoke(connectionState, connectionStatusEvent.remoteName);
         }
 
 
@@ -131,7 +66,7 @@ namespace Chess.UI.Models
 
         public void ConnectToHost()
         {
-
+            EngineAPI.SendConnectionRequestToHost();
         }
 
 
@@ -141,44 +76,46 @@ namespace Chess.UI.Models
         }
 
 
-        public void StartMultiplerGame(MultiplayerMode mode)
+        public void SetLocalPlayerColor(EngineAPI.PlayerColor color)
         {
-            switch (mode)
-            {
-                case MultiplayerMode.Client:
-                    {
-                        EngineAPI.StartMultiplayerGame(false);
-                        break;
-                    }
-                case MultiplayerMode.Server:
-                    {
-                        EngineAPI.StartMultiplayerGame(true);
-                        break;
-                    }
-                default: break;
-            }
-        }
-
-        public void AcceptConnectionRequest()
-        {
-            EngineAPI.ApproveConnectionRequest();
+            EngineAPI.SetLocalPlayer((int)color);
         }
 
 
-        public void RejectConnectionRequest()
+        public void SetPlayerReady(bool flag)
         {
-            EngineAPI.RejectConnectionRequest();
+            EngineAPI.SetLocalPlayerReady(flag);
         }
 
 
-        public void ClientRequestedConnection(string clientName)
+        public void StartMultiplerGame()
         {
-            OnClientRequestedConnection?.Invoke(clientName);
+            EngineAPI.StartMultiplayerGame();
         }
+
+
+        public void DisconnectMultiplayer()
+        {
+            EngineAPI.DisconnectMultiplayerGame();
+        }
+
+
+        public void AnswerConnectionInvitation(bool accepted)
+        {
+            EngineAPI.AnswerConnectionInvitation(accepted);
+        }
+
+
+        public void HandleLocalPlayerChosenByRemote(PlayerColor local)
+        {
+            OnMultiplayerPlayerSetFromRemote?.Invoke(local);
+        }
+
 
 
         public event Action<string> OnConnectionErrorOccured;
-        public event Action<ConnectionState> OnConnectionStatusChanged;
-        public event Action<string> OnClientRequestedConnection;
+        public event Action<ConnectionState, string> OnConnectionStatusChanged;
+        public event Action<PlayerColor> OnPlayerChanged;
+        public event Action<PlayerColor> OnMultiplayerPlayerSetFromRemote;
     }
 }

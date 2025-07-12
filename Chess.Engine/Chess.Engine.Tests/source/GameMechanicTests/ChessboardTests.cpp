@@ -10,6 +10,10 @@
 #include "ChessBoard.h"
 
 
+namespace GameMechanicTests
+{
+
+
 class ChessBoardTest : public ::testing::Test
 {
 protected:
@@ -324,3 +328,5 @@ TEST_F(ChessBoardTest, GetPieceAtPosition)
 	auto piece3 = mBoard.getPiece(Position{8, 8});
 	EXPECT_EQ(piece3, nullptr) << "Should get nullptr for out-of-bounds position";
 }
+
+} // namespace GameMechanicTests

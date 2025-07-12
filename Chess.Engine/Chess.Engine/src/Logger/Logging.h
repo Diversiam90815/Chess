@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "Logger.h"
+#include "Logger/Logger.h"
 
 #include <string>
 
@@ -20,8 +20,8 @@
 class Logging
 {
 public:
-	Logging();
-	~Logging();
+	Logging()  = default;
+	~Logging() = default;
 
 	void initLogging();
 

@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.0.0.502)
+set(CHESS_VERSION 1.1.0.646)
 
 project(Chess.Engine VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
@@ -113,7 +113,8 @@ set(GAME_MANAGER_FILES
 )
 
 set(PLAYER_FILES
-	${PLAYER_DIR}/Player.h      ${PLAYER_DIR}/Player.cpp
+	${PLAYER_DIR}/Player.h      	${PLAYER_DIR}/Player.cpp
+	${PLAYER_DIR}/PlayerName.h      ${PLAYER_DIR}/PlayerName.cpp
 )
 
 set(HELPER_FILES
@@ -152,11 +153,13 @@ set(COMMUNICATION_FILES
 )
 
 set(MULTIPLAYER_FILES
+	${MULTIPLAYER_DIR}/ConnectionStatus.h
 	${MULTIPLAYER_DIR}/Discovery/DiscoveryEndpoint.h
 	${MULTIPLAYER_DIR}/RemoteMessaging/MultiplayerMessageStruct.h
 	${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.h		${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.cpp
 	${MULTIPLAYER_DIR}/MultiplayerManager.h							${MULTIPLAYER_DIR}/MultiplayerManager.cpp
 	${MULTIPLAYER_DIR}/Discovery/DiscoveryService.h					${MULTIPLAYER_DIR}/Discovery/DiscoveryService.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPInterfaces.h
 	${MULTIPLAYER_DIR}/TCPConnection/TCPSession.h					${MULTIPLAYER_DIR}/TCPConnection/TCPSession.cpp
 	${MULTIPLAYER_DIR}/TCPConnection/TCPServer.h					${MULTIPLAYER_DIR}/TCPConnection/TCPServer.cpp
 	${MULTIPLAYER_DIR}/TCPConnection/TCPClient.h					${MULTIPLAYER_DIR}/TCPConnection/TCPClient.cpp
@@ -164,7 +167,7 @@ set(MULTIPLAYER_FILES
 	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.h				${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.cpp
 	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.h		${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.cpp
 )
-
+	
 
 set(ALL_FILES
 	${API_FILES}
@@ -212,7 +215,7 @@ set(Asio_INCLUDE_DIR ${ASIO_ROOT}/include)
 
 set(JSON_DIR ${SUBMODULES_DIR}/json/)
 set(JSON_SINGLE_FILE ${JSON_DIR}/single_include/nlohmann)
-add_subdirectory(${JSON_DIR})
+#add_subdirectory(${JSON_DIR})
 
 
 #==========================================
@@ -244,23 +247,23 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_compile_definitions(${PROJECT_NAME}.Core PUBLIC
 	-DENV_DEVELOPMENT
 	_CRT_SECURE_NO_WARNINGS
+	_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
 
 	_WINDOWS
 	WIN32_LEAN_AND_MEAN
 	_WINSOCK_DEPRECATED_NO_WARNING
 	_WIN32_WINNT=0x0A00
-
 )
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC
 	-DENV_DEVELOPMENT
 	_CRT_SECURE_NO_WARNINGS
+	_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING 
 
 	_WINDOWS
 	WIN32_LEAN_AND_MEAN
 	_WINSOCK_DEPRECATED_NO_WARNING
 	_WIN32_WINNT=0x0A00
-
 )
 
 

@@ -13,7 +13,7 @@
 #include "GameManager.h"
 #include "FileManager.h"
 #include "StateMachine.h"
-
+#include "Logging.h"
 
 
 //=============================================
@@ -84,8 +84,7 @@ static char *StringToCharPtr(std::string string)
 
 Engine_API void Init()
 {
-	GameManager *manager = GameManager::GetInstance();
-	manager->init();
+	GameManager::GetInstance()->init();
 }
 
 
@@ -98,8 +97,7 @@ Engine_API void Deinit()
 
 Engine_API void SetDelegate(PFN_CALLBACK pDelegate)
 {
-	GameManager *manager = GameManager::GetInstance();
-	manager->setDelegate(pDelegate);
+	GameManager::GetInstance()->setDelegate(pDelegate);
 }
 
 
@@ -120,10 +118,8 @@ Engine_API void SetUnvirtualizedAppDataPath(const char *appDataPath)
 
 Engine_API int GetNumPossibleMoves()
 {
-	GameManager *manager  = GameManager::GetInstance();
-
-	auto		 moves	  = manager->getPossibleMoveForPosition();
-	size_t		 numMoves = moves.size();
+	auto   moves	= GameManager::GetInstance()->getPossibleMoveForPosition();
+	size_t numMoves = moves.size();
 	return numMoves;
 }
 
@@ -137,9 +133,6 @@ Engine_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possible
 
 	if (index < 0 || index >= static_cast<int>(moves.size()))
 		return false;
-
-	// auto it = moves.begin();
-	// std::advance(it, index); // Get the iterator to the desired element
 
 	PossibleMove tmpMove = moves.at(index);
 
@@ -217,9 +210,9 @@ Engine_API void StartedMultiplayer()
 }
 
 
-Engine_API void StartMultiplayerGame(bool isHost)
+Engine_API void StartMultiplayerGame()
 {
-	StateMachine::GetInstance()->onMultiplayerGameStarted(isHost);
+	StateMachine::GetInstance()->onMultiplayerGameStarted();
 }
 
 
@@ -232,12 +225,6 @@ Engine_API void StartRemoteDiscovery(bool isHost)
 Engine_API void DisconnectMultiplayerGame()
 {
 	return GameManager::GetInstance()->disconnectMultiplayerGame();
-}
-
-
-Engine_API bool IsMultiplayerActive()
-{
-	return GameManager::GetInstance()->isMultiplayerActive();
 }
 
 
@@ -257,53 +244,46 @@ Engine_API void OnPawnPromotionChosen(PieceTypeInstance promotionInstance)
 
 Engine_API void LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
 {
-	spdlog::source_loc loc(className, lineNumber, method);
-	logging::log(LogLevel::Info, loc, message);
+	logging::log(LogLevel::Info, className, lineNumber, method, message);
 }
 
 
 Engine_API void LogErrorWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
 {
-	spdlog::source_loc loc(className, lineNumber, method);
-	logging::log(LogLevel::Error, loc, message);
+	logging::log(LogLevel::Error, className, lineNumber, method, message);
 }
 
 
 Engine_API void LogWarningWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
 {
-	spdlog::source_loc loc(className, lineNumber, method);
-	logging::log(LogLevel::Warn, loc, message);
+	logging::log(LogLevel::Warn, className, lineNumber, method, message);
 }
 
 
 Engine_API void SetCurrentBoardTheme(const char *theme)
 {
-	GameManager *manager = GameManager::GetInstance();
-	manager->setBoardTheme(theme);
+	GameManager::GetInstance()->setBoardTheme(theme);
 }
 
 
 Engine_API char *GetCurrentBoardTheme()
 {
-	GameManager *manager  = GameManager::GetInstance();
-	std::string	 theme	  = manager->getBoardTheme();
-	char		*themeTmp = StringToCharPtr(theme);
+	std::string theme	 = GameManager::GetInstance()->getBoardTheme();
+	char	   *themeTmp = StringToCharPtr(theme);
 	return themeTmp;
 }
 
 
 Engine_API void SetCurrentPieceTheme(const char *theme)
 {
-	GameManager *manager = GameManager::GetInstance();
-	manager->setPieceTheme(theme);
+	GameManager::GetInstance()->setPieceTheme(theme);
 }
 
 
 Engine_API char *GetCurrentPieceTheme()
 {
-	GameManager *manager  = GameManager::GetInstance();
-	std::string	 theme	  = manager->getPieceTheme();
-	char		*themeTmp = StringToCharPtr(theme);
+	std::string theme	 = GameManager::GetInstance()->getPieceTheme();
+	char	   *themeTmp = StringToCharPtr(theme);
 	return themeTmp;
 }
 
@@ -314,15 +294,17 @@ Engine_API void SetLocalPlayerName(const char *name)
 }
 
 
-Engine_API void ApproveConnectionRequest()
+Engine_API char *GetLocalPlayerName()
 {
-	GameManager::GetInstance()->approveConnectionRequest();
+	std::string name	= GameManager::GetInstance()->getLocalPlayerName();
+	char	   *tmpName = StringToCharPtr(name);
+	return tmpName;
 }
 
 
-Engine_API void RejectConnectionRequest()
+Engine_API void AnswerConnectionInvitation(bool accept)
 {
-	GameManager::GetInstance()->rejectConnectionRequest();
+	GameManager::GetInstance()->answerConnectionInvitation(accept);
 }
 
 
@@ -338,24 +320,35 @@ Engine_API void StoppedMultiplayer()
 }
 
 
+Engine_API void SetLocalPlayer(int iLocalPlayer)
+{
+	PlayerColor local = (PlayerColor)iLocalPlayer;
+	GameManager::GetInstance()->setLocalPlayerInMultiplayer(local);
+}
+
+
+Engine_API void SetLocalPlayerReady(bool ready)
+{
+	GameManager::GetInstance()->setLocalPlayerReady(ready);
+}
+
+
 Engine_API int GetNetworkAdapterCount()
 {
-	GameManager *manager	 = GameManager::GetInstance();
-	auto		 adapters	 = manager->getNetworkAdapters();
-	size_t		 numAdapters = adapters.size();
+	auto   adapters	   = GameManager::GetInstance()->getNetworkAdapters();
+	size_t numAdapters = adapters.size();
 	return numAdapters;
 }
 
 
 Engine_API bool GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInstance *adapter)
 {
-	GameManager *manager  = GameManager::GetInstance();
-	auto		 adapters = manager->getNetworkAdapters();
+	auto		adapters = GameManager::GetInstance()->getNetworkAdapters();
 
-	std::string	 name{};
-	int			 ID{0};
-	bool		 selectedByUser{0};
-	int			 counter{-1};
+	std::string name{};
+	int			ID{0};
+	bool		selectedByUser{0};
+	int			counter{-1};
 
 	for (auto &adapter : adapters)
 	{
@@ -387,7 +380,6 @@ Engine_API int GetSavedAdapterID()
 
 Engine_API bool ChangeCurrentAdapter(int ID)
 {
-	GameManager *manager = GameManager::GetInstance();
-	bool		 result	 = manager->changeCurrentNetworkAdapter(ID);
+	bool result = GameManager::GetInstance()->changeCurrentNetworkAdapter(ID);
 	return result;
 }

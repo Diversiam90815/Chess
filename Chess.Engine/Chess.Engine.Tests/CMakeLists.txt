@@ -15,7 +15,10 @@ enable_testing()
 #   Test Files
 #==========================================
 
-set(MoveTest_Dir source/MoveTests)
+set(MoveTest_Dir            source/MoveTests)
+set(MultiplayerTest_Dir     source/MultiplayerTests)
+set(GameMechanicTest_Dir    source/GameMechanicTests)
+
 
 set(MoveTest_Files
     ${MoveTest_Dir}/MoveGenerationTests.cpp
@@ -25,10 +28,29 @@ set(MoveTest_Files
     ${MoveTest_Dir}/EnPassantTests.cpp
 )
 
+
+set(MultiplayerTest_Files
+    ${MultiplayerTest_Dir}/DiscoveryEndpointTests.cpp
+    ${MultiplayerTest_Dir}/MultiplayerMessageTests.cpp
+    ${MultiplayerTest_Dir}/RemoteCommunicationTests.cpp
+    ${MultiplayerTest_Dir}/DiscoveryServiceTests.cpp
+    ${MultiplayerTest_Dir}/MultiplayerManagerTests.cpp
+    ${MultiplayerTest_Dir}/TCPClientAndServerTests.cpp
+    ${MultiplayerTest_Dir}/TCPSessionTests.cpp
+    ${MultiplayerTest_Dir}/MultiplayerIntegrationTests.cpp
+)
+
+
+set(GameMechanicTest_Files
+    ${GameMechanicTest_Dir}/ChessboardTests.cpp
+    ${GameMechanicTest_Dir}/PawnPromotionTests.cpp
+)
+
+
 set(Test_Files
     ${MoveTest_Files}
-    source/ChessboardTests.cpp
-    source/PawnPromotionTests.cpp
+    ${MultiplayerTest_Files}
+    ${GameMechanicTest_Files}
 )
 
 
@@ -56,6 +78,7 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${GOOGLETEST_SOURCE_DIR}/googletest/include
+        ${GOOGLETEST_SOURCE_DIR}/googlemock/include
 )
 
 include(GoogleTest)
@@ -69,6 +92,7 @@ target_link_libraries(${PROJECT_NAME}
       PRIVATE
         Chess.Engine.Core
         GTest::gtest_main
+        GTest::gmock_main
 )
 
 

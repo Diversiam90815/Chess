@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chess.UI.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,9 +23,9 @@ namespace Chess.UI.Communication_Layer.Interfaces
         event Action<GameState> GameStateChanged;
         event Action<MoveHistoryEvent> MoveHistoryUpdated;
         event Action<PlayerCapturedPiece> PlayerCapturedPieceEvent;
-        event Action<Services.EngineAPI.Score> PlayerScoreUpdated;
+        event Action<EngineAPI.Score> PlayerScoreUpdated;
         event Action<EndGameState> EndGameStateEvent;
         event Action<ConnectionStatusEvent> ConnectionStatusEvent;
-        event Action<string> ClientRequestedConnection;
+        event Action<PlayerColor> MultiPlayerChosenByRemote;
     }
 }

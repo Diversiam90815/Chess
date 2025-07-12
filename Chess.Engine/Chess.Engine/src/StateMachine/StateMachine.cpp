@@ -38,19 +38,27 @@ StateMachine::~StateMachine()
 
 void StateMachine::onGameStarted()
 {
-	if (getCurrentGameState() == GameState::Undefined)
+	GameState currentState = getCurrentGameState();
+
+	if (currentState == GameState::Undefined)
 	{
 		gameStateChanged(GameState::Init);
 		start();
 		triggerEvent();
 	}
+	else
+	{
+		int iCurrentState = static_cast<int>(currentState);
+
+		LOG_WARNING("Game Start called, but our state is wrong/not set up! Our current state is {0} ({1})", LoggingHelper::gameStateToString(currentState).c_str(), iCurrentState);
+	}
 }
 
 
-void StateMachine::onMultiplayerGameStarted(bool isHost)
+void StateMachine::onMultiplayerGameStarted()
 {
-	mIsMultiplayerGame = true;
-	mIsLocalHost	   = isHost;
+	LOG_INFO("Starting a Multiplayer Game!");
+	mIsMultiplayerGame.store(true);
 
 	onGameStarted();
 }
@@ -106,20 +114,12 @@ void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
 		LOG_INFO("Remote move received!");
 
 		// Setting the current move
-		mCurrentPossibleMove = remoteMove;
+		mCurrentPossibleMove	= remoteMove;
 
-		// Is it valid?
-		mIsValidMove		 = GameManager::GetInstance()->checkForValidMoves(mCurrentPossibleMove);
-
-		if (!mIsValidMove)
-		{
-			LOG_WARNING("Invalid remote move received! This could indicate synchronisation issues!");
-			resetCurrentPossibleMove();
-			return;
-		}
+		mReceivedMoveFromRemote = true; // Set flag to true to avoid echo effect
 
 		// Check if a pawn promotion is needed!
-		bool isPawnPromotion = GameManager::GetInstance()->checkForPawnPromotionMove(mCurrentPossibleMove);
+		bool isPawnPromotion	= GameManager::GetInstance()->checkForPawnPromotionMove(mCurrentPossibleMove);
 
 		if (isPawnPromotion && mCurrentPossibleMove.promotionPiece == PieceType::DefaultType)
 		{
@@ -127,7 +127,7 @@ void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
 			return;
 		}
 
-		// If the move is valid and set correctly, we will enter the execute move state!
+		// We will enter the execute move state!
 
 		{
 			std::lock_guard<std::mutex> lock(mStateChangedMutex);
@@ -135,6 +135,12 @@ void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
 			mPendingState		   = GameState::ExecutingMove;
 		}
 		triggerEvent();
+	}
+
+	else
+	{
+		LOG_WARNING("Received a move from the remote endpoint, but we are not in the wrong state! Our state is {}",
+					LoggingHelper::gameStateToString(getCurrentGameState()).c_str());
 	}
 }
 
@@ -160,6 +166,7 @@ void StateMachine::resetGame()
 	mWaitingForTargetEnd   = false;
 	resetCurrentPossibleMove();
 	setCurrrentGameState(GameState::Undefined);
+	setInitialized(false);
 	GameManager::GetInstance()->resetGame();
 }
 
@@ -273,8 +280,7 @@ void StateMachine::run()
 		}
 		case GameState::WaitingForRemoteMove:
 		{
-			// This state is passive -> we are waiting for onREmoteMoveReceieved to be called
-			// Maybe implement a timeout later? (-> TODO?)
+			handleWaitingForRemoteState();
 			break;
 		}
 		case GameState::GameOver:
@@ -308,7 +314,25 @@ void StateMachine::switchToNextState()
 	}
 	case GameState::InitSucceeded:
 	{
-		gameStateChanged(GameState::WaitingForInput);
+		if (mIsMultiplayerGame.load())
+		{
+			bool isLocalPlayerTurn = GameManager::GetInstance()->isLocalPlayerTurn();
+			if (isLocalPlayerTurn)
+			{
+				LOG_INFO("Initial State: Local Player's turn");
+				gameStateChanged(GameState::WaitingForInput);
+			}
+			else
+			{
+				LOG_INFO("Initial State: Remote Player's turn, waiting for remote move");
+				gameStateChanged(GameState::WaitingForRemoteMove);
+			}
+		}
+		else
+		{
+			LOG_INFO("Single Player mode. We switch to WaitingForInput");
+			gameStateChanged(GameState::WaitingForInput);
+		}
 		break;
 	}
 	case GameState::WaitingForInput:
@@ -347,30 +371,39 @@ void StateMachine::switchToNextState()
 	case GameState::ExecutingMove:
 	{
 		mEndgameState = GameManager::GetInstance()->checkForEndGameConditions();
+
 		if (isGameOngoing())
 		{
+			GameManager::GetInstance()->switchTurns();
+
 			resetCurrentPossibleMove();
 			mMovesCalulated		   = false;
 			mWaitingForTargetStart = false;
 			mWaitingForTargetEnd   = false;
 
 			// If we're in multiplayer mode, check who's turn it is
-			if (mIsMultiplayerGame)
+			if (mIsMultiplayerGame.load())
 			{
 				bool isLocalPlayerTurn = GameManager::GetInstance()->isLocalPlayerTurn();
 				if (isLocalPlayerTurn)
 				{
+					LOG_INFO("Local Player's turn, so we wait for the input!");
 					gameStateChanged(GameState::WaitingForInput);
 				}
 				else
 				{
+					LOG_INFO("Remote Player's turn, so we wait until we get a move from the remote!");
 					// If it's not local player's turn, switch to WaitForRemoteMove state!
 					gameStateChanged(GameState::WaitingForRemoteMove);
 				}
 			}
+			else
+			{
+				LOG_INFO("We are in single player mode, so we wait for the next input");
 
-			// Single player moves always switch to Waiting For Input!
-			gameStateChanged(GameState::WaitingForInput);
+				// Single player moves always switch to Waiting For Input!
+				gameStateChanged(GameState::WaitingForInput);
+			}
 		}
 		else
 		{
@@ -418,7 +451,7 @@ bool StateMachine::handleInitState(bool multiplayer) const
 
 	if (multiplayer)
 	{
-		return GameManager::GetInstance()->startMultiplayerGame(mIsLocalHost);
+		return GameManager::GetInstance()->startMultiplayerGame();
 	}
 	else
 	{
@@ -432,8 +465,6 @@ bool StateMachine::handleWaitingForInputState()
 	LOG_INFO("Handling waiting for input state");
 
 	resetCurrentPossibleMove();
-
-	GameManager::GetInstance()->switchTurns(); // Sets the player
 
 	mMovesCalulated = GameManager::GetInstance()->calculateAllMovesForPlayer();
 	return mMovesCalulated;
@@ -464,7 +495,8 @@ bool StateMachine::handleValidatingMoveState()
 
 bool StateMachine::handleExecutingMoveState()
 {
-	GameManager::GetInstance()->executeMove(mCurrentPossibleMove);
+	GameManager::GetInstance()->executeMove(mCurrentPossibleMove, mReceivedMoveFromRemote);
+	mReceivedMoveFromRemote = false; // Reset remote flag
 	return true;
 }
 
@@ -480,4 +512,13 @@ bool StateMachine::handleGameOverState()
 {
 	// @TODO: Let UI know of EndGameState -> Checkmate or Stalemate
 	return false;
+}
+
+
+bool StateMachine::handleWaitingForRemoteState()
+{
+	// State change will happen in onRemoteMoveReceived()
+	// but to validate the remote's move, we want to calculate the possible moves for the remote
+
+	return GameManager::GetInstance()->calculateAllMovesForPlayer();
 }

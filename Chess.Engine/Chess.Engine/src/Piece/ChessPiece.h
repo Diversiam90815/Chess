@@ -25,17 +25,21 @@ public:
 
 	virtual ~ChessPiece() {}
 
-	PieceType						   getType() const { return type; }
+	PieceType	getType() const { return type; }
 
-	PlayerColor						   getColor() const { return color; }
+	PlayerColor getColor() const { return color; }
 
-	bool							   hasMoved() const { return moveCounter != 0; }
+	bool		hasMoved() const { return moveCounter != 0; }
 
-	int								   getMoveCounter() const { return moveCounter; }
+	int			getMoveCounter() const { return moveCounter; }
 
-	void							   increaseMoveCounter() { moveCounter++; }
+	void		increaseMoveCounter() { moveCounter++; }
 
-	void							   decreaseMoveCounter() { moveCounter--; }
+	void		decreaseMoveCounter()
+	{
+		if (moveCounter > 0)
+			moveCounter--;
+	}
 
 	static std::shared_ptr<ChessPiece> CreatePiece(PieceType type, PlayerColor color);
 

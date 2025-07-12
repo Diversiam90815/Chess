@@ -22,19 +22,25 @@ DiscoveryService::~DiscoveryService()
 
 bool DiscoveryService::init(const std::string &playerName, std::string localIPv4, unsigned short tcpPort)
 {
-	if (tcpPort != 0 && !localIPv4.empty())
-	{
-		mTcpPort   = tcpPort;
-		mLocalIPv4 = localIPv4;
-	}
+	if (localIPv4.empty() || playerName.empty())
+		return false;
 
+	asio::error_code ec;
+	mTcpPort	= tcpPort;
+	mLocalIPv4	= localIPv4;
 	mPlayerName = playerName;
 
 	mSocket.open(udp::v4());
 
+	mSocket.set_option(asio::socket_base::reuse_address(true), ec);
+	if (ec)
+	{
+		LOG_ERROR("Failed to set reuse_address option: {}", ec.message().c_str());
+		// Continue anyway, this might not be critical
+	}
+
 	// setting the local endpoint
-	mLocalEndpoint = udp::endpoint(udp::v4(), mDiscoveryPort);
-	asio::error_code	 ec;
+	mLocalEndpoint				 = udp::endpoint(udp::v4(), mDiscoveryPort);
 
 	// Setting the target endpoint
 	asio::ip::address_v4 address = asio::ip::make_address_v4(broadCastAddress);
@@ -77,11 +83,19 @@ void DiscoveryService::deinit()
 
 	// stop the thread
 	stop();
+
+	mInitialized.store(false);
 }
 
 
 void DiscoveryService::startDiscovery(DiscoveryMode mode)
 {
+	if (!isInitialized())
+	{
+		throw std::runtime_error("Discovery Service has not been initialized but was called to start!");
+		return;
+	}
+
 	mDiscoveryMode = mode;
 
 	if (mDiscoveryMode == DiscoveryMode::Server)
@@ -102,21 +116,25 @@ void DiscoveryService::startDiscovery(DiscoveryMode mode)
 }
 
 
+Endpoint DiscoveryService::getEndpointFromIP(const std::string &IPv4)
+{
+	for (auto &endpoint : mRemoteDevices)
+	{
+		if (endpoint.IPAddress == IPv4)
+			return endpoint;
+	}
+	return {};
+}
+
+
 void DiscoveryService::run()
 {
-	// Start the first async receive operation
-	receivePackage();
-
 	while (isRunning())
 	{
-		// If in Server mode, periodically send discovery packages
-		if (mDiscoveryMode == DiscoveryMode::Server)
-		{
-			sendPackage();
-		}
+		// Start the first async receive operation
+		receivePackage();
 
-		// Run IO context for processing async operations
-		mIoContext->run_for(std::chrono::milliseconds(500));
+		sendPackage();
 
 		// Sleep or wait for event
 		waitForEvent(200);
@@ -151,7 +169,7 @@ void DiscoveryService::sendPackage()
 	}
 	else
 	{
-		LOG_INFO("Discovery package sent ({} bytes)!", bytesSent);
+		LOG_DEBUG("Discovery package sent ({} bytes)!", bytesSent);
 	}
 }
 
@@ -184,21 +202,29 @@ void DiscoveryService::handleReceive(const asio::error_code &error, size_t bytes
 	{
 		LOG_WARNING("Receive error occurred: {}", error.message().c_str());
 	}
-
-	// Continue receiving packages
-	receivePackage();
 }
 
 
 void DiscoveryService::addRemoteToList(Endpoint remote)
 {
+	if (!remote.isValid())
+		return;
+
 	for (auto &ep : mRemoteDevices) // Detecting duplicates
 	{
 		if (ep == remote)
 			return;
 	}
+
+	if (mLocalIPv4 == remote.IPAddress) // Don't add this device
+		return;
+
+	LOG_INFO("Found remote: IPv4 : {0}, Port: {1}, Name: {2}", remote.IPAddress.c_str(), remote.tcpPort, remote.playerName.c_str());
+
 	mRemoteDevices.push_back(remote);
-	remoteFound(remote);
+
+	if (mDiscoveryMode == DiscoveryMode::Client) //	Notify Observers only in Client mode
+		remoteFound(remote);
 }
 
 

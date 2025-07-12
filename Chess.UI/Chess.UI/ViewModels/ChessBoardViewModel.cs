@@ -1,23 +1,13 @@
 ﻿using Chess.UI.Services;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using static Chess.UI.Images.ImageServices;
 using static Chess.UI.Services.EngineAPI;
 using System.Collections.ObjectModel;
 using System;
-using Microsoft.UI.Composition.Interactions;
-using Windows.UI.Popups;
-using Microsoft.UI.Xaml;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Xml.Linq;
 using Chess.UI.Themes;
 using Chess.UI.Board;
-using Chess.UI.Moves;
-using Chess.UI.Coordinates;
 using Chess.UI.Images;
 using Chess.UI.Wrappers;
 using Chess.UI.Themes.Interfaces;
@@ -28,7 +18,7 @@ using Chess.UI.Models.Interfaces;
 
 namespace Chess.UI.ViewModels
 {
-    public class ChessBoardViewModel : INotifyPropertyChanged
+    public partial class ChessBoardViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -40,32 +30,37 @@ namespace Chess.UI.ViewModels
 
         public event Func<Task<PieceTypeInstance?>> ShowPawnPromotionDialogRequested;
 
-        public ScoreViewModel _scoreViewModel { get; }
+        public ScoreViewModel ScoreViewModel { get; }
 
-        public MoveHistoryViewModel _moveHistoryViewModel { get; set; }
+        public MoveHistoryViewModel MoveHistoryViewModel { get; set; }
+
+        public MultiplayerViewModel MultiplayerViewModel { get; }
 
         private readonly IThemeManager _themeManager;
 
-        private IMoveModel _moveModel;
+        private readonly IMoveModel _moveModel;
 
-        private IBoardModel _boardModel;
+        private readonly IBoardModel _boardModel;
 
         private readonly IChessCoordinate _coordinate;
 
         private readonly IImageService _imageServices;
+
+        public ImageServices.BoardTheme CurrentBoardTheme;
 
 
         public ChessBoardViewModel(IDispatcherQueueWrapper dispatcherQueue)
         {
             _dispatcherQueue = dispatcherQueue;
 
-            _moveHistoryViewModel = App.Current.Services.GetService<MoveHistoryViewModel>();
-            _scoreViewModel = App.Current.Services.GetService<ScoreViewModel>();
+            MoveHistoryViewModel = App.Current.Services.GetService<MoveHistoryViewModel>();
+            ScoreViewModel = App.Current.Services.GetService<ScoreViewModel>();
             _moveModel = App.Current.Services.GetService<IMoveModel>();
             _boardModel = App.Current.Services.GetService<IBoardModel>();
             _coordinate = App.Current.Services.GetService<IChessCoordinate>();
             _imageServices = App.Current.Services.GetService<IImageService>();
             _themeManager = App.Current.Services.GetService<IThemeManager>();
+            MultiplayerViewModel = App.Current.Services.GetService<MultiplayerViewModel>();
 
             _moveModel.PossibleMovesCalculated += OnHighlightPossibleMoves;
             _moveModel.PlayerChanged += OnHandlePlayerChanged;
@@ -79,7 +74,7 @@ namespace Chess.UI.ViewModels
 
             this.CurrentBoardTheme = _themeManager.CurrentBoardTheme;
 
-            Board = new ObservableCollection<BoardSquare>();
+            Board = [];
 
             for (int i = 0; i < _coordinate.GetNumBoardSquares(); i++)
             {
@@ -151,7 +146,7 @@ namespace Chess.UI.ViewModels
             {
                 Board.Add(new BoardSquare());
             }
-            _scoreViewModel.ReinitScoreValues();
+            ScoreViewModel.ReinitScoreValues();
         }
 
 
@@ -201,7 +196,6 @@ namespace Chess.UI.ViewModels
         public void HandleSquareClick(BoardSquare square)
         {
             PositionInstance enginePos = _coordinate.FromDisplayCoordinates(square.pos);
-
             Logger.LogInfo($"Square (UI) X{square.pos.x}-Y{square.pos.y} clicked => (Engine) X{enginePos.x}-Y{enginePos.y}!");
 
             EngineAPI.OnSquareSelected(enginePos);
@@ -240,7 +234,7 @@ namespace Chess.UI.ViewModels
         {
             EngineAPI.UndoMove();
             UpdateBoardFromNative();
-            _moveHistoryViewModel.RemoveLastMove();
+            MoveHistoryViewModel.RemoveLastMove();
         }
 
 
@@ -259,28 +253,41 @@ namespace Chess.UI.ViewModels
             ShowEndGameDialog?.Invoke(state);
         }
 
+
         private void OnHandlePlayerChanged(PlayerColor player)
         {
             CurrentPlayer = player;
         }
 
 
-        private PlayerColor currentPlayer;
+        private PlayerColor _currentPlayer;
         public PlayerColor CurrentPlayer
         {
-            get => currentPlayer;
+            get => _currentPlayer;
             set
             {
-                if (value != currentPlayer)
+                if (value != _currentPlayer)
                 {
-                    currentPlayer = value;
+                    _currentPlayer = value;
                     OnPropertyChanged();
                 }
             }
         }
 
 
-        public ImageServices.BoardTheme CurrentBoardTheme;
+        private bool _isMultiplayerGame;
+        public bool IsMultiplayerGame
+        {
+            get => _isMultiplayerGame;
+            set
+            {
+                if (value != _isMultiplayerGame)
+                {
+                    _isMultiplayerGame = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
 
         public ImageSource BoardBackgroundImage

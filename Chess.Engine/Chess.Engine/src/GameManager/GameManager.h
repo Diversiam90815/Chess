@@ -20,6 +20,7 @@
 #include "UICommunication.h"
 #include "NetworkManager.h"
 #include "MultiplayerManager.h"
+#include "PlayerName.h"
 
 
 class StateMachine;
@@ -37,7 +38,7 @@ public:
 
 	bool						startGame();
 
-	void						executeMove(PossibleMove &tmpMove);
+	void						executeMove(PossibleMove &tmpMove, bool fromRemote = false);
 
 	void						undoMove();
 
@@ -65,15 +66,16 @@ public:
 	int							getCurrentNetworkAdapterID();
 
 	void						setLocalPlayerName(std::string name);
+	std::string					getLocalPlayerName();
 
 	void						changeCurrentPlayer(PlayerColor player) override;
 	PlayerColor					getCurrentPlayer() const;
 
 	void						setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
-	std::string					getBoardTheme() const { return mUserSettings.getCurrentBoardTheme(); }
+	std::string					getBoardTheme() { return mUserSettings.getCurrentBoardTheme(); }
 
 	void						setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
-	std::string					getPieceTheme() const { return mUserSettings.getCurrentPieceTheme(); }
+	std::string					getPieceTheme() { return mUserSettings.getCurrentPieceTheme(); }
 
 	void						switchTurns();
 
@@ -83,7 +85,7 @@ public:
 
 	EndGameState				checkForEndGameConditions();
 
-	bool						startMultiplayerGame(bool isHost);
+	bool						startMultiplayerGame();
 
 	void						disconnectMultiplayerGame();
 
@@ -96,10 +98,11 @@ public:
 
 	void						startRemoteDiscovery(bool isHost);
 
-	void						approveConnectionRequest();
-	void						rejectConnectionRequest();
+	void						answerConnectionInvitation(bool accepted);
 	void						sendConnectionRequestToHost();
 
+	void						setLocalPlayerInMultiplayer(PlayerColor localPlayer);
+	void						setLocalPlayerReady(const bool flag);
 
 private:
 	GameManager() = default;
@@ -112,6 +115,8 @@ private:
 	Logging								mLog;
 
 	UserSettings						mUserSettings;
+
+	PlayerName							mPlayerName;
 
 	bool								mMovesGeneratedForCurrentTurn = false;
 
@@ -131,8 +136,7 @@ private:
 	std::shared_ptr<UICommunication>	mUiCommunicationLayer;
 
 	std::shared_ptr<MultiplayerManager> mMultiplayerManager;
-
+	std::unique_ptr<NetworkManager>		mNetwork;
 
 	bool								mIsMultiplayerMode{false};
-	bool								mIsHost{false};
 };

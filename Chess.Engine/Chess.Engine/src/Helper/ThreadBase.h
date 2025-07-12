@@ -49,6 +49,9 @@ public:
 		cv.notify_one();
 	}
 
+	bool isRunning() const { return mRunning.load(); }
+
+
 protected:
 	// Needs to be implemented by the derived class!!
 	virtual void run() = 0;
@@ -71,7 +74,6 @@ protected:
 		return wasTriggered && isRunning(); // Return true if event was triggered and thread is still running
 	}
 
-	bool isRunning() const { return mRunning.load(); }
 
 private:
 	std::thread				mThread;

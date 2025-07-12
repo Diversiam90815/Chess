@@ -1,40 +1,43 @@
-﻿using Chess.UI.Models;
+﻿using Chess.UI.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static Chess.UI.Services.EngineAPI;
+
 
 namespace Chess.UI.Multiplayer
 {
     public interface IMultiplayerModel
     {
+        void Init();
+
         void ResetToInit();
 
         void StartGameServer();
 
         void StartGameClient();
 
-        void StartMultiplerGame(MultiplayerMode mode);
+        void StartMultiplerGame();
 
-        void SetLocalPlayerName(string playerName);
+        void StartMultiplayer();
 
-        int GetSelectedNetworkAdapterID();
-
-        void ChangeNetworkAdapter(int adapterID);
-
-        List<NetworkAdapter> GetNetworkAdapters();
+        void DisconnectMultiplayer();
 
         void ConnectToHost();
 
-        void AcceptConnectionRequest();
+        void AnswerConnectionInvitation(bool accept);
 
-        void RejectConnectionRequest();
+        void SetLocalPlayerColor(EngineAPI.PlayerColor color);
+        
+        void SetPlayerReady(bool ready);
+
+        void HandleLocalPlayerChosenByRemote(PlayerColor local);
+
 
         event Action<string> OnConnectionErrorOccured;
 
-        event Action<Services.EngineAPI.ConnectionState> OnConnectionStatusChanged;
+        event Action<ConnectionState, string> OnConnectionStatusChanged;
 
-        event Action<string> OnClientRequestedConnection;
+        event Action<PlayerColor> OnPlayerChanged;
+
+        event Action<PlayerColor> OnMultiplayerPlayerSetFromRemote;
     }
 }

@@ -28,9 +28,7 @@ void TCPClient::connect(const std::string &host, unsigned short port)
 			{
 				// Timer expired -> connection timed out
 				if (mConnectTimeoutHandler)
-				{
 					mConnectTimeoutHandler();
-				}
 			}
 		});
 
@@ -49,9 +47,7 @@ void TCPClient::connect(const std::string &host, unsigned short port)
 									   LOG_INFO("TCPClient connected to {}", endpoint.address().to_string().c_str());
 
 									   if (mConnectHandler)
-									   {
 										   mConnectHandler(session);
-									   }
 								   }
 								   else
 								   {

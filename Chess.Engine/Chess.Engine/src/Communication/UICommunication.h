@@ -9,6 +9,7 @@
 
 #include <combaseapi.h>
 #include <strsafe.h>
+#include <mutex>
 
 #include "IObserver.h"
 #include "EngineAPIDefines.h"
@@ -17,14 +18,14 @@
 
 enum class MessageType
 {
-	EndGameState			  = 1,
-	PlayerScoreUpdated		  = 2,
-	PlayerCapturedPiece		  = 3,
-	PlayerChanged			  = 4,
-	GameStateChanged		  = 5,
-	MoveHistoryUpdated		  = 6,
-	ConnectionStateChanged	  = 7,
-	ClientRequestedConnection = 8
+	EndGameState			= 1,
+	PlayerScoreUpdated		= 2,
+	PlayerCapturedPiece		= 3,
+	PlayerChanged			= 4,
+	GameStateChanged		= 5,
+	MoveHistoryUpdated		= 6,
+	ConnectionStateChanged	= 7,
+	MultiplayerPlayerChosen = 8,
 };
 
 
@@ -36,10 +37,11 @@ struct PlayerCapturedPieceEvent
 };
 
 
-struct ConnectionEvent
+struct CConnectionEvent
 {
-	ConnectionState state{ConnectionState::Disconnected};
-	char			errorMessage[MAX_STRING_LENGTH];
+	int	 state;
+	char remoteName[MAX_STRING_LENGTH];
+	char errorMessage[MAX_STRING_LENGTH];
 };
 
 struct MoveHistoryEvent
@@ -61,7 +63,7 @@ public:
 	void onAddCapturedPiece(PlayerColor player, PieceType captured) override;
 	void onRemoveLastCapturedPiece(PlayerColor player, PieceType captured) override;
 
-	void onExecuteMove(const PossibleMove &move) override {}
+	void onExecuteMove(const PossibleMove &move, bool fromRemote = false) override {}
 	void onAddToMoveHistory(Move &move) override;
 	void onClearMoveHistory() override;
 
@@ -69,12 +71,16 @@ public:
 	void onEndGame(EndGameState state, PlayerColor winner) override;
 	void onChangeCurrentPlayer(PlayerColor player) override;
 
-	void onConnectionStateChanged(ConnectionState state, const std::string &errorMessage = "") override;
-	void onPendingHostApproval(const std::string &remotePlayerName) override;
+	void onConnectionStateChanged(const ConnectionStatusEvent event) override;
+	void onLocalPlayerChosen(const PlayerColor localPlayer) {}
+	void onRemotePlayerChosen(PlayerColor local) override; // This is already the local player. This is called if the remote chose the player so we set it to the opposite
+	void onLocalReadyFlagSet(const bool flag) {}
 
 
 private:
 	bool			   communicateToUI(MessageType type, void *message) const;
+
+	CConnectionEvent   convertToCStyleConnectionStateEvent(const ConnectionStatusEvent state);
 
 	PFN_CALLBACK	   mDelegate = nullptr;
 	mutable std::mutex mDelegateMutex;

@@ -68,24 +68,11 @@ enum class GameState
 };
 
 
-enum SettingsType
+enum class SettingsType
 {
-	boardTheme,
-	piecesTheme
-};
-
-
-enum class ConnectionState
-{
-	Disconnected		= 1,
-	HostingSession		= 2,
-	WaitingForARemote	= 3,
-	Connecting			= 4,
-	Connected			= 5,
-	Disconnecting		= 6,
-	Error				= 7,
-	ConnectionRequested = 8, // Client has requested a connection to the host
-	PendingHostApproval = 9	 // Waiting for the host to approve the connection
+	BoardStyle,
+	ChessPieceStyle,
+	PlayerName
 };
 
 
@@ -93,23 +80,67 @@ enum class ConnectionState
 //			File Manager
 //============================================================
 
-constexpr auto LoggingFolder	 = "Logs";
-constexpr auto LogFile			 = "Chess.log";
+constexpr auto		  LoggingFolder				   = "Logs";
+constexpr auto		  LogFile					   = "Chess.log";
 
-constexpr auto UserSettingsFile	 = "Config.json";
-constexpr auto SettingsFolder	 = "Settings";
+constexpr auto		  UserSettingsFile			   = "Config.json";
+constexpr auto		  SettingsFolder			   = "Settings";
 
-constexpr auto BoardTheme		 = "BoardTheme";
-constexpr auto PieceTheme		 = "PieceTheme";
-constexpr auto SelectedAdapter	 = "Selected_Adapter";
+
+//============================================================
+//			Config File Settings
+//============================================================
+
+constexpr auto		  BoardStyleSetting			   = "BoardStyle";
+constexpr auto		  PieceStyleSetting			   = "PieceStyle";
+constexpr auto		  SelectedAdapter			   = "Selected_Adapter";
+constexpr auto		  PlayerNameSetting			   = "PlayerName";
 
 
 //============================================================
 //			Multiplayer - Network Communication
 //============================================================
 
-constexpr int  PackageBufferSize = 65536;
-constexpr auto RemoteComSecret	 = "316";
+constexpr int		  PackageBufferSize			   = 65536;
+constexpr const char *RemoteComSecret			   = "316";
 
-constexpr auto MoveKey			 = "Move";
-constexpr auto ChatMessageKey	 = "Chat";
+constexpr auto		  ConnectionStateKey		   = "ConnectionState";
+constexpr auto		  MoveKey					   = "Move";
+constexpr auto		  ChatMessageKey			   = "Chat";
+constexpr auto		  InvitationMessageKey		   = "Invitation";
+constexpr auto		  InvitationResponseMessageKey = "InvResponse";
+constexpr auto		  PlayerChosenKey			   = "PlayerChosen";
+constexpr auto		  PlayerReadyFlagKey		   = "PlayerReady";
+
+
+//============================================================
+//			JSON Conversion
+//============================================================
+
+constexpr auto		  jNetworkAdapterID			   = "ID";
+constexpr auto		  jNetworkAdapterDesc		   = "description";
+constexpr auto		  jNetworkAdapterIP			   = "IPv4";
+constexpr auto		  jNetworkAdapterISubnet	   = "subnet";
+constexpr auto		  jNetworkAdapterIEligible	   = "eligible";
+constexpr auto		  jNetworkAdapterISelected	   = "selected";
+
+constexpr auto		  jPositionX				   = "x";
+constexpr auto		  jPositionY				   = "y";
+
+constexpr auto		  jMoveStart				   = "start";
+constexpr auto		  jMoveEnd					   = "end";
+constexpr auto		  jMoveType					   = "type";
+constexpr auto		  jMovePromotion			   = "promotion";
+
+constexpr auto		  jDiscoveryIP				   = "IPAddress";
+constexpr auto		  jDiscoveryPort			   = "tcpPort";
+constexpr auto		  jDiscoveryName			   = "player";
+
+constexpr auto		  jInvitationPlayerName		   = "PlayerName";
+constexpr auto		  jInvitationVersion		   = "Version";
+constexpr auto		  jInvitationAccepted		   = "Accepted";
+constexpr auto		  jInvitationReason			   = "Reason";
+
+constexpr auto		  jConnectEventType			   = "Type";
+constexpr auto		  jConnectEventError		   = "Error";
+constexpr auto		  jConnectEventEndpoint		   = "Endpoint";

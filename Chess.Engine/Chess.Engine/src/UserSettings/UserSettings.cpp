@@ -12,76 +12,15 @@ void UserSettings::init()
 {
 	bool configFileExists = doesConfigFileExist();
 
-	if (configFileExists)
+	if (!configFileExists)
 	{
-		LOG_INFO("User Config found");
-		initializeValues();
+		LOG_INFO("User Config not found, so we set up one!");
+		initializeConfigFile(mDefaultSettings);
 		return;
 	}
-	LOG_INFO("User Config not found, so we set up one!");
-	initializeConfigFile();
-}
 
-
-void UserSettings::storeSetting(SettingsType setting, std::string value)
-{
-	switch (setting)
-	{
-	case (SettingsType::boardTheme):
-	{
-		LOG_INFO("Board theme setting set {}", value.c_str());
-		FileManager *fmg = FileManager::GetInstance();
-		fmg->writeSettingToFile(BoardTheme, value);
-		break;
-	}
-	case (SettingsType::piecesTheme):
-	{
-		LOG_INFO("Piece theme setting set {}", value.c_str());
-		FileManager *fmg = FileManager::GetInstance();
-		fmg->writeSettingToFile(PieceTheme, value);
-		break;
-	}
-	default: break;
-	}
-}
-
-
-std::string UserSettings::readSetting(SettingsType setting)
-{
-	std::string value = "";
-
-	switch (setting)
-	{
-	case (SettingsType::boardTheme):
-	{
-		FileManager *fmg = FileManager::GetInstance();
-		value			 = fmg->readSettingFromFile(BoardTheme);
-		LOG_INFO("Board theme read from file {}", value.c_str());
-		return value;
-	}
-	case (SettingsType::piecesTheme):
-	{
-		FileManager *fmg = FileManager::GetInstance();
-		value			 = fmg->readSettingFromFile(PieceTheme);
-		LOG_INFO("Piece theme read from file : {}", value.c_str());
-		return value;
-	}
-	default: return value;
-	}
-}
-
-
-void UserSettings::initializeValues()
-{
-	mCurrentBoardTheme = readSetting(SettingsType::boardTheme);
-	mCurrentPieceTheme = readSetting(SettingsType::piecesTheme);
-}
-
-
-void UserSettings::initializeConfigFile()
-{
-	storeSetting(SettingsType::boardTheme, mCurrentBoardTheme);
-	storeSetting(SettingsType::piecesTheme, mCurrentPieceTheme);
+	LOG_INFO("User Config found");
+	logUserSettings();
 }
 
 
@@ -95,33 +34,59 @@ bool UserSettings::doesConfigFileExist()
 
 void UserSettings::setCurrentBoardTheme(std::string theme)
 {
-	if (mCurrentBoardTheme != theme)
-	{
-		mCurrentBoardTheme = theme;
-		storeSetting(SettingsType::boardTheme, theme);
-		LOG_INFO("Set the Board Theme to {}", theme.c_str());
-	}
+	storeSetting(SettingsType::BoardStyle, theme);
+	LOG_INFO("Set the Board Style to {}", theme.c_str());
 }
 
 
-std::string UserSettings::getCurrentBoardTheme() const
+std::string UserSettings::getCurrentBoardTheme()
 {
-	return mCurrentBoardTheme;
+	return readSetting<std::string>(SettingsType::BoardStyle);
 }
 
 
 void UserSettings::setCurrentPieceTheme(std::string theme)
 {
-	if (mCurrentPieceTheme != theme)
-	{
-		mCurrentPieceTheme = theme;
-		storeSetting(SettingsType::piecesTheme, theme);
-		LOG_INFO("Set the Piece Theme to {}", theme.c_str());
-	}
+	storeSetting(SettingsType::ChessPieceStyle, theme);
+	LOG_INFO("Set the Piece Style to {}", theme.c_str());
 }
 
 
-std::string UserSettings::getCurrentPieceTheme() const
+std::string UserSettings::getCurrentPieceTheme()
 {
-	return mCurrentPieceTheme;
+	return readSetting<std::string>(SettingsType::ChessPieceStyle);
+}
+
+
+void UserSettings::setLocalPlayerName(std::string name)
+{
+	storeSetting(SettingsType::PlayerName, name);
+	LOG_INFO("Set the ChessPiece Style to {}", name.c_str());
+}
+
+
+std::string UserSettings::getLocalPlayerName()
+{
+	return readSetting<std::string>(SettingsType::PlayerName);
+}
+
+
+void UserSettings::initializeConfigFile(DefaultSettings settings)
+{
+	storeSetting(SettingsType::BoardStyle, settings.BoardStyle);
+	storeSetting(SettingsType::ChessPieceStyle, settings.ChessPieceStyle);
+}
+
+
+void UserSettings::logUserSettings()
+{
+	const std::string piecesTheme = getCurrentPieceTheme();
+	const std::string boardTheme  = getCurrentBoardTheme();
+	const std::string playerName  = getLocalPlayerName();
+
+	LOG_INFO("------------------ User Settings ------------------");
+	LOG_INFO("Board Style :\t{}", boardTheme);
+	LOG_INFO("Board Style :\t{}", piecesTheme);
+	LOG_INFO("Player Name :\t{}", playerName);
+	LOG_INFO("---------------------------------------------------");
 }

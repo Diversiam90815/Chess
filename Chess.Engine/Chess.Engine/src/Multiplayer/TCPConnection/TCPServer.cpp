@@ -17,46 +17,33 @@ TCPServer::~TCPServer() {}
 void TCPServer::startAccept()
 {
 	auto session = TCPSession::create(mIoContext);
-	mBoundPort	 = session->getBoundPort();
+	mBoundPort	 = mAcceptor.local_endpoint().port();
 
-	mAcceptor.async_accept(session->socket(), [this, session](const asio::error_code &error) { handleAccept(session, error); });
-}
+	LOG_INFO("Bound Port = {}", mBoundPort);
 
-
-void TCPServer::handleAccept(std::shared_ptr<TCPSession> session, const asio::error_code &error)
-{
-	if (!error)
-	{
-		LOG_INFO("TCP accepted connection from {}", session->socket().remote_endpoint().address().to_string().c_str());
-
-		// Store pending session
-		mPendingSession				  = session;
-
-		const std::string &remoteIPv4 = mPendingSession->socket().remote_endpoint().address().to_string();
-
-		// Notify that we have a connection request
-		if (mConnectionRequestHandler)
+	mAcceptor.async_accept(
+		[this](const asio::error_code &error, tcp::socket socket)
 		{
-			mConnectionRequestHandler(remoteIPv4);
-		}
-		startAccept(); // Start accepting new conection
-	}
-	else
-	{
-		LOG_ERROR("TCPServer accept error {}!", error.message().c_str());
-	}
+			if (!error)
+			{
+				LOG_INFO("TCP accepted connection from {}", socket.remote_endpoint().address().to_string().c_str());
+
+				// Store pending session
+				auto newSession = TCPSession::create(std::move(socket));
+				mPendingSession = newSession;
+
+				if (mSessionHandler)
+					mSessionHandler(mPendingSession);
+
+				// We start waiting for invitation message
+			}
+		});
 }
 
 
 void TCPServer::setSessionHandler(SessionHandler handler)
 {
 	mSessionHandler = handler;
-}
-
-
-void TCPServer::setConnectionRequestHandler(ConnectionRequestHandler handler)
-{
-	mConnectionRequestHandler = handler;
 }
 
 
@@ -70,9 +57,7 @@ void TCPServer::respondToConnectionRequest(bool accepted)
 		LOG_INFO("Accepting connection from: {}", mPendingSession->socket().remote_endpoint().address().to_string().c_str());
 
 		if (mSessionHandler)
-		{
 			mSessionHandler(mPendingSession);
-		}
 	}
 
 	else
@@ -89,7 +74,7 @@ void TCPServer::respondToConnectionRequest(bool accepted)
 }
 
 
-const int TCPServer::getBoundPort() const
+int TCPServer::getBoundPort() const
 {
 	return mBoundPort;
 }

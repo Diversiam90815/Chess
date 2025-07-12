@@ -54,6 +54,28 @@ int NetworkManager::getCurrentNetworkAdapterID()
 }
 
 
+std::string NetworkManager::getCurrentIPv4()
+{
+	return mNetworkInfo.getCurrentNetworkAdapter().IPv4;
+}
+
+
+bool NetworkManager::changeCurrentNetworkAdapter(const int ID)
+{
+	auto adapters = getAvailableNetworkAdapters();
+
+	for (auto &adapter : adapters)
+	{
+		if (adapter.ID != ID)
+			continue;
+
+		networkAdapterChanged(adapter);
+		return true;
+	}
+	return false;
+}
+
+
 bool NetworkManager::presetNetworkAdapter()
 {
 	auto adapterInFile = FileManager::GetInstance()->readSelectedNetworkAdapter();

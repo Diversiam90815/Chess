@@ -8,30 +8,26 @@
 #pragma once
 
 #include <asio.hpp>
-#include <functional>
 #include <memory>
 
+#include "TCPInterfaces.h"
 #include "TCPSession.h"
 #include "Logging.h"
 
 
 using asio::ip::tcp;
 
-using ConnectHandler		= std::function<void(std::shared_ptr<TCPSession> session)>;
 
-using ConnectTimeoutHandler = std::function<void()>;
-
-
-class TCPClient
+class TCPClient : public ITCPClient
 {
 public:
 	TCPClient(asio::io_context &ioContext);
 	~TCPClient() = default;
 
-	void connect(const std::string &host, unsigned short port);
+	void connect(const std::string &host, unsigned short port) override;
 
-	void setConnectHandler(ConnectHandler handler);
-	void setConnectTimeoutHandler(ConnectTimeoutHandler handler);
+	void setConnectHandler(ConnectHandler handler) override;
+	void setConnectTimeoutHandler(ConnectTimeoutHandler handler) override;
 
 private:
 	ConnectHandler		  mConnectHandler;

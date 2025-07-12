@@ -49,23 +49,21 @@ extern "C"
 
 	Engine_API void	 StartedMultiplayer();
 
-	Engine_API void	 StartMultiplayerGame(bool isHost);
+	Engine_API void	 StartMultiplayerGame();
 
 	Engine_API void	 StartRemoteDiscovery(bool isHost);
 
 	Engine_API void	 DisconnectMultiplayerGame();
 
-	Engine_API bool	 IsMultiplayerActive();
-
-	Engine_API void	 SetLocalPlayerName(const char *name);
-
-	Engine_API void	 ApproveConnectionRequest();
-
-	Engine_API void	 RejectConnectionRequest();
+	Engine_API void	 AnswerConnectionInvitation(bool accept);
 
 	Engine_API void	 SendConnectionRequestToHost();
 
 	Engine_API void	 StoppedMultiplayer();
+
+	Engine_API void	 SetLocalPlayer(int iLocalPlayer);
+
+	Engine_API void	 SetLocalPlayerReady(bool ready);
 
 
 	Engine_API void	 LogInfoWithCaller(const char *message, const char *method, const char *className, const int lineNumber);
@@ -82,6 +80,10 @@ extern "C"
 	Engine_API void	 SetCurrentPieceTheme(const char *theme);
 
 	Engine_API char *GetCurrentPieceTheme();
+
+	Engine_API void	 SetLocalPlayerName(const char *name);
+
+	Engine_API char *GetLocalPlayerName();
 
 
 	Engine_API int	 GetNetworkAdapterCount();

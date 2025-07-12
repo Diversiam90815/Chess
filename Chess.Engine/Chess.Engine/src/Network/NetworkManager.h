@@ -27,6 +27,8 @@ public:
 	bool						isInitialized() const { return initialized.load(); }
 	void						setInitialized(const bool value) { initialized.store(value); }
 
+	std::string					getCurrentIPv4();
+	bool						changeCurrentNetworkAdapter(const int ID);
 
 private:
 	bool			   presetNetworkAdapter();

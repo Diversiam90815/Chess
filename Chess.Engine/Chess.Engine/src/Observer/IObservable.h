@@ -59,9 +59,9 @@ class IMoveObservable : public ObservableBase<IMoveObserver>
 public:
 	virtual ~IMoveObservable() {};
 
-	virtual Move executeMove(PossibleMove &move) = 0;
-	virtual void addMoveToHistory(Move &move)	 = 0;
-	virtual void clearMoveHistory()				 = 0;
+	virtual Move executeMove(PossibleMove &move, bool fromRemote) = 0;
+	virtual void addMoveToHistory(Move &move)					  = 0;
+	virtual void clearMoveHistory()								  = 0;
 };
 
 
@@ -107,8 +107,13 @@ class IRemoteMessagesObservable : public ObservableBase<IRemoteMessagesObserver>
 public:
 	virtual ~IRemoteMessagesObservable() {};
 
-	virtual void remoteMoveReceived(const PossibleMove &move)		   = 0;
-	virtual void remoteChatMessageReceived(const std::string &message) = 0;
+	virtual void remoteConnectionStateReceived(const ConnectionState &state)		  = 0;
+	virtual void remoteMoveReceived(const PossibleMove &move)						  = 0;
+	virtual void remoteChatMessageReceived(const std::string &message)				  = 0;
+	virtual void remoteInvitationReceived(const InvitationRequest &invite)			  = 0;
+	virtual void remoteInvitationResponseReceived(const InvitationResponse &response) = 0;
+	virtual void remotePlayerChosenReceived(const PlayerColor player)				  = 0;
+	virtual void remotePlayerReadyFlagReceived(const bool flag)						  = 0;
 };
 
 
@@ -127,8 +132,6 @@ public:
 	virtual ~IDiscoveryObservable() {};
 
 	virtual void remoteFound(const Endpoint &remote) = 0;
-	// virtual void remoteSelected(const std::string &remoteName) = 0;
-	// virtual void remoteRemoved(const std::string &remoteName)  = 0;
 };
 
 
@@ -137,6 +140,8 @@ class IConnectionStatusObservable : public ObservableBase<IConnectionStatusObser
 public:
 	virtual ~IConnectionStatusObservable() {};
 
-	virtual void connectionStatusChanged(ConnectionState state, const std::string &errorMessage = "") = 0;
-	virtual void pendingHostApproval(const std::string &remoteIPv4)									  = 0;
+	virtual void connectionStatusChanged(const ConnectionStatusEvent event) = 0;
+	virtual void localPlayerChosen(const PlayerColor localPlayer)			= 0;
+	virtual void remotePlayerChosen(const PlayerColor localPlayer)			= 0;
+	virtual void localReadyFlagSet(const bool flag)							= 0;
 };

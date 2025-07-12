@@ -12,7 +12,7 @@
 MoveExecution::MoveExecution(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation) : mChessBoard(board), mValidation(validation) {}
 
 
-Move MoveExecution::executeMove(PossibleMove &possibleMove)
+Move MoveExecution::executeMove(PossibleMove &possibleMove, bool fromRemote)
 {
 	// Store positions in Move from executed PossibleMove
 	Move  executedMove		= Move(possibleMove);
@@ -83,7 +83,6 @@ Move MoveExecution::executeMove(PossibleMove &possibleMove)
 		executedMove.type |= MoveType::Check;
 	}
 
-
 	// Increment or reset the halfMoveClock
 
 	int previousHalfMoveClock = 0;
@@ -107,7 +106,7 @@ Move MoveExecution::executeMove(PossibleMove &possibleMove)
 	for (auto &observer : mObservers)
 	{
 		if (auto obs = observer.lock())
-			obs->onExecuteMove(possibleMove);
+			obs->onExecuteMove(possibleMove, fromRemote);
 	}
 
 	addMoveToHistory(executedMove);
@@ -171,9 +170,7 @@ bool MoveExecution::executePawnPromotion(const PossibleMove &move, PlayerColor p
 
 	// Validate promoted piece
 	if ((promotedPieceType != PieceType::Queen) && (promotedPieceType != PieceType::Rook) && (promotedPieceType != PieceType::Knight) && (promotedPieceType != PieceType::Bishop))
-	{
 		return false;
-	}
 
 	mChessBoard->removePiece(move.start);
 

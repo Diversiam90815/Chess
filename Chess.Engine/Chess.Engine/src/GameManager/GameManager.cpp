@@ -53,6 +53,9 @@ bool GameManager::init()
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
 
+	mNetwork = std::make_unique<NetworkManager>();
+	mNetwork->init();
+
 	initObservers();
 
 	return true;
@@ -62,6 +65,8 @@ bool GameManager::init()
 bool GameManager::startGame()
 {
 	clearState();
+
+	switchTurns();
 
 	mChessBoard->initializeBoard(); // Reset the board
 
@@ -92,9 +97,8 @@ PieceType GameManager::getCurrentPieceTypeAtPosition(const Position position)
 	auto &chessPiece = mChessBoard->getPiece(position);
 
 	if (chessPiece)
-	{
 		return chessPiece->getType();
-	}
+
 	return PieceType::DefaultType;
 }
 
@@ -191,9 +195,17 @@ bool GameManager::initiateMove(const Position &startPosition)
 }
 
 
-void GameManager::executeMove(PossibleMove &tmpMove)
+void GameManager::executeMove(PossibleMove &tmpMove, bool fromRemote)
 {
 	PossibleMove moveToExecute{};
+
+	if (fromRemote)
+	{
+		// Initiate move first to get all moves for current position
+		Position startPosition = tmpMove.start;
+		initiateMove(startPosition);
+	}
+
 	for (auto &move : mAllMovesForPosition)
 	{
 		if (move == tmpMove)
@@ -201,7 +213,7 @@ void GameManager::executeMove(PossibleMove &tmpMove)
 			moveToExecute = move;
 
 			// On pawn promotion, assign the promotion piece type
-			if (moveToExecute.type == MoveType::PawnPromotion)
+			if ((moveToExecute.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
 			{
 				moveToExecute.promotionPiece = tmpMove.promotionPiece;
 			}
@@ -209,7 +221,7 @@ void GameManager::executeMove(PossibleMove &tmpMove)
 		}
 	}
 
-	Move executedMove = mMoveExecution->executeMove(moveToExecute);
+	Move executedMove = mMoveExecution->executeMove(moveToExecute, fromRemote);
 
 	LoggingHelper::logMove(executedMove);
 
@@ -264,7 +276,9 @@ void GameManager::undoMove()
 	}
 
 	auto &piece = mChessBoard->getPiece(lastMove->startingPosition);
-	piece->decreaseMoveCounter();
+
+	if (piece)
+		piece->decreaseMoveCounter();
 
 	mMoveExecution->removeLastMove();
 }
@@ -330,25 +344,31 @@ bool GameManager::checkForPawnPromotionMove(const PossibleMove &move)
 
 std::vector<NetworkAdapter> GameManager::getNetworkAdapters()
 {
-	return mMultiplayerManager->getNetworkAdapters();
+	return mNetwork->getAvailableNetworkAdapters();
 }
 
 
 bool GameManager::changeCurrentNetworkAdapter(int ID)
 {
-	return mMultiplayerManager->changeCurrentNetworkAdapter(ID);
+	return mNetwork->changeCurrentNetworkAdapter(ID);
 }
 
 
 int GameManager::getCurrentNetworkAdapterID()
 {
-	return mMultiplayerManager->getCurrentNetworkAdapterID();
+	return mNetwork->getCurrentNetworkAdapterID();
 }
 
 
 void GameManager::setLocalPlayerName(std::string name)
 {
-	mMultiplayerManager->setLocalPlayerName(name);
+	mPlayerName.setLocalPlayerName(name);
+}
+
+
+std::string GameManager::getLocalPlayerName()
+{
+	return mPlayerName.getLocalPlayerName();
 }
 
 
@@ -415,34 +435,39 @@ EndGameState GameManager::checkForEndGameConditions()
 }
 
 
-bool GameManager::startMultiplayerGame(bool isHost)
+bool GameManager::startMultiplayerGame()
 {
+	LOG_INFO("Game started in Multiplayer mode..");
+
 	mIsMultiplayerMode = true;
-	mIsHost			   = isHost;
 
 	// Initialize the game & board
 	clearState();
+	switchTurns();
 	mChessBoard->initializeBoard();
 
-	if (isHost)
+	PlayerColor localPlayer = mMultiplayerManager->mLocalPlayerColor;
+
+	if (localPlayer == PlayerColor::White)
 	{
-		changeCurrentPlayer(PlayerColor::White); // If we are the host, we are chosen to play as white -> TODO : Add UI selector in future
+		LOG_INFO("We start as white player");
+
 		mWhitePlayer.setIsLocalPlayer(true);
 		mBlackPlayer.setIsLocalPlayer(false);
 	}
-	else
+	else if (localPlayer == PlayerColor::Black)
 	{
+		LOG_INFO("We start as black player!");
+
 		// Guests are black
-		changeCurrentPlayer(PlayerColor::White); // Game still starts with white
 		mWhitePlayer.setIsLocalPlayer(false);
 		mBlackPlayer.setIsLocalPlayer(true);
 	}
 
-	// mMultiplayerManager->setInternalObservers(); // Set the internal multiplayer observers
+	initMultiplayerObservers();
 
 	return true;
 }
-
 
 
 void GameManager::disconnectMultiplayerGame()
@@ -459,10 +484,17 @@ void GameManager::startedMultiplayer()
 {
 	// The player clicked on the Multiplayer menu button and started the multiplayer
 
+	LOG_INFO("Multiplayer started..");
+
 	mMultiplayerManager = std::make_shared<MultiplayerManager>(); // Create the multiplayer manager
 
-	mMultiplayerManager->setInternalObservers();				  // First set the observers, so
-	mMultiplayerManager->init();								  // the modules already receive notifications on init
+	mMultiplayerManager->attachObserver(mUiCommunicationLayer);	  // Set the UI Communication as a connection observer
+	mNetwork->attachObserver(mMultiplayerManager);				  // Let the MultiplayerManager know of network changes
+
+	mMultiplayerManager->setInternalObservers();
+
+	std::string localIPv4 = mNetwork->getCurrentIPv4();
+	mMultiplayerManager->init(localIPv4);
 }
 
 
@@ -490,6 +522,11 @@ bool GameManager::isLocalPlayerTurn()
 	bool		isBlackPlayerTurn  = currentPlayer == PlayerColor::Black;
 
 	bool		isLocalPlayersTurn = (isWhitePlayerTurn && mWhitePlayer.isLocalPlayer() || isBlackPlayerTurn && mBlackPlayer.isLocalPlayer());
+
+	LOG_INFO("Local Player's turn: {}", LoggingHelper::boolToString(isLocalPlayersTurn).c_str());
+	LOG_DEBUG("White Player's turn: {}", LoggingHelper::boolToString(isWhitePlayerTurn).c_str());
+	LOG_DEBUG("Black Player's turn: {}", LoggingHelper::boolToString(isBlackPlayerTurn).c_str());
+
 	return isLocalPlayersTurn;
 }
 
@@ -504,26 +541,22 @@ void GameManager::startRemoteDiscovery(bool isHost)
 	else
 	{
 		LOG_INFO("Starting to join a session..");
-		mMultiplayerManager->startClientDiscovery();
+		mMultiplayerManager->startClient();
 	}
 }
 
 
-void GameManager::approveConnectionRequest()
+void GameManager::answerConnectionInvitation(bool accepted)
 {
 	if (!mMultiplayerManager)
 		return;
 
-	mMultiplayerManager->approveConnectionRequest();
-}
+	std::string reason = "";
 
+	if (!accepted)
+		reason = "User declined invitation!";
 
-void GameManager::rejectConnectionRequest()
-{
-	if (!mMultiplayerManager)
-		return;
-
-	mMultiplayerManager->rejectConnectionRequest();
+	mMultiplayerManager->sendConnectResponse(accepted, reason);
 }
 
 
@@ -532,7 +565,20 @@ void GameManager::sendConnectionRequestToHost()
 	if (!mMultiplayerManager)
 		return;
 
+	LOG_DEBUG("Sending connection request to the host..");
 	mMultiplayerManager->joinSession();
+}
+
+
+void GameManager::setLocalPlayerInMultiplayer(PlayerColor localPlayer)
+{
+	mMultiplayerManager->localPlayerChosen(localPlayer);
+}
+
+
+void GameManager::setLocalPlayerReady(const bool flag)
+{
+	mMultiplayerManager->localReadyFlagSet(flag);
 }
 
 
@@ -559,6 +605,8 @@ void GameManager::initMultiplayerObservers()
 
 	mMoveExecution->attachObserver(mMultiplayerManager->mRemoteSender);				   // Moves will be sent to the remote
 	mMultiplayerManager->mRemoteReceiver->attachObserver(StateMachine::GetInstance()); // Received moves will be handled in the state machine
+
+	LOG_DEBUG("Mulitplayer observers set up!");
 }
 
 

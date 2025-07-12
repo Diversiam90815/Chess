@@ -71,24 +71,27 @@ namespace Chess.UI
             services.AddSingleton<IThemeManager, ThemeManager>();
             services.AddSingleton<IImageService, ImageServices>();
 
-            services.AddTransient<IMoveModel, MoveModel>();
-            services.AddTransient<IScoreModel, ScoreModel>();
-            services.AddTransient<IMoveHistoryModel, MoveHistoryModel>();
-            services.AddTransient<IBoardModel, BoardModel>();
-            services.AddTransient<IMultiplayerModel, MultiplayerModel>();
+            services.AddSingleton<IMoveModel, MoveModel>();
+            services.AddSingleton<IScoreModel, ScoreModel>();
+            services.AddSingleton<IMoveHistoryModel, MoveHistoryModel>();
+            services.AddSingleton<IBoardModel, BoardModel>();
+            services.AddSingleton<IMultiplayerModel, MultiplayerModel>();
+            services.AddSingleton<IMultiplayerPreferencesModel, MultiplayerPreferencesModel>();
 
             // Register view models
-            services.AddTransient<ChessBoardViewModel>();
-            services.AddTransient<ScoreViewModel>();
-            services.AddTransient<MoveHistoryViewModel>();
-            services.AddTransient<MainMenuViewModel>();
-            services.AddTransient<MultiplayerViewModel>();
-            services.AddTransient<ThemePreferencesViewModel>();
+            services.AddSingleton<ChessBoardViewModel>();
+            services.AddSingleton<ScoreViewModel>();
+            services.AddSingleton<MoveHistoryViewModel>();
+            services.AddSingleton<MainMenuViewModel>();
+            services.AddSingleton<MultiplayerViewModel>();
+            services.AddSingleton<ThemePreferencesViewModel>();
+            services.AddSingleton<MultiplayerPreferencesViewModel>();
 
             services.AddTransient<MainMenuWindow>();
             services.AddTransient<ChessBoardWindow>();
             services.AddTransient<MultiplayerWindow>();
             services.AddTransient<ThemePreferencesView>();
+            services.AddTransient<MultiplayerPreferencesView>();
 
             services.AddTransient<PreferencesView>();
 

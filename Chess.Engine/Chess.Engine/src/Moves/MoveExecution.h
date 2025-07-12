@@ -24,7 +24,7 @@ public:
 	MoveExecution(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation);
 	~MoveExecution() = default;
 
-	Move		executeMove(PossibleMove &executedMove) override;
+	Move		executeMove(PossibleMove &executedMove, bool fromRemote = false) override;
 
 	bool		executeCastlingMove(PossibleMove &move);
 

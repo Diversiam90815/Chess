@@ -85,41 +85,17 @@ void UICommunication::onChangeCurrentPlayer(PlayerColor player)
 }
 
 
-void UICommunication::onConnectionStateChanged(ConnectionState state, const std::string &errorMessage)
+void UICommunication::onConnectionStateChanged(const ConnectionStatusEvent event)
 {
-	ConnectionEvent event{};
-	event.state = state;
+	CConnectionEvent tmpEvent = convertToCStyleConnectionStateEvent(event);
 
-	if (state == ConnectionState::Error)
-	{
-		size_t	len		   = errorMessage.size();
-		size_t	bufferSize = (len + 1) * sizeof(char);
-
-		HRESULT hr		   = StringCbCopyA(event.errorMessage, bufferSize, errorMessage.c_str());
-
-		if (!SUCCEEDED(hr))
-			return;
-	}
-
-	communicateToUI(MessageType::ConnectionStateChanged, &event);
+	communicateToUI(MessageType::ConnectionStateChanged, &tmpEvent);
 }
 
 
-void UICommunication::onPendingHostApproval(const std::string &remotePlayerName)
+void UICommunication::onRemotePlayerChosen(PlayerColor local)
 {
-	size_t len		  = remotePlayerName.size();
-	size_t bufferSize = (len + 1) * sizeof(char);
-	char  *strCopy	  = static_cast<char *>(CoTaskMemAlloc(bufferSize));
-
-	if (!strCopy)
-		return;
-
-	HRESULT hr = StringCbCopyA(strCopy, bufferSize, remotePlayerName.c_str());
-
-	if (!SUCCEEDED(hr))
-		return;
-
-	communicateToUI(MessageType::ClientRequestedConnection, &strCopy);
+	communicateToUI(MessageType::MultiplayerPlayerChosen, &local);
 }
 
 
@@ -139,4 +115,29 @@ bool UICommunication::communicateToUI(MessageType type, void *message) const
 
 	LOG_WARNING("Failed to communicate to UI. Error: Delegate is null");
 	return false;
+}
+
+
+CConnectionEvent UICommunication::convertToCStyleConnectionStateEvent(const ConnectionStatusEvent state)
+{
+	CConnectionEvent c_style_state{};
+	c_style_state.state = static_cast<int>(state.state);
+
+	if (state.state == ConnectionState::Error)
+	{
+		size_t len		  = state.errorMessage.size();
+		size_t bufferSize = (len + 1) * sizeof(char);
+		char  *strCopy	  = static_cast<char *>(CoTaskMemAlloc(bufferSize));
+		StringCbCopyA(c_style_state.errorMessage, bufferSize, state.errorMessage.c_str());
+	}
+
+	if (!state.remoteEndpoint.playerName.empty())
+	{
+		size_t len		  = state.remoteEndpoint.playerName.size();
+		size_t bufferSize = (len + 1) * sizeof(char);
+		char  *strCopy	  = static_cast<char *>(CoTaskMemAlloc(bufferSize));
+		StringCbCopyA(c_style_state.remoteName, bufferSize, state.remoteEndpoint.playerName.c_str());
+	}
+
+	return c_style_state;
 }

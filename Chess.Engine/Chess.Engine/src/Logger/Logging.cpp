@@ -7,17 +7,6 @@
 
 
 #include "Logging.h"
-#include <iostream>
-
-
-Logging::Logging()
-{
-}
-
-
-Logging::~Logging()
-{
-}
 
 
 void Logging::initLogging()
@@ -26,8 +15,6 @@ void Logging::initLogging()
 
 	auto		 logPath = fmg->getLoggingPath();
 	auto		 log	 = logPath / LogFile;
-
-	logging::setLoggerName(mLoggerName);
 
 	std::string fileName = log.string();
 

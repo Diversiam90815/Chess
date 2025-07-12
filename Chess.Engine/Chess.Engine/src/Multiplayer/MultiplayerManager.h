@@ -1,4 +1,5 @@
 /*
+/*
   ==============================================================================
 	Module:         MultiplayerManager
 	Description:    Managing the multiplayer game mode
@@ -14,52 +15,68 @@
 #include "RemoteMessaging/RemoteSender.h"
 #include "RemoteMessaging/RemoteCommunication.h"
 #include "IObserver.h"
-#include "NetworkManager.h"
+#include "PlayerName.h"
 
 
-class MultiplayerManager : public INetworkObserver, public IConnectionStatusObservable, public IDiscoveryObserver, public std::enable_shared_from_this<MultiplayerManager>
+class MultiplayerManager : public INetworkObserver,
+						   public IConnectionStatusObservable,
+						   public IDiscoveryObserver,
+						   public IRemoteMessagesObserver,
+						   public std::enable_shared_from_this<MultiplayerManager>
 {
 public:
 	MultiplayerManager();
 	~MultiplayerManager();
 
-	void						init();
+	bool		init(const std::string &localIPv4);
 
-	void						reset();
+	void		reset();
 
-	bool						hostSession();
+	bool		hostSession();
+	bool		startClient();
+	void		joinSession();
 
-	void						joinSession();
+	void		setTCPSession(ITCPSession::pointer session);
 
-	void						setTCPSession(TCPSession::pointer session);
-	TCPSession::pointer			getActiveSession();
+	void		disconnect();
 
-	void						disconnect();
+	std::string getLocalPlayerName() { return mPlayerName.getLocalPlayerName(); }
 
-	void						setLocalPlayerName(const std::string name) { mLocalPlayerName = name; }
-	std::string					getLocalPlayerName() const { return mLocalPlayerName; }
+	void		onNetworkAdapterChanged(const NetworkAdapter &adapter) override;
 
-	void						onNetworkAdapterChanged(const NetworkAdapter &adapter) override;
+	bool		startDiscovery(const std::string IPv4, const int port, DiscoveryMode mode);
 
-	bool						startServerDiscovery(const std::string IPv4, const int port);
-	void						startClientDiscovery();
+	void		setInternalObservers();
 
-	void						setInternalObservers();
+	void		sendConnectRequest();
+	void		sendConnectResponse(bool accepted, std::string reason = "");
 
-	void						approveConnectionRequest();
-	void						rejectConnectionRequest();
+	void		connectionStatusChanged(const ConnectionStatusEvent event) override;
+	void		localPlayerChosen(const PlayerColor localPlayer) override;
+	void		remotePlayerChosen(const PlayerColor local) override; // This is the already set to the localPlayer, but set if the remote chose a player
+	void		localReadyFlagSet(const bool flag) override;
 
-	void						connectionStatusChanged(ConnectionState state, const std::string &errorMessage = "") override;
-	void						pendingHostApproval(const std::string &remoteIPv4) override;
+	void		onRemoteFound(const Endpoint &remote) override;
 
-	void						onRemoteFound(const Endpoint &remote) override;
+	void		onRemoteMoveReceived(const PossibleMove &remoteMove) override {}
+	void		onRemoteChatMessageReceived(const std::string &mesage) override {}
+	void		onRemoteConnectionStateReceived(const ConnectionState &state) override;
+	void		onRemoteInvitationReceived(const InvitationRequest &invite) override;
+	void		onRemoteInvitationResponseReceived(const InvitationResponse &response) override;
+	void		onRemotePlayerChosenReceived(const PlayerColor player) override;
+	void		onRemotePlayerReadyFlagReceived(const bool flag) override;
 
-	std::vector<NetworkAdapter> getNetworkAdapters();
-	bool						changeCurrentNetworkAdapter(int ID);
-	int							getCurrentNetworkAdapterID();
+	void		setRemotePlayerReadyForGameFlag(const bool flag);
+	bool		checkIfReadyForGame();
+
 
 private:
-	TCPSession::pointer										   mSession = nullptr;
+	void													   closeDiscovery();
+	void													   closeTCPServerOrClient();
+	void													   closeRemoteCommunication();
+
+
+	ITCPSession::pointer									   mSession = nullptr;
 
 	std::unique_ptr<TCPServer>								   mServer;
 	std::unique_ptr<TCPClient>								   mClient;
@@ -73,17 +90,20 @@ private:
 	asio::executor_work_guard<asio::io_context::executor_type> mWorkGuard;
 	std::thread												   mWorkerThread;
 
-	std::unique_ptr<NetworkManager>							   mNetwork;
-
-	std::string												   mLocalPlayerName{};
-
+	PlayerColor												   mLocalPlayerColor{};
 	std::string												   mLocalIPv4{};
 
 	Endpoint												   mRemoteEndpoint;
 
 	std::mutex												   mSessionMutex;
 
-	std::atomic<ConnectionState>							   mConnectionState{ConnectionState::Disconnected};
+	ConnectionStatusEvent									   mConnectionState{ConnectionState::None};
+	ConnectionStatusEvent									   mRemoteConnectionState{ConnectionState::None};
+
+	std::atomic<bool>										   mLocalPlayerReadyForGameFlag{false};
+	std::atomic<bool>										   mRemotePlayerReadyForGameFlag{false};
+
+	PlayerName												   mPlayerName;
 
 	friend class GameManager;
 };

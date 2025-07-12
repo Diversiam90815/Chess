@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Chess.UI.ViewModels
 {
-    public class MainMenuViewModel : INotifyPropertyChanged
+    public partial class MainMenuViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -12,6 +12,9 @@
 #include "MoveValidation.h"
 
 
+namespace MoveTests
+{
+
 class EnPassantTests : public ::testing::Test
 {
 protected:
@@ -194,3 +197,5 @@ TEST_F(EnPassantTests, EnPassantNotAvailableWithoutDoublePawnMove)
 
 	EXPECT_FALSE(hasEnPassantMove);
 }
+
+} // namespace MoveTests

@@ -27,13 +27,9 @@ struct Square
 	Position					pos;
 	std::shared_ptr<ChessPiece> piece;
 
-	Square(int x, int y) : pos{x, y}, piece(nullptr)
-	{
-	}
+	Square(int x, int y) : pos{x, y}, piece(nullptr) {}
 
-	Square() : pos{0, 0}, piece(nullptr)
-	{
-	}
+	Square() : pos{0, 0}, piece(nullptr) {}
 };
 
 
@@ -43,7 +39,6 @@ public:
 	ChessBoard();
 	ChessBoard(const ChessBoard &other);
 	~ChessBoard();
-
 
 	void						 initializeBoard();
 

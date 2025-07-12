@@ -28,7 +28,7 @@ public:
 	~StateMachine();
 
 	void	  onGameStarted();							  // Called from UI
-	void	  onMultiplayerGameStarted(bool isHost);	  // Called from UI
+	void	  onMultiplayerGameStarted();				  // Called from UI
 	void	  onSquareSelected(const Position &pos);	  // Called from UI
 	void	  onPawnPromotionChosen(PieceType promotion); // Called from UI
 
@@ -38,12 +38,18 @@ public:
 
 	void	  onRemoteMoveReceived(const PossibleMove &remoteMove) override;
 	void	  onRemoteChatMessageReceived(const std::string &mesage) override {}
+	void	  onRemoteConnectionStateReceived(const ConnectionState &state) override {}
+	void	  onRemoteInvitationReceived(const InvitationRequest &invite) override {};
+	void	  onRemoteInvitationResponseReceived(const InvitationResponse &response) override {};
+	void	  onRemotePlayerChosenReceived(const PlayerColor player) override {};
+	void	  onRemotePlayerReadyFlagReceived(const bool flag) override {};
 
 	bool	  isInitialized() const;
 	void	  setInitialized(const bool value);
 
 	void	  resetGame();
 	void	  reactToUndoMove();
+
 
 private:
 	StateMachine();
@@ -58,12 +64,14 @@ private:
 	bool				   handleExecutingMoveState();
 	bool				   handlePawnPromotionState();
 	bool				   handleGameOverState();
+	bool				   handleWaitingForRemoteState();
 
 	void				   switchToNextState();
 
 	bool				   isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
 
 	void				   resetCurrentPossibleMove();
+
 
 	std::atomic<bool>	   mInitialized{false};
 
@@ -79,11 +87,11 @@ private:
 	bool				   mIsValidMove{false};
 
 	bool				   mAwaitingPromotion{false};
+	bool				   mReceivedMoveFromRemote{false};
 
 	EndGameState		   mEndgameState{EndGameState::OnGoing};
 
-	bool				   mIsMultiplayerGame{false};
-	bool				   mIsLocalHost{false};
+	std::atomic<bool>	   mIsMultiplayerGame{false};
 
 	std::mutex			   mStateChangedMutex;
 	bool				   mHasPendingStateChange{false};

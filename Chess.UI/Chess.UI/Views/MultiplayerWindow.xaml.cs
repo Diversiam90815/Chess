@@ -1,26 +1,8 @@
-using ABI.Windows.ApplicationModel.Activation;
-using Chess.UI.Models;
 using Chess.UI.Services;
 using Chess.UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text.RegularExpressions;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Media;
 
 
 namespace Chess.UI.Views
@@ -29,12 +11,12 @@ namespace Chess.UI.Views
     {
         private OverlappedPresenter Presenter;
 
-        private MultiplayerViewModel _viewModel;
+        private readonly MultiplayerViewModel _viewModel;
 
 
         public MultiplayerWindow()
         {
-            this.InitializeComponent(); 
+            this.InitializeComponent();
             AppWindow.SetIcon(Project.IconPath);
 
             _viewModel = App.Current.Services.GetService<MultiplayerViewModel>();
@@ -51,6 +33,9 @@ namespace Chess.UI.Views
             Presenter = AppWindow.Presenter as OverlappedPresenter;
             Presenter.IsResizable = false;
             Presenter.IsMaximizable = false;
+
+            _viewModel.ResetViewState();
+            _viewModel.StartMultiplayerSetup();
         }
 
 
@@ -64,44 +49,14 @@ namespace Chess.UI.Views
         }
 
 
-        private void NetworkAdapterChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (e.RemovedItems.Count == 0 || e.AddedItems.Count == 0)
-            {
-                // This is the first initialization of the Combobox
-                return;
-            }
-            else
-            {
-                NetworkAdapter selectedAdapter = (NetworkAdapter)e.AddedItems[0];
-                if (selectedAdapter != null)
-                {
-                    _viewModel.SelectedAdapter = selectedAdapter;
-                }
-            }
-        }
-
-
         private void HostGameButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = LocalPlayerName.Text.Trim();
-            if (name.Length == 0)
-                return;
-
-            _viewModel.LocalPlayerName = name;
-
             _viewModel.EnterServerMultiplayerMode();
         }
 
 
         private void JoinGameButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = LocalPlayerName.Text.Trim();
-            if (name.Length == 0)
-                return;
-
-            _viewModel.LocalPlayerName = name;
-
             _viewModel.EnterClientMultiplayerMode();
         }
 
@@ -150,25 +105,21 @@ namespace Chess.UI.Views
         }
 
 
-        private void LocalPlayerName_TextChanged(object sender, TextChangedEventArgs e)
+        private void SelectWhiteButton_Click(object sender, RoutedEventArgs e)
         {
-            _viewModel.UpdateMPButtons(MultiplayerMode.Init);
+            _viewModel.SelectPlayerColor(EngineAPI.PlayerColor.White);
         }
 
 
-        private void PlayerName_TextChanging(TextBox sender, TextBoxTextChangingEventArgs args)
+        private void SelectBlackButton_Click(object sender, RoutedEventArgs e)
         {
-            var newText = sender.Text;
+            _viewModel.SelectPlayerColor(EngineAPI.PlayerColor.Black);
+        }
 
-            var filteredText = Regex.Replace(newText, "[^A-Za-z]", "");
 
-            if (newText != filteredText)
-            {
-                int oldCaretPos = sender.SelectionStart;
-                sender.Text = filteredText;
-
-                sender.SelectionStart = Math.Min(oldCaretPos, newText.Length);
-            }
+        private void ReadyButton_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.SetPlayerReady();
         }
     }
 }

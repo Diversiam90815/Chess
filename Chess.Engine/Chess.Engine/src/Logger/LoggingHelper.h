@@ -10,7 +10,9 @@
 #include <string>
 
 #include "Parameters.h"
+#include "ConnectionStatus.h"
 #include "Move.h"
+
 
 class LoggingHelper
 {
@@ -23,6 +25,10 @@ public:
 	static std::string moveTypeToString(MoveType type);
 
 	static std::string boardStateToString(const int *boardState);
+
+	static std::string boolToString(const bool value);
+
+	static std::string connectionStateToString(const ConnectionState &state);
 
 	static void		   logMove(Move &move);
 	static void		   logBoardState(const int *boardState);

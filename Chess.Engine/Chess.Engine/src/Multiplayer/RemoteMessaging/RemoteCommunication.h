@@ -18,7 +18,7 @@ public:
 	RemoteCommunication()  = default;
 	~RemoteCommunication() = default;
 
-	bool init(std::shared_ptr<TCPSession> session);
+	bool init(std::shared_ptr<ITCPSession> session);
 	void deinit();
 
 	void start();
@@ -35,12 +35,14 @@ public:
 	bool sendMessages();
 
 private:
-	void								  notifyObservers();
 	void								  receivedMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) override;
+
+	void								  clearPendingMessages();
+
 
 	std::atomic<bool>					  mIsInitialized{false};
 
-	std::shared_ptr<TCPSession>			  mTCPSession;
+	std::shared_ptr<ITCPSession>		  mTCPSession;
 
 	std::shared_ptr<SendThread>			  mSendThread;
 	std::shared_ptr<ReceiveThread>		  mReceiveThread;

@@ -49,6 +49,7 @@ std::string LoggingHelper::gameStateToString(GameState state)
 	{
 	case GameState::Undefined: return "Undefined";
 	case GameState::Init: return "Init";
+	case GameState::InitSucceeded: return "Init Succeeded";
 	case GameState::MoveInitiated: return "Move Initiated";
 	case GameState::ExecutingMove: return "Executing Move";
 	case GameState::ValidatingMove: return "Validating Move";
@@ -140,6 +141,32 @@ std::string LoggingHelper::boardStateToString(const int *boardState)
 	oss << "\n";
 
 	return oss.str();
+}
+
+
+std::string LoggingHelper::boolToString(const bool value)
+{
+	return value ? "True" : "False";
+}
+
+
+std::string LoggingHelper::connectionStateToString(const ConnectionState &state)
+{
+	switch (state)
+	{
+	case ConnectionState::None: return "None";
+	case ConnectionState::Disconnected: return "Disconnects";
+	case ConnectionState::HostingSession: return "Hosting Session";
+	case ConnectionState::WaitingForARemote: return "Waiting for a remote";
+	case ConnectionState::Connected: return "Connected";
+	case ConnectionState::Error: return "Error";
+	case ConnectionState::ConnectionRequested: return "Connection requested";
+	case ConnectionState::PendingHostApproval: return "Pending host approval";
+	case ConnectionState::ClientFoundHost: return "Client found host";
+	case ConnectionState::SetPlayerColor: return "Set player color";
+	case ConnectionState::GameStarted: return "Game Started";
+	default: return "Unknown ConnectionState";
+	}
 }
 
 
