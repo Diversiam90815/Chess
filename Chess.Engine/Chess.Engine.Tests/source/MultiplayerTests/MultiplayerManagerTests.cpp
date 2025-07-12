@@ -112,6 +112,7 @@ TEST_F(MultiplayerManagerTests, StartClientWithoutInit)
 	EXPECT_FALSE(result) << "Start client should fail without initialization";
 }
 
+
 TEST_F(MultiplayerManagerTests, LocalPlayerChosen)
 {
 	multiplayerManager->attachObserver(mockObserver);
