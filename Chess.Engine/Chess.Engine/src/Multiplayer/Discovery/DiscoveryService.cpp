@@ -25,15 +25,22 @@ bool DiscoveryService::init(const std::string &playerName, std::string localIPv4
 	if (localIPv4.empty() || playerName.empty())
 		return false;
 
+	asio::error_code ec;
 	mTcpPort	= tcpPort;
 	mLocalIPv4	= localIPv4;
 	mPlayerName = playerName;
 
 	mSocket.open(udp::v4());
 
+	mSocket.set_option(asio::socket_base::reuse_address(true), ec);
+	if (ec)
+	{
+		LOG_ERROR("Failed to set reuse_address option: {}", ec.message().c_str());
+		// Continue anyway, this might not be critical
+	}
+
 	// setting the local endpoint
-	mLocalEndpoint = udp::endpoint(udp::v4(), mDiscoveryPort);
-	asio::error_code	 ec;
+	mLocalEndpoint				 = udp::endpoint(udp::v4(), mDiscoveryPort);
 
 	// Setting the target endpoint
 	asio::ip::address_v4 address = asio::ip::make_address_v4(broadCastAddress);
@@ -76,6 +83,8 @@ void DiscoveryService::deinit()
 
 	// stop the thread
 	stop();
+
+	mInitialized.store(false);
 }
 
 
