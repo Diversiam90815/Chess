@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.0.0.641)
+set(CHESS_VERSION 1.0.0.642)
 
 project(Chess.Engine VERSION ${CHESS_VERSION} LANGUAGES CXX)
 

@@ -42,8 +42,6 @@ bool GameManager::init()
 	mLog.initLogging();
 	mUserSettings.init();
 
-	mPlayerName.init();
-
 	mUiCommunicationLayer = std::make_shared<UICommunication>();
 
 	mChessBoard			  = std::make_shared<ChessBoard>();

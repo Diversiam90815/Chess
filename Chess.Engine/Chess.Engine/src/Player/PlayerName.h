@@ -19,8 +19,6 @@ public:
 	PlayerName()  = default;
 	~PlayerName() = default;
 
-	void		init();
-
 	void		setLocalPlayerName(const std::string &name);
 	std::string getLocalPlayerName();
 

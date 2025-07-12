@@ -15,7 +15,7 @@
 #include "RemoteMessaging/RemoteSender.h"
 #include "RemoteMessaging/RemoteCommunication.h"
 #include "IObserver.h"
-#include "UserSettings.h"
+#include "PlayerName.h"
 
 
 class MultiplayerManager : public INetworkObserver,
@@ -40,7 +40,7 @@ public:
 
 	void		disconnect();
 
-	std::string getLocalPlayerName() { return mUserSettings.getLocalPlayerName(); }
+	std::string getLocalPlayerName() { return mPlayerName.getLocalPlayerName(); }
 
 	void		onNetworkAdapterChanged(const NetworkAdapter &adapter) override;
 
@@ -103,7 +103,7 @@ private:
 	std::atomic<bool>										   mLocalPlayerReadyForGameFlag{false};
 	std::atomic<bool>										   mRemotePlayerReadyForGameFlag{false};
 
-	UserSettings											   mUserSettings;
+	PlayerName												   mPlayerName;
 
 	friend class GameManager;
 };
