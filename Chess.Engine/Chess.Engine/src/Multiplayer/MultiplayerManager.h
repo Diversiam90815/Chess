@@ -28,7 +28,7 @@ public:
 	MultiplayerManager();
 	~MultiplayerManager();
 
-	void		init(const std::string &localIPv4);
+	bool		init(const std::string &localIPv4);
 
 	void		reset();
 
