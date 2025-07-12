@@ -37,6 +37,7 @@ set(MultiplayerTest_Files
     ${MultiplayerTest_Dir}/MultiplayerManagerTests.cpp
     ${MultiplayerTest_Dir}/TCPClientAndServerTests.cpp
     ${MultiplayerTest_Dir}/TCPSessionTests.cpp
+    ${MultiplayerTest_Dir}/MultiplayerIntegrationTests.cpp
 )
 
 
