@@ -45,6 +45,7 @@ set(GameMechanicTest_Files
     ${GameMechanicTest_Dir}/ChessboardTests.cpp
     ${GameMechanicTest_Dir}/PawnPromotionTests.cpp
     ${GameMechanicTest_Dir}/EndgameTests.cpp
+    ${GameMechanicTest_Dir}/UndoMoveTests.cpp
 )
 
 
