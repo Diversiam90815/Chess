@@ -27,8 +27,8 @@ std::string MoveNotation::generateStandardAlgebraicNotation(Move &move)
 	// Get the piece character
 	char		pieceChar = getPieceType(move.movedPiece);
 
-	// Determine if the move is a capture
-	bool		isCapture = (move.type & MoveType::Capture) == MoveType::Capture;
+	// Determine if the move is a capture (regular capture OR en passant)
+	bool		isCapture = (move.type & MoveType::Capture) == MoveType::Capture || (move.type & MoveType::EnPassant) == MoveType::EnPassant;
 
 	// Handle pawn moves
 	if (move.movedPiece == PieceType::Pawn)
@@ -91,13 +91,25 @@ std::string MoveNotation::generateStandardAlgebraicNotation(Move &move)
 
 std::string MoveNotation::castlingToSAN(Move &move)
 {
+	std::string castlingNotation{};
+
 	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside)
-		return "O-O";
+	{
+		castlingNotation = "O-O";
+
+		if ((move.type & MoveType::Check) == MoveType::Check)
+			castlingNotation += '+';
+	}
 
 	else if ((move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
-		return "O-O-O";
+	{
+		castlingNotation = "O-O-O";
 
-	return "";
+		if ((move.type & MoveType::Check) == MoveType::Check)
+			castlingNotation += '+';
+	}
+
+	return castlingNotation;
 }
 
 
