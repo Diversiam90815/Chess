@@ -42,8 +42,6 @@ public:
 
 	std::optional<PlayerColor>	getWinner() const;
 
-	void						clearState();
-
 	void						setDelegate(PFN_CALLBACK pDelegate);
 
 	std::vector<PossibleMove>	getPossibleMoveForPosition();

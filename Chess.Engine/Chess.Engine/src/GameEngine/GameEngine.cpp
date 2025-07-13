@@ -40,6 +40,8 @@ void GameEngine::resetGame()
 
 	mWhitePlayer.reset();
 	mBlackPlayer.reset();
+
+	reset();
 }
 
 
@@ -97,6 +99,8 @@ bool GameEngine::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 
 void GameEngine::startGame()
 {
+	reset();
+
 	switchTurns();
 
 	mChessBoard->initializeBoard(); // Reset the board

@@ -58,17 +58,9 @@ bool GameManager::init()
 
 bool GameManager::startGame()
 {
-	clearState();
-
 	mEngine->startGame();
 
 	return true;
-}
-
-
-void GameManager::clearState()
-{
-	mEngine->reset();
 }
 
 
@@ -123,8 +115,6 @@ void GameManager::undoMove()
 void GameManager::resetGame()
 {
 	mEngine->resetGame();
-
-	clearState();
 }
 
 
@@ -188,8 +178,6 @@ bool GameManager::startMultiplayerGame()
 
 	mIsMultiplayerMode = true;
 
-	// Initialize the game & board
-	clearState();
 	mEngine->startGame();
 
 	PlayerColor localPlayer = mMultiplayerManager->mLocalPlayerColor;
