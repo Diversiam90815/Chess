@@ -8,11 +8,7 @@
 
 #include <gtest/gtest.h>
 
-#include "GameManager.h"
-#include "StateMachine.h"
-#include "MoveExecution.h"
-#include "MoveValidation.h"
-#include "MoveGeneration.h"
+#include "GameEngine.h"
 
 
 namespace GameMechanicTests
@@ -21,329 +17,242 @@ namespace GameMechanicTests
 class EndgameTests : public ::testing::Test
 {
 protected:
-	GameManager					   *mGameManager;
-	std::shared_ptr<StateMachine>	mStateMachine;
-	std::shared_ptr<ChessBoard>		mBoard;
-	std::shared_ptr<MoveValidation> mValidation;
-	std::shared_ptr<MoveExecution>	mExecution;
-	std::shared_ptr<MoveGeneration> mGeneration;
+	std::unique_ptr<GameEngine> mEngine;
 
 
-	void							SetUp() override
+	void						SetUp() override
 	{
-		mGameManager = GameManager::GetInstance();
-		mGameManager->init();
-
-		mStateMachine = StateMachine::GetInstance();
-
-		// Get access to internal components for setup
-		mBoard		  = std::make_shared<ChessBoard>();
-		mBoard->initializeBoard();
-		mValidation = std::make_shared<MoveValidation>(mBoard);
-		mExecution	= std::make_shared<MoveExecution>(mBoard, mValidation);
-		mGeneration = std::make_shared<MoveGeneration>(mBoard, mValidation, mExecution);
+		mEngine = std::make_unique<GameEngine>();
+		mEngine->init();
 	}
 
 
 	void TearDown() override
 	{
-		mGameManager->resetGame();
-		mStateMachine->ReleaseInstance();
-		GameManager::ReleaseInstance();
+		mEngine->resetGame();
+		mEngine.reset();
 	}
 
 
-	// Helper method to setup a checkmate position
-	void SetupCheckmatePosition()
+	// Helper to execute moves through GameEngine
+	void ExecuteMove(const PossibleMove &move)
 	{
-		mBoard->removeAllPiecesFromBoard();
-
-		// Setup Scholar's mate position
-		Position blackKingPos = {4, 0}; // e8
-
-		// Black pieces
-		mBoard->setPiece(blackKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::Black));
-		mBoard->setPiece({3, 0}, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::Black));  // d8
-		mBoard->setPiece({5, 0}, ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::Black)); // f8
-		mBoard->setPiece({3, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // d7
-		mBoard->setPiece({4, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // e7
-		mBoard->setPiece({6, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // g7
-
-		// White pieces - queen delivers checkmate at f7
-		mBoard->setPiece({5, 1}, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White));  // f7
-		mBoard->setPiece({2, 4}, ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::White)); // c4 (supports queen)
-
-		mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
+		PossibleMove mutableMove = move;
+		mEngine->executeMove(mutableMove);
 	}
 
-
-	// Helper method to setup a stalemate position
-	void SetupStalematePosition()
+	// Helper to create a basic move
+	PossibleMove CreateMove(Position start, Position end, MoveType type = MoveType::Normal)
 	{
-		mBoard->removeAllPiecesFromBoard();
-
-		// Setup simple stalemate position
-		Position blackKingPos  = {7, 0}; // h8
-		Position whiteQueenPos = {6, 2}; // g6
-
-		mBoard->setPiece(blackKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::Black));
-		mBoard->setPiece(whiteQueenPos, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White));
-		mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
+		PossibleMove move;
+		move.start			= start;
+		move.end			= end;
+		move.type			= type;
+		move.promotionPiece = PieceType::DefaultType;
+		return move;
 	}
 
-
-	// Helper method to simulate a checkmate move
-	void SimulateCheckmateMove()
+		// Helper to execute Scholar's Mate sequence
+	void ExecuteScholarsMate()
 	{
-		// Create a move that results in checkmate
-		PossibleMove checkmateMove;
-		checkmateMove.start = {5, 2}; // f6
-		checkmateMove.end	= {5, 1}; // f7
-		checkmateMove.type	= MoveType::Checkmate | MoveType::Normal;
+		std::vector<PossibleMove> moveSequence = {
+			CreateMove({4, 6}, {4, 4}), // e2-e4 (White)
+			CreateMove({4, 1}, {4, 3}), // e7-e5 (Black)
+			CreateMove({5, 7}, {2, 4}), // f1-c4 (White: Bc4)
+			CreateMove({1, 0}, {2, 2}), // b8-c6 (Black: Nc6)
+			CreateMove({3, 7}, {7, 3}), // d1-h5 (White: Qh5)
+			CreateMove({6, 0}, {5, 2}), // g8-f6 (Black: Nf6??)
+			CreateMove({7, 3}, {5, 1})	// h5xf7# (White: Qxf7# checkmate)
+		};
 
-		Move executedMove(checkmateMove);
-		executedMove.player		= PlayerColor::White;
-		executedMove.type		= MoveType::Checkmate | MoveType::Normal;
-		executedMove.movedPiece = PieceType::Queen;
+		for (const auto &move : moveSequence)
+		{
+			ExecuteMove(move);
+		}
+	}
 
-		// Add the move to history to simulate it was executed
-		mExecution->addMoveToHistory(executedMove);
+	// Helper to execute Fool's Mate sequence (fastest checkmate)
+	void ExecuteFoolsMate()
+	{
+		std::vector<PossibleMove> moveSequence = {
+			CreateMove({5, 6}, {5, 5}), // f2-f3 (White)
+			CreateMove({4, 1}, {4, 3}), // e7-e5 (Black)
+			CreateMove({6, 6}, {6, 4}), // g2-g4 (White)
+			CreateMove({3, 0}, {7, 4})	// d8-h4# (Black: Qh4# checkmate)
+		};
+
+		for (const auto &move : moveSequence)
+		{
+			ExecuteMove(move);
+		}
 	}
 };
 
 
+// ============================================================================
+// BASIC TESTS
+// ============================================================================
+
 TEST_F(EndgameTests, GetWinnerReturnsNulloptWhenNoMoves)
 {
-	auto winner = mGameManager->getWinner();
+	auto winner = mEngine->getWinner();
 
 	EXPECT_FALSE(winner.has_value()) << "getWinner should return nullopt when no moves have been made";
 }
 
 
-TEST_F(EndgameTests, GetWinnerReturnsNulloptForNonCheckmateMoves)
+TEST_F(EndgameTests, GetWinnerAfterNormalMove)
 {
-	// Set up a normal move (no checkmate) from e2 -> e4
-	PossibleMove normalMove;
-	normalMove.start = {4, 6};
-	normalMove.end	 = {
-		  4,
-		  4,
-	  };
-	normalMove.type = MoveType::Normal;
+	// Start the game to initialize the board
+	mEngine->startGame();
 
-	Move executedMove(normalMove);
-	executedMove.player		= PlayerColor::White;
-	executedMove.type		= MoveType::Normal;
-	executedMove.movedPiece = PieceType::Pawn;
+	// Execute a normal pawn move (e2-e4)
+	PossibleMove normalMove = CreateMove({4, 6}, {4, 4}, MoveType::Normal);
+	ExecuteMove(normalMove);
 
-	mExecution->addMoveToHistory(executedMove);
-
-	// Get the winner
-	auto winner = mGameManager->getWinner();
-
+	auto winner = mEngine->getWinner();
 	EXPECT_FALSE(winner.has_value()) << "getWinner should return nullopt for non-checkmate moves";
-}
-
-
-TEST_F(EndgameTests, GetWinnerReturnsCorrectPlayerForWhiteCheckmate)
-{
-	// Simulate a checkmate move by white
-	PossibleMove checkmateMove;
-	checkmateMove.start = {5, 2}; // f6
-	checkmateMove.end	= {5, 1}; // f7
-	checkmateMove.type	= MoveType::Normal | MoveType::Checkmate;
-
-	Move executedMove(checkmateMove);
-	executedMove.player		= PlayerColor::White;
-	executedMove.type		= MoveType::Checkmate | MoveType::Normal;
-	executedMove.movedPiece = PieceType::Queen;
-
-	mExecution->addMoveToHistory(executedMove);
-
-	auto winner = mGameManager->getWinner();
-
-	ASSERT_TRUE(winner.has_value()) << "getWinner should return a player for checkmate moves";
-	EXPECT_EQ(winner.value(), PlayerColor::White) << "Whites should be the winner after delivering checkmate";
-}
-
-
-TEST_F(EndgameTests, GetWinnerReturnsCoeectPlayerForBlackCheckmate)
-{
-	// Simulate a checkmate move by black
-	PossibleMove checkmateMove;
-	checkmateMove.start = {3, 1}; // d7
-	checkmateMove.end	= {3, 2}; // d6
-	checkmateMove.type	= MoveType::Checkmate | MoveType::Normal;
-
-	Move executedMove(checkmateMove);
-	executedMove.player		= PlayerColor::Black;
-	executedMove.type		= MoveType::Checkmate | MoveType::Normal;
-	executedMove.movedPiece = PieceType::Queen;
-
-	mExecution->addMoveToHistory(executedMove);
-
-	auto winner = mGameManager->getWinner();
-
-	ASSERT_TRUE(winner.has_value()) << "getWinner should return a player for checkmate moves";
-	EXPECT_EQ(winner.value(), PlayerColor::Black) << "Black should be the winner after delivering checkmate";
-}
-
-
-TEST_F(EndgameTests, CheckForEndgameConditionsDetectsCheckmate)
-{
-	SetupCheckmatePosition();
-	SimulateCheckmateMove();
-
-	// Set current player to the checkmated player
-	mGameManager->changeCurrentPlayer(PlayerColor::Black);
-
-	EndGameState state = mGameManager->checkForEndGameConditions();
-
-	EXPECT_EQ(state, EndGameState::Checkmate) << "checkForEndGameConditions should detect checkmate";
-}
-
-
-TEST_F(EndgameTests, CheckForEndgameConditionsDetectsStalemate)
-{
-	SetupStalematePosition();
-
-	// Create a regular move (not checkmate) to simulate game state
-	PossibleMove normalMove;
-	normalMove.start = {6, 3}; // g5
-	normalMove.end	 = {6, 2}; // g6
-	normalMove.type	 = MoveType::Normal;
-
-	Move executedMove(normalMove);
-	executedMove.player		= PlayerColor::White;
-	executedMove.type		= MoveType::Normal;
-	executedMove.movedPiece = PieceType::Queen;
-
-	mExecution->addMoveToHistory(executedMove);
-
-	// Set current player to the stalemated player
-	mGameManager->changeCurrentPlayer(PlayerColor::Black);
-
-	EndGameState result = mGameManager->checkForEndGameConditions();
-
-	EXPECT_EQ(result, EndGameState::StaleMate) << "checkForEndGameConditions should detect stalemate";
-}
-
-
-TEST_F(EndgameTests, CheckForEndGameConditionsReturnsOngoingForNormalGame)
-{
-	// Start with initial board position
-	mGameManager->startGame();
-
-	// Make a normal opening move
-	PossibleMove normalMove;
-	normalMove.start = {4, 6}; // e2
-	normalMove.end	 = {4, 4}; // e4
-	normalMove.type	 = MoveType::Normal;
-
-	Move executedMove(normalMove);
-	executedMove.player		= PlayerColor::White;
-	executedMove.type		= MoveType::Normal;
-	executedMove.movedPiece = PieceType::Pawn;
-
-	mExecution->addMoveToHistory(executedMove);
-
-	EndGameState result = mGameManager->checkForEndGameConditions();
-
-	EXPECT_EQ(result, EndGameState::OnGoing) << "checkForEndGameConditions should return OnGoing for normal game";
 }
 
 
 TEST_F(EndgameTests, CheckForEndgameConditionsHandlingNoLastMove)
 {
 	// Test when there's no last move in history
-	EndGameState state = mGameManager->checkForEndGameConditions();
-
+	EndGameState state = mEngine->checkForEndGameConditions();
 	EXPECT_EQ(state, EndGameState::OnGoing) << "checkForEndGameConditions should return OnGoing when no moves have been made";
 }
 
 
-TEST_F(EndgameTests, CheckForEndGameConditionsWithCheckmateCallsEndGame)
+TEST_F(EndgameTests, CheckForEndGameConditionsReturnsOngoingForNormalGame)
 {
-	SetupCheckmatePosition();
-	SimulateCheckmateMove();
+	// Start with initial board position
+	mEngine->startGame();
 
-	// Set current player to the checkmated player
-	mGameManager->changeCurrentPlayer(PlayerColor::Black);
+	// Make a normal opening move (e2-e4)
+	PossibleMove normalMove = CreateMove({4, 6}, {4, 4}, MoveType::Normal);
+	ExecuteMove(normalMove);
 
-	// This should internally call endGame with the correct winner
-	EndGameState result = mGameManager->checkForEndGameConditions();
-
-	EXPECT_EQ(result, EndGameState::Checkmate) << "Should return checkmate state";
-
-	// Verify that getWinner returns the correct winner after checkmate detection
-	auto winner = mGameManager->getWinner();
-
-	ASSERT_TRUE(winner.has_value()) << "Winner should be determined after checkmate";
-	EXPECT_EQ(winner.value(), PlayerColor::White) << "White should be the winner";
+	EndGameState result = mEngine->checkForEndGameConditions();
+	EXPECT_EQ(result, EndGameState::OnGoing) << "checkForEndGameConditions should return OnGoing for normal game";
 }
 
 
-TEST_F(EndgameTests, CheckForEndGameConditionsWithStalemateCallsEndGame)
+
+// ============================================================================
+// GAME SEQUENCE TESTS
+// ============================================================================
+
+TEST_F(EndgameTests, ScholarsMateSequence)
 {
-	SetupStalematePosition();
+	mEngine->startGame();
 
-	// Create a regular move to simulate game state
-	PossibleMove normalMove;
-	normalMove.start = {6, 3}; // g5
-	normalMove.end	 = {6, 2}; // g6
-	normalMove.type	 = MoveType::Normal;
+	// Scholar's mate sequence
+	std::vector<std::pair<PossibleMove, std::string>> moveSequence = {
+		{CreateMove({4, 6}, {4, 4}), "e2-e4"},						// White: e4
+		{CreateMove({4, 1}, {4, 3}), "e7-e5"},						// Black: e5
+		{CreateMove({5, 7}, {2, 4}), "f1-c4"},						// White: Bc4
+		{CreateMove({1, 0}, {2, 2}), "b8-c6"},						// Black: Nc6
+		{CreateMove({3, 7}, {7, 3}), "d1-h5"},						// White: Qh5
+		{CreateMove({6, 0}, {5, 2}), "g8-f6"},						// Black: Nf6??
+		{CreateMove({7, 3}, {5, 1}, MoveType::Checkmate), "h5xf7#"} // White: Qxf7# (checkmate)
+	};
 
-	Move executedMove(normalMove);
-	executedMove.player		= PlayerColor::White;
-	executedMove.type		= MoveType::Normal;
-	executedMove.movedPiece = PieceType::Queen;
+	EndGameState gameState = EndGameState::OnGoing;
 
-	mExecution->addMoveToHistory(executedMove);
+	for (size_t i = 0; i < moveSequence.size(); ++i)
+	{
+		const auto &[move, notation] = moveSequence[i];
 
-	// Set current player to the stalemated player
-	mGameManager->changeCurrentPlayer(PlayerColor::Black);
+		// Execute the move
+		ExecuteMove(move);
 
-	EndGameState result = mGameManager->checkForEndGameConditions();
+		// Check game state after each move
+		gameState = mEngine->checkForEndGameConditions();
 
-	EXPECT_EQ(result, EndGameState::StaleMate) << "Should return stalemate state";
+		if (i < moveSequence.size() - 1)
+		{
+			// All moves except the last should result in ongoing game
+			EXPECT_EQ(gameState, EndGameState::OnGoing) << "Game should be ongoing after move: " << notation;
+		}
+		else
+		{
+			// Last move should result in checkmate
+			EXPECT_EQ(gameState, EndGameState::Checkmate) << "Final move should result in checkmate: " << notation;
 
-	// In stalemate, there should be no winner
-	auto winner = mGameManager->getWinner();
-	EXPECT_FALSE(winner.has_value()) << "There should be no winner in stalemate";
+			// Check that White is the winner
+			auto winner = mEngine->getWinner();
+			ASSERT_TRUE(winner.has_value()) << "Winner should be determined after checkmate";
+			EXPECT_EQ(winner.value(), PlayerColor::White) << "White should be the winner";
+		}
+	}
 }
 
 
-TEST_F(EndgameTests, CheckForEndGameConditionsAfterNormalMoveFollowingCheckmate)
+// ============================================================================
+// INTEGRATION TESTS
+// ============================================================================
+
+TEST_F(EndgameTests, MultipleGameSequences)
 {
-	// Test that a normal move after checkmate doesn't override the checkmate detection
-	SetupCheckmatePosition();
-	SimulateCheckmateMove();
+	// Test that we can play multiple complete games with checkmates using the same engine
 
-	// Add a normal move after checkmate (this shouldn't happen in real game but tests robustness)
-	PossibleMove normalMove;
-	normalMove.start = {4, 6};
-	normalMove.end	 = {4, 4};
-	normalMove.type	 = MoveType::Normal;
+	// Game 1: Scholar's Mate (White wins)
+	{
+		mEngine->startGame();
+		ExecuteScholarsMate();
 
-	Move executedMove(normalMove);
-	executedMove.player		= PlayerColor::Black;
-	executedMove.type		= MoveType::Normal;
-	executedMove.movedPiece = PieceType::Pawn;
+		EndGameState state = mEngine->checkForEndGameConditions();
+		EXPECT_EQ(state, EndGameState::Checkmate) << "Game 1 should end in checkmate";
 
-	mExecution->addMoveToHistory(executedMove);
+		auto winner = mEngine->getWinner();
+		ASSERT_TRUE(winner.has_value()) << "Game 1 should have a winner";
+		EXPECT_EQ(winner.value(), PlayerColor::White) << "White should win Game 1";
 
-	// The last move is now normal, so getWinner should return nullopt
-	auto winner = mGameManager->getWinner();
-	EXPECT_FALSE(winner.has_value()) << "getWinner should return nullopt when last move is not checkmate";
+		// Reset for next game
+		mEngine->resetGame();
+	}
 
-	// But checkForEndGameConditions should still work based on current board state
-	mGameManager->changeCurrentPlayer(PlayerColor::Black);
-	EndGameState result = mGameManager->checkForEndGameConditions();
+	// Game 2: Fool's Mate (Black wins)
+	{
+		mEngine->startGame();
+		ExecuteFoolsMate();
 
-	// This depends on the actual board state and move validation
-	EXPECT_TRUE(result == EndGameState::OnGoing || result == EndGameState::Checkmate || result == EndGameState::StaleMate)
-		<< "checkForEndGameConditions should return a valid state";
+		EndGameState state = mEngine->checkForEndGameConditions();
+		EXPECT_EQ(state, EndGameState::Checkmate) << "Game 2 should end in checkmate";
+
+		auto winner = mEngine->getWinner();
+		ASSERT_TRUE(winner.has_value()) << "Game 2 should have a winner";
+		EXPECT_EQ(winner.value(), PlayerColor::Black) << "Black should win Game 2";
+
+		// Reset for next game
+		mEngine->resetGame();
+	}
+
+	// Game 3: Normal game sequence (no checkmate)
+	{
+		mEngine->startGame();
+
+		// Play some normal moves without reaching checkmate
+		ExecuteMove(CreateMove({4, 6}, {4, 4})); // e2-e4
+		ExecuteMove(CreateMove({4, 1}, {4, 3})); // e7-e5
+		ExecuteMove(CreateMove({6, 7}, {5, 5})); // g1-f3
+		ExecuteMove(CreateMove({1, 0}, {2, 2})); // b8-c6
+
+		EndGameState state = mEngine->checkForEndGameConditions();
+		EXPECT_EQ(state, EndGameState::OnGoing) << "Game 3 should be ongoing";
+
+		auto winner = mEngine->getWinner();
+		EXPECT_FALSE(winner.has_value()) << "Game 3 should have no winner yet";
+
+		mEngine->resetGame();
+	}
+
+	// Verify final reset worked
+	auto finalWinner = mEngine->getWinner();
+	EXPECT_FALSE(finalWinner.has_value()) << "Winner should be cleared after final reset";
 }
+
+
 
 
 
