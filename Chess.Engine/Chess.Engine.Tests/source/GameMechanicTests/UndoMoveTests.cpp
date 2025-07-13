@@ -16,10 +16,11 @@ namespace GameMechanicTests
 class UndoMoveTests : public ::testing::Test
 {
 protected:
-	GameEngine *mEngine;
+	std::unique_ptr<GameEngine> mEngine;
 
-	void		SetUp() override
+	void						SetUp() override
 	{
+		mEngine = std::make_unique<GameEngine>();
 		mEngine->init();
 		mEngine->startGame();
 	}
@@ -108,8 +109,8 @@ TEST_F(UndoMoveTests, UndoSimplePawnMove)
 TEST_F(UndoMoveTests, UndoCaptureMove)
 {
 	// Set up a capture scenario
-	ExecuteMove(CreateMove({4, 6}, {4, 4}, MoveType::Normal)); // e2-e4
-	ExecuteMove(CreateMove({3, 1}, {3, 3}, MoveType::Normal)); // d7-d5
+	ExecuteMove(CreateMove({4, 6}, {4, 4}, MoveType::Normal));	// e2-e4
+	ExecuteMove(CreateMove({3, 1}, {3, 3}, MoveType::Normal));	// d7-d5
 	ExecuteMove(CreateMove({4, 4}, {3, 3}, MoveType::Capture)); // exd5
 
 	// Verify capture was executed
