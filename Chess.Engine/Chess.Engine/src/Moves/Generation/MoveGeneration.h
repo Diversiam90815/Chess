@@ -14,8 +14,8 @@
 
 #include "ChessBoard.h"
 #include "Move.h"
-#include "MoveValidation.h"
-#include "MoveExecution.h"
+#include "Validation/MoveValidation.h"
+#include "Execution/MoveExecution.h"
 
 
 class MoveGeneration
@@ -43,7 +43,7 @@ private:
 	std::shared_ptr<ChessBoard>								mChessBoard;
 
 	std::shared_ptr<MoveValidation>							mValidation;
-		 
+
 	std::shared_ptr<MoveExecution>							mExecution;
 
 	std::unordered_map<Position, std::vector<PossibleMove>> mAllLegalMovesForCurrentRound;

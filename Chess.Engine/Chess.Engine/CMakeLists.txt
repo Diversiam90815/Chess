@@ -107,11 +107,11 @@ set(MOVE_FILES
 	${MOVE_DIR}/MoveType.h
 	${MOVE_DIR}/Move.h
 	${MOVE_DIR}/MoveSerialization.h
-	${MOVE_DIR}/MoveHelper.h                ${MOVE_DIR}/MoveHelper.cpp
-	${MOVE_DIR}/MoveGeneration.h            ${MOVE_DIR}/MoveGeneration.cpp
-	${MOVE_DIR}/MoveValidation.h            ${MOVE_DIR}/MoveValidation.cpp
-	${MOVE_DIR}/MoveExecution.h             ${MOVE_DIR}/MoveExecution.cpp
-	${MOVE_DIR}/MoveNotationHelper.h        ${MOVE_DIR}/MoveNotationHelper.cpp
+	${MOVE_DIR}/MoveHelper.h							${MOVE_DIR}/MoveHelper.cpp
+	${MOVE_DIR}/generation/MoveGeneration.h				${MOVE_DIR}/Generation/MoveGeneration.cpp
+	${MOVE_DIR}/Validation/MoveValidation.h				${MOVE_DIR}/Validation/MoveValidation.cpp
+	${MOVE_DIR}/Execution/MoveExecution.h				${MOVE_DIR}/Execution/MoveExecution.cpp
+	${MOVE_DIR}/Notation/MoveNotationHelper.h			${MOVE_DIR}/Notation/MoveNotationHelper.cpp
 )
 
 set(GAME_MANAGER_FILES
@@ -222,7 +222,6 @@ set(Asio_INCLUDE_DIR ${ASIO_ROOT}/include)
 
 set(JSON_DIR ${SUBMODULES_DIR}/json/)
 set(JSON_SINGLE_FILE ${JSON_DIR}/single_include/nlohmann)
-#add_subdirectory(${JSON_DIR})
 
 
 #==========================================

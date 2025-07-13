@@ -7,9 +7,9 @@
 
 #include <gtest/gtest.h>
 
-#include "MoveGeneration.h"
-#include "MoveExecution.h"
-#include "MoveValidation.h"
+#include "Generation/MoveGeneration.h"
+#include "Validation/MoveValidation.h"
+#include "Execution/MoveExecution.h"
 
 
 namespace MoveTests

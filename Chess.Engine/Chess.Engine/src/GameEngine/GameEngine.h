@@ -10,9 +10,9 @@
 
 #include <optional>
 
-#include "MoveExecution.h"
-#include "MoveGeneration.h"
-#include "MoveValidation.h"
+#include "Execution/MoveExecution.h"
+#include "Generation/MoveGeneration.h"
+#include "Validation/MoveValidation.h"
 #include "IObservable.h"
 #include "Parameters.h"
 

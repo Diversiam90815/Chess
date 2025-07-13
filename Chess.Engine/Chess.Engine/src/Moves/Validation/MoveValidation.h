@@ -10,8 +10,6 @@
 #include <memory>
 
 #include "ChessBoard.h"
-//#include "Move.h"
-//#include "Parameters.h"
 
 
 class MoveValidation

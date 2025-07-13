@@ -58,13 +58,14 @@
 		<PackageCertificateThumbprint>F0B1A6F3B7078207995ED0EC06C1335832F2CD0F</PackageCertificateThumbprint>
 		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
 		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
-		<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+		<AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
 		<GenerateTestArtifacts>True</GenerateTestArtifacts>
-		<AppxBundle>Never</AppxBundle>
+		<AppxBundle>Auto</AppxBundle>
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<PackageIcon>Assets\Logo\Chess.ico</PackageIcon>
 		<ApplicationIcon>Assets\Logo\Chess.ico</ApplicationIcon>
 		<AppxPackageDir>C:\Users\QA\Documents\Repositories\PrivateRepo\Chess-Game\Package\</AppxPackageDir>
+		<AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
 	</PropertyGroup>
 
 	<!-- Add the Chess Logic DLL library to project -->

@@ -11,10 +11,9 @@
 #include <set>
 #include <mutex>
 
-#include "MoveValidation.h"
-
 #include "ChessBoard.h"
-#include "MoveNotationHelper.h"
+#include "Validation/MoveValidation.h"
+#include "Notation/MoveNotationHelper.h"
 #include "Move.h"
 #include "IObservable.h"
 
