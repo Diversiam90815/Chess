@@ -13,7 +13,7 @@
 
 #include "ChessBoard.h"
 #include "Validation/MoveValidation.h"
-#include "Notation/MoveNotationHelper.h"
+#include "Notation/MoveNotation.h"
 #include "Move.h"
 #include "IObservable.h"
 
@@ -46,7 +46,7 @@ private:
 
 	std::shared_ptr<MoveValidation>		mValidation;
 
-	std::shared_ptr<MoveNotationHelper> mMoveNotation;
+	std::shared_ptr<MoveNotation>		mMoveNotation;
 
 	std::set<Move>						mMoveHistory;
 

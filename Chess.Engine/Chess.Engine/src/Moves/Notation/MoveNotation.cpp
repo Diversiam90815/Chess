@@ -1,24 +1,20 @@
 /*
   ==============================================================================
-	Module:         MoveNotationHelper
+	Module:         MoveNotation
 	Description:    Transforming the Move class into a Standart Algebraic Notation string
   ==============================================================================
 */
 
-#include "MoveNotationHelper.h"
+#include "MoveNotation.h"
 
 
-MoveNotationHelper::MoveNotationHelper()
-{
-}
+MoveNotation::MoveNotation() {}
 
 
-MoveNotationHelper::~MoveNotationHelper()
-{
-}
+MoveNotation::~MoveNotation() {}
 
 
-std::string MoveNotationHelper::generateStandardAlgebraicNotation(Move &move)
+std::string MoveNotation::generateStandardAlgebraicNotation(Move &move)
 {
 	// Handle castling
 	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
@@ -93,7 +89,7 @@ std::string MoveNotationHelper::generateStandardAlgebraicNotation(Move &move)
 }
 
 
-std::string MoveNotationHelper::castlingToSAN(Move &move)
+std::string MoveNotation::castlingToSAN(Move &move)
 {
 	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside)
 		return "O-O";
@@ -105,7 +101,7 @@ std::string MoveNotationHelper::castlingToSAN(Move &move)
 }
 
 
-std::string MoveNotationHelper::getPositionString(Position &pos)
+std::string MoveNotation::getPositionString(Position &pos)
 {
 	std::string positionString;
 	positionString += getFileFromPosition(pos);
@@ -114,19 +110,19 @@ std::string MoveNotationHelper::getPositionString(Position &pos)
 }
 
 
-char MoveNotationHelper::getFileFromPosition(Position &pos)
+char MoveNotation::getFileFromPosition(Position &pos)
 {
 	return 'a' + pos.x;
 }
 
 
-char MoveNotationHelper::getRankFromPosition(Position &pos)
+char MoveNotation::getRankFromPosition(Position &pos)
 {
 	return '8' - pos.y;
 }
 
 
-char MoveNotationHelper::getPieceType(PieceType type)
+char MoveNotation::getPieceType(PieceType type)
 {
 	switch (type)
 	{

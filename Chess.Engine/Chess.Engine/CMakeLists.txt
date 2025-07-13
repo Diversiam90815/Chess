@@ -107,11 +107,11 @@ set(MOVE_FILES
 	${MOVE_DIR}/MoveType.h
 	${MOVE_DIR}/Move.h
 	${MOVE_DIR}/MoveSerialization.h
-	${MOVE_DIR}/MoveHelper.h							${MOVE_DIR}/MoveHelper.cpp
-	${MOVE_DIR}/generation/MoveGeneration.h				${MOVE_DIR}/Generation/MoveGeneration.cpp
-	${MOVE_DIR}/Validation/MoveValidation.h				${MOVE_DIR}/Validation/MoveValidation.cpp
-	${MOVE_DIR}/Execution/MoveExecution.h				${MOVE_DIR}/Execution/MoveExecution.cpp
-	${MOVE_DIR}/Notation/MoveNotationHelper.h			${MOVE_DIR}/Notation/MoveNotationHelper.cpp
+	${MOVE_DIR}/MoveHelper.h					${MOVE_DIR}/MoveHelper.cpp
+	${MOVE_DIR}/generation/MoveGeneration.h		${MOVE_DIR}/Generation/MoveGeneration.cpp
+	${MOVE_DIR}/Validation/MoveValidation.h		${MOVE_DIR}/Validation/MoveValidation.cpp
+	${MOVE_DIR}/Execution/MoveExecution.h		${MOVE_DIR}/Execution/MoveExecution.cpp
+	${MOVE_DIR}/Notation/MoveNotation.h			${MOVE_DIR}/Notation/MoveNotation.cpp
 )
 
 set(GAME_MANAGER_FILES
