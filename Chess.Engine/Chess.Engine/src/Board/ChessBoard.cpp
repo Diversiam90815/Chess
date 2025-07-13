@@ -91,6 +91,7 @@ std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos)
 void ChessBoard::removePiece(Position pos)
 {
 	LOG_DEBUG("removePiece called at x={}, y={}", pos.x, pos.y);
+
 	squares[pos.y][pos.x].piece = nullptr;
 }
 
@@ -146,9 +147,7 @@ void ChessBoard::removeAllPiecesFromBoard()
 void ChessBoard::initializeBoard()
 {
 	if (!mInitialized)
-	{
 		removeAllPiecesFromBoard();
-	}
 
 	// Place pieces for White
 	setPiece(Position(0, 0), std::make_shared<Rook>(PlayerColor::Black));

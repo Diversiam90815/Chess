@@ -15,61 +15,74 @@ MoveExecution::MoveExecution(std::shared_ptr<ChessBoard> board, std::shared_ptr<
 Move MoveExecution::executeMove(PossibleMove &possibleMove, bool fromRemote)
 {
 	// Store positions in Move from executed PossibleMove
-	Move  executedMove		= Move(possibleMove);
+	Move  executedMove = Move(possibleMove);
 
 	// Store the moved piece type
-	auto &movedPiece		= mChessBoard->getPiece(possibleMove.start);
-	auto  movedPieceType	= movedPiece->getType();
-	auto  player			= mChessBoard->getPiece(possibleMove.start)->getColor();
+	auto &movedPiece   = mChessBoard->getPiece(possibleMove.start);
+
+	if (!movedPiece)
+	{
+		LOG_ERROR("The piece that has been moved is empty. Position was x:{}, y:{}", possibleMove.start.x, possibleMove.start.y);
+		return {};
+	}
+
+	auto movedPieceType		= movedPiece->getType();
+	auto player				= mChessBoard->getPiece(possibleMove.start)->getColor();
 
 	executedMove.movedPiece = movedPieceType;
 	executedMove.player		= player;
+	bool capturedPiece		= false;
 
-	movedPiece->increaseMoveCounter();
-
-	if (movedPiece->getType() == PieceType::King)
 	{
-		mChessBoard->updateKingsPosition(executedMove.endingPosition, movedPiece->getColor());
-	}
+		std::lock_guard<std::mutex> lock(mExecutionMutex);
 
-	// Store if this move captured another piece
-	bool capturedPiece = (possibleMove.type & MoveType::Capture) == MoveType::Capture;
-	if (capturedPiece)
-	{
-		auto &pieceCaptured = mChessBoard->getPiece(possibleMove.end);
-		if (pieceCaptured)
+		movedPiece->increaseMoveCounter();
+
+		if (movedPieceType == PieceType::King)
 		{
-			auto capturedPieceType	   = pieceCaptured->getType();
-			executedMove.capturedPiece = capturedPieceType;
+			mChessBoard->updateKingsPosition(executedMove.endingPosition, movedPiece->getColor());
+		}
+
+		// Store if this move captured another piece
+		capturedPiece = (possibleMove.type & MoveType::Capture) == MoveType::Capture;
+		if (capturedPiece)
+		{
+			auto &pieceCaptured = mChessBoard->getPiece(possibleMove.end);
+			if (pieceCaptured)
+			{
+				auto capturedPieceType	   = pieceCaptured->getType();
+				executedMove.capturedPiece = capturedPieceType;
+				mChessBoard->movePiece(possibleMove.start, possibleMove.end);
+			}
+		}
+
+
+		if ((possibleMove.type & MoveType::EnPassant) == MoveType::EnPassant)
+		{
+			bool result = executeEnPassantMove(possibleMove, player);
+			if (result)
+			{
+				executedMove.capturedPiece = PieceType::Pawn;
+			}
+		}
+
+		if ((possibleMove.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (possibleMove.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
+		{
+			executeCastlingMove(possibleMove);
+		}
+
+		if ((possibleMove.type & MoveType::Normal) == MoveType::Normal || (possibleMove.type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush)
+		{
 			mChessBoard->movePiece(possibleMove.start, possibleMove.end);
 		}
-	}
 
-
-	if ((possibleMove.type & MoveType::EnPassant) == MoveType::EnPassant)
-	{
-		bool result = executeEnPassantMove(possibleMove, player);
-		if (result)
+		if ((possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
 		{
-			executedMove.capturedPiece = PieceType::Pawn;
+			executePawnPromotion(possibleMove, executedMove.player);
+			executedMove.promotionType = possibleMove.promotionPiece;
 		}
-	}
 
-	if ((possibleMove.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (possibleMove.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
-	{
-		executeCastlingMove(possibleMove);
-	}
-
-	if ((possibleMove.type & MoveType::Normal) == MoveType::Normal || (possibleMove.type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush)
-	{
-		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
-	}
-
-	if ((possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
-	{
-		executePawnPromotion(possibleMove, executedMove.player);
-		executedMove.promotionType = possibleMove.promotionPiece;
-	}
+	} // End critical section
 
 	PlayerColor opponent	 = player == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
 	auto		opponentKing = mChessBoard->getKingsPosition(opponent);
