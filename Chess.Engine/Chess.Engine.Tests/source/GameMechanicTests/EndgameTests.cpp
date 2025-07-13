@@ -18,7 +18,7 @@
 namespace GameMechanicTests
 {
 
-class EndgameTest : public ::testing::Test
+class EndgameTests : public ::testing::Test
 {
 protected:
 	GameManager					   *mGameManager;
@@ -27,7 +27,7 @@ protected:
 	std::shared_ptr<MoveValidation> mValidation;
 	std::shared_ptr<MoveExecution>	mExecution;
 	std::shared_ptr<MoveGeneration> mGeneration;
-	
+
 
 	void							SetUp() override
 	{
@@ -112,7 +112,85 @@ protected:
 };
 
 
+TEST_F(EndgameTests, GetWinnerReturnsNulloptWhenNoMoves)
+{
+	auto winner = mGameManager->getWinner();
 
-
-
+	EXPECT_FALSE(winner.has_value()) << "getWinner should return nullopt when no moves have been made";
 }
+
+
+TEST_F(EndgameTests, GetWinnerReturnsNulloptForNonCheckmateMoves)
+{
+	// Set up a normal move (no checkmate) from e2 -> e4
+	PossibleMove normalMove;
+	normalMove.start = {4, 6};
+	normalMove.end	 = {
+		  4,
+		  4,
+	  };
+	normalMove.type = MoveType::Normal;
+
+	Move executedMove(normalMove);
+	executedMove.player		= PlayerColor::White;
+	executedMove.type		= MoveType::Normal;
+	executedMove.movedPiece = PieceType::Pawn;
+
+	mExecution->addMoveToHistory(executedMove);
+
+	// Get the winner
+	auto winner = mGameManager->getWinner();
+
+	EXPECT_FALSE(winner.has_value()) << "getWinner should return nullopt for non-checkmate moves";
+}
+
+
+TEST_F(EndgameTests, GetWinnerReturnsCorrectPlayerForWhiteCheckmate)
+{
+	// Simulate a checkmate move by white
+	PossibleMove checkmateMove;
+	checkmateMove.start = {5, 2}; // f6
+	checkmateMove.end	= {5, 1}; // f7
+	checkmateMove.type	= MoveType::Normal | MoveType::Checkmate;
+
+	Move executedMove(checkmateMove);
+	executedMove.player		= PlayerColor::White;
+	executedMove.type		= MoveType::Checkmate | MoveType::Normal;
+	executedMove.movedPiece = PieceType::Queen;
+
+	mExecution->addMoveToHistory(executedMove);
+
+	auto winner = mGameManager->getWinner();
+
+	ASSERT_TRUE(winner.has_value()) << "getWinner should return a player for checkmate moves";
+	EXPECT_EQ(winner.value(), PlayerColor::White) << "Whites should be the winner after delivering checkmate";
+}
+
+
+TEST_F(EndgameTests, GetWinnerReturnsCoeectPlayerForBlackCheckmate)
+{
+	// Simulate a checkmate move by black
+	PossibleMove checkmateMove;
+	checkmateMove.start = {3, 1}; // d7
+	checkmateMove.end	= {3, 2}; // d6
+	checkmateMove.type	= MoveType::Checkmate | MoveType::Normal;
+
+	Move executedMove(checkmateMove);
+	executedMove.player		= PlayerColor::Black;
+	executedMove.type		= MoveType::Checkmate | MoveType::Normal;
+	executedMove.movedPiece = PieceType::Queen;
+
+	mExecution->addMoveToHistory(executedMove);
+
+	auto winner = mGameManager->getWinner();
+
+	ASSERT_TRUE(winner.has_value()) << "getWinner should return a player for checkmate moves";
+	EXPECT_EQ(winner.value(), PlayerColor::Black) << "Black should be the winner after delivering checkmate";
+}
+
+
+
+
+
+
+} // namespace GameMechanicTests
