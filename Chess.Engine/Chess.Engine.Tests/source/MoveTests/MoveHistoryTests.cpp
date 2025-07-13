@@ -10,7 +10,7 @@
 #include "GameEngine.h"
 #include "Execution/MoveExecution.h"
 
-namespace GameMechanicTests
+namespace MoveTests
 {
 
 class MoveHistoryTests : public ::testing::Test

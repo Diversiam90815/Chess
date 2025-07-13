@@ -16,24 +16,25 @@ namespace MoveTests
 class MoveNotationTests : public ::testing::Test
 {
 protected:
-	std::unique_ptr<MoveNotation> mNotationHelper;
+	std::unique_ptr<MoveNotation>		mNotationHelper;
 
-	void						  SetUp() override { mNotationHelper = std::make_unique<MoveNotation>(); }
+	void								SetUp() override { mNotationHelper = std::make_unique<MoveNotation>(); }
 
-	void						  TearDown() override { mNotationHelper.reset(); }
+	void								TearDown() override { mNotationHelper.reset(); }
 
 	// Helper to create a Move object with all necessary fields
-	Move						  CreateMove(Position  start,
-											 Position  end,
-											 PieceType movedPiece,
-											 MoveType  type			  = MoveType::Normal,
-											 PieceType capturedPiece  = PieceType::DefaultType,
-											 PieceType promotionPiece = PieceType::DefaultType)
+	Move								CreateMove(Position	 start,
+												   Position	 end,
+												   PieceType movedPiece,
+												   MoveType	 type			= MoveType::Normal,
+												   PieceType capturedPiece	= PieceType::DefaultType,
+												   PieceType promotionPiece = PieceType::DefaultType)
 	{
 		Move move(start, end, movedPiece, capturedPiece, type, promotionPiece);
 		return move;
 	}
 };
+
 
 
 
@@ -450,4 +451,6 @@ TEST_F(MoveNotationTests, InvalidPieceType)
 }
 
 
-} // namespace MoveTests
+}
+
+
