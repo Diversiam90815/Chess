@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.1.0.646)
+set(CHESS_VERSION 1.1.0.664)
 
 project(Chess.Engine VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
@@ -30,6 +30,7 @@ set (SUBMODULES_DIR         ${PROJECT_SOURCE_DIR}/submodule)
 set (PIECE_DIR              ${SOURCE_DIR}/Piece)
 set (MOVE_DIR               ${SOURCE_DIR}/Moves)
 set (GAME_MANAGER_DIR       ${SOURCE_DIR}/GameManager)
+set (GAME_ENGINE_DIR		${SOURCE_DIR}/GameEngine)
 set (BOARD_DIR              ${SOURCE_DIR}/Board)
 set (PLAYER_DIR             ${SOURCE_DIR}/Player)
 set (API_DIR                ${SOURCE_DIR}/API)
@@ -52,6 +53,7 @@ set(ALL_PROJECT_DIRS
 			${PIECE_DIR}
 			${MOVE_DIR}
 			${GAME_MANAGER_DIR}
+			${GAME_ENGINE_DIR}
 			${BOARD_DIR}
 			${PLAYER_DIR}
 			${API_DIR}
@@ -81,6 +83,10 @@ set(API_FILES
 
 set(STATEMACHINE_FILES
 	${STATEMACHINE_DIR}/StateMachine.h	${STATEMACHINE_DIR}/StateMachine.cpp
+)
+
+set(GAMEENGINE_FILES
+	${GAME_ENGINE_DIR}/GameEngine.h	${GAME_ENGINE_DIR}/GameEngine.cpp
 )
 
 set(PIECE_FILES
@@ -172,6 +178,7 @@ set(MULTIPLAYER_FILES
 set(ALL_FILES
 	${API_FILES}
 	${PIECE_FILES}
+	${GAMEENGINE_FILES}
 	${BOARD_FILES}
 	${MOVE_FILES}
 	${GAME_MANAGER_FILES}

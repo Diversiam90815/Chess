@@ -7,12 +7,8 @@
 
 #pragma once
 
-#include <optional>
-
 #include "EngineAPIDefines.h"
-#include "MoveExecution.h"
-#include "MoveGeneration.h"
-#include "MoveValidation.h"
+#include "GameEngine.h"
 #include "Player.h"
 #include "Logging.h"
 #include "UserSettings.h"
@@ -26,7 +22,7 @@
 class StateMachine;
 
 
-class GameManager : public IGameObservable
+class GameManager
 {
 public:
 	~GameManager();
@@ -44,15 +40,9 @@ public:
 
 	void						resetGame();
 
-	void						endGame(EndGameState state, PlayerColor player) override;
-
 	std::optional<PlayerColor>	getWinner() const;
 
-	void						clearState();
-
 	void						setDelegate(PFN_CALLBACK pDelegate);
-
-	PieceType					getCurrentPieceTypeAtPosition(const Position position);
 
 	std::vector<PossibleMove>	getPossibleMoveForPosition();
 
@@ -67,9 +57,6 @@ public:
 
 	void						setLocalPlayerName(std::string name);
 	std::string					getLocalPlayerName();
-
-	void						changeCurrentPlayer(PlayerColor player) override;
-	PlayerColor					getCurrentPlayer() const;
 
 	void						setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
 	std::string					getBoardTheme() { return mUserSettings.getCurrentBoardTheme(); }
@@ -118,20 +105,7 @@ private:
 
 	PlayerName							mPlayerName;
 
-	bool								mMovesGeneratedForCurrentTurn = false;
-
-	Player								mWhitePlayer;
-	Player								mBlackPlayer;
-
-	PlayerColor							mCurrentPlayer = PlayerColor::NoColor;
-
-	std::vector<PossibleMove>			mAllMovesForPosition;
-
-	std::shared_ptr<ChessBoard>			mChessBoard;
-
-	std::shared_ptr<MoveGeneration>		mMoveGeneration;
-	std::shared_ptr<MoveValidation>		mMoveValidation;
-	std::shared_ptr<MoveExecution>		mMoveExecution;
+	std::shared_ptr<GameEngine>			mEngine;
 
 	std::shared_ptr<UICommunication>	mUiCommunicationLayer;
 

@@ -139,7 +139,7 @@ namespace Chess.UI.Services
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetCurrentPieceTheme", CharSet = CharSet.Unicode)]
         public static extern void SetCurrentPieceTheme([In()][MarshalAs(UnmanagedType.LPStr)] string theme);
-    
+
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetCurrentPieceTheme", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string GetCurrentPieceTheme();
@@ -374,7 +374,6 @@ namespace Chess.UI.Services
         };
 
 
-
         [StructLayout(LayoutKind.Sequential)]
         public struct ConnectionStatusEvent
         {
@@ -387,6 +386,13 @@ namespace Chess.UI.Services
         };
 
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct EndGameStateEvent
+        {
+            public EndGameState State;
+            public PlayerColor winner;
+        };
+
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
         public struct NetworkAdapter
@@ -395,6 +401,7 @@ namespace Chess.UI.Services
             public string name;
             public int id;
         }
+
 
         #endregion  // Structures and Enums
     }

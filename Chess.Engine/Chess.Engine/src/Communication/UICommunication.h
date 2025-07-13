@@ -50,6 +50,12 @@ struct MoveHistoryEvent
 	char moveNotation[MAX_STRING_LENGTH]; // If move is being added, this is the move notation
 };
 
+struct EndgameStateEvent
+{
+	EndGameState state;
+	PlayerColor	 winner = PlayerColor::NoColor;
+};
+
 
 class UICommunication : public IMoveObserver, public IGameObserver, public IPlayerObserver, public IGameStateObserver, public IConnectionStatusObserver
 {

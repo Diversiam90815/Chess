@@ -9,7 +9,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using WinRT.Chess_GameVtableClasses;
 
 
 namespace Chess.UI.ViewModels

@@ -15,7 +15,7 @@ namespace Chess.UI.Models.Interfaces
         event Action PossibleMovesCalculated;
         event Action<PlayerColor> PlayerChanged;
         event Action GameStateInitSucceeded;
-        event Action<EndGameState> GameOverEvent;
+        event Action<EndGameState, PlayerColor> GameOverEvent;
         event Action NewBoardFromBackendEvent;
         event Action PawnPromotionEvent;
 

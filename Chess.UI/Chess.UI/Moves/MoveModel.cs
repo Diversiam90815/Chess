@@ -81,9 +81,12 @@ namespace Chess.UI.Moves
         }
 
 
-        public void HandleEndGameState(EndGameState endgame)
+        public void HandleEndGameState(EndGameStateEvent endgame)
         {
-            GameOverEvent?.Invoke(endgame);
+            EndGameState state = endgame.State;
+            PlayerColor winner = endgame.winner;
+
+            GameOverEvent?.Invoke(state, winner);
         }
 
 
@@ -128,7 +131,7 @@ namespace Chess.UI.Moves
         public event Action<PlayerColor> PlayerChanged;
         public event Action RemotePlayersTurn;
         public event Action GameStateInitSucceeded;
-        public event Action<EndGameState> GameOverEvent;
+        public event Action<EndGameState, PlayerColor> GameOverEvent;
         public event Action NewBoardFromBackendEvent;
         public event Action PawnPromotionEvent;
     }

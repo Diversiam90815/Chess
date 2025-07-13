@@ -129,9 +129,8 @@ namespace Chess.UI.Services
 
         private void HandleEndGameState(nint data)
         {
-            int endGame = Marshal.ReadInt32(data);
-            EndGameState state = (EndGameState)endGame;
-            EndGameStateEvent?.Invoke(state);
+            EndGameStateEvent endgameEvent = (EndGameStateEvent)Marshal.PtrToStructure(data, typeof(EndGameStateEvent));
+            EndGameStateEvent?.Invoke(endgameEvent);
         }
 
 
@@ -172,7 +171,7 @@ namespace Chess.UI.Services
         public event Action<MoveHistoryEvent> MoveHistoryUpdated;
         public event Action<PlayerCapturedPiece> PlayerCapturedPieceEvent;
         public event Action<EngineAPI.Score> PlayerScoreUpdated;
-        public event Action<EndGameState> EndGameStateEvent;
+        public event Action<EndGameStateEvent> EndGameStateEvent;
         public event Action<ConnectionStatusEvent> ConnectionStatusEvent;
         public event Action<PlayerColor> MultiPlayerChosenByRemote;
 

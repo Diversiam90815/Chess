@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <set>
+#include <mutex>
 
 #include "MoveValidation.h"
 
@@ -49,4 +50,6 @@ private:
 	std::shared_ptr<MoveNotationHelper> mMoveNotation;
 
 	std::set<Move>						mMoveHistory;
+
+	std::mutex							mExecutionMutex;
 };

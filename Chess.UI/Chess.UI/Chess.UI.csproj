@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Product>Chess Game</Product>
+		<Product>Chess</Product>
 		<AssemblyName>$(Product)</AssemblyName>
 	</PropertyGroup>
 
@@ -55,7 +55,7 @@
 		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Debug'">..\..\Chess.Engine\build\Chess.Engine\Debug</LocalChessLogicFiles>
 		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
 		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-		<PackageCertificateThumbprint>1E78FA83BFB0BB085640F0BA80FFCBE6725475EA</PackageCertificateThumbprint>
+		<PackageCertificateThumbprint>F0B1A6F3B7078207995ED0EC06C1335832F2CD0F</PackageCertificateThumbprint>
 		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
 		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
 		<AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
@@ -64,6 +64,7 @@
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<PackageIcon>Assets\Logo\Chess.ico</PackageIcon>
 		<ApplicationIcon>Assets\Logo\Chess.ico</ApplicationIcon>
+		<AppxPackageDir>C:\Users\QA\Documents\Repositories\PrivateRepo\Chess-Game\Package\</AppxPackageDir>
 	</PropertyGroup>
 
 	<!-- Add the Chess Logic DLL library to project -->
@@ -76,6 +77,10 @@
 			<Link>%(Filename)%(Extension)</Link>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="..\..\Chess.Engine\build\Chess.Engine\Debug\ChessEngine.dll" />
+	  <None Remove="..\..\Chess.Engine\build\Chess.Engine\Debug\ChessEngine.pdb" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Chess.Engine\build\Chess.Engine\Chess.Engine.vcxproj" />
