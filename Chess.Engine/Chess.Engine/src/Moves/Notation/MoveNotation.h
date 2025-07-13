@@ -1,6 +1,6 @@
 /*
   ==============================================================================
-	Module:         MoveNotationHelper
+	Module:         MoveNotation
 	Description:    Transforming the Move class into a Standart Algebraic Notation string
   ==============================================================================
 */
@@ -13,15 +13,14 @@
 #include "MoveType.h"
 
 
-class MoveNotationHelper
+class MoveNotation
 {
 public:
-	MoveNotationHelper();
-	~MoveNotationHelper();
+	MoveNotation();
+	~MoveNotation();
 
 	std::string generateStandardAlgebraicNotation(Move &move);
 
-private:
 	std::string castlingToSAN(Move &move);
 
 	std::string getPositionString(Position &pos);

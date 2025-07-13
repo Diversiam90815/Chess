@@ -1,24 +1,20 @@
 /*
   ==============================================================================
-	Module:         MoveNotationHelper
+	Module:         MoveNotation
 	Description:    Transforming the Move class into a Standart Algebraic Notation string
   ==============================================================================
 */
 
-#include "MoveNotationHelper.h"
+#include "MoveNotation.h"
 
 
-MoveNotationHelper::MoveNotationHelper()
-{
-}
+MoveNotation::MoveNotation() {}
 
 
-MoveNotationHelper::~MoveNotationHelper()
-{
-}
+MoveNotation::~MoveNotation() {}
 
 
-std::string MoveNotationHelper::generateStandardAlgebraicNotation(Move &move)
+std::string MoveNotation::generateStandardAlgebraicNotation(Move &move)
 {
 	// Handle castling
 	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
@@ -31,8 +27,8 @@ std::string MoveNotationHelper::generateStandardAlgebraicNotation(Move &move)
 	// Get the piece character
 	char		pieceChar = getPieceType(move.movedPiece);
 
-	// Determine if the move is a capture
-	bool		isCapture = (move.type & MoveType::Capture) == MoveType::Capture;
+	// Determine if the move is a capture (regular capture OR en passant)
+	bool		isCapture = (move.type & MoveType::Capture) == MoveType::Capture || (move.type & MoveType::EnPassant) == MoveType::EnPassant;
 
 	// Handle pawn moves
 	if (move.movedPiece == PieceType::Pawn)
@@ -93,19 +89,31 @@ std::string MoveNotationHelper::generateStandardAlgebraicNotation(Move &move)
 }
 
 
-std::string MoveNotationHelper::castlingToSAN(Move &move)
+std::string MoveNotation::castlingToSAN(Move &move)
 {
+	std::string castlingNotation{};
+
 	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside)
-		return "O-O";
+	{
+		castlingNotation = "O-O";
+
+		if ((move.type & MoveType::Check) == MoveType::Check)
+			castlingNotation += '+';
+	}
 
 	else if ((move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
-		return "O-O-O";
+	{
+		castlingNotation = "O-O-O";
 
-	return "";
+		if ((move.type & MoveType::Check) == MoveType::Check)
+			castlingNotation += '+';
+	}
+
+	return castlingNotation;
 }
 
 
-std::string MoveNotationHelper::getPositionString(Position &pos)
+std::string MoveNotation::getPositionString(Position &pos)
 {
 	std::string positionString;
 	positionString += getFileFromPosition(pos);
@@ -114,19 +122,19 @@ std::string MoveNotationHelper::getPositionString(Position &pos)
 }
 
 
-char MoveNotationHelper::getFileFromPosition(Position &pos)
+char MoveNotation::getFileFromPosition(Position &pos)
 {
 	return 'a' + pos.x;
 }
 
 
-char MoveNotationHelper::getRankFromPosition(Position &pos)
+char MoveNotation::getRankFromPosition(Position &pos)
 {
 	return '8' - pos.y;
 }
 
 
-char MoveNotationHelper::getPieceType(PieceType type)
+char MoveNotation::getPieceType(PieceType type)
 {
 	switch (type)
 	{
