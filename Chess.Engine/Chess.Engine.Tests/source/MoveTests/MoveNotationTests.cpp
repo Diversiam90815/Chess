@@ -277,7 +277,7 @@ TEST_F(MoveNotationTests, BishopMove)
 	Move		bishopMove = CreateMove({2, 7}, {5, 4}, PieceType::Bishop, MoveType::Normal);
 
 	std::string notation   = mNotationHelper->generateStandardAlgebraicNotation(bishopMove);
-	EXPECT_EQ(notation, "Bc4") << "Bishop move should include B and destination";
+	EXPECT_EQ(notation, "Bf4") << "Bishop move should include B and destination";
 }
 
 
