@@ -25,16 +25,16 @@ public:
 
 	void					   init();
 	void					   reset();
+
+	void					   startGame();
 	void					   resetGame();
 
 	void					   executeMove(PossibleMove &tmpMove, bool fromRemote = false);
-
 	void					   undoMove();
 
 	PieceType				   getCurrentPieceTypeAtPosition(const Position position);
 
 	std::vector<PossibleMove>  getPossibleMoveForPosition();
-
 
 	bool					   getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE]);
 
@@ -43,14 +43,9 @@ public:
 
 	std::optional<PlayerColor> getWinner() const;
 
-
+	void					   endGame(EndGameState state, PlayerColor player = PlayerColor::NoColor) override;
 	void					   changeCurrentPlayer(PlayerColor player) override;
 	PlayerColor				   getCurrentPlayer() const;
-
-	void					   endGame(EndGameState state, PlayerColor player = PlayerColor::NoColor) override;
-
-	void					   startGame();
-
 
 	void					   setLocalPlayer(PlayerColor player);
 	PlayerColor				   getLocalPlayer() const;

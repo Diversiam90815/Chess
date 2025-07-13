@@ -94,6 +94,7 @@ bool GameEngine::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 	return true;
 }
 
+
 void GameEngine::startGame()
 {
 	switchTurns();
@@ -123,6 +124,7 @@ PlayerColor GameEngine::getCurrentPlayer() const
 {
 	return mCurrentPlayer;
 }
+
 
 EndGameState GameEngine::checkForEndGameConditions()
 {
@@ -166,6 +168,7 @@ EndGameState GameEngine::checkForEndGameConditions()
 	LOG_WARNING("Couldn't find the last move! Game is still on-going");
 	return EndGameState::OnGoing;
 }
+
 
 void GameEngine::setLocalPlayer(PlayerColor player)
 {
