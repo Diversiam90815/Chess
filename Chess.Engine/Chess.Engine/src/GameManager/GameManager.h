@@ -7,12 +7,8 @@
 
 #pragma once
 
-#include <optional>
-
 #include "EngineAPIDefines.h"
-#include "MoveExecution.h"
-#include "MoveGeneration.h"
-#include "MoveValidation.h"
+#include "GameEngine.h"
 #include "Player.h"
 #include "Logging.h"
 #include "UserSettings.h"
@@ -26,7 +22,7 @@
 class StateMachine;
 
 
-class GameManager : public IGameObservable
+class GameManager
 {
 public:
 	~GameManager();
@@ -44,7 +40,7 @@ public:
 
 	void						resetGame();
 
-	void						endGame(EndGameState state, PlayerColor player = PlayerColor::NoColor) override;
+	// void						endGame(EndGameState state, PlayerColor player = PlayerColor::NoColor) override;
 
 	std::optional<PlayerColor>	getWinner() const;
 
@@ -52,7 +48,7 @@ public:
 
 	void						setDelegate(PFN_CALLBACK pDelegate);
 
-	PieceType					getCurrentPieceTypeAtPosition(const Position position);
+	// PieceType					getCurrentPieceTypeAtPosition(const Position position);
 
 	std::vector<PossibleMove>	getPossibleMoveForPosition();
 
@@ -68,8 +64,8 @@ public:
 	void						setLocalPlayerName(std::string name);
 	std::string					getLocalPlayerName();
 
-	void						changeCurrentPlayer(PlayerColor player) override;
-	PlayerColor					getCurrentPlayer() const;
+	// void						changeCurrentPlayer(PlayerColor player) override;
+	// PlayerColor					getCurrentPlayer() const;
 
 	void						setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
 	std::string					getBoardTheme() { return mUserSettings.getCurrentBoardTheme(); }
@@ -118,20 +114,22 @@ private:
 
 	PlayerName							mPlayerName;
 
-	bool								mMovesGeneratedForCurrentTurn = false;
+	std::shared_ptr<GameEngine>			mEngine;
 
-	Player								mWhitePlayer;
-	Player								mBlackPlayer;
+	// bool								mMovesGeneratedForCurrentTurn = false;
 
-	PlayerColor							mCurrentPlayer = PlayerColor::NoColor;
+	// Player								mWhitePlayer;
+	// Player								mBlackPlayer;
 
-	std::vector<PossibleMove>			mAllMovesForPosition;
+	// PlayerColor							mCurrentPlayer = PlayerColor::NoColor;
 
-	std::shared_ptr<ChessBoard>			mChessBoard;
+	// std::vector<PossibleMove>			mAllMovesForPosition;
 
-	std::shared_ptr<MoveGeneration>		mMoveGeneration;
-	std::shared_ptr<MoveValidation>		mMoveValidation;
-	std::shared_ptr<MoveExecution>		mMoveExecution;
+	// std::shared_ptr<ChessBoard>			mChessBoard;
+
+	// std::shared_ptr<MoveGeneration>		mMoveGeneration;
+	// std::shared_ptr<MoveValidation>		mMoveValidation;
+	// std::shared_ptr<MoveExecution>		mMoveExecution;
 
 	std::shared_ptr<UICommunication>	mUiCommunicationLayer;
 

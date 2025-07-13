@@ -44,14 +44,17 @@ bool GameManager::init()
 
 	mUiCommunicationLayer = std::make_shared<UICommunication>();
 
-	mChessBoard			  = std::make_shared<ChessBoard>();
+	mEngine				  = std::make_shared<GameEngine>();
+	mEngine->init();
 
-	mMoveValidation		  = std::make_shared<MoveValidation>(mChessBoard);
-	mMoveExecution		  = std::make_shared<MoveExecution>(mChessBoard, mMoveValidation);
-	mMoveGeneration		  = std::make_shared<MoveGeneration>(mChessBoard, mMoveValidation, mMoveExecution);
+	// mChessBoard			  = std::make_shared<ChessBoard>();
 
-	mWhitePlayer.setPlayerColor(PlayerColor::White);
-	mBlackPlayer.setPlayerColor(PlayerColor::Black);
+	// mMoveValidation		  = std::make_shared<MoveValidation>(mChessBoard);
+	// mMoveExecution		  = std::make_shared<MoveExecution>(mChessBoard, mMoveValidation);
+	// mMoveGeneration		  = std::make_shared<MoveGeneration>(mChessBoard, mMoveValidation, mMoveExecution);
+
+	// mWhitePlayer.setPlayerColor(PlayerColor::White);
+	// mBlackPlayer.setPlayerColor(PlayerColor::Black);
 
 	mNetwork = std::make_unique<NetworkManager>();
 	mNetwork->init();
@@ -66,9 +69,11 @@ bool GameManager::startGame()
 {
 	clearState();
 
-	switchTurns();
+	mEngine->startGame();
 
-	mChessBoard->initializeBoard(); // Reset the board
+	// switchTurns();
+
+	// mChessBoard->initializeBoard(); // Reset the board
 
 	return true;
 }
@@ -76,10 +81,11 @@ bool GameManager::startGame()
 
 void GameManager::clearState()
 {
-	changeCurrentPlayer(PlayerColor::NoColor);
+	//mEngine->changeCurrentPlayer(PlayerColor::NoColor);
 
-	mAllMovesForPosition.clear();
-	mMovesGeneratedForCurrentTurn = false; // Reset flag
+	mEngine->reset();
+	// mAllMovesForPosition.clear();
+	// mMovesGeneratedForCurrentTurn = false; // Reset flag
 }
 
 
@@ -88,268 +94,285 @@ void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 	mUiCommunicationLayer->setDelegate(pDelegate);
 }
 
-
-PieceType GameManager::getCurrentPieceTypeAtPosition(const Position position)
-{
-	if (!mChessBoard)
-		return PieceType::DefaultType;
-
-	auto &chessPiece = mChessBoard->getPiece(position);
-
-	if (chessPiece)
-		return chessPiece->getType();
-
-	return PieceType::DefaultType;
-}
+//
+// PieceType GameManager::getCurrentPieceTypeAtPosition(const Position position)
+//{
+//	if (!mChessBoard)
+//		return PieceType::DefaultType;
+//
+//	auto &chessPiece = mChessBoard->getPiece(position);
+//
+//	if (chessPiece)
+//		return chessPiece->getType();
+//
+//	return PieceType::DefaultType;
+//}
 
 
 std::vector<PossibleMove> GameManager::getPossibleMoveForPosition()
 {
-	return mAllMovesForPosition;
+	return mEngine->getPossibleMoveForPosition();
+	// return mAllMovesForPosition;
 }
 
 
 bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 {
-	if (!mChessBoard)
-		return false;
+	return mEngine->getBoardState(boardState);
 
-	for (int y = 0; y < BOARD_SIZE; ++y)
-	{
-		for (int x = 0; x < BOARD_SIZE; ++x)
-		{
-			Position pos	  = {x, y};
-			auto	&piece	  = mChessBoard->getPiece(pos);
+	// if (!mChessBoard)
+	//	return false;
 
-			int		 colorVal = 0; // 0 = no color
-			int		 typeVal  = 0; // 0 = PieceType::DefaultType
+	// for (int y = 0; y < BOARD_SIZE; ++y)
+	//{
+	//	for (int x = 0; x < BOARD_SIZE; ++x)
+	//	{
+	//		Position pos	  = {x, y};
+	//		auto	&piece	  = mChessBoard->getPiece(pos);
 
-			if (piece)
-			{
-				colorVal = static_cast<int>(piece->getColor()) & 0xF;
-				typeVal	 = static_cast<int>(piece->getType()) & 0xF;
-			}
+	//		int		 colorVal = 0; // 0 = no color
+	//		int		 typeVal  = 0; // 0 = PieceType::DefaultType
 
-			// Pack color in high nibble, type in low nibble:
-			// bits [4..7] = color, bits [0..3] = piece type
-			int encoded		 = (colorVal << 4) | (typeVal & 0xF);
+	//		if (piece)
+	//		{
+	//			colorVal = static_cast<int>(piece->getColor()) & 0xF;
+	//			typeVal	 = static_cast<int>(piece->getType()) & 0xF;
+	//		}
 
-			boardState[y][x] = encoded;
-		}
-	}
-	return true;
+	//		// Pack color in high nibble, type in low nibble:
+	//		// bits [4..7] = color, bits [0..3] = piece type
+	//		int encoded		 = (colorVal << 4) | (typeVal & 0xF);
+
+	//		boardState[y][x] = encoded;
+	//	}
+	//}
+	// return true;
 }
 
 
 void GameManager::switchTurns()
 {
-	mMovesGeneratedForCurrentTurn = false;			// Reset flag for the new turn
+	mEngine->switchTurns();
 
-	if (getCurrentPlayer() == PlayerColor::NoColor) // We are in init state and set the first round's player : white
-	{
-		LOG_INFO("Since we setup the game now, we select the white player as the current player!");
-		changeCurrentPlayer(PlayerColor::White);
-		return;
-	}
+	// mMovesGeneratedForCurrentTurn = false;			// Reset flag for the new turn
 
-	if (getCurrentPlayer() == PlayerColor::White)
-	{
-		changeCurrentPlayer(PlayerColor::Black);
-		LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
+	// if (getCurrentPlayer() == PlayerColor::NoColor) // We are in init state and set the first round's player : white
+	//{
+	//	LOG_INFO("Since we setup the game now, we select the white player as the current player!");
+	//	changeCurrentPlayer(PlayerColor::White);
+	//	return;
+	// }
 
-		return;
-	}
+	// if (getCurrentPlayer() == PlayerColor::White)
+	//{
+	//	changeCurrentPlayer(PlayerColor::Black);
+	//	LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
 
-	changeCurrentPlayer(PlayerColor::White);
+	//	return;
+	//}
 
-	LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
+	// changeCurrentPlayer(PlayerColor::White);
+
+	// LOG_INFO("Current player is {}", LoggingHelper::playerColourToString(getCurrentPlayer()).c_str());
 }
 
 
 bool GameManager::calculateAllMovesForPlayer()
 {
-	if (!mMovesGeneratedForCurrentTurn)
-	{
-		LOG_INFO("We start calculating this player's possible moves!");
-		bool result					  = mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer());
-		mMovesGeneratedForCurrentTurn = true;
-		return result;
-	}
-	return false;
+	return mEngine->calculateAllMovesForPlayer();
+
+	// if (!mMovesGeneratedForCurrentTurn)
+	//{
+	//	LOG_INFO("We start calculating this player's possible moves!");
+	//	bool result					  = mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer());
+	//	mMovesGeneratedForCurrentTurn = true;
+	//	return result;
+	// }
+	// return false;
 }
 
 
 bool GameManager::initiateMove(const Position &startPosition)
 {
-	LOG_INFO("We started to initate a move with starting position {}", LoggingHelper::positionToString(startPosition).c_str());
+	return mEngine->initiateMove(startPosition);
+	// LOG_INFO("We started to initate a move with starting position {}", LoggingHelper::positionToString(startPosition).c_str());
 
-	mAllMovesForPosition.clear();
+	// mAllMovesForPosition.clear();
 
-	auto possibleMoves = mMoveGeneration->getMovesForPosition(startPosition);
+	// auto possibleMoves = mMoveGeneration->getMovesForPosition(startPosition);
 
-	mAllMovesForPosition.reserve(possibleMoves.size());
-	mAllMovesForPosition = possibleMoves;
+	// mAllMovesForPosition.reserve(possibleMoves.size());
+	// mAllMovesForPosition = possibleMoves;
 
-	LOG_INFO("Number of possible moves for the current position is {}", mAllMovesForPosition.size());
-	return true;
+	// LOG_INFO("Number of possible moves for the current position is {}", mAllMovesForPosition.size());
+	// return true;
 }
 
 
 void GameManager::executeMove(PossibleMove &tmpMove, bool fromRemote)
 {
-	PossibleMove moveToExecute{};
+	mEngine->executeMove(tmpMove, fromRemote);
 
-	if (fromRemote)
-	{
-		// Initiate move first to get all moves for current position
-		Position startPosition = tmpMove.start;
-		initiateMove(startPosition);
-	}
+	// PossibleMove moveToExecute{};
 
-	for (auto &move : mAllMovesForPosition)
-	{
-		if (move == tmpMove)
-		{
-			moveToExecute = move;
+	// if (fromRemote)
+	//{
+	//	// Initiate move first to get all moves for current position
+	//	Position startPosition = tmpMove.start;
+	//	initiateMove(startPosition);
+	// }
 
-			// On pawn promotion, assign the promotion piece type
-			if ((moveToExecute.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
-			{
-				moveToExecute.promotionPiece = tmpMove.promotionPiece;
-			}
-			break;
-		}
-	}
+	// for (auto &move : mAllMovesForPosition)
+	//{
+	//	if (move == tmpMove)
+	//	{
+	//		moveToExecute = move;
 
-	Move executedMove = mMoveExecution->executeMove(moveToExecute, fromRemote);
+	//		// On pawn promotion, assign the promotion piece type
+	//		if ((moveToExecute.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
+	//		{
+	//			moveToExecute.promotionPiece = tmpMove.promotionPiece;
+	//		}
+	//		break;
+	//	}
+	//}
 
-	LoggingHelper::logMove(executedMove);
+	// Move executedMove = mMoveExecution->executeMove(moveToExecute, fromRemote);
 
-	if (executedMove.capturedPiece != PieceType::DefaultType)
-	{
-		if (getCurrentPlayer() == PlayerColor::White)
-		{
-			mWhitePlayer.addCapturedPiece(executedMove.capturedPiece);
-			mWhitePlayer.updateScore();
-		}
-		else
-		{
-			mBlackPlayer.addCapturedPiece(executedMove.capturedPiece);
-			mBlackPlayer.updateScore();
-		}
-	}
+	// LoggingHelper::logMove(executedMove);
 
-	checkForEndGameConditions();
+	// if (executedMove.capturedPiece != PieceType::DefaultType)
+	//{
+	//	if (getCurrentPlayer() == PlayerColor::White)
+	//	{
+	//		mWhitePlayer.addCapturedPiece(executedMove.capturedPiece);
+	//		mWhitePlayer.updateScore();
+	//	}
+	//	else
+	//	{
+	//		mBlackPlayer.addCapturedPiece(executedMove.capturedPiece);
+	//		mBlackPlayer.updateScore();
+	//	}
+	// }
+
+	// checkForEndGameConditions();
 }
 
 
 void GameManager::undoMove()
 {
-	const Move *lastMove = mMoveExecution->getLastMove();
+	mEngine->undoMove();
+	// const Move *lastMove = mMoveExecution->getLastMove();
 
-	if (!lastMove)
-	{
-		LOG_WARNING("No moves found to undo!");
-		return;
-	}
+	// if (!lastMove)
+	//{
+	//	LOG_WARNING("No moves found to undo!");
+	//	return;
+	// }
 
-	mChessBoard->movePiece(lastMove->endingPosition, lastMove->startingPosition);
+	// mChessBoard->movePiece(lastMove->endingPosition, lastMove->startingPosition);
 
-	if (lastMove->capturedPiece != PieceType::DefaultType)
-	{
-		PlayerColor capturedColor  = (lastMove->player == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
-		auto		pieceToRestore = ChessPiece::CreatePiece(lastMove->capturedPiece, capturedColor);
+	// if (lastMove->capturedPiece != PieceType::DefaultType)
+	//{
+	//	PlayerColor capturedColor  = (lastMove->player == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
+	//	auto		pieceToRestore = ChessPiece::CreatePiece(lastMove->capturedPiece, capturedColor);
 
-		if (pieceToRestore)
-		{
-			mChessBoard->setPiece(lastMove->endingPosition, pieceToRestore);
-		}
+	//	if (pieceToRestore)
+	//	{
+	//		mChessBoard->setPiece(lastMove->endingPosition, pieceToRestore);
+	//	}
 
-		if (lastMove->player == PlayerColor::White)
-		{
-			mWhitePlayer.removeLastCapturedPiece();
-		}
-		else if (lastMove->player == PlayerColor::Black)
-		{
-			mBlackPlayer.removeLastCapturedPiece();
-		}
-	}
+	//	if (lastMove->player == PlayerColor::White)
+	//	{
+	//		mWhitePlayer.removeLastCapturedPiece();
+	//	}
+	//	else if (lastMove->player == PlayerColor::Black)
+	//	{
+	//		mBlackPlayer.removeLastCapturedPiece();
+	//	}
+	//}
 
-	auto &piece = mChessBoard->getPiece(lastMove->startingPosition);
+	// auto &piece = mChessBoard->getPiece(lastMove->startingPosition);
 
-	if (piece)
-		piece->decreaseMoveCounter();
+	// if (piece)
+	//	piece->decreaseMoveCounter();
 
-	mMoveExecution->removeLastMove();
+	// mMoveExecution->removeLastMove();
 }
 
 
 void GameManager::resetGame()
 {
-	mChessBoard->removeAllPiecesFromBoard();
-	mChessBoard->initializeBoard();
+	// mChessBoard->removeAllPiecesFromBoard();
+	// mChessBoard->initializeBoard();
 
-	mMoveExecution->clearMoveHistory();
+	// mMoveExecution->clearMoveHistory();
 
-	mWhitePlayer.reset();
-	mBlackPlayer.reset();
+	// mWhitePlayer.reset();
+	// mBlackPlayer.reset();
+	mEngine->resetGame();
 
 	clearState();
 }
 
-
-void GameManager::endGame(EndGameState state, PlayerColor player)
-{
-	for (auto &observer : mObservers)
-	{
-		auto obs = observer.lock();
-
-		if (obs)
-			obs->onEndGame(state, player);
-	}
-}
+//
+// void GameManager::endGame(EndGameState state, PlayerColor player)
+//{
+//	for (auto &observer : mObservers)
+//	{
+//		auto obs = observer.lock();
+//
+//		if (obs)
+//			obs->onEndGame(state, player);
+//	}
+//}
 
 
 std::optional<PlayerColor> GameManager::getWinner() const
 {
-	const Move *lastMove = mMoveExecution->getLastMove();
+	return mEngine->getWinner();
+	// const Move *lastMove = mMoveExecution->getLastMove();
 
-	if (!lastMove)
-		return std::nullopt;
+	// if (!lastMove)
+	//	return std::nullopt;
 
-	// Check if the last move resulted in a checkmate
-	bool isCheckMate = (lastMove->type & MoveType::Checkmate) == MoveType::Checkmate;
+	//// Check if the last move resulted in a checkmate
+	// bool isCheckMate = (lastMove->type & MoveType::Checkmate) == MoveType::Checkmate;
 
-	if (isCheckMate)
-		return lastMove->player;
+	// if (isCheckMate)
+	//	return lastMove->player;
 
-	return std::nullopt;
+	// return std::nullopt;
 }
 
 
 bool GameManager::checkForValidMoves(const PossibleMove &move)
 {
-	if (move.start == move.end)						// The user aborted the move by clicking the piece again
-		return false;
+	return mEngine->checkForValidMoves(move);
 
-	for (auto &possibleMove : mAllMovesForPosition) // Check if the move is a valid move
-	{
-		if (move == possibleMove)
-			return true;
-	}
+	// if (move.start == move.end)						// The user aborted the move by clicking the piece again
+	//	return false;
 
-	return false;
+	// for (auto &possibleMove : mAllMovesForPosition) // Check if the move is a valid move
+	//{
+	//	if (move == possibleMove)
+	//		return true;
+	// }
+
+	// return false;
 }
 
 
 bool GameManager::checkForPawnPromotionMove(const PossibleMove &move)
 {
-	for (auto &possibleMove : mAllMovesForPosition)
-	{
-		if (move == possibleMove)
-			return (possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion;
-	}
-	return false;
+	return mEngine->checkForPawnPromotionMove(move);
+
+	// for (auto &possibleMove : mAllMovesForPosition)
+	//{
+	//	if (move == possibleMove)
+	//		return (possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion;
+	// }
+	// return false;
 }
 
 
@@ -382,71 +405,73 @@ std::string GameManager::getLocalPlayerName()
 	return mPlayerName.getLocalPlayerName();
 }
 
+//
+// void GameManager::changeCurrentPlayer(PlayerColor player)
+//{
+//	if (mCurrentPlayer != player)
+//	{
+//		mCurrentPlayer = player;
+//
+//		for (auto &observer : mObservers)
+//		{
+//			auto obs = observer.lock();
+//
+//			if (obs)
+//				obs->onChangeCurrentPlayer(mCurrentPlayer);
+//		}
+//	}
+//}
 
-void GameManager::changeCurrentPlayer(PlayerColor player)
-{
-	if (mCurrentPlayer != player)
-	{
-		mCurrentPlayer = player;
-
-		for (auto &observer : mObservers)
-		{
-			auto obs = observer.lock();
-
-			if (obs)
-				obs->onChangeCurrentPlayer(mCurrentPlayer);
-		}
-	}
-}
-
-
-PlayerColor GameManager::getCurrentPlayer() const
-{
-	return mCurrentPlayer;
-}
+//
+// PlayerColor GameManager::getCurrentPlayer() const
+//{
+//	return mCurrentPlayer;
+//}
 
 
 EndGameState GameManager::checkForEndGameConditions()
 {
-	const Move *lastMove = mMoveExecution->getLastMove();
+	return mEngine->checkForEndGameConditions();
 
-	if (lastMove)
-	{
-		bool isCheckMate = (lastMove->type & MoveType::Checkmate) == MoveType::Checkmate;
-		if (isCheckMate)
-		{
-			LOG_INFO("Detected a Checkmate!");
+	// const Move *lastMove = mMoveExecution->getLastMove();
 
-			auto winner = getWinner();
-			if (winner.has_value())
-				endGame(EndGameState::Checkmate, winner.value());
-			else
-				endGame(EndGameState::Checkmate);
+	// if (lastMove)
+	//{
+	//	bool isCheckMate = (lastMove->type & MoveType::Checkmate) == MoveType::Checkmate;
+	//	if (isCheckMate)
+	//	{
+	//		LOG_INFO("Detected a Checkmate!");
 
-			return EndGameState::Checkmate;
-		}
+	//		auto winner = getWinner();
+	//		if (winner.has_value())
+	//			endGame(EndGameState::Checkmate, winner.value());
+	//		else
+	//			endGame(EndGameState::Checkmate);
 
-		mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer()); // Calculate all legal moves to check if we have a stalemate (no valid moves left)
-		bool isStaleMate = mMoveValidation->isStalemate(getCurrentPlayer());
-		if (isStaleMate)
-		{
-			LOG_INFO("Detected a Stalemate");
+	//		return EndGameState::Checkmate;
+	//	}
 
-			auto winner = getWinner();
-			if (winner.has_value())
-				endGame(EndGameState::StaleMate, winner.value());
-			else
-				endGame(EndGameState::StaleMate);
+	//	mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer()); // Calculate all legal moves to check if we have a stalemate (no valid moves left)
+	//	bool isStaleMate = mMoveValidation->isStalemate(getCurrentPlayer());
+	//	if (isStaleMate)
+	//	{
+	//		LOG_INFO("Detected a Stalemate");
 
-			return EndGameState::StaleMate;
-		}
+	//		auto winner = getWinner();
+	//		if (winner.has_value())
+	//			endGame(EndGameState::StaleMate, winner.value());
+	//		else
+	//			endGame(EndGameState::StaleMate);
 
-		LOG_INFO("Game is still on-going. We switch player's turns!");
-		return EndGameState::OnGoing;
-	}
+	//		return EndGameState::StaleMate;
+	//	}
 
-	LOG_WARNING("Couldn't find the last move! Game is still on-going");
-	return EndGameState::OnGoing;
+	//	LOG_INFO("Game is still on-going. We switch player's turns!");
+	//	return EndGameState::OnGoing;
+	//}
+
+	// LOG_WARNING("Couldn't find the last move! Game is still on-going");
+	// return EndGameState::OnGoing;
 }
 
 
@@ -458,26 +483,29 @@ bool GameManager::startMultiplayerGame()
 
 	// Initialize the game & board
 	clearState();
-	switchTurns();
-	mChessBoard->initializeBoard();
+	// switchTurns();
+	// mChessBoard->initializeBoard();
+
+	mEngine->startGame();
 
 	PlayerColor localPlayer = mMultiplayerManager->mLocalPlayerColor;
+	mEngine->setLocalPlayer(localPlayer);
 
-	if (localPlayer == PlayerColor::White)
-	{
-		LOG_INFO("We start as white player");
+	// if (localPlayer == PlayerColor::White)
+	//{
+	//	LOG_INFO("We start as white player");
 
-		mWhitePlayer.setIsLocalPlayer(true);
-		mBlackPlayer.setIsLocalPlayer(false);
-	}
-	else if (localPlayer == PlayerColor::Black)
-	{
-		LOG_INFO("We start as black player!");
+	//	mWhitePlayer.setIsLocalPlayer(true);
+	//	mBlackPlayer.setIsLocalPlayer(false);
+	//}
+	// else if (localPlayer == PlayerColor::Black)
+	//{
+	//	LOG_INFO("We start as black player!");
 
-		// Guests are black
-		mWhitePlayer.setIsLocalPlayer(false);
-		mBlackPlayer.setIsLocalPlayer(true);
-	}
+	//	// Guests are black
+	//	mWhitePlayer.setIsLocalPlayer(false);
+	//	mBlackPlayer.setIsLocalPlayer(true);
+	//}
 
 	initMultiplayerObservers();
 
@@ -531,12 +559,14 @@ bool GameManager::isLocalPlayerTurn()
 	if (!isMultiplayerActive())
 		return true;
 
-	PlayerColor currentPlayer	   = getCurrentPlayer();
+	PlayerColor currentPlayer	   = mEngine->getCurrentPlayer();
 
 	bool		isWhitePlayerTurn  = currentPlayer == PlayerColor::White;
 	bool		isBlackPlayerTurn  = currentPlayer == PlayerColor::Black;
+	bool		isWhiteLocal	   = mEngine->getLocalPlayer() == PlayerColor::White;
+	bool		isBlackLocal	   = mEngine->getLocalPlayer() == PlayerColor::Black;
 
-	bool		isLocalPlayersTurn = (isWhitePlayerTurn && mWhitePlayer.isLocalPlayer() || isBlackPlayerTurn && mBlackPlayer.isLocalPlayer());
+	bool		isLocalPlayersTurn = (isWhitePlayerTurn && isWhiteLocal || isBlackPlayerTurn && isBlackLocal);
 
 	LOG_INFO("Local Player's turn: {}", LoggingHelper::boolToString(isLocalPlayersTurn).c_str());
 	LOG_DEBUG("White Player's turn: {}", LoggingHelper::boolToString(isWhitePlayerTurn).c_str());
@@ -599,12 +629,11 @@ void GameManager::setLocalPlayerReady(const bool flag)
 
 void GameManager::initObservers()
 {
-	this->attachObserver(mUiCommunicationLayer);
+	mEngine->attachObserver(mUiCommunicationLayer);
 
-	mWhitePlayer.attachObserver(mUiCommunicationLayer);
-	mBlackPlayer.attachObserver(mUiCommunicationLayer);
-
-	mMoveExecution->attachObserver(mUiCommunicationLayer);
+	mEngine->mWhitePlayer.attachObserver(mUiCommunicationLayer);
+	mEngine->mBlackPlayer.attachObserver(mUiCommunicationLayer);
+	mEngine->mMoveExecution->attachObserver(mUiCommunicationLayer);
 
 	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer);
 }
@@ -618,7 +647,7 @@ void GameManager::initMultiplayerObservers()
 		return;
 	}
 
-	mMoveExecution->attachObserver(mMultiplayerManager->mRemoteSender);				   // Moves will be sent to the remote
+	mEngine->mMoveExecution->attachObserver(mMultiplayerManager->mRemoteSender);	   // Moves will be sent to the remote
 	mMultiplayerManager->mRemoteReceiver->attachObserver(StateMachine::GetInstance()); // Received moves will be handled in the state machine
 
 	LOG_DEBUG("Mulitplayer observers set up!");
@@ -627,12 +656,11 @@ void GameManager::initMultiplayerObservers()
 
 void GameManager::deinitObservers()
 {
-	this->detachObserver(mUiCommunicationLayer);
+	mEngine->detachObserver(mUiCommunicationLayer);
 
-	mWhitePlayer.detachObserver(mUiCommunicationLayer);
-	mBlackPlayer.detachObserver(mUiCommunicationLayer);
-
-	mMoveExecution->detachObserver(mUiCommunicationLayer);
+	mEngine->mWhitePlayer.detachObserver(mUiCommunicationLayer);
+	mEngine->mBlackPlayer.detachObserver(mUiCommunicationLayer);
+	mEngine->mMoveExecution->detachObserver(mUiCommunicationLayer);
 
 	StateMachine::GetInstance()->detachObserver(mUiCommunicationLayer);
 }
