@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
 
-
 namespace Chess.UI.Audio.Services
 {
     public enum UIInteraction

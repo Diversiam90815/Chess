@@ -1,4 +1,5 @@
-﻿using Chess.UI.Images;
+﻿using Chess.UI.Audio.Services;
+using Chess.UI.Images;
 using Chess.UI.Services;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,12 +24,17 @@ namespace Chess.UI.ViewModels
 
         private readonly IImageService _imageServices;
 
+        private readonly IChessAudioService _audioService;
+
         public MainMenuViewModel(IDispatcherQueueWrapper dispatcher)
         {
             _dispatcherQueue = dispatcher;
             _imageServices = App.Current.Services.GetService<IImageService>();
 
             Init();
+
+            _audioService = App.Current.Services.GetService<IChessAudioService>();
+            _ = Task.Run(async () => await _audioService.InitializeAsync());
         }
 
 
@@ -38,6 +44,11 @@ namespace Chess.UI.ViewModels
             SettingButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.Settings);
             MultiplayerButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.Multiplayer);
             EndGameButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.EndGame);
+        }
+
+        public void OnButtonClicked()
+        {
+            _ = _audioService.HandleUIInteractionAsync(UIInteraction.ButtonClick);
         }
 
         private ImageSource startGameButtonImage;

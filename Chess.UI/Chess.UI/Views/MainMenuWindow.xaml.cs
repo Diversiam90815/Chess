@@ -150,12 +150,15 @@ namespace Chess.UI
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
+            ViewModel.OnButtonClicked();
             OpenChessboardView(false);
         }
 
 
         private void MultiplayerButton_Click(object sender, RoutedEventArgs e)
         {
+            ViewModel.OnButtonClicked();
+
             if (_multiplayerWindow == null)
             {
                 _multiplayerWindow = App.Current.Services.GetService<MultiplayerWindow>();
@@ -172,6 +175,8 @@ namespace Chess.UI
 
         private void QuitButton_Click(object sender, RoutedEventArgs e)
         {
+            ViewModel.OnButtonClicked();
+
             var app = Application.Current;
             app.Exit();
         }

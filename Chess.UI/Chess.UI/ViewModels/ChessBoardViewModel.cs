@@ -14,6 +14,7 @@ using Chess.UI.Themes.Interfaces;
 using Chess.UI.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Chess.UI.Models.Interfaces;
+using Chess.UI.Audio.Services;
 
 
 namespace Chess.UI.ViewModels
@@ -46,6 +47,8 @@ namespace Chess.UI.ViewModels
 
         private readonly IImageService _imageServices;
 
+        private readonly IChessAudioService _audioService;
+
         public ImageServices.BoardTheme CurrentBoardTheme;
 
 
@@ -53,6 +56,7 @@ namespace Chess.UI.ViewModels
         {
             _dispatcherQueue = dispatcherQueue;
 
+            _audioService = App.Current.Services.GetService<IChessAudioService>();
             MoveHistoryViewModel = App.Current.Services.GetService<MoveHistoryViewModel>();
             ScoreViewModel = App.Current.Services.GetService<ScoreViewModel>();
             _moveModel = App.Current.Services.GetService<IMoveModel>();
