@@ -106,7 +106,6 @@ set(BOARD_FILES
 set(MOVE_FILES
 	${MOVE_DIR}/MoveType.h
 	${MOVE_DIR}/Move.h
-	${MOVE_DIR}/MoveSerialization.h
 	${MOVE_DIR}/MoveHelper.h					${MOVE_DIR}/MoveHelper.cpp
 	${MOVE_DIR}/generation/MoveGeneration.h		${MOVE_DIR}/Generation/MoveGeneration.cpp
 	${MOVE_DIR}/Validation/MoveValidation.h		${MOVE_DIR}/Validation/MoveValidation.cpp
