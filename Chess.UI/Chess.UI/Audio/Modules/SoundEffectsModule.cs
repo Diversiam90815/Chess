@@ -1,4 +1,5 @@
 ﻿using Chess.UI.Audio.Core;
+using Chess.UI.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
+using Windows.Storage;
 
 namespace Chess.UI.Audio.Modules
 {
@@ -150,24 +152,111 @@ namespace Chess.UI.Audio.Modules
 
         private async Task PreloadSoundEffectsAsync()
         {
+            var loadTasks = new List<Task>();
 
+            foreach (SoundEffect effect in Enum.GetValues<SoundEffect>())
+            {
+                loadTasks.Add(LoadSoundEffectAsync(effect));
+            }
+
+            await Task.WhenAll(loadTasks);
         }
 
 
         private async Task LoadSoundEffectAsync(SoundEffect effect)
         {
+            try
+            {
+                var filePath = GetSoundEffectPath(effect);
+                if (!File.Exists(filePath))
+                {
+                    Logger.LogWarning($"Sound file not found : {filePath}");
+                    return;
+                }
 
+                var file = await StorageFile.GetFileFromPathAsync(filePath);
+                var mediaSource = MediaSource.CreateFromStorageFile(file);
+
+                _soundCache.TryAdd(effect, mediaSource);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"Failed to load sound effect {effect} : {ex.Message}");
+            }
+        }
+
+
+        private async Task<MediaSource> GetMediaSourceAsync(SoundEffect effect)
+        {
+            if (_soundCache.TryGetValue(effect, out var mediaSource))
+            {
+                return mediaSource;
+            }
+
+            // Try to load on-demand if not in cache
+            await LoadSoundEffectAsync(effect);
+            _soundCache.TryGetValue(effect, out mediaSource);
+            return mediaSource;
         }
 
 
         private void InitializeMediaPlayerPool()
         {
-
+            for (int i = 0; i < _maxConcurrentSounds; ++i)
+            {
+                var mediaPlayer = new MediaPlayer();
+                _playerPool.Enqueue(mediaPlayer);
+            }
         }
+
+
+        private MediaPlayer GetMediaPlayerFromPool()
+        {
+            lock (_mediaPlayerPoolLock)
+            {
+                if (_playerPool.TryDequeue(out var player))
+                {
+                    return player;
+                }
+            }
+
+            // If pool is empty, create new temporary player
+            return new MediaPlayer();
+        }
+
+
+        private void ReturnPlayerToPool(MediaPlayer player)
+        {
+            if (player == null) return;
+
+            try
+            {
+                player.Source = null;
+                player.PlaybackRate = 1.0;
+
+                lock (_mediaPlayerPoolLock)
+                {
+                    if (_playerPool.Count < _maxConcurrentSounds)
+                    {
+                        _playerPool.Enqueue(player);
+                        return;
+                    }
+                }
+
+                // Pool is full, dispose the player
+                player.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"Error returning player to pool: {ex.Message}");
+                player?.Dispose();
+            }
+        }
+
 
         public async Task PlaySoundAsync(SoundEffect effect, float volume = 1.0f)
         {
-
+            await PlaySoundAsync(effect, volume, 1.0f);
         }
 
 
