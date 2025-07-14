@@ -1,10 +1,7 @@
 ﻿using Chess.UI.Audio.Modules;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
+
 
 namespace Chess.UI.Audio.Services
 {
@@ -14,6 +11,7 @@ namespace Chess.UI.Audio.Services
         MenuOpen,
         ItemSelected,
         PieceMove,
+        PieceSelect
     }
 
 
@@ -36,6 +34,6 @@ namespace Chess.UI.Audio.Services
         void SetSFXVolume(float volume);
         void SetMasterVolume(float volume);
 
-        ISoundEffectsModule SFXModule { get; }
+        ISoundEffectsModule SoundEffectsModule { get; }
     }
 }

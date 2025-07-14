@@ -4,12 +4,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
+
 
 namespace Chess.UI.Audio.Modules
 {
@@ -37,6 +36,7 @@ namespace Chess.UI.Audio.Modules
         ButtonClick,
         MenuOpen,
         ItemSelected,
+        PieceSelected,
 
         // Multiplayer
         OpponentJoined,
