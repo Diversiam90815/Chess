@@ -26,7 +26,7 @@ namespace Chess.UI.Audio.Core
         // Events
         event EventHandler<AudioEngineEventArgs> ModuleRegistered;
         event EventHandler<AudioEngineEventArgs> ModuleUnregistered;
-        event EventHandler<AudioEngineEventArgs> AudioError;
+        event EventHandler<AudioErrorEventArgs> AudioError;
     }
 
 
@@ -66,6 +66,20 @@ namespace Chess.UI.Audio.Core
         {
             ModuleName = moduleName;
             Status = status;
+        }
+    }
+
+    public class AudioErrorEventArgs : EventArgs
+    {
+        public string ErrorMessage { get; }
+        public Exception Exception { get; }
+        public string ModuleName { get; }
+
+        public AudioErrorEventArgs(string errorMessage, Exception exception = null, string moduleName = null)
+        {
+            ErrorMessage = errorMessage;
+            Exception = exception;
+            ModuleName = moduleName;
         }
     }
 
