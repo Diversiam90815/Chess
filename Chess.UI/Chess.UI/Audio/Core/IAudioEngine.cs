@@ -38,8 +38,10 @@ namespace Chess.UI.Audio.Core
         Task InitializeAsync();
         void Dispose();
 
-        void SetVolume(float volume);
-        float GetVolume();
+        void SetModuleVolume(float volume);          // Sets the module's own volume level
+        float GetModuleVolume();                     // Gets the module's own volume level
+        void SetMasterVolume(float masterVolume);    // Updates master volume for final calculation
+        float GetEffectiveVolume();                  // Returns module volume * master volume
 
         event EventHandler<AudioModuleEventArgs> StatusChanged;
     }
