@@ -25,12 +25,10 @@ namespace Chess.UI.Audio.Modules
         Check,
         Checkmate,
         Stalemate,
-        Draw,
 
         // Flow
         GameStart,
         GameEnd,
-        TurnChange,
 
         // UI
         ButtonClick,
