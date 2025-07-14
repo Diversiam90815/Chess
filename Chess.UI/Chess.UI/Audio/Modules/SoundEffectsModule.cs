@@ -261,7 +261,37 @@ namespace Chess.UI.Audio.Modules
 
 
         public async Task PlaySoundAsync(SoundEffect effect, float volume, float pitch)
-        { }
+        {
+            if (!_isInitialized || !IsEnabled) return;
+
+            try
+            {
+                var mediaSource = await GetMediaSourceAsync(effect);
+                if (mediaSource == null) return;
+
+                var mediaPlayer = GetMediaPlayerFromPool();
+                if (mediaPlayer == null) return;
+
+                // Calculate final volume
+                var effectiveVolume = volume * GetEffectiveVolume();
+
+                mediaPlayer.Source = mediaSource;
+                mediaPlayer.Volume = Math.Clamp(effectiveVolume, 0.0f, 1.0f);
+                mediaPlayer.PlaybackRate = Math.Clamp(pitch, 0.25, 4.0);
+
+                // Return player to pool when playback ends
+                mediaPlayer.MediaEnded += (s, e) => ReturnPlayerToPool(mediaPlayer);
+                mediaPlayer.MediaFailed += (s, e) => ReturnPlayerToPool(mediaPlayer);
+
+                mediaPlayer.Play();
+
+                SoundPlayed?.Invoke(this, new SoundPlayedEventArgs(effect, effectiveVolume));
+            }
+            catch (Exception ex)
+            {
+                StatusChanged?.Invoke(this, new AudioModuleEventArgs(ModuleName, $"Play failed for {effect}: {ex.Message}"));
+            }
+        }
 
 
         private string GetSoundEffectPath(SoundEffect effect)
