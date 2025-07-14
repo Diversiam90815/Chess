@@ -1,4 +1,6 @@
-﻿using Chess.UI.Board;
+﻿using Chess.UI.Audio.Core;
+using Chess.UI.Audio.Services;
+using Chess.UI.Board;
 using Chess.UI.Coordinates;
 using Chess.UI.Images;
 using Chess.UI.Models;
@@ -92,6 +94,10 @@ namespace Chess.UI
             services.AddTransient<MultiplayerWindow>();
             services.AddTransient<ThemePreferencesView>();
             services.AddTransient<MultiplayerPreferencesView>();
+
+            // Audio Services
+            services.AddSingleton<IAudioEngine, AudioEngine>();
+            services.AddSingleton<IChessAudioService, ChessAudioService>();
 
             services.AddTransient<PreferencesView>();
 
