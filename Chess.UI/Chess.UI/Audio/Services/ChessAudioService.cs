@@ -39,11 +39,20 @@ namespace Chess.UI.Audio.Services
             var mainMenuViewModel = App.Current.Services.GetService<MainMenuViewModel>();
             if (mainMenuViewModel != null)
             {
-                mainMenuViewModel.ButtonClicked += () => _ = HandleUIInteractionAsync(UIInteraction.ButtonClick);
-                mainMenuViewModel.StartGameRequested += () => _ = HandleUIInteractionAsync(UIInteraction.MenuOpen);
-                mainMenuViewModel.SettingsRequested += () => _ = HandleUIInteractionAsync(UIInteraction.MenuOpen);
-                mainMenuViewModel.MultiplayerRequested += () => _ = HandleUIInteractionAsync(UIInteraction.MenuOpen);
-                mainMenuViewModel.QuitRequested += () => _ = HandleUIInteractionAsync(UIInteraction.ItemSelected);
+                mainMenuViewModel.ButtonClicked += () => _ = Task.Run(async () =>
+                    await HandleUIInteractionAsync(UIInteraction.ButtonClick).ConfigureAwait(false));
+
+                mainMenuViewModel.StartGameRequested += () => _ = Task.Run(async () =>
+                    await HandleUIInteractionAsync(UIInteraction.MenuOpen).ConfigureAwait(false));
+
+                mainMenuViewModel.SettingsRequested += () => _ = Task.Run(async () =>
+                    await HandleUIInteractionAsync(UIInteraction.MenuOpen).ConfigureAwait(false));
+
+                mainMenuViewModel.MultiplayerRequested += () => _ = Task.Run(async () =>
+                    await HandleUIInteractionAsync(UIInteraction.MenuOpen).ConfigureAwait(false));
+
+                mainMenuViewModel.QuitRequested += () => _ = Task.Run(async () =>
+                    await HandleUIInteractionAsync(UIInteraction.ItemSelected).ConfigureAwait(false));
             }
         }
 

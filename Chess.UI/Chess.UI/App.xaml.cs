@@ -50,6 +50,9 @@ namespace Chess.UI
         {
             ChessLogicCommunication.Init();
 
+            var audioService = Services.GetService<IChessAudioService>();
+            audioService.InitializeAsync();
+
             MainMenu = new MainMenuWindow();
 
             MainMenu.Closed += (sender, args) =>

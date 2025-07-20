@@ -2,7 +2,6 @@ using Chess.UI.Services;
 using Chess.UI.ViewModels;
 using Chess.UI.Views;
 using Chess.UI.Wrappers;
-using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;

@@ -40,9 +40,6 @@ namespace Chess.UI.ViewModels
             _imageServices = App.Current.Services.GetService<IImageService>();
 
             Init();
-
-            _audioService = App.Current.Services.GetService<IChessAudioService>();
-            _ = Task.Run(async () => await _audioService.InitializeAsync());
         }
 
 

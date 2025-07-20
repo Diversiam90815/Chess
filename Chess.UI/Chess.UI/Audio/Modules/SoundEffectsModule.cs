@@ -203,8 +203,30 @@ namespace Chess.UI.Audio.Modules
             for (int i = 0; i < _maxConcurrentSounds; ++i)
             {
                 var mediaPlayer = new MediaPlayer();
+                mediaPlayer.AudioCategory = Windows.Media.Playback.MediaPlayerAudioCategory.GameEffects;
+
+                // Preconfigure common settings
+                mediaPlayer.Volume = 1.0f;
+                mediaPlayer.PlaybackRate = 1.0f;
+
+                // Set event handlers
+                mediaPlayer.MediaEnded += OnMediaPlayerEnded;
+                mediaPlayer.MediaFailed += OnMediaPlayerFailed;
+
                 _playerPool.Enqueue(mediaPlayer);
             }
+        }
+
+
+        private void OnMediaPlayerEnded(MediaPlayer sender, object args)
+        {
+            ReturnPlayerToPool(sender);
+        }
+
+
+        private void OnMediaPlayerFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
+        {
+            ReturnPlayerToPool(sender);
         }
 
 
@@ -273,14 +295,15 @@ namespace Chess.UI.Audio.Modules
                 // Calculate final volume
                 var effectiveVolume = volume * GetEffectiveVolume();
 
-                mediaPlayer.Source = mediaSource;
                 mediaPlayer.Volume = Math.Clamp(effectiveVolume, 0.0f, 1.0f);
-                mediaPlayer.PlaybackRate = Math.Clamp(pitch, 0.25, 4.0);
 
-                // Return player to pool when playback ends
-                mediaPlayer.MediaEnded += (s, e) => ReturnPlayerToPool(mediaPlayer);
-                mediaPlayer.MediaFailed += (s, e) => ReturnPlayerToPool(mediaPlayer);
+                // Only set playback rate if it's not default
+                if (Math.Abs(pitch - 1.0f) > 0.001f)
+                {
+                    mediaPlayer.PlaybackRate = Math.Clamp(pitch, 0.25, 4.0);
+                }
 
+                mediaPlayer.Source = mediaSource;
                 mediaPlayer.Play();
 
                 SoundPlayed?.Invoke(this, new SoundPlayedEventArgs(effect, effectiveVolume));
