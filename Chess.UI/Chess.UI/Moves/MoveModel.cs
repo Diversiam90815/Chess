@@ -32,7 +32,7 @@ namespace Chess.UI.Moves
             {
                 case GameState.InitSucceeded:
                     {
-                        HandleInitSucceeded();
+                        GameStateInitSucceeded?.Invoke();
                         break;
                     }
                 case GameState.WaitingForInput:
@@ -66,18 +66,12 @@ namespace Chess.UI.Moves
                 case GameState.WaitingForRemoteMove:
                     {
                         NewBoardFromBackendEvent?.Invoke();
-                        HandleRemotePlayersTurn();
+                        RemotePlayersTurn?.Invoke();
                         break;
                     }
                 default:
                     break;
             }
-        }
-
-
-        public void HandleInitSucceeded()
-        {
-            GameStateInitSucceeded?.Invoke();
         }
 
 
@@ -115,12 +109,6 @@ namespace Chess.UI.Moves
         {
             Logger.LogInfo("Promoting to " + pieceType.ToString());
             OnPawnPromotionChosen(pieceType);
-        }
-
-
-        private void HandleRemotePlayersTurn()
-        {
-            RemotePlayersTurn?.Invoke();
         }
 
 

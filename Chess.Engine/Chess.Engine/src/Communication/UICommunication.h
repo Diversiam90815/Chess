@@ -24,8 +24,9 @@ enum class MessageType
 	PlayerChanged			= 4,
 	GameStateChanged		= 5,
 	MoveHistoryUpdated		= 6,
-	ConnectionStateChanged	= 7,
-	MultiplayerPlayerChosen = 8,
+	MoveExecuted			= 7,
+	ConnectionStateChanged	= 8,
+	MultiplayerPlayerChosen = 9,
 };
 
 
@@ -69,7 +70,7 @@ public:
 	void onAddCapturedPiece(PlayerColor player, PieceType captured) override;
 	void onRemoveLastCapturedPiece(PlayerColor player, PieceType captured) override;
 
-	void onExecuteMove(const PossibleMove &move, bool fromRemote = false) override {}
+	void onExecuteMove(const PossibleMove &move, bool fromRemote = false) override;
 	void onAddToMoveHistory(Move &move) override;
 	void onClearMoveHistory() override;
 

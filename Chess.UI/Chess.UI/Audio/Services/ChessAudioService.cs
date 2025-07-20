@@ -46,11 +46,16 @@ namespace Chess.UI.Audio.Services
             var moveModel = App.Current.Services.GetService<IMoveModel>();
             moveModel.GameOverEvent += (EndGameState state, PlayerColor player) => _ = Task.Run(async () => await HandleEndGameStateAsync(state));
             moveModel.ChesspieceSelected += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.PieceSelect));
+
+            var backendCom = App.Current.ChessLogicCommunication;
+            backendCom.MoveExecuted += (PossibleMoveInstance move) => _ = Task.Run(async () => await HandleMoveAsync(move));
         }
 
 
-        public async Task HandleMoveAsync(PossibleMoveInstance move, bool isCapture)
+        public async Task HandleMoveAsync(PossibleMoveInstance move)
         {
+            bool isCapture = move.type.HasFlag(MoveTypeInstance.MoveType_Capture);
+
             var sfx = DetermineMoveSound(move, isCapture);
             var volume = DetermineMoveVolume(move, isCapture);
 
@@ -68,12 +73,6 @@ namespace Chess.UI.Audio.Services
             };
 
             await _soundEffectsModule?.PlaySoundAsync(sfx, 0.8f);
-        }
-
-
-        public async Task HandleCheckAsync()
-        {
-            await _soundEffectsModule?.PlaySoundAsync(SoundEffect.Check, 0.7f);
         }
 
 

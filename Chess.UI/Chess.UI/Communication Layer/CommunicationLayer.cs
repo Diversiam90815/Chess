@@ -26,8 +26,9 @@ namespace Chess.UI.Services
             PlayerChanged = 4,
             GameStateChanged = 5,
             MoveHistoryUpdated = 6,
-            ConnectionStateChanged = 7,
-            MultiplayerPlayerChosen = 8,
+            MoveExecuted = 7,
+            ConnectionStateChanged = 8,
+            MultiplayerPlayerChosen = 9,
         }
 
 
@@ -84,6 +85,11 @@ namespace Chess.UI.Services
                         HandleMoveHistoryUpdated(data);
                         break;
                     }
+                case DelegateMessage.MoveExecuted:
+                    {
+                        HandleMoveExecuted(data);
+                        break;
+                    }
                 case DelegateMessage.PlayerCapturedPiece:
                     {
                         HandlePlayerCapturedPiece(data);
@@ -116,6 +122,13 @@ namespace Chess.UI.Services
         {
             MoveHistoryEvent moveHistoryEvent = (MoveHistoryEvent)Marshal.PtrToStructure(data, typeof(MoveHistoryEvent));
             MoveHistoryUpdated?.Invoke(moveHistoryEvent);
+        }
+
+
+        private void HandleMoveExecuted(nint data)
+        {
+            PossibleMoveInstance moveInstance = (PossibleMoveInstance)Marshal.PtrToStructure(data, typeof(PossibleMoveInstance));
+            MoveExecuted?.Invoke(moveInstance);
         }
 
 
@@ -169,6 +182,7 @@ namespace Chess.UI.Services
         public event Action<PlayerColor> PlayerChanged;
         public event Action<GameState> GameStateChanged;
         public event Action<MoveHistoryEvent> MoveHistoryUpdated;
+        public event Action<PossibleMoveInstance> MoveExecuted;
         public event Action<PlayerCapturedPiece> PlayerCapturedPieceEvent;
         public event Action<EngineAPI.Score> PlayerScoreUpdated;
         public event Action<EndGameStateEvent> EndGameStateEvent;

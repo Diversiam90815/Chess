@@ -27,5 +27,6 @@ namespace Chess.UI.Communication_Layer.Interfaces
         event Action<EndGameStateEvent> EndGameStateEvent;
         event Action<ConnectionStatusEvent> ConnectionStatusEvent;
         event Action<PlayerColor> MultiPlayerChosenByRemote;
+        event Action<PossibleMoveInstance> MoveExecuted;
     }
 }
