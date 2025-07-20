@@ -23,7 +23,11 @@ namespace Chess.UI.ViewModels
 
         private readonly IThemeManager _themeManager;
 
+        public event Action ItemSelected;
+
         private bool _isInitialized = false;
+        private bool _userInteractionEnabled = false;
+
 
         public ObservableCollection<Themes.BoardTheme> BoardThemes { get; }
 
@@ -68,6 +72,7 @@ namespace Chess.UI.ViewModels
                     SelectedPieceTheme = GetCurrentSelectedPieceTheme();
 
                     _isInitialized = true;
+                    _userInteractionEnabled = true;
                 });
             }
             catch (Exception ex)
@@ -112,6 +117,9 @@ namespace Chess.UI.ViewModels
                     // Update ThemeManager’s board theme
                     // This triggers property change events in the manager
                     _themeManager.CurrentBoardTheme = value.BoardThemeID;
+
+                    if (_userInteractionEnabled)
+                        ItemSelected?.Invoke();
                 }
             }
         }
@@ -128,10 +136,14 @@ namespace Chess.UI.ViewModels
                     _selectedPieceTheme = value;
                     if (value != null)
                         Settings.Settings.CurrentPieceTheme = value.Name;
+
                     OnPropertyChanged();
 
                     // Update ThemeManager’s piece theme
                     _themeManager.CurrentPieceTheme = value.PieceThemeID;
+
+                    if (_userInteractionEnabled)
+                        ItemSelected?.Invoke();
                 }
             }
         }

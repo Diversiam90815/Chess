@@ -31,11 +31,11 @@ namespace Chess.UI.Audio.Services
             await _audioEngine.InitializeAsync();
 
             // Subscribe to the events from the viewmodels
-            SubscribeToViewModelEvents();
+            SubscribeToEvents();
         }
 
 
-        private void SubscribeToViewModelEvents()
+        private void SubscribeToEvents()
         {
             var mainMenuViewModel = App.Current.Services.GetService<MainMenuViewModel>();
             mainMenuViewModel.ButtonClicked += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ButtonClick));
@@ -49,6 +49,9 @@ namespace Chess.UI.Audio.Services
 
             var backendCom = App.Current.ChessLogicCommunication;
             backendCom.MoveExecuted += (PossibleMoveInstance move) => _ = Task.Run(async () => await HandleMoveAsync(move));
+
+            var themePreferences = App.Current.Services.GetService<ThemePreferencesViewModel>();
+            themePreferences.ItemSelected += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ItemSelected));
         }
 
 
