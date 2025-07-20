@@ -2,6 +2,7 @@
 using Chess.UI.Board;
 using Chess.UI.Images;
 using Chess.UI.Services;
+using Chess.UI.Styles;
 using Chess.UI.ViewModels;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
@@ -464,7 +465,7 @@ namespace Chess.UI.Views
 
                     var image = new Image
                     {
-                        Source = _images.GetPieceImage(ImageServices.PieceTheme.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
+                        Source = _images.GetPieceImage(PieceStyle.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
                         Stretch = Stretch.Uniform
                     };
 

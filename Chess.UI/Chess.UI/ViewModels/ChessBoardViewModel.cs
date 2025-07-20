@@ -6,16 +6,13 @@ using static Chess.UI.Services.EngineAPI;
 using System.Collections.ObjectModel;
 using System;
 using System.Threading.Tasks;
-using Chess.UI.Themes;
+using Chess.UI.Styles;
 using Chess.UI.Board;
 using Chess.UI.Images;
 using Chess.UI.Wrappers;
-using Chess.UI.Themes.Interfaces;
 using Chess.UI.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Chess.UI.Models.Interfaces;
-using Chess.UI.Audio.Services;
-using Windows.Devices.Enumeration;
 
 
 namespace Chess.UI.ViewModels
@@ -41,7 +38,7 @@ namespace Chess.UI.ViewModels
 
         public MultiplayerViewModel MultiplayerViewModel { get; }
 
-        private readonly IThemeManager _themeManager;
+        private readonly IStyleManager _styleManager;
 
         private readonly IMoveModel _moveModel;
 
@@ -51,7 +48,7 @@ namespace Chess.UI.ViewModels
 
         private readonly IImageService _imageServices;
 
-        public ImageServices.BoardTheme CurrentBoardTheme;
+        public BoardStyle CurrentBoardStyle;
 
 
         public ChessBoardViewModel(IDispatcherQueueWrapper dispatcherQueue)
@@ -64,7 +61,7 @@ namespace Chess.UI.ViewModels
             _boardModel = App.Current.Services.GetService<IBoardModel>();
             _coordinate = App.Current.Services.GetService<IChessCoordinate>();
             _imageServices = App.Current.Services.GetService<IImageService>();
-            _themeManager = App.Current.Services.GetService<IThemeManager>();
+            _styleManager = App.Current.Services.GetService<IStyleManager>();
             MultiplayerViewModel = App.Current.Services.GetService<MultiplayerViewModel>();
 
             _moveModel.PossibleMovesCalculated += OnHighlightPossibleMoves;
@@ -73,11 +70,11 @@ namespace Chess.UI.ViewModels
             _moveModel.GameOverEvent += OnEndGameState;
             _moveModel.NewBoardFromBackendEvent += OnBoardFromBackendUpdated;
 
-            _themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+            _styleManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
             _moveModel.PawnPromotionEvent += OnPromotionPiece;
 
-            this.CurrentBoardTheme = _themeManager.CurrentBoardTheme;
+            this.CurrentBoardStyle = _styleManager.CurrentBoardStyle;
 
             Board = [];
 
@@ -170,16 +167,16 @@ namespace Chess.UI.ViewModels
 
         private void OnThemeManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ThemeManager.CurrentBoardTheme))
+            if (e.PropertyName == nameof(StyleManager.CurrentBoardStyle))
             {
-                UpdateBoardTheme(_themeManager.CurrentBoardTheme);
+                UpdateBoardTheme(_styleManager.CurrentBoardStyle);
             }
         }
 
 
-        private void UpdateBoardTheme(ImageServices.BoardTheme boardTheme)
+        private void UpdateBoardTheme(BoardStyle boardTheme)
         {
-            CurrentBoardTheme = boardTheme;
+            CurrentBoardStyle = boardTheme;
         }
 
 
@@ -311,7 +308,7 @@ namespace Chess.UI.ViewModels
         {
             get
             {
-                return _imageServices.GetImage(CurrentBoardTheme);
+                return _imageServices.GetImage(CurrentBoardStyle);
             }
         }
 

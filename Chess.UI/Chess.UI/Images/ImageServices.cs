@@ -2,9 +2,7 @@
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Chess.UI.Styles;
 using static Chess.UI.Services.EngineAPI;
 
 
@@ -20,25 +18,25 @@ namespace Chess.UI.Images
             EndGame
         }
 
-        public enum BoardTheme
-        {
-            Wood = 1,
-            Wood2 = 2,
-            Plain,
-            Plastic,
-            Marble,
-            Marble2,
-            Glass
-        }
+        //public enum BoardTheme
+        //{
+        //    Wood = 1,
+        //    Wood2 = 2,
+        //    Plain,
+        //    Plastic,
+        //    Marble,
+        //    Marble2,
+        //    Glass
+        //}
 
-        public enum PieceTheme
-        {
-            Basic = 1,
-            Standard
-        }
+        //public enum PieceTheme
+        //{
+        //    Basic = 1,
+        //    Standard
+        //}
 
 
-        public Dictionary<BoardTheme, ImageSource> BoardBackgroundImages;
+        public Dictionary<BoardStyle, ImageSource> BoardBackgroundImages;
 
         public Dictionary<MainMenuButton, ImageSource> MainMenutImages;
 
@@ -58,13 +56,13 @@ namespace Chess.UI.Images
         {
             BoardBackgroundImages = new()
         {
-            { BoardTheme.Wood, LoadImage("/Assets/Board/Wood.png") },
-            { BoardTheme.Wood2, LoadImage("/Assets/Board/Wood2.png") },
-            { BoardTheme.Plain, LoadImage("/Assets/Board/Plain.png") },
-            { BoardTheme.Plastic, LoadImage("/Assets/Board/Plastic.png") },
-            { BoardTheme.Marble, LoadImage("/Assets/Board/Marble.png") },
-            { BoardTheme.Marble2, LoadImage("/Assets/Board/Marble2.png") },
-            { BoardTheme.Glass, LoadImage("/Assets/Board/Glass.png") }
+            { BoardStyle.Wood, LoadImage("/Assets/Board/Wood.png") },
+            { BoardStyle.Wood2, LoadImage("/Assets/Board/Wood2.png") },
+            { BoardStyle.Plain, LoadImage("/Assets/Board/Plain.png") },
+            { BoardStyle.Plastic, LoadImage("/Assets/Board/Plastic.png") },
+            { BoardStyle.Marble, LoadImage("/Assets/Board/Marble.png") },
+            { BoardStyle.Marble2, LoadImage("/Assets/Board/Marble2.png") },
+            { BoardStyle.Glass, LoadImage("/Assets/Board/Glass.png") }
         };
 
             MainMenutImages = new()
@@ -98,7 +96,7 @@ namespace Chess.UI.Images
 
 
         // Dynamic piece image loading based on theme, color, and type
-        public ImageSource GetPieceImage(PieceTheme theme, PlayerColor color, PieceTypeInstance pieceType)
+        public ImageSource GetPieceImage(PieceStyle theme, PlayerColor color, PieceTypeInstance pieceType)
         {
             // Convert enum values to strings that match folder and file naming conventions
             string themeName = theme.ToString();
@@ -120,7 +118,7 @@ namespace Chess.UI.Images
 
         public ImageSource GetImage(MainMenuButton button) => MainMenutImages[button];
 
-        public ImageSource GetImage(BoardTheme background) => BoardBackgroundImages[background];
+        public ImageSource GetImage(BoardStyle background) => BoardBackgroundImages[background];
 
 
         public ImageSource GetCapturedPieceImage(PlayerColor player, PieceTypeInstance pieceTypeInstance)

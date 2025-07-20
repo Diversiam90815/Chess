@@ -50,7 +50,7 @@ namespace Chess.UI.Audio.Services
             var backendCom = App.Current.ChessLogicCommunication;
             backendCom.MoveExecuted += (PossibleMoveInstance move) => _ = Task.Run(async () => await HandleMoveAsync(move));
 
-            var themePreferences = App.Current.Services.GetService<ThemePreferencesViewModel>();
+            var themePreferences = App.Current.Services.GetService<StylesPreferencesViewModel>();
             themePreferences.ItemSelected += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ItemSelected));
         }
 

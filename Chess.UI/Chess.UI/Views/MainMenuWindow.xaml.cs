@@ -216,7 +216,7 @@ namespace Chess.UI
             {
                 p.Width = 700;
                 p.Height = 800;
-                p.AddPreferencesTab("Styles", typeof(ThemePreferencesView), "\uE790");
+                p.AddPreferencesTab("Styles", typeof(StylePreferencesView), "\uE790");
                 p.AddPreferencesTab("Multiplayer", typeof(MultiplayerPreferencesView), "\uE774");
             });
         }

@@ -1,6 +1,5 @@
 ﻿using Chess.UI.Services;
-using Chess.UI.Themes;
-using Chess.UI.Themes.Interfaces;
+using Chess.UI.Styles;
 using Chess.UI.Wrappers;
 using System;
 using System.Collections.ObjectModel;
@@ -8,20 +7,19 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using static Chess.UI.Images.ImageServices;
 
 
 namespace Chess.UI.ViewModels
 {
-    public class ThemePreferencesViewModel
+    public class StylesPreferencesViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
         private readonly IDispatcherQueueWrapper _dispatcherQueueWrapper;
 
-        private readonly ThemeLoader _themeLoader;
+        private readonly StyleLoader _styleLoader;
 
-        private readonly IThemeManager _themeManager;
+        private readonly IStyleManager _styleManager;
 
         public event Action ItemSelected;
 
@@ -29,16 +27,16 @@ namespace Chess.UI.ViewModels
         private bool _userInteractionEnabled = false;
 
 
-        public ObservableCollection<Themes.BoardTheme> BoardThemes { get; }
+        public ObservableCollection<BoardStyleInfo> BoardThemes { get; }
 
-        public ObservableCollection<Themes.PieceTheme> PieceThemes { get; }
+        public ObservableCollection<PieceStyleInfo> PieceThemes { get; }
 
 
-        public ThemePreferencesViewModel(IDispatcherQueueWrapper dispatcherQueue, IThemeManager themeManager)
+        public StylesPreferencesViewModel(IDispatcherQueueWrapper dispatcherQueue, IStyleManager themeManager)
         {
             _dispatcherQueueWrapper = dispatcherQueue;
-            _themeLoader = new();
-            _themeManager = themeManager;
+            _styleLoader = new();
+            _styleManager = themeManager;
 
             BoardThemes = [];
             PieceThemes = [];
@@ -55,8 +53,8 @@ namespace Chess.UI.ViewModels
             {
                 var (boardThemes, pieceThemes) = await Task.Run(() =>
                 {
-                    var boards = _themeLoader.LoadBoardThemes();
-                    var pieces = _themeLoader.LoadPieceThemes();
+                    var boards = _styleLoader.LoadBoardStyles();
+                    var pieces = _styleLoader.LoadPieceStyles();
                     return (boards, pieces);
                 });
 
@@ -83,24 +81,24 @@ namespace Chess.UI.ViewModels
         }
 
 
-        public Themes.BoardTheme GetCurrentSelectedBoardTheme()
+        public BoardStyleInfo GetCurrentSelectedBoardTheme()
         {
             string currentThemeName = Settings.Settings.CurrentBoardTheme;
-            Themes.BoardTheme theme = BoardThemes.FirstOrDefault(b => string.Equals(b.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
+            BoardStyleInfo theme = BoardThemes.FirstOrDefault(b => string.Equals(b.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
             return theme;
         }
 
 
-        public Themes.PieceTheme GetCurrentSelectedPieceTheme()
+        public PieceStyleInfo GetCurrentSelectedPieceTheme()
         {
             string currentThemeName = Settings.Settings.CurrentPieceTheme;
-            Themes.PieceTheme theme = PieceThemes.FirstOrDefault(p => string.Equals(p.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
+            PieceStyleInfo theme = PieceThemes.FirstOrDefault(p => string.Equals(p.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
             return theme;
         }
 
 
-        private Themes.BoardTheme _selectedBoardTheme;
-        public Themes.BoardTheme SelectedBoardTheme
+        private BoardStyleInfo _selectedBoardTheme;
+        public BoardStyleInfo SelectedBoardTheme
         {
             get => _selectedBoardTheme;
             set
@@ -116,7 +114,7 @@ namespace Chess.UI.ViewModels
 
                     // Update ThemeManager’s board theme
                     // This triggers property change events in the manager
-                    _themeManager.CurrentBoardTheme = value.BoardThemeID;
+                    _styleManager.CurrentBoardStyle = value.Style;
 
                     if (_userInteractionEnabled)
                         ItemSelected?.Invoke();
@@ -125,8 +123,8 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private Themes.PieceTheme _selectedPieceTheme;
-        public Themes.PieceTheme SelectedPieceTheme
+        private PieceStyleInfo _selectedPieceTheme;
+        public PieceStyleInfo SelectedPieceTheme
         {
             get => _selectedPieceTheme;
             set
@@ -140,7 +138,7 @@ namespace Chess.UI.ViewModels
                     OnPropertyChanged();
 
                     // Update ThemeManager’s piece theme
-                    _themeManager.CurrentPieceTheme = value.PieceThemeID;
+                    _styleManager.CurrentPieceStyle = value.Style;
 
                     if (_userInteractionEnabled)
                         ItemSelected?.Invoke();

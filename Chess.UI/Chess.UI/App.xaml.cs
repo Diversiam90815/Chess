@@ -11,16 +11,13 @@ using Chess.UI.Multiplayer;
 using Chess.UI.Score;
 using Chess.UI.Services;
 using Chess.UI.Services.Interfaces;
-using Chess.UI.Settings;
-using Chess.UI.Themes;
-using Chess.UI.Themes.Interfaces;
+using Chess.UI.Styles;
 using Chess.UI.ViewModels;
 using Chess.UI.Views;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using System;
-using System.Net.WebSockets;
 
 
 namespace Chess.UI
@@ -73,7 +70,7 @@ namespace Chess.UI
             services.AddSingleton<IDispatcherQueueWrapper, DispatcherQueueWrapper>();
 
             services.AddSingleton<IChessCoordinate, ChessCoordinate>();
-            services.AddSingleton<IThemeManager, ThemeManager>();
+            services.AddSingleton<IStyleManager, StyleManager>();
             services.AddSingleton<IImageService, ImageServices>();
 
             services.AddSingleton<IMoveModel, MoveModel>();
@@ -89,13 +86,13 @@ namespace Chess.UI
             services.AddSingleton<MoveHistoryViewModel>();
             services.AddSingleton<MainMenuViewModel>();
             services.AddSingleton<MultiplayerViewModel>();
-            services.AddSingleton<ThemePreferencesViewModel>();
+            services.AddSingleton<StylesPreferencesViewModel>();
             services.AddSingleton<MultiplayerPreferencesViewModel>();
 
             services.AddTransient<MainMenuWindow>();
             services.AddTransient<ChessBoardWindow>();
             services.AddTransient<MultiplayerWindow>();
-            services.AddTransient<ThemePreferencesView>();
+            services.AddTransient<StylePreferencesView>();
             services.AddTransient<MultiplayerPreferencesView>();
 
             // Audio Services

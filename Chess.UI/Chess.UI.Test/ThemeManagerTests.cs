@@ -1,85 +1,87 @@
 using Chess.UI.Images;
-using Chess.UI.Themes;
-using Chess.UI.Themes.Interfaces;
+using Chess.UI.Styles;
 using System.ComponentModel;
-using Windows.Devices.Display;
+
 
 namespace Chess.UI.Test
 {
-    public class ThemeManagerTests
+    public class StyleManagerTests
     {
         [Fact]
         public void CurrentBoardTheme_PropertyChanged_PropertyRaised()
         {
             // Arrange
-            var mockThemeManager = new MockThemeManager();
+            var mockStyleManager = new MockStyleManager();
             bool eventRaised = false;
             string propertyNameChanged = null;
 
-            mockThemeManager.PropertyChanged += (sender, e) =>
+            mockStyleManager.PropertyChanged += (sender, e) =>
             {
                 eventRaised = true;
                 propertyNameChanged = e.PropertyName;
             };
 
             // Act
-            mockThemeManager.CurrentBoardTheme = ImageServices.BoardTheme.Glass;
+            mockStyleManager.CurrentBoardStyle = BoardStyle.Glass;
 
             // Assert
             Assert.True(eventRaised);
-            Assert.Equal(nameof(IThemeManager.CurrentBoardTheme), propertyNameChanged);
+            Assert.Equal(nameof(IStyleManager.CurrentBoardStyle), propertyNameChanged);
         }
 
         [Fact]
         public void CurrentPieceTheme_PropertyChanged_PropertyRaised()
         {
             // Arrange
-            var mockThemeManager = new MockThemeManager();
+            var mockStyleManager = new MockStyleManager();
             bool eventRaised = false;
             string propertyNameChanged = null;
 
-            mockThemeManager.PropertyChanged += (sender, e) =>
+            mockStyleManager.PropertyChanged += (sender, e) =>
             {
                 eventRaised = true;
                 propertyNameChanged = e.PropertyName;
             };
 
             // Act
-            mockThemeManager.CurrentPieceTheme = ImageServices.PieceTheme.Standard;
+            mockStyleManager.CurrentPieceStyle = PieceStyle.Standard;
 
             // Assert
             Assert.True(eventRaised);
-            Assert.Equal(nameof(IThemeManager.CurrentPieceTheme), propertyNameChanged);
+            Assert.Equal(nameof(IStyleManager.CurrentPieceStyle), propertyNameChanged);
         }
 
 
         // Mock implementation for testing
-        private class MockThemeManager : IThemeManager
+        private class MockStyleManager : IStyleManager
         {
-            private ImageServices.BoardTheme _boardTheme;
-            private ImageServices.PieceTheme _pieceTheme;
+            private BoardStyle _boardStyle;
+            private PieceStyle _pieceStyle;
 
             public event PropertyChangedEventHandler PropertyChanged;
 
-            public ImageServices.BoardTheme CurrentBoardTheme
+            public BoardStyle CurrentBoardStyle
             {
-                get => _boardTheme;
+                get => _boardStyle;
                 set
                 {
-                    _boardTheme = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentBoardTheme)));
+                    _boardStyle = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentBoardStyle)));
                 }
             }
 
-            public ImageServices.PieceTheme CurrentPieceTheme
+            public PieceStyle CurrentPieceStyle
             {
-                get => _pieceTheme;
+                get => _pieceStyle;
                 set
                 {
-                    _pieceTheme = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentPieceTheme)));
+                    _pieceStyle = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentPieceStyle)));
                 }
             }
+
+            public void LoadStyles() { }
+            public void SaveStyles() { }
         }
     }
 }
