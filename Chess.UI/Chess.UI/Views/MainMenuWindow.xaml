@@ -56,7 +56,7 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Bottom"
                 Orientation="Vertical">
-                <Button Command="{x:Bind OpenPreferencesCommand}" Style="{StaticResource MainMenuButtonStyle}">
+                <Button Click="SettingsButton_Click" Style="{StaticResource MainMenuButtonStyle}">
                     <Image Source="{x:Bind ViewModel.SettingButtonImage}" Style="{StaticResource MainMenuImageStyle}" />
                 </Button>
                 <TextBlock Style="{StaticResource MainMenuTitleStyles}" Text="Settings" />

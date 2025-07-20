@@ -20,11 +20,19 @@ namespace Chess.UI.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        // Specific events for different actions
+        public event Action ButtonClicked;
+        public event Action StartGameRequested;
+        public event Action SettingsRequested;
+        public event Action MultiplayerRequested;
+        public event Action QuitRequested;
+
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
         private readonly IImageService _imageServices;
 
         private readonly IChessAudioService _audioService;
+
 
         public MainMenuViewModel(IDispatcherQueueWrapper dispatcher)
         {
@@ -48,8 +56,29 @@ namespace Chess.UI.ViewModels
 
         public void OnButtonClicked()
         {
-            _ = _audioService.HandleUIInteractionAsync(UIInteraction.ButtonClick);
+            ButtonClicked?.Invoke();
         }
+
+        public void OnStartGameRequested()
+        {
+            StartGameRequested?.Invoke();
+        }
+
+        public void OnSettingsRequested()
+        {
+            SettingsRequested?.Invoke();
+        }
+
+        public void OnMultiplayerRequested()
+        {
+            MultiplayerRequested?.Invoke();
+        }
+
+        public void OnQuitRequested()
+        {
+            QuitRequested?.Invoke();
+        }
+
 
         private ImageSource startGameButtonImage;
         public ImageSource StartGameButtonImage

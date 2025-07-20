@@ -1,5 +1,7 @@
 ﻿using Chess.UI.Audio.Core;
 using Chess.UI.Audio.Modules;
+using Chess.UI.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
 
@@ -26,6 +28,23 @@ namespace Chess.UI.Audio.Services
             _audioEngine.RegisterModule(AudioModuleType.SFX, _soundEffectsModule);
 
             await _audioEngine.InitializeAsync();
+
+            // Subscribe to the events from the viewmodels
+            SubscribeToViewModelEvents();
+        }
+
+
+        private void SubscribeToViewModelEvents()
+        {
+            var mainMenuViewModel = App.Current.Services.GetService<MainMenuViewModel>();
+            if (mainMenuViewModel != null)
+            {
+                mainMenuViewModel.ButtonClicked += () => _ = HandleUIInteractionAsync(UIInteraction.ButtonClick);
+                mainMenuViewModel.StartGameRequested += () => _ = HandleUIInteractionAsync(UIInteraction.MenuOpen);
+                mainMenuViewModel.SettingsRequested += () => _ = HandleUIInteractionAsync(UIInteraction.MenuOpen);
+                mainMenuViewModel.MultiplayerRequested += () => _ = HandleUIInteractionAsync(UIInteraction.MenuOpen);
+                mainMenuViewModel.QuitRequested += () => _ = HandleUIInteractionAsync(UIInteraction.ItemSelected);
+            }
         }
 
 

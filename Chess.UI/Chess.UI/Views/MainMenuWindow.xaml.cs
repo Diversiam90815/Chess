@@ -28,8 +28,6 @@ namespace Chess.UI
 
         private MultiplayerViewModel MultiplayerViewModel { get; }
 
-        public IAsyncRelayCommand OpenPreferencesCommand { get; }
-
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
         private bool _multiplayerWindowClosedProgrammatically = false;
@@ -49,8 +47,6 @@ namespace Chess.UI
 
             this.RootGrid.DataContext = ViewModel;
 
-            OpenPreferencesCommand = new AsyncRelayCommand(OpenPreferencesView);
-
             MultiplayerViewModel.RequestNavigationToChessboard += () =>
             {
                 // We enter the Multiplayer Game, so we show the Chessboard
@@ -69,6 +65,8 @@ namespace Chess.UI
         {
             mPresenter = AppWindow.Presenter as OverlappedPresenter;
             mPresenter.IsResizable = false;
+
+            SubscribeToViewModelEvents();
         }
 
 
@@ -79,6 +77,16 @@ namespace Chess.UI
             int scaledWidth = (int)(width * scalingFactor);
             int scaledHeight = (int)(height * scalingFactor);
             AppWindow.Resize(new(scaledWidth, scaledHeight));
+        }
+
+
+        private void SubscribeToViewModelEvents()
+        {
+            // Subscribe to specific events from MainMenuViewModel
+            ViewModel.StartGameRequested += () => OpenChessboardView(false);
+            ViewModel.MultiplayerRequested += () => HandleMultiplayerButtonAction();
+            ViewModel.QuitRequested += () => HandleQuitButtonAction();
+            ViewModel.SettingsRequested += () => _ = OpenPreferencesView();
         }
 
 
@@ -150,15 +158,30 @@ namespace Chess.UI
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.OnButtonClicked();
-            OpenChessboardView(false);
+            ViewModel.OnStartGameRequested();
         }
 
 
         private void MultiplayerButton_Click(object sender, RoutedEventArgs e)
         {
-            ViewModel.OnButtonClicked();
+            ViewModel.OnMultiplayerRequested();
+        }
 
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.OnSettingsRequested();
+        }
+
+
+        private void QuitButton_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.OnQuitRequested();
+        }
+
+
+        private void HandleMultiplayerButtonAction()
+        {
             if (_multiplayerWindow == null)
             {
                 _multiplayerWindow = App.Current.Services.GetService<MultiplayerWindow>();
@@ -173,10 +196,8 @@ namespace Chess.UI
         }
 
 
-        private void QuitButton_Click(object sender, RoutedEventArgs e)
+        private void HandleQuitButtonAction()
         {
-            ViewModel.OnButtonClicked();
-
             var app = Application.Current;
             app.Exit();
         }
