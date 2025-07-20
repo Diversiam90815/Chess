@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Chess.UI.Styles
 {
@@ -11,7 +9,6 @@ namespace Chess.UI.Styles
         List<PieceStyleInfo> LoadPieceStyles();
         List<BoardStyleInfo> LoadBoardStyles();
     }
-    
     
     
     public class StyleLoader : IStyleLoader

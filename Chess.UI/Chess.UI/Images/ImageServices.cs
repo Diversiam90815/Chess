@@ -18,24 +18,6 @@ namespace Chess.UI.Images
             EndGame
         }
 
-        //public enum BoardTheme
-        //{
-        //    Wood = 1,
-        //    Wood2 = 2,
-        //    Plain,
-        //    Plastic,
-        //    Marble,
-        //    Marble2,
-        //    Glass
-        //}
-
-        //public enum PieceTheme
-        //{
-        //    Basic = 1,
-        //    Standard
-        //}
-
-
         public Dictionary<BoardStyle, ImageSource> BoardBackgroundImages;
 
         public Dictionary<MainMenuButton, ImageSource> MainMenutImages;
@@ -130,7 +112,5 @@ namespace Chess.UI.Images
                 _ => null
             };
         }
-
-
     }
 }

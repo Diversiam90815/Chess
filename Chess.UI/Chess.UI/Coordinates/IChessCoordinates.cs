@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Chess.UI.Services.EngineAPI;
+﻿using static Chess.UI.Services.EngineAPI;
 
-namespace Chess.UI.Services.Interfaces
+
+namespace Chess.UI.Coordinates
 {
     public interface IChessCoordinate
     {

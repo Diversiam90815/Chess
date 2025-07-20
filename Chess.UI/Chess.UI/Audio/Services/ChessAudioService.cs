@@ -1,6 +1,6 @@
 ﻿using Chess.UI.Audio.Core;
 using Chess.UI.Audio.Modules;
-using Chess.UI.Models.Interfaces;
+using Chess.UI.Moves;
 using Chess.UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;

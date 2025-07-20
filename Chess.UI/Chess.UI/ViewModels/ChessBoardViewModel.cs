@@ -10,9 +10,9 @@ using Chess.UI.Styles;
 using Chess.UI.Board;
 using Chess.UI.Images;
 using Chess.UI.Wrappers;
-using Chess.UI.Services.Interfaces;
+using Chess.UI.Coordinates;
 using Microsoft.Extensions.DependencyInjection;
-using Chess.UI.Models.Interfaces;
+using Chess.UI.Moves;
 
 
 namespace Chess.UI.ViewModels

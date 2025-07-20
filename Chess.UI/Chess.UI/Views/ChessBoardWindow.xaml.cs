@@ -1,5 +1,4 @@
-﻿using Chess.UI.Audio.Services;
-using Chess.UI.Board;
+﻿using Chess.UI.Board;
 using Chess.UI.Images;
 using Chess.UI.Services;
 using Chess.UI.Styles;
@@ -365,6 +364,7 @@ namespace Chess.UI.Views
 
             return grid;
         }
+
 
         private StackPanel CreatePlayerCapturedPanel(string title, PlayerColor player)
         {

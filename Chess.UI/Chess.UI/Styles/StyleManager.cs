@@ -1,11 +1,8 @@
 ﻿using Chess.UI.Wrappers;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Chess.UI.Styles
 {
@@ -17,7 +14,6 @@ namespace Chess.UI.Styles
         void SaveStyles();
         void LoadStyles();
     }
-
 
 
     public class StyleManager : IStyleManager
@@ -49,6 +45,7 @@ namespace Chess.UI.Styles
                 }
             }
         }
+
 
         private PieceStyle _currentPieceStyle;
         public PieceStyle CurrentPieceStyle
@@ -100,6 +97,5 @@ namespace Chess.UI.Styles
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             });
         }
-
     }
 }

@@ -1,4 +1,3 @@
-using Chess.UI.Images;
 using Chess.UI.Styles;
 using System.ComponentModel;
 
@@ -8,7 +7,7 @@ namespace Chess.UI.Test
     public class StyleManagerTests
     {
         [Fact]
-        public void CurrentBoardTheme_PropertyChanged_PropertyRaised()
+        public void CurrentBoardStyle_PropertyChanged_PropertyRaised()
         {
             // Arrange
             var mockStyleManager = new MockStyleManager();
@@ -30,7 +29,7 @@ namespace Chess.UI.Test
         }
 
         [Fact]
-        public void CurrentPieceTheme_PropertyChanged_PropertyRaised()
+        public void CurrentPieceStyle_PropertyChanged_PropertyRaised()
         {
             // Arrange
             var mockStyleManager = new MockStyleManager();

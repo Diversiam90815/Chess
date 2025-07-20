@@ -1,5 +1,4 @@
-﻿using Chess.UI.Services.Interfaces;
-using static Chess.UI.Services.EngineAPI;
+﻿using static Chess.UI.Services.EngineAPI;
 
 namespace Chess.UI.Coordinates
 {
