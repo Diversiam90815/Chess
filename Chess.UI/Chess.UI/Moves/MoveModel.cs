@@ -94,6 +94,9 @@ namespace Chess.UI.Moves
         {
             Logger.LogInfo("Due to delegate message WaitingForTarget we start getting the moves!");
 
+            // We have selected a chesspiece and started the move cycle
+            ChesspieceSelected?.Invoke();
+
             PossibleMoves.Clear();
 
             int numMoves = GetNumPossibleMoves();
@@ -127,6 +130,7 @@ namespace Chess.UI.Moves
         }
 
 
+        public event Action ChesspieceSelected;
         public event Action PossibleMovesCalculated;
         public event Action<PlayerColor> PlayerChanged;
         public event Action RemotePlayersTurn;

@@ -1,4 +1,5 @@
-﻿using Chess.UI.Board;
+﻿using Chess.UI.Audio.Services;
+using Chess.UI.Board;
 using Chess.UI.Images;
 using Chess.UI.Services;
 using Chess.UI.ViewModels;
@@ -42,6 +43,7 @@ namespace Chess.UI.Views
             _dispatcher = App.Current.Services.GetService<IDispatcherQueueWrapper>();
             _images = App.Current.Services.GetService<IImageService>();
             _viewModel = App.Current.Services.GetService<ChessBoardViewModel>();
+
             RootPanel.DataContext = _viewModel;
 
             _viewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
@@ -73,12 +75,16 @@ namespace Chess.UI.Views
 
         private void UndoMove_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.UndoLastMove();
         }
 
 
         private void ResetGame_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.ResetGame();
             _viewModel.StartGame();
         }
@@ -86,12 +92,15 @@ namespace Chess.UI.Views
 
         private void EndGame_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
             this.Close();
         }
 
 
         private void ChessPiece_Clicked(object sender, TappedRoutedEventArgs e)
         {
+            _viewModel.OnSquareClicked();
+
             var grid = sender as FrameworkElement;
             var square = grid.DataContext as BoardSquare;
 

@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Chess.UI.Services;
+using Chess.UI.Themes;
+using Chess.UI.Themes.Interfaces;
+using Chess.UI.Wrappers;
+using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Collections.ObjectModel;
-using Chess.UI.Themes;
-using Chess.UI.Wrappers;
-using Chess.UI.Themes.Interfaces;
+using System.Threading.Tasks;
+using static Chess.UI.Images.ImageServices;
 
 
 namespace Chess.UI.ViewModels
@@ -20,9 +23,11 @@ namespace Chess.UI.ViewModels
 
         private readonly IThemeManager _themeManager;
 
-        public ObservableCollection<BoardTheme> BoardThemes { get; }
+        private bool _isInitialized = false;
 
-        public ObservableCollection<PieceTheme> PieceThemes { get; }
+        public ObservableCollection<Themes.BoardTheme> BoardThemes { get; }
+
+        public ObservableCollection<Themes.PieceTheme> PieceThemes { get; }
 
 
         public ThemePreferencesViewModel(IDispatcherQueueWrapper dispatcherQueue, IThemeManager themeManager)
@@ -31,32 +36,66 @@ namespace Chess.UI.ViewModels
             _themeLoader = new();
             _themeManager = themeManager;
 
-            BoardThemes = new ObservableCollection<BoardTheme>(_themeLoader.LoadBoardThemes());
-            PieceThemes = new ObservableCollection<PieceTheme>(_themeLoader.LoadPieceThemes());
+            BoardThemes = [];
+            PieceThemes = [];
 
-            SelectedBoardTheme = GetCurrentSelectedBoardTheme();
-            SelectedPieceTheme = GetCurrentSelectedPieceTheme();
+            _ = InitializeAsync();
         }
 
 
-        public BoardTheme GetCurrentSelectedBoardTheme()
+        private async Task InitializeAsync()
+        {
+            if (_isInitialized) return;
+
+            try
+            {
+                var (boardThemes, pieceThemes) = await Task.Run(() =>
+                {
+                    var boards = _themeLoader.LoadBoardThemes();
+                    var pieces = _themeLoader.LoadPieceThemes();
+                    return (boards, pieces);
+                });
+
+                _dispatcherQueueWrapper.TryEnqueue(() =>
+                {
+                    foreach (var board in boardThemes)
+                        BoardThemes.Add(board);
+
+                    foreach (var piece in pieceThemes)
+                        PieceThemes.Add(piece);
+
+                    SelectedBoardTheme = GetCurrentSelectedBoardTheme();
+                    SelectedPieceTheme = GetCurrentSelectedPieceTheme();
+
+                    _isInitialized = true;
+                });
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Failed to initialize themes: {ex.Message}");
+            }
+
+        }
+
+
+        public Themes.BoardTheme GetCurrentSelectedBoardTheme()
         {
             string currentThemeName = Settings.Settings.CurrentBoardTheme;
-            BoardTheme theme = BoardThemes.FirstOrDefault(b => string.Equals(b.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
+            Themes.BoardTheme theme = BoardThemes.FirstOrDefault(b => string.Equals(b.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
             return theme;
         }
 
 
-        public PieceTheme GetCurrentSelectedPieceTheme()
+        public Themes.PieceTheme GetCurrentSelectedPieceTheme()
         {
             string currentThemeName = Settings.Settings.CurrentPieceTheme;
-            PieceTheme theme = PieceThemes.FirstOrDefault(p => string.Equals(p.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
+            Themes.PieceTheme theme = PieceThemes.FirstOrDefault(p => string.Equals(p.Name, currentThemeName, StringComparison.OrdinalIgnoreCase));
             return theme;
         }
 
 
-        private BoardTheme _selectedBoardTheme;
-        public BoardTheme SelectedBoardTheme
+        private Themes.BoardTheme _selectedBoardTheme;
+        public Themes.BoardTheme SelectedBoardTheme
         {
             get => _selectedBoardTheme;
             set
@@ -78,8 +117,8 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private PieceTheme _selectedPieceTheme;
-        public PieceTheme SelectedPieceTheme
+        private Themes.PieceTheme _selectedPieceTheme;
+        public Themes.PieceTheme SelectedPieceTheme
         {
             get => _selectedPieceTheme;
             set

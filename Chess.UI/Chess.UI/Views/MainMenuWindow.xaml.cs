@@ -157,24 +157,32 @@ namespace Chess.UI
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
+            ViewModel.OnButtonClicked();
+
             ViewModel.OnStartGameRequested();
         }
 
 
         private void MultiplayerButton_Click(object sender, RoutedEventArgs e)
         {
+            ViewModel.OnButtonClicked();
+
             ViewModel.OnMultiplayerRequested();
         }
 
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
+            ViewModel.OnButtonClicked();
+
             ViewModel.OnSettingsRequested();
         }
 
 
         private void QuitButton_Click(object sender, RoutedEventArgs e)
         {
+            ViewModel.OnButtonClicked();
+
             ViewModel.OnQuitRequested();
         }
 

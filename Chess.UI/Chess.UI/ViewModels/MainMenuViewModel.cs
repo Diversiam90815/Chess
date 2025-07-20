@@ -1,17 +1,10 @@
-﻿using Chess.UI.Audio.Services;
-using Chess.UI.Images;
-using Chess.UI.Services;
+﻿using Chess.UI.Images;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace Chess.UI.ViewModels
@@ -30,8 +23,6 @@ namespace Chess.UI.ViewModels
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
         private readonly IImageService _imageServices;
-
-        private readonly IChessAudioService _audioService;
 
 
         public MainMenuViewModel(IDispatcherQueueWrapper dispatcher)

@@ -12,6 +12,7 @@ namespace Chess.UI.Models.Interfaces
     {
         List<PossibleMoveInstance> PossibleMoves { get; }
 
+        public event Action ChesspieceSelected;
         event Action PossibleMovesCalculated;
         event Action<PlayerColor> PlayerChanged;
         event Action GameStateInitSucceeded;

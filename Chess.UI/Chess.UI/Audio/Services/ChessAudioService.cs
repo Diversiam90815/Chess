@@ -1,5 +1,6 @@
 ﻿using Chess.UI.Audio.Core;
 using Chess.UI.Audio.Modules;
+using Chess.UI.Models.Interfaces;
 using Chess.UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
@@ -37,23 +38,14 @@ namespace Chess.UI.Audio.Services
         private void SubscribeToViewModelEvents()
         {
             var mainMenuViewModel = App.Current.Services.GetService<MainMenuViewModel>();
-            if (mainMenuViewModel != null)
-            {
-                mainMenuViewModel.ButtonClicked += () => _ = Task.Run(async () =>
-                    await HandleUIInteractionAsync(UIInteraction.ButtonClick).ConfigureAwait(false));
+            mainMenuViewModel.ButtonClicked += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ButtonClick));
 
-                mainMenuViewModel.StartGameRequested += () => _ = Task.Run(async () =>
-                    await HandleUIInteractionAsync(UIInteraction.MenuOpen).ConfigureAwait(false));
+            var chessboardVM = App.Current.Services.GetService<ChessBoardViewModel>();
+            chessboardVM.ButtonClicked += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ButtonClick));
 
-                mainMenuViewModel.SettingsRequested += () => _ = Task.Run(async () =>
-                    await HandleUIInteractionAsync(UIInteraction.MenuOpen).ConfigureAwait(false));
-
-                mainMenuViewModel.MultiplayerRequested += () => _ = Task.Run(async () =>
-                    await HandleUIInteractionAsync(UIInteraction.MenuOpen).ConfigureAwait(false));
-
-                mainMenuViewModel.QuitRequested += () => _ = Task.Run(async () =>
-                    await HandleUIInteractionAsync(UIInteraction.ItemSelected).ConfigureAwait(false));
-            }
+            var moveModel = App.Current.Services.GetService<IMoveModel>();
+            moveModel.GameOverEvent += (EndGameState state, PlayerColor player) => _ = Task.Run(async () => await HandleEndGameStateAsync(state));
+            moveModel.ChesspieceSelected += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.PieceSelect));
         }
 
 
@@ -66,7 +58,7 @@ namespace Chess.UI.Audio.Services
         }
 
 
-        public async Task HandleGameStateAsync(EndGameState gameState)
+        public async Task HandleEndGameStateAsync(EndGameState gameState)
         {
             var sfx = gameState switch
             {
