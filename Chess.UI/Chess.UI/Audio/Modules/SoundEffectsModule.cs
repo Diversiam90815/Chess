@@ -284,13 +284,19 @@ namespace Chess.UI.Audio.Modules
         {
             if (!_isInitialized || !IsEnabled) return;
 
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
             try
             {
                 var mediaSource = await GetMediaSourceAsync(effect);
+                Logger.LogInfo($"GetMediaSource took: {stopwatch.ElapsedMilliseconds}ms");
                 if (mediaSource == null) return;
 
+
                 var mediaPlayer = GetMediaPlayerFromPool();
-                if (mediaPlayer == null) return;
+                Logger.LogInfo($"GetMediaPlayer took: {stopwatch.ElapsedMilliseconds}ms");
+                if (mediaPlayer == null) return; 
+
 
                 // Calculate final volume
                 var effectiveVolume = volume * GetEffectiveVolume();
@@ -302,14 +308,20 @@ namespace Chess.UI.Audio.Modules
                 {
                     mediaPlayer.PlaybackRate = Math.Clamp(pitch, 0.25, 4.0);
                 }
+                Logger.LogInfo($"Configure took: {stopwatch.ElapsedMilliseconds}ms");
+
 
                 mediaPlayer.Source = mediaSource;
                 mediaPlayer.Play();
+
+                Logger.LogInfo($"Total PlaySound took: {stopwatch.ElapsedMilliseconds}ms");
 
                 SoundPlayed?.Invoke(this, new SoundPlayedEventArgs(effect, effectiveVolume));
             }
             catch (Exception ex)
             {
+                Logger.LogError($"PlaySound failed after {stopwatch.ElapsedMilliseconds}ms: {ex.Message}");
+
                 StatusChanged?.Invoke(this, new AudioModuleEventArgs(ModuleName, $"Play failed for {effect}: {ex.Message}"));
             }
         }
