@@ -87,5 +87,6 @@ namespace Chess.UI.Audio.Core
     {
         SFX,
         Music,
+        Atmosphere,
     }
 }
