@@ -151,6 +151,45 @@ namespace Chess.UI.Services
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string GetLocalPlayerName();
 
+
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetSFXEnabled", CharSet = CharSet.Unicode)]
+        public static extern bool GetSFXEnabled();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetSFXEnabled", CharSet = CharSet.Unicode)]
+        public static extern void SetSFXEnabled(bool enabled);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetAtmosEnabled", CharSet = CharSet.Unicode)]
+        public static extern bool GetAtmosEnabled();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetAtmosEnabled", CharSet = CharSet.Unicode)]
+        public static extern void SetAtmosEnabled(bool enabled);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetSFXVolume", CharSet = CharSet.Unicode)]
+        public static extern void SetSFXVolume(float volume);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetSFXVolume", CharSet = CharSet.Unicode)]
+        public static extern float GetSFXVolume(float volume);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetAtmosVolume", CharSet = CharSet.Unicode)]
+        public static extern void SetAtmosVolume(float volume);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetAtmosVolume", CharSet = CharSet.Unicode)]
+        public static extern float GetAtmosVolume(float volume);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetMasterVolume", CharSet = CharSet.Unicode)]
+        public static extern void SetMasterVolume(float volume);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetMasterVolume", CharSet = CharSet.Unicode)]
+        public static extern float GetMasterVolume(float volume);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetAtmosScenario", CharSet = CharSet.Unicode)]
+        public static extern void SetAtmosScenario([In()][MarshalAs(UnmanagedType.LPStr)] string scenario);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetAtmosScenario", CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string GetAtmosScenario();
+
         #endregion // User Config
 
 

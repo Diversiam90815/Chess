@@ -91,6 +91,25 @@ public:
 	void						setLocalPlayerInMultiplayer(PlayerColor localPlayer);
 	void						setLocalPlayerReady(const bool flag);
 
+	void						setSFXEnabled(const bool enabled);
+	bool						getSFXEnabled();
+
+	void						setAtmosEnabled(const bool enabled);
+	bool						getAtmosEnabled();
+
+	void						setSFXVolume(const float volume);
+	float						getSFXVolume();
+
+	void						setAtmosVolume(const float volume);
+	float						getAtmosVolume();
+
+	void						setMasterAudioVolume(const float volume);
+	float						getMasterVolume();
+
+	void						setAtmosScenario(const std::string scenario);
+	std::string					getAtmosScenario();
+
+
 private:
 	GameManager() = default;
 

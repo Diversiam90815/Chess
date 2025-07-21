@@ -85,6 +85,30 @@ extern "C"
 
 	Engine_API char *GetLocalPlayerName();
 
+	Engine_API bool	 GetSFXEnabled();
+
+	Engine_API void	 SetSFXEnabled(bool enabled);
+
+	Engine_API bool	 GetAtmosEnabled();
+
+	Engine_API void	 SetAtmosEnabled(bool enabled);
+
+	Engine_API void	 SetSFXVolume(float volume);
+
+	Engine_API float GetSFXVolume();
+
+	Engine_API void	 SetAtmosVolume(float volume);
+
+	Engine_API float GetAtmosVolume();
+
+	Engine_API void	 SetAtmosScenario(const char *scenario);
+
+	Engine_API char *GetAtmosScenario();
+
+	Engine_API void	 SetMasterVolume(float volume);
+
+	Engine_API float GetMasterVolume();
+
 
 	Engine_API int	 GetNetworkAdapterCount();
 

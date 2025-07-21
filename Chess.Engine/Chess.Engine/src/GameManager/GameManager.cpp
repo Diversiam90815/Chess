@@ -340,3 +340,75 @@ void GameManager::deinitObservers()
 
 	StateMachine::GetInstance()->detachObserver(mUiCommunicationLayer);
 }
+
+
+void GameManager::setSFXEnabled(const bool enabled)
+{
+	mUserSettings.setSFXEnabled(enabled);
+}
+
+
+bool GameManager::getSFXEnabled()
+{
+	return mUserSettings.getSFXEnabled();
+}
+
+
+void GameManager::setAtmosEnabled(const bool enabled)
+{
+	mUserSettings.setAtmosEnabled(enabled);
+}
+
+
+bool GameManager::getAtmosEnabled()
+{
+	return mUserSettings.getAtmosEnabled();
+}
+
+
+void GameManager::setSFXVolume(const float volume)
+{
+	mUserSettings.setSFXVolume(volume);
+}
+
+
+float GameManager::getSFXVolume()
+{
+	return mUserSettings.getSFXVolume();
+}
+
+
+void GameManager::setAtmosVolume(const float volume)
+{
+	mUserSettings.setAtmosVolume(volume);
+}
+
+
+float GameManager::getAtmosVolume()
+{
+	return mUserSettings.getAtmosVolume();
+}
+
+
+void GameManager::setMasterAudioVolume(const float volume)
+{
+	mUserSettings.setMasterAudioVolume(volume);
+}
+
+
+float GameManager::getMasterVolume()
+{
+	return mUserSettings.getMasterVolume();
+}
+
+
+void GameManager::setAtmosScenario(const std::string scenario)
+{
+	mUserSettings.setAtmosScenario(scenario);
+}
+
+
+std::string GameManager::getAtmosScenario()
+{
+	return mUserSettings.getAtmosScenario();
+}

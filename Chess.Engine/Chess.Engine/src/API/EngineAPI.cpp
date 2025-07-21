@@ -302,6 +302,80 @@ Engine_API char *GetLocalPlayerName()
 }
 
 
+Engine_API bool GetSFXEnabled()
+{
+	return GameManager::GetInstance()->getSFXEnabled();
+}
+
+
+Engine_API void SetSFXEnabled(bool enabled)
+{
+	GameManager::GetInstance()->setSFXEnabled(enabled);
+}
+
+
+Engine_API bool GetAtmosEnabled()
+{
+	return GameManager::GetInstance()->getAtmosEnabled();
+}
+
+
+Engine_API void SetAtmosEnabled(bool enabled)
+{
+	GameManager::GetInstance()->setAtmosEnabled(enabled);
+}
+
+
+Engine_API void SetSFXVolume(float volume)
+{
+	GameManager::GetInstance()->setSFXVolume(volume);
+}
+
+
+Engine_API float GetSFXVolume()
+{
+	return GameManager::GetInstance()->getSFXVolume();
+}
+
+
+Engine_API void SetAtmosVolume(float volume)
+{
+	GameManager::GetInstance()->setAtmosVolume(volume);
+}
+
+
+Engine_API float GetAtmosVolume()
+{
+	return GameManager::GetInstance()->getAtmosVolume();
+}
+
+
+Engine_API void SetAtmosScenario(const char *scenario)
+{
+	GameManager::GetInstance()->setAtmosScenario(scenario);
+}
+
+
+Engine_API char *GetAtmosScenario()
+{
+	std::string sScenario = GameManager::GetInstance()->getAtmosScenario();
+	char	   *scenario  = StringToCharPtr(sScenario);
+	return scenario;
+}
+
+
+Engine_API void SetMasterVolume(float volume)
+{
+	GameManager::GetInstance()->setMasterAudioVolume(volume);
+}
+
+
+Engine_API float GetMasterVolume()
+{
+	return GameManager::GetInstance()->getMasterVolume();
+}
+
+
 Engine_API void AnswerConnectionInvitation(bool accept)
 {
 	GameManager::GetInstance()->answerConnectionInvitation(accept);
