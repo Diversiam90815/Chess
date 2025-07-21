@@ -175,8 +175,10 @@ namespace Chess.UI.Audio.Services
 
         public void SetSFXEnabled(bool enabled)
         {
-            if (_soundEffectsModule != null)
-                _soundEffectsModule.IsEnabled = enabled;
+            if (_soundEffectsModule == null) return;
+            if (_soundEffectsModule.IsEnabled == enabled) return;
+
+            _soundEffectsModule.IsEnabled = enabled;
 
             EngineAPI.SetSFXEnabled(enabled);
         }
@@ -191,6 +193,8 @@ namespace Chess.UI.Audio.Services
 
         public void SetSFXVolume(float volume)
         {
+            if (_soundEffectsModule.GetModuleVolume() == volume) return;
+
             _soundEffectsModule?.SetModuleVolume(volume);
             EngineAPI.SetSFXVolume(volume);
         }
@@ -198,6 +202,8 @@ namespace Chess.UI.Audio.Services
 
         public async Task SetAtmosphereAsync(AtmosphereScenario scenario)
         {
+            if (_atmosphereModule?.CurrentScenario == scenario) return;
+
             await _atmosphereModule?.SetAtmosphereAsync(scenario);
             EngineAPI.SetAtmosScenario(scenario.ToString());
         }
@@ -217,8 +223,10 @@ namespace Chess.UI.Audio.Services
 
         public void SetAtmosphereEnabled(bool enabled)
         {
-            if (_atmosphereModule != null)
-                _atmosphereModule.IsEnabled = enabled;
+            if (_atmosphereModule == null) return;
+            if (_atmosphereModule.IsEnabled == enabled) return;
+
+            _atmosphereModule.IsEnabled = enabled;
 
             EngineAPI.SetAtmosEnabled(enabled);
         }
@@ -240,6 +248,8 @@ namespace Chess.UI.Audio.Services
 
         public void SetAtmosphereVolume(float volume)
         {
+            if (_atmosphereModule?.GetModuleVolume() == volume) return;
+
             _atmosphereModule?.SetModuleVolume(volume);
             EngineAPI.SetAtmosVolume(volume);
         }
@@ -247,6 +257,8 @@ namespace Chess.UI.Audio.Services
 
         public void SetMasterVolume(float volume)
         {
+            if (_audioEngine.GetMasterVolume() == volume) return;
+
             _audioEngine.SetMasterVolume(volume);
             EngineAPI.SetMasterVolume(volume);
         }

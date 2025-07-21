@@ -99,8 +99,9 @@ bool UserSettings::getAtmosEnabled()
 
 void UserSettings::setSFXVolume(const float volume)
 {
-	storeSetting<float>(SettingsType::AudioSFXVolume, volume);
-	LOG_INFO("Set SFX volume to {}", volume);
+	float roundedVolume = std::round(volume * 10.0f) / 10.0f;
+	storeSetting<float>(SettingsType::AudioSFXVolume, roundedVolume);
+	LOG_INFO("Set SFX volume to {}", roundedVolume);
 }
 
 
@@ -112,8 +113,9 @@ float UserSettings::getSFXVolume()
 
 void UserSettings::setAtmosVolume(const float volume)
 {
-	storeSetting<float>(SettingsType::AudioAtmosVolume, volume);
-	LOG_INFO("Set Atmos volume to {}", volume);
+	float roundedVolume = std::round(volume * 10.0f) / 10.0f;
+	storeSetting<float>(SettingsType::AudioAtmosVolume, roundedVolume);
+	LOG_INFO("Set Atmos volume to {}", roundedVolume);
 }
 
 
@@ -125,8 +127,9 @@ float UserSettings::getAtmosVolume()
 
 void UserSettings::setMasterAudioVolume(const float volume)
 {
-	storeSetting<float>(SettingsType::AudioMasterVolume, volume);
-	LOG_INFO("Set master volume to {}", volume);
+	float roundedVolume = std::round(volume * 10.0f) / 10.0f;
+	storeSetting<float>(SettingsType::AudioMasterVolume, roundedVolume);
+	LOG_INFO("Set master volume to {}", roundedVolume);
 }
 
 

@@ -51,10 +51,10 @@ namespace Chess.UI.ViewModels
             int masterVolume = (int)masterEngineVolume * 100;
 
             float sfxEngineVolume = _audioService.GetSFXVolume();
-            int sfxVolume = (int)sfxEngineVolume * 100;
+            int sfxVolume = (int)(sfxEngineVolume * 100);
 
             float atmosEngineVolume = _audioService.GetAtmosphereVolume();
-            int atmosVolume = (int)atmosEngineVolume * 100;
+            int atmosVolume = (int)(atmosEngineVolume * 100);
 
             bool sfxEnabled = _audioService.GetSFXEnabled();
             bool atmosEnabled = _audioService.GetAtmosphereEnabled();
@@ -161,22 +161,22 @@ namespace Chess.UI.ViewModels
 
         public void SetSfxVolumeInEngine(int volume)
         {
-            float engineVolume = volume / 100;
-            _audioService.SetSFXVolume(engineVolume);
+            double engineVolume = Math.Round(volume / 100.0f, 1);
+            _audioService.SetSFXVolume((float)engineVolume);
         }
 
 
         public void SetAtmosVolumeInEngine(int volume)
         {
-            float engineVolume = volume / 100;
-            _audioService.SetAtmosphereVolume(engineVolume);
+            double engineVolume = Math.Round(volume / 100.0f, 1);
+            _audioService.SetAtmosphereVolume((float)engineVolume);
         }
 
 
         public void SetMasterVolumeInEngine(int volume)
         {
-            float engineVolume = volume / 100;
-            _audioService.SetMasterVolume(engineVolume);
+            double engineVolume = Math.Round(volume / 100.0f, 1);
+            _audioService.SetMasterVolume((float)engineVolume);
         }
 
 
