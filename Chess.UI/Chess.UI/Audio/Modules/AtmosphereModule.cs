@@ -14,7 +14,6 @@ namespace Chess.UI.Audio.Modules
 {
     public enum AtmosphereScenario
     {
-        None,
         Tavern,
         Fireplace,
         Forest,
@@ -67,7 +66,7 @@ namespace Chess.UI.Audio.Modules
         public AudioModuleType ModuleType => AudioModuleType.Atmosphere;
 
         // IAtmosphereModule Properties
-        public AtmosphereScenario CurrentScenario { get; private set; } = AtmosphereScenario.None;
+        public AtmosphereScenario CurrentScenario { get; private set; } = AtmosphereScenario.Forest;
         public bool IsPlaying => _currentPlayer?.PlaybackSession?.PlaybackState == MediaPlaybackState.Playing;
         public bool IsEnabled { get; set; } = true;
 
@@ -133,12 +132,6 @@ namespace Chess.UI.Audio.Modules
         {
             if (!_isInitialized || !IsEnabled) return;
 
-            if (scenario == AtmosphereScenario.None)
-            {
-                StopAtmosphereAsync();
-                return;
-            }
-
             try
             {
                 var mediaSource = await GetMediaSourceAsync(scenario);
@@ -181,8 +174,7 @@ namespace Chess.UI.Audio.Modules
                 _crossfadePlayer?.Pause();
             }
 
-            CurrentScenario = AtmosphereScenario.None;
-            AtmosphereChanged?.Invoke(this, new AtmosphereChangedEventArgs(AtmosphereScenario.None, 0.0f));
+            AtmosphereChanged?.Invoke(this, new AtmosphereChangedEventArgs(CurrentScenario, 0.0f));
         }
 
 
@@ -192,10 +184,7 @@ namespace Chess.UI.Audio.Modules
 
             foreach (AtmosphereScenario scenario in Enum.GetValues<AtmosphereScenario>())
             {
-                if (scenario != AtmosphereScenario.None)
-                {
-                    loadTasks.Add(LoadAtmosphereTrackAsync(scenario));
-                }
+                loadTasks.Add(LoadAtmosphereTrackAsync(scenario));
             }
 
             await Task.WhenAll(loadTasks);

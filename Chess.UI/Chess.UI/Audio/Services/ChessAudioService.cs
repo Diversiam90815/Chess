@@ -97,8 +97,7 @@ namespace Chess.UI.Audio.Services
 
                     // Set atmosphere scenario if not "None"
                     if (!string.IsNullOrEmpty(atmosScenario) &&
-                        Enum.TryParse<AtmosphereScenario>(atmosScenario, out var scenario) &&
-                        scenario != AtmosphereScenario.None)
+                        Enum.TryParse<AtmosphereScenario>(atmosScenario, out var scenario))
                     {
                         await _atmosphereModule.SetAtmosphereAsync(scenario);
                     }

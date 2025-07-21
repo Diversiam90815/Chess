@@ -174,8 +174,6 @@ void UserSettings::logUserSettings()
 	const float		  atmosVolume	= getAtmosVolume();
 	const std::string atmosScenario = getAtmosScenario();
 
-
-
 	LOG_INFO("------------------ User Settings ------------------");
 	LOG_INFO("Board Style :\t\t{}", boardTheme);
 	LOG_INFO("Board Style :\t\t{}", piecesTheme);
