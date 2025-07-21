@@ -4,12 +4,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
+
 
 namespace Chess.UI.Audio.Modules
 {
@@ -18,7 +17,9 @@ namespace Chess.UI.Audio.Modules
         None,
         Tavern,
         Fireplace,
+        Forest,
     }
+
 
     public class AtmosphereChangedEventArgs : EventArgs
     {
@@ -238,15 +239,19 @@ namespace Chess.UI.Audio.Modules
 
         private void InitializeMediaPlayers()
         {
-            _currentPlayer = new MediaPlayer();
-            _currentPlayer.AudioCategory = Windows.Media.Playback.MediaPlayerAudioCategory.GameMedia;
-            _currentPlayer.IsLoopingEnabled = true;
+            _currentPlayer = new MediaPlayer
+            {
+                AudioCategory = MediaPlayerAudioCategory.GameMedia,
+                IsLoopingEnabled = true
+            };
             _currentPlayer.MediaEnded += OnMediaPlayerEnded;
             _currentPlayer.MediaFailed += OnMediaPlayerFailed;
 
-            _crossfadePlayer = new MediaPlayer();
-            _crossfadePlayer.AudioCategory = Windows.Media.Playback.MediaPlayerAudioCategory.GameMedia;
-            _crossfadePlayer.IsLoopingEnabled = true;
+            _crossfadePlayer = new MediaPlayer
+            {
+                AudioCategory = MediaPlayerAudioCategory.GameMedia,
+                IsLoopingEnabled = true
+            };
             _crossfadePlayer.MediaEnded += OnCrossfadePlayerEnded;
             _crossfadePlayer.MediaFailed += OnMediaPlayerFailed;
         }
@@ -287,7 +292,7 @@ namespace Chess.UI.Audio.Modules
 
         private async Task PerformCrossfade(float targetVolume)
         {
-            const int steps = 20;
+            int steps = (int)(_crossfadeDuration * 10);
             int stepDelay = (int)((_crossfadeDuration * 1000) / steps);
             float effectiveVolume = targetVolume * GetEffectiveVolume();
 
@@ -364,6 +369,5 @@ namespace Chess.UI.Audio.Modules
             }
             _atmosphereCache.Clear();
         }
-
     }
 }
