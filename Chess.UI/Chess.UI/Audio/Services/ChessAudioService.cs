@@ -1,8 +1,10 @@
 ﻿using Chess.UI.Audio.Core;
 using Chess.UI.Audio.Modules;
 using Chess.UI.Moves;
+using Chess.UI.Services;
 using Chess.UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
 
@@ -35,6 +37,9 @@ namespace Chess.UI.Audio.Services
 
             await _audioEngine.InitializeAsync();
 
+            // Apply settings from the config
+            await LoadAudioSettingsFromConfig();
+
             // Subscribe to the events from the viewmodels
             SubscribeToEvents();
         }
@@ -59,6 +64,53 @@ namespace Chess.UI.Audio.Services
 
             var themePreferences = App.Current.Services.GetService<StylesPreferencesViewModel>();
             themePreferences.ItemSelected += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ItemSelected));
+        }
+
+
+        private async Task LoadAudioSettingsFromConfig()
+        {
+            try
+            {
+                // Load settings from the backend/UserSettings via EngineAPI
+                float masterVolume = EngineAPI.GetMasterVolume();
+                float sfxVolume = EngineAPI.GetSFXVolume();
+                float atmosVolume = EngineAPI.GetAtmosVolume();
+                bool sfxEnabled = EngineAPI.GetSFXEnabled();
+                bool atmosEnabled = EngineAPI.GetAtmosEnabled();
+                string atmosScenario = EngineAPI.GetAtmosScenario();
+
+                // Apply master volume to audio engine
+                _audioEngine.SetMasterVolume(masterVolume);
+
+                // Apply SFX settings
+                if (_soundEffectsModule != null)
+                {
+                    _soundEffectsModule.SetModuleVolume(sfxVolume);
+                    _soundEffectsModule.IsEnabled = sfxEnabled;
+                }
+
+                // Apply atmosphere settings
+                if (_atmosphereModule != null)
+                {
+                    _atmosphereModule.SetModuleVolume(atmosVolume);
+                    _atmosphereModule.IsEnabled = atmosEnabled;
+
+                    // Set atmosphere scenario if not "None"
+                    if (!string.IsNullOrEmpty(atmosScenario) &&
+                        Enum.TryParse<AtmosphereScenario>(atmosScenario, out var scenario) &&
+                        scenario != AtmosphereScenario.None)
+                    {
+                        await _atmosphereModule.SetAtmosphereAsync(scenario);
+                    }
+                }
+
+                Logger.LogInfo("Audio settings loaded and applied from configuration");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Failed to load audio settings from configuration: {ex.Message}");
+                // Continue with default settings
+            }
         }
 
 
@@ -126,6 +178,8 @@ namespace Chess.UI.Audio.Services
         {
             if (_soundEffectsModule != null)
                 _soundEffectsModule.IsEnabled = enabled;
+
+            EngineAPI.SetSFXEnabled(enabled);
         }
 
 
@@ -139,12 +193,14 @@ namespace Chess.UI.Audio.Services
         public void SetSFXVolume(float volume)
         {
             _soundEffectsModule?.SetModuleVolume(volume);
+            EngineAPI.SetSFXVolume(volume);
         }
 
 
-        public async Task SetAtmosphereAsync(AtmosphereScenario scenario, float volume = 0.5f)
+        public async Task SetAtmosphereAsync(AtmosphereScenario scenario)
         {
-            await _atmosphereModule?.SetAtmosphereAsync(scenario, volume);
+            await _atmosphereModule?.SetAtmosphereAsync(scenario);
+            EngineAPI.SetAtmosScenario(scenario.ToString());
         }
 
 
@@ -164,6 +220,8 @@ namespace Chess.UI.Audio.Services
         {
             if (_atmosphereModule != null)
                 _atmosphereModule.IsEnabled = enabled;
+
+            EngineAPI.SetAtmosEnabled(enabled);
         }
 
 
@@ -184,12 +242,14 @@ namespace Chess.UI.Audio.Services
         public void SetAtmosphereVolume(float volume)
         {
             _atmosphereModule?.SetModuleVolume(volume);
+            EngineAPI.SetAtmosVolume(volume);
         }
 
 
         public void SetMasterVolume(float volume)
         {
             _audioEngine.SetMasterVolume(volume);
+            EngineAPI.SetMasterVolume(volume);
         }
 
 

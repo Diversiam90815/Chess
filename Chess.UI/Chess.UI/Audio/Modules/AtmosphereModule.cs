@@ -38,7 +38,7 @@ namespace Chess.UI.Audio.Modules
 
     public interface IAtmosphereModule : IAudioModule
     {
-        Task SetAtmosphereAsync(AtmosphereScenario scenario, float volume = 0.5f);
+        Task SetAtmosphereAsync(AtmosphereScenario scenario);
         void StopAtmosphereAsync();
         void SetCrossfadeDuration(float seconds);
 
@@ -129,7 +129,7 @@ namespace Chess.UI.Audio.Modules
         }
 
 
-        public async Task SetAtmosphereAsync(AtmosphereScenario scenario, float volume = 0.5f)
+        public async Task SetAtmosphereAsync(AtmosphereScenario scenario)
         {
             if (!_isInitialized || !IsEnabled) return;
 
@@ -143,6 +143,8 @@ namespace Chess.UI.Audio.Modules
             {
                 var mediaSource = await GetMediaSourceAsync(scenario);
                 if (mediaSource == null) return;
+
+                float volume = GetEffectiveVolume();
 
                 lock (_playerLock)
                 {

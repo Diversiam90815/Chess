@@ -28,7 +28,7 @@ namespace Chess.UI.Audio.Services
         Task HandleUIInteractionAsync(UIInteraction interaction);
 
         // Atmosphere Control
-        Task SetAtmosphereAsync(AtmosphereScenario scenario, float volume = 0.5f);
+        Task SetAtmosphereAsync(AtmosphereScenario scenario);
         AtmosphereScenario GetCurrentAtmosphere();
         void StopAtmosphereAsync();
 

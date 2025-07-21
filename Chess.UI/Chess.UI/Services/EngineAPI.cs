@@ -169,19 +169,19 @@ namespace Chess.UI.Services
         public static extern void SetSFXVolume(float volume);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetSFXVolume", CharSet = CharSet.Unicode)]
-        public static extern float GetSFXVolume(float volume);
+        public static extern float GetSFXVolume();
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetAtmosVolume", CharSet = CharSet.Unicode)]
         public static extern void SetAtmosVolume(float volume);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetAtmosVolume", CharSet = CharSet.Unicode)]
-        public static extern float GetAtmosVolume(float volume);
+        public static extern float GetAtmosVolume();
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetMasterVolume", CharSet = CharSet.Unicode)]
         public static extern void SetMasterVolume(float volume);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetMasterVolume", CharSet = CharSet.Unicode)]
-        public static extern float GetMasterVolume(float volume);
+        public static extern float GetMasterVolume();
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetAtmosScenario", CharSet = CharSet.Unicode)]
         public static extern void SetAtmosScenario([In()][MarshalAs(UnmanagedType.LPStr)] string scenario);
