@@ -18,6 +18,12 @@ struct DefaultSettings
 {
 	const std::string BoardStyle	  = "Wood";
 	const std::string ChessPieceStyle = "Basic";
+	const std::string AtmosScenario	  = "Forest";
+	const float		  AtmosVolume	  = 1.0f;
+	const float		  SFXVolume		  = 1.0f;
+	const float		  MasterVolume	  = 1.0f;
+	const bool		  SFXEnabled	  = true;
+	const bool		  AtmosEnabled	  = true;
 };
 
 
@@ -169,35 +175,35 @@ inline T UserSettings::readSetting(SettingsType setting)
 	}
 	case SettingsType::AudioSFXEnabled:
 	{
-		value = readOrDefault<bool>(AudioSFXEnabledSetting, {}, setting, "Audio SFX Enabled");
+		value = readOrDefault<bool>(AudioSFXEnabledSetting, mDefaultSettings.SFXEnabled, setting, "Audio SFX Enabled");
 		break;
 	}
 	case SettingsType::AudioSFXVolume:
 	{
-		value = readOrDefault<float>(AudioSFXVolumeSetting, {}, setting, "Audio SFX Volume");
+		value = readOrDefault<float>(AudioSFXVolumeSetting, mDefaultSettings.SFXVolume, setting, "Audio SFX Volume");
 		break;
 	}
 	case SettingsType::AudioAtmosEnabled:
 	{
-		value = readOrDefault<bool>(AudioAtmosEnabledSetting, {}, setting, "Audio Atmos Enabled");
+		value = readOrDefault<bool>(AudioAtmosEnabledSetting, mDefaultSettings.AtmosEnabled, setting, "Audio Atmos Enabled");
 		break;
 	}
 	case SettingsType::AudioAtmosVolume:
 	{
-		value = readOrDefault<float>(AudioAtmosVolumeSetting, {}, setting, "Audio Atmos Volume");
+		value = readOrDefault<float>(AudioAtmosVolumeSetting, mDefaultSettings.AtmosVolume, setting, "Audio Atmos Volume");
 		break;
 	}
 	case SettingsType::AudioAtmosScenario:
 	{
 		if constexpr (std::is_same_v<T, std::string>)
 		{
-			value = readOrDefault<std::string>(AudioAtmosScenarioSetting, {}, setting, "Audio Atmos Scencario");
+			value = readOrDefault<std::string>(AudioAtmosScenarioSetting, mDefaultSettings.AtmosScenario, setting, "Audio Atmos Scencario");
 		}
 		break;
 	}
 	case SettingsType::AudioMasterVolume:
 	{
-		value = readOrDefault<float>(AudioMasterVolumeSetting, {}, setting, "Audio Master Volume");
+		value = readOrDefault<float>(AudioMasterVolumeSetting, mDefaultSettings.MasterVolume, setting, "Audio Master Volume");
 		break;
 	}
 	default: return value;

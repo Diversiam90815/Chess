@@ -153,18 +153,38 @@ void UserSettings::initializeConfigFile(DefaultSettings settings)
 {
 	storeSetting(SettingsType::BoardStyle, settings.BoardStyle);
 	storeSetting(SettingsType::ChessPieceStyle, settings.ChessPieceStyle);
+	storeSetting(SettingsType::AudioAtmosEnabled, settings.AtmosEnabled);
+	storeSetting(SettingsType::AudioAtmosScenario, settings.AtmosScenario);
+	storeSetting(SettingsType::AudioAtmosVolume, settings.AtmosVolume);
+	storeSetting(SettingsType::AudioSFXEnabled, settings.SFXEnabled);
+	storeSetting(SettingsType::AudioSFXVolume, settings.SFXVolume);
+	storeSetting(SettingsType::AudioMasterVolume, settings.MasterVolume);
 }
 
 
 void UserSettings::logUserSettings()
 {
-	const std::string piecesTheme = getCurrentPieceTheme();
-	const std::string boardTheme  = getCurrentBoardTheme();
-	const std::string playerName  = getLocalPlayerName();
+	const std::string piecesTheme	= getCurrentPieceTheme();
+	const std::string boardTheme	= getCurrentBoardTheme();
+	const std::string playerName	= getLocalPlayerName();
+	const float		  masterVolume	= getMasterVolume();
+	const bool		  sfxEnabled	= getSFXEnabled();
+	const float		  sfxVolume		= getSFXVolume();
+	const bool		  atmosEnabled	= getAtmosEnabled();
+	const float		  atmosVolume	= getAtmosVolume();
+	const std::string atmosScenario = getAtmosScenario();
+
+
 
 	LOG_INFO("------------------ User Settings ------------------");
-	LOG_INFO("Board Style :\t{}", boardTheme);
-	LOG_INFO("Board Style :\t{}", piecesTheme);
-	LOG_INFO("Player Name :\t{}", playerName);
+	LOG_INFO("Board Style :\t\t{}", boardTheme);
+	LOG_INFO("Board Style :\t\t{}", piecesTheme);
+	LOG_INFO("Player Name :\t\t{}", playerName);
+	LOG_INFO("Master Volume:\t{}", masterVolume);
+	LOG_INFO("SFX Enabled :\t{}", LoggingHelper::boolToString(sfxEnabled).c_str());
+	LOG_INFO("SFX Volume:\t\t{}", sfxVolume);
+	LOG_INFO("Atmos Enabled:\t{}", LoggingHelper::boolToString(atmosEnabled).c_str());
+	LOG_INFO("Atmos Volume:\t{}", atmosVolume);
+	LOG_INFO("Atmos Scenario:\t{}", atmosScenario);
 	LOG_INFO("---------------------------------------------------");
 }
