@@ -32,10 +32,15 @@ namespace Chess.UI.Audio.Services
         void StopAtmosphereAsync();
 
         // Settings
+        bool GetSFXEnabled();
         void SetSFXEnabled(bool enabled);
+        float GetSFXVolume();
         void SetSFXVolume(float volume);
+        bool GetAtmosphereEnabled();
         void SetAtmosphereEnabled(bool enabled);
+        float GetAtmosphereVolume();
         void SetAtmosphereVolume(float volume);
+        float GetMasterVolume();
         void SetMasterVolume(float volume);
 
         ISoundEffectsModule SoundEffectsModule { get; }

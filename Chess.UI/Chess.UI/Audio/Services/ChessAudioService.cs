@@ -115,6 +115,13 @@ namespace Chess.UI.Audio.Services
         }
 
 
+        public bool GetSFXEnabled()
+        {
+            if (_soundEffectsModule == null) return false;
+            return _soundEffectsModule.IsEnabled;
+        }
+
+
         public void SetSFXEnabled(bool enabled)
         {
             if (_soundEffectsModule != null)
@@ -122,10 +129,16 @@ namespace Chess.UI.Audio.Services
         }
 
 
+        public float GetSFXVolume()
+        {
+            if (_soundEffectsModule == null) return 0.0f;
+            return _soundEffectsModule.GetModuleVolume();
+        }
+
+
         public void SetSFXVolume(float volume)
         {
             _soundEffectsModule?.SetModuleVolume(volume);
-
         }
 
 
@@ -148,6 +161,20 @@ namespace Chess.UI.Audio.Services
         }
 
 
+        public bool GetAtmosphereEnabled()
+        {
+            if (_atmosphereModule == null) return false;
+            return _atmosphereModule.IsEnabled;
+        }
+
+
+        public float GetAtmosphereVolume()
+        {
+            if (_atmosphereModule == null) return 0.0f;
+            return _atmosphereModule.GetModuleVolume();
+        }
+
+
         public void SetAtmosphereVolume(float volume)
         {
             _atmosphereModule?.SetModuleVolume(volume);
@@ -157,6 +184,12 @@ namespace Chess.UI.Audio.Services
         public void SetMasterVolume(float volume)
         {
             _audioEngine.SetMasterVolume(volume);
+        }
+
+
+        public float GetMasterVolume()
+        {
+            return _audioEngine.GetMasterVolume();
         }
 
 

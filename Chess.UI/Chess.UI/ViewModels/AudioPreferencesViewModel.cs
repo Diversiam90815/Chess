@@ -22,6 +22,7 @@ namespace Chess.UI.ViewModels
 
         private readonly IChessAudioService _audioService;
 
+
         public AudioPreferencesViewModel(IDispatcherQueueWrapper dispatcher)
         {
             _audioService = App.Current.Services.GetService<IChessAudioService>();
@@ -31,6 +32,31 @@ namespace Chess.UI.ViewModels
             AtmosphereSoundscapes.Add("Test1");
             AtmosphereSoundscapes.Add("Test2");
             AtmosphereSoundscapes.Add("Test3");
+
+            InitializeValues();
+        }
+
+
+        private void InitializeValues()
+        {
+            float masterEngineVolume = _audioService.GetMasterVolume();
+            int masterVolume = (int)masterEngineVolume * 100;
+
+            float sfxEngineVolume = _audioService.GetSFXVolume();
+            int sfxVolume = (int)sfxEngineVolume * 100;
+
+            float atmosEngineVolume = _audioService.GetAtmosphereVolume();
+            int atmosVolume = (int)atmosEngineVolume * 100;
+
+            bool sfxEnabled = _audioService.GetSFXEnabled();
+            bool atmosEnabled = _audioService.GetAtmosphereEnabled();
+
+            SfxEnabled = sfxEnabled;
+            AtmosEnabled = atmosEnabled;
+
+            MasterVolume = masterVolume;
+            SfxVolume = sfxVolume;
+            AtmosVolume = atmosVolume;
         }
 
 
