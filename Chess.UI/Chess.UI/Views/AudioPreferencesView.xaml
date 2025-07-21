@@ -105,9 +105,11 @@
                     <StackPanel Grid.Column="1">
                         <ComboBox
                             HorizontalAlignment="Stretch"
+                            DisplayMemberPath="DisplayName"
                             ItemsSource="{x:Bind _viewModel.AtmosphereSoundscapes}"
                             SelectedItem="{x:Bind _viewModel.SelectedAtmosphereSoundscape, Mode=TwoWay}"
                             Style="{StaticResource SettingComboBoxStyle}" />
+
                         <Slider
                             Name="Atmos_Volume"
                             Grid.Column="1"

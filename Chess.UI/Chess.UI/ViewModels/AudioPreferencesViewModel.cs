@@ -1,4 +1,5 @@
-﻿using Chess.UI.Audio.Services;
+﻿using Chess.UI.Audio.Modules;
+using Chess.UI.Audio.Services;
 using Chess.UI.Styles;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,26 +14,33 @@ using WinRT.ChessVtableClasses;
 
 namespace Chess.UI.ViewModels
 {
-
-    internal class AudioPreferencesViewModel
+    public record AtmosphereScenarioItem
     {
-        public ObservableCollection<string> AtmosphereSoundscapes { get; }
+        public string DisplayName { get; }
+        public Audio.Modules.AtmosphereScenario Scenario { get; }
 
-        private readonly IDispatcherQueueWrapper _dispatcherQueue;
+        public AtmosphereScenarioItem(Audio.Modules.AtmosphereScenario scenario)
+        {
+            Scenario = scenario;
+            DisplayName = scenario.ToString();
+        }
+    }
+
+
+    public class AudioPreferencesViewModel
+    {
+        public ObservableCollection<AtmosphereScenarioItem> AtmosphereSoundscapes { get; }
 
         private readonly IChessAudioService _audioService;
 
 
-        public AudioPreferencesViewModel(IDispatcherQueueWrapper dispatcher)
+        public AudioPreferencesViewModel()
         {
             _audioService = App.Current.Services.GetService<IChessAudioService>();
-            _dispatcherQueue = dispatcher;
 
-            AtmosphereSoundscapes = new ObservableCollection<string>();
-            AtmosphereSoundscapes.Add("Test1");
-            AtmosphereSoundscapes.Add("Test2");
-            AtmosphereSoundscapes.Add("Test3");
+            AtmosphereSoundscapes = new ObservableCollection<AtmosphereScenarioItem>();
 
+            IntiializeAtmosphereScenarios();
             InitializeValues();
         }
 
@@ -51,24 +59,37 @@ namespace Chess.UI.ViewModels
             bool sfxEnabled = _audioService.GetSFXEnabled();
             bool atmosEnabled = _audioService.GetAtmosphereEnabled();
 
+            AtmosphereScenario currentScenario = _audioService.GetCurrentAtmosphere();
+
             SfxEnabled = sfxEnabled;
             AtmosEnabled = atmosEnabled;
 
             MasterVolume = masterVolume;
             SfxVolume = sfxVolume;
             AtmosVolume = atmosVolume;
+
+            SelectedAtmosphereSoundscape = AtmosphereSoundscapes.FirstOrDefault(a => a.Scenario == currentScenario);
         }
 
 
-        private string selectedAtmosphereSoundscape;
-        public string SelectedAtmosphereSoundscape
+        private void IntiializeAtmosphereScenarios()
+        {
+            foreach (var scenario in Enum.GetValues<AtmosphereScenario>())
+            {
+                AtmosphereSoundscapes.Add(new AtmosphereScenarioItem(scenario));
+            }
+        }
+
+
+        private AtmosphereScenarioItem selectedAtmosphereSoundscape;
+        public AtmosphereScenarioItem SelectedAtmosphereSoundscape
         {
             get => selectedAtmosphereSoundscape;
             set
             {
                 if (value == selectedAtmosphereSoundscape) return;
                 selectedAtmosphereSoundscape = value;
-                _audioService.SetAtmosphereAsync(Audio.Modules.AtmosphereScenario.None);    // TODO
+                _audioService.SetAtmosphereAsync(value.Scenario);
             }
         }
 
@@ -81,7 +102,7 @@ namespace Chess.UI.ViewModels
             {
                 if (value == masterVolume) return;
                 masterVolume = value;
-                _audioService.SetMasterVolume(masterVolume);
+                SetMasterVolumeInEngine(masterVolume);
             }
         }
 
@@ -94,7 +115,7 @@ namespace Chess.UI.ViewModels
             {
                 if (value == sfxVolume) return;
                 sfxVolume = value;
-                _audioService.SetSFXVolume(sfxVolume);
+                SetSfxVolumeInEngine(sfxVolume);
             }
         }
 
@@ -107,7 +128,7 @@ namespace Chess.UI.ViewModels
             {
                 if (value == atmosVolume) return;
                 atmosVolume = value;
-                _audioService.SetAtmosphereVolume(atmosVolume);
+                SetAtmosVolumeInEngine(atmosVolume);
             }
         }
 

@@ -148,6 +148,12 @@ namespace Chess.UI.Audio.Services
         }
 
 
+        public AtmosphereScenario GetCurrentAtmosphere()
+        {
+            return _atmosphereModule.CurrentScenario;
+        }
+
+
         public void StopAtmosphereAsync()
         {
             _atmosphereModule?.StopAtmosphereAsync();
