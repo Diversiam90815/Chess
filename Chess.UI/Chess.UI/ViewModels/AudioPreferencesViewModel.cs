@@ -1,15 +1,10 @@
 ﻿using Chess.UI.Audio.Modules;
 using Chess.UI.Audio.Services;
-using Chess.UI.Styles;
-using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WinRT.ChessVtableClasses;
+
 
 
 namespace Chess.UI.ViewModels
@@ -178,12 +173,5 @@ namespace Chess.UI.ViewModels
             double engineVolume = Math.Round(volume / 100.0f, 1);
             _audioService.SetMasterVolume((float)engineVolume);
         }
-
-
-
-
-
-
-
     }
 }

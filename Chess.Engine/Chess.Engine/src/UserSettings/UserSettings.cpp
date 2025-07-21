@@ -178,9 +178,9 @@ void UserSettings::logUserSettings()
 	const std::string atmosScenario = getAtmosScenario();
 
 	LOG_INFO("------------------ User Settings ------------------");
-	LOG_INFO("Board Style :\t\t{}", boardTheme);
-	LOG_INFO("Board Style :\t\t{}", piecesTheme);
-	LOG_INFO("Player Name :\t\t{}", playerName);
+	LOG_INFO("Board Style :\t{}", boardTheme);
+	LOG_INFO("Board Style :\t{}", piecesTheme);
+	LOG_INFO("Player Name :\t{}", playerName);
 	LOG_INFO("Master Volume:\t{}", masterVolume);
 	LOG_INFO("SFX Enabled :\t{}", LoggingHelper::boolToString(sfxEnabled).c_str());
 	LOG_INFO("SFX Volume:\t\t{}", sfxVolume);

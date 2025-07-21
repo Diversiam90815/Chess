@@ -203,7 +203,7 @@ namespace Chess.UI.Audio.Modules
             for (int i = 0; i < _maxConcurrentSounds; ++i)
             {
                 var mediaPlayer = new MediaPlayer();
-                mediaPlayer.AudioCategory = Windows.Media.Playback.MediaPlayerAudioCategory.GameEffects;
+                mediaPlayer.AudioCategory = MediaPlayerAudioCategory.GameEffects;
 
                 // Preconfigure common settings
                 mediaPlayer.Volume = 1.0f;
