@@ -71,6 +71,84 @@ std::string UserSettings::getLocalPlayerName()
 }
 
 
+void UserSettings::setSFXEnabled(const bool enabled)
+{
+	storeSetting<bool>(SettingsType::AudioSFXEnabled, enabled);
+	LOG_INFO("Set SFX enabled to {}", LoggingHelper::boolToString(enabled).c_str());
+}
+
+
+bool UserSettings::getSFXEnabled()
+{
+	return readSetting<bool>(SettingsType::AudioSFXEnabled);
+}
+
+
+void UserSettings::setAtmosEnabled(const bool enabled)
+{
+	storeSetting<bool>(SettingsType::AudioAtmosEnabled, enabled);
+	LOG_INFO("Set Atmos enabled to {}", LoggingHelper::boolToString(enabled).c_str());
+}
+
+
+bool UserSettings::getAtmosEnabled()
+{
+	return readSetting<bool>(SettingsType::AudioAtmosEnabled);
+}
+
+
+void UserSettings::setSFXVolume(const float volume)
+{
+	storeSetting<float>(SettingsType::AudioSFXVolume, volume);
+	LOG_INFO("Set SFX volume to {}", volume);
+}
+
+
+float UserSettings::getSFXVolume()
+{
+	return readSetting<float>(SettingsType::AudioSFXVolume);
+}
+
+
+void UserSettings::setAtmosVolume(const float volume)
+{
+	storeSetting<float>(SettingsType::AudioAtmosVolume, volume);
+	LOG_INFO("Set Atmos volume to {}", volume);
+}
+
+
+float UserSettings::getAtmosVolume()
+{
+	return readSetting<float>(SettingsType::AudioAtmosVolume);
+}
+
+
+void UserSettings::setMasterAudioVolume(const float volume)
+{
+	storeSetting<float>(SettingsType::AudioMasterVolume, volume);
+	LOG_INFO("Set master volume to {}", volume);
+}
+
+
+float UserSettings::getMasterVolume()
+{
+	return readSetting<float>(SettingsType::AudioMasterVolume);
+}
+
+
+void UserSettings::setAtmosScenario(const std::string scenario)
+{
+	storeSetting<std::string>(SettingsType::AudioAtmosScenario, scenario);
+	LOG_INFO("Set atmos scenario to {}", scenario.c_str());
+}
+
+
+std::string UserSettings::getAtmosScenario()
+{
+	return readSetting<std::string>(SettingsType::AudioAtmosScenario);
+}
+
+
 void UserSettings::initializeConfigFile(DefaultSettings settings)
 {
 	storeSetting(SettingsType::BoardStyle, settings.BoardStyle);
