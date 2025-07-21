@@ -1,12 +1,15 @@
 ﻿using Chess.UI.Audio.Core;
+using Chess.UI.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Media.Core;
 using Windows.Media.Playback;
+using Windows.Storage;
 
 namespace Chess.UI.Audio.Modules
 {
@@ -35,11 +38,12 @@ namespace Chess.UI.Audio.Modules
     public interface IAtmosphereModule : IAudioModule
     {
         Task SetAtmosphereAsync(AtmosphereScenario scenario, float volume = 0.5f);
-        Task StopAtmosphereAsync();
+        void StopAtmosphereAsync();
+        void SetCrossfadeDuration(float seconds);
 
         AtmosphereScenario CurrentScenario { get; }
         bool IsPlaying { get; }
-        bool InEnabled { get; set; }
+        bool IsEnabled { get; set; }
 
         event EventHandler<AtmosphereChangedEventArgs> AtmosphereChanged;
     }
@@ -49,9 +53,12 @@ namespace Chess.UI.Audio.Modules
     {
         private readonly ConcurrentDictionary<AtmosphereScenario, MediaSource> _atmosphereCache;
         private MediaPlayer _currentPlayer;
+        private MediaPlayer _crossfadePlayer;
+        private readonly object _playerLock = new();
 
         private float _moduleVolume = 1.0f;
         private float _masterVolume = 1.0f;
+        private float _crossfadeDuration = 2.0f; // seconds
         private bool _isInitialized = false;
 
         // IAudioModule Properties
@@ -71,6 +78,262 @@ namespace Chess.UI.Audio.Modules
         public AtmosphereModule()
         {
             _atmosphereCache = new ConcurrentDictionary<AtmosphereScenario, MediaSource>();
+        }
+
+
+        public async Task InitializeAsync()
+        {
+            if (!_isInitialized) return;
+
+            try
+            {
+                await PreloadAtmosphereTracksAsync();
+                InitializeMediaPlayers();
+
+                _isInitialized = true;
+                StatusChanged?.Invoke(this, new AudioModuleEventArgs(ModuleName, "Initialized"));
+            }
+            catch (Exception ex)
+            {
+                StatusChanged?.Invoke(this, new AudioModuleEventArgs(ModuleName, $"Failed to initialize: {ex.Message}"));
+                throw;
+            }
+        }
+
+
+        // Volume Management - IAudioModule Implementation
+        public void SetModuleVolume(float volume)
+        {
+            _moduleVolume = Math.Clamp(volume, 0.0f, 1.0f);
+            UpdateCurrentPlayerVolume();
+        }
+
+
+        public float GetModuleVolume() => _moduleVolume;
+
+
+        public void SetMasterVolume(float masterVolume)
+        {
+            _masterVolume = Math.Clamp(masterVolume, 0.0f, 1.0f);
+            UpdateCurrentPlayerVolume();
+        }
+
+
+        public float GetEffectiveVolume() => _moduleVolume * _masterVolume;
+
+
+        public void SetCrossfadeDuration(float seconds)
+        {
+            _crossfadeDuration = Math.Max(0.1f, seconds);
+        }
+
+
+        public async Task SetAtmosphereAsync(AtmosphereScenario scenario, float volume = 0.5f)
+        {
+            if (!_isInitialized || !IsEnabled) return;
+
+            if (scenario == AtmosphereScenario.None)
+            {
+                StopAtmosphereAsync();
+                return;
+            }
+
+            try
+            {
+                var mediaSource = await GetMediaSourceAsync(scenario);
+                if (mediaSource == null) return;
+
+                lock (_playerLock)
+                {
+                    if (_currentPlayer?.PlaybackSession?.PlaybackState == MediaPlaybackState.Playing)
+                    {
+                        //Start crossfade
+                        StartCrossfade(mediaSource, volume);
+                    }
+                    else
+                    {
+                        // Start direct play
+                        StartDirectPlayback(mediaSource, volume);
+                    }
+                }
+
+                CurrentScenario = scenario;
+                AtmosphereChanged?.Invoke(this, new AtmosphereChangedEventArgs(scenario, volume * GetEffectiveVolume()));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Failed to set atmosphere {scenario}: {ex.Message}");
+                StatusChanged?.Invoke(this, new AudioModuleEventArgs(ModuleName, $"Failed to set atmosphere {scenario}: {ex.Message}"));
+            }
+        }
+
+
+        public void StopAtmosphereAsync()
+        {
+            if (!_isInitialized) return;
+
+            lock (_playerLock)
+            {
+                _currentPlayer?.Pause();
+                _crossfadePlayer?.Pause();
+            }
+
+            CurrentScenario = AtmosphereScenario.None;
+            AtmosphereChanged?.Invoke(this, new AtmosphereChangedEventArgs(AtmosphereScenario.None, 0.0f));
+        }
+
+
+        private async Task PreloadAtmosphereTracksAsync()
+        {
+            var loadTasks = new List<Task>();
+
+            foreach (AtmosphereScenario scenario in Enum.GetValues<AtmosphereScenario>())
+            {
+                if (scenario != AtmosphereScenario.None)
+                {
+                    loadTasks.Add(LoadAtmosphereTrackAsync(scenario));
+                }
+            }
+
+            await Task.WhenAll(loadTasks);
+        }
+
+
+        private async Task LoadAtmosphereTrackAsync(AtmosphereScenario scenario)
+        {
+            try
+            {
+                var filePath = GetAtmosphereTrackPath(scenario);
+                if (!File.Exists(filePath))
+                {
+                    Logger.LogWarning($"Atmosphere track not found: {filePath}");
+                    return;
+                }
+
+                var file = await StorageFile.GetFileFromPathAsync(filePath);
+                var mediaSource = MediaSource.CreateFromStorageFile(file);
+
+                _atmosphereCache.TryAdd(scenario, mediaSource);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"Failed to load atmosphere track {scenario}: {ex.Message}");
+            }
+        }
+
+
+        private async Task<MediaSource> GetMediaSourceAsync(AtmosphereScenario scenario)
+        {
+            if (_atmosphereCache.TryGetValue(scenario, out var mediaSource))
+            {
+                return mediaSource;
+            }
+
+            // Try to load on-demand if not in cache
+            await LoadAtmosphereTrackAsync(scenario);
+            _atmosphereCache.TryGetValue(scenario, out mediaSource);
+            return mediaSource;
+        }
+
+
+        private void InitializeMediaPlayers()
+        {
+            _currentPlayer = new MediaPlayer();
+            _currentPlayer.AudioCategory = Windows.Media.Playback.MediaPlayerAudioCategory.GameMedia;
+            _currentPlayer.IsLoopingEnabled = true;
+            _currentPlayer.MediaEnded += OnMediaPlayerEnded;
+            _currentPlayer.MediaFailed += OnMediaPlayerFailed;
+
+            _crossfadePlayer = new MediaPlayer();
+            _crossfadePlayer.AudioCategory = Windows.Media.Playback.MediaPlayerAudioCategory.GameMedia;
+            _crossfadePlayer.IsLoopingEnabled = true;
+            _crossfadePlayer.MediaEnded += OnCrossfadePlayerEnded;
+            _crossfadePlayer.MediaFailed += OnMediaPlayerFailed;
+        }
+
+
+        private void StartDirectPlayback(MediaSource mediaSource, float volume)
+        {
+            _currentPlayer.Source = mediaSource;
+            _currentPlayer.Volume = Math.Clamp(volume * GetEffectiveVolume(), 0.0f, 1.0f);
+            _currentPlayer.Play();
+        }
+
+
+        private void StartCrossfade(MediaSource mediaSource, float targetVolume)
+        {
+            // Setup crossfade player
+            _crossfadePlayer.Source = mediaSource;
+            _crossfadePlayer.Volume = 0.0f;
+            _crossfadePlayer.Play();
+
+            // Start crossfade animation
+            Task.Run(async () => await PerformCrossfade(targetVolume));
+        }
+
+
+        private void UpdateCurrentPlayerVolume()
+        {
+            lock (_playerLock)
+            {
+                if (_currentPlayer != null)
+                {
+                    var currentVolume = _currentPlayer.Volume / Math.Max(0.001f, GetEffectiveVolume());
+                    _currentPlayer.Volume = Math.Clamp(currentVolume * GetEffectiveVolume(), 0.0f, 1.0f);
+                }
+            }
+        }
+
+        private async Task PerformCrossfade(float targetVolume)
+        {
+            // TODO : Perform crossfade between players
+
+        }
+
+
+        private void OnMediaPlayerEnded(MediaPlayer sender, object args)
+        {
+            // Should not happen with looping enabled, but just in case
+            Logger.LogWarning("Atmosphere track ended unexpectedly");
+        }
+
+
+        private void OnCrossfadePlayerEnded(MediaPlayer sender, object args)
+        {
+            // Crossfade player ended - should not happen during normal operation
+        }
+
+
+        private void OnMediaPlayerFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
+        {
+            Logger.LogError($"Atmosphere player failed: {args.ErrorMessage}");
+            StatusChanged?.Invoke(this, new AudioModuleEventArgs(ModuleName, $"Playback failed: {args.ErrorMessage}"));
+        }
+
+
+        private string GetAtmosphereTrackPath(AtmosphereScenario scenario)
+        {
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            return Path.Combine(baseDir, "Assets", "Audio", "Atmosphere", $"{scenario}.wav");
+        }
+
+
+        public void Dispose()
+        {
+            _isInitialized = false;
+
+            lock (_playerLock)
+            {
+                _currentPlayer?.Dispose();
+                _crossfadePlayer?.Dispose();
+            }
+
+            // Dispose all cached media sources
+            foreach (var mediaSource in _atmosphereCache.Values)
+            {
+                mediaSource?.Dispose();
+            }
+            _atmosphereCache.Clear();
         }
 
     }
