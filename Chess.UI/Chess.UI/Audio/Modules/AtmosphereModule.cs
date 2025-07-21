@@ -284,10 +284,39 @@ namespace Chess.UI.Audio.Modules
             }
         }
 
+
         private async Task PerformCrossfade(float targetVolume)
         {
-            // TODO : Perform crossfade between players
+            const int steps = 20;
+            int stepDelay = (int)((_crossfadeDuration * 1000) / steps);
+            float effectiveVolume = targetVolume * GetEffectiveVolume();
 
+            for (int i = 0; i <= steps; i++)
+            {
+                float progress = (float)i / steps;
+
+                lock (_playerLock)
+                {
+                    if (_currentPlayer != null)
+                        _currentPlayer.Volume = Math.Clamp(effectiveVolume * (1.0 - progress), 0.0f, 1.0f);
+
+                    if (_crossfadePlayer != null)
+                        _crossfadePlayer.Volume = Math.Clamp(effectiveVolume * progress, 0.0f, 1.0f);
+                }
+
+                await Task.Delay(stepDelay);
+            }
+
+            // Swap the players
+            lock (_playerLock)
+            {
+                var temp = _currentPlayer;
+                _currentPlayer = _crossfadePlayer;
+                _crossfadePlayer = null;
+
+                _crossfadePlayer?.Pause();
+                _crossfadePlayer.Source = null;
+            }
         }
 
 
