@@ -47,6 +47,19 @@ namespace Chess.UI.ViewModels
         }
 
 
+        private int masterVolume;
+        public int MasterVolume
+        {
+            get => masterVolume;
+            set
+            {
+                if (value == masterVolume) return;
+                masterVolume = value;
+                _audioService.SetMasterVolume(masterVolume);
+            }
+        }
+
+
         private int sfxVolume;
         public int SfxVolume
         {
@@ -55,7 +68,7 @@ namespace Chess.UI.ViewModels
             {
                 if (value == sfxVolume) return;
                 sfxVolume = value;
-                _audioService.SetSFXVolume(value / 100);
+                _audioService.SetSFXVolume(sfxVolume);
             }
         }
 
@@ -68,7 +81,7 @@ namespace Chess.UI.ViewModels
             {
                 if (value == atmosVolume) return;
                 atmosVolume = value;
-                _audioService.SetAtmosphereVolume(value / 100);
+                _audioService.SetAtmosphereVolume(atmosVolume);
             }
         }
 
@@ -96,6 +109,27 @@ namespace Chess.UI.ViewModels
                 atmosEnabled = value;
                 _audioService.SetAtmosphereEnabled(value);
             }
+        }
+
+
+        public void SetSfxVolumeInEngine(int volume)
+        {
+            float engineVolume = volume / 100;
+            _audioService.SetSFXVolume(engineVolume);
+        }
+
+
+        public void SetAtmosVolumeInEngine(int volume)
+        {
+            float engineVolume = volume / 100;
+            _audioService.SetAtmosphereVolume(engineVolume);
+        }
+
+
+        public void SetMasterVolumeInEngine(int volume)
+        {
+            float engineVolume = volume / 100;
+            _audioService.SetMasterVolume(engineVolume);
         }
 
 

@@ -20,6 +20,36 @@
             <!--  Category: Audio  -->
             <TextBlock Style="{StaticResource SettingsTitle}" Text="Audio" />
 
+            <!--  Master  -->
+            <StackPanel Spacing="4">
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Style="{StaticResource SettingsSubTitle}" Text="Master" />
+
+                    <Slider
+                        Name="Master_Volume"
+                        Grid.Column="1"
+                        Width="200"
+                        PointerCaptureLost="Master_Volume_PointerCaptureLost"
+                        SnapsTo="StepValues"
+                        StepFrequency="10"
+                        Maximum="100"
+                        Value="{x:Bind _viewModel.MasterVolume, Mode=OneWay}"
+                        Minimum="0" />
+
+                </Grid>
+
+                <TextBlock Style="{ThemeResource SettingsDescription}" Text="Adjust the overall audio level" />
+            </StackPanel>
+
+
+            <Border Height="12" />
+
+
             <!--  SXF  -->
             <TextBlock Style="{StaticResource SettingsSubTitle}" Text="SFX" />
 
@@ -44,7 +74,7 @@
                         SnapsTo="StepValues"
                         StepFrequency="10"
                         Maximum="100"
-                        Value="{x:Bind _viewModel.SfxVolume}"
+                        Value="{x:Bind _viewModel.SfxVolume, Mode=OneWay}"
                         Minimum="0" />
 
                 </Grid>
@@ -52,7 +82,9 @@
                 <TextBlock Style="{ThemeResource SettingsDescription}" Text="Adjust the soundeffect" />
             </StackPanel>
 
+
             <Border Height="12" />
+
 
             <!--  Atmosphere  -->
             <TextBlock Style="{StaticResource SettingsSubTitle}" Text="Atmosphere" />
@@ -72,7 +104,6 @@
 
                     <StackPanel Grid.Column="1">
                         <ComboBox
-                            Grid.Column="1"
                             HorizontalAlignment="Stretch"
                             ItemsSource="{x:Bind _viewModel.AtmosphereSoundscapes}"
                             SelectedItem="{x:Bind _viewModel.SelectedAtmosphereSoundscape, Mode=TwoWay}"
@@ -85,7 +116,7 @@
                             SnapsTo="StepValues"
                             StepFrequency="10"
                             Maximum="100"
-                            Value="{x:Bind _viewModel.AtmosVolume}"
+                            Value="{x:Bind _viewModel.AtmosVolume, Mode=OneWay}"
                             Minimum="0" />
                     </StackPanel>
 
@@ -93,8 +124,6 @@
 
                 <TextBlock Style="{ThemeResource SettingsDescription}" Text="Adjust the atmospheric soundscape" />
             </StackPanel>
-
-
         </StackPanel>
     </Grid>
 </Page>

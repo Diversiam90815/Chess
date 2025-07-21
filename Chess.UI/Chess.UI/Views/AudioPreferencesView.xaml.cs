@@ -22,12 +22,28 @@ namespace Chess.UI.Views
 
         private void SFX_Volume_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
         {
-
+            if (sender is Slider slider && _viewModel != null)
+            {
+                _viewModel.SfxVolume = (int)slider.Value;
+            }
         }
+
 
         private void Atmos_Volume_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
         {
+            if (sender is Slider slider && _viewModel != null)
+            {
+                _viewModel.AtmosVolume = (int)slider.Value;
+            }
+        }
 
+
+        private void Master_Volume_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
+        {
+            if (sender is Slider slider && _viewModel != null)
+            {
+                _viewModel.MasterVolume = (int)slider.Value;
+            }
         }
     }
 }
