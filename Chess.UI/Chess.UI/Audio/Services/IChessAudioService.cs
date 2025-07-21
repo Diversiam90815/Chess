@@ -27,11 +27,18 @@ namespace Chess.UI.Audio.Services
         // UI Interaction
         Task HandleUIInteractionAsync(UIInteraction interaction);
 
+        // Atmosphere Control
+        Task SetAtmosphereAsync(AtmosphereScenario scenario, float volume = 0.5f);
+        void StopAtmosphereAsync();
+
         // Settings
         void SetSFXEnabled(bool enabled);
         void SetSFXVolume(float volume);
+        void SetAtmosphereEnabled(bool enabled);
+        void SetAtmosphereVolume(float volume);
         void SetMasterVolume(float volume);
 
         ISoundEffectsModule SoundEffectsModule { get; }
+        IAtmosphereModule AtmosphereModule { get; }
     }
 }

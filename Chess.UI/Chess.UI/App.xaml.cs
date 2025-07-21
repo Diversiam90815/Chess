@@ -86,12 +86,14 @@ namespace Chess.UI
             services.AddSingleton<MultiplayerViewModel>();
             services.AddSingleton<StylesPreferencesViewModel>();
             services.AddSingleton<MultiplayerPreferencesViewModel>();
+            services.AddSingleton<AudioPreferencesViewModel>();
 
             services.AddTransient<MainMenuWindow>();
             services.AddTransient<ChessBoardWindow>();
             services.AddTransient<MultiplayerWindow>();
             services.AddTransient<StylePreferencesView>();
             services.AddTransient<MultiplayerPreferencesView>();
+            services.AddTransient<AudioPreferencesView>();
 
             // Audio Services
             services.AddSingleton<IAudioEngine, AudioEngine>();

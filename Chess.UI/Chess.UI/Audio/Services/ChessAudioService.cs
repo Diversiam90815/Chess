@@ -13,8 +13,10 @@ namespace Chess.UI.Audio.Services
     {
         private readonly IAudioEngine _audioEngine;
         private ISoundEffectsModule _soundEffectsModule;
+        private IAtmosphereModule _atmosphereModule;
 
         public ISoundEffectsModule SoundEffectsModule => _soundEffectsModule;
+        public IAtmosphereModule AtmosphereModule => _atmosphereModule;
 
 
         public ChessAudioService(IAudioEngine engine)
@@ -26,7 +28,10 @@ namespace Chess.UI.Audio.Services
         public async Task InitializeAsync()
         {
             _soundEffectsModule = new SoundEffectsModule();
+            _atmosphereModule = new AtmosphereModule();
+
             _audioEngine.RegisterModule(AudioModuleType.SFX, _soundEffectsModule);
+            _audioEngine.RegisterModule(AudioModuleType.Atmosphere, _atmosphereModule);
 
             await _audioEngine.InitializeAsync();
 
@@ -40,6 +45,7 @@ namespace Chess.UI.Audio.Services
             var mainMenuViewModel = App.Current.Services.GetService<MainMenuViewModel>();
             mainMenuViewModel.ButtonClicked += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ButtonClick));
             mainMenuViewModel.StartGameRequested += () => _ = Task.Run(async () => await HandleGameStartAsync());
+            mainMenuViewModel.StartGameRequested += () => _ = Task.Run(async () => await SetAtmosphereAsync(AtmosphereScenario.Fireplace));
 
             var chessboardVM = App.Current.Services.GetService<ChessBoardViewModel>();
             chessboardVM.ButtonClicked += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ButtonClick));
@@ -119,6 +125,32 @@ namespace Chess.UI.Audio.Services
         public void SetSFXVolume(float volume)
         {
             _soundEffectsModule?.SetModuleVolume(volume);
+
+        }
+
+
+        public async Task SetAtmosphereAsync(AtmosphereScenario scenario, float volume = 0.5f)
+        {
+            await _atmosphereModule?.SetAtmosphereAsync(scenario, volume);
+        }
+
+
+        public void StopAtmosphereAsync()
+        {
+            _atmosphereModule?.StopAtmosphereAsync();
+        }
+
+
+        public void SetAtmosphereEnabled(bool enabled)
+        {
+            if (_atmosphereModule != null)
+                _atmosphereModule.IsEnabled = enabled;
+        }
+
+
+        public void SetAtmosphereVolume(float volume)
+        {
+            _atmosphereModule?.SetModuleVolume(volume);
         }
 
 

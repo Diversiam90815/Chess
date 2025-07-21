@@ -84,7 +84,7 @@ namespace Chess.UI.Audio.Modules
 
         public async Task InitializeAsync()
         {
-            if (!_isInitialized) return;
+            if (_isInitialized) return;
 
             try
             {
@@ -268,6 +268,17 @@ namespace Chess.UI.Audio.Modules
         private void StartCrossfade(MediaSource mediaSource, float targetVolume)
         {
             // Setup crossfade player
+            if (_crossfadePlayer is null)
+            {
+                _crossfadePlayer = new MediaPlayer
+                {
+                    AudioCategory = MediaPlayerAudioCategory.GameMedia,
+                    IsLoopingEnabled = true
+                };
+                _crossfadePlayer.MediaEnded += OnCrossfadePlayerEnded;
+                _crossfadePlayer.MediaFailed += OnMediaPlayerFailed;
+            }
+
             _crossfadePlayer.Source = mediaSource;
             _crossfadePlayer.Volume = 0.0f;
             _crossfadePlayer.Play();
@@ -315,12 +326,16 @@ namespace Chess.UI.Audio.Modules
             // Swap the players
             lock (_playerLock)
             {
-                var temp = _currentPlayer;
+                var tmp = _currentPlayer;
                 _currentPlayer = _crossfadePlayer;
-                _crossfadePlayer = null;
+                _crossfadePlayer = tmp;
 
-                _crossfadePlayer?.Pause();
-                _crossfadePlayer.Source = null;
+                if (_crossfadePlayer != null)
+                {
+                    _crossfadePlayer.Pause();
+                    _crossfadePlayer.Source = null;
+                }
+                _crossfadePlayer = null;
             }
         }
 

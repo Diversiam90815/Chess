@@ -218,6 +218,7 @@ namespace Chess.UI
                 p.Height = 800;
                 p.AddPreferencesTab("Styles", typeof(StylePreferencesView), "\uE790");
                 p.AddPreferencesTab("Multiplayer", typeof(MultiplayerPreferencesView), "\uE774");
+                p.AddPreferencesTab("Audio", typeof(AudioPreferencesView), "\uE8D6");
             });
         }
 

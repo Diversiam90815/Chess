@@ -82,6 +82,7 @@
 	<ItemGroup>
 	  <None Remove="..\..\Chess.Engine\build\Chess.Engine\Debug\ChessEngine.dll" />
 	  <None Remove="..\..\Chess.Engine\build\Chess.Engine\Debug\ChessEngine.pdb" />
+	  <None Remove="Views\AudioPreferencesView.xaml" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Chess.Engine\build\Chess.Engine\Chess.Engine.vcxproj" />
@@ -104,6 +105,9 @@
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
+	  <Page Update="Views\AudioPreferencesView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 	<ItemGroup>
 	  <Page Update="Views\MultiplayerPreferencesView.xaml">
