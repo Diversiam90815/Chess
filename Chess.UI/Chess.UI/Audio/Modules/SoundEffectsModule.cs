@@ -17,9 +17,9 @@ namespace Chess.UI.Audio.Modules
         // Piece Movement
         PieceMove,
         PieceCapture,
-        Castling,
-        EnPassant,
-        PawnPromotion,
+        Castling,       // maybe removed
+        EnPassant,      // Maybe removed
+        PawnPromotion,  // Maybe removed
 
         // States
         Check,
@@ -37,9 +37,7 @@ namespace Chess.UI.Audio.Modules
         PieceSelected,
 
         // Multiplayer
-        OpponentJoined,
-        OpponentLeft,
-        ChatMessageReceived,
+        ChatMessageReceived,    // chat feature not yet implemented, though prepared
     }
 
 
@@ -295,7 +293,7 @@ namespace Chess.UI.Audio.Modules
 
                 var mediaPlayer = GetMediaPlayerFromPool();
                 Logger.LogInfo($"GetMediaPlayer took: {stopwatch.ElapsedMilliseconds}ms");
-                if (mediaPlayer == null) return; 
+                if (mediaPlayer == null) return;
 
 
                 // Calculate final volume

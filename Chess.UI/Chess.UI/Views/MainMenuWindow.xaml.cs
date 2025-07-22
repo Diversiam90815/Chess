@@ -219,6 +219,8 @@ namespace Chess.UI
                 p.AddPreferencesTab("Audio", typeof(AudioPreferencesView), "\uE8D6");
                 p.AddPreferencesTab("Styles", typeof(StylePreferencesView), "\uE790");
                 p.AddPreferencesTab("Multiplayer", typeof(MultiplayerPreferencesView), "\uE774");
+
+                p.ButtonClicked += ViewModel.OnButtonClicked;
             });
         }
 

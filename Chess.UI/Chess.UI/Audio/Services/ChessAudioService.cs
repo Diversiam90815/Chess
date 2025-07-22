@@ -50,7 +50,6 @@ namespace Chess.UI.Audio.Services
             var mainMenuViewModel = App.Current.Services.GetService<MainMenuViewModel>();
             mainMenuViewModel.ButtonClicked += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ButtonClick));
             mainMenuViewModel.StartGameRequested += () => _ = Task.Run(async () => await HandleGameStartAsync());
-            mainMenuViewModel.StartGameRequested += () => _ = Task.Run(async () => await SetAtmosphereAsync(AtmosphereScenario.Fireplace));
 
             var chessboardVM = App.Current.Services.GetService<ChessBoardViewModel>();
             chessboardVM.ButtonClicked += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ButtonClick));
@@ -64,6 +63,12 @@ namespace Chess.UI.Audio.Services
 
             var themePreferences = App.Current.Services.GetService<StylesPreferencesViewModel>();
             themePreferences.ItemSelected += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ItemSelected));
+
+            var multiplayerPreferences = App.Current.Services.GetService<MultiplayerPreferencesViewModel>();
+            multiplayerPreferences.ItemSelected += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ItemSelected));
+
+            var multiplayerVM = App.Current.Services.GetService<MultiplayerViewModel>();
+            multiplayerVM.ButtonClicked += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ButtonClick));
         }
 
 
@@ -95,11 +100,10 @@ namespace Chess.UI.Audio.Services
                     _atmosphereModule.SetModuleVolume(atmosVolume);
                     _atmosphereModule.IsEnabled = atmosEnabled;
 
-                    // Set atmosphere scenario if not "None"
                     if (!string.IsNullOrEmpty(atmosScenario) &&
                         Enum.TryParse<AtmosphereScenario>(atmosScenario, out var scenario))
                     {
-                        await _atmosphereModule.SetAtmosphereAsync(scenario);
+                        await _atmosphereModule.SetAtmosphereAsync(scenario);   // Also triggers playback
                     }
                 }
 

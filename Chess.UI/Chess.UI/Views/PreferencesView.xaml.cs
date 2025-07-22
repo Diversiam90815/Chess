@@ -16,6 +16,8 @@ namespace Chess.UI.Views
 
         private readonly StylesPreferencesViewModel _settingsViewModel;
 
+        public event Action ButtonClicked;
+
 
         public PreferencesView()
         {
@@ -59,8 +61,10 @@ namespace Chess.UI.Views
             }
         }
 
+
         private void ReturnButtonClick(object sender, RoutedEventArgs e)
         {
+            ButtonClicked?.Invoke();
             this.Hide();
         }
     }

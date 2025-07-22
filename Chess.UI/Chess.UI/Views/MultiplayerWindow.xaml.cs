@@ -51,18 +51,22 @@ namespace Chess.UI.Views
 
         private void HostGameButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
             _viewModel.EnterServerMultiplayerMode();
         }
 
 
         private void JoinGameButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
             _viewModel.EnterClientMultiplayerMode();
         }
 
 
         private void ReturnButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             if (_viewModel.Processing)
             {
                 _viewModel.EnterInitMode();
@@ -77,48 +81,64 @@ namespace Chess.UI.Views
 
         private void HostAcceptButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.AcceptClientConnection();
         }
 
 
         private void HostDeclineButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.DeclineClientConnection();
         }
 
 
         private void JoinAcceptButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.AcceptConnectingToHost();
         }
 
 
         private void JoinDiscardButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.DeclineConnectingToHost();
         }
 
 
         private void AbortWaitButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.DisplayClientView();
         }
 
 
         private void SelectWhiteButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.SelectPlayerColor(EngineAPI.PlayerColor.White);
         }
 
 
         private void SelectBlackButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.SelectPlayerColor(EngineAPI.PlayerColor.Black);
         }
 
 
         private void ReadyButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.SetPlayerReady();
         }
     }
