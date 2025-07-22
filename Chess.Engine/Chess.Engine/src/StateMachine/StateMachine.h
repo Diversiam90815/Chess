@@ -56,7 +56,7 @@ private:
 
 	void				   run() override;
 
-	bool				   handleInitState(bool multiplayer) const;
+	bool				   handleInitState() const;
 	bool				   handleWaitingForInputState();
 	bool				   handleMoveInitiatedState() const;
 	bool				   handleWaitingForTargetState();
@@ -93,6 +93,7 @@ private:
 	EndGameState		   mEndgameState{EndGameState::OnGoing};
 
 	std::atomic<bool>	   mIsMultiplayerGame{false};
+	std::atomic<bool>	   mPlayingAgainstPC{false};
 
 	std::mutex			   mStateChangedMutex;
 	bool				   mHasPendingStateChange{false};

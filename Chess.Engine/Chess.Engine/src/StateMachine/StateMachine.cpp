@@ -211,7 +211,7 @@ void StateMachine::run()
 		{
 			if (!isInitialized())
 			{
-				bool result = handleInitState(mIsMultiplayerGame);
+				bool result = handleInitState();
 				setInitialized(result);
 			}
 
@@ -450,18 +450,15 @@ void StateMachine::reactToUndoMove()
 }
 
 
-bool StateMachine::handleInitState(bool multiplayer) const
+bool StateMachine::handleInitState() const
 {
 	LOG_INFO("Handling init state");
 
-	if (multiplayer)
-	{
+	if (mIsMultiplayerGame)
 		return GameManager::GetInstance()->startMultiplayerGame();
-	}
+
 	else
-	{
 		return GameManager::GetInstance()->startGame();
-	}
 }
 
 
