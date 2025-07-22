@@ -39,7 +39,7 @@ set (FILEMANAGER_DIR        ${SOURCE_DIR}/FileManager)
 set (LOGGER_DIR             ${SOURCE_DIR}/Logger)
 set (USERSETTINGS_DIR       ${SOURCE_DIR}/UserSettings)
 set (COMMUNICATION_DIR      ${SOURCE_DIR}/Communication)
-set (OBSERVER_DIR           ${SOURCE_DIR}/Observer)
+set (CPUPLAYER_DIR          ${SOURCE_DIR}/CPUPlayer)
 set (NETWORK_DIR            ${SOURCE_DIR}/Network)
 set (MULTIPLAYER_DIR        ${SOURCE_DIR}/Multiplayer)
 set (STATEMACHINE_DIR       ${SOURCE_DIR}/StateMachine)
@@ -63,7 +63,7 @@ set(ALL_PROJECT_DIRS
 			${SOURCE_DIR}
 			${USERSETTINGS_DIR}
 			${COMMUNICATION_DIR}
-			${OBSERVER_DIR}
+			${CPUPLAYER_DIR}
 			${NETWORK_DIR}
 			${MULTIPLAYER_DIR}
 			${STATEMACHINE_DIR}
@@ -110,6 +110,7 @@ set(MOVE_FILES
 	${MOVE_DIR}/generation/MoveGeneration.h		${MOVE_DIR}/Generation/MoveGeneration.cpp
 	${MOVE_DIR}/Validation/MoveValidation.h		${MOVE_DIR}/Validation/MoveValidation.cpp
 	${MOVE_DIR}/Execution/MoveExecution.h		${MOVE_DIR}/Execution/MoveExecution.cpp
+	${MOVE_DIR}/Evaluation/MoveEvaluation.h		${MOVE_DIR}/Evaluation/MoveEvaluation.cpp
 	${MOVE_DIR}/Notation/MoveNotation.h			${MOVE_DIR}/Notation/MoveNotation.cpp
 )
 
@@ -122,11 +123,17 @@ set(PLAYER_FILES
 	${PLAYER_DIR}/PlayerName.h      ${PLAYER_DIR}/PlayerName.cpp
 )
 
+set(CPU_PLAYER_FILES
+	${CPUPLAYER_DIR}/CPUPlayer.h      	${CPUPLAYER_DIR}/CPUPlayer.cpp
+)
+
 set(HELPER_FILES
 	${HELPER_DIR}/JsonConversion.h
 	${HELPER_DIR}/Parameters.h
 	${HELPER_DIR}/ThreadBase.h
 	${HELPER_DIR}/Conversion.h
+	${HELPER_DIR}/IObserver.h
+	${HELPER_DIR}/IObservable.h
 )
 
 set(LOGGER_FILES
@@ -146,11 +153,6 @@ set(NETWORK_FILES
 	${NETWORK_DIR}/NetworkAdapter.h
 	${NETWORK_DIR}/NetworkManager.h         ${NETWORK_DIR}/NetworkManager.cpp
 	${NETWORK_DIR}/NetworkInformation.h     ${NETWORK_DIR}/NetworkInformation.cpp
-)
-
-set(OBSERVER_FILES
-	${OBSERVER_DIR}/IObserver.h
-	${OBSERVER_DIR}/IObservable.h
 )
 
 set(COMMUNICATION_FILES
@@ -187,7 +189,7 @@ set(ALL_FILES
 	${FILEMANAGER_FILES}
 	${USERSETTINGS_FILES}
 	${COMMUNICATION_FILES}
-	${OBSERVER_FILES}
+	${CPU_PLAYER_FILES}
 	${NETWORK_FILES}
 	${MULTIPLAYER_FILES}
 	${STATEMACHINE_FILES}
