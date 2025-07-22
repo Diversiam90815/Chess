@@ -13,6 +13,7 @@
 #include "Execution/MoveExecution.h"
 #include "Generation/MoveGeneration.h"
 #include "Validation/MoveValidation.h"
+#include "CPUPlayer.h"
 #include "IObservable.h"
 #include "Parameters.h"
 
@@ -58,6 +59,14 @@ public:
 
 	EndGameState			   checkForEndGameConditions();
 
+	void					   setCPUConfiguration(const CPUConfiguration &config);
+
+	CPUConfiguration		   getCPUConfiguration() const;
+
+	bool					   isCPUPlayer(PlayerColor player) const;
+
+	std::future<PossibleMove>  getCPUMoveAsync(PlayerColor player);
+
 
 private:
 	bool							mMovesGeneratedForCurrentTurn = false;
@@ -74,6 +83,8 @@ private:
 	std::shared_ptr<MoveGeneration> mMoveGeneration;
 	std::shared_ptr<MoveValidation> mMoveValidation;
 	std::shared_ptr<MoveExecution>	mMoveExecution;
+
+	std::shared_ptr<CPUPlayer>		mCPUPlayer;
 
 	friend class GameManager;
 };

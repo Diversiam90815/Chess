@@ -71,6 +71,7 @@ PossibleMove CPUPlayer::getBestMove(PlayerColor player)
 	}
 }
 
+
 bool CPUPlayer::isCPUPlayer(PlayerColor player) const
 {
 	return mConfig.enabled && (player == mConfig.cpuColor);
