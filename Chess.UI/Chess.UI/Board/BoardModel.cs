@@ -1,5 +1,5 @@
 ﻿using Chess.UI.Services;
-using Chess.UI.Services.Interfaces;
+using Chess.UI.Coordinates;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;

@@ -18,6 +18,12 @@ struct DefaultSettings
 {
 	const std::string BoardStyle	  = "Wood";
 	const std::string ChessPieceStyle = "Basic";
+	const std::string AtmosScenario	  = "Forest";
+	const float		  AtmosVolume	  = 1.0f;
+	const float		  SFXVolume		  = 1.0f;
+	const float		  MasterVolume	  = 1.0f;
+	const bool		  SFXEnabled	  = true;
+	const bool		  AtmosEnabled	  = true;
 };
 
 
@@ -44,6 +50,24 @@ public:
 	void		setLocalPlayerName(const std::string name);
 	std::string getLocalPlayerName();
 
+	void		setSFXEnabled(const bool enabled);
+	bool		getSFXEnabled();
+
+	void		setAtmosEnabled(const bool enabled);
+	bool		getAtmosEnabled();
+
+	void		setSFXVolume(const float volume);
+	float		getSFXVolume();
+
+	void		setAtmosVolume(const float volume);
+	float		getAtmosVolume();
+
+	void		setMasterAudioVolume(const float volume);
+	float		getMasterVolume();
+
+	void		setAtmosScenario(const std::string scenario);
+	std::string getAtmosScenario();
+
 
 private:
 	bool doesConfigFileExist();
@@ -69,19 +93,50 @@ inline void UserSettings::storeSetting(SettingsType setting, T value)
 	{
 	case SettingsType::BoardStyle:
 	{
-		fmg->writeSettingToFile<std::string>(BoardStyleSetting, value);
+		fmg->writeSettingToFile<T>(BoardStyleSetting, value);
 		break;
 	}
 	case SettingsType::ChessPieceStyle:
 	{
-		fmg->writeSettingToFile<std::string>(PieceStyleSetting, value);
+		fmg->writeSettingToFile<T>(PieceStyleSetting, value);
 		break;
 	}
 	case SettingsType::PlayerName:
 	{
-		fmg->writeSettingToFile<std::string>(PlayerNameSetting, value);
+		fmg->writeSettingToFile<T>(PlayerNameSetting, value);
 		break;
 	}
+	case SettingsType::AudioSFXEnabled:
+	{
+		fmg->writeSettingToFile<T>(AudioSFXEnabledSetting, value);
+		break;
+	}
+	case SettingsType::AudioSFXVolume:
+	{
+		fmg->writeSettingToFile<T>(AudioSFXVolumeSetting, value);
+		break;
+	}
+	case SettingsType::AudioAtmosEnabled:
+	{
+		fmg->writeSettingToFile<T>(AudioAtmosEnabledSetting, value);
+		break;
+	}
+	case SettingsType::AudioAtmosVolume:
+	{
+		fmg->writeSettingToFile<T>(AudioAtmosVolumeSetting, value);
+		break;
+	}
+	case SettingsType::AudioAtmosScenario:
+	{
+		fmg->writeSettingToFile<T>(AudioAtmosScenarioSetting, value);
+		break;
+	}
+	case SettingsType::AudioMasterVolume:
+	{
+		fmg->writeSettingToFile<T>(AudioMasterVolumeSetting, value);
+		break;
+	}
+
 	default: break;
 	}
 }
@@ -90,27 +145,71 @@ inline void UserSettings::storeSetting(SettingsType setting, T value)
 template <typename T>
 inline T UserSettings::readSetting(SettingsType setting)
 {
-	T value = "";
+	T value = {};
 
 	switch (setting)
 	{
 	case (SettingsType::BoardStyle):
 	{
-		value = readOrDefault<std::string>(BoardStyleSetting, mDefaultSettings.BoardStyle, setting, "Board Style");
-		return value;
+		if constexpr (std::is_same_v<T, std::string>)
+		{
+			value = readOrDefault<std::string>(BoardStyleSetting, mDefaultSettings.BoardStyle, setting, "Board Style");
+		}
+		break;
 	}
 	case (SettingsType::ChessPieceStyle):
 	{
-		value = readOrDefault<std::string>(PieceStyleSetting, mDefaultSettings.ChessPieceStyle, setting, "Piece Style");
-		return value;
+		if constexpr (std::is_same_v<T, std::string>)
+		{
+			value = readOrDefault<std::string>(PieceStyleSetting, mDefaultSettings.ChessPieceStyle, setting, "Piece Style");
+		}
+		break;
 	}
 	case (SettingsType::PlayerName):
 	{
-		value = readOrDefault<std::string>(PlayerNameSetting, "", setting, "Local Player Name");
-		return value;
+		if constexpr (std::is_same_v<T, std::string>)
+		{
+			value = readOrDefault<std::string>(PlayerNameSetting, {}, setting, "Local Player Name");
+		}
+		break;
+	}
+	case SettingsType::AudioSFXEnabled:
+	{
+		value = readOrDefault<bool>(AudioSFXEnabledSetting, mDefaultSettings.SFXEnabled, setting, "Audio SFX Enabled");
+		break;
+	}
+	case SettingsType::AudioSFXVolume:
+	{
+		value = readOrDefault<float>(AudioSFXVolumeSetting, mDefaultSettings.SFXVolume, setting, "Audio SFX Volume");
+		break;
+	}
+	case SettingsType::AudioAtmosEnabled:
+	{
+		value = readOrDefault<bool>(AudioAtmosEnabledSetting, mDefaultSettings.AtmosEnabled, setting, "Audio Atmos Enabled");
+		break;
+	}
+	case SettingsType::AudioAtmosVolume:
+	{
+		value = readOrDefault<float>(AudioAtmosVolumeSetting, mDefaultSettings.AtmosVolume, setting, "Audio Atmos Volume");
+		break;
+	}
+	case SettingsType::AudioAtmosScenario:
+	{
+		if constexpr (std::is_same_v<T, std::string>)
+		{
+			value = readOrDefault<std::string>(AudioAtmosScenarioSetting, mDefaultSettings.AtmosScenario, setting, "Audio Atmos Scencario");
+		}
+		break;
+	}
+	case SettingsType::AudioMasterVolume:
+	{
+		value = readOrDefault<float>(AudioMasterVolumeSetting, mDefaultSettings.MasterVolume, setting, "Audio Master Volume");
+		break;
 	}
 	default: return value;
 	}
+
+	return value;
 }
 
 

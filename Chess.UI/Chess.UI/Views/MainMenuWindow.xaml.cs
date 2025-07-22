@@ -2,7 +2,6 @@ using Chess.UI.Services;
 using Chess.UI.ViewModels;
 using Chess.UI.Views;
 using Chess.UI.Wrappers;
-using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -28,8 +27,6 @@ namespace Chess.UI
 
         private MultiplayerViewModel MultiplayerViewModel { get; }
 
-        public IAsyncRelayCommand OpenPreferencesCommand { get; }
-
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
         private bool _multiplayerWindowClosedProgrammatically = false;
@@ -49,8 +46,6 @@ namespace Chess.UI
 
             this.RootGrid.DataContext = ViewModel;
 
-            OpenPreferencesCommand = new AsyncRelayCommand(OpenPreferencesView);
-
             MultiplayerViewModel.RequestNavigationToChessboard += () =>
             {
                 // We enter the Multiplayer Game, so we show the Chessboard
@@ -69,6 +64,8 @@ namespace Chess.UI
         {
             mPresenter = AppWindow.Presenter as OverlappedPresenter;
             mPresenter.IsResizable = false;
+
+            SubscribeToViewModelEvents();
         }
 
 
@@ -79,6 +76,16 @@ namespace Chess.UI
             int scaledWidth = (int)(width * scalingFactor);
             int scaledHeight = (int)(height * scalingFactor);
             AppWindow.Resize(new(scaledWidth, scaledHeight));
+        }
+
+
+        private void SubscribeToViewModelEvents()
+        {
+            // Subscribe to specific events from MainMenuViewModel
+            ViewModel.StartGameRequested += () => OpenChessboardView(false);
+            ViewModel.MultiplayerRequested += () => HandleMultiplayerButtonAction();
+            ViewModel.QuitRequested += () => HandleQuitButtonAction();
+            ViewModel.SettingsRequested += () => _ = OpenPreferencesView();
         }
 
 
@@ -150,11 +157,37 @@ namespace Chess.UI
 
         private void StartGameButton_Click(object sender, RoutedEventArgs e)
         {
-            OpenChessboardView(false);
+            ViewModel.OnButtonClicked();
+
+            ViewModel.OnStartGameRequested();
         }
 
 
         private void MultiplayerButton_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.OnButtonClicked();
+
+            ViewModel.OnMultiplayerRequested();
+        }
+
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.OnButtonClicked();
+
+            ViewModel.OnSettingsRequested();
+        }
+
+
+        private void QuitButton_Click(object sender, RoutedEventArgs e)
+        {
+            ViewModel.OnButtonClicked();
+
+            ViewModel.OnQuitRequested();
+        }
+
+
+        private void HandleMultiplayerButtonAction()
         {
             if (_multiplayerWindow == null)
             {
@@ -170,7 +203,7 @@ namespace Chess.UI
         }
 
 
-        private void QuitButton_Click(object sender, RoutedEventArgs e)
+        private void HandleQuitButtonAction()
         {
             var app = Application.Current;
             app.Exit();
@@ -183,8 +216,11 @@ namespace Chess.UI
             {
                 p.Width = 700;
                 p.Height = 800;
-                p.AddPreferencesTab("Styles", typeof(ThemePreferencesView), "\uE790");
+                p.AddPreferencesTab("Audio", typeof(AudioPreferencesView), "\uE8D6");
+                p.AddPreferencesTab("Styles", typeof(StylePreferencesView), "\uE790");
                 p.AddPreferencesTab("Multiplayer", typeof(MultiplayerPreferencesView), "\uE774");
+
+                p.ButtonClicked += ViewModel.OnButtonClicked;
             });
         }
 

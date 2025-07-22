@@ -42,6 +42,20 @@ void UICommunication::onRemoveLastCapturedPiece(PlayerColor player, PieceType ca
 }
 
 
+void UICommunication::onExecuteMove(const PossibleMove &move, bool fromRemote)
+{
+	PossibleMoveInstance moveInstance{};
+	moveInstance.start.x = move.start.x;
+	moveInstance.start.y = move.start.y;
+	moveInstance.end.x	 = move.end.x;
+	moveInstance.end.y	 = move.end.y;
+
+	moveInstance.type = static_cast<MoveTypeInstance>(move.type);
+
+	communicateToUI(MessageType::MoveExecuted, &moveInstance);
+}
+
+
 void UICommunication::onAddToMoveHistory(Move &move)
 {
 	MoveHistoryEvent event{};

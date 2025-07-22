@@ -81,6 +81,7 @@ private:
 
 	bool				   mMovesCalulated{false};
 
+	bool				   mMoveInitiated{false};
 	bool				   mWaitingForTargetStart{false};
 	bool				   mWaitingForTargetEnd{false};
 

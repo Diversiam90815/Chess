@@ -254,7 +254,7 @@ bool GameEngine::initiateMove(const Position &startPosition)
 	mAllMovesForPosition = possibleMoves;
 
 	LOG_INFO("Number of possible moves for the current position is {}", mAllMovesForPosition.size());
-	return true;
+	return !mAllMovesForPosition.empty();
 }
 
 

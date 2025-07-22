@@ -240,7 +240,7 @@ void StateMachine::run()
 		case GameState::MoveInitiated:
 		{
 			// Display possible moves to UI
-			handleMoveInitiatedState();
+			mMoveInitiated = handleMoveInitiatedState();
 			switchToNextState();
 			break;
 		}
@@ -341,7 +341,11 @@ void StateMachine::switchToNextState()
 	}
 	case GameState::MoveInitiated:
 	{
-		gameStateChanged(GameState::WaitingForTarget);
+		if (mMoveInitiated)
+			gameStateChanged(GameState::WaitingForTarget);
+		else
+			gameStateChanged(GameState::WaitingForInput);
+
 		break;
 	}
 	case GameState::WaitingForTarget:

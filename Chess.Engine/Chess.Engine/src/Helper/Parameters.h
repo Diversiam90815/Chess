@@ -72,7 +72,13 @@ enum class SettingsType
 {
 	BoardStyle,
 	ChessPieceStyle,
-	PlayerName
+	PlayerName,
+	AudioSFXEnabled,
+	AudioSFXVolume,
+	AudioAtmosEnabled,
+	AudioAtmosVolume,
+	AudioAtmosScenario,
+	AudioMasterVolume,
 };
 
 
@@ -95,6 +101,12 @@ constexpr auto		  BoardStyleSetting			   = "BoardStyle";
 constexpr auto		  PieceStyleSetting			   = "PieceStyle";
 constexpr auto		  SelectedAdapter			   = "Selected_Adapter";
 constexpr auto		  PlayerNameSetting			   = "PlayerName";
+constexpr auto		  AudioSFXVolumeSetting		   = "Audio_SFX_Volume";
+constexpr auto		  AudioSFXEnabledSetting	   = "Audio_SFX_Enabled";
+constexpr auto		  AudioAtmosVolumeSetting	   = "Audio_Atmos_Volume";
+constexpr auto		  AudioAtmosEnabledSetting	   = "Audio_Atmos_Enabled";
+constexpr auto		  AudioAtmosScenarioSetting	   = "Audio_Atmos_Scenario";
+constexpr auto		  AudioMasterVolumeSetting	   = "Audio_Master_Volume";
 
 
 //============================================================
