@@ -16,6 +16,7 @@
 
 #include "Parameters.h"
 #include "Generation/MoveGeneration.h"
+#include "Evaluation/MoveEvaluation.h"
 #include "ChessBoard.h"
 #include "IObservable.h"
 
@@ -41,7 +42,7 @@ struct CPUConfiguration
 class CPUPlayer : public ICPUMoveObservable
 {
 public:
-	CPUPlayer(std::shared_ptr<MoveGeneration> moveGeneration, std::shared_ptr<ChessBoard> board);
+	CPUPlayer(std::shared_ptr<MoveGeneration> moveGeneration, std::shared_ptr<MoveEvaluation> moveEvaluation, std::shared_ptr<ChessBoard> board);
 	~CPUPlayer() = default;
 
 	void			 setCPUConfiguration(const CPUConfiguration &config);
@@ -69,6 +70,7 @@ private:
 	CPUConfiguration				mConfig;
 
 	std::shared_ptr<MoveGeneration> mMoveGeneration;
+	std::shared_ptr<MoveEvaluation> mMoveEvaluation;
 	std::shared_ptr<ChessBoard>		mBoard;
 
 	std::random_device				mRandomDevice;

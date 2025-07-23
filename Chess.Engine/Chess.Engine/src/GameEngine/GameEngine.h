@@ -13,6 +13,7 @@
 #include "Execution/MoveExecution.h"
 #include "Generation/MoveGeneration.h"
 #include "Validation/MoveValidation.h"
+#include "Evaluation/MoveEvaluation.h"
 #include "CPUPlayer.h"
 #include "IObservable.h"
 #include "Parameters.h"
@@ -65,7 +66,7 @@ public:
 
 	bool					   isCPUPlayer(PlayerColor player) const;
 
-	void  requestCPUMoveAsync(PlayerColor player);
+	void					   requestCPUMoveAsync(PlayerColor player);
 
 
 private:
@@ -83,6 +84,7 @@ private:
 	std::shared_ptr<MoveGeneration> mMoveGeneration;
 	std::shared_ptr<MoveValidation> mMoveValidation;
 	std::shared_ptr<MoveExecution>	mMoveExecution;
+	std::shared_ptr<MoveEvaluation> mMoveEvaluation;
 
 	std::shared_ptr<CPUPlayer>		mCPUPlayer;
 

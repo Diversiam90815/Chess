@@ -8,8 +8,8 @@
 #include "CPUPlayer.h"
 
 
-CPUPlayer::CPUPlayer(std::shared_ptr<MoveGeneration> moveGeneration, std::shared_ptr<ChessBoard> board)
-	: mMoveGeneration(moveGeneration), mBoard(board), mRandomGenerator(mRandomDevice())
+CPUPlayer::CPUPlayer(std::shared_ptr<MoveGeneration> moveGeneration, std::shared_ptr<MoveEvaluation> moveEvaluation, std::shared_ptr<ChessBoard> board)
+	: mMoveGeneration(moveGeneration), mMoveEvaluation(moveEvaluation), mBoard(board), mRandomGenerator(mRandomDevice())
 {
 }
 
@@ -65,8 +65,24 @@ PossibleMove CPUPlayer::getRandomMove(const std::vector<PossibleMove> &moves)
 
 PossibleMove CPUPlayer::getEasyMove(const std::vector<PossibleMove> &moves)
 {
-	// TODO
-	return PossibleMove();
+	// Easy: Basic move evaluation
+	std::vector<std::pair<PossibleMove, int>> evaluatedMoves;
+
+	for (const auto &move : moves)
+	{
+		int score = mMoveEvaluation->getBasicEvaluation(move);
+		evaluatedMoves.emplace_back(move, score);
+	}
+
+	// Sort by score (descending order)
+	std::sort(evaluatedMoves.begin(), evaluatedMoves.end(), [](const auto &a, const auto &b) { return a.second > b.second; });
+
+	// Pick from top 3 moves with somewhat randomness
+	size_t								  topMoves = (evaluatedMoves.size() < 3) ? evaluatedMoves.size() : 3;
+	std::uniform_int_distribution<size_t> distribution(0, topMoves - 1);
+	size_t								  selectedIndex = distribution(mRandomGenerator);
+
+	return evaluatedMoves[selectedIndex].first;
 }
 
 
