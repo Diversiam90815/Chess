@@ -34,6 +34,8 @@ namespace Chess.UI.Views
 
         private readonly IDispatcherQueueWrapper _dispatcher;
 
+        private readonly IWindowSizeService _windowSizeService;
+
 
         public ChessBoardWindow()
         {
@@ -43,6 +45,7 @@ namespace Chess.UI.Views
             _dispatcher = App.Current.Services.GetService<IDispatcherQueueWrapper>();
             _images = App.Current.Services.GetService<IImageService>();
             _viewModel = App.Current.Services.GetService<ChessBoardViewModel>();
+            _windowSizeService = App.Current.Services.GetService<IWindowSizeService>();
 
             RootPanel.DataContext = _viewModel;
 
@@ -50,19 +53,7 @@ namespace Chess.UI.Views
             _viewModel.ShowEndGameDialog += OnGameOverState;
 
             Init();
-            SetWindowSize(1100, 800);
-        }
-
-
-        private void SetWindowSize(double width, double height)
-        {
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            float scalingFactor = EngineAPI.GetWindowScalingFactor(hwnd);
-
-            int scaledWidth = (int)(width * scalingFactor);
-            int scaledHeight = (int)(height * scalingFactor);
-            AppWindow.Resize(new(scaledWidth, scaledHeight));
-            Logger.LogInfo(string.Format("Window size set to {0} - {1} with a scaling factor of {2}", scaledWidth.ToString(), scaledHeight.ToString(), scalingFactor.ToString()));
+            _windowSizeService.SetWindowSize(this, 1100, 800);
         }
 
 

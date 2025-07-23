@@ -15,6 +15,7 @@ namespace Chess.UI
         private readonly MainMenuViewModel _viewModel;
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
         private readonly INavigationService _navigationService;
+        private readonly IWindowSizeService _windowSizeService;
 
 
         public MainMenuWindow()
@@ -26,6 +27,7 @@ namespace Chess.UI
             _dispatcherQueue = App.Current.Services.GetRequiredService<IDispatcherQueueWrapper>();
             _viewModel = App.Current.Services.GetService<MainMenuViewModel>();
             _navigationService = App.Current.Services.GetService<INavigationService>();
+            _windowSizeService = App.Current.Services.GetService<IWindowSizeService>();
 
             // Set this window in navigation service
             if (_navigationService is NavigationService navService)
@@ -36,7 +38,7 @@ namespace Chess.UI
             this.RootGrid.DataContext = _viewModel;
 
             Init();
-            SetWindowSize(800, 750);
+            _windowSizeService.SetWindowSize(this, 800, 750);
         }
 
 
@@ -49,16 +51,6 @@ namespace Chess.UI
 
             SubscribeToViewModelEvents();
             SubscribeToMultiplayerEvents();
-        }
-
-
-        private void SetWindowSize(double width, double height)
-        {
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            float scalingFactor = EngineAPI.GetWindowScalingFactor(hwnd);
-            int scaledWidth = (int)(width * scalingFactor);
-            int scaledHeight = (int)(height * scalingFactor);
-            AppWindow.Resize(new(scaledWidth, scaledHeight));
         }
 
 
