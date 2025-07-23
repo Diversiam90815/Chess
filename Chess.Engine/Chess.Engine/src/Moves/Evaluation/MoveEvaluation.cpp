@@ -15,11 +15,11 @@ int MoveEvaluation::getBasicEvaluation(const PossibleMove &move)
 
 	// Capture bonus
 	if ((move.type & MoveType::Capture) == MoveType::Capture)
-		score += 10;
+		score += 50;
 
 	// Check bonus
 	if ((move.type & MoveType::Check) == MoveType::Check)
-		score += 5;
+		score += 15;
 
 	// Checkmate bonus
 	if ((move.type & MoveType::Checkmate) == MoveType::Checkmate)
@@ -27,11 +27,17 @@ int MoveEvaluation::getBasicEvaluation(const PossibleMove &move)
 
 	// Promotion bonus
 	if ((move.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
-		score += 8;
+	{
+		score += 800;
+
+		// Additional bonus for promoting to queen
+		if (move.promotionPiece == PieceType::Queen)
+			score += 100;
+	}
 
 	// Castling bonus
 	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
-		score += 3;
+		score += 30;
 
 	return score;
 }

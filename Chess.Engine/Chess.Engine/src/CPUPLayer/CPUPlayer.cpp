@@ -77,12 +77,8 @@ PossibleMove CPUPlayer::getEasyMove(const std::vector<PossibleMove> &moves)
 	// Sort by score (descending order)
 	std::sort(evaluatedMoves.begin(), evaluatedMoves.end(), [](const auto &a, const auto &b) { return a.second > b.second; });
 
-	// Pick from top 3 moves with somewhat randomness
-	size_t								  topMoves = (evaluatedMoves.size() < 3) ? evaluatedMoves.size() : 3;
-	std::uniform_int_distribution<size_t> distribution(0, topMoves - 1);
-	size_t								  selectedIndex = distribution(mRandomGenerator);
-
-	return evaluatedMoves[selectedIndex].first;
+	LOG_INFO("CPU (Easy) selected best move with score {}", evaluatedMoves[0].second);
+	return evaluatedMoves[0].first;
 }
 
 
