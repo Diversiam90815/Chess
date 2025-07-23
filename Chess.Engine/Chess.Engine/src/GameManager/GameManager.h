@@ -93,7 +93,7 @@ public:
 	void						setLocalPlayerReady(const bool flag);
 
 
-	bool						startCPUGame(CPUDifficulty difficulty = CPUDifficulty::Random, PlayerColor cpuColor = PlayerColor::Black);
+	bool						startCPUGame();
 
 	bool						isCPUPlayer(PlayerColor player) const;
 
@@ -119,6 +119,9 @@ public:
 	std::string					getAtmosScenario();
 
 
+	void						setGameConfiguration(GameConfiguration config);
+
+
 private:
 	GameManager() = default;
 
@@ -139,6 +142,8 @@ private:
 
 	std::shared_ptr<MultiplayerManager> mMultiplayerManager;
 	std::unique_ptr<NetworkManager>		mNetwork;
+
+	GameConfiguration					mConfig;
 
 	bool								mIsMultiplayerMode{false};
 };

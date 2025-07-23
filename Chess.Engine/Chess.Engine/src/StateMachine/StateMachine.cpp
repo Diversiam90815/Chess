@@ -38,12 +38,12 @@ StateMachine::~StateMachine()
 
 void StateMachine::onGameStarted(GameConfiguration config)
 {
+	GameManager::GetInstance()->setGameConfiguration(config);
+
 	if (config.mode == GameModeSelection::VsCPU)
 	{
 		LOG_INFO("Starting a game against the CPU!");
 		mPlayingAgainstPC.store(true);
-		PlayerColor cpuColor = config.localPlayer == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
-		GameManager::GetInstance()->startCPUGame(static_cast<CPUDifficulty>(config.difficulty), cpuColor);
 	}
 	else
 	{

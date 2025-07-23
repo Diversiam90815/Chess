@@ -422,17 +422,25 @@ std::string GameManager::getAtmosScenario()
 }
 
 
-bool GameManager::startCPUGame(CPUDifficulty difficulty, PlayerColor cpuColor)
+void GameManager::setGameConfiguration(GameConfiguration config)
 {
-	LOG_INFO("Game started against CPU - Difficulty: {}", static_cast<int>(difficulty));
+	mConfig = config;
+}
 
-	CPUConfiguration config;
-	config.difficulty	= difficulty;
-	config.enabled		= true;
-	config.cpuColor		= cpuColor;
-	config.thinkingTime = std::chrono::milliseconds(1000);
 
-	mEngine->setCPUConfiguration(config);
+bool GameManager::startCPUGame()
+{
+	LOG_INFO("Game started against CPU - Difficulty: {}", mConfig.difficulty);
+
+	PlayerColor		 cpuColor = mConfig.localPlayer == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
+
+	CPUConfiguration CPUConfig;
+	CPUConfig.difficulty = static_cast<CPUDifficulty>(mConfig.difficulty);
+	CPUConfig.enabled	 = true;
+	CPUConfig.cpuColor	 = cpuColor;
+	CPUConfig.thinkingTime = std::chrono::milliseconds(1000);
+
+	mEngine->setCPUConfiguration(CPUConfig);
 
 	mEngine->startGame();
 
