@@ -95,8 +95,6 @@ public:
 
 	bool						startCPUGame(CPUDifficulty difficulty = CPUDifficulty::Random, PlayerColor cpuColor = PlayerColor::Black);
 
-	void						setCPUConfiguration(const CPUConfiguration &config);
-
 	bool						isCPUPlayer(PlayerColor player) const;
 
 	void						requestCPUMoveAsync(PlayerColor player);

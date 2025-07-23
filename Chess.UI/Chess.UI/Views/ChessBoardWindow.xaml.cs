@@ -86,7 +86,7 @@ namespace Chess.UI.Views
             _viewModel.OnButtonClicked();
 
             _viewModel.ResetGame();
-            _viewModel.StartGame();
+            _viewModel.StartGame(new GameConfiguration());
         }
 
 
@@ -286,7 +286,7 @@ namespace Chess.UI.Views
             {
                 case ContentDialogResult.Primary: // New Game
                     _viewModel.ResetGame();
-                    _viewModel.StartGame();
+                    _viewModel.StartGame(new GameConfiguration());
                     break;
                 case ContentDialogResult.Secondary: // View Board
                     // Do nothing - just close dialog and let user examine the board

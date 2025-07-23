@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Media;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using static Chess.UI.Services.EngineAPI;
 
 
 namespace Chess.UI.ViewModels

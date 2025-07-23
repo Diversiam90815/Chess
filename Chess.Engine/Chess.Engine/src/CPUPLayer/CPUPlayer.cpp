@@ -113,11 +113,11 @@ void CPUPlayer::calculateMove(PlayerColor player)
 	// Select move based on difficulty (for now we just test random moves)
 	switch (mConfig.difficulty)
 	{
-	case CPUDifficulty::Random: selectedMove = getRandomMove(allMoves);
-	case CPUDifficulty::Easy: selectedMove = getEasyMove(allMoves);
-	case CPUDifficulty::Medium: selectedMove = getMediumMove(allMoves);
-	case CPUDifficulty::Hard: selectedMove = getHardMove(allMoves);
-	default: selectedMove = getRandomMove(allMoves);
+	case CPUDifficulty::Random: selectedMove = getRandomMove(allMoves); break;
+	case CPUDifficulty::Easy: selectedMove = getEasyMove(allMoves); break;
+	case CPUDifficulty::Medium: selectedMove = getMediumMove(allMoves); break;
+	case CPUDifficulty::Hard: selectedMove = getHardMove(allMoves); break;
+	default: selectedMove = getRandomMove(allMoves); break;
 	}
 
 	moveCalculated(selectedMove);

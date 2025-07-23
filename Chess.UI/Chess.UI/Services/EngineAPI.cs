@@ -59,7 +59,7 @@ namespace Chess.UI.Services
         #region Game
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartGame", CharSet = CharSet.Unicode)]
-        public static extern void StartGame();
+        public static extern void StartGame([In, MarshalAs(UnmanagedType.Struct)] GameConfiguration config);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ResetGame", CharSet = CharSet.Unicode)]
         public static extern void ResetGame();
@@ -328,6 +328,14 @@ namespace Chess.UI.Services
         }
 
 
+        public enum GameModeSelection
+        {
+            None,
+            LocalCoop,
+            VsCPU,
+        }
+
+
         [Flags]
         public enum MoveTypeInstance : int
         {
@@ -441,6 +449,16 @@ namespace Chess.UI.Services
             public string name;
             public int id;
         }
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct GameConfiguration
+        {
+            public GameModeSelection Mode;
+            public PlayerColor PlayerColor;
+            public int CpuDifficulty;
+        }
+
 
 
         #endregion  // Structures and Enums

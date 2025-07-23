@@ -36,8 +36,20 @@ StateMachine::~StateMachine()
 }
 
 
-void StateMachine::onGameStarted()
+void StateMachine::onGameStarted(GameConfiguration config)
 {
+	if (config.mode == GameModeSelection::VsCPU)
+	{
+		LOG_INFO("Starting a game against the CPU!");
+		mPlayingAgainstPC.store(true);
+		PlayerColor cpuColor = config.localPlayer == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
+		GameManager::GetInstance()->startCPUGame(static_cast<CPUDifficulty>(config.difficulty), cpuColor);
+	}
+	else
+	{
+		mPlayingAgainstPC.store(false);
+	}
+
 	GameState currentState = getCurrentGameState();
 
 	if (currentState == GameState::Undefined)
@@ -60,16 +72,7 @@ void StateMachine::onMultiplayerGameStarted()
 	LOG_INFO("Starting a Multiplayer Game!");
 	mIsMultiplayerGame.store(true);
 
-	onGameStarted();
-}
-
-
-void StateMachine::onCPUGameStarted()
-{
-	LOG_INFO("Starting a game against the CPU!");
-	mPlayingAgainstPC.store(true);
-
-	onGameStarted();
+	onGameStarted({});
 }
 
 

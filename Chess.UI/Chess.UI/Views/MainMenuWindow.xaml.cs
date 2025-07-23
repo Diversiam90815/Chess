@@ -1,14 +1,16 @@
-using Chess.UI.Services;
+﻿using Chess.UI.Services;
 using Chess.UI.ViewModels;
 using Chess.UI.Views;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Text;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using static Chess.UI.Services.EngineAPI;
 
 
 namespace Chess.UI
@@ -30,6 +32,15 @@ namespace Chess.UI
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
         private bool _multiplayerWindowClosedProgrammatically = false;
+
+        private GameConfiguration _config;
+
+
+        private class GameConfigWrapper
+        {
+            public GameConfiguration Config { get; set; }
+        }
+
 
 
         public MainMenuWindow()
@@ -155,11 +166,31 @@ namespace Chess.UI
         }
 
 
-        private void StartGameButton_Click(object sender, RoutedEventArgs e)
+        private async void StartGameButton_ClickAsync(object sender, RoutedEventArgs e)
         {
             ViewModel.OnButtonClicked();
 
-            ViewModel.OnStartGameRequested();
+            _config = await ShowGameSetupDialogAsync();
+
+            switch (_config.Mode)
+            {
+                case GameModeSelection.LocalCoop:
+                    // Start local cooperative game (two humans on same machine)
+                    ChessBoardViewModel.IsMultiplayerGame = false;
+                    // TODO: Set up local coop configuration
+                    ViewModel.OnStartGameRequested();
+                    break;
+
+                case GameModeSelection.VsCPU:
+                    // CPU game configuration already set in dialog
+                    ChessBoardViewModel.IsMultiplayerGame = false;
+                    ViewModel.OnStartGameRequested();
+                    break;
+
+                case GameModeSelection.None:
+                    // User cancelled - do nothing
+                    break;
+            }
         }
 
 
@@ -260,7 +291,7 @@ namespace Chess.UI
                     {
                         ChessBoardViewModel.IsMultiplayerGame = false;
                         // If we start a MP game, the game is started from the MP VM
-                        ChessBoardViewModel.StartGame();
+                        ChessBoardViewModel.StartGame(_config);
                         return;
                     }
 
@@ -272,5 +303,255 @@ namespace Chess.UI
                 }
             });
         }
+
+
+        private async Task<GameConfiguration> ShowGameSetupDialogAsync()
+        {
+            var tcs = new TaskCompletionSource<GameConfiguration>();
+
+            _dispatcherQueue.TryEnqueue(async () =>
+            {
+                try
+                {
+                    var configWrapper = new GameConfigWrapper ();
+
+                    var dialog = new ContentDialog
+                    {
+                        Title = "Game Setup",
+                        XamlRoot = this.Content.XamlRoot,
+                        PrimaryButtonText = "Start Game",
+                        CloseButtonText = "Cancel",
+                        DefaultButton = ContentDialogButton.Primary
+                    };
+
+                    // Create a pivot to manage multiple pages
+                    var pivot = new Pivot();
+
+                    // Page 1: Game Mode Selection
+                    var gameModePage = CreateGameModeSelectionPage(configWrapper);
+                    var gameModeItem = new PivotItem
+                    {
+                        Header = "Game Mode",
+                        Content = gameModePage
+                    };
+                    pivot.Items.Add(gameModeItem);
+
+                    // Page 2: CPU Configuration (initially hidden)
+                    var cpuConfigPage = CreateCpuConfigurationPage(configWrapper);
+                    var cpuConfigItem = new PivotItem
+                    {
+                        Header = "CPU Settings",
+                        Content = cpuConfigPage,
+                    };
+                    pivot.Items.Add(cpuConfigItem);
+
+                    // Handle game mode selection changes
+                    var gameModeRadios = FindRadioButtons(gameModePage);
+                    foreach (var radio in gameModeRadios)
+                    {
+                        radio.Checked += (s, e) =>
+                        {
+                            var selectedMode = (GameModeSelection)((RadioButton)s).Tag;
+                            var gameConfig = configWrapper.Config;
+
+                            gameConfig.Mode = selectedMode;
+                            configWrapper.Config = gameConfig; 
+
+                            // Auto-navigate to CPU page if VS CPU is selected
+                            if (selectedMode == GameModeSelection.VsCPU)
+                            {
+                                pivot.SelectedItem = cpuConfigItem;
+                            }
+                        };
+                    }
+
+                    dialog.Content = pivot;
+
+                    var result = await dialog.ShowAsync();
+
+                    if (result == ContentDialogResult.Primary && configWrapper.Config.Mode != GameModeSelection.None)
+                    {
+                        tcs.SetResult(configWrapper.Config);
+                    }
+                    else
+                    {
+                        var cancelConfig = configWrapper.Config;
+                        cancelConfig.Mode = GameModeSelection.None;
+                        tcs.SetResult(cancelConfig);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    tcs.SetException(ex);
+                }
+            });
+
+            return await tcs.Task;
+        }
+
+
+        private StackPanel CreateGameModeSelectionPage(GameConfigWrapper config)
+        {
+            var stackPanel = new StackPanel
+            {
+                Spacing = 20,
+                Margin = new Thickness(20)
+            };
+
+            var headerText = new TextBlock
+            {
+                Text = "Choose how you want to play:",
+                FontSize = 16,
+                FontWeight = FontWeights.SemiBold,
+                Margin = new Thickness(0, 0, 0, 10)
+            };
+            stackPanel.Children.Add(headerText);
+
+            var localCoopRadio = new RadioButton
+            {
+                Content = "🎮 Local Co-op (Two players on this computer)",
+                Tag = GameModeSelection.LocalCoop,
+                GroupName = "GameMode",
+                Margin = new Thickness(0, 5, 0, 5)
+            };
+            stackPanel.Children.Add(localCoopRadio);
+
+            var vsCpuRadio = new RadioButton
+            {
+                Content = "🤖 Play vs CPU (Configure difficulty and color)",
+                Tag = GameModeSelection.VsCPU,
+                GroupName = "GameMode",
+                Margin = new Thickness(0, 5, 0, 5)
+            };
+            stackPanel.Children.Add(vsCpuRadio);
+
+            return stackPanel;
+        }
+
+        private StackPanel CreateCpuConfigurationPage(GameConfigWrapper configWrapper)
+        {
+            var mainPanel = new StackPanel
+            {
+                Spacing = 20,
+                Margin = new Thickness(20)
+            };
+
+            // Player color selection
+            var colorHeader = new TextBlock
+            {
+                Text = "Choose your color:",
+                FontWeight = FontWeights.SemiBold,
+                FontSize = 16
+            };
+            mainPanel.Children.Add(colorHeader);
+
+            var colorPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 20,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Margin = new Thickness(0, 0, 0, 20)
+            };
+
+            var whiteRadio = new RadioButton
+            {
+                Content = "⚪ Play as White",
+                IsChecked = true,
+                GroupName = "PlayerColor"
+            };
+
+            var blackRadio = new RadioButton
+            {
+                Content = "⚫ Play as Black",
+                GroupName = "PlayerColor"
+            };
+
+            whiteRadio.Checked += (s, e) =>
+            {
+                var config = configWrapper.Config;
+                config.PlayerColor = PlayerColor.White;
+                configWrapper.Config = config;
+            };
+
+            blackRadio.Checked += (s, e) =>
+            {
+                var config = configWrapper.Config;
+                config.PlayerColor = PlayerColor.Black;
+                configWrapper.Config = config;
+            };
+
+            // Set default
+            // Set default
+            var defaultConfig = configWrapper.Config;
+            defaultConfig.PlayerColor = PlayerColor.White;
+            configWrapper.Config = defaultConfig;
+
+            colorPanel.Children.Add(whiteRadio);
+            colorPanel.Children.Add(blackRadio);
+            mainPanel.Children.Add(colorPanel);
+
+            // Difficulty selection
+            var difficultyHeader = new TextBlock
+            {
+                Text = "Select CPU difficulty:",
+                FontWeight = FontWeights.SemiBold,
+                FontSize = 16
+            };
+            mainPanel.Children.Add(difficultyHeader);
+
+            var difficultyCombo = new ComboBox
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Margin = new Thickness(0, 5, 0, 0)
+            };
+
+            difficultyCombo.Items.Add(new ComboBoxItem { Content = "🎲 Random - Completely random moves", Tag = 0 });
+            difficultyCombo.Items.Add(new ComboBoxItem { Content = "😊 Easy - Basic strategy", Tag = 1 });
+            difficultyCombo.Items.Add(new ComboBoxItem { Content = "🤔 Medium - Improved tactics", Tag = 2 });
+            difficultyCombo.Items.Add(new ComboBoxItem { Content = "😤 Hard - Advanced play", Tag = 3 });
+
+            difficultyCombo.SelectedIndex = 0; // Default to Random
+
+            var initialConfig = configWrapper.Config;
+            initialConfig.CpuDifficulty = 0;
+            configWrapper.Config = initialConfig;
+            
+            difficultyCombo.SelectionChanged += (s, e) =>
+            {
+                if (difficultyCombo.SelectedItem is ComboBoxItem item)
+                {
+                    var config = configWrapper.Config;
+                    config.CpuDifficulty = (int)item.Tag;
+                    configWrapper.Config = config;
+                }
+            };
+
+            mainPanel.Children.Add(difficultyCombo);
+
+            return mainPanel;
+        }
+
+        private System.Collections.Generic.List<RadioButton> FindRadioButtons(DependencyObject parent)
+        {
+            var radioButtons = new System.Collections.Generic.List<RadioButton>();
+
+            for (int i = 0; i < Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = Microsoft.UI.Xaml.Media.VisualTreeHelper.GetChild(parent, i);
+
+                if (child is RadioButton radio)
+                {
+                    radioButtons.Add(radio);
+                }
+                else
+                {
+                    radioButtons.AddRange(FindRadioButtons(child));
+                }
+            }
+
+            return radioButtons;
+        }
+
+
     }
 }

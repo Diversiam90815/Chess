@@ -429,7 +429,7 @@ bool GameManager::startCPUGame(CPUDifficulty difficulty, PlayerColor cpuColor)
 	CPUConfiguration config;
 	config.difficulty	= difficulty;
 	config.enabled		= true;
-	config.cpuColor		= PlayerColor::Black; // CPU plays as black by default
+	config.cpuColor		= cpuColor;
 	config.thinkingTime = std::chrono::milliseconds(1000);
 
 	mEngine->setCPUConfiguration(config);
@@ -437,12 +437,6 @@ bool GameManager::startCPUGame(CPUDifficulty difficulty, PlayerColor cpuColor)
 	mEngine->startGame();
 
 	return true;
-}
-
-
-void GameManager::setCPUConfiguration(const CPUConfiguration &config)
-{
-	mEngine->setCPUConfiguration(config);
 }
 
 

@@ -36,7 +36,7 @@ extern "C"
 	Engine_API void	 OnPawnPromotionChosen(PieceTypeInstance promotionInstance);
 
 
-	Engine_API void	 StartGame();
+	Engine_API void	 StartGame(GameConfiguration config);
 
 	Engine_API void	 ResetGame();
 

@@ -27,9 +27,8 @@ public:
 
 	~StateMachine();
 
-	void	  onGameStarted();							  // Called from UI
+	void	  onGameStarted(GameConfiguration config);							  // Called from UI
 	void	  onMultiplayerGameStarted();				  // Called from UI
-	void	  onCPUGameStarted();
 	void	  onSquareSelected(const Position &pos);	  // Called from UI
 	void	  onPawnPromotionChosen(PieceType promotion); // Called from UI
 

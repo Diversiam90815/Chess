@@ -43,7 +43,7 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
                 Orientation="Vertical">
-                <Button Click="StartGameButton_Click" Style="{StaticResource MainMenuButtonStyle}">
+                <Button Click="StartGameButton_ClickAsync" Style="{StaticResource MainMenuButtonStyle}">
                     <Image Source="{x:Bind ViewModel.StartGameButtonImage}" Style="{StaticResource MainMenuImageStyle}" />
                 </Button>
                 <TextBlock Style="{StaticResource MainMenuTitleStyles}" Text="Start Game" />

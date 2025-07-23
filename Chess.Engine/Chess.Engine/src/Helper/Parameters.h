@@ -83,6 +83,22 @@ enum class SettingsType
 };
 
 
+enum class GameModeSelection
+{
+	None	  = 0,
+	LocalCoop = 1,
+	VsCPU	  = 2,
+};
+
+
+struct GameConfiguration
+{
+	GameModeSelection mode;
+	PlayerColor		  localPlayer;
+	int				  difficulty;
+};
+
+
 //============================================================
 //			File Manager
 //============================================================
