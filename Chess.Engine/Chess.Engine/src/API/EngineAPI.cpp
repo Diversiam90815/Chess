@@ -151,7 +151,8 @@ Engine_API bool GetPossibleMoveAtIndex(int index, PossibleMoveInstance *possible
 
 Engine_API void StartGame()
 {
-	StateMachine::GetInstance()->onGameStarted();
+	// StateMachine::GetInstance()->onGameStarted();
+	StateMachine::GetInstance()->onCPUGameStarted();
 }
 
 

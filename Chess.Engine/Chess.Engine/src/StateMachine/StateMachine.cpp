@@ -64,6 +64,15 @@ void StateMachine::onMultiplayerGameStarted()
 }
 
 
+void StateMachine::onCPUGameStarted()
+{
+	LOG_INFO("Starting a game against the CPU!");
+	mPlayingAgainstPC.store(true);
+
+	onGameStarted();
+}
+
+
 void StateMachine::onSquareSelected(const Position &pos)
 {
 	if (getCurrentGameState() == GameState::WaitingForInput) // Selected Start Position
@@ -141,6 +150,27 @@ void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
 	{
 		LOG_WARNING("Received a move from the remote endpoint, but we are not in the wrong state! Our state is {}",
 					LoggingHelper::gameStateToString(getCurrentGameState()).c_str());
+	}
+}
+
+
+void StateMachine::onMoveCalculated(PossibleMove cpuMove)
+{
+	if (!cpuMove.isEmpty())
+	{
+		LOG_INFO("CPU selcted move from {} to {}", LoggingHelper::positionToString(cpuMove.start).c_str(), LoggingHelper::positionToString(cpuMove.end).c_str());
+
+		mReceivedMoveFromRemote = true; // treat CPU as remote so the move will be initiated correctly before execution
+		// Set move and transition to validation
+		mCurrentPossibleMove	= cpuMove;
+		mWaitingForCPUMove		= false;
+		gameStateChanged(GameState::ExecutingMove);
+	}
+	else
+	{
+		LOG_ERROR("CPU returned invalid move");
+		mWaitingForCPUMove = false;
+		gameStateChanged(GameState::GameOver);
 	}
 }
 
@@ -283,6 +313,11 @@ void StateMachine::run()
 			handleWaitingForRemoteState();
 			break;
 		}
+		case GameState::WaitingForCPUMove:
+		{
+			handleWaitingForCPUState();
+			break;
+		}
 		case GameState::GameOver:
 		{
 			// Determine the EndGameState and send message to UI
@@ -381,9 +416,12 @@ void StateMachine::switchToNextState()
 			GameManager::GetInstance()->switchTurns();
 
 			resetCurrentPossibleMove();
-			mMovesCalulated		   = false;
-			mWaitingForTargetStart = false;
-			mWaitingForTargetEnd   = false;
+			mMovesCalulated			  = false;
+			mWaitingForTargetStart	  = false;
+			mWaitingForTargetEnd	  = false;
+
+			PlayerColor currentPlayer = GameManager::GetInstance()->getCurrentPlayer();
+			bool		isCPUTurn	  = GameManager::GetInstance()->isCPUPlayer(currentPlayer);
 
 			// If we're in multiplayer mode, check who's turn it is
 			if (mIsMultiplayerGame.load())
@@ -401,11 +439,14 @@ void StateMachine::switchToNextState()
 					gameStateChanged(GameState::WaitingForRemoteMove);
 				}
 			}
+			else if (mPlayingAgainstPC.load() && isCPUTurn)
+			{
+				LOG_INFO("CPU PLayer's turn, waiting for CPU move");
+				gameStateChanged(GameState::WaitingForCPUMove);
+			}
 			else
 			{
-				LOG_INFO("We are in single player mode, so we wait for the next input");
-
-				// Single player moves always switch to Waiting For Input!
+				LOG_INFO("Human player's turn, waiting for input");
 				gameStateChanged(GameState::WaitingForInput);
 			}
 		}
@@ -456,6 +497,9 @@ bool StateMachine::handleInitState() const
 
 	if (mIsMultiplayerGame)
 		return GameManager::GetInstance()->startMultiplayerGame();
+
+	else if (mPlayingAgainstPC)
+		return GameManager::GetInstance()->startCPUGame();
 
 	else
 		return GameManager::GetInstance()->startGame();
@@ -527,4 +571,21 @@ bool StateMachine::handleWaitingForRemoteState()
 	// but to validate the remote's move, we want to calculate the possible moves for the remote
 
 	return GameManager::GetInstance()->calculateAllMovesForPlayer();
+}
+
+
+bool StateMachine::handleWaitingForCPUState()
+{
+	if (!mWaitingForCPUMove)
+	{
+		PlayerColor currentPlayer = GameManager::GetInstance()->getCurrentPlayer();
+
+		// Start CPU Move calculation async
+		GameManager::GetInstance()->requestCPUMoveAsync(currentPlayer);
+		mWaitingForCPUMove = true;
+
+		LOG_INFO("Started CPU move calculation for player {}", LoggingHelper::playerColourToString(currentPlayer).c_str());
+	}
+
+	return true;
 }

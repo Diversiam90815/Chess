@@ -145,3 +145,12 @@ public:
 	virtual void remotePlayerChosen(const PlayerColor localPlayer)			= 0;
 	virtual void localReadyFlagSet(const bool flag)							= 0;
 };
+
+
+class ICPUMoveObservable : public ObservableBase<ICPUMoveObserver>
+{
+public:
+	virtual ~ICPUMoveObservable() {};
+
+	virtual void moveCalculated(PossibleMove move) = 0;
+};

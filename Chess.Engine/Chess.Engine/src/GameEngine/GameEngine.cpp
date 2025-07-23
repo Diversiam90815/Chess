@@ -17,15 +17,7 @@ void GameEngine::init()
 	mMoveExecution	= std::make_shared<MoveExecution>(mChessBoard, mMoveValidation);
 	mMoveGeneration = std::make_shared<MoveGeneration>(mChessBoard, mMoveValidation, mMoveExecution);
 
-	mCPUPlayer		= std::make_shared<CPUPlayer>(mChessBoard, mMoveGeneration);
-
-	// Setting the random cpu configuration here for now:
-	CPUConfiguration config;
-	config.difficulty	= CPUDifficulty::Random;
-	config.enabled		= true;
-	config.cpuColor		= PlayerColor::Black;
-	config.thinkingTime = std::chrono::milliseconds(1000);
-	setCPUConfiguration(config);
+	mCPUPlayer		= std::make_shared<CPUPlayer>(mMoveGeneration, mChessBoard);
 
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
@@ -434,14 +426,8 @@ bool GameEngine::isCPUPlayer(PlayerColor player) const
 }
 
 
-std::future<PossibleMove> GameEngine::getCPUMoveAsync(PlayerColor player)
+void GameEngine::requestCPUMoveAsync(PlayerColor player)
 {
 	if (mCPUPlayer)
-		return mCPUPlayer->getBestMoveAsync(player);
-
-	// Return empty future if no CPU player
-	std::promise<PossibleMove> promise;
-	promise.set_value(PossibleMove{});
-
-	return promise.get_future();
+		return mCPUPlayer->requestMoveAsync(player);
 }

@@ -81,6 +81,7 @@ public:
 
 	bool						isMultiplayerActive() const;
 
+	PlayerColor					getCurrentPlayer() const;
 	bool						isLocalPlayerTurn();
 
 	void						startRemoteDiscovery(bool isHost);
@@ -90,6 +91,16 @@ public:
 
 	void						setLocalPlayerInMultiplayer(PlayerColor localPlayer);
 	void						setLocalPlayerReady(const bool flag);
+
+
+	bool						startCPUGame(CPUDifficulty difficulty = CPUDifficulty::Random, PlayerColor cpuColor = PlayerColor::Black);
+
+	void						setCPUConfiguration(const CPUConfiguration &config);
+
+	bool						isCPUPlayer(PlayerColor player) const;
+
+	void						requestCPUMoveAsync(PlayerColor player);
+
 
 	void						setSFXEnabled(const bool enabled);
 	bool						getSFXEnabled();

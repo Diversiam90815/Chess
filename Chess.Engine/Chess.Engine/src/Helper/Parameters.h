@@ -64,7 +64,8 @@ enum class GameState
 	ExecutingMove		 = 7,
 	PawnPromotion		 = 8,
 	WaitingForRemoteMove = 9,
-	GameOver			 = 10
+	WaitingForCPUMove	 = 10,
+	GameOver			 = 11,
 };
 
 

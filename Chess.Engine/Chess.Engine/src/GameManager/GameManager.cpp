@@ -229,6 +229,12 @@ bool GameManager::isMultiplayerActive() const
 }
 
 
+PlayerColor GameManager::getCurrentPlayer() const
+{
+	return mEngine->getCurrentPlayer();
+}
+
+
 bool GameManager::isLocalPlayerTurn()
 {
 	// If we're in single player mode, it is always our turn
@@ -312,6 +318,8 @@ void GameManager::initObservers()
 	mEngine->mMoveExecution->attachObserver(mUiCommunicationLayer);
 
 	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer);
+
+	mEngine->mCPUPlayer->attachObserver(StateMachine::GetInstance());
 }
 
 
@@ -411,4 +419,40 @@ void GameManager::setAtmosScenario(const std::string scenario)
 std::string GameManager::getAtmosScenario()
 {
 	return mUserSettings.getAtmosScenario();
+}
+
+
+bool GameManager::startCPUGame(CPUDifficulty difficulty, PlayerColor cpuColor)
+{
+	LOG_INFO("Game started against CPU - Difficulty: {}", static_cast<int>(difficulty));
+
+	CPUConfiguration config;
+	config.difficulty	= difficulty;
+	config.enabled		= true;
+	config.cpuColor		= PlayerColor::Black; // CPU plays as black by default
+	config.thinkingTime = std::chrono::milliseconds(1000);
+
+	mEngine->setCPUConfiguration(config);
+
+	mEngine->startGame();
+
+	return true;
+}
+
+
+void GameManager::setCPUConfiguration(const CPUConfiguration &config)
+{
+	mEngine->setCPUConfiguration(config);
+}
+
+
+bool GameManager::isCPUPlayer(PlayerColor player) const
+{
+	return mEngine->isCPUPlayer(player);
+}
+
+
+void GameManager::requestCPUMoveAsync(PlayerColor player)
+{
+	return mEngine->requestCPUMoveAsync(player);
 }

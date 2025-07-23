@@ -12,10 +12,12 @@
 #include <memory>
 #include <random>
 #include <thread>
+#include <algorithm>
 
 #include "Parameters.h"
 #include "Generation/MoveGeneration.h"
 #include "ChessBoard.h"
+#include "IObservable.h"
 
 
 enum class CPUDifficulty
@@ -36,28 +38,30 @@ struct CPUConfiguration
 };
 
 
-class CPUPlayer
+class CPUPlayer : public ICPUMoveObservable
 {
 public:
 	CPUPlayer(std::shared_ptr<MoveGeneration> moveGeneration, std::shared_ptr<ChessBoard> board);
 	~CPUPlayer() = default;
 
-	void					  setCPUConfiguration(const CPUConfiguration &config);
-	CPUConfiguration		  getCPUConfiguration() const { return mConfig; }
+	void			 setCPUConfiguration(const CPUConfiguration &config);
+	CPUConfiguration getCPUConfiguration() const { return mConfig; }
 
-	std::future<PossibleMove> getBestMoveAsync(PlayerColor player);
-	PossibleMove			  getBestMove(PlayerColor player);
+	void			 requestMoveAsync(PlayerColor player);
 
-	bool					  isCPUPlayer(PlayerColor player) const;
-	bool					  isCPUEnabled() const { return mConfig.enabled; }
-	void					  setEnabled(bool enabled) { mConfig.enabled = enabled; }
+	bool			 isCPUPlayer(PlayerColor player) const;
+	bool			 isCPUEnabled() const { return mConfig.enabled; }
+	void			 setEnabled(bool enabled) { mConfig.enabled = enabled; }
 
+	void			 moveCalculated(PossibleMove calculatedMove) override;
 
 private:
 	PossibleMove					getRandomMove(const std::vector<PossibleMove> &moves);
 	PossibleMove					getEasyMove(const std::vector<PossibleMove> &moves);
 	PossibleMove					getMediumMove(const std::vector<PossibleMove> &moves);
 	PossibleMove					getHardMove(const std::vector<PossibleMove> &moves);
+
+	void							calculateMove(PlayerColor player);
 
 	void							simulateThinking();
 

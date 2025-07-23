@@ -118,3 +118,12 @@ public:
 	virtual void onRemotePlayerChosen(PlayerColor remotePlayer)				 = 0;
 	virtual void onLocalReadyFlagSet(const bool flag)						 = 0;
 };
+
+
+class ICPUMoveObserver
+{
+public:
+	virtual ~ICPUMoveObserver() {};
+
+	virtual void onMoveCalculated(PossibleMove move) = 0;
+};

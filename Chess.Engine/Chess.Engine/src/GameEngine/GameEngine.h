@@ -65,7 +65,7 @@ public:
 
 	bool					   isCPUPlayer(PlayerColor player) const;
 
-	std::future<PossibleMove>  getCPUMoveAsync(PlayerColor player);
+	void  requestCPUMoveAsync(PlayerColor player);
 
 
 private:

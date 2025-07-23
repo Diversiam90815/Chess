@@ -50,6 +50,11 @@ namespace Chess.UI.Moves
                         NewBoardFromBackendEvent?.Invoke();
                         break;
                     }
+                case GameState.WaitingForCPUMove:
+                    {
+                        NewBoardFromBackendEvent?.Invoke();
+                        break;
+                    }
                 case GameState.GameOver:
                     {
                         break;
