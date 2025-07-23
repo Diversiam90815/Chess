@@ -1,10 +1,13 @@
 ﻿using Chess.UI.Images;
+using Chess.UI.Services;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
 
 
@@ -16,20 +19,32 @@ namespace Chess.UI.ViewModels
 
         // Specific events for different actions
         public event Action ButtonClicked;
-        public event Action StartGameRequested;
-        public event Action SettingsRequested;
-        public event Action MultiplayerRequested;
+        public event Func<Task> StartGameRequested;
+        public event Func<Task> SettingsRequested;
+        public event Func<Task> MultiplayerRequested;
         public event Action QuitRequested;
 
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
-
         private readonly IImageService _imageServices;
+        private readonly INavigationService _navigationService;
+        private readonly IDialogService _dialogService;
+        private readonly IGameConfigurationService _gameConfigurationService;
+
+        private Window _ownerWindow;
 
 
-        public MainMenuViewModel(IDispatcherQueueWrapper dispatcher)
+        public MainMenuViewModel(
+          IDispatcherQueueWrapper dispatcher,
+          IImageService imageServices,
+          INavigationService navigationService,
+          IDialogService dialogService,
+          IGameConfigurationService gameConfigurationService)
         {
             _dispatcherQueue = dispatcher;
-            _imageServices = App.Current.Services.GetService<IImageService>();
+            _imageServices = imageServices;
+            _navigationService = navigationService;
+            _dialogService = dialogService;
+            _gameConfigurationService = gameConfigurationService;
 
             Init();
         }
@@ -43,25 +58,35 @@ namespace Chess.UI.ViewModels
             EndGameButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.EndGame);
         }
 
+        public void SetOwnerWindow(Window owner)
+        {
+            _ownerWindow = owner;
+        }
+
+
         public void OnButtonClicked()
         {
             ButtonClicked?.Invoke();
         }
 
-        public void OnStartGameRequested()
+
+        public async Task OnStartGameRequestedAsync()
         {
-            StartGameRequested?.Invoke();
+            await (StartGameRequested?.Invoke() ?? Task.CompletedTask);
         }
 
-        public void OnSettingsRequested()
+
+        public async Task OnSettingsRequestedAsync()
         {
-            SettingsRequested?.Invoke();
+            await (SettingsRequested?.Invoke() ?? Task.CompletedTask);
         }
 
-        public void OnMultiplayerRequested()
+
+        public async Task OnMultiplayerRequestedAsync()
         {
-            MultiplayerRequested?.Invoke();
+            await (MultiplayerRequested?.Invoke() ?? Task.CompletedTask);
         }
+
 
         public void OnQuitRequested()
         {
@@ -129,6 +154,33 @@ namespace Chess.UI.ViewModels
         }
 
 
+        public async Task HandleStartGameAsync()
+        {
+            try
+            {
+                var config = await _dialogService.ShowGameSetupDialogAsync(_ownerWindow);
+                await _gameConfigurationService.StartGameAsync(config);
+            }
+            catch (Exception ex)
+            {
+                // Handle error - could add error service here
+                Logger.LogError($"Failed to start game: {ex.Message}");
+            }
+        }
+
+
+        public async Task HandleSettingsAsync()
+        {
+            await _navigationService.ShowPreferencesAsync();
+        }
+
+
+        public async Task HandleMultiplayerAsync()
+        {
+            await _navigationService.NavigateToMultiplayerAsync();
+        }
+
+
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             _dispatcherQueue.TryEnqueue(() =>
@@ -136,6 +188,5 @@ namespace Chess.UI.ViewModels
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             });
         }
-
     }
 }

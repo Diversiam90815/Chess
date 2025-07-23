@@ -44,7 +44,7 @@
                 VerticalAlignment="Top"
                 Orientation="Vertical">
                 <Button Click="StartGameButton_ClickAsync" Style="{StaticResource MainMenuButtonStyle}">
-                    <Image Source="{x:Bind ViewModel.StartGameButtonImage}" Style="{StaticResource MainMenuImageStyle}" />
+                    <Image Source="{x:Bind _viewModel.StartGameButtonImage}" Style="{StaticResource MainMenuImageStyle}" />
                 </Button>
                 <TextBlock Style="{StaticResource MainMenuTitleStyles}" Text="Start Game" />
             </StackPanel>
@@ -57,7 +57,7 @@
                 VerticalAlignment="Bottom"
                 Orientation="Vertical">
                 <Button Click="SettingsButton_Click" Style="{StaticResource MainMenuButtonStyle}">
-                    <Image Source="{x:Bind ViewModel.SettingButtonImage}" Style="{StaticResource MainMenuImageStyle}" />
+                    <Image Source="{x:Bind _viewModel.SettingButtonImage}" Style="{StaticResource MainMenuImageStyle}" />
                 </Button>
                 <TextBlock Style="{StaticResource MainMenuTitleStyles}" Text="Settings" />
             </StackPanel>
@@ -70,7 +70,7 @@
                 VerticalAlignment="Top"
                 Orientation="Vertical">
                 <Button Click="MultiplayerButton_Click" Style="{StaticResource MainMenuButtonStyle}">
-                    <Image Source="{x:Bind ViewModel.MultiplayerButtonImage}" Style="{StaticResource MainMenuImageStyle}" />
+                    <Image Source="{x:Bind _viewModel.MultiplayerButtonImage}" Style="{StaticResource MainMenuImageStyle}" />
                 </Button>
                 <TextBlock Style="{StaticResource MainMenuTitleStyles}" Text="Multiplayer" />
             </StackPanel>
@@ -83,7 +83,7 @@
                 VerticalAlignment="Bottom"
                 Orientation="Vertical">
                 <Button Click="QuitButton_Click" Style="{StaticResource MainMenuButtonStyle}">
-                    <Image Source="{x:Bind ViewModel.EndGameButtonImage}" Style="{StaticResource MainMenuImageStyle}" />
+                    <Image Source="{x:Bind _viewModel.EndGameButtonImage}" Style="{StaticResource MainMenuImageStyle}" />
                 </Button>
                 <TextBlock Style="{StaticResource MainMenuTitleStyles}" Text="Quit" />
             </StackPanel>
