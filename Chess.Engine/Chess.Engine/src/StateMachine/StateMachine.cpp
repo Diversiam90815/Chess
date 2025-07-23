@@ -366,6 +366,22 @@ void StateMachine::switchToNextState()
 				gameStateChanged(GameState::WaitingForRemoteMove);
 			}
 		}
+		else if (mPlayingAgainstPC.load())
+		{
+			// TODO: If CPU is white, let CPU start
+			bool isCPUTurn = GameManager::GetInstance()->isCPUPlayer(PlayerColor::White); // White always goes first
+			if (isCPUTurn)
+			{
+
+				LOG_INFO("Initial state: CPU's turn");
+				gameStateChanged(GameState::WaitingForCPUMove);
+			}
+			else
+			{
+				LOG_INFO("Initial state: Local Player's turn");
+				gameStateChanged(GameState::WaitingForInput);
+			}
+		}
 		else
 		{
 			LOG_INFO("Single Player mode. We switch to WaitingForInput");
