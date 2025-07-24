@@ -287,12 +287,12 @@ namespace Chess.UI.Audio.Modules
             try
             {
                 var mediaSource = await GetMediaSourceAsync(effect);
-                Logger.LogInfo($"GetMediaSource took: {stopwatch.ElapsedMilliseconds}ms");
+                Logger.LogDebug($"GetMediaSource took: {stopwatch.ElapsedMilliseconds}ms");
                 if (mediaSource == null) return;
 
 
                 var mediaPlayer = GetMediaPlayerFromPool();
-                Logger.LogInfo($"GetMediaPlayer took: {stopwatch.ElapsedMilliseconds}ms");
+                Logger.LogDebug($"GetMediaPlayer took: {stopwatch.ElapsedMilliseconds}ms");
                 if (mediaPlayer == null) return;
 
 
@@ -306,13 +306,13 @@ namespace Chess.UI.Audio.Modules
                 {
                     mediaPlayer.PlaybackRate = Math.Clamp(pitch, 0.25, 4.0);
                 }
-                Logger.LogInfo($"Configure took: {stopwatch.ElapsedMilliseconds}ms");
+                Logger.LogDebug($"Configure took: {stopwatch.ElapsedMilliseconds}ms");
 
 
                 mediaPlayer.Source = mediaSource;
                 mediaPlayer.Play();
 
-                Logger.LogInfo($"Total PlaySound took: {stopwatch.ElapsedMilliseconds}ms");
+                Logger.LogDebug($"Total PlaySound took: {stopwatch.ElapsedMilliseconds}ms");
 
                 SoundPlayed?.Invoke(this, new SoundPlayedEventArgs(effect, effectiveVolume));
             }

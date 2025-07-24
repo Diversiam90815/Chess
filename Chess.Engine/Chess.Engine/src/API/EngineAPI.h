@@ -72,6 +72,8 @@ extern "C"
 
 	Engine_API void	 LogWarningWithCaller(const char *message, const char *method, const char *className, const int lineNumber);
 
+	Engine_API void	 LogDebugWithCaller(const char *message, const char *method, const char *className, const int lineNumber);
+
 
 	Engine_API void	 SetCurrentBoardTheme(const char *theme);
 

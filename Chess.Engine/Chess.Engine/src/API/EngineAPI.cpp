@@ -260,6 +260,12 @@ Engine_API void LogWarningWithCaller(const char *message, const char *method, co
 }
 
 
+Engine_API void LogDebugWithCaller(const char *message, const char *method, const char *className, const int lineNumber)
+{
+	logging::log(LogLevel::Debug, className, lineNumber, method, message);
+}
+
+
 Engine_API void SetCurrentBoardTheme(const char *theme)
 {
 	GameManager::GetInstance()->setBoardTheme(theme);
