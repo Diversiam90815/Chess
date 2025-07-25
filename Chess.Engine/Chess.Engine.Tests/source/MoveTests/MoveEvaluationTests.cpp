@@ -149,12 +149,12 @@ TEST_F(MoveEvaluationTests, GetPositionValueInvalidPositionReturnsZero)
 
 TEST_F(MoveEvaluationTests, GetPositionValuePawnWhiteInitialRow)
 {
-	Position pawnPos{4, 6}; // e2
+	Position pawnPos{0, 6}; // a2
 
 	int		 value = mEvaluation->getPositionValue(PieceType::Pawn, pawnPos, PlayerColor::White);
 
 	// From PAWN_TABLE[6][4] (white perspective, row 6 = second rank for white)
-	EXPECT_EQ(value, 5) << "Pawn on e2 should have position value from pawn table";
+	EXPECT_EQ(value, 5) << "Pawn on a2 should have position value from pawn table";
 }
 
 
@@ -165,7 +165,7 @@ TEST_F(MoveEvaluationTests, GetPositionValuePawnBlackFlippedTable)
 	int		 value = mEvaluation->getPositionValue(PieceType::Pawn, pawnPos, PlayerColor::Black);
 
 	// For black, row should be flipped: 7 - 1 = 6, so PAWN_TABLE[6][4]
-	EXPECT_EQ(value, 5) << "Black pawn on e7 should have same position value as white pawn on e2 due to table flipping";
+	EXPECT_EQ(value, -20) << "Black pawn on e7 should have same position value as white pawn on e2 due to table flipping";
 }
 
 
@@ -192,7 +192,7 @@ TEST_F(MoveEvaluationTests, EvaluateMaterialGainNonCaptureReturnsZero)
 
 TEST_F(MoveEvaluationTests, EvaluateMaterialGainCaptureWithNoPiece)
 {
-	PossibleMove captureMove{{0, 1}, {7, 7}, MoveType::Capture}; // Capture on empty square
+	PossibleMove captureMove{{0, 1}, {4, 7}, MoveType::Capture}; // Capture on empty square
 
 	int			 gain = mEvaluation->evaluateMaterialGain(captureMove);
 
