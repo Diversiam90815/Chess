@@ -58,31 +58,35 @@ struct CPUPerformanceStats
 class MoveEvaluationPerformanceTests : public ::testing::Test, public IGameObserver, public IGameStateObserver, public std::enable_shared_from_this<MoveEvaluationPerformanceTests>
 {
 protected:
-	std::shared_ptr<GameEngine>			  mGameEngine;
-	std::shared_ptr<StateMachine>		  mStateMachine;
+	std::shared_ptr<GameEngine>						mGameEngine;
+	std::shared_ptr<StateMachine>					mStateMachine;
+	std::shared_ptr<MoveEvaluationPerformanceTests> mSelf;
 
-	std::atomic<bool>					  mGameCompleted{false};
-	std::atomic<bool>					  mGameRunning{false};
-	GameResult							  mCurrentGameResult;
-	std::chrono::steady_clock::time_point mGameStartTime;
+	std::atomic<bool>								mGameCompleted{false};
+	std::atomic<bool>								mGameRunning{false};
+	GameResult										mCurrentGameResult;
+	std::chrono::steady_clock::time_point			mGameStartTime;
 
 
-	void								  SetUp() override
+	void											SetUp() override
 	{
 		mGameEngine = std::make_shared<GameEngine>();
 		mGameEngine->init();
-		mGameEngine->attachObserver(shared_from_this());
+
+		mSelf		= std::shared_ptr<MoveEvaluationPerformanceTests>(this, [](MoveEvaluationPerformanceTests *) {});
+		mGameEngine->attachObserver(mSelf);
 
 		mStateMachine = StateMachine::GetInstance();
-		mStateMachine->attachObserver(shared_from_this());
+		mStateMachine->attachObserver(mSelf);
 	}
 
 
 	void TearDown() override
 	{
-		mGameEngine->detachObserver(shared_from_this());
-		mStateMachine->detachObserver(shared_from_this());
+		mGameEngine->detachObserver(mSelf);
+		mStateMachine->detachObserver(mSelf);
 		StateMachine::ReleaseInstance();
+		mSelf.reset();
 	}
 
 
@@ -235,6 +239,33 @@ protected:
 		}
 	}
 };
+
+
+// Test different CPU difficulties against each other
+TEST_F(MoveEvaluationPerformanceTests, BasicDifficultyComparison)
+{
+	CPUConfiguration easyConfig;
+	easyConfig.difficulty	= CPUDifficulty::Easy;
+	easyConfig.enabled		= true;
+	easyConfig.thinkingTime = std::chrono::milliseconds(100);
+
+	CPUConfiguration mediumConfig;
+	mediumConfig.difficulty	  = CPUDifficulty::Medium;
+	mediumConfig.enabled	  = true;
+	mediumConfig.thinkingTime = std::chrono::milliseconds(100);
+
+	// Test Medium vs Easy (100 games)
+	auto stats				  = runMultipleGames(mediumConfig, easyConfig, 100, true);
+
+	std::cout << "Medium vs Easy Results:" << std::endl;
+	std::cout << "Win Rate: " << stats.winRate << "%" << std::endl;
+	std::cout << "Total Games: " << stats.totalGames << std::endl;
+
+	saveResultsToFile("move_evaluation_performance.txt", stats, "Medium vs Easy");
+
+	// Medium should significantly outperform Easy
+	EXPECT_GT(stats.winRate, 60.0) << "Medium difficulty should win more than 60% against Easy";
+}
 
 
 
