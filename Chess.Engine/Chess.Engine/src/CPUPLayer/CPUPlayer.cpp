@@ -84,15 +84,41 @@ PossibleMove CPUPlayer::getEasyMove(const std::vector<PossibleMove> &moves)
 
 PossibleMove CPUPlayer::getMediumMove(const std::vector<PossibleMove> &moves)
 {
-	// TODO
-	return PossibleMove();
+	// Medium: Enhanced evaluation with  positional awareness
+	std::vector<std::pair<PossibleMove, int>> evaluatedMoves;
+
+	for (const auto &move : moves)
+	{
+		int score = mMoveEvaluation->getMediumEvaluation(move, mConfig.cpuColor);
+		evaluatedMoves.emplace_back(move, score);
+	}
+
+	// Sort by score (descending order)
+	std::sort(evaluatedMoves.begin(), evaluatedMoves.end(), [](const auto &a, const auto &b) { return a.second > b.second; });
+
+	// Always pick the best move
+	LOG_INFO("CPU (Medíum) selected best move with score {}", evaluatedMoves[0].second);
+	return evaluatedMoves[0].first;
 }
 
 
 PossibleMove CPUPlayer::getHardMove(const std::vector<PossibleMove> &moves)
 {
-	// TODO
-	return PossibleMove();
+	// Hard: Advanced evaluation with deeper analysis
+	std::vector<std::pair<PossibleMove, int>> evaluatedMoves;
+
+	for (const auto &move : moves)
+	{
+		int score = mMoveEvaluation->getAdvancedEvaluation(move, mConfig.cpuColor);
+		evaluatedMoves.emplace_back(move, score);
+	}
+
+	// Sort by score (descending order)
+	std::sort(evaluatedMoves.begin(), evaluatedMoves.end(), [](const auto &a, const auto &b) { return a.second > b.second; });
+
+	// Always pick the best move
+	LOG_INFO("CPU (Hard) selected best move with score {}", evaluatedMoves[0].second);
+	return evaluatedMoves[0].first;
 }
 
 
@@ -130,6 +156,13 @@ void CPUPlayer::calculateMove(PlayerColor player)
 	case CPUDifficulty::Medium: selectedMove = getMediumMove(allMoves); break;
 	case CPUDifficulty::Hard: selectedMove = getHardMove(allMoves); break;
 	default: selectedMove = getRandomMove(allMoves); break;
+	}
+
+	// Set promotion piece for pawn promotion moves
+	if ((selectedMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
+	{
+		selectedMove.promotionPiece = PieceType::Queen; // CPU always promotes to Queen
+		LOG_INFO("CPU selected pawn promotion to Queen");
 	}
 
 	moveCalculated(selectedMove);

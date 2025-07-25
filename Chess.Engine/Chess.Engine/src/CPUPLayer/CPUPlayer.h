@@ -56,12 +56,12 @@ public:
 
 	void			 moveCalculated(PossibleMove calculatedMove) override;
 
-private:
-	PossibleMove					getRandomMove(const std::vector<PossibleMove> &moves);
-	PossibleMove					getEasyMove(const std::vector<PossibleMove> &moves);
-	PossibleMove					getMediumMove(const std::vector<PossibleMove> &moves);
-	PossibleMove					getHardMove(const std::vector<PossibleMove> &moves);
+	PossibleMove	 getRandomMove(const std::vector<PossibleMove> &moves);
+	PossibleMove	 getEasyMove(const std::vector<PossibleMove> &moves);
+	PossibleMove	 getMediumMove(const std::vector<PossibleMove> &moves);
+	PossibleMove	 getHardMove(const std::vector<PossibleMove> &moves);
 
+private:
 	void							calculateMove(PlayerColor player);
 
 	void							simulateThinking();
