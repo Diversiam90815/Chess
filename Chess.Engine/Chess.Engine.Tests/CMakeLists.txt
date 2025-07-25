@@ -28,6 +28,7 @@ set(MoveTest_Files
     ${MoveTest_Dir}/EnPassantTests.cpp
     ${MoveTest_Dir}/MoveHistoryTests.cpp
     ${MoveTest_Dir}/MoveNotationTests.cpp
+    ${MoveTest_Dir}/MoveEvaluationTests.cpp
 )
 
 
@@ -48,6 +49,7 @@ set(GameMechanicTest_Files
     ${GameMechanicTest_Dir}/PawnPromotionTests.cpp
     ${GameMechanicTest_Dir}/EndgameTests.cpp
     ${GameMechanicTest_Dir}/UndoMoveTests.cpp
+    ${GameMechanicTest_Dir}/CPUPlayerTests.cpp
 )
 
 
