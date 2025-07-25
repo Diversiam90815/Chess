@@ -19,22 +19,22 @@ public:
 	MoveEvaluation(std::shared_ptr<ChessBoard> chessboard);
 	~MoveEvaluation() = default;
 
-	int getBasicEvaluation(const PossibleMove &move);
+	int					 getBasicEvaluation(const PossibleMove &move);
 
-	int getMediumEvaluation(const PossibleMove &move, PlayerColor player);
+	int					 getMediumEvaluation(const PossibleMove &move, PlayerColor player);
 
-	int getAdvancedEvaluation(const PossibleMove &move, PlayerColor player);
+	int					 getAdvancedEvaluation(const PossibleMove &move, PlayerColor player);
+
+	static constexpr int getPieceValue(PieceType piece);
+
+	int					 getPositionValue(PieceType piece, const Position &pos, PlayerColor player);
+
+	int					 evaluateMaterialGain(const PossibleMove &move);
+
+	int					 evaluatePositionalGain(const PossibleMove &move, PlayerColor player);
+
 
 private:
-	static constexpr int							   getPieceValue(PieceType piece);
-
-	int												   getPositionValue(PieceType piece, const Position &pos, PlayerColor player);
-
-	int												   evaluateMaterialGain(const PossibleMove &move);
-
-	int												   evaluatePositionalGain(const PossibleMove &move, PlayerColor player);
-
-
 	std::shared_ptr<ChessBoard>						   mBoard;
 
 	static constexpr int							   PAWN_VALUE	= 100;
