@@ -18,6 +18,7 @@ enable_testing()
 set(MoveTest_Dir            source/MoveTests)
 set(MultiplayerTest_Dir     source/MultiplayerTests)
 set(GameMechanicTest_Dir    source/GameMechanicTests)
+set(CPUPerformanceTests_Dir    source/CPUPerformanceTests)
 
 
 set(MoveTest_Files
@@ -52,11 +53,16 @@ set(GameMechanicTest_Files
     ${GameMechanicTest_Dir}/CPUPlayerTests.cpp
 )
 
+set(CPUPerformanceTest_Files
+    ${CPUPerformanceTests_Dir}/CPUPerformanceTests.cpp
+)
+
 
 set(Test_Files
     ${MoveTest_Files}
     ${MultiplayerTest_Files}
     ${GameMechanicTest_Files}
+    ${CPUPerformanceTest_Files}
 )
 
 
