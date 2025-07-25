@@ -98,7 +98,7 @@ int MoveEvaluation::evaluateMaterialGain(const PossibleMove &move)
 	if ((move.type & MoveType::Capture) != MoveType::Capture)
 		return 0;
 
-	auto capturedPiece = mBoard->getPiece(move.end);
+	auto &capturedPiece = mBoard->getPiece(move.end);
 
 	if (!capturedPiece)
 		return 0;

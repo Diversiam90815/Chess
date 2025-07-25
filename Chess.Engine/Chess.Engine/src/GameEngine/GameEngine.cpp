@@ -19,6 +19,8 @@ void GameEngine::init()
 	mMoveGeneration = std::make_shared<MoveGeneration>(mChessBoard, mMoveValidation, mMoveExecution);
 
 	mCPUPlayer		= std::make_shared<CPUPlayer>(mMoveGeneration, mMoveEvaluation, mChessBoard);
+	mWhiteCPUPlayer = std::make_shared<CPUPlayer>(mMoveGeneration, mMoveEvaluation, mChessBoard);
+	mBlackCPUPlayer = std::make_shared<CPUPlayer>(mMoveGeneration, mMoveEvaluation, mChessBoard);
 
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
@@ -412,10 +414,42 @@ void GameEngine::setCPUConfiguration(const CPUConfiguration &config)
 }
 
 
+void GameEngine::setWhiteCPUConfiguration(const CPUConfiguration &config)
+{
+	if (mWhiteCPUPlayer)
+		mWhiteCPUPlayer->setCPUConfiguration(config);
+}
+
+
+void GameEngine::setBlackCPUConfiguration(const CPUConfiguration &config)
+{
+	if (mBlackCPUPlayer)
+		mBlackCPUPlayer->setCPUConfiguration(config);
+}
+
+
 CPUConfiguration GameEngine::getCPUConfiguration() const
 {
 	if (mCPUPlayer)
 		return mCPUPlayer->getCPUConfiguration();
+
+	return {};
+}
+
+
+CPUConfiguration GameEngine::getWhiteCPUConfiguration() const
+{
+	if (mWhiteCPUPlayer)
+		return mWhiteCPUPlayer->getCPUConfiguration();
+
+	return {};
+}
+
+
+CPUConfiguration GameEngine::getBlackCPUConfiguration() const
+{
+	if (mBlackCPUPlayer)
+		return mBlackCPUPlayer->getCPUConfiguration();
 
 	return {};
 }
