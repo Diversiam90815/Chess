@@ -49,12 +49,36 @@ struct CPUPerformanceStats
 class CPUPerformanceTests : public ::testing::Test
 {
 protected:
-	std::shared_ptr<GameEngine>			  mEngine;
+	std::shared_ptr<ChessBoard>			  mBoard;
+	std::shared_ptr<MoveValidation>		  mValidation;
+	std::shared_ptr<MoveExecution>		  mExecution;
+	std::shared_ptr<MoveGeneration>		  mGeneration;
+	std::shared_ptr<MoveEvaluation>		  mEvaluation;
+
+	std::shared_ptr<CPUPlayer>			  mWhiteCPU;
+	std::shared_ptr<CPUPlayer>			  mBlackCPU;
 
 	std::atomic<bool>					  mGameCompleted{false};
 	std::atomic<bool>					  mGameRunning{false};
 	GameResult							  mCurrentGameResult;
 	std::chrono::steady_clock::time_point mGameStartTime;
+
+
+	void								  SetUp() override
+	{
+		// Initialize core components
+		mBoard = std::make_shared<ChessBoard>();
+		mBoard->initializeBoard();
+
+		mValidation = std::make_shared<MoveValidation>(mBoard);
+		mExecution	= std::make_shared<MoveExecution>(mBoard, mValidation);
+		mGeneration = std::make_shared<MoveGeneration>(mBoard, mValidation, mExecution);
+		mEvaluation = std::make_shared<MoveEvaluation>(mBoard);
+
+		// Create CPU players
+		mWhiteCPU	= std::make_shared<CPUPlayer>(mGeneration, mEvaluation, mBoard);
+		mBlackCPU	= std::make_shared<CPUPlayer>(mGeneration, mEvaluation, mBoard);
+	}
 };
 
 
