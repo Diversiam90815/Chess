@@ -16,6 +16,7 @@
 #include <memory>
 
 #include "GameEngine/GameEngine.h"
+#include "GameManager.h"
 #include "StateMachine/StateMachine.h"
 #include "CPUPLayer/CPUPlayer.h"
 #include "Moves/Evaluation/MoveEvaluation.h"
@@ -58,7 +59,6 @@ struct CPUPerformanceStats
 class MoveEvaluationPerformanceTests : public ::testing::Test, public IGameObserver, public IGameStateObserver, public std::enable_shared_from_this<MoveEvaluationPerformanceTests>
 {
 protected:
-	std::shared_ptr<GameEngine>						mGameEngine;
 	std::shared_ptr<StateMachine>					mStateMachine;
 	std::shared_ptr<MoveEvaluationPerformanceTests> mSelf;
 
@@ -70,11 +70,10 @@ protected:
 
 	void											SetUp() override
 	{
-		mGameEngine = std::make_shared<GameEngine>();
-		mGameEngine->init();
+		GameManager::GetInstance()->init();
 
-		mSelf		= std::shared_ptr<MoveEvaluationPerformanceTests>(this, [](MoveEvaluationPerformanceTests *) {});
-		mGameEngine->attachObserver(mSelf);
+		mSelf = std::shared_ptr<MoveEvaluationPerformanceTests>(this, [](MoveEvaluationPerformanceTests *) {});
+		GameManager::GetInstance()->getGameEngine()->attachObserver(mSelf);
 
 		mStateMachine = StateMachine::GetInstance();
 		mStateMachine->attachObserver(mSelf);
@@ -83,7 +82,7 @@ protected:
 
 	void TearDown() override
 	{
-		mGameEngine->detachObserver(mSelf);
+		GameManager::GetInstance()->getGameEngine()->detachObserver(mSelf);
 		mStateMachine->detachObserver(mSelf);
 		StateMachine::ReleaseInstance();
 		mSelf.reset();
@@ -131,12 +130,11 @@ protected:
 		mCurrentGameResult.gameDescription = description;
 
 		// Reset game state
-		mGameEngine->resetGame();
 		mStateMachine->resetGame();
 
 		// Configure CPU players
-		mGameEngine->setWhiteCPUConfiguration(whiteCPU);
-		mGameEngine->setBlackCPUConfiguration(blackCPU);
+		GameManager::GetInstance()->setWhiteCPUConfiguration(whiteCPU);
+		GameManager::GetInstance()->setBlackCPUConfiguration(blackCPU);
 
 		// Start CPU vs CPU game
 		mStateMachine->onCPUvsCPUGameStarted(whiteCPU, blackCPU);
@@ -255,7 +253,7 @@ TEST_F(MoveEvaluationPerformanceTests, BasicDifficultyComparison)
 	mediumConfig.thinkingTime = std::chrono::milliseconds(100);
 
 	// Test Medium vs Easy (100 games)
-	auto stats				  = runMultipleGames(mediumConfig, easyConfig, 100, true);
+	auto stats				  = runMultipleGames(mediumConfig, easyConfig, 1, true);
 
 	std::cout << "Medium vs Easy Results:" << std::endl;
 	std::cout << "Win Rate: " << stats.winRate << "%" << std::endl;

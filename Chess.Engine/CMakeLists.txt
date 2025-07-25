@@ -28,3 +28,4 @@ enable_testing()
 # Include sub-projects.
 add_subdirectory (Chess.Engine)
 add_subdirectory (Chess.Engine.Tests)
+add_subdirectory (Chess.Engine.Performance)

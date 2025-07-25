@@ -129,6 +129,7 @@ public:
 	CPUConfiguration			getWhiteCPUConfiguration() const;
 	CPUConfiguration			getBlackCPUConfiguration() const;
 
+	std::shared_ptr<GameEngine> getGameEngine() { return mEngine; }
 
 private:
 	GameManager() = default;

@@ -148,7 +148,7 @@ void CPUPlayer::calculateMove(PlayerColor player)
 	// Simulate thinking
 	simulateThinking();
 
-	// Select move based on difficulty (for now we just test random moves)
+	// Select move based on difficulty
 	switch (mConfig.difficulty)
 	{
 	case CPUDifficulty::Random: selectedMove = getRandomMove(allMoves); break;
