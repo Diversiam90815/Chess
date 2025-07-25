@@ -11,6 +11,7 @@
 
 #include "GameEngine/GameEngine.h"
 
+namespace fs = std::filesystem;
 
 namespace PerformanceTests
 {
@@ -249,7 +250,41 @@ private:
 
 		return stats;
 	}
+
+
+	void saveResultsToFile(const std::string &fileName, const CPUPerformanceStats &stats, const std::string &testDescription)
+	{
+		// Create directory if not exists yet
+		fs::path resultDir = "Test_Results";
+		if (!fs::exists(resultDir))
+			fs::create_directories(resultDir);
+
+		fs::path	  fullPath = resultDir / fileName;
+
+		std::ofstream file(fullPath, std::ios::app);
+
+		if (file.is_open())
+		{
+			file << "=== " << testDescription << " ===" << std::endl;
+			file << "Total Games: " << stats.totalGames << std::endl;
+			file << "Wins: " << stats.wins << std::endl;
+			file << "Losses: " << stats.losses << std::endl;
+			file << "Draws: " << stats.draws << std::endl;
+			file << "Win Rate: " << std::fixed << std::setprecision(2) << stats.winRate << "%" << std::endl;
+			file << "Average Game Duration: " << stats.averageGameDuration.count() << "ms" << std::endl;
+			file << "Average Move Count: " << stats.averageMoveCount << std::endl;
+			file << std::string(50, '-') << std::endl; // Separator line
+			file << std::endl;
+
+			file.close();
+
+			std::cout << "Results saved to: " << fullPath << std::endl;
+		}
+	}
 };
+
+
+
 
 
 
