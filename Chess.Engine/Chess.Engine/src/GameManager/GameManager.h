@@ -94,7 +94,6 @@ public:
 
 
 	bool						startCPUGame();
-	bool						startCPUvsCPUGame();
 
 	bool						isCPUPlayer(PlayerColor player) const;
 
@@ -120,16 +119,6 @@ public:
 	std::string					getAtmosScenario();
 
 	void						setGameConfiguration(GameConfiguration config);
-
-	void						setCPUConfiguration(const CPUConfiguration &config);
-	void						setWhiteCPUConfiguration(const CPUConfiguration &config);
-	void						setBlackCPUConfiguration(const CPUConfiguration &config);
-
-	CPUConfiguration			getCPUConfiguration() const;
-	CPUConfiguration			getWhiteCPUConfiguration() const;
-	CPUConfiguration			getBlackCPUConfiguration() const;
-
-	std::shared_ptr<GameEngine> getGameEngine() { return mEngine; }
 
 private:
 	GameManager() = default;

@@ -61,12 +61,8 @@ public:
 	EndGameState			   checkForEndGameConditions();
 
 	void					   setCPUConfiguration(const CPUConfiguration &config);
-	void					   setWhiteCPUConfiguration(const CPUConfiguration &config);
-	void					   setBlackCPUConfiguration(const CPUConfiguration &config);
 
 	CPUConfiguration		   getCPUConfiguration() const;
-	CPUConfiguration		   getWhiteCPUConfiguration() const;
-	CPUConfiguration		   getBlackCPUConfiguration() const;
 
 	bool					   isCPUPlayer(PlayerColor player) const;
 
@@ -91,8 +87,6 @@ private:
 	std::shared_ptr<MoveEvaluation> mMoveEvaluation;
 
 	std::shared_ptr<CPUPlayer>		mCPUPlayer;
-	std::shared_ptr<CPUPlayer>		mWhiteCPUPlayer; // For testing different CPU Configurations
-	std::shared_ptr<CPUPlayer>		mBlackCPUPlayer; // For testing different CPU Configurations
 
 	friend class GameManager;
 };

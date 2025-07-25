@@ -320,11 +320,6 @@ void GameManager::initObservers()
 	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer);
 
 	mEngine->mCPUPlayer->attachObserver(StateMachine::GetInstance());
-
-	if (mEngine->mWhiteCPUPlayer)
-		mEngine->mWhiteCPUPlayer->attachObserver(StateMachine::GetInstance());
-	if (mEngine->mBlackCPUPlayer)
-		mEngine->mBlackCPUPlayer->attachObserver(StateMachine::GetInstance());
 }
 
 
@@ -461,63 +456,5 @@ bool GameManager::isCPUPlayer(PlayerColor player) const
 
 void GameManager::requestCPUMoveAsync(PlayerColor player)
 {
-	if (StateMachine::GetInstance()->isCPUvsCPUGame())
-	{
-		switch (player)
-		{
-		case PlayerColor::White: mEngine->mWhiteCPUPlayer->requestMoveAsync(PlayerColor::White); break;
-		case PlayerColor::Black: mEngine->mBlackCPUPlayer->requestMoveAsync(PlayerColor::Black); break;
-		default: break;
-		}
-
-		return;
-	}
-
 	return mEngine->requestCPUMoveAsync(player);
-}
-
-
-void GameManager::setCPUConfiguration(const CPUConfiguration &config)
-{
-	return mEngine->setCPUConfiguration(config);
-}
-
-
-void GameManager::setWhiteCPUConfiguration(const CPUConfiguration &config)
-{
-	return mEngine->setWhiteCPUConfiguration(config);
-}
-
-
-void GameManager::setBlackCPUConfiguration(const CPUConfiguration &config)
-{
-	return mEngine->setBlackCPUConfiguration(config);
-}
-
-
-CPUConfiguration GameManager::getCPUConfiguration() const
-{
-	return mEngine->getCPUConfiguration();
-}
-
-
-CPUConfiguration GameManager::getWhiteCPUConfiguration() const
-{
-	return mEngine->getWhiteCPUConfiguration();
-}
-
-
-CPUConfiguration GameManager::getBlackCPUConfiguration() const
-{
-	return mEngine->getBlackCPUConfiguration();
-}
-
-
-bool GameManager::startCPUvsCPUGame()
-{
-	LOG_INFO("Game started in CPU vs CPU mode for testing");
-
-	mEngine->startGame();
-
-	return true;
 }

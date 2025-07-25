@@ -381,11 +381,6 @@ void StateMachine::switchToNextState()
 				gameStateChanged(GameState::WaitingForInput);
 			}
 		}
-		else if (mIsCPUvsCPU.load())
-		{
-			LOG_INFO("Initial state: CPU vs CPU mode - White CPU starts");
-			gameStateChanged(GameState::WaitingForCPUMove);
-		}
 		else
 		{
 			LOG_INFO("Single Player mode. We switch to WaitingForInput");
@@ -467,12 +462,6 @@ void StateMachine::switchToNextState()
 				LOG_INFO("CPU PLayer's turn, waiting for CPU move");
 				gameStateChanged(GameState::WaitingForCPUMove);
 			}
-			else if (mIsCPUvsCPU.load())
-			{
-				// In CPU vs CPU mode, always wait for CPU move regardless of color
-				LOG_INFO("CPU vs CPU mode: {} CPU's turn, waiting for CPU move", LoggingHelper::playerColourToString(currentPlayer).c_str());
-				gameStateChanged(GameState::WaitingForCPUMove);
-			}
 			else
 			{
 				LOG_INFO("Human player's turn, waiting for input");
@@ -529,9 +518,6 @@ bool StateMachine::handleInitState() const
 
 	else if (mPlayingAgainstPC)
 		return GameManager::GetInstance()->startCPUGame();
-
-	else if (isCPUvsCPUGame())
-		return GameManager::GetInstance()->startCPUvsCPUGame();
 
 	else
 		return GameManager::GetInstance()->startGame();
@@ -620,34 +606,4 @@ bool StateMachine::handleWaitingForCPUState()
 	}
 
 	return true;
-}
-
-
-void StateMachine::onCPUvsCPUGameStarted(CPUConfiguration whiteCPU, CPUConfiguration blackCPU)
-{
-	LOG_INFO("Starting CPU vs CPU game for testing purposes!");
-
-	// Set CPU vs CPU mode
-	setCPUvsCPU(true);
-	mPlayingAgainstPC.store(false);
-	mIsMultiplayerGame.store(false);
-
-	// Configure both CPU players through GameManager
-	GameManager::GetInstance()->setWhiteCPUConfiguration(whiteCPU);
-	GameManager::GetInstance()->setBlackCPUConfiguration(blackCPU);
-
-	GameState currentState = getCurrentGameState();
-
-	if (currentState == GameState::Undefined)
-	{
-		gameStateChanged(GameState::Init);
-		start();
-		triggerEvent();
-	}
-	else
-	{
-		int iCurrentState = static_cast<int>(currentState);
-		LOG_WARNING("CPU vs CPU Game Start called, but our state is wrong/not set up! Our current state is {0} ({1})", LoggingHelper::gameStateToString(currentState).c_str(),
-					iCurrentState);
-	}
 }

@@ -53,10 +53,6 @@ public:
 	void	  resetGame();
 	void	  reactToUndoMove();
 
-	void	  onCPUvsCPUGameStarted(CPUConfiguration whiteCPU, CPUConfiguration blackCPU);
-	bool	  isCPUvsCPUGame() const { return mIsCPUvsCPU.load(); }
-	void	  setCPUvsCPU(bool enabled) { mIsCPUvsCPU.store(enabled); }
-
 private:
 	StateMachine();
 
@@ -103,8 +99,6 @@ private:
 
 	std::atomic<bool>	   mPlayingAgainstPC{false};
 	bool				   mWaitingForCPUMove{false};
-
-	std::atomic<bool>	   mIsCPUvsCPU{false}; // For testing purposes
 
 	std::mutex			   mStateChangedMutex;
 	bool				   mHasPendingStateChange{false};
