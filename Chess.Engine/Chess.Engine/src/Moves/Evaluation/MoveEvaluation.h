@@ -11,6 +11,8 @@
 
 #include "Move.h"
 #include "ChessBoard.h"
+#include "Generation/MoveGeneration.h"
+
 
 enum class GamePhase
 {
@@ -23,7 +25,7 @@ enum class GamePhase
 class MoveEvaluation
 {
 public:
-	MoveEvaluation(std::shared_ptr<ChessBoard> chessboard);
+	MoveEvaluation(std::shared_ptr<ChessBoard> chessboard, std::shared_ptr<MoveGeneration> generation);
 	~MoveEvaluation() = default;
 
 	int					 getBasicEvaluation(const PossibleMove &move);
@@ -68,6 +70,7 @@ private:
 
 
 	std::shared_ptr<ChessBoard>						   mBoard;
+	std::shared_ptr<MoveGeneration>					   mGeneration;
 
 	static constexpr int							   PAWN_VALUE			   = 100;
 	static constexpr int							   KNIGHT_VALUE			   = 320;

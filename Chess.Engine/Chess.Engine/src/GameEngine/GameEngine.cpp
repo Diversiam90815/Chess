@@ -13,10 +13,10 @@ void GameEngine::init()
 {
 	mChessBoard		= std::make_shared<ChessBoard>();
 
-	mMoveEvaluation = std::make_shared<MoveEvaluation>(mChessBoard);
 	mMoveValidation = std::make_shared<MoveValidation>(mChessBoard);
 	mMoveExecution	= std::make_shared<MoveExecution>(mChessBoard, mMoveValidation);
 	mMoveGeneration = std::make_shared<MoveGeneration>(mChessBoard, mMoveValidation, mMoveExecution);
+	mMoveEvaluation = std::make_shared<MoveEvaluation>(mChessBoard, mMoveGeneration);
 
 	mCPUPlayer		= std::make_shared<CPUPlayer>(mMoveGeneration, mMoveEvaluation, mChessBoard);
 

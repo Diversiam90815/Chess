@@ -9,7 +9,7 @@
 #include "MoveEvaluation.h"
 
 
-MoveEvaluation::MoveEvaluation(std::shared_ptr<ChessBoard> chessboard) : mBoard(chessboard) {}
+MoveEvaluation::MoveEvaluation(std::shared_ptr<ChessBoard> chessboard, std::shared_ptr<MoveGeneration> generation) : mBoard(chessboard), mGeneration(generation) {}
 
 
 int MoveEvaluation::getBasicEvaluation(const PossibleMove &move)
