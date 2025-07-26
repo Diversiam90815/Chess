@@ -74,7 +74,7 @@ protected:
 		mValidation = std::make_shared<MoveValidation>(mBoard);
 		mExecution	= std::make_shared<MoveExecution>(mBoard, mValidation);
 		mGeneration = std::make_shared<MoveGeneration>(mBoard, mValidation, mExecution);
-		mEvaluation = std::make_shared<MoveEvaluation>(mBoard);
+		mEvaluation = std::make_shared<MoveEvaluation>(mBoard, mGeneration);
 
 		// Create CPU players
 		mWhiteCPU	= std::make_shared<CPUPlayer>(mGeneration, mEvaluation, mBoard);
