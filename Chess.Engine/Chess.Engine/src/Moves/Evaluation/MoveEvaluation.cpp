@@ -136,13 +136,55 @@ int MoveEvaluation::evaluatePositionalGain(const PossibleMove &move, PlayerColor
 
 int MoveEvaluation::evaluateThreadLevel(const PossibleMove &move, PlayerColor player)
 {
-	return 0;
+	int			score			= 0;
+
+	// Check if this move creates threat to the opponent pieces
+	auto		attackedSquares = getAttackedSquares(move.end, player);
+	PlayerColor opponnent		= getOpponnentColor(player);
+
+	for (const auto &square : attackedSquares)
+	{
+		auto &piece = mBoard->getPiece(square);
+
+		if (!piece && piece->getColor() != player)
+			continue;
+
+		// Threatening valuable pieces gives more points
+		int pieceValue = getPieceValue(piece->getType());
+		score += pieceValue / 2; // Threat is worth 1/10th of piece value
+	}
+
+	// Check if this moves blocks opponnent threats
+	if (blocksEnemyThreats(move, player))
+		score += THREAT_BLOCK_BONUS;
+
+	return score;
 }
 
 
 int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor player)
 {
-	return 0;
+	int		 score			  = 0;
+	Position kingPos		  = mBoard->getKingsPosition(player);
+	Position opponnentKingPos = mBoard->getKingsPosition(getOpponnentColor(player));
+
+	// Penalize moves that expose our king
+	if (wouldExposeKing(move, player))
+		score -= 100;
+
+	// Reward moves that attack near the opponnents king
+	if (isNearKing(move.end, opponnentKingPos))
+		score += 30;
+
+	// Reward defensive moves near our king when under threat
+	if (isNearKing(move.end, kingPos))
+	{
+		int attackerCount = countAttackers(kingPos, getOpponnentColor(player));
+		if (attackerCount > 0)
+			score += 25;
+	}
+
+	return score;
 }
 
 
@@ -237,13 +279,38 @@ bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor pl
 
 int MoveEvaluation::getStrategicEvaluation(const PossibleMove &move, PlayerColor player)
 {
-	return 0;
+	int score = 0;
+
+	score += evaluatePawnStructure(move, player); // Pawn structure considerations
+
+	// King's safety considerations (weighed more in middlegame)
+	GamePhase phase = determineGamePhase();
+
+	if (phase != GamePhase::EndGame)
+		score += evaluateKingSafety(move, player) * KING_SAFETY_WEIGHT;
+
+	score += evaluatePieceActivity(move, player); // Piece coordination and activity
+
+	return score;
 }
 
 
 int MoveEvaluation::getTacticalEvaluation(const PossibleMove &move, PlayerColor player)
 {
-	return 0;
+	int score = 0;
+
+	if (createsFork(move, player))
+		score += FORK_BONUS;
+
+	if (createsPin(move, player))
+		score += PIN_BONUS;
+
+	if (createsSkewer(move, player))
+		score += SKEWER_BONUS;
+
+	score += evaluateThreadLevel(move, player) * THREAT_WEIGHT;
+
+	return score;
 }
 
 
@@ -255,19 +322,74 @@ GamePhase MoveEvaluation::determineGamePhase() const
 
 int MoveEvaluation::calculateMobility(PlayerColor player) const
 {
-	return 0;
+	int	 mobility	  = 0;
+
+	auto playerPieces = mBoard->getPiecesFromPlayer(player);
+
+	for (const auto &[position, piece] : playerPieces)
+	{
+		auto attackedSquares = getAttackedSquares(position, player);
+		mobility += static_cast<int>(attackedSquares.size());
+	}
+
+	return mobility;
 }
 
 
 int MoveEvaluation::calculateKingSafetyScore(PlayerColor player) const
 {
-	return 0;
+	int			score	  = 0;
+
+	Position	kingPos	  = mBoard->getKingsPosition(player);
+
+	// Count attackers near king
+	PlayerColor opponnent = getOpponnentColor(player);
+	int			attackers = countAttackers(kingPos, opponnent);
+	score -= 20 * attackers; // Penalty for each attacker
+
+	// bonus for each king protecting pieces near king
+	for (int dx = -1; dx <= 1; ++dx)
+	{
+		for (int dy = -1; dy <= 1; ++dy)
+		{
+			Position nearPos{kingPos.x + dx, kingPos.y + dy};
+
+			if (!nearPos.isValid())
+				continue;
+
+			auto &piece = mBoard->getPiece(nearPos);
+
+			if (piece && piece->getColor() == player)
+				score += 5; // Bonus for friendly pieces near king
+		}
+	}
+
+	return score;
 }
 
 
 int MoveEvaluation::calculatePawnStructureScore(PlayerColor player) const
 {
-	return 0;
+	int	 score		  = 0;
+
+	auto playerPieces = mBoard->getPiecesFromPlayer(player);
+
+	for (const auto &[position, piece] : playerPieces)
+	{
+		if (piece->getType() != PieceType::Pawn)
+			continue;
+
+		if (isPasssedPawn(position, player))
+			score += 50;
+
+		if (isIsolatedPawn(position, player))
+			score -= 20;
+
+		if (isDoublePawn(position, player))
+			score -= 15;
+	}
+
+	return score;
 }
 
 
