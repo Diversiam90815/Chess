@@ -146,7 +146,7 @@ int MoveEvaluation::evaluateThreadLevel(const PossibleMove &move, PlayerColor pl
 	{
 		auto &piece = mBoard->getPiece(square);
 
-		if (!piece && piece->getColor() != player)
+		if (!piece || piece->getColor() != player)
 			continue;
 
 		// Threatening valuable pieces gives more points
@@ -284,7 +284,28 @@ bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player)
 
 bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
 {
-	return false;
+	int			valuabeTargets	= 0;
+
+	auto		attackedSqaures = getAttackedSquares(move.end, player);
+	PlayerColor opponnent		= getOpponnentColor(player);
+
+	for (const auto &square : attackedSqaures)
+	{
+		auto &piece = mBoard->getPiece(square);
+
+		if (!piece && piece->getColor() != opponnent)
+			continue;
+
+		PieceType type = piece->getType();
+
+		// Count valuable pieces
+		if (type == PieceType::Knight || type == PieceType::Bishop || type == PieceType::Rook || type == PieceType::Queen || type == PieceType::King)
+		{
+			valuabeTargets++;
+		}
+	}
+
+	return valuabeTargets >= 2; // Fork if attacking 2+ valuable pieces
 }
 
 
@@ -339,7 +360,34 @@ int MoveEvaluation::getTacticalEvaluation(const PossibleMove &move, PlayerColor 
 
 GamePhase MoveEvaluation::determineGamePhase() const
 {
-	return GamePhase();
+	int totalMaterial = 0;
+	int totalPieces	  = 0;
+
+	// Count total material on board
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			Position pos{x, y};
+			auto	&piece = mBoard->getPiece(pos);
+
+			if (!piece)
+				continue;
+
+			totalMaterial += getPieceValue(piece->getType());
+			totalPieces++;
+		}
+	}
+
+	// Determine game phase based on material and piece count
+	if (totalMaterial > 6000 || totalPieces > 20)
+		return GamePhase::Opening;
+
+	else if (totalMaterial > 2500 || totalPieces > 12)
+		return GamePhase::MiddleGame;
+
+	else
+		return GamePhase::EndGame;
 }
 
 
@@ -418,18 +466,63 @@ int MoveEvaluation::calculatePawnStructureScore(PlayerColor player) const
 
 bool MoveEvaluation::isPasssedPawn(const Position &pos, PlayerColor player) const
 {
-	return false;
+	// Check if no enemy pawn can block this pawn's advance
+	int direction = (player == PlayerColor::White) ? -1 : 1;
+	int startY	  = pos.y;
+	int endY	  = (player == PlayerColor::White) ? 0 : 7;
+
+	for (int y = startY + direction; y != endY; y += direction)
+	{
+		Position checkPos{pos.x, y};
+		auto	&piece = mBoard->getPiece(checkPos);
+
+		if (piece && piece->getType() == PieceType::Pawn && piece->getColor() != player)
+			return false; // Found enemy pawn that could block
+	}
+
+	return true;
 }
 
 
 bool MoveEvaluation::isIsolatedPawn(const Position &pos, PlayerColor player) const
 {
-	return false;
+	// Check adjacent files for friendly pawns
+	for (int fileOffset = -1; fileOffset <= 1; fileOffset += 2) // Check left and right files
+	{
+		int checkFile = pos.x + fileOffset;
+		if (checkFile < 0 || checkFile > 7)
+			continue;
+
+		// Check entire file for friendly pawns
+		for (int y = 0; y < 8; ++y)
+		{
+			Position checkPos{checkFile, y};
+			auto	&piece = mBoard->getPiece(checkPos);
+			if (piece && piece->getType() == PieceType::Pawn && piece->getColor() == player)
+				return false; // Found friendly pawn on adjacent file
+		}
+	}
+
+	return true;
 }
 
 
 bool MoveEvaluation::isDoublePawn(const Position &pos, PlayerColor player) const
 {
+	// Check same file for another friendly pawn
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		if (y == pos.y)
+			continue; // Skip current position
+
+		Position checkPos{pos.x, y};
+
+		auto	&piece = mBoard->getPiece(checkPos);
+
+		if (piece || piece->getType() == PieceType::Pawn && piece->getColor() == player)
+			return true; // Found another friendly pawn pawn on same file
+	}
+
 	return false;
 }
 
@@ -448,12 +541,25 @@ bool MoveEvaluation::isNearKing(const Position &pos, const Position &kingPos) co
 
 std::vector<Position> MoveEvaluation::getAttackedSquares(const Position &piecePos, PlayerColor player) const
 {
-	return std::vector<Position>();
+	std::vector<Position> attackedSquares;
+
+
+	return attackedSquares;
 }
 
 
 bool MoveEvaluation::wouldExposeKing(const PossibleMove &move, PlayerColor player) const
 {
+	Position kingPos = mBoard->getKingsPosition(player);
+
+	// If we're moving a piece from near the king, check if it exposes the king
+	if (isNearKing(move.start, kingPos) && !isNearKing(move.end, kingPos))
+	{
+		// Count current attackers
+		int currentAttackers = countAttackers(kingPos, getOpponnentColor(player));
+		return currentAttackers > 0; // Risk if already under attack
+	}
+
 	return false;
 }
 
@@ -469,7 +575,7 @@ int MoveEvaluation::countAttackers(const Position &target, PlayerColor attackerP
 			Position pos{x, y};
 			auto	&piece = mBoard->getPiece(pos);
 
-			if (!piece && piece->getColor() != attackerPlayer)
+			if (!piece || piece->getColor() != attackerPlayer)
 				continue;
 
 			auto attackedSquares = getAttackedSquares(pos, attackerPlayer);
@@ -491,7 +597,7 @@ int MoveEvaluation::countAttackers(const Position &target, PlayerColor attackerP
 
 PlayerColor MoveEvaluation::getOpponnentColor(PlayerColor player) const
 {
-	return (player == PlayerColor::White) ? PlayerColor::White : PlayerColor::Black;
+	return (player == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
 }
 
 
