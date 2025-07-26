@@ -36,7 +36,7 @@ public:
 	int					 getPositionValue(PieceType piece, const Position &pos, PlayerColor player);
 	int					 evaluateMaterialGain(const PossibleMove &move);
 	int					 evaluatePositionalGain(const PossibleMove &move, PlayerColor player);
-	int					 evaluateThreadLevel(const PossibleMove &move, PlayerColor player);
+	int					 evaluateThreatLevel(const PossibleMove &move, PlayerColor player);
 	int					 evaluateKingSafety(const PossibleMove &move, PlayerColor player);
 	int					 evaluateCenterControl(const PossibleMove &move, PlayerColor player);
 	int					 evaluatePawnStructure(const PossibleMove &move, PlayerColor player);

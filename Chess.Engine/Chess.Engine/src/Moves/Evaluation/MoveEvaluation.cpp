@@ -66,7 +66,7 @@ int MoveEvaluation::getAdvancedEvaluation(const PossibleMove &move, PlayerColor 
 
 	score += getTacticalEvaluation(move, player);	  // Advanced technical evaluation
 	score += getStrategicEvaluation(move, player);	  // Advanced strategic evaluation
-	score += evaluateThreadLevel(move, player);		  // Threat analysis
+	score += evaluateThreatLevel(move, player);		  // Threat analysis
 	score += evaluateDefensivePatterns(move, player); // Defensive patterns
 
 	return score;
@@ -146,7 +146,7 @@ int MoveEvaluation::evaluatePositionalGain(const PossibleMove &move, PlayerColor
 }
 
 
-int MoveEvaluation::evaluateThreadLevel(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::evaluateThreatLevel(const PossibleMove &move, PlayerColor player)
 {
 	int			score			= 0;
 
@@ -364,7 +364,7 @@ int MoveEvaluation::getTacticalEvaluation(const PossibleMove &move, PlayerColor 
 	if (createsSkewer(move, player))
 		score += SKEWER_BONUS;
 
-	score += evaluateThreadLevel(move, player) * THREAT_WEIGHT;
+	score += evaluateThreatLevel(move, player) * THREAT_WEIGHT;
 
 	return score;
 }
