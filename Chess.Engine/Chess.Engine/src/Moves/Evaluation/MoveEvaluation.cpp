@@ -148,19 +148,60 @@ int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor pla
 
 int MoveEvaluation::evaluateCenterControl(const PossibleMove &move, PlayerColor player)
 {
-	return 0;
+	int score = 0;
+
+	// Reward moves that control/occupy center squares
+	if (isInCenter(move.end))
+		score += CENTER_CONTROL_BONUS;
+
+	// Additional: bonus for pieces attacking center squares
+	auto attackedSquares = getAttackedSquares(move.end, player);
+
+	for (const auto &square : attackedSquares)
+	{
+		if (isInCenter(square))
+			score += CENTER_CONTROL_BONUS / 2;
+	}
+
+	return score;
 }
 
 
 int MoveEvaluation::evaluatePawnStructure(const PossibleMove &move, PlayerColor player)
 {
-	return 0;
+	int	  score		  = 0;
+	auto &movingPiece = mBoard->getPiece(move.start);
+
+	if (!movingPiece || movingPiece->getType() != PieceType::Pawn)
+		return 0;
+
+	// Check for pawn structure improvements
+	if (isPasssedPawn(move.end, player))
+		score += 50;
+
+	if (isIsolatedPawn(move.end, player))
+		score -= 20;
+
+	if (isDoublePawn(move.end, player))
+		score -= 15;
+
+	return score;
 }
 
 
 int MoveEvaluation::evaluatePieceActivity(const PossibleMove &move, PlayerColor player)
 {
-	return 0;
+	auto &piece = mBoard->getPiece(move.start);
+
+	if (!piece)
+		return 0;
+
+	// Count squares piece can attack from new position
+	auto attackedSquares = getAttackedSquares(move.end, player);
+	int	 mobility		 = static_cast<int>(attackedSquares.size());
+
+	// Reward increased mobility
+	return mobility * 2;
 }
 
 
@@ -250,13 +291,13 @@ bool MoveEvaluation::isDoublePawn(const Position &pos, PlayerColor player) const
 
 bool MoveEvaluation::isInCenter(const Position &pos) const
 {
-	return false;
+	return (pos.x >= 2 && pos.x <= 5 && pos.y >= 2 && pos.y <= 5);
 }
 
 
-bool MoveEvaluation::isNearKing(const Position &pos) const
+bool MoveEvaluation::isNearKing(const Position &pos, const Position &kingPos) const
 {
-	return false;
+	return (abs(pos.x - kingPos.x) <= 2 && abs(pos.y - kingPos.y) <= 2);
 }
 
 
@@ -274,13 +315,38 @@ bool MoveEvaluation::wouldExposeKing(const PossibleMove &move, PlayerColor playe
 
 int MoveEvaluation::countAttackers(const Position &target, PlayerColor attackerPlayer) const
 {
-	return 0;
+	int count = 0;
+
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			Position pos{x, y};
+			auto	&piece = mBoard->getPiece(pos);
+
+			if (!piece && piece->getColor() != attackerPlayer)
+				continue;
+
+			auto attackedSquares = getAttackedSquares(pos, attackerPlayer);
+
+			for (const auto &square : attackedSquares)
+			{
+				if (square == target)
+				{
+					count++;
+					break;
+				}
+			}
+		}
+	}
+
+	return count;
 }
 
 
 PlayerColor MoveEvaluation::getOpponnentColor(PlayerColor player) const
 {
-	return PlayerColor();
+	return (player == PlayerColor::White) ? PlayerColor::White : PlayerColor::Black;
 }
 
 

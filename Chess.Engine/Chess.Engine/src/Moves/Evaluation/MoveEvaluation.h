@@ -60,7 +60,7 @@ private:
 	bool											   isIsolatedPawn(const Position &pos, PlayerColor player) const;
 	bool											   isDoublePawn(const Position &pos, PlayerColor player) const;
 	bool											   isInCenter(const Position &pos) const;
-	bool											   isNearKing(const Position &pos) const;
+	bool											   isNearKing(const Position &pos, const Position &kingPos) const;
 	std::vector<Position>							   getAttackedSquares(const Position &piecePos, PlayerColor player) const;
 	bool											   wouldExposeKing(const PossibleMove &move, PlayerColor player) const;
 	int												   countAttackers(const Position &target, PlayerColor attackerPlayer) const;
