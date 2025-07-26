@@ -18,20 +18,20 @@ int MoveEvaluation::getBasicEvaluation(const PossibleMove &move)
 
 	// Capture bonus
 	if ((move.type & MoveType::Capture) == MoveType::Capture)
-		score += 50;
+		score += CAPTURE_BONUS;
 
 	// Check bonus
 	if ((move.type & MoveType::Check) == MoveType::Check)
-		score += 15;
+		score += CHECK_BONUS;
 
 	// Checkmate bonus
 	if ((move.type & MoveType::Checkmate) == MoveType::Checkmate)
-		score += 1000;
+		score += CHECKMATE_BONUS;
 
 	// Promotion bonus
 	if ((move.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
 	{
-		score += 800;
+		score += PROMOTION_BONUS;
 
 		// Additional bonus for promoting to queen
 		if (move.promotionPiece == PieceType::Queen)
@@ -40,7 +40,7 @@ int MoveEvaluation::getBasicEvaluation(const PossibleMove &move)
 
 	// Castling bonus
 	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
-		score += 30;
+		score += CASTLE_BONUS;
 
 	return score;
 }
@@ -50,11 +50,11 @@ int MoveEvaluation::getMediumEvaluation(const PossibleMove &move, PlayerColor pl
 {
 	int score = getBasicEvaluation(move);
 
-	// Material evaluation
-	score += evaluateMaterialGain(move);
-
-	// Positional evaluation
-	score += evaluatePositionalGain(move, player);
+	score += evaluateMaterialGain(move);		   // Material evaluation
+	score += evaluatePositionalGain(move, player); // Positional evaluation
+	score += evaluateCenterControl(move, player);  // Center COntrol
+	score += evaluateKingSafety(move, player);	   // King Safety
+	score += evaluatePieceActivity(move, player);  // Piece activity
 
 	return score;
 }
@@ -62,8 +62,14 @@ int MoveEvaluation::getMediumEvaluation(const PossibleMove &move, PlayerColor pl
 
 int MoveEvaluation::getAdvancedEvaluation(const PossibleMove &move, PlayerColor player)
 {
-	// TODO: Implement with more tactical analysis,...
-	return getMediumEvaluation(move, player);
+	int score = getMediumEvaluation(move, player);
+
+	score += getTacticalEvaluation(move, player);	  // Advanced technical evaluation
+	score += getStrategicEvaluation(move, player);	  // Advanced strategic evaluation
+	score += evaluateThreadLevel(move, player);		  // Threat analysis
+	score += evaluateDefensivePatterns(move, player); // Defensive patterns
+
+	return score;
 }
 
 
