@@ -109,7 +109,19 @@ int MoveEvaluation::evaluateMaterialGain(const PossibleMove &move)
 	if (!capturedPiece)
 		return 0;
 
-	return getPieceValue(capturedPiece->getType());
+	int	  capturedValue = getPieceValue(capturedPiece->getType());
+
+	// Consider exchanging pieces -> evaluate the trade
+	auto &movingPiece	= mBoard->getPiece(move.start);
+	if (movingPiece)
+	{
+		int movingValue = getPieceValue(movingPiece->getType());
+
+		// Bonus for good exchanges
+        return capturedValue + (::std::max)(0, (capturedValue - movingValue));
+	}
+
+	return capturedValue;
 }
 
 
