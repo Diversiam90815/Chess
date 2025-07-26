@@ -249,7 +249,30 @@ int MoveEvaluation::evaluatePieceActivity(const PossibleMove &move, PlayerColor 
 
 int MoveEvaluation::evaluateDefensivePatterns(const PossibleMove &move, PlayerColor player)
 {
-	return 0;
+	int		 score	 = 0;
+
+	// Check if move defends important pieces or squares
+	Position kingPos = mBoard->getKingsPosition(player);
+
+	// Defending the king area
+	if (isNearKing(move.end, kingPos))
+		score += 15;
+
+	// Defending important central squares
+	if (isInCenter(move.end))
+		score += 10;
+
+	// Check if move blocks enemy attacks on our pieces
+	auto attackedSquares = getAttackedSquares(move.end, player);
+	for (const auto &square : attackedSquares)
+	{
+		auto &piece = mBoard->getPiece(square);
+
+		if (piece && piece->getColor() == player)
+			score += 5;
+	}
+
+	return score;
 }
 
 
