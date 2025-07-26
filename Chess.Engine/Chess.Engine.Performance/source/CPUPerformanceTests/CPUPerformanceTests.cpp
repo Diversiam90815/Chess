@@ -85,7 +85,7 @@ protected:
 	GameResult runSingleGame(const CPUConfiguration &whiteCPU,
 							 const CPUConfiguration &blackCPU,
 							 const std::string		&description = "",
-							 int					 maxMoves	 = 100,
+							 int					 maxMoves	 = 200,
 							 std::chrono::seconds	 timeout	 = std::chrono::seconds(300))
 	{
 		GameResult result;
@@ -154,50 +154,6 @@ protected:
 	}
 
 
-private:
-	PossibleMove selectCPUMove(std::shared_ptr<CPUPlayer> cpu, PlayerColor player)
-	{
-		auto allMoves = getAllLegalMovesForPlayer(player);
-		if (allMoves.empty())
-			return PossibleMove();
-
-		// Select move based on CPU Difficulty
-		auto config = cpu->getCPUConfiguration();
-
-		switch (config.difficulty)
-		{
-		case CPUDifficulty::Random: return cpu->getRandomMove(allMoves);
-		case CPUDifficulty::Easy: return cpu->getEasyMove(allMoves);
-		case CPUDifficulty::Medium: return cpu->getMediumMove(allMoves);
-		case CPUDifficulty::Hard: return cpu->getHardMove(allMoves);
-		default: return {};
-		}
-	}
-
-
-	std::vector<PossibleMove> getAllLegalMovesForPlayer(PlayerColor player)
-	{
-		std::vector<PossibleMove> allMoves;
-
-		// Get all pieces for the player and collect their possible moves
-		for (int y = 0; y < BOARD_SIZE; ++y)
-		{
-			for (int x = 0; x < BOARD_SIZE; ++x)
-			{
-				Position pos{x, y};
-				auto	&piece = mBoard->getPiece(pos);
-
-				if (piece && piece->getColor() == player)
-				{
-					auto moves = mGeneration->getMovesForPosition(pos);
-					allMoves.insert(allMoves.end(), moves.begin(), moves.end());
-				}
-			}
-		}
-
-		return allMoves;
-	}
-
 	CPUPerformanceStats runMultipleGames(const CPUConfiguration &testCPU, const CPUConfiguration &referenceCPU, int gameCount, bool testCPUAsWhite = true)
 	{
 		CPUPerformanceStats		stats;
@@ -217,6 +173,8 @@ private:
 
 			// Run the game
 			GameResult	result		  = runSingleGame(whiteCPU, blackCPU, description);
+
+			games.push_back(result);
 
 			// Update stats
 			stats.totalGames++;
@@ -281,10 +239,77 @@ private:
 			std::cout << "Results saved to: " << fullPath << std::endl;
 		}
 	}
+
+private:
+	PossibleMove selectCPUMove(std::shared_ptr<CPUPlayer> cpu, PlayerColor player)
+	{
+		auto allMoves = getAllLegalMovesForPlayer(player);
+		if (allMoves.empty())
+			return PossibleMove();
+
+		// Select move based on CPU Difficulty
+		auto config = cpu->getCPUConfiguration();
+
+		switch (config.difficulty)
+		{
+		case CPUDifficulty::Random: return cpu->getRandomMove(allMoves);
+		case CPUDifficulty::Easy: return cpu->getEasyMove(allMoves);
+		case CPUDifficulty::Medium: return cpu->getMediumMove(allMoves);
+		case CPUDifficulty::Hard: return cpu->getHardMove(allMoves);
+		default: return {};
+		}
+	}
+
+
+	std::vector<PossibleMove> getAllLegalMovesForPlayer(PlayerColor player)
+	{
+		std::vector<PossibleMove> allMoves;
+
+		// Get all pieces for the player and collect their possible moves
+		for (int y = 0; y < BOARD_SIZE; ++y)
+		{
+			for (int x = 0; x < BOARD_SIZE; ++x)
+			{
+				Position pos{x, y};
+				auto	&piece = mBoard->getPiece(pos);
+
+				if (piece && piece->getColor() == player)
+				{
+					auto moves = mGeneration->getMovesForPosition(pos);
+					allMoves.insert(allMoves.end(), moves.begin(), moves.end());
+				}
+			}
+		}
+
+		return allMoves;
+	}
 };
 
 
+TEST_F(CPUPerformanceTests, BasicDiffucultyComparison)
+{
+	CPUConfiguration easyConfig;
+	easyConfig.difficulty	= CPUDifficulty::Easy;
+	easyConfig.enabled		= true;
+	easyConfig.thinkingTime = std::chrono::milliseconds(100);
 
+	CPUConfiguration mediumConfig;
+	mediumConfig.difficulty	  = CPUDifficulty::Medium;
+	mediumConfig.enabled	  = true;
+	mediumConfig.thinkingTime = std::chrono::milliseconds(100);
+
+	// Test medium vs easy
+	auto stats				  = runMultipleGames(mediumConfig, easyConfig, 50, true);
+
+	std::cout << "Medium vs Easy Results:" << std::endl;
+	std::cout << "Win Rate: " << stats.winRate << "%" << std::endl;
+	std::cout << "Total Games: " << stats.totalGames << std::endl;
+
+	saveResultsToFile("result_medium_vs_easy.txt", stats, "Medium vs Easy CPU Configuration Performance Tests");
+
+	// Medium should significantly outperform Easy
+	EXPECT_GT(stats.winRate, 60.0) << "Medium difficulty should win more than 60% against Easy";
+}
 
 
 
