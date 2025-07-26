@@ -17,13 +17,21 @@ class MoveEvaluationTests : public ::testing::Test
 {
 protected:
 	std::shared_ptr<ChessBoard>		mBoard;
+	std::shared_ptr<MoveGeneration> mGeneration;
+	std::shared_ptr<MoveValidation> mValidation;
+	std::shared_ptr<MoveExecution>	mExecution;
 	std::shared_ptr<MoveEvaluation> mEvaluation;
 
 	void							SetUp() override
 	{
-		mBoard = std::make_shared<ChessBoard>();
+		mBoard		= std::make_shared<ChessBoard>();
+		mValidation = std::make_shared<MoveValidation>(mBoard);
+		mExecution	= std::make_shared<MoveExecution>(mBoard, mValidation);
+		mGeneration = std::make_shared<MoveGeneration>(mBoard, mValidation, mExecution);
+
 		mBoard->initializeBoard();
-		mEvaluation = std::make_shared<MoveEvaluation>(mBoard);
+
+		mEvaluation = std::make_shared<MoveEvaluation>(mBoard, mGeneration);
 	}
 };
 
