@@ -118,7 +118,7 @@ int MoveEvaluation::evaluateMaterialGain(const PossibleMove &move)
 		int movingValue = getPieceValue(movingPiece->getType());
 
 		// Bonus for good exchanges
-        return capturedValue + (::std::max)(0, (capturedValue - movingValue));
+		return capturedValue + (::std::max)(0, (capturedValue - movingValue));
 	}
 
 	return capturedValue;
@@ -290,6 +290,7 @@ int MoveEvaluation::evaluateDefensivePatterns(const PossibleMove &move, PlayerCo
 
 bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player)
 {
+	// TODO
 	return false;
 }
 
@@ -323,12 +324,14 @@ bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
 
 bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
 {
+	// TODO
 	return false;
 }
 
 
 bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor player)
 {
+	// TODO
 	return false;
 }
 
@@ -555,6 +558,14 @@ std::vector<Position> MoveEvaluation::getAttackedSquares(const Position &piecePo
 {
 	std::vector<Position> attackedSquares;
 
+	mGeneration->calculateAllLegalBasicMoves(player);
+
+	auto possibleMoves = mGeneration->getMovesForPosition(piecePos);
+
+	for (const auto &move : possibleMoves)
+	{
+		attackedSquares.push_back(move.end);
+	}
 
 	return attackedSquares;
 }
