@@ -41,6 +41,11 @@ public:
 	int					 evaluatePieceActivity(const PossibleMove &move, PlayerColor player);
 	int					 evaluateDefensivePatterns(const PossibleMove &move, PlayerColor player);
 
+	bool				 createsPin(const PossibleMove &move, PlayerColor player);
+	bool				 createsFork(const PossibleMove &move, PlayerColor player);
+	bool				 createsSkewer(const PossibleMove &move, PlayerColor player);
+	bool				 blocksEnemyThreats(const PossibleMove &move, PlayerColor player);
+
 	int					 getStrategicEvaluation(const PossibleMove &move, PlayerColor player);
 	int					 getTacticalEvaluation(const PossibleMove &move, PlayerColor player);
 

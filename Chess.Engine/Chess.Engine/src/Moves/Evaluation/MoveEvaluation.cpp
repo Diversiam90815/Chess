@@ -128,6 +128,156 @@ int MoveEvaluation::evaluatePositionalGain(const PossibleMove &move, PlayerColor
 }
 
 
+int MoveEvaluation::evaluateThreadLevel(const PossibleMove &move, PlayerColor player)
+{
+	return 0;
+}
+
+
+int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor player)
+{
+	return 0;
+}
+
+
+int MoveEvaluation::evaluateCenterControl(const PossibleMove &move, PlayerColor player)
+{
+	return 0;
+}
+
+
+int MoveEvaluation::evaluatePawnStructure(const PossibleMove &move, PlayerColor player)
+{
+	return 0;
+}
+
+
+int MoveEvaluation::evaluatePieceActivity(const PossibleMove &move, PlayerColor player)
+{
+	return 0;
+}
+
+
+int MoveEvaluation::evaluateDefensivePatterns(const PossibleMove &move, PlayerColor player)
+{
+	return 0;
+}
+
+
+bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player)
+{
+	return false;
+}
+
+
+bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
+{
+	return false;
+}
+
+
+bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
+{
+	return false;
+}
+
+
+bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor player)
+{
+	return false;
+}
+
+
+int MoveEvaluation::getStrategicEvaluation(const PossibleMove &move, PlayerColor player)
+{
+	return 0;
+}
+
+
+int MoveEvaluation::getTacticalEvaluation(const PossibleMove &move, PlayerColor player)
+{
+	return 0;
+}
+
+
+GamePhase MoveEvaluation::determineGamePhase() const
+{
+	return GamePhase();
+}
+
+
+int MoveEvaluation::calculateMobility(PlayerColor player) const
+{
+	return 0;
+}
+
+
+int MoveEvaluation::calculateKingSafetyScore(PlayerColor player) const
+{
+	return 0;
+}
+
+
+int MoveEvaluation::calculatePawnStructureScore(PlayerColor player) const
+{
+	return 0;
+}
+
+
+bool MoveEvaluation::isPasssedPawn(const Position &pos, PlayerColor player) const
+{
+	return false;
+}
+
+
+bool MoveEvaluation::isIsolatedPawn(const Position &pos, PlayerColor player) const
+{
+	return false;
+}
+
+
+bool MoveEvaluation::isDoublePawn(const Position &pos, PlayerColor player) const
+{
+	return false;
+}
+
+
+bool MoveEvaluation::isInCenter(const Position &pos) const
+{
+	return false;
+}
+
+
+bool MoveEvaluation::isNearKing(const Position &pos) const
+{
+	return false;
+}
+
+
+std::vector<Position> MoveEvaluation::getAttackedSquares(const Position &piecePos, PlayerColor player) const
+{
+	return std::vector<Position>();
+}
+
+
+bool MoveEvaluation::wouldExposeKing(const PossibleMove &move, PlayerColor player) const
+{
+	return false;
+}
+
+
+int MoveEvaluation::countAttackers(const Position &target, PlayerColor attackerPlayer) const
+{
+	return 0;
+}
+
+
+PlayerColor MoveEvaluation::getOpponnentColor(PlayerColor player) const
+{
+	return PlayerColor();
+}
+
+
 constexpr int MoveEvaluation::getPieceValue(PieceType piece)
 {
 	switch (piece)
