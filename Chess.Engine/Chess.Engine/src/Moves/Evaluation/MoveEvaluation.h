@@ -91,7 +91,7 @@ private:
 	std::vector<Position> getAttackedSquares(const Position &piecePos, PlayerColor player) const;
 	bool				  wouldExposeKing(const PossibleMove &move, PlayerColor player) const;
 	int					  countAttackers(const Position &target, PlayerColor attackerPlayer) const;
-	PlayerColor			  getOpponnentColor(PlayerColor player) const;
+	PlayerColor			  getOpponentColor(PlayerColor player) const;
 
 	bool				  areCollinear(const Position &pos1, const Position &pos2, PieceType pieceType);
 

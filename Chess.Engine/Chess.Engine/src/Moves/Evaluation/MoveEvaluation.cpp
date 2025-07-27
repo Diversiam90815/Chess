@@ -154,7 +154,7 @@ int MoveEvaluation::evaluateThreatLevel(const PossibleMove &move, PlayerColor pl
 
 	// Check if this move creates threat to the opponent pieces
 	auto		attackedSquares = getAttackedSquares(move.end, player);
-	PlayerColor opponent		= getOpponnentColor(player);
+	PlayerColor opponent		= getOpponentColor(player);
 
 	for (const auto &square : attackedSquares)
 	{
@@ -180,7 +180,7 @@ int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor pla
 {
 	int		 score			 = 0;
 	Position kingPos		 = mBoard->getKingsPosition(player);
-	Position opponentKingPos = mBoard->getKingsPosition(getOpponnentColor(player));
+	Position opponentKingPos = mBoard->getKingsPosition(getOpponentColor(player));
 
 	// Penalize moves that expose our king
 	if (wouldExposeKing(move, player))
@@ -193,7 +193,7 @@ int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor pla
 	// Reward defensive moves near our king when under threat
 	if (isNearKing(move.end, kingPos))
 	{
-		int attackerCount = countAttackers(kingPos, getOpponnentColor(player));
+		int attackerCount = countAttackers(kingPos, getOpponentColor(player));
 		if (attackerCount > 0)
 			score += 25;
 	}
@@ -301,7 +301,7 @@ bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player)
 	if (type != PieceType::Bishop && type != PieceType::Rook && type != PieceType::Queen)
 		return false;
 
-	PlayerColor opponnent	 = getOpponnentColor(player);
+	PlayerColor opponnent	 = getOpponentColor(player);
 	Position	opponentKing = mBoard->getKingsPosition(opponnent);
 
 	// Check if the piece after moving would be on the same line as the opponent's king
@@ -347,7 +347,7 @@ bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
 	int			valuableTargets = 0;
 
 	auto		attackedSquares = getAttackedSquares(move.end, player);
-	PlayerColor opponnent		= getOpponnentColor(player);
+	PlayerColor opponnent		= getOpponentColor(player);
 
 	for (const auto &square : attackedSquares)
 	{
@@ -371,7 +371,7 @@ bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
 
 bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
 {
-	PlayerColor opponent	= getOpponnentColor(player);
+	PlayerColor opponent	= getOpponentColor(player);
 
 	auto	   &movingPiece = mBoard->getPiece(move.start);
 	if (!movingPiece)
@@ -445,7 +445,7 @@ bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
 bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor player)
 {
 
-	PlayerColor opponent			   = getOpponnentColor(player);
+	PlayerColor opponent			   = getOpponentColor(player);
 	Position	ourKing				   = mBoard->getKingsPosition(player);
 
 	// calculate threats in parallel
@@ -587,8 +587,8 @@ bool MoveEvaluation::analyzeThreatReduction(const ThreatAnalysis &before, const 
 bool MoveEvaluation::physicallyBlocksAttack(const PossibleMove &move, PlayerColor player, ChessBoard &board)
 {
 	Position	ourKing		   = board.getKingsPosition(player);
-	PlayerColor oponnent	   = getOpponnentColor(player);
-	auto		opponentPieces = board.getPiecesFromPlayer(oponnent);
+	PlayerColor oponent	   = getOpponentColor(player);
+	auto		opponentPieces = board.getPiecesFromPlayer(oponent);
 
 	for (const auto &[enemyPos, piece] : opponentPieces)
 	{
@@ -668,7 +668,7 @@ int MoveEvaluation::calculateKingSafetyScore(PlayerColor player) const
 	Position	kingPos	  = mBoard->getKingsPosition(player);
 
 	// Count attackers near king
-	PlayerColor opponent  = getOpponnentColor(player);
+	PlayerColor opponent  = getOpponentColor(player);
 	int			attackers = countAttackers(kingPos, opponent);
 	score -= 20 * attackers; // Penalty for each attacker
 
@@ -818,7 +818,7 @@ bool MoveEvaluation::wouldExposeKing(const PossibleMove &move, PlayerColor playe
 	if (isNearKing(move.start, kingPos) && !isNearKing(move.end, kingPos))
 	{
 		// Count current attackers
-		int currentAttackers = countAttackers(kingPos, getOpponnentColor(player));
+		int currentAttackers = countAttackers(kingPos, getOpponentColor(player));
 		return currentAttackers > 0; // Risk if already under attack
 	}
 
@@ -857,7 +857,7 @@ int MoveEvaluation::countAttackers(const Position &target, PlayerColor attackerP
 }
 
 
-PlayerColor MoveEvaluation::getOpponnentColor(PlayerColor player) const
+PlayerColor MoveEvaluation::getOpponentColor(PlayerColor player) const
 {
 	return (player == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
 }
