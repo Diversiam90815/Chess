@@ -252,9 +252,12 @@ int MoveEvaluation::evaluatePieceActivity(const PossibleMove &move, PlayerColor 
 	if (!piece)
 		return 0;
 
-	// Count squares piece can attack from new position
-	auto attackedSquares = getAttackedSquares(move.end, player);
-	int	 mobility		 = static_cast<int>(attackedSquares.size());
+	// Use direct piece movements instead of expensive move calculation here
+	ChessBoard tmpBoard(*mBoard);
+	tmpBoard.movePiece(move.start, move.end);
+
+	auto moves	  = piece->getPossibleMoves(move.end, tmpBoard, true);
+	int	 mobility = static_cast<int>(moves.size());
 
 	// Reward increased mobility
 	return mobility * 2;
@@ -587,7 +590,7 @@ bool MoveEvaluation::analyzeThreatReduction(const ThreatAnalysis &before, const 
 bool MoveEvaluation::physicallyBlocksAttack(const PossibleMove &move, PlayerColor player, ChessBoard &board)
 {
 	Position	ourKing		   = board.getKingsPosition(player);
-	PlayerColor oponent	   = getOpponentColor(player);
+	PlayerColor oponent		   = getOpponentColor(player);
 	auto		opponentPieces = board.getPiecesFromPlayer(oponent);
 
 	for (const auto &[enemyPos, piece] : opponentPieces)
