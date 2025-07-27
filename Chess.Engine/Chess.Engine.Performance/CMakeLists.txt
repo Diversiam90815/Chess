@@ -1,5 +1,5 @@
 ﻿#==========================================
-#   Chess Engine Perormance
+#   Chess Engine Performance
 #       by Jens W. Langenberg
 #==========================================
 
