@@ -178,8 +178,8 @@ int MoveEvaluation::evaluateThreatLevel(const PossibleMove &move, PlayerColor pl
 
 int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor player)
 {
-	int		 score			  = 0;
-	Position kingPos		  = mBoard->getKingsPosition(player);
+	int		 score			 = 0;
+	Position kingPos		 = mBoard->getKingsPosition(player);
 	Position opponentKingPos = mBoard->getKingsPosition(getOpponnentColor(player));
 
 	// Penalize moves that expose our king
@@ -301,29 +301,19 @@ bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player)
 	if (type != PieceType::Bishop && type != PieceType::Rook && type != PieceType::Queen)
 		return false;
 
-	// to simulate the move we need to create a copy of the chessboard and other modules
-	ChessBoard tmpBoard(*mBoard);
-	tmpBoard.movePiece(move.start, move.end);
+	PlayerColor opponnent	 = getOpponnentColor(player);
+	Position	opponentKing = mBoard->getKingsPosition(opponnent);
 
-	auto		tmpValidation = std::make_shared<MoveValidation>(std::make_shared<ChessBoard>(tmpBoard));
-	auto		tmpExecution  = std::make_shared<MoveExecution>(std::make_shared<ChessBoard>(tmpBoard), tmpValidation);
-	auto		tmpGeneration = std::make_shared<MoveGeneration>(std::make_shared<ChessBoard>(tmpBoard), tmpValidation, tmpExecution);
-
-	PlayerColor opponnent	  = getOpponnentColor(player);
-	Position	opponnentKing = tmpBoard.getKingsPosition(opponnent);
-
-	// Get attacked squares from the piece's new position
-	tmpGeneration->calculateAllLegalBasicMoves(player);
-	auto attackedSquares = tmpGeneration->getMovesForPosition(move.end);
-
-	// Check if there is exactly one opponnent's piece between us and their king
+	// Check if the piece after moving would be on the same line as the opponent's king
+	if (!areCollinear(move.end, opponentKing, type))
+		return false;
 
 	// Determine direction from our piece to opponnent's king
-	int	 dx				 = opponnentKing.x - move.end.x;
-	int	 dy				 = opponnentKing.y - move.end.y;
+	int dx	  = opponentKing.x - move.end.x;
+	int dy	  = opponentKing.y - move.end.y;
 
 	// Normalize direction for sliding pieces
-	int	 stepX = 0, stepY = 0;
+	int stepX = 0, stepY = 0;
 	if (dx != 0)
 		stepX = dx / abs(dx);
 
@@ -332,14 +322,13 @@ bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player)
 
 	// Count pieces in between
 	int		 piecesInBetween = 0;
-
 	Position current		 = move.end;
 	current.x += stepX;
 	current.y += stepY;
 
-	while (current.isValid() && current != opponnentKing)
+	while (current.isValid() && current != opponentKing)
 	{
-		auto &piece = tmpBoard.getPiece(current);
+		auto &piece = mBoard->getPiece(current);
 
 		if (piece && piece->getColor() == opponnent)
 			piecesInBetween++;
@@ -355,7 +344,7 @@ bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player)
 
 bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
 {
-	int			valuableTargets	= 0;
+	int			valuableTargets = 0;
 
 	auto		attackedSquares = getAttackedSquares(move.end, player);
 	PlayerColor opponnent		= getOpponnentColor(player);
@@ -382,7 +371,9 @@ bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
 
 bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
 {
-	auto &movingPiece = mBoard->getPiece(move.start);
+	PlayerColor opponent	= getOpponnentColor(player);
+
+	auto	   &movingPiece = mBoard->getPiece(move.start);
 	if (!movingPiece)
 		return false;
 
@@ -391,70 +382,61 @@ bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
 	if (type != PieceType::Bishop && type != PieceType::Rook && type != PieceType::Queen)
 		return false;
 
-	// to simulate the move we need to create a copy of the chessboard and other modules
-	ChessBoard tmpBoard(*mBoard);
-	tmpBoard.movePiece(move.start, move.end);
+	auto							 opponentsPieces = mBoard->getPiecesFromPlayer(opponent);
 
-	auto		tmpValidation = std::make_shared<MoveValidation>(std::make_shared<ChessBoard>(tmpBoard));
-	auto		tmpExecution  = std::make_shared<MoveExecution>(std::make_shared<ChessBoard>(tmpBoard), tmpValidation);
-	auto		tmpGeneration = std::make_shared<MoveGeneration>(std::make_shared<ChessBoard>(tmpBoard), tmpValidation, tmpExecution);
+	// Define directions depending on piece type
+	std::vector<std::pair<int, int>> directions;
 
-	PlayerColor opponent	  = getOpponnentColor(player);
-
-	// Get attacked squares from the piece's new pos
-	tmpGeneration->calculateAllLegalBasicMoves(player);
-	auto allMoves = tmpGeneration->getMovesForPosition(move.end);
+	if (type == PieceType::Rook || type == PieceType::Queen)
+		directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};						   // rank & file
+	if (type == PieceType::Bishop || type == PieceType::Queen)
+		directions.insert(directions.end(), {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}}); // diagonal
 
 	// Check each direction for potential skewers
-	for (const auto &attackMove : allMoves)
+	for (const auto &[dx, dy] : directions)
 	{
-		auto &targetPiece = tmpBoard.getPiece(attackMove.end);
+		Position current = move.end;
+		current.x += dx;
+		current.y += dy;
 
-		if (!targetPiece || targetPiece->getColor() != opponent)
-			continue;
+		std::shared_ptr<ChessPiece> firstPiece	= nullptr;
+		std::shared_ptr<ChessPiece> secondPiece = nullptr;
+		Position					firstPiecePos;
 
-		// We found an opponnents piece we could attack
-		// Check if there is a more valuable piece behind in the same line
-
-		// Determine direction
-		int dx	  = attackMove.end.x - move.end.x;
-		int dy	  = attackMove.end.y - move.end.y;
-
-		// Normalize direction
-		int stepX = 0, stepY = 0;
-		if (dx != 0)
-			stepX = dx / abs(dx);
-		if (dy != 0)
-			stepY = dy / abs(dy);
-
-		// Continue in the same direction to find 2nd piece
-		Position current = attackMove.end;
-		current.x += stepX;
-		current.y += stepY;
-
+		// Find the first two pieces in this direction
 		while (current.isValid())
 		{
-			auto &secondPiece = tmpBoard.getPiece(current);
+			auto &piece = mBoard->getPiece(current);
 
-			if (secondPiece)
+			if (piece)
 			{
-				// Found 2nd piece
-				if (secondPiece->getColor() != opponent)
-					break; // found our piece, stop looking in this direction
-
-				int firstPieceValue	 = getPieceValue(targetPiece->getType());
-				int secondPieceValue = getPieceValue(secondPiece->getType());
-
-				// Skewer: first piece is more valuable and will be forced to move exposing 2nd piece
-				if (firstPieceValue > secondPieceValue)
-					return true;
+				if (!firstPiece)
+				{
+					// Found the first piece in this direction
+					firstPiece	  = piece;
+					firstPiecePos = current;
+				}
+				else
+				{
+					// Found the second piece in this direction
+					secondPiece = piece;
+					break;
+				}
 			}
 
-			current.x += stepX;
-			current.y += stepY;
+			current.x += dx;
+			current.y += dy;
+		}
+
+		// Check if we have a valid skewer pattern
+		if (firstPiece && secondPiece && firstPiece->getColor() == opponent && secondPiece->getColor() == opponent)
+		{
+			int firstPieceValue	 = getPieceValue(firstPiece->getType());
+			int secondPieceValue = getPieceValue(secondPiece->getType());
+
+			return firstPieceValue > secondPieceValue;
 		}
 	}
-
 	return false;
 }
 
@@ -463,7 +445,7 @@ bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor pl
 {
 	// We calculate the threats before and after the move to compare the two
 
-	Position			  ourKing	= mBoard->getKingsPosition(player);
+	Position			  ourKing  = mBoard->getKingsPosition(player);
 	PlayerColor			  opponent = getOpponnentColor(player);
 	std::vector<Position> currentThreats;
 	std::vector<Position> threatsAfterMove;
@@ -683,7 +665,7 @@ int MoveEvaluation::calculateKingSafetyScore(PlayerColor player) const
 	Position	kingPos	  = mBoard->getKingsPosition(player);
 
 	// Count attackers near king
-	PlayerColor opponent = getOpponnentColor(player);
+	PlayerColor opponent  = getOpponnentColor(player);
 	int			attackers = countAttackers(kingPos, opponent);
 	score -= 20 * attackers; // Penalty for each attacker
 
@@ -875,6 +857,21 @@ int MoveEvaluation::countAttackers(const Position &target, PlayerColor attackerP
 PlayerColor MoveEvaluation::getOpponnentColor(PlayerColor player) const
 {
 	return (player == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
+}
+
+
+bool MoveEvaluation::areCollinear(const Position &pos1, const Position &pos2, PieceType pieceType)
+{
+	int dx = pos2.x - pos1.x;
+	int dy = pos2.y - pos1.y;
+
+	switch (pieceType)
+	{
+	case PieceType::Bishop: return (dx != 0 && dy != 0 && abs(dx) == abs(dy));
+	case PieceType::Rook: return (dx == 0 || dy == 0);
+	case PieceType::Queen: return (dx == 0 || dy == 0 || (dx != 0 && dy != 0 && abs(dx) == abs(dy)));
+	default: return false;
+	}
 }
 
 
