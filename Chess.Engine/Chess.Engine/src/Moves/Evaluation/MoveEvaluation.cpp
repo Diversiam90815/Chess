@@ -86,14 +86,16 @@ int MoveEvaluation::getPositionValue(PieceType piece, const Position &pos, Playe
 	if (player == PlayerColor::Black)
 		row = 7 - row;
 
+	GamePhase phase = determineGamePhase();
+
 	switch (piece)
 	{
-	case PieceType::Pawn: return PAWN_TABLE[row][col];
-	case PieceType::Knight: return KNIGHT_TABLE[row][col];
+	case PieceType::Pawn: return (phase == GamePhase::EndGame) ? PAWN_TABLE_EG[row][col] : PAWN_TABLE_MG[row][col];
+	case PieceType::Knight: return (phase == GamePhase::EndGame) ? KNIGHT_TABLE_EG[row][col] : KNIGHT_TABLE_MG[row][col];
 	case PieceType::Bishop: return BISHOP_TABLE[row][col];
 	case PieceType::Rook: return ROOK_TABLE[row][col];
 	case PieceType::Queen: return QUEEN_TABLE[row][col];
-	case PieceType::King: return KING_TABLE[row][col];
+	case PieceType::King: return (phase == GamePhase::EndGame) ? KING_TABLE_EG[row][col] : KING_TABLE_MG[row][col]; ;
 	default: return 0;
 	}
 }
@@ -152,18 +154,18 @@ int MoveEvaluation::evaluateThreatLevel(const PossibleMove &move, PlayerColor pl
 
 	// Check if this move creates threat to the opponent pieces
 	auto		attackedSquares = getAttackedSquares(move.end, player);
-	PlayerColor opponnent		= getOpponnentColor(player);
+	PlayerColor opponent		= getOpponnentColor(player);
 
 	for (const auto &square : attackedSquares)
 	{
 		auto &piece = mBoard->getPiece(square);
 
-		if (!piece || piece->getColor() != player)
+		if (!piece || piece->getColor() != opponent)
 			continue;
 
 		// Threatening valuable pieces gives more points
 		int pieceValue = getPieceValue(piece->getType());
-		score += pieceValue / 2; // Threat is worth 1/10th of piece value
+		score += pieceValue / 10; // Threat is worth 1/10th of piece value
 	}
 
 	// Check if this moves blocks opponnent threats
@@ -178,14 +180,14 @@ int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor pla
 {
 	int		 score			  = 0;
 	Position kingPos		  = mBoard->getKingsPosition(player);
-	Position opponnentKingPos = mBoard->getKingsPosition(getOpponnentColor(player));
+	Position opponentKingPos = mBoard->getKingsPosition(getOpponnentColor(player));
 
 	// Penalize moves that expose our king
 	if (wouldExposeKing(move, player))
 		score -= 100;
 
 	// Reward moves that attack near the opponnents king
-	if (isNearKing(move.end, opponnentKingPos))
+	if (isNearKing(move.end, opponentKingPos))
 		score += 30;
 
 	// Reward defensive moves near our king when under threat
@@ -353,16 +355,16 @@ bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player)
 
 bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
 {
-	int			valuabeTargets	= 0;
+	int			valuableTargets	= 0;
 
-	auto		attackedSqaures = getAttackedSquares(move.end, player);
+	auto		attackedSquares = getAttackedSquares(move.end, player);
 	PlayerColor opponnent		= getOpponnentColor(player);
 
-	for (const auto &square : attackedSqaures)
+	for (const auto &square : attackedSquares)
 	{
 		auto &piece = mBoard->getPiece(square);
 
-		if (!piece && piece->getColor() != opponnent)
+		if (!piece || piece->getColor() != opponnent)
 			continue;
 
 		PieceType type = piece->getType();
@@ -370,11 +372,11 @@ bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
 		// Count valuable pieces
 		if (type == PieceType::Knight || type == PieceType::Bishop || type == PieceType::Rook || type == PieceType::Queen || type == PieceType::King)
 		{
-			valuabeTargets++;
+			valuableTargets++;
 		}
 	}
 
-	return valuabeTargets >= 2; // Fork if attacking 2+ valuable pieces
+	return valuableTargets >= 2; // Fork if attacking 2+ valuable pieces
 }
 
 
@@ -397,7 +399,7 @@ bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
 	auto		tmpExecution  = std::make_shared<MoveExecution>(std::make_shared<ChessBoard>(tmpBoard), tmpValidation);
 	auto		tmpGeneration = std::make_shared<MoveGeneration>(std::make_shared<ChessBoard>(tmpBoard), tmpValidation, tmpExecution);
 
-	PlayerColor opponnent	  = getOpponnentColor(player);
+	PlayerColor opponent	  = getOpponnentColor(player);
 
 	// Get attacked squares from the piece's new pos
 	tmpGeneration->calculateAllLegalBasicMoves(player);
@@ -408,7 +410,7 @@ bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
 	{
 		auto &targetPiece = tmpBoard.getPiece(attackMove.end);
 
-		if (!targetPiece || targetPiece->getColor() != opponnent)
+		if (!targetPiece || targetPiece->getColor() != opponent)
 			continue;
 
 		// We found an opponnents piece we could attack
@@ -437,7 +439,7 @@ bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
 			if (secondPiece)
 			{
 				// Found 2nd piece
-				if (secondPiece->getColor() != opponnent)
+				if (secondPiece->getColor() != opponent)
 					break; // found our piece, stop looking in this direction
 
 				int firstPieceValue	 = getPieceValue(targetPiece->getType());
@@ -462,14 +464,14 @@ bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor pl
 	// We calculate the threats before and after the move to compare the two
 
 	Position			  ourKing	= mBoard->getKingsPosition(player);
-	PlayerColor			  opponnent = getOpponnentColor(player);
+	PlayerColor			  opponent = getOpponnentColor(player);
 	std::vector<Position> currentThreats;
 	std::vector<Position> threatsAfterMove;
 
 	// Cound current threads against our king and important pieces
-	mGeneration->calculateAllLegalBasicMoves(opponnent);
+	mGeneration->calculateAllLegalBasicMoves(opponent);
 
-	auto opponnentPieces = mBoard->getPiecesFromPlayer(opponnent);
+	auto opponnentPieces = mBoard->getPiecesFromPlayer(opponent);
 
 	for (const auto &[pos, piece] : opponnentPieces)
 	{
@@ -498,8 +500,8 @@ bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor pl
 	Position ourKingAfterMove = tmpBoard.getKingsPosition(player);
 
 	// Count threats after move
-	tmpGeneration->calculateAllLegalBasicMoves(opponnent);
-	auto opponnentsPiecesAfterMove = tmpBoard.getPiecesFromPlayer(opponnent);
+	tmpGeneration->calculateAllLegalBasicMoves(opponent);
+	auto opponnentsPiecesAfterMove = tmpBoard.getPiecesFromPlayer(opponent);
 
 	for (const auto &[pos, piece] : opponnentsPiecesAfterMove)
 	{
@@ -681,8 +683,8 @@ int MoveEvaluation::calculateKingSafetyScore(PlayerColor player) const
 	Position	kingPos	  = mBoard->getKingsPosition(player);
 
 	// Count attackers near king
-	PlayerColor opponnent = getOpponnentColor(player);
-	int			attackers = countAttackers(kingPos, opponnent);
+	PlayerColor opponent = getOpponnentColor(player);
+	int			attackers = countAttackers(kingPos, opponent);
 	score -= 20 * attackers; // Penalty for each attacker
 
 	// bonus for each king protecting pieces near king
@@ -786,7 +788,7 @@ bool MoveEvaluation::isDoublePawn(const Position &pos, PlayerColor player) const
 
 		auto	&piece = mBoard->getPiece(checkPos);
 
-		if (piece || piece->getType() == PieceType::Pawn && piece->getColor() == player)
+		if (piece && piece->getType() == PieceType::Pawn && piece->getColor() == player)
 			return true; // Found another friendly pawn pawn on same file
 	}
 
