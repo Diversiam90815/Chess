@@ -347,14 +347,23 @@ bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player)
 
 bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
 {
+	auto &movingPiece = mBoard->getPiece(move.start);
+	if (!movingPiece)
+		return false;
+
+	// Create a temporary board with the move executed
+	ChessBoard tmpBoard(*mBoard);
+	tmpBoard.movePiece(move.start, move.end);
+
+	// Get attacked squares from the destination position on the temporary board
+	auto		attackedSquares = movingPiece->getPossibleMoves(move.end, tmpBoard, true);
+
+	PlayerColor opponnent		= getOpponentColor(player);
 	int			valuableTargets = 0;
 
-	auto		attackedSquares = getAttackedSquares(move.end, player);
-	PlayerColor opponnent		= getOpponentColor(player);
-
-	for (const auto &square : attackedSquares)
+	for (const auto &attackMove : attackedSquares)
 	{
-		auto &piece = mBoard->getPiece(square);
+		auto &piece = tmpBoard.getPiece(attackMove.end);
 
 		if (!piece || piece->getColor() != opponnent)
 			continue;
@@ -476,7 +485,28 @@ int MoveEvaluation::getStrategicEvaluation(const PossibleMove &move, PlayerColor
 	GamePhase phase = determineGamePhase();
 
 	if (phase != GamePhase::EndGame)
+	{
 		score += evaluateKingSafety(move, player) * KING_SAFETY_WEIGHT;
+	}
+	else
+	{
+		// In endgame, reward king activity and centralization
+		auto &movingPiece = mBoard->getPiece(move.start);
+		if (movingPiece && movingPiece->getType() == PieceType::King)
+		{
+			// Reward king moving towards center in endgame
+			int centerDistance	= abs(move.end.x - 3.5) + abs(move.end.y - 3.5);
+			int currentDistance = abs(move.start.x - 3.5) + abs(move.start.y - 3.5);
+
+			if (centerDistance < currentDistance)
+			{
+				score += 25; // Bonus for king centralization in endgame
+			}
+
+			// Additional bonus for king activity (any king move in endgame)
+			score += 10;
+		}
+	}
 
 	score += evaluatePieceActivity(move, player); // Piece coordination and activity
 
