@@ -434,7 +434,8 @@ bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
 			int firstPieceValue	 = getPieceValue(firstPiece->getType());
 			int secondPieceValue = getPieceValue(secondPiece->getType());
 
-			return firstPieceValue > secondPieceValue;
+			if (firstPieceValue > secondPieceValue)
+				return true;
 		}
 	}
 	return false;
@@ -443,132 +444,22 @@ bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
 
 bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor player)
 {
-	// We calculate the threats before and after the move to compare the two
 
-	Position			  ourKing  = mBoard->getKingsPosition(player);
-	PlayerColor			  opponent = getOpponnentColor(player);
-	std::vector<Position> currentThreats;
-	std::vector<Position> threatsAfterMove;
+	PlayerColor opponent			   = getOpponnentColor(player);
+	Position	ourKing				   = mBoard->getKingsPosition(player);
 
-	// Cound current threads against our king and important pieces
-	mGeneration->calculateAllLegalBasicMoves(opponent);
+	// calculate threats in parallel
 
-	auto opponnentPieces = mBoard->getPiecesFromPlayer(opponent);
+	auto		currentThreatsFuture   = std::async(std::launch::async, [this, opponent, player]() { return calculateCurrentThreats(opponent, player); });
 
-	for (const auto &[pos, piece] : opponnentPieces)
-	{
-		auto opponnentMoves = mGeneration->getMovesForPosition(pos);
-		for (const auto &opponnentMove : opponnentMoves)
-		{
-			// Check if opponnent is threatening our pieces
-			auto &threateningPiece = mBoard->getPiece(opponnentMove.end);
-			if (threateningPiece && threateningPiece->getColor() == player)
-			{
-				currentThreats.push_back(opponnentMove.end);
-			}
-		}
-	}
+	auto		threatsAfterMoveFuture = std::async(std::launch::async, [this, move, opponent, player]() { return calculateThreatsAfterMove(move, player, opponent); });
 
-	// Simulate the move on copies of the modules
-	ChessBoard tmpBoard(*mBoard);
-	tmpBoard.movePiece(move.start, move.end);
+	// Get results from both futures
+	auto		currentThreats		   = currentThreatsFuture.get();
+	auto		threatsAfterMove	   = threatsAfterMoveFuture.get();
 
-	// Create temporary MoveGeneration for the board after our move
-	auto	 tmpValidation	  = std::make_shared<MoveValidation>(std::make_shared<ChessBoard>(tmpBoard));
-	auto	 tmpExecution	  = std::make_shared<MoveExecution>(std::make_shared<ChessBoard>(tmpBoard), tmpValidation);
-	auto	 tmpGeneration	  = std::make_shared<MoveGeneration>(std::make_shared<ChessBoard>(tmpBoard), tmpValidation, tmpExecution);
-
-	// Update king position if king was moved
-	Position ourKingAfterMove = tmpBoard.getKingsPosition(player);
-
-	// Count threats after move
-	tmpGeneration->calculateAllLegalBasicMoves(opponent);
-	auto opponnentsPiecesAfterMove = tmpBoard.getPiecesFromPlayer(opponent);
-
-	for (const auto &[pos, piece] : opponnentsPiecesAfterMove)
-	{
-		auto opponentMoves = tmpGeneration->getMovesForPosition(pos);
-		for (const auto &opponentMove : opponentMoves)
-		{
-			// Check if opponent is threatening our pieces
-			auto &threatenedPiece = tmpBoard.getPiece(opponentMove.end);
-			if (threatenedPiece && threatenedPiece->getColor() == player)
-			{
-				threatsAfterMove.push_back(opponentMove.end);
-			}
-		}
-	}
-
-	// We blocked enemy threats if:
-	// 1. We reduced threats against our king
-	// 2. We reduced total threats against our pieces
-	// 3. Our move physically blocks a line of attack
-
-	// Check if we reduced the number of threats (especially against our king)
-	bool blockedKingThreats = false;
-	int	 kingThreatsBefore	= 0;
-	int	 kingThreatsAfter	= 0;
-
-	for (const auto &threat : currentThreats)
-	{
-		if (threat == ourKing)
-			kingThreatsBefore++;
-	}
-
-	for (const auto &threat : threatsAfterMove)
-	{
-		if (threat == ourKingAfterMove)
-			kingThreatsAfter++;
-	}
-
-	blockedKingThreats		 = (kingThreatsAfter < kingThreatsBefore);
-	bool reducedTotalThreats = (threatsAfterMove.size() < currentThreats.size());
-
-	// Check if our move physically interposes between an enemy piece and our king
-	bool physicallyBlocked	 = false;
-
-	// Check if our destination square blocks any line of attack to our king
-	for (const auto &[enemyPos, piece] : opponnentsPiecesAfterMove)
-	{
-		PieceType enemyType = piece->getType();
-
-		// Only check long range pieces
-		if (enemyType == PieceType::Bishop || enemyType == PieceType::Rook || enemyType == PieceType::Queen)
-		{
-			// Check if enemy piece, our move destination, and our king are collinear
-			int	 dx1	   = move.end.x - enemyPos.x;
-			int	 dy1	   = move.end.y - enemyPos.y;
-			int	 dx2	   = ourKingAfterMove.x - enemyPos.x;
-			int	 dy2	   = ourKingAfterMove.y - enemyPos.y;
-
-			// Check if they're on the same line
-			bool collinear = false;
-
-			if (enemyType == PieceType::Rook || enemyType == PieceType::Queen)
-			{
-				collinear = (dx1 == 0 && dx2 == 0) || (dy1 == 0 && dy2 == 0);
-			}
-			if ((enemyType == PieceType::Bishop || enemyType == PieceType::Queen) && !collinear)
-			{
-				collinear = (dx1 != 0 && dy1 != 0 && dx2 != 0 && dy2 != 0 && abs(dx1) * dy2 == abs(dy1) * dx2 && ((dx1 > 0) == (dx2 > 0)) && ((dy1 > 0) == (dy2 > 0)));
-			}
-
-			if (collinear)
-			{
-				// Check if our piece is in between the enemy and our king
-				int distToEnemy = abs(dx1) + abs(dy1);
-				int distToKing	= abs(dx2) + abs(dy2);
-
-				if (distToEnemy < distToKing)
-				{
-					physicallyBlocked = true;
-					break;
-				}
-			}
-		}
-	}
-
-	return blockedKingThreats || reducedTotalThreats || physicallyBlocked;
+	// Analyze the results
+	return analyzeThreatReduction(currentThreats, threatsAfterMove, ourKing, move, player);
 }
 
 
@@ -639,6 +530,118 @@ GamePhase MoveEvaluation::determineGamePhase() const
 
 	else
 		return GamePhase::EndGame;
+}
+
+
+MoveEvaluation::ThreatAnalysis MoveEvaluation::calculateCurrentThreats(PlayerColor opponent, PlayerColor player)
+{
+	std::vector<Position> threats;
+	Position			  ourKing = mBoard->getKingsPosition(player);
+
+	mGeneration->calculateAllLegalBasicMoves(opponent);
+	auto opponentPieces = mBoard->getPiecesFromPlayer(opponent);
+
+	for (const auto &[pos, piece] : opponentPieces)
+	{
+		auto moves = mGeneration->getMovesForPosition(pos);
+
+		for (const auto &move : moves)
+		{
+			auto &threatenedPiece = mBoard->getPiece(move.end);
+			if (threatenedPiece && threatenedPiece->getColor() == player)
+			{
+				threats.push_back(move.end);
+			}
+		}
+	}
+
+	return ThreatAnalysis(threats, ourKing);
+}
+
+
+MoveEvaluation::ThreatAnalysis MoveEvaluation::calculateThreatsAfterMove(const PossibleMove &move, PlayerColor player, PlayerColor opponent)
+{
+	// Create a chessboard copy for simulating move
+	ChessBoard tmpBoard(*mBoard);
+	tmpBoard.movePiece(move.start, move.end);
+	Position			  ourKingAfterMove = tmpBoard.getKingsPosition(player);
+
+	std::vector<Position> threats		   = calculateThreatsOnBoard(tmpBoard, opponent, player);
+
+	return ThreatAnalysis(threats, ourKingAfterMove);
+}
+
+
+bool MoveEvaluation::analyzeThreatReduction(const ThreatAnalysis &before, const ThreatAnalysis &after, const Position &ourKing, const PossibleMove &move, PlayerColor player)
+{
+	bool reducedKingThreats	 = after.kingThreats < before.kingThreats;
+
+	bool reducedTotalThreats = after.threatenedPieces.size() < before.threatenedPieces.size();
+
+	bool physicalBlock		 = physicallyBlocksAttack(move, player, *mBoard);
+
+	return reducedKingThreats || reducedTotalThreats || physicalBlock;
+}
+
+
+bool MoveEvaluation::physicallyBlocksAttack(const PossibleMove &move, PlayerColor player, ChessBoard &board)
+{
+	Position	ourKing		   = board.getKingsPosition(player);
+	PlayerColor oponnent	   = getOpponnentColor(player);
+	auto		opponentPieces = board.getPiecesFromPlayer(oponnent);
+
+	for (const auto &[enemyPos, piece] : opponentPieces)
+	{
+		PieceType enemyType = piece->getType();
+
+		// Only check long range pieces that can be blocked
+		if (enemyType == PieceType::Bishop || enemyType == PieceType::Rook || enemyType == PieceType::Queen)
+		{
+			// Check if our move destination blocks the line between enemy and king
+			if (!areCollinear(enemyPos, ourKing, enemyType))
+				continue;
+
+			// Check if the destination is in between
+			int dx1			= move.end.x - enemyPos.x;
+			int dy1			= move.end.y - enemyPos.y;
+			int dx2			= ourKing.x - enemyPos.x;
+			int dy2			= ourKing.y - enemyPos.y;
+
+			int distToEnemy = abs(dx1) + abs(dy1);
+			int distToKing	= abs(dx2) + abs(dy2);
+
+			if (distToEnemy < distToKing)
+				return true;
+		}
+	}
+
+	return false;
+}
+
+
+std::vector<Position> MoveEvaluation::calculateThreatsOnBoard(ChessBoard &board, PlayerColor opponent, PlayerColor player)
+{
+	// Use lightweight move generation without proper validation
+
+	std::vector<Position> threats;
+	auto				  opponentPieces = board.getPiecesFromPlayer(opponent);
+
+	for (const auto &[pos, piece] : opponentPieces)
+	{
+		auto moves = piece->getPossibleMoves(pos, board, true);
+
+		for (const auto &move : moves)
+		{
+			auto &threatenedPiece = board.getPiece(move.end);
+
+			if (threatenedPiece && threatenedPiece->getColor() == player)
+			{
+				threats.push_back(move.end);
+			}
+		}
+	}
+
+	return threats;
 }
 
 

@@ -8,6 +8,8 @@
 #pragma once
 
 #include <array>
+#include <vector>
+#include <future>
 
 #include "Move.h"
 #include "ChessBoard.h"
@@ -55,20 +57,43 @@ public:
 
 
 private:
-	int												   calculateMobility(PlayerColor player) const;
-	int												   calculateKingSafetyScore(PlayerColor player) const;
-	int												   calculatePawnStructureScore(PlayerColor player) const;
-	bool											   isPasssedPawn(const Position &pos, PlayerColor player) const;
-	bool											   isIsolatedPawn(const Position &pos, PlayerColor player) const;
-	bool											   isDoublePawn(const Position &pos, PlayerColor player) const;
-	bool											   isInCenter(const Position &pos) const;
-	bool											   isNearKing(const Position &pos, const Position &kingPos) const;
-	std::vector<Position>							   getAttackedSquares(const Position &piecePos, PlayerColor player) const;
-	bool											   wouldExposeKing(const PossibleMove &move, PlayerColor player) const;
-	int												   countAttackers(const Position &target, PlayerColor attackerPlayer) const;
-	PlayerColor										   getOpponnentColor(PlayerColor player) const;
+	struct ThreatAnalysis
+	{
+		std::vector<Position> threatenedPieces;
+		int					  kingThreats = 0;
 
-	bool											   areCollinear(const Position &pos1, const Position &pos2, PieceType pieceType);
+		ThreatAnalysis(const std::vector<Position> &threats, const Position &kingPos)
+		{
+			threatenedPieces = threats;
+			for (const auto &threat : threats)
+			{
+				if (threat == kingPos)
+					kingThreats++;
+			}
+		}
+	};
+
+	ThreatAnalysis		  calculateCurrentThreats(PlayerColor opponent, PlayerColor player);
+	ThreatAnalysis		  calculateThreatsAfterMove(const PossibleMove &move, PlayerColor player, PlayerColor opponent);
+	bool				  analyzeThreatReduction(const ThreatAnalysis &before, const ThreatAnalysis &after, const Position &ourKing, const PossibleMove &move, PlayerColor player);
+	bool				  physicallyBlocksAttack(const PossibleMove &move, PlayerColor player, ChessBoard &board);
+	std::vector<Position> calculateThreatsOnBoard(ChessBoard &board, PlayerColor opponent, PlayerColor player);
+
+
+	int					  calculateMobility(PlayerColor player) const;
+	int					  calculateKingSafetyScore(PlayerColor player) const;
+	int					  calculatePawnStructureScore(PlayerColor player) const;
+	bool				  isPasssedPawn(const Position &pos, PlayerColor player) const;
+	bool				  isIsolatedPawn(const Position &pos, PlayerColor player) const;
+	bool				  isDoublePawn(const Position &pos, PlayerColor player) const;
+	bool				  isInCenter(const Position &pos) const;
+	bool				  isNearKing(const Position &pos, const Position &kingPos) const;
+	std::vector<Position> getAttackedSquares(const Position &piecePos, PlayerColor player) const;
+	bool				  wouldExposeKing(const PossibleMove &move, PlayerColor player) const;
+	int					  countAttackers(const Position &target, PlayerColor attackerPlayer) const;
+	PlayerColor			  getOpponnentColor(PlayerColor player) const;
+
+	bool				  areCollinear(const Position &pos1, const Position &pos2, PieceType pieceType);
 
 	std::shared_ptr<ChessBoard>						   mBoard;
 	std::shared_ptr<MoveGeneration>					   mGeneration;
