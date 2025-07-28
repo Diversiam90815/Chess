@@ -127,14 +127,21 @@ bool MoveValidation::wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerC
 	bool		isKing		   = movingPiece->getType() == PieceType::King;
 	PlayerColor opponentColour = playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
 
-	LOG_DEBUG("Simulating move: {} -> {} with piece {}", LoggingHelper::positionToString(move.startingPosition).c_str(),
-			  LoggingHelper::positionToString(move.endingPosition).c_str(), LoggingHelper::pieceTypeToString(movingPiece->getType()).c_str());
+	if (VALIDATION_DEBUG)
+	{
+		LOG_DEBUG("Simulating move: {} -> {} with piece {}", LoggingHelper::positionToString(move.startingPosition).c_str(),
+				  LoggingHelper::positionToString(move.endingPosition).c_str(), LoggingHelper::pieceTypeToString(movingPiece->getType()).c_str());
+	}
 
 	if (capturingPiece)
 	{
 		auto type = capturingPiece->getType();
 		boardCopy.removePiece(move.endingPosition);
-		LOG_DEBUG("After placing, occupant of endSquare = {}", LoggingHelper::pieceTypeToString(type).c_str());
+
+		if (VALIDATION_DEBUG)
+		{
+			LOG_DEBUG("After placing, occupant of endSquare = {}", LoggingHelper::pieceTypeToString(type).c_str());
+		}
 	}
 
 	// Simulate the move
@@ -156,8 +163,11 @@ bool MoveValidation::wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerC
 	PlayerColor opponentColor = (playerColor == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
 	kingInCheck				  = isSquareAttacked(kingPosition, opponentColor, boardCopy);
 
-	LOG_DEBUG("King is at {}", LoggingHelper::positionToString(kingPosition).c_str());
-	LOG_DEBUG("isSquareAttacked(...) = {}", kingInCheck ? "true" : "false");
+	if (VALIDATION_DEBUG)
+	{
+		LOG_DEBUG("King is at {}", LoggingHelper::positionToString(kingPosition).c_str());
+		LOG_DEBUG("isSquareAttacked(...) = {}", kingInCheck ? "true" : "false");
+	}
 
 	return kingInCheck;
 }
@@ -176,9 +186,7 @@ bool MoveValidation::isSquareAttacked(const Position &square, PlayerColor attack
 		for (const auto &move : moves)
 		{
 			if (move.end == square)
-			{
 				return true;
-			}
 		}
 	}
 
@@ -200,7 +208,10 @@ bool MoveValidation::isSquareAttacked(const Position &square, PlayerColor attack
 		{
 			if (move.end == square)
 			{
-				LOG_DEBUG("Square ({}, {}) is attacked by {} at ({}, {})", square.x, square.y, LoggingHelper::pieceTypeToString(piece->getType()).c_str(), pos.x, pos.y);
+				if (VALIDATION_DEBUG)
+				{
+					LOG_DEBUG("Square ({}, {}) is attacked by {} at ({}, {})", square.x, square.y, LoggingHelper::pieceTypeToString(piece->getType()).c_str(), pos.x, pos.y);
+				}
 				return true;
 			}
 		}

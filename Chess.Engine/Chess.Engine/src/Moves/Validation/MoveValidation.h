@@ -12,6 +12,9 @@
 #include "ChessBoard.h"
 
 
+#define VALIDATION_DEBUG false
+
+
 class MoveValidation
 {
 public:
