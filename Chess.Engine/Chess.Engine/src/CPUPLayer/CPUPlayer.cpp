@@ -58,7 +58,7 @@ PossibleMove CPUPlayer::getRandomMove(const std::vector<PossibleMove> &moves)
 	std::uniform_int_distribution<size_t> distribution(0, moves.size() - 1);
 	size_t								  randomIndex = distribution(mRandomGenerator);
 
-	LOG_INFO("CPU selected random move {}/{}", randomIndex + 1, moves.size());
+	LOG_DEBUG("CPU selected random move {}/{}", randomIndex + 1, moves.size());
 	return moves[randomIndex];
 }
 
@@ -66,7 +66,7 @@ PossibleMove CPUPlayer::getRandomMove(const std::vector<PossibleMove> &moves)
 PossibleMove CPUPlayer::getEasyMove(const std::vector<PossibleMove> &moves)
 {
 	// Easy: Basic move evaluation
-	std::vector<std::pair<PossibleMove, int>> evaluatedMoves;
+	std::vector<MoveCandidate> evaluatedMoves;
 
 	for (const auto &move : moves)
 	{
@@ -74,18 +74,16 @@ PossibleMove CPUPlayer::getEasyMove(const std::vector<PossibleMove> &moves)
 		evaluatedMoves.emplace_back(move, score);
 	}
 
-	// Sort by score (descending order)
-	std::sort(evaluatedMoves.begin(), evaluatedMoves.end(), [](const auto &a, const auto &b) { return a.second > b.second; });
+	PossibleMove selectedMove = mConfig.enableRandomization ? selectMoveWithRandomization(evaluatedMoves) : selectBestMove(evaluatedMoves);
 
-	LOG_INFO("CPU (Easy) selected best move with score {}", evaluatedMoves[0].second);
-	return evaluatedMoves[0].first;
+	return selectedMove;
 }
 
 
 PossibleMove CPUPlayer::getMediumMove(const std::vector<PossibleMove> &moves)
 {
 	// Medium: Enhanced evaluation with  positional awareness
-	std::vector<std::pair<PossibleMove, int>> evaluatedMoves;
+	std::vector<MoveCandidate> evaluatedMoves;
 
 	for (const auto &move : moves)
 	{
@@ -93,19 +91,16 @@ PossibleMove CPUPlayer::getMediumMove(const std::vector<PossibleMove> &moves)
 		evaluatedMoves.emplace_back(move, score);
 	}
 
-	// Sort by score (descending order)
-	std::sort(evaluatedMoves.begin(), evaluatedMoves.end(), [](const auto &a, const auto &b) { return a.second > b.second; });
+	PossibleMove selectedMove = mConfig.enableRandomization ? selectMoveWithRandomization(evaluatedMoves) : selectBestMove(evaluatedMoves);
 
-	// Always pick the best move
-	LOG_INFO("CPU (Medíum) selected best move with score {}", evaluatedMoves[0].second);
-	return evaluatedMoves[0].first;
+	return selectedMove;
 }
 
 
 PossibleMove CPUPlayer::getHardMove(const std::vector<PossibleMove> &moves)
 {
 	// Hard: Advanced evaluation with deeper analysis
-	std::vector<std::pair<PossibleMove, int>> evaluatedMoves;
+	std::vector<MoveCandidate> evaluatedMoves;
 
 	for (const auto &move : moves)
 	{
@@ -113,12 +108,9 @@ PossibleMove CPUPlayer::getHardMove(const std::vector<PossibleMove> &moves)
 		evaluatedMoves.emplace_back(move, score);
 	}
 
-	// Sort by score (descending order)
-	std::sort(evaluatedMoves.begin(), evaluatedMoves.end(), [](const auto &a, const auto &b) { return a.second > b.second; });
+	PossibleMove selectedMove = mConfig.enableRandomization ? selectMoveWithRandomization(evaluatedMoves) : selectBestMove(evaluatedMoves);
 
-	// Always pick the best move
-	LOG_INFO("CPU (Hard) selected best move with score {}", evaluatedMoves[0].second);
-	return evaluatedMoves[0].first;
+	return selectedMove;
 }
 
 
@@ -175,4 +167,77 @@ void CPUPlayer::simulateThinking()
 	{
 		std::this_thread::sleep_for(mConfig.thinkingTime);
 	}
+}
+
+
+PossibleMove CPUPlayer::selectBestMove(std::vector<MoveCandidate> &moves)
+{
+	auto topCandidates = filterTopCandidates(moves);
+
+	if (topCandidates.empty())
+		return {};
+
+	return topCandidates[0].move;
+}
+
+
+PossibleMove CPUPlayer::selectMoveWithRandomization(std::vector<MoveCandidate> &moves)
+{
+	auto topCandidates = filterTopCandidates(moves);
+
+	if (topCandidates.empty())
+		return {};
+
+	if (topCandidates.size() == 1 || !mConfig.enableRandomization)
+		return topCandidates[0].move;
+
+	// weigh moves depending on score difference to the best move and randomization factor
+	int											bestScore = topCandidates[0].score;
+	std::vector<std::pair<PossibleMove, float>> weightedMoves;
+
+	for (const auto &candidate : topCandidates)
+	{
+		float scoreDiff = static_cast<float>(bestScore - candidate.score);
+		float weight	= std::exp(-scoreDiff * mConfig.randomizationFactor);
+		weightedMoves.emplace_back(candidate.move, weight);
+	}
+
+	// Select best on weight
+	std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+	float								  randomValue = dist(mRandomGenerator);
+	float								  totalWeight = 0.0f;
+
+	for (const auto &[move, weight] : weightedMoves)
+	{
+		totalWeight += weight;
+	}
+
+	float accumulatedWeight = 0.0f;
+	for (const auto &[move, weight] : weightedMoves)
+	{
+		accumulatedWeight += weight / totalWeight;
+		if (randomValue <= accumulatedWeight)
+			return move;
+	}
+
+	return topCandidates[0].move;
+}
+
+
+std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandidate> &allMoves)
+{
+	std::vector<MoveCandidate> topCandidates;
+	topCandidates.reserve(mConfig.candidateMoveCount);
+
+	// Sort by score (descending order)
+	std::sort(allMoves.begin(), allMoves.end(), [](const auto &a, const auto &b) { return a.score > b.score; });
+
+	int actualCount = (std::min)(mConfig.candidateMoveCount, static_cast<int>(allMoves.size()));
+
+	for (int i = 0; i < actualCount; ++i)
+	{
+		topCandidates.push_back(allMoves[i]);
+	}
+
+	return topCandidates;
 }

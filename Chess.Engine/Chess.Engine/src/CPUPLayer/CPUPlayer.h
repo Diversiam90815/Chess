@@ -29,13 +29,23 @@ enum class CPUDifficulty
 	Hard   = 3
 };
 
+struct MoveCandidate
+{
+	PossibleMove move;
+	int			 score;
+};
+
 
 struct CPUConfiguration
 {
 	CPUDifficulty			  difficulty = CPUDifficulty::Random;
 	std::chrono::milliseconds thinkingTime{1000};
-	bool					  enabled  = false;
-	PlayerColor				  cpuColor = PlayerColor::Black; // Default to black
+	bool					  enabled			  = false;
+	PlayerColor				  cpuColor			  = PlayerColor::Black; // Default to black
+
+	bool					  enableRandomization = true;				// Add some randomness to move selection
+	float					  randomizationFactor = 0.1f;				// How much randomness? Between 0.0 and 1.0
+	int						  candidateMoveCount  = 5;					// Number of top moves to consider
 };
 
 
@@ -65,6 +75,12 @@ private:
 	void							calculateMove(PlayerColor player);
 
 	void							simulateThinking();
+
+	PossibleMove					selectBestMove(std::vector<MoveCandidate> &moves);
+
+	PossibleMove					selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
+
+	std::vector<MoveCandidate>		filterTopCandidates(std::vector<MoveCandidate> &allMoves);
 
 
 	CPUConfiguration				mConfig;

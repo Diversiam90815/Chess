@@ -435,10 +435,13 @@ bool GameManager::startCPUGame()
 	PlayerColor		 cpuColor = mConfig.localPlayer == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
 
 	CPUConfiguration CPUConfig;
-	CPUConfig.difficulty   = static_cast<CPUDifficulty>(mConfig.difficulty);
-	CPUConfig.enabled	   = true;
-	CPUConfig.cpuColor	   = cpuColor;
-	CPUConfig.thinkingTime = std::chrono::milliseconds(1000);
+	CPUConfig.difficulty		  = static_cast<CPUDifficulty>(mConfig.difficulty);
+	CPUConfig.enabled			  = true;
+	CPUConfig.cpuColor			  = cpuColor;
+	CPUConfig.thinkingTime		  = std::chrono::milliseconds(1000);
+	CPUConfig.enableRandomization = true;
+	CPUConfig.randomizationFactor = 0.3f;
+	CPUConfig.candidateMoveCount  = 7;
 
 	mEngine->setCPUConfiguration(CPUConfig);
 
