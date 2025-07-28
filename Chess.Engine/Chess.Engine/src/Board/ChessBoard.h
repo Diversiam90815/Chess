@@ -19,6 +19,7 @@
 #include "Queen.h"
 #include "King.h"
 
+#define CHESSBOARD_DEBUG false
 
 using PlayerPiece = std::pair<Position, std::shared_ptr<ChessPiece>>;
 

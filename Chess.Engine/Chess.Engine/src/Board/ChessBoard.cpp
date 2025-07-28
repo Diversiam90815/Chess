@@ -90,7 +90,8 @@ std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos)
 
 void ChessBoard::removePiece(Position pos)
 {
-	LOG_DEBUG("removePiece called at x={}, y={}", pos.x, pos.y);
+	if (CHESSBOARD_DEBUG)
+		LOG_DEBUG("removePiece called at {}", LoggingHelper::positionToString(pos).c_str());
 
 	squares[pos.y][pos.x].piece = nullptr;
 }
@@ -98,6 +99,9 @@ void ChessBoard::removePiece(Position pos)
 
 bool ChessBoard::movePiece(Position start, Position end)
 {
+	if (CHESSBOARD_DEBUG)
+		LOG_DEBUG("Moved piece from {} to {}", LoggingHelper::positionToString(start).c_str(), LoggingHelper::positionToString(end).c_str());
+
 	if (!start.isValid() || !end.isValid())
 		return false;
 
