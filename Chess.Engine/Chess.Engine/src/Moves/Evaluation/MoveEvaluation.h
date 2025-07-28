@@ -35,7 +35,7 @@ public:
 	int					 getAdvancedEvaluation(const PossibleMove &move, PlayerColor player);
 
 	static constexpr int getPieceValue(PieceType piece);
-	int					 getPositionValue(PieceType piece, const Position &pos, PlayerColor player);
+	int					 getPositionValue(PieceType piece, const Position &pos, PlayerColor player) const;
 	int					 evaluateMaterialGain(const PossibleMove &move);
 	int					 evaluatePositionalGain(const PossibleMove &move, PlayerColor player);
 	int					 evaluateThreatLevel(const PossibleMove &move, PlayerColor player);

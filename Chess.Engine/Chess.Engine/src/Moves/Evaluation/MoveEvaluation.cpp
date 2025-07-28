@@ -73,7 +73,7 @@ int MoveEvaluation::getAdvancedEvaluation(const PossibleMove &move, PlayerColor 
 }
 
 
-int MoveEvaluation::getPositionValue(PieceType piece, const Position &pos, PlayerColor player)
+int MoveEvaluation::getPositionValue(PieceType piece, const Position &pos, PlayerColor player) const
 {
 	// Ensure position is valid
 	if (!pos.isValid())
