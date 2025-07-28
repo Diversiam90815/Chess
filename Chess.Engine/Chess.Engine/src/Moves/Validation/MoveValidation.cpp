@@ -46,7 +46,9 @@ bool MoveValidation::validateMove(Move &move, PlayerColor playerColor)
 	// 3. Check if king would be in check after move
 	if (wouldKingBeInCheckAfterMove(move, playerColor))
 	{
-		LOG_INFO("Move could not be validated, since the king would be in check after this move!");
+		if (VALIDATION_DEBUG)
+			LOG_DEBUG("Move could not be validated, since the king would be in check after this move!");
+
 		return false;
 	}
 
