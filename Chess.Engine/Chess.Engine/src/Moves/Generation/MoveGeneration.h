@@ -18,6 +18,9 @@
 #include "Execution/MoveExecution.h"
 
 
+#define GENERATION_DEBUG false
+
+
 class MoveGeneration
 {
 public:

@@ -52,7 +52,9 @@ std::vector<PossibleMove> MoveGeneration::getMovesForPosition(const Position &po
 		}
 	}
 
-	LOG_INFO("Position {} has {} possible moves!", LoggingHelper::positionToString(position).c_str(), possibleMoves.size());
+	if (GENERATION_DEBUG)
+		LOG_DEBUG("Position {} has {} possible moves!", LoggingHelper::positionToString(position).c_str(), possibleMoves.size());
+	
 	return possibleMoves;
 }
 
