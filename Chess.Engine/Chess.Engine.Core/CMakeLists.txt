@@ -5,9 +5,9 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.1.0.745)
+set(CHESS_VERSION 1.1.0.783)
 
-project(Chess.Engine VERSION ${CHESS_VERSION} LANGUAGES CXX)
+project(Chess.Engine.Core VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
 
 #==========================================
@@ -27,13 +27,13 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set (SOURCE_DIR             ${PROJECT_SOURCE_DIR}/src)
 set (SUBMODULES_DIR         ${PROJECT_SOURCE_DIR}/submodule)
 	
+set(API_DIR ${SOURCE_DIR}/API)
 set (PIECE_DIR              ${SOURCE_DIR}/Piece)
 set (MOVE_DIR               ${SOURCE_DIR}/Moves)
 set (GAME_MANAGER_DIR       ${SOURCE_DIR}/GameManager)
 set (GAME_ENGINE_DIR		${SOURCE_DIR}/GameEngine)
 set (BOARD_DIR              ${SOURCE_DIR}/Board)
 set (PLAYER_DIR             ${SOURCE_DIR}/Player)
-set (API_DIR                ${SOURCE_DIR}/API)
 set (HELPER_DIR             ${SOURCE_DIR}/Helper)
 set (FILEMANAGER_DIR        ${SOURCE_DIR}/FileManager)
 set (LOGGER_DIR             ${SOURCE_DIR}/Logger)
@@ -50,13 +50,13 @@ set (STATEMACHINE_DIR       ${SOURCE_DIR}/StateMachine)
 #==========================================
 
 set(ALL_PROJECT_DIRS 
+			${API_DIR}
 			${PIECE_DIR}
 			${MOVE_DIR}
 			${GAME_MANAGER_DIR}
 			${GAME_ENGINE_DIR}
 			${BOARD_DIR}
 			${PLAYER_DIR}
-			${API_DIR}
 			${HELPER_DIR}
 			${LOGGER_DIR}
 			${FILEMANAGER_DIR}
@@ -77,7 +77,7 @@ include_directories(${ALL_PROJECT_DIRS})
 #==========================================
 
 set(API_FILES
-	${API_DIR}/EngineAPI.h    ${API_DIR}/EngineAPI.cpp
+		${API_DIR}/EngineAPI.h    ${API_DIR}/EngineAPI.cpp
 	${API_DIR}/EngineAPIDefines.h
 )
 
@@ -100,7 +100,8 @@ set(PIECE_FILES
 )
 
 set(BOARD_FILES
-	${BOARD_DIR}/ChessBoard.h    ${BOARD_DIR}/ChessBoard.cpp
+	${BOARD_DIR}/ChessBoard.h			${BOARD_DIR}/ChessBoard.cpp
+	${BOARD_DIR}/LightChessBoard.h		${BOARD_DIR}/LightChessBoard.cpp
 )
 	
 set(MOVE_FILES
@@ -229,11 +230,7 @@ set(JSON_SINGLE_FILE ${JSON_DIR}/single_include/nlohmann)
 #   CREATE TARGET
 #==========================================
 
-add_library(${PROJECT_NAME}.Core STATIC   
-  ${ALL_FILES}
-)
-
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} STATIC   
   ${ALL_FILES}
 )
 
@@ -251,21 +248,10 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 #   COMPILE DEFINITIONS
 #==========================================
 
-target_compile_definitions(${PROJECT_NAME}.Core PUBLIC
-	-DENV_DEVELOPMENT
-	_CRT_SECURE_NO_WARNINGS
-	_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
-
-	_WINDOWS
-	WIN32_LEAN_AND_MEAN
-	_WINSOCK_DEPRECATED_NO_WARNING
-	_WIN32_WINNT=0x0A00
-)
-
 target_compile_definitions(${PROJECT_NAME} PUBLIC
 	-DENV_DEVELOPMENT
 	_CRT_SECURE_NO_WARNINGS
-	_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING 
+	_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
 
 	_WINDOWS
 	WIN32_LEAN_AND_MEAN
@@ -277,20 +263,6 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 #==========================================
 #   COMPILE OPTIONS
 #==========================================
-
-target_compile_options(${PROJECT_NAME}.Core PRIVATE
-	$<$<CONFIG:Release>:
-		/Oi
-		/Gy
-	>
-	$<$<CONFIG:Debug>:
-		/Od
-		/Z7
-	>
-	/sdl
-	/MP
-	/WX-        # Don't treat warnings as errors
-)
 
 target_compile_options(${PROJECT_NAME} PRIVATE
 	$<$<CONFIG:Release>:
@@ -319,7 +291,6 @@ set(Include_Dirs
 		${Asio_INCLUDE_DIR}
 )
 
-target_include_directories(${PROJECT_NAME}.Core PUBLIC ${Include_Dirs})
 target_include_directories(${PROJECT_NAME} PUBLIC ${Include_Dirs})
 
 
@@ -329,6 +300,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${Include_Dirs})
 
 set(PROJECT_LIBS Logger)
 
-target_link_libraries(${PROJECT_NAME}.Core PUBLIC ${PROJECT_LIBS})
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_LIBS})
 
