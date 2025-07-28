@@ -19,6 +19,7 @@
 #include "Evaluation/MoveEvaluation.h"
 #include "ChessBoard.h"
 #include "IObservable.h"
+#include "LightChessBoard.h"
 
 
 enum class CPUDifficulty
@@ -27,6 +28,20 @@ enum class CPUDifficulty
 	Easy   = 1,
 	Medium = 2,
 	Hard   = 3
+};
+
+struct TranspositionEntry
+{
+	uint64_t hash;
+	int		 depth;
+	int		 score;
+	enum class NodeType
+	{
+		Exact,
+		Alpha,
+		Beta
+	} type;
+	PossibleMove move;
 };
 
 struct MoveCandidate
@@ -71,24 +86,39 @@ public:
 	PossibleMove	 getMediumMove(const std::vector<PossibleMove> &moves);
 	PossibleMove	 getHardMove(const std::vector<PossibleMove> &moves);
 
+	PossibleMove	 getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth);
+	PossibleMove	 getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth);
+
 private:
-	void							calculateMove(PlayerColor player);
+	void											 calculateMove(PlayerColor player);
 
-	void							simulateThinking();
+	void											 simulateThinking();
 
-	PossibleMove					selectBestMove(std::vector<MoveCandidate> &moves);
+	int												 minimax(LightChessBoard &board, int depth, bool maximizing, PlayerColor player);
+	int												 alphaBeta(LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player);
 
-	PossibleMove					selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
+	PossibleMove									 selectBestMove(std::vector<MoveCandidate> &moves);
 
-	std::vector<MoveCandidate>		filterTopCandidates(std::vector<MoveCandidate> &allMoves);
+	PossibleMove									 selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
+
+	std::vector<MoveCandidate>						 filterTopCandidates(std::vector<MoveCandidate> &allMoves);
+
+	void											 storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move);
+	bool											 lookupTransposition(uint64_t hash, int depth, int &score, PossibleMove &move);
 
 
-	CPUConfiguration				mConfig;
+	CPUConfiguration								 mConfig;
 
-	std::shared_ptr<MoveGeneration> mMoveGeneration;
-	std::shared_ptr<MoveEvaluation> mMoveEvaluation;
-	std::shared_ptr<ChessBoard>		mBoard;
+	std::shared_ptr<MoveGeneration>					 mMoveGeneration;
+	std::shared_ptr<MoveEvaluation>					 mMoveEvaluation;
+	std::shared_ptr<ChessBoard>						 mBoard;
 
-	std::random_device				mRandomDevice;
-	std::mt19937					mRandomGenerator;
+	std::unordered_map<uint64_t, TranspositionEntry> mTranspositionTable;
+	int												 mNodesSearched		= 0;
+	int												 mTranspositionHits = 0;
+
+	std::random_device								 mRandomDevice;
+	std::mt19937									 mRandomGenerator;
+
+    static constexpr size_t							 MAX_TRANSPOSITION_ENTRIES = 1000000;
 };

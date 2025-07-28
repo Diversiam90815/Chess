@@ -113,6 +113,16 @@ PossibleMove CPUPlayer::getHardMove(const std::vector<PossibleMove> &moves)
 	return selectedMove;
 }
 
+PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth)
+{
+	return PossibleMove();
+}
+
+PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth)
+{
+	return PossibleMove();
+}
+
 
 void CPUPlayer::calculateMove(PlayerColor player)
 {
@@ -167,6 +177,18 @@ void CPUPlayer::simulateThinking()
 	{
 		std::this_thread::sleep_for(mConfig.thinkingTime);
 	}
+}
+
+
+int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, PlayerColor player)
+{
+	return 0;
+}
+
+
+int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player)
+{
+	return 0;
 }
 
 
@@ -240,4 +262,37 @@ std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandid
 	}
 
 	return topCandidates;
+}
+
+
+void CPUPlayer::storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move)
+{
+	if (mTranspositionTable.size() >= MAX_TRANSPOSITION_ENTRIES)
+	{
+		mTranspositionTable.clear();
+	}
+
+	TranspositionEntry entry;
+	entry.hash				  = hash;
+	entry.depth				  = depth;
+	entry.score				  = score;
+	entry.type				  = type;
+	entry.move				  = move;
+
+	mTranspositionTable[hash] = entry;
+}
+
+
+bool CPUPlayer::lookupTransposition(uint64_t hash, int depth, int &score, PossibleMove &move)
+{
+	auto it = mTranspositionTable.find(hash);
+
+	if (it != mTranspositionTable.end() && it->second.depth >= depth)
+	{
+		score = it->second.score;
+		move  = it->second.move;
+		return true;
+	}
+
+	return false;
 }

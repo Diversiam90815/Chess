@@ -95,6 +95,7 @@ private:
 
 	bool				  areCollinear(const Position &pos1, const Position &pos2, PieceType pieceType);
 
+
 	std::shared_ptr<ChessBoard>						   mBoard;
 	std::shared_ptr<MoveGeneration>					   mGeneration;
 
