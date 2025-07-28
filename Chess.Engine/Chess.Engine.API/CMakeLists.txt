@@ -42,7 +42,6 @@ include_directories(${ALL_PROJECT_DIRS})
 
 set(API_FILES
 	${SOURCE_DIR}/EngineAPI.h    ${SOURCE_DIR}/EngineAPI.cpp
-	${SOURCE_DIR}/EngineAPIDefines.h
 )
 
 

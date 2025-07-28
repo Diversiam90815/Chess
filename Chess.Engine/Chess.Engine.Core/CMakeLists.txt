@@ -27,7 +27,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set (SOURCE_DIR             ${PROJECT_SOURCE_DIR}/src)
 set (SUBMODULES_DIR         ${PROJECT_SOURCE_DIR}/submodule)
 	
-set(API_DIR ${SOURCE_DIR}/API)
+set (API_DIR				${SOURCE_DIR}/API)
 set (PIECE_DIR              ${SOURCE_DIR}/Piece)
 set (MOVE_DIR               ${SOURCE_DIR}/Moves)
 set (GAME_MANAGER_DIR       ${SOURCE_DIR}/GameManager)
@@ -77,7 +77,6 @@ include_directories(${ALL_PROJECT_DIRS})
 #==========================================
 
 set(API_FILES
-		${API_DIR}/EngineAPI.h    ${API_DIR}/EngineAPI.cpp
 	${API_DIR}/EngineAPIDefines.h
 )
 
