@@ -178,24 +178,49 @@ int MoveEvaluation::evaluateThreatLevel(const PossibleMove &move, PlayerColor pl
 
 int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor player)
 {
-	int		 score			 = 0;
-	Position kingPos		 = mBoard->getKingsPosition(player);
-	Position opponentKingPos = mBoard->getKingsPosition(getOpponentColor(player));
+	int score = 0;
 
-	// Penalize moves that expose our king
-	if (wouldExposeKing(move, player))
-		score -= 100;
-
-	// Reward moves that attack near the opponnents king
-	if (isNearKing(move.end, opponentKingPos))
-		score += 30;
-
-	// Reward defensive moves near our king when under threat
-	if (isNearKing(move.end, kingPos))
+	if (determineGamePhase() != GamePhase::EndGame)
 	{
-		int attackerCount = countAttackers(kingPos, getOpponentColor(player));
-		if (attackerCount > 0)
-			score += 25;
+		Position kingPos		 = mBoard->getKingsPosition(player);
+		Position opponentKingPos = mBoard->getKingsPosition(getOpponentColor(player));
+
+		// Penalize moves that expose our king
+		if (wouldExposeKing(move, player))
+			score -= 100;
+
+		// Reward moves that attack near the opponnents king
+		if (isNearKing(move.end, opponentKingPos))
+			score += 30;
+
+		// Reward defensive moves near our king when under threat
+		if (isNearKing(move.end, kingPos))
+		{
+			int attackerCount = countAttackers(kingPos, getOpponentColor(player));
+			if (attackerCount > 0)
+				score += 25;
+		}
+
+		score = score * KING_SAFETY_WEIGHT;
+	}
+	else
+	{
+		// In endgame, reward king activity and centralization
+		auto &movingPiece = mBoard->getPiece(move.start);
+		if (movingPiece && movingPiece->getType() == PieceType::King)
+		{
+			// Reward king moving towards center in endgame
+			int centerDistance	= abs(move.end.x - 3.5) + abs(move.end.y - 3.5);
+			int currentDistance = abs(move.start.x - 3.5) + abs(move.start.y - 3.5);
+
+			if (centerDistance < currentDistance)
+			{
+				score += 25; // Bonus for king centralization in endgame
+			}
+
+			// Additional bonus for king activity (any king move in endgame)
+			score += 10;
+		}
 	}
 
 	return score;
@@ -481,32 +506,7 @@ int MoveEvaluation::getStrategicEvaluation(const PossibleMove &move, PlayerColor
 
 	score += evaluatePawnStructure(move, player); // Pawn structure considerations
 
-	// King's safety considerations (weighed more in middlegame)
-	GamePhase phase = determineGamePhase();
-
-	if (phase != GamePhase::EndGame)
-	{
-		score += evaluateKingSafety(move, player) * KING_SAFETY_WEIGHT;
-	}
-	else
-	{
-		// In endgame, reward king activity and centralization
-		auto &movingPiece = mBoard->getPiece(move.start);
-		if (movingPiece && movingPiece->getType() == PieceType::King)
-		{
-			// Reward king moving towards center in endgame
-			int centerDistance	= abs(move.end.x - 3.5) + abs(move.end.y - 3.5);
-			int currentDistance = abs(move.start.x - 3.5) + abs(move.start.y - 3.5);
-
-			if (centerDistance < currentDistance)
-			{
-				score += 25; // Bonus for king centralization in endgame
-			}
-
-			// Additional bonus for king activity (any king move in endgame)
-			score += 10;
-		}
-	}
+	score += evaluateKingSafety(move, player);	  // King safety in Early Game and Activation in Endgame
 
 	score += evaluatePieceActivity(move, player); // Piece coordination and activity
 
