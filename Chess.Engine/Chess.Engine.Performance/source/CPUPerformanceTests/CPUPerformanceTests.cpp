@@ -25,8 +25,6 @@ struct GameResult
 	std::string				  gameDescription;
 };
 
-
-
 struct CPUPerformanceStats
 {
 	int						  wins		 = 0;
@@ -286,7 +284,7 @@ private:
 };
 
 
-TEST_F(CPUPerformanceTests, BasicDiffucultyComparison)
+TEST_F(CPUPerformanceTests, Medium_VS_Easy)
 {
 	CPUConfiguration easyConfig;
 	easyConfig.difficulty	= CPUDifficulty::Easy;
@@ -299,7 +297,7 @@ TEST_F(CPUPerformanceTests, BasicDiffucultyComparison)
 	mediumConfig.thinkingTime = std::chrono::milliseconds(100);
 
 	// Test medium vs easy
-	auto stats				  = runMultipleGames(mediumConfig, easyConfig, 10, true);
+	auto stats				  = runMultipleGames(mediumConfig, easyConfig, 50, true);
 
 	std::cout << "Medium vs Easy Results:" << std::endl;
 	std::cout << "Win Rate: " << stats.winRate << "%" << std::endl;
