@@ -77,7 +77,7 @@ std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PlayerColor playerColor
 }
 
 
-std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos)
+std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos) 
 {
 	static std::shared_ptr<ChessPiece> nullPiece = nullptr;
 
