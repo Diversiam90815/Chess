@@ -183,7 +183,7 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 		auto undoInfo = lightBoard.makeMove(move);
 
 		// evaluate using alpha-beta (opp's turn, so minimizing)
-		int	 score	  = alphaBeta(lightBoard, depth - 1, alpha, beta, true, mConfig.cpuColor);
+		int	 score	  = alphaBeta(lightBoard, depth - 1, alpha, beta, false, mConfig.cpuColor);
 
 		// unmake move
 		lightBoard.unmakeMove(undoInfo);
