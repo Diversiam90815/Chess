@@ -14,12 +14,12 @@ namespace MoveTests
 {
 
 
-class MoveTest : public ::testing::Test
+class MoveTests : public ::testing::Test
 {
 };
 
 
-TEST_F(MoveTest, DefaultConstructor)
+TEST_F(MoveTests, DefaultConstructor)
 {
 	Move move;
 
@@ -36,7 +36,7 @@ TEST_F(MoveTest, DefaultConstructor)
 }
 
 
-TEST_F(MoveTest, PossibleMoveConstructor)
+TEST_F(MoveTests, PossibleMoveConstructor)
 {
 	PossibleMove possibleMove{{4, 6}, {4, 4}, MoveType::DoublePawnPush, PieceType::Queen};
 	Move		 move(possibleMove);
@@ -47,7 +47,7 @@ TEST_F(MoveTest, PossibleMoveConstructor)
 }
 
 
-TEST_F(MoveTest, ParameterizedConstructor)
+TEST_F(MoveTests, ParameterizedConstructor)
 {
 	Position  start{4, 6};
 	Position  end{4, 4};
@@ -67,7 +67,7 @@ TEST_F(MoveTest, ParameterizedConstructor)
 }
 
 
-TEST_F(MoveTest, DefaultParametersInConstructor)
+TEST_F(MoveTests, DefaultParametersInConstructor)
 {
 	Position  start{4, 6};
 	Position  end{4, 4};
@@ -81,7 +81,7 @@ TEST_F(MoveTest, DefaultParametersInConstructor)
 }
 
 
-TEST_F(MoveTest, ComparisonOperators)
+TEST_F(MoveTests, ComparisonOperators)
 {
 	Move move1;
 	move1.number = 5;
@@ -103,7 +103,7 @@ TEST_F(MoveTest, ComparisonOperators)
 }
 
 
-TEST_F(MoveTest, MoveInContainers)
+TEST_F(MoveTests, MoveInContainers)
 {
 	// Test that Move can be used in sorted containers (requires operator<)
 	std::set<Move> moveSet;
@@ -133,7 +133,7 @@ TEST_F(MoveTest, MoveInContainers)
 }
 
 
-TEST_F(MoveTest, PossibleMoveToMoveConversion)
+TEST_F(MoveTests, PossibleMoveToMoveConversion)
 {
 	PossibleMove possibleMove{{1, 6}, {1, 4}, MoveType::DoublePawnPush};
 	Move		 move(possibleMove);
@@ -144,7 +144,7 @@ TEST_F(MoveTest, PossibleMoveToMoveConversion)
 }
 
 
-TEST_F(MoveTest, MoveTypeFlags)
+TEST_F(MoveTests, MoveTypeFlags)
 {
 	// Test individual flags
 	EXPECT_EQ(static_cast<int>(MoveType::Normal), 1) << "Normal move should be flag 1";
@@ -159,7 +159,7 @@ TEST_F(MoveTest, MoveTypeFlags)
 }
 
 
-TEST_F(MoveTest, CombinedMoveTypes)
+TEST_F(MoveTests, CombinedMoveTypes)
 {
 	// Test combining move types
 	MoveType capturePromotion = static_cast<MoveType>(static_cast<int>(MoveType::Capture) | static_cast<int>(MoveType::PawnPromotion));
@@ -170,7 +170,7 @@ TEST_F(MoveTest, CombinedMoveTypes)
 }
 
 
-TEST_F(MoveTest, TestingMoveTypeFlags)
+TEST_F(MoveTests, TestingMoveTypeFlags)
 {
 	MoveType combinedType = (MoveType::Capture | MoveType::Check);
 

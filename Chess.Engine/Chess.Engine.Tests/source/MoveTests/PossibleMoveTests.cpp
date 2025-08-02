@@ -14,12 +14,12 @@ namespace MoveTests
 {
 
 
-class PossibleMoveTest : public ::testing::Test
+class PossibleMoveTests : public ::testing::Test
 {
 };
 
 
-TEST_F(PossibleMoveTest, DefaultConstructor)
+TEST_F(PossibleMoveTests, DefaultConstructor)
 {
 	PossibleMove move;
 
@@ -30,7 +30,7 @@ TEST_F(PossibleMoveTest, DefaultConstructor)
 }
 
 
-TEST_F(PossibleMoveTest, ParameterizedInitialization)
+TEST_F(PossibleMoveTests, ParameterizedInitialization)
 {
 	Position	 start{4, 6};
 	Position	 end{4, 4};
@@ -44,7 +44,7 @@ TEST_F(PossibleMoveTest, ParameterizedInitialization)
 }
 
 
-TEST_F(PossibleMoveTest, EqualityOperator)
+TEST_F(PossibleMoveTests, EqualityOperator)
 {
 	Position	 start{4, 6};
 	Position	 end{4, 4};
@@ -64,7 +64,7 @@ TEST_F(PossibleMoveTest, EqualityOperator)
 }
 
 
-TEST_F(PossibleMoveTest, IsEmpty)
+TEST_F(PossibleMoveTests, IsEmpty)
 {
 	PossibleMove emptyMove;
 	PossibleMove validMove{{4, 6}, {4, 4}};

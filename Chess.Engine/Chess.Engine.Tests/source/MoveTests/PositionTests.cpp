@@ -15,12 +15,12 @@
 namespace MoveTests
 {
 
-class PositionTest : public ::testing::Test
+class PositionTests : public ::testing::Test
 {
 };
 
 
-TEST_F(PositionTest, DefaultConstructor)
+TEST_F(PositionTests, DefaultConstructor)
 {
 	Position pos;
 
@@ -29,7 +29,7 @@ TEST_F(PositionTest, DefaultConstructor)
 }
 
 
-TEST_F(PositionTest, ParameterizedConstructor)
+TEST_F(PositionTests, ParameterizedConstructor)
 {
 	Position pos{4, 6};
 
@@ -38,7 +38,7 @@ TEST_F(PositionTest, ParameterizedConstructor)
 }
 
 
-TEST_F(PositionTest, IsValid)
+TEST_F(PositionTests, IsValid)
 {
 	// valid positions
 	Position a8			  = {0, 0};
@@ -66,7 +66,7 @@ TEST_F(PositionTest, IsValid)
 }
 
 
-TEST_F(PositionTest, EqualityOperator)
+TEST_F(PositionTests, EqualityOperator)
 {
 	Position pos1{4, 6};
 	Position pos2{4, 6};
@@ -79,7 +79,7 @@ TEST_F(PositionTest, EqualityOperator)
 }
 
 
-TEST_F(PositionTest, HashFunction)
+TEST_F(PositionTests, HashFunction)
 {
 	Position			pos1{4, 6};
 	Position			pos2{4, 6};
@@ -95,7 +95,7 @@ TEST_F(PositionTest, HashFunction)
 }
 
 
-TEST_F(PositionTest, HashInContainers)
+TEST_F(PositionTests, HashInContainers)
 {
 	// Test Position can be used in hash-based containers
 	std::unordered_set<Position>	  posSet;
