@@ -17,6 +17,7 @@ enable_testing()
 
 set(MoveTest_Dir            source/MoveTests)
 set(MultiplayerTest_Dir     source/MultiplayerTests)
+set(BoardTest_Dir           source/BoardTests)
 set(GameMechanicTest_Dir    source/GameMechanicTests)
 
 
@@ -45,7 +46,6 @@ set(MultiplayerTest_Files
 
 
 set(GameMechanicTest_Files
-    ${GameMechanicTest_Dir}/ChessboardTests.cpp
     ${GameMechanicTest_Dir}/PawnPromotionTests.cpp
     ${GameMechanicTest_Dir}/EndgameTests.cpp
     ${GameMechanicTest_Dir}/UndoMoveTests.cpp
@@ -53,8 +53,15 @@ set(GameMechanicTest_Files
 )
 
 
+set(BoardTest_Files
+    ${BoardTest_Dir}/ChessboardTests.cpp
+)
+
+
 set(Test_Files
+    source/main.cpp
     ${MoveTest_Files}
+    ${BoardTest_Files}
     ${MultiplayerTest_Files}
     ${GameMechanicTest_Files}
 )
@@ -71,10 +78,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Test_Files})
 #   Setup Test Project
 #==========================================
 
-add_executable(${PROJECT_NAME}
-    source/main.cpp
-    ${Test_Files}
-)
+add_executable(${PROJECT_NAME} ${Test_Files})
 
 
 #==========================================
