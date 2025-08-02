@@ -177,6 +177,27 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 
 	LOG_INFO("Starting alpha-beta search with depth {}", depth);
 
+	// Sort moves for better pruning
+	std::sort(moves.begin(), moves.end(),
+			  [&](const PossibleMove &a, const PossibleMove &b)
+			  {
+				  int scoreA = 0, scoreB = 0;
+
+				  // prioritize captures
+				  if ((a.type & MoveType::Capture) == MoveType::Capture)
+					  scoreA += 1000;
+				  if ((b.type & MoveType::Capture) == MoveType::Capture)
+					  scoreB += 1000;
+
+				  // Prioritize checks
+				  if ((a.type & MoveType::Check) == MoveType::Check)
+					  scoreA += 500;
+				  if ((b.type & MoveType::Check) == MoveType::Check)
+					  scoreB += 500;
+
+				  return scoreA > scoreB;
+			  });
+
 	for (const auto &move : moves)
 	{
 		// make move
@@ -253,8 +274,8 @@ int CPUPlayer::evaluatePlayerPosition(const LightChessBoard &board, PlayerColor 
 		int		 playerCentrality	= 4 - std::max(std::abs(playerKing.x - 3.5), std::abs(playerKing.y - 3.5));
 		int		 opponentCentrality = 4 - std::max(std::abs(opponentKing.x - 3.5), std::abs(opponentKing.y - 3.5));
 
-		score += playerCentrality * 10;
-		score -= opponentCentrality * 10;
+		score += playerCentrality * 10;	  // our centralization is good
+		score -= opponentCentrality * 10; // opponnent centralization is bad for us
 	}
 
 	// Mobility evaluation
