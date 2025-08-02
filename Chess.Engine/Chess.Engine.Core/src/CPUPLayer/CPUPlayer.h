@@ -89,6 +89,9 @@ public:
 	PossibleMove	 getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth);
 	PossibleMove	 getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth);
 
+	int				 evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player);
+
+
 private:
 	void											 calculateMove(PlayerColor player);
 
@@ -120,5 +123,5 @@ private:
 	std::random_device								 mRandomDevice;
 	std::mt19937									 mRandomGenerator;
 
-    static constexpr size_t							 MAX_TRANSPOSITION_ENTRIES = 1000000;
+	static constexpr size_t							 MAX_TRANSPOSITION_ENTRIES = 1000000;
 };

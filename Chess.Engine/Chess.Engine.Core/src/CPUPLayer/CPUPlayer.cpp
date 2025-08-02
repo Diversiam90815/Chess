@@ -113,14 +113,77 @@ PossibleMove CPUPlayer::getHardMove(const std::vector<PossibleMove> &moves)
 	return selectedMove;
 }
 
+
 PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth)
 {
 	return PossibleMove();
 }
 
+
 PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth)
 {
 	return PossibleMove();
+}
+
+
+int CPUPlayer::evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player)
+{
+	int			score	 = 0;
+	PlayerColor opponent = (player == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
+
+	// Material evaluation (from LightChessBoard)
+	score += board.getMaterialValue(player) - board.getMaterialValue(opponent);
+
+	// Positional evaluation
+	auto playerPieces	= board.getPiecePositions(player);
+	auto opponentPieces = board.getPiecePositions(opponent);
+
+	for (const auto &pos : playerPieces)
+	{
+		auto &piece = board.getPiece(pos);
+
+		if (!piece.isEmpty())
+			score += mMoveEvaluation->getPositionValue(piece.type, pos, player);
+	}
+
+	for (const auto &pos : opponentPieces)
+	{
+		auto &piece = board.getPiece(pos);
+
+		if (!piece.isEmpty())
+			score -= mMoveEvaluation->getPositionValue(piece.type, pos, opponent);
+	}
+
+	// King safety evaluation
+	if (board.isEndgame())
+	{
+		if (board.isInCheck(player))
+			score -= 50;
+
+		if (board.isInCheck(opponent))
+			score += 50;
+	}
+	else
+	{
+		// Endgame: encourage king activity and centralization
+		Position playerKing			= board.getKingPosition(player);
+		Position opponentKing		= board.getKingPosition(opponent);
+
+		int		 playerCentrality	= 4 - std::max(std::abs(playerKing.x - 3.5), std::abs(playerKing.y - 3.5));
+		int		 opponentCentrality = 4 - std::max(std::abs(opponentKing.x - 3.5), std::abs(opponentKing.y - 3.5));
+
+		score -= playerCentrality * 10;
+		score += opponentCentrality * 10;
+	}
+
+	// Mobility evaluation
+	auto playerMoves   = board.generateLegalMoves(player);
+	auto opponentMoves = board.generateLegalMoves(opponent);
+
+	score += static_cast<int>(playerMoves.size()) * 2;
+	score -= static_cast<int>(opponentMoves.size()) * 2;
+
+	return score;
 }
 
 

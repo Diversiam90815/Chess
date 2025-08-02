@@ -487,7 +487,7 @@ bool LightChessBoard::isSquareAttacked(Position pos, PlayerColor attacker) const
 		{
 			const LightPiece &piece = getPiece(x, y);
 
-			if (piece.isEmpty() && piece.color != attacker)
+			if (piece.isEmpty() || piece.color != attacker)
 				continue;
 
 			Position from{x, y};
