@@ -44,8 +44,8 @@ struct hash<Position>
 
 struct PossibleMove
 {
-	Position  start;
-	Position  end;
+	Position  start{-1, -1};
+	Position  end{-1, -1};
 	MoveType  type			 = MoveType::Normal;
 	PieceType promotionPiece = PieceType::DefaultType;
 

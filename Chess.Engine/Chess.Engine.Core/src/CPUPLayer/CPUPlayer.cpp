@@ -55,6 +55,9 @@ void CPUPlayer::moveCalculated(PossibleMove calculatedMove)
 
 PossibleMove CPUPlayer::getRandomMove(const std::vector<PossibleMove> &moves)
 {
+	if (moves.empty())
+		return {};
+
 	std::uniform_int_distribution<size_t> distribution(0, moves.size() - 1);
 	size_t								  randomIndex = distribution(mRandomGenerator);
 
@@ -65,6 +68,9 @@ PossibleMove CPUPlayer::getRandomMove(const std::vector<PossibleMove> &moves)
 
 PossibleMove CPUPlayer::getEasyMove(const std::vector<PossibleMove> &moves)
 {
+	if (moves.empty())
+		return {};
+
 	// Easy: Basic move evaluation
 	std::vector<MoveCandidate> evaluatedMoves;
 
@@ -82,6 +88,9 @@ PossibleMove CPUPlayer::getEasyMove(const std::vector<PossibleMove> &moves)
 
 PossibleMove CPUPlayer::getMediumMove(const std::vector<PossibleMove> &moves)
 {
+	if (moves.empty())
+		return {};
+
 	// Medium: Enhanced evaluation with  positional awareness
 	std::vector<MoveCandidate> evaluatedMoves;
 
@@ -99,6 +108,9 @@ PossibleMove CPUPlayer::getMediumMove(const std::vector<PossibleMove> &moves)
 
 PossibleMove CPUPlayer::getHardMove(const std::vector<PossibleMove> &moves)
 {
+	if (moves.empty())
+		return {};
+
 	// Hard: Advanced evaluation with deeper analysis
 	std::vector<MoveCandidate> evaluatedMoves;
 
