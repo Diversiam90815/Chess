@@ -352,7 +352,7 @@ int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta,
 {
 	mNodesSearched++;
 
-	// Check transpositon table first
+	// Check transposition table first
 	uint64_t	 hashKey = board.getHashKey();
 	int			 storedScore{0};
 	PossibleMove storedMove{};
