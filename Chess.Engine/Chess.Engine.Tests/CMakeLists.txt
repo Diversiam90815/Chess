@@ -24,6 +24,8 @@ set(PlayerTest_Dir          source/PlayerTests)
 
 set(MoveTest_Files
     ${MoveTest_Dir}/MoveTests.cpp
+    ${MoveTest_Dir}/PossibleMoveTests.cpp
+    ${MoveTest_Dir}/PositionTests.cpp
     ${MoveTest_Dir}/MoveGenerationTests.cpp
     ${MoveTest_Dir}/MoveValidationTests.cpp
     ${MoveTest_Dir}/MoveExecutionTests.cpp
