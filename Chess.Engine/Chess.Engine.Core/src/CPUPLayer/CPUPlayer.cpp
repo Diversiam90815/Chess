@@ -245,7 +245,68 @@ void CPUPlayer::simulateThinking()
 
 int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, PlayerColor player)
 {
-	return 0;
+	mNodesSearched++;
+
+	// Terminal depth reached -> evaluate static position
+	if (depth == 0)
+		return evaluatePlayerPosition(board, player);
+
+	// Generate legal moves for player
+	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
+
+	// Terminal position check (checkmate/stalemate)
+	if (moves.empty())
+	{
+		if (board.isInCheck(board.getCurrentPlayer()))
+		{
+			// Checkmate -> return large signed value based on perspective (prefer quicker mates by adding depth to score
+			return maximizing ? (-10000 + depth) : (10000 - depth);
+		}
+		else
+		{
+			// Stalemate
+			return 0;
+		}
+	}
+
+	if (maximizing)
+	{
+		int maxEval = -std::numeric_limits<int>::max();
+
+		for (const auto &move : moves)
+		{
+			// make move
+			auto undoInfo = board.makeMove(move);
+
+			// recursively evaluate (switch to minimizing player)
+			int	 eval	  = minimax(board, depth - 1, false, player);
+			maxEval		  = std::max(maxEval, eval);
+
+			// Unmake move
+			board.unmakeMove(undoInfo);
+		}
+
+		return maxEval;
+	}
+	else
+	{
+		int minEval = std::numeric_limits<int>::max();
+
+		for (const auto &move : moves)
+		{
+			// make move
+			auto undoInfo = board.makeMove(move);
+
+			// recursively evaluate (switch to maximizing player)
+			int	 eval	  = minimax(board, depth - 1, true, player);
+			minEval		  = std::min(minEval, eval);
+
+			// unmake move
+			board.unmakeMove(undoInfo);
+		}
+
+		return minEval;
+	}
 }
 
 
