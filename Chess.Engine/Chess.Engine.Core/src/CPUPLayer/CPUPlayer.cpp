@@ -116,7 +116,45 @@ PossibleMove CPUPlayer::getHardMove(const std::vector<PossibleMove> &moves)
 
 PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth)
 {
-	return PossibleMove();
+	if (moves.empty())
+		return {};
+
+	// Reset search statistics
+	mNodesSearched	   = 0;
+	mTranspositionHits = 0;
+
+	// Create lightweight board from current board data
+	LightChessBoard lightBoard(*mBoard);
+
+	PossibleMove	bestMove  = moves[0];
+	int				bestScore = -std::numeric_limits<int>::max();
+
+	LOG_INFO("Starting minimax search with depth {}", depth);
+
+	for (const auto &move : moves)
+	{
+		// make the move
+		auto undoInfo = lightBoard.makeMove(move);
+
+		// Evaluate using minimax (opp's turn -> minimizing)
+		int	 score	  = minimax(lightBoard, depth - 1, false, mConfig.cpuColor);
+
+		// unmake move
+		lightBoard.unmakeMove(undoInfo);
+
+		// update best move if this is better
+		if (score > bestScore)
+		{
+			bestScore = score;
+			bestMove  = move;
+		}
+
+		LOG_DEBUG("Move from {} to {} scored: {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
+	}
+
+	LOG_INFO("Minimax search completed. Best score: {}, Nodes searched: {}", bestScore, mNodesSearched);
+	
+	return bestMove;
 }
 
 
@@ -310,10 +348,7 @@ int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, Playe
 }
 
 
-int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player)
-{
-	return 0;
-}
+int			 CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player) {}
 
 
 PossibleMove CPUPlayer::selectBestMove(std::vector<MoveCandidate> &moves)
