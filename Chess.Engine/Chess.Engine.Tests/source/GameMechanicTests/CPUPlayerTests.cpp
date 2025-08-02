@@ -49,16 +49,22 @@ TEST_F(CPUPlayerTests, ConstructorInitializeCorrectly)
 	EXPECT_EQ(config.cpuColor, PlayerColor::Black) << "Default CPU color should be Black";
 	EXPECT_FALSE(config.enabled) << "CPU should be disabled by default";
 	EXPECT_EQ(config.thinkingTime.count(), 1000) << "Default thinking time should be 1000ms";
+	EXPECT_TRUE(config.enableRandomization) << "Randomization should be enabled by default";
+	EXPECT_FLOAT_EQ(config.randomizationFactor, 0.1f) << "Default randomization factor should be 0.1";
+	EXPECT_EQ(config.candidateMoveCount, 5) << "Default candidate move count should be 5";
 }
 
 
 TEST_F(CPUPlayerTests, SetCPUConfigurationUpdatesCorrectly)
 {
 	CPUConfiguration config;
-	config.cpuColor		= PlayerColor::White;
-	config.difficulty	= CPUDifficulty::Hard;
-	config.enabled		= true;
-	config.thinkingTime = std::chrono::milliseconds(2000);
+	config.cpuColor			   = PlayerColor::White;
+	config.difficulty		   = CPUDifficulty::Hard;
+	config.enabled			   = true;
+	config.thinkingTime		   = std::chrono::milliseconds(2000);
+	config.enableRandomization = false;
+	config.randomizationFactor = 0.3f;
+	config.candidateMoveCount  = 10;
 
 	mCPUPlayer->setCPUConfiguration(config);
 	CPUConfiguration retrievedConfig = mCPUPlayer->getCPUConfiguration();
@@ -67,6 +73,9 @@ TEST_F(CPUPlayerTests, SetCPUConfigurationUpdatesCorrectly)
 	EXPECT_EQ(retrievedConfig.cpuColor, PlayerColor::White) << "CPU color should be updated to White";
 	EXPECT_TRUE(retrievedConfig.enabled) << "CPU should be enabled";
 	EXPECT_EQ(retrievedConfig.thinkingTime.count(), 2000) << "Thinking time should be updated to 2000ms";
+	EXPECT_FALSE(retrievedConfig.enableRandomization) << "Randomization should be disabled";
+	EXPECT_FLOAT_EQ(retrievedConfig.randomizationFactor, 0.3f) << "Randomization factor should be updated to 0.3";
+	EXPECT_EQ(retrievedConfig.candidateMoveCount, 10) << "Candidate move count should be updated to 10";
 }
 
 
@@ -192,6 +201,49 @@ TEST_F(CPUPlayerTests, GetEasyMovePrefersCheckmate)
 }
 
 
+
+TEST_F(CPUPlayerTests, GetMiniMaxMoveReturnsValidMove)
+{
+	std::vector<PossibleMove> moves;
+
+	// Create some test moves
+	PossibleMove			  move1{{4, 6}, {4, 4}, MoveType::Normal}; // e2-e4
+	PossibleMove			  move2{{3, 6}, {3, 4}, MoveType::Normal}; // d2-d4
+	PossibleMove			  move3{{6, 7}, {5, 5}, MoveType::Normal}; // g1-f3
+
+	moves.push_back(move1);
+	moves.push_back(move2);
+	moves.push_back(move3);
+
+	PossibleMove selectedMove = mCPUPlayer->getMiniMaxMove(moves, 2);
+
+	// MiniMax should select a valid move from the provided options
+	bool		 isValidMove  = (selectedMove == move1) || (selectedMove == move2) || (selectedMove == move3);
+	EXPECT_TRUE(isValidMove) << "MiniMax move should be one of the provided moves";
+}
+
+
+TEST_F(CPUPlayerTests, GetAlphaBetaMoveReturnsValidMove)
+{
+	std::vector<PossibleMove> moves;
+
+	// Create some test moves
+	PossibleMove			  move1{{4, 6}, {4, 4}, MoveType::Normal}; // e2-e4
+	PossibleMove			  move2{{3, 6}, {3, 4}, MoveType::Normal}; // d2-d4
+	PossibleMove			  move3{{6, 7}, {5, 5}, MoveType::Normal}; // g1-f3
+
+	moves.push_back(move1);
+	moves.push_back(move2);
+	moves.push_back(move3);
+
+	PossibleMove selectedMove = mCPUPlayer->getAlphaBetaMove(moves, 2);
+
+	// Alpha-Beta should select a valid move from the provided options
+	bool		 isValidMove  = (selectedMove == move1) || (selectedMove == move2) || (selectedMove == move3);
+	EXPECT_TRUE(isValidMove) << "Alpha-Beta move should be one of the provided moves";
+}
+
+
 TEST_F(CPUPlayerTests, RequestMoveAsyncDoesNothingForNonCPUPlayer)
 {
 	CPUConfiguration config;
@@ -206,5 +258,30 @@ TEST_F(CPUPlayerTests, RequestMoveAsyncDoesNothingForNonCPUPlayer)
 	// If we reach this point without hanging, the test passes
 	SUCCEED() << "requestMoveAsync should handle non-CPU player gracefully";
 }
+
+
+TEST_F(CPUPlayerTests, EmptyMoveListHandling)
+{
+	std::vector<PossibleMove> emptyMoves;
+
+	// Test that CPU handles empty move lists gracefully
+	PossibleMove			  randomMove	= mCPUPlayer->getRandomMove(emptyMoves);
+	PossibleMove			  easyMove		= mCPUPlayer->getEasyMove(emptyMoves);
+	PossibleMove			  mediumMove	= mCPUPlayer->getMediumMove(emptyMoves);
+	PossibleMove			  hardMove		= mCPUPlayer->getHardMove(emptyMoves);
+
+	PossibleMove			  alphaBetaMove = mCPUPlayer->getAlphaBetaMove(emptyMoves, 2);
+	PossibleMove			  minimaxMove	= mCPUPlayer->getMiniMaxMove(emptyMoves, 2);
+
+
+	// Empty moves should result in empty/default moves
+	EXPECT_TRUE(randomMove.isEmpty()) << "Random move should be empty for empty input";
+	EXPECT_TRUE(easyMove.isEmpty()) << "Easy move should be empty for empty input";
+	EXPECT_TRUE(mediumMove.isEmpty()) << "Medium move should be empty for empty input";
+	EXPECT_TRUE(hardMove.isEmpty()) << "Hard move should be empty for empty input";
+	EXPECT_TRUE(alphaBetaMove.isEmpty()) << "Alpha-Beta move should be empty for empty input";
+	EXPECT_TRUE(minimaxMove.isEmpty()) << "Minimax move should be empty for empty input";
+}
+
 
 } // namespace GameMechanicTests
