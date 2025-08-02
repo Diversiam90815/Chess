@@ -168,17 +168,12 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 	mTranspositionHits = 0;
 
 	// create lightweight board from current board
-	LightChessBoard lightBoard(*mBoard);
+	LightChessBoard			  lightBoard(*mBoard);
 
-	PossibleMove	bestMove  = moves[0];
-	int				bestScore = -std::numeric_limits<int>::max();
-	int				alpha	  = -std::numeric_limits<int>::max();
-	int				beta	  = std::numeric_limits<int>::max();
-
-	LOG_INFO("Starting alpha-beta search with depth {}", depth);
+	std::vector<PossibleMove> sortedMoves = moves;
 
 	// Sort moves for better pruning
-	std::sort(moves.begin(), moves.end(),
+	std::sort(sortedMoves.begin(), sortedMoves.end(),
 			  [&](const PossibleMove &a, const PossibleMove &b)
 			  {
 				  int scoreA = 0, scoreB = 0;
@@ -198,7 +193,14 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 				  return scoreA > scoreB;
 			  });
 
-	for (const auto &move : moves)
+	PossibleMove bestMove  = sortedMoves[0];
+	int			 bestScore = -std::numeric_limits<int>::max();
+	int			 alpha	   = -std::numeric_limits<int>::max();
+	int			 beta	   = std::numeric_limits<int>::max();
+
+	LOG_INFO("Starting alpha-beta search with depth {}", depth);
+
+	for (const auto &move : sortedMoves)
 	{
 		// make move
 		auto undoInfo = lightBoard.makeMove(move);
@@ -230,6 +232,8 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 
 int CPUPlayer::evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player)
 {
+	// TODO:	Utilize MoveEvaluation with LightChessBoard for better evaluation and improving the algorithms
+
 	int			score	 = 0;
 	PlayerColor opponent = (player == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
 
