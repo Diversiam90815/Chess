@@ -153,7 +153,7 @@ PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, i
 	}
 
 	LOG_INFO("Minimax search completed. Best score: {}, Nodes searched: {}", bestScore, mNodesSearched);
-	
+
 	return bestMove;
 }
 
@@ -348,7 +348,153 @@ int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, Playe
 }
 
 
-int			 CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player) {}
+int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player)
+{
+	mNodesSearched++;
+
+	// Check transpositon table first
+	uint64_t	 hashKey = board.getHashKey();
+	int			 storedScore{0};
+	PossibleMove storedMove{};
+
+	if (lookupTransposition(hashKey, depth, storedScore, storedMove))
+	{
+		mTranspositionHits++;
+		return storedScore;
+	}
+
+	// Terminal depth reached -> evaluate static positon
+	if (depth == 0)
+	{
+		int score = evaluatePlayerPosition(board, player);
+		storeTransposition(hashKey, depth, score, TranspositionEntry::NodeType::Exact, PossibleMove{});
+		return score;
+	}
+
+	// Generate legal mvoes for current player
+	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
+
+	// Terminal positon check (checkmate/stalemate)
+	if (moves.empty())
+	{
+		int score{0};
+		if (board.isInCheck(board.getCurrentPlayer()))
+		{
+			// checkmate -> return large signed value based on perspective (prefer quicker mates by adding depth to score
+			score = maximizing ? (-10000 + depth) : (10000 - depth);
+		}
+		else
+		{
+			// stalemate
+			score = 0;
+		}
+
+		storeTransposition(hashKey, depth, score, TranspositionEntry::NodeType::Exact, PossibleMove{});
+		return score;
+	}
+
+	// Move ordering : try best move from transposition table first if available
+	if (!storedMove.isEmpty())
+	{
+		// find stored move in our moves list and put it first
+		auto it = std::find_if(moves.begin(), moves.end(), [&storedMove](const PossibleMove &move) { return move == storedMove; });
+
+		if (it != moves.end())
+			std::swap(*moves.begin(), *it);
+	}
+
+	PossibleMove				 bestMove{};
+	TranspositionEntry::NodeType nodeType = TranspositionEntry::NodeType::Alpha;
+
+	if (maximizing)
+	{
+		int maxEval = -std::numeric_limits<int>::max();
+
+		for (const auto &move : moves)
+		{
+			// make move
+			auto undoInfo = board.makeMove(move);
+
+			// recursively evaluate (switch to minimizing player)
+			int	 eval	  = alphaBeta(board, depth - 1, alpha, beta, false, player);
+
+			// unmake move
+			board.unmakeMove(undoInfo);
+
+			if (eval > maxEval)
+			{
+				maxEval	 = eval;
+				bestMove = move;
+			}
+
+			alpha = std::max(alpha, eval);
+
+			// alpha beta prunning
+			if (beta <= alpha)
+			{
+				nodeType = TranspositionEntry::NodeType::Beta;
+				break; // Beta cutoff
+			}
+		}
+
+		// determine node type for transpotion table
+		if (maxEval >= beta)
+			nodeType = TranspositionEntry::NodeType::Beta;
+		else if (maxEval <= alpha)
+			nodeType = TranspositionEntry::NodeType::Alpha;
+		else
+			nodeType = TranspositionEntry::NodeType::Exact;
+
+		// store it in transposition table
+		storeTransposition(hashKey, depth, maxEval, nodeType, bestMove);
+
+		return maxEval;
+	}
+	else
+	{
+		int minEval = std::numeric_limits<int>::max();
+
+		for (const auto &move : moves)
+		{
+			// make move
+			auto undoInfo = board.makeMove(move);
+
+			// Recursively evaluate (switch to maximizing player)
+			int	 eval	  = alphaBeta(board, depth - 1, alpha, beta, true, player);
+
+			// unmake move
+			board.unmakeMove(undoInfo);
+
+			if (eval < minEval)
+			{
+				minEval	 = eval;
+				bestMove = move;
+			}
+
+			beta = std::min(beta, eval);
+
+			// alpha beta prunning
+			if (beta <= alpha)
+			{
+				nodeType = TranspositionEntry::NodeType::Alpha;
+				break; // alpha cutoff
+			}
+		}
+
+		// Determine node type for transposition table
+		if (minEval <= alpha)
+			nodeType = TranspositionEntry::NodeType::Alpha;
+		else if (minEval >= beta)
+			nodeType = TranspositionEntry::NodeType::Beta;
+		else
+			nodeType = TranspositionEntry::NodeType::Exact;
+
+		// store transposition table
+		storeTransposition(hashKey, depth, minEval, nodeType, bestMove);
+
+		return minEval;
+	}
+}
 
 
 PossibleMove CPUPlayer::selectBestMove(std::vector<MoveCandidate> &moves)
