@@ -21,7 +21,8 @@
 
 #define CHESSBOARD_DEBUG false
 
-using PlayerPiece = std::pair<Position, std::shared_ptr<ChessPiece>>;
+using PlayerPiece	  = std::pair<Position, std::shared_ptr<ChessPiece>>;
+using BoardStateArray = int[BOARD_SIZE][BOARD_SIZE];
 
 
 struct Square
@@ -42,27 +43,26 @@ public:
 	ChessBoard(const ChessBoard &other);
 	~ChessBoard();
 
-	void							initializeBoard();
+	void						 initializeBoard();
 
-	Square						   &getSquare(Position pos);
+	Square						&getSquare(Position pos);
 
-	void							setPiece(Position pos, std::shared_ptr<ChessPiece> piece);
+	void						 setPiece(Position pos, std::shared_ptr<ChessPiece> piece);
+	std::shared_ptr<ChessPiece> &getPiece(Position pos);
 
-	std::vector<PlayerPiece>		getPiecesFromPlayer(PlayerColor playerColor);
+	std::vector<PlayerPiece>	 getPiecesFromPlayer(PlayerColor playerColor);
 
-	std::shared_ptr<ChessPiece>	   &getPiece(Position pos);
+	bool						 movePiece(Position start, Position end);
+	void						 removePiece(Position pos);
 
-	void							removePiece(Position pos);
+	bool						 isEmpty(Position pos) const;
 
-	bool							movePiece(Position start, Position end);
+	void						 updateKingsPosition(Position &pos, PlayerColor player);
+	Position					 getKingsPosition(PlayerColor player) const;
 
-	bool							isEmpty(Position pos) const;
+	void						 removeAllPiecesFromBoard();
 
-	void							updateKingsPosition(Position &pos, PlayerColor player);
-
-	Position						getKingsPosition(PlayerColor player) const;
-
-	void							removeAllPiecesFromBoard();
+	bool						 getBoardState(BoardStateArray boardState);
 
 private:
 	std::vector<std::vector<Square>> squares;

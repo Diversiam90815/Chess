@@ -148,6 +148,35 @@ void ChessBoard::removeAllPiecesFromBoard()
 }
 
 
+bool ChessBoard::getBoardState(BoardStateArray boardState)
+{
+	for (int y = 0; y < BOARD_SIZE; ++y)
+	{
+		for (int x = 0; x < BOARD_SIZE; ++x)
+		{
+			Position pos	  = {x, y};
+			auto	&piece	  = getPiece(pos);
+
+			int		 colorVal = 0; // 0 = no color
+			int		 typeVal  = 0; // 0 = PieceType::DefaultType
+
+			if (piece)
+			{
+				colorVal = static_cast<int>(piece->getColor()) & 0xF;
+				typeVal	 = static_cast<int>(piece->getType()) & 0xF;
+			}
+
+			// Pack color in high nibble, type in low nibble:
+			// bits [4..7] = color, bits [0..3] = piece type
+			int encoded		 = (colorVal << 4) | (typeVal & 0xF);
+
+			boardState[y][x] = encoded;
+		}
+	}
+	return true;
+}
+
+
 void ChessBoard::initializeBoard()
 {
 	if (!mInitialized)

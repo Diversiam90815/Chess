@@ -38,7 +38,7 @@ public:
 
 	std::vector<PossibleMove>  getPossibleMoveForPosition();
 
-	bool					   getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE]);
+	bool					   getBoardState(BoardStateArray boardState);
 
 	bool					   checkForValidMoves(const PossibleMove &move);
 	bool					   checkForPawnPromotionMove(const PossibleMove &move);
