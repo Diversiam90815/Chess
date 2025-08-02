@@ -10,7 +10,7 @@
 #include "ChessBoard.h"
 
 
-namespace GameMechanicTests
+namespace BoardTests
 {
 
 
@@ -329,4 +329,180 @@ TEST_F(ChessBoardTest, GetPieceAtPosition)
 	EXPECT_EQ(piece3, nullptr) << "Should get nullptr for out-of-bounds position";
 }
 
-} // namespace GameMechanicTests
+
+TEST_F(ChessBoardTest, GetBoardStateInitialPosition)
+{
+	// Test getBoardState with initial board setup
+	BoardStateArray boardState;
+	bool			result = mBoard.getBoardState(boardState);
+
+	EXPECT_TRUE(result) << "getBoardState should return true for successful operation";
+
+	// Test some key positions for initial board setup
+
+	// White pieces (bottom of board)
+	int whiteRookEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Rook);
+	EXPECT_EQ(boardState[7][0], whiteRookEncoded) << "a1 should contain white rook";
+	EXPECT_EQ(boardState[7][7], whiteRookEncoded) << "h1 should contain white rook";
+
+	int whiteKnightEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Knight);
+	EXPECT_EQ(boardState[7][1], whiteKnightEncoded) << "b1 should contain white knight";
+	EXPECT_EQ(boardState[7][6], whiteKnightEncoded) << "g1 should contain white knight";
+
+	int whiteBishopEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Bishop);
+	EXPECT_EQ(boardState[7][2], whiteBishopEncoded) << "c1 should contain white bishop";
+	EXPECT_EQ(boardState[7][5], whiteBishopEncoded) << "f1 should contain white bishop";
+
+	int whiteQueenEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Queen);
+	EXPECT_EQ(boardState[7][3], whiteQueenEncoded) << "d1 should contain white queen";
+
+	int whiteKingEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::King);
+	EXPECT_EQ(boardState[7][4], whiteKingEncoded) << "e1 should contain white king";
+
+	// White pawns
+	int whitePawnEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Pawn);
+	for (int x = 0; x < 8; x++)
+	{
+		EXPECT_EQ(boardState[6][x], whitePawnEncoded) << "White pawn should be at rank 2 (array index 6), file " << x;
+	}
+
+	// Black pieces (top of board)
+	int blackRookEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Rook);
+	EXPECT_EQ(boardState[0][0], blackRookEncoded) << "a8 should contain black rook";
+	EXPECT_EQ(boardState[0][7], blackRookEncoded) << "h8 should contain black rook";
+
+	int blackKnightEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Knight);
+	EXPECT_EQ(boardState[0][1], blackKnightEncoded) << "b8 should contain black knight";
+	EXPECT_EQ(boardState[0][6], blackKnightEncoded) << "g8 should contain black knight";
+
+	int blackBishopEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Bishop);
+	EXPECT_EQ(boardState[0][2], blackBishopEncoded) << "c8 should contain black bishop";
+	EXPECT_EQ(boardState[0][5], blackBishopEncoded) << "f8 should contain black bishop";
+
+	int blackQueenEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Queen);
+	EXPECT_EQ(boardState[0][3], blackQueenEncoded) << "d8 should contain black queen";
+
+	int blackKingEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::King);
+	EXPECT_EQ(boardState[0][4], blackKingEncoded) << "e8 should contain black king";
+
+	// Black pawns
+	int blackPawnEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Pawn);
+	for (int x = 0; x < 8; x++)
+	{
+		EXPECT_EQ(boardState[1][x], blackPawnEncoded) << "Black pawn should be at rank 7 (array index 1), file " << x;
+	}
+
+	// Empty squares in the middle
+	for (int y = 2; y < 6; y++)
+	{
+		for (int x = 0; x < 8; x++)
+		{
+			EXPECT_EQ(boardState[y][x], 0) << "Middle squares should be empty at (" << x << "," << y << ")";
+		}
+	}
+}
+
+
+TEST_F(ChessBoardTest, GetBoardStateEmptyBoard)
+{
+	// Remove all pieces and test getBoardState
+	mBoard.removeAllPiecesFromBoard();
+
+	BoardStateArray boardState;
+	bool			result = mBoard.getBoardState(boardState);
+
+	EXPECT_TRUE(result) << "getBoardState should return true for empty board";
+
+	// All squares should be empty (value 0)
+	for (int y = 0; y < 8; y++)
+	{
+		for (int x = 0; x < 8; x++)
+		{
+			EXPECT_EQ(boardState[y][x], 0) << "Empty board square should be 0 at (" << x << "," << y << ")";
+		}
+	}
+}
+
+
+TEST_F(ChessBoardTest, GetBoardStateAfterMoves)
+{
+	// Make some moves and verify the board state
+	Position pawnStart = {4, 6}; // e2
+	Position pawnEnd   = {4, 4}; // e4
+	mBoard.movePiece(pawnStart, pawnEnd);
+
+	BoardStateArray boardState;
+	bool			result = mBoard.getBoardState(boardState);
+
+	EXPECT_TRUE(result) << "getBoardState should return true after moves";
+
+	// Original position should be empty
+	EXPECT_EQ(boardState[6][4], 0) << "e2 should be empty after pawn move";
+
+	// New position should contain the pawn
+	int whitePawnEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Pawn);
+	EXPECT_EQ(boardState[4][4], whitePawnEncoded) << "e4 should contain white pawn after move";
+}
+
+
+TEST_F(ChessBoardTest, GetBoardStateAfterPieceRemoval)
+{
+	// Remove a specific piece and verify the board state
+	Position rookPos = {0, 0}; // a8
+	mBoard.removePiece(rookPos);
+
+	BoardStateArray boardState;
+	bool			result = mBoard.getBoardState(boardState);
+
+	EXPECT_TRUE(result) << "getBoardState should return true after piece removal";
+
+	// Removed position should be empty
+	EXPECT_EQ(boardState[0][0], 0) << "a8 should be empty after rook removal";
+
+	// Other pieces should remain unchanged
+	int blackKnightEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Knight);
+	EXPECT_EQ(boardState[0][1], blackKnightEncoded) << "b8 should still contain black knight";
+}
+
+
+TEST_F(ChessBoardTest, GetBoardStateAfterPieceAddition)
+{
+	// Add a piece to an empty square and verify the board state
+	Position emptyPos = {4, 4}; // e4
+	auto	 piece	  = ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White);
+	mBoard.setPiece(emptyPos, piece);
+
+	BoardStateArray boardState;
+	bool			result = mBoard.getBoardState(boardState);
+
+	EXPECT_TRUE(result) << "getBoardState should return true after piece addition";
+
+	// Added position should contain the piece
+	int whiteQueenEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Queen);
+	EXPECT_EQ(boardState[4][4], whiteQueenEncoded) << "e4 should contain white queen after addition";
+}
+
+
+TEST_F(ChessBoardTest, GetBoardStateEncoding)
+{
+	// Test the encoding format: color in high nibble, piece type in low nibble
+	mBoard.removeAllPiecesFromBoard();
+
+	// Add a specific piece and test its encoding
+	Position testPos = {3, 3}; // d4
+	auto	 piece	 = ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::Black);
+	mBoard.setPiece(testPos, piece);
+
+	BoardStateArray boardState;
+	mBoard.getBoardState(boardState);
+
+	int encoded	 = boardState[3][3];
+	int colorVal = (encoded >> 4) & 0xF;
+	int typeVal	 = encoded & 0xF;
+
+	EXPECT_EQ(colorVal, static_cast<int>(PlayerColor::Black)) << "Color should be correctly encoded in high nibble";
+	EXPECT_EQ(typeVal, static_cast<int>(PieceType::Bishop)) << "Piece type should be correctly encoded in low nibble";
+}
+
+
+} // namespace BoardTests
