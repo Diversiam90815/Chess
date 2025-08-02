@@ -160,7 +160,50 @@ PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, i
 
 PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth)
 {
-	return PossibleMove();
+	if (moves.empty())
+		return {};
+
+	// reset statistics
+	mNodesSearched	   = 0;
+	mTranspositionHits = 0;
+
+	// create lightweight board from current board
+	LightChessBoard lightBoard(*mBoard);
+
+	PossibleMove	bestMove  = moves[0];
+	int				bestScore = -std::numeric_limits<int>::max();
+	int				alpha	  = -std::numeric_limits<int>::max();
+	int				beta	  = std::numeric_limits<int>::max();
+
+	LOG_INFO("Starting alpha-beta search with depth {}", depth);
+
+	for (const auto &move : moves)
+	{
+		// make move
+		auto undoInfo = lightBoard.makeMove(move);
+
+		// evaluate using alpha-beta (opp's turn, so minimizing)
+		int	 score	  = alphaBeta(lightBoard, depth - 1, alpha, beta, true, mConfig.cpuColor);
+
+		// unmake move
+		lightBoard.unmakeMove(undoInfo);
+
+		// update best move if this is better
+		if (score > bestScore)
+		{
+			bestScore = score;
+			bestMove  = move;
+		}
+
+		// update alpha for pruning at root level
+		alpha = std::max(alpha, score);
+
+		LOG_DEBUG("Move from {} to {} scored: {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
+	}
+
+	LOG_INFO("Alpha-Beta search completed. Best score: {}, Nodes searched: {}, Transposition hits: {}", bestScore, mNodesSearched, mTranspositionHits);
+
+	return bestMove;
 }
 
 
@@ -193,7 +236,7 @@ int CPUPlayer::evaluatePlayerPosition(const LightChessBoard &board, PlayerColor 
 	}
 
 	// King safety evaluation
-	if (board.isEndgame())
+	if (!board.isEndgame())
 	{
 		if (board.isInCheck(player))
 			score -= 50;
@@ -210,8 +253,8 @@ int CPUPlayer::evaluatePlayerPosition(const LightChessBoard &board, PlayerColor 
 		int		 playerCentrality	= 4 - std::max(std::abs(playerKing.x - 3.5), std::abs(playerKing.y - 3.5));
 		int		 opponentCentrality = 4 - std::max(std::abs(opponentKing.x - 3.5), std::abs(opponentKing.y - 3.5));
 
-		score -= playerCentrality * 10;
-		score += opponentCentrality * 10;
+		score += playerCentrality * 10;
+		score -= opponentCentrality * 10;
 	}
 
 	// Mobility evaluation
