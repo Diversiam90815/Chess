@@ -97,7 +97,7 @@ void Player::updateScore()
 		auto obs = observer.lock();
 
 		if (obs)
-			obs->onScoreUpdate(mScore.player, mScore.value);
+			obs->onScoreUpdate(mScore.getPlayerColor(), mScore.getValue());
 	}
 
 	LOG_INFO("Updated Score for {} : {}", LoggingHelper::playerColourToString(mPlayerColor).c_str(), score);

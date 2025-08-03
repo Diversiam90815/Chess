@@ -57,6 +57,7 @@ set(GameMechanicTest_Files
 
 
 set(PlayerTest_Files
+    ${PlayerTest_Dir}/PlayerTests.cpp
     ${PlayerTest_Dir}/CPUPlayerTests.cpp
 )
 

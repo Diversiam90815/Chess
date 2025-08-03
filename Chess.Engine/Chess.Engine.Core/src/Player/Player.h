@@ -12,7 +12,6 @@
 #include "Parameters.h"
 #include "Logging.h"
 
-//#include "EngineAPIDefines.h"
 #include "IObservable.h"
 
 
@@ -20,10 +19,15 @@ struct Score
 {
 	Score(PlayerColor player, int value) : player(player), value(value) {};
 
-	PlayerColor player = PlayerColor::NoColor;
-	int			value  = 0;
+
+	int			getValue() const { return value; }
+	PlayerColor getPlayerColor() const { return player; }
 
 	bool		operator==(Score other) { return this->value == other.value && this->player == other.player; }
+
+private:
+	PlayerColor player = PlayerColor::NoColor;
+	int			value  = 0;
 };
 
 
@@ -53,13 +57,13 @@ public:
 	void		  setIsLocalPlayer(const bool isLocal) { mIsLocalPlayer = isLocal; }
 
 private:
-	PlayerColor									mPlayerColor = PlayerColor::NoColor;
+	PlayerColor			   mPlayerColor = PlayerColor::NoColor;
 
-	std::vector<PieceType>						mCapturedPieces;
+	std::vector<PieceType> mCapturedPieces;
 
-	bool										mIsCurrentTurn = false;
+	bool				   mIsCurrentTurn = false;
 
-	Score										mScore		   = Score(PlayerColor::NoColor, 0);
+	Score				   mScore		  = Score(PlayerColor::NoColor, 0);
 
-	bool										mIsLocalPlayer{true};	// Default to local player in single-player mode
+	bool				   mIsLocalPlayer{true}; // Default to local player in single-player mode
 };
