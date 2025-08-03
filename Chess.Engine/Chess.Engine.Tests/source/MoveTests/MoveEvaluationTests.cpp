@@ -617,8 +617,8 @@ TEST_F(MoveEvaluationTests, TacticalPatternsWithComplexPositions)
 	mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
 
 	// Test multiple different moves and their tactical implications
-	PossibleMove queenToKing	= CreateMove(whiteQueenPos, {6, 3}, MoveType::Normal);	// Attack king
-	PossibleMove queenToRook	= CreateMove(whiteQueenPos, {3, 6}, MoveType::Normal);	// Attack rook
+	PossibleMove queenToKing	= CreateMove(whiteQueenPos, {6, 3}, MoveType::Check);	// Attack king
+	PossibleMove queenToRook	= CreateMove(whiteQueenPos, {3, 6}, MoveType::Capture);	// Attack rook
 	PossibleMove knightJump		= CreateMove(whiteKnightPos, {2, 3}, MoveType::Normal); // Knight development
 
 	int			 queenKingScore = mEvaluation->getAdvancedEvaluation(queenToKing, PlayerColor::White);
