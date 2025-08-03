@@ -14,7 +14,8 @@
 #include "Validation/MoveValidation.h"
 #include "Execution/MoveExecution.h"
 
-namespace GameMechanicTests
+
+namespace PlayerTests
 {
 
 class CPUPlayerTests : public ::testing::Test
@@ -284,4 +285,4 @@ TEST_F(CPUPlayerTests, EmptyMoveListHandling)
 }
 
 
-} // namespace GameMechanicTests
+} // namespace PlayerTests
