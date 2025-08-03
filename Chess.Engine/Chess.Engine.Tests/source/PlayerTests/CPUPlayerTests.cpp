@@ -9,7 +9,7 @@
 #include <thread>
 #include <chrono>
 
-#include "CPUPLayer/CPUPlayer.h"
+#include "PLayer/CPUPlayer.h"
 #include "Generation/MoveGeneration.h"
 #include "Validation/MoveValidation.h"
 #include "Execution/MoveExecution.h"
