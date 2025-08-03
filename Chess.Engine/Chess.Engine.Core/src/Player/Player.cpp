@@ -9,7 +9,10 @@
 #include "Player.h"
 
 
-Player::Player(PlayerColor color) : mPlayerColor(color) {}
+Player::Player(PlayerColor color) : mPlayerColor(color)
+{
+	setScore(0);
+}
 
 
 Score Player::getScore() const
@@ -47,6 +50,7 @@ void Player::setPlayerColor(PlayerColor value)
 void Player::addCapturedPiece(const PieceType piece)
 {
 	mCapturedPieces.push_back(piece);
+	updateScore();
 
 	for (auto &observer : mObservers)
 	{
