@@ -112,7 +112,6 @@ public:
 	// Attack/defend queries
 	bool					  isSquareAttacked(Position pos, PlayerColor attacker) const;
 	bool					  isInCheck(PlayerColor player) const;
-	std::vector<Position>	  getAttackingSquares(Position target, PlayerColor attacker) const;
 
 	// Move generation and validation (integrated MoveHelper functionality)
 	bool					  canPieceMove(Position from, Position to, PieceType piece, PlayerColor player) const;

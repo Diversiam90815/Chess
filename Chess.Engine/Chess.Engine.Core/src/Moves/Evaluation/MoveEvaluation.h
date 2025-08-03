@@ -14,6 +14,7 @@
 #include "Move.h"
 #include "ChessBoard.h"
 #include "Generation/MoveGeneration.h"
+#include "LightChessBoard.h"
 
 
 enum class GamePhase
@@ -31,29 +32,29 @@ public:
 	~MoveEvaluation() = default;
 
 	int					 getBasicEvaluation(const PossibleMove &move);
-	int					 getMediumEvaluation(const PossibleMove &move, PlayerColor player);
-	int					 getAdvancedEvaluation(const PossibleMove &move, PlayerColor player);
+	int					 getMediumEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int					 getAdvancedEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
 	static constexpr int getPieceValue(PieceType piece);
 	int					 getPositionValue(PieceType piece, const Position &pos, PlayerColor player) const;
-	int					 evaluateMaterialGain(const PossibleMove &move);
-	int					 evaluatePositionalGain(const PossibleMove &move, PlayerColor player);
-	int					 evaluateThreatLevel(const PossibleMove &move, PlayerColor player);
-	int					 evaluateKingSafety(const PossibleMove &move, PlayerColor player);
-	int					 evaluateCenterControl(const PossibleMove &move, PlayerColor player);
-	int					 evaluatePawnStructure(const PossibleMove &move, PlayerColor player);
-	int					 evaluatePieceActivity(const PossibleMove &move, PlayerColor player);
-	int					 evaluateDefensivePatterns(const PossibleMove &move, PlayerColor player);
+	int					 evaluateMaterialGain(const PossibleMove &move, const LightChessBoard *lightBoard = nullptr);
+	int					 evaluatePositionalGain(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int					 evaluateThreatLevel(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int					 evaluateKingSafety(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int					 evaluateCenterControl(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int					 evaluatePawnStructure(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int					 evaluatePieceActivity(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int					 evaluateDefensivePatterns(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
-	bool				 createsPin(const PossibleMove &move, PlayerColor player);
-	bool				 createsFork(const PossibleMove &move, PlayerColor player);
-	bool				 createsSkewer(const PossibleMove &move, PlayerColor player);
-	bool				 blocksEnemyThreats(const PossibleMove &move, PlayerColor player);
+	bool				 createsPin(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	bool				 createsFork(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	bool				 createsSkewer(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	bool				 blocksEnemyThreats(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
-	int					 getStrategicEvaluation(const PossibleMove &move, PlayerColor player);
-	int					 getTacticalEvaluation(const PossibleMove &move, PlayerColor player);
+	int					 getStrategicEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int					 getTacticalEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
-	GamePhase			 determineGamePhase() const;
+	GamePhase			 determineGamePhase(const LightChessBoard *lightBoard = nullptr) const;
 
 
 private:
@@ -88,12 +89,15 @@ private:
 	bool				  isDoublePawn(const Position &pos, PlayerColor player) const;
 	bool				  isInCenter(const Position &pos) const;
 	bool				  isNearKing(const Position &pos, const Position &kingPos) const;
-	std::vector<Position> getAttackedSquares(const Position &piecePos, PlayerColor player) const;
-	bool				  wouldExposeKing(const PossibleMove &move, PlayerColor player) const;
-	int					  countAttackers(const Position &target, PlayerColor attackerPlayer) const;
+	std::vector<Position> getAttackedSquares(const Position &piecePos, PlayerColor player, const LightChessBoard *board = nullptr) const;
+	bool				  wouldExposeKing(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr) const;
+	int					  countAttackers(const Position &target, PlayerColor attackerPlayer, const LightChessBoard *lightBoard = nullptr) const;
 	PlayerColor			  getOpponentColor(PlayerColor player) const;
 
 	bool				  areCollinear(const Position &pos1, const Position &pos2, PieceType pieceType);
+
+	PieceType			  getPieceTypeFromPosition(const Position &pos, const LightChessBoard *lightBoard = nullptr) const;
+	PlayerColor			  getPieceColorFromPosition(const Position &pos, const LightChessBoard *lightBoard = nullptr) const;
 
 
 	std::shared_ptr<ChessBoard>						   mBoard;

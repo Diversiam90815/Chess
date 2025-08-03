@@ -508,12 +508,6 @@ bool LightChessBoard::isInCheck(PlayerColor player) const
 }
 
 
-std::vector<Position> LightChessBoard::getAttackingSquares(Position target, PlayerColor attacker) const
-{
-	return std::vector<Position>();
-}
-
-
 bool LightChessBoard::canPieceMove(Position from, Position to, PieceType piece, PlayerColor player) const
 {
 	if (!isValidPosition(from) || !isValidPosition(to) || from == to)
@@ -710,11 +704,11 @@ int LightChessBoard::getGamePhaseValue() const
 	const int ENDGAME_MATERIAL	= 2500;
 
 	if (totalMaterial >= STARTING_MATERIAL)
-		return 0; // Opening
+		return 1; // Opening
 	else if (totalMaterial <= ENDGAME_MATERIAL)
-		return 2; // Endgame
+		return 3; // Endgame
 	else
-		return 1; // Middlegame
+		return 2; // Middlegame
 }
 
 

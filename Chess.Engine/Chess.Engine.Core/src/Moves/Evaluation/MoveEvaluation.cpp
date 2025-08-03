@@ -46,28 +46,28 @@ int MoveEvaluation::getBasicEvaluation(const PossibleMove &move)
 }
 
 
-int MoveEvaluation::getMediumEvaluation(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::getMediumEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	int score = getBasicEvaluation(move);
 
-	score += evaluateMaterialGain(move);		   // Material evaluation
-	score += evaluatePositionalGain(move, player); // Positional evaluation
-	score += evaluateCenterControl(move, player);  // Center COntrol
-	score += evaluateKingSafety(move, player);	   // King Safety
-	score += evaluatePieceActivity(move, player);  // Piece activity
+	score += evaluateMaterialGain(move, lightBoard);		   // Material evaluation
+	score += evaluatePositionalGain(move, player, lightBoard); // Positional evaluation
+	score += evaluateCenterControl(move, player, lightBoard);  // Center COntrol
+	score += evaluateKingSafety(move, player, lightBoard);	   // King Safety
+	score += evaluatePieceActivity(move, player, lightBoard);  // Piece activity
 
 	return score;
 }
 
 
-int MoveEvaluation::getAdvancedEvaluation(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::getAdvancedEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
-	int score = getMediumEvaluation(move, player);
+	int score = getMediumEvaluation(move, player, lightBoard);
 
-	score += getTacticalEvaluation(move, player);	  // Advanced technical evaluation
-	score += getStrategicEvaluation(move, player);	  // Advanced strategic evaluation
-	score += evaluateThreatLevel(move, player);		  // Threat analysis
-	score += evaluateDefensivePatterns(move, player); // Defensive patterns
+	score += getTacticalEvaluation(move, player);				  // Advanced technical evaluation
+	score += getStrategicEvaluation(move, player);				  // Advanced strategic evaluation
+	score += evaluateThreatLevel(move, player, lightBoard);		  // Threat analysis
+	score += evaluateDefensivePatterns(move, player, lightBoard); // Defensive patterns
 
 	return score;
 }
@@ -101,92 +101,79 @@ int MoveEvaluation::getPositionValue(PieceType piece, const Position &pos, Playe
 }
 
 
-int MoveEvaluation::evaluateMaterialGain(const PossibleMove &move)
+int MoveEvaluation::evaluateMaterialGain(const PossibleMove &move, const LightChessBoard *lightBoard)
 {
 	if ((move.type & MoveType::Capture) != MoveType::Capture)
 		return 0;
 
-	auto &capturedPiece = mBoard->getPiece(move.end);
+	PieceType capturedPieceType = getPieceTypeFromPosition(move.end, lightBoard);
+	PieceType movingPieceType	= getPieceTypeFromPosition(move.start, lightBoard);
 
-	if (!capturedPiece)
-		return 0;
+	int		  capturedValue		= getPieceValue(capturedPieceType);
+	int		  movingValue		= getPieceValue(movingPieceType);
 
-	int	  capturedValue = getPieceValue(capturedPiece->getType());
-
-	// Consider exchanging pieces -> evaluate the trade
-	auto &movingPiece	= mBoard->getPiece(move.start);
-	if (movingPiece)
-	{
-		int movingValue = getPieceValue(movingPiece->getType());
-
-		// Bonus for good exchanges
-		return capturedValue + (::std::max)(0, (capturedValue - movingValue));
-	}
-
-	return capturedValue;
+	return capturedValue + (::std::max)(0, (capturedValue - movingValue));
 }
 
 
-int MoveEvaluation::evaluatePositionalGain(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::evaluatePositionalGain(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
-	int	  positionalScore = 0;
-
-	auto &movingPiece	  = mBoard->getPiece(move.start);
-
-	if (!movingPiece)
-		return 0;
-
-	PieceType piece = movingPiece->getType();
+	int		  positionalScore = 0;
+	PieceType pieceType		  = getPieceTypeFromPosition(move.start);
 
 	// Add positional value for destination
-	positionalScore += getPositionValue(piece, move.end, player);
+	positionalScore += getPositionValue(pieceType, move.end, player);
 
 	// Subtract position value for leaving current square
-	positionalScore -= getPositionValue(piece, move.start, player);
+	positionalScore -= getPositionValue(pieceType, move.start, player);
 
 	return positionalScore;
 }
 
 
-int MoveEvaluation::evaluateThreatLevel(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::evaluateThreatLevel(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	int			score			= 0;
 
 	// Check if this move creates threat to the opponent pieces
-	auto		attackedSquares = getAttackedSquares(move.end, player);
+	auto		attackedSquares = getAttackedSquares(move.end, player, lightBoard);
 	PlayerColor opponent		= getOpponentColor(player);
 
 	for (const auto &square : attackedSquares)
 	{
-		auto &piece = mBoard->getPiece(square);
+		PlayerColor pieceColor = PlayerColor::NoColor;
+		PieceType	pieceType  = PieceType::DefaultType;
 
-		if (!piece || piece->getColor() != opponent)
+		pieceType			   = getPieceTypeFromPosition(square, lightBoard);
+		pieceColor			   = getPieceColorFromPosition(square, lightBoard);
+
+		if (pieceType != PieceType::DefaultType || pieceColor != opponent)
 			continue;
 
 		// Threatening valuable pieces gives more points
-		int pieceValue = getPieceValue(piece->getType());
+		int pieceValue = getPieceValue(pieceType);
 		score += pieceValue / 10; // Threat is worth 1/10th of piece value
 	}
 
 	// Check if this moves blocks opponnent threats
-	if (blocksEnemyThreats(move, player))
+	if (blocksEnemyThreats(move, player, lightBoard))
 		score += THREAT_BLOCK_BONUS;
 
 	return score;
 }
 
 
-int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	int score = 0;
 
 	if (determineGamePhase() != GamePhase::EndGame)
 	{
-		Position kingPos		 = mBoard->getKingsPosition(player);
-		Position opponentKingPos = mBoard->getKingsPosition(getOpponentColor(player));
+		Position kingPos		 = lightBoard ? lightBoard->getKingPosition(player) : mBoard->getKingsPosition(player);
+		Position opponentKingPos = lightBoard ? lightBoard->getKingPosition(getOpponentColor(player)) : mBoard->getKingsPosition(getOpponentColor(player));
 
 		// Penalize moves that expose our king
-		if (wouldExposeKing(move, player))
+		if (wouldExposeKing(move, player, lightBoard))
 			score -= 100;
 
 		// Reward moves that attack near the opponnents king
@@ -196,7 +183,7 @@ int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor pla
 		// Reward defensive moves near our king when under threat
 		if (isNearKing(move.end, kingPos))
 		{
-			int attackerCount = countAttackers(kingPos, getOpponentColor(player));
+			int attackerCount = countAttackers(kingPos, getOpponentColor(player), lightBoard);
 			if (attackerCount > 0)
 				score += 25;
 		}
@@ -206,28 +193,29 @@ int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor pla
 	else
 	{
 		// In endgame, reward king activity and centralization
-		auto &movingPiece = mBoard->getPiece(move.start);
-		if (movingPiece && movingPiece->getType() == PieceType::King)
+		PieceType pieceType = getPieceTypeFromPosition(move.start);
+
+		if (pieceType != PieceType::King)
+			return 0;
+
+		// Reward king moving towards center in endgame
+		int centerDistance	= abs(move.end.x - 3.5) + abs(move.end.y - 3.5);
+		int currentDistance = abs(move.start.x - 3.5) + abs(move.start.y - 3.5);
+
+		if (centerDistance < currentDistance)
 		{
-			// Reward king moving towards center in endgame
-			int centerDistance	= abs(move.end.x - 3.5) + abs(move.end.y - 3.5);
-			int currentDistance = abs(move.start.x - 3.5) + abs(move.start.y - 3.5);
-
-			if (centerDistance < currentDistance)
-			{
-				score += 25; // Bonus for king centralization in endgame
-			}
-
-			// Additional bonus for king activity (any king move in endgame)
-			score += 10;
+			score += 25; // Bonus for king centralization in endgame
 		}
+
+		// Additional bonus for king activity (any king move in endgame)
+		score += 10;
 	}
 
 	return score;
 }
 
 
-int MoveEvaluation::evaluateCenterControl(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::evaluateCenterControl(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	int score = 0;
 
@@ -236,7 +224,7 @@ int MoveEvaluation::evaluateCenterControl(const PossibleMove &move, PlayerColor 
 		score += CENTER_CONTROL_BONUS;
 
 	// Additional: bonus for pieces attacking center squares
-	auto attackedSquares = getAttackedSquares(move.end, player);
+	auto attackedSquares = getAttackedSquares(move.end, player, lightBoard);
 
 	for (const auto &square : attackedSquares)
 	{
@@ -248,12 +236,12 @@ int MoveEvaluation::evaluateCenterControl(const PossibleMove &move, PlayerColor 
 }
 
 
-int MoveEvaluation::evaluatePawnStructure(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::evaluatePawnStructure(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
-	int	  score		  = 0;
-	auto &movingPiece = mBoard->getPiece(move.start);
+	int		  score = 0;
+	PieceType type	= getPieceTypeFromPosition(move.start, lightBoard);
 
-	if (!movingPiece || movingPiece->getType() != PieceType::Pawn)
+	if (type != PieceType::Pawn)
 		return 0;
 
 	// Check for pawn structure improvements
@@ -270,7 +258,7 @@ int MoveEvaluation::evaluatePawnStructure(const PossibleMove &move, PlayerColor 
 }
 
 
-int MoveEvaluation::evaluatePieceActivity(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::evaluatePieceActivity(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	auto &piece = mBoard->getPiece(move.start);
 
@@ -289,12 +277,12 @@ int MoveEvaluation::evaluatePieceActivity(const PossibleMove &move, PlayerColor 
 }
 
 
-int MoveEvaluation::evaluateDefensivePatterns(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::evaluateDefensivePatterns(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	int		 score	 = 0;
 
 	// Check if move defends important pieces or squares
-	Position kingPos = mBoard->getKingsPosition(player);
+	Position kingPos = lightBoard ? lightBoard->getKingPosition(player) : mBoard->getKingsPosition(player);
 
 	// Defending the king area
 	if (isNearKing(move.end, kingPos))
@@ -305,12 +293,13 @@ int MoveEvaluation::evaluateDefensivePatterns(const PossibleMove &move, PlayerCo
 		score += 10;
 
 	// Check if move blocks enemy attacks on our pieces
-	auto attackedSquares = getAttackedSquares(move.end, player);
+	auto attackedSquares = getAttackedSquares(move.end, player, lightBoard);
+
 	for (const auto &square : attackedSquares)
 	{
-		auto &piece = mBoard->getPiece(square);
+		PlayerColor pieceColor = getPieceColorFromPosition(square, lightBoard);
 
-		if (piece && piece->getColor() == player)
+		if (pieceColor == player)
 			score += 5;
 	}
 
@@ -318,7 +307,7 @@ int MoveEvaluation::evaluateDefensivePatterns(const PossibleMove &move, PlayerCo
 }
 
 
-bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player)
+bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	auto &movingPiece = mBoard->getPiece(move.start);
 	if (!movingPiece)
@@ -370,7 +359,7 @@ bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player)
 }
 
 
-bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
+bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	auto &movingPiece = mBoard->getPiece(move.start);
 	if (!movingPiece)
@@ -406,7 +395,7 @@ bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player)
 }
 
 
-bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
+bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	PlayerColor opponent	= getOpponentColor(player);
 
@@ -479,11 +468,10 @@ bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player)
 }
 
 
-bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor player)
+bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
-
 	PlayerColor opponent			   = getOpponentColor(player);
-	Position	ourKing				   = mBoard->getKingsPosition(player);
+	Position	ourKing				   = lightBoard ? lightBoard->getKingPosition(player) : mBoard->getKingsPosition(player);
 
 	// calculate threats in parallel
 
@@ -500,41 +488,44 @@ bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor pl
 }
 
 
-int MoveEvaluation::getStrategicEvaluation(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::getStrategicEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	int score = 0;
 
-	score += evaluatePawnStructure(move, player); // Pawn structure considerations
+	score += evaluatePawnStructure(move, player, lightBoard); // Pawn structure considerations
 
-	score += evaluateKingSafety(move, player);	  // King safety in Early Game and Activation in Endgame
+	score += evaluateKingSafety(move, player, lightBoard);	  // King safety in Early Game and Activation in Endgame
 
-	score += evaluatePieceActivity(move, player); // Piece coordination and activity
+	score += evaluatePieceActivity(move, player, lightBoard); // Piece coordination and activity
 
 	return score;
 }
 
 
-int MoveEvaluation::getTacticalEvaluation(const PossibleMove &move, PlayerColor player)
+int MoveEvaluation::getTacticalEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	int score = 0;
 
-	if (createsFork(move, player))
+	if (createsFork(move, player, lightBoard))
 		score += FORK_BONUS;
 
-	if (createsPin(move, player))
+	if (createsPin(move, player, lightBoard))
 		score += PIN_BONUS;
 
-	if (createsSkewer(move, player))
+	if (createsSkewer(move, player, lightBoard))
 		score += SKEWER_BONUS;
 
-	score += evaluateThreatLevel(move, player) * THREAT_WEIGHT;
+	score += evaluateThreatLevel(move, player, lightBoard) * THREAT_WEIGHT;
 
 	return score;
 }
 
 
-GamePhase MoveEvaluation::determineGamePhase() const
+GamePhase MoveEvaluation::determineGamePhase(const LightChessBoard *lightBoard) const
 {
+	if (lightBoard)
+		return static_cast<GamePhase>(lightBoard->getGamePhaseValue());
+
 	int totalMaterial = 0;
 	int totalPieces	  = 0;
 
@@ -826,15 +817,31 @@ bool MoveEvaluation::isNearKing(const Position &pos, const Position &kingPos) co
 }
 
 
-std::vector<Position> MoveEvaluation::getAttackedSquares(const Position &piecePos, PlayerColor player) const
+std::vector<Position> MoveEvaluation::getAttackedSquares(const Position &piecePos, PlayerColor player, const LightChessBoard *lightBoard) const
 {
-	std::vector<Position> attackedSquares;
+	std::vector<Position>	  attackedSquares;
+	std::vector<PossibleMove> moves;
 
-	mGeneration->calculateAllLegalBasicMoves(player);
+	if (lightBoard)
+	{
+		auto allMoves = lightBoard->generateLegalMoves(player);
 
-	auto possibleMoves = mGeneration->getMovesForPosition(piecePos);
+		for (const auto &move : allMoves)
+		{
+			// filter this piece's moves
+			if (move.start == piecePos)
+				moves.push_back(move);
+		}
+	}
+	else
+	{
+		mGeneration->calculateAllLegalBasicMoves(player);
+		moves = mGeneration->getMovesForPosition(piecePos);
+	}
 
-	for (const auto &move : possibleMoves)
+	attackedSquares.reserve(moves.size());
+
+	for (const auto &move : moves)
 	{
 		attackedSquares.push_back(move.end);
 	}
@@ -843,15 +850,15 @@ std::vector<Position> MoveEvaluation::getAttackedSquares(const Position &piecePo
 }
 
 
-bool MoveEvaluation::wouldExposeKing(const PossibleMove &move, PlayerColor player) const
+bool MoveEvaluation::wouldExposeKing(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard) const
 {
-	Position kingPos = mBoard->getKingsPosition(player);
+	Position kingPos = lightBoard ? lightBoard->getKingPosition(player) : mBoard->getKingsPosition(player);
 
 	// If we're moving a piece from near the king, check if it exposes the king
 	if (isNearKing(move.start, kingPos) && !isNearKing(move.end, kingPos))
 	{
 		// Count current attackers
-		int currentAttackers = countAttackers(kingPos, getOpponentColor(player));
+		int currentAttackers = countAttackers(kingPos, getOpponentColor(player), lightBoard);
 		return currentAttackers > 0; // Risk if already under attack
 	}
 
@@ -859,7 +866,7 @@ bool MoveEvaluation::wouldExposeKing(const PossibleMove &move, PlayerColor playe
 }
 
 
-int MoveEvaluation::countAttackers(const Position &target, PlayerColor attackerPlayer) const
+int MoveEvaluation::countAttackers(const Position &target, PlayerColor attackerPlayer, const LightChessBoard *lightBoard) const
 {
 	int count = 0;
 
@@ -867,13 +874,13 @@ int MoveEvaluation::countAttackers(const Position &target, PlayerColor attackerP
 	{
 		for (int x = 0; x < BOARD_SIZE; ++x)
 		{
-			Position pos{x, y};
-			auto	&piece = mBoard->getPiece(pos);
+			const Position pos{x, y};
+			PlayerColor	   pieceColor = getPieceColorFromPosition(pos, lightBoard);
 
-			if (!piece || piece->getColor() != attackerPlayer)
+			if (pieceColor != attackerPlayer)
 				continue;
 
-			auto attackedSquares = getAttackedSquares(pos, attackerPlayer);
+			auto attackedSquares = getAttackedSquares(pos, attackerPlayer, lightBoard);
 
 			for (const auto &square : attackedSquares)
 			{
@@ -908,6 +915,48 @@ bool MoveEvaluation::areCollinear(const Position &pos1, const Position &pos2, Pi
 	case PieceType::Queen: return (dx == 0 || dy == 0 || (dx != 0 && dy != 0 && abs(dx) == abs(dy)));
 	default: return false;
 	}
+}
+
+
+PieceType MoveEvaluation::getPieceTypeFromPosition(const Position &pos, const LightChessBoard *lightBoard) const
+{
+	if (lightBoard)
+	{
+		auto &piece = lightBoard->getPiece(pos);
+
+		if (piece.isValid())
+			return piece.type;
+	}
+	else
+	{
+		auto &piece = mBoard->getPiece(pos);
+
+		if (piece)
+			return piece->getType();
+	}
+
+	return PieceType::DefaultType;
+}
+
+
+PlayerColor MoveEvaluation::getPieceColorFromPosition(const Position &pos, const LightChessBoard *lightBoard) const
+{
+	if (lightBoard)
+	{
+		auto &piece = lightBoard->getPiece(pos);
+
+		if (piece.isValid())
+			return piece.color;
+	}
+	else
+	{
+		auto &piece = mBoard->getPiece(pos);
+
+		if (piece)
+			return piece->getColor();
+	}
+
+	return PlayerColor::NoColor;
 }
 
 
