@@ -115,6 +115,20 @@ TEST_F(PlayerTests, SetPlayerColor)
 }
 
 
+TEST_F(PlayerTests, PlayerColorAffectsScore)
+{
+	Player player;
+	player.setScore(100);
+
+	EXPECT_EQ(player.getScore().getPlayerColor(), PlayerColor::NoColor) << "Score should have NoColor initially";
+
+	player.setPlayerColor(PlayerColor::White);
+	player.setScore(100); // Set score again to update color
+
+	EXPECT_EQ(player.getScore().getPlayerColor(), PlayerColor::White) << "Score should have White color after setting player color";
+}
+
+
 
 // =============================================================================
 // CAPTURED PIECES TESTS
@@ -202,6 +216,14 @@ TEST_F(PlayerTests, ScoreUpdateAfterMultipleCaptures)
 }
 
 
+TEST_F(PlayerTests, UpdateScoreOnEmptyList)
+{
+	// Update score with no captured pieces
+	mWhitePlayer->updateScore();
+	EXPECT_EQ(mWhitePlayer->getScore().getValue(), 0) << "Score should be 0 when no pieces are captured";
+}
+
+
 
 // =============================================================================
 // RESET FUNCTIONALITY TESTS
@@ -237,6 +259,38 @@ TEST_F(PlayerTests, ResetPreservesPlayerColor)
 }
 
 
+TEST_F(PlayerTests, ResetAfterMultipleOperations)
+{
+	// Perform multiple operations
+	mWhitePlayer->setPlayerColor(PlayerColor::Black);
+	mWhitePlayer->setIsLocalPlayer(false);
+	mWhitePlayer->addCapturedPiece(PieceType::Queen);
+	mWhitePlayer->addCapturedPiece(PieceType::Rook);
+	mWhitePlayer->addCapturedPiece(PieceType::Knight);
+	mWhitePlayer->setScore(2000); // Override calculated score
+
+	// Reset
+	mWhitePlayer->reset();
+
+	// Verify state
+	EXPECT_EQ(mWhitePlayer->getScore().getValue(), 0) << "Score should be 0";
+	EXPECT_EQ(mWhitePlayer->getPlayerColor(), PlayerColor::Black) << "Color should be preserved";
+	EXPECT_FALSE(mWhitePlayer->isLocalPlayer()) << "Local status should be preserved";
+}
+
+
+TEST_F(PlayerTests, ResetPreservesLocalPlayerStatus)
+{
+	mWhitePlayer->setIsLocalPlayer(false);
+	bool originalLocalStatus = mWhitePlayer->isLocalPlayer();
+
+	mWhitePlayer->addCapturedPiece(PieceType::Queen);
+	mWhitePlayer->reset();
+
+	EXPECT_EQ(mWhitePlayer->isLocalPlayer(), originalLocalStatus) << "Local player status should be preserved after reset";
+}
+
+
 
 // =============================================================================
 // LOCAL PLAYER TESTS
@@ -260,8 +314,71 @@ TEST_F(PlayerTests, SetIsLocalPlayer)
 }
 
 
+TEST_F(PlayerTests, SetIsLocalPlayerMultipleTimes)
+{
+	// Toggle multiple times
+	mWhitePlayer->setIsLocalPlayer(false);
+	EXPECT_FALSE(mWhitePlayer->isLocalPlayer()) << "Should be remote";
+
+	mWhitePlayer->setIsLocalPlayer(false); // Set to same value
+	EXPECT_FALSE(mWhitePlayer->isLocalPlayer()) << "Should remain remote";
+
+	mWhitePlayer->setIsLocalPlayer(true);
+	EXPECT_TRUE(mWhitePlayer->isLocalPlayer()) << "Should be local again";
+}
 
 
+TEST_F(PlayerTests, LocalPlayerStatusIndependentOfOtherProperties)
+{
+	// Test that local player status is independent of other properties
+	mWhitePlayer->setIsLocalPlayer(false);
+	mWhitePlayer->addCapturedPiece(PieceType::Queen);
+	mWhitePlayer->setPlayerColor(PlayerColor::Black);
+
+	EXPECT_FALSE(mWhitePlayer->isLocalPlayer()) << "Local status should be independent of other operations";
+}
+
+
+
+// =============================================================================
+// EDGE CASES AND ERROR CONDITIONS
+// =============================================================================
+
+
+TEST_F(PlayerTests, HandleDefaultPieceType)
+{
+	// Test with DefaultType piece
+	int defaultValue = mWhitePlayer->getPieceValue(PieceType::DefaultType);
+	EXPECT_EQ(defaultValue, 0) << "DefaultType piece should have value 0";
+
+	mWhitePlayer->addCapturedPiece(PieceType::DefaultType);
+	EXPECT_EQ(mWhitePlayer->getScore().getValue(), 0) << "Score should remain 0 after capturing DefaultType piece";
+}
+
+
+TEST_F(PlayerTests, LargeNumberOfCapturedPieces)
+{
+	// Test with many captured pieces
+	for (int i = 0; i < 100; ++i)
+	{
+		mWhitePlayer->addCapturedPiece(PieceType::Pawn);
+	}
+
+	int expectedScore = 100 * mWhitePlayer->getPieceValue(PieceType::Pawn);
+	EXPECT_EQ(mWhitePlayer->getScore().getValue(), expectedScore) << "Should handle large number of captured pieces";
+}
+
+
+TEST_F(PlayerTests, ScoreWithMixedPositiveAndZeroValuePieces)
+{
+	mWhitePlayer->addCapturedPiece(PieceType::Queen); // Positive value
+	mWhitePlayer->addCapturedPiece(PieceType::King);  // Zero value
+	mWhitePlayer->addCapturedPiece(PieceType::Rook);  // Positive value
+
+	int expectedScore = mWhitePlayer->getPieceValue(PieceType::Queen) + mWhitePlayer->getPieceValue(PieceType::King) + mWhitePlayer->getPieceValue(PieceType::Rook);
+
+	EXPECT_EQ(mWhitePlayer->getScore().getValue(), expectedScore) << "Should correctly handle mix of valuable and zero-value pieces";
+}
 
 
 } // namespace PlayerTests
