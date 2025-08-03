@@ -36,7 +36,7 @@ public:
 	int					 getAdvancedEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
 	static constexpr int getPieceValue(PieceType piece);
-	int					 getPositionValue(PieceType piece, const Position &pos, PlayerColor player) const;
+	int					 getPositionValue(PieceType piece, const Position &pos, PlayerColor player, const LightChessBoard *lightBoard = nullptr) const;
 	int					 evaluateMaterialGain(const PossibleMove &move, const LightChessBoard *lightBoard = nullptr);
 	int					 evaluatePositionalGain(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 	int					 evaluateThreatLevel(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
@@ -74,11 +74,12 @@ private:
 		}
 	};
 
-	ThreatAnalysis		  calculateCurrentThreats(PlayerColor opponent, PlayerColor player);
-	ThreatAnalysis		  calculateThreatsAfterMove(const PossibleMove &move, PlayerColor player, PlayerColor opponent);
+	ThreatAnalysis		  calculateCurrentThreats(PlayerColor opponent, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	ThreatAnalysis		  calculateThreatsAfterMove(const PossibleMove &move, PlayerColor player, PlayerColor opponent, const LightChessBoard *lightBoard = nullptr);
 	bool				  analyzeThreatReduction(const ThreatAnalysis &before, const ThreatAnalysis &after, const Position &ourKing, const PossibleMove &move, PlayerColor player);
 	bool				  physicallyBlocksAttack(const PossibleMove &move, PlayerColor player, ChessBoard &board);
-	std::vector<Position> calculateThreatsOnBoard(ChessBoard &board, PlayerColor opponent, PlayerColor player);
+	std::vector<Position> calculateThreatsOnBoard(PlayerColor opponent, PlayerColor player, ChessBoard &board);
+	std::vector<Position> calculateThreatsOnBoard(PlayerColor opponent, PlayerColor player, LightChessBoard &board);
 
 
 	int					  calculateMobility(PlayerColor player) const;

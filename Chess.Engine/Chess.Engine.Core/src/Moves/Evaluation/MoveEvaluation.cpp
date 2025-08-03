@@ -64,8 +64,8 @@ int MoveEvaluation::getAdvancedEvaluation(const PossibleMove &move, PlayerColor 
 {
 	int score = getMediumEvaluation(move, player, lightBoard);
 
-	score += getTacticalEvaluation(move, player);				  // Advanced technical evaluation
-	score += getStrategicEvaluation(move, player);				  // Advanced strategic evaluation
+	score += getTacticalEvaluation(move, player, lightBoard);	  // Advanced technical evaluation
+	score += getStrategicEvaluation(move, player, lightBoard);	  // Advanced strategic evaluation
 	score += evaluateThreatLevel(move, player, lightBoard);		  // Threat analysis
 	score += evaluateDefensivePatterns(move, player, lightBoard); // Defensive patterns
 
@@ -73,7 +73,7 @@ int MoveEvaluation::getAdvancedEvaluation(const PossibleMove &move, PlayerColor 
 }
 
 
-int MoveEvaluation::getPositionValue(PieceType piece, const Position &pos, PlayerColor player) const
+int MoveEvaluation::getPositionValue(PieceType piece, const Position &pos, PlayerColor player, const LightChessBoard *lightBoard) const
 {
 	// Ensure position is valid
 	if (!pos.isValid())
@@ -86,7 +86,7 @@ int MoveEvaluation::getPositionValue(PieceType piece, const Position &pos, Playe
 	if (player == PlayerColor::Black)
 		row = 7 - row;
 
-	GamePhase phase = determineGamePhase();
+	GamePhase phase = determineGamePhase(lightBoard);
 
 	switch (piece)
 	{
@@ -119,13 +119,13 @@ int MoveEvaluation::evaluateMaterialGain(const PossibleMove &move, const LightCh
 int MoveEvaluation::evaluatePositionalGain(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	int		  positionalScore = 0;
-	PieceType pieceType		  = getPieceTypeFromPosition(move.start);
+	PieceType pieceType		  = getPieceTypeFromPosition(move.start, lightBoard);
 
 	// Add positional value for destination
-	positionalScore += getPositionValue(pieceType, move.end, player);
+	positionalScore += getPositionValue(pieceType, move.end, player, lightBoard);
 
 	// Subtract position value for leaving current square
-	positionalScore -= getPositionValue(pieceType, move.start, player);
+	positionalScore -= getPositionValue(pieceType, move.start, player, lightBoard);
 
 	return positionalScore;
 }
@@ -147,7 +147,7 @@ int MoveEvaluation::evaluateThreatLevel(const PossibleMove &move, PlayerColor pl
 		pieceType			   = getPieceTypeFromPosition(square, lightBoard);
 		pieceColor			   = getPieceColorFromPosition(square, lightBoard);
 
-		if (pieceType != PieceType::DefaultType || pieceColor != opponent)
+		if (pieceType == PieceType::DefaultType || pieceColor != opponent)
 			continue;
 
 		// Threatening valuable pieces gives more points
@@ -167,7 +167,7 @@ int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor pla
 {
 	int score = 0;
 
-	if (determineGamePhase() != GamePhase::EndGame)
+	if (determineGamePhase(lightBoard) != GamePhase::EndGame)
 	{
 		Position kingPos		 = lightBoard ? lightBoard->getKingPosition(player) : mBoard->getKingsPosition(player);
 		Position opponentKingPos = lightBoard ? lightBoard->getKingPosition(getOpponentColor(player)) : mBoard->getKingsPosition(getOpponentColor(player));
@@ -260,20 +260,43 @@ int MoveEvaluation::evaluatePawnStructure(const PossibleMove &move, PlayerColor 
 
 int MoveEvaluation::evaluatePieceActivity(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
-	auto &piece = mBoard->getPiece(move.start);
-
-	if (!piece)
+	PieceType pieceType = getPieceTypeFromPosition(move.start, lightBoard);
+	if (pieceType == PieceType::DefaultType)
 		return 0;
 
-	// Use direct piece movements instead of expensive move calculation here
-	ChessBoard tmpBoard(*mBoard);
-	tmpBoard.movePiece(move.start, move.end);
+	if (lightBoard)
+	{
+		// Fast path using LightChessBoard
+		LightChessBoard tmpBoard = *lightBoard;
+		auto			undoInfo = tmpBoard.makeMove(move);
 
-	auto moves	  = piece->getPossibleMoves(move.end, tmpBoard, true);
-	int	 mobility = static_cast<int>(moves.size());
+		// Generate moves from new position
+		auto			moves	 = tmpBoard.generateLegalMoves(player);
+		int				mobility = 0;
 
-	// Reward increased mobility
-	return mobility * 2;
+		// Count moves from the destination square
+		for (const auto &testMove : moves)
+		{
+			if (testMove.start == move.end)
+				mobility++;
+		}
+
+		tmpBoard.unmakeMove(undoInfo);
+		return mobility * 2;
+	}
+	else
+	{
+		// Fallback to ChessBoard (existing implementation)
+		auto &piece = mBoard->getPiece(move.start);
+
+		if (!piece)
+			return 0;
+
+		ChessBoard tmpBoard(*mBoard);
+		tmpBoard.movePiece(move.start, move.end);
+		auto moves = piece->getPossibleMoves(move.end, tmpBoard, true);
+		return static_cast<int>(moves.size()) * 2;
+	}
 }
 
 
@@ -358,31 +381,54 @@ bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player, co
 
 bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
-	auto &movingPiece = mBoard->getPiece(move.start);
-	if (!movingPiece)
+	PieceType movingPieceType = getPieceTypeFromPosition(move.start, lightBoard);
+	if (movingPieceType == PieceType::DefaultType)
 		return false;
 
-	// Create a temporary board with the move executed
-	ChessBoard tmpBoard(*mBoard);
-	tmpBoard.movePiece(move.start, move.end);
+	PlayerColor			  opponent		  = getOpponentColor(player);
+	int					  valuableTargets = 0;
 
-	// Get attacked squares from the destination position on the temporary board
-	auto		attackedSquares = movingPiece->getPossibleMoves(move.end, tmpBoard, true);
+	std::vector<Position> attackedSquares;
 
-	PlayerColor opponnent		= getOpponentColor(player);
-	int			valuableTargets = 0;
-
-	for (const auto &attackMove : attackedSquares)
+	if (lightBoard)
 	{
-		auto &piece = tmpBoard.getPiece(attackMove.end);
+		// Create a temporary LightChessBoard to simulate the move
+		LightChessBoard tmpBoard = *lightBoard;
+		auto			undoInfo = tmpBoard.makeMove(move);
 
-		if (!piece || piece->getColor() != opponnent)
+		// Generate attacked squares from new position
+		attackedSquares			 = getAttackedSquares(move.end, player, &tmpBoard);
+
+		tmpBoard.unmakeMove(undoInfo);
+	}
+	else
+	{
+		// Fallback to ChessBoard method
+		ChessBoard tmpBoard(*mBoard);
+		tmpBoard.movePiece(move.start, move.end);
+
+		auto piece = mBoard->getPiece(move.start);
+		if (!piece)
+			return false;
+
+		auto possibleMoves = piece->getPossibleMoves(move.end, tmpBoard, true);
+		for (const auto &attackMove : possibleMoves)
+		{
+			attackedSquares.push_back(attackMove.end);
+		}
+	}
+
+	// Count valuable targets
+	for (const auto &attackedPos : attackedSquares)
+	{
+		PieceType	targetType	= getPieceTypeFromPosition(attackedPos, lightBoard);
+		PlayerColor targetColor = getPieceColorFromPosition(attackedPos, lightBoard);
+
+		if (targetColor != opponent || targetType == PieceType::DefaultType)
 			continue;
 
-		PieceType type = piece->getType();
-
 		// Count valuable pieces
-		if (type == PieceType::Knight || type == PieceType::Bishop || type == PieceType::Rook || type == PieceType::Queen || type == PieceType::King)
+		if (targetType == PieceType::Knight || targetType == PieceType::Bishop || targetType == PieceType::Rook || targetType == PieceType::Queen || targetType == PieceType::King)
 		{
 			valuableTargets++;
 		}
@@ -395,24 +441,18 @@ bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player, c
 bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	PlayerColor opponent	= getOpponentColor(player);
-
-	auto	   &movingPiece = mBoard->getPiece(move.start);
-	if (!movingPiece)
-		return false;
+	PieceType	movingPiece = getPieceTypeFromPosition(move.start, lightBoard);
 
 	// Only long range pieces can create skewers
-	PieceType type = movingPiece->getType();
-	if (type != PieceType::Bishop && type != PieceType::Rook && type != PieceType::Queen)
+	if (movingPiece != PieceType::Bishop && movingPiece != PieceType::Rook && movingPiece != PieceType::Queen)
 		return false;
-
-	auto							 opponentsPieces = mBoard->getPiecesFromPlayer(opponent);
 
 	// Define directions depending on piece type
 	std::vector<std::pair<int, int>> directions;
 
-	if (type == PieceType::Rook || type == PieceType::Queen)
+	if (movingPiece == PieceType::Rook || movingPiece == PieceType::Queen)
 		directions = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};						   // rank & file
-	if (type == PieceType::Bishop || type == PieceType::Queen)
+	if (movingPiece == PieceType::Bishop || movingPiece == PieceType::Queen)
 		directions.insert(directions.end(), {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}}); // diagonal
 
 	// Check each direction for potential skewers
@@ -422,27 +462,30 @@ bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player,
 		current.x += dx;
 		current.y += dy;
 
-		std::shared_ptr<ChessPiece> firstPiece	= nullptr;
-		std::shared_ptr<ChessPiece> secondPiece = nullptr;
-		Position					firstPiecePos;
+		PieceType	firstPieceType	 = PieceType::DefaultType;
+		PieceType	secondPieceType	 = PieceType::DefaultType;
+		PlayerColor firstPieceColor	 = PlayerColor::NoColor;
+		PlayerColor secondPieceColor = PlayerColor::NoColor;
 
 		// Find the first two pieces in this direction
 		while (current.isValid())
 		{
-			auto &piece = mBoard->getPiece(current);
+			PieceType	currentPieceType  = getPieceTypeFromPosition(current, lightBoard);
+			PlayerColor currentPieceColor = getPieceColorFromPosition(current, lightBoard);
 
-			if (piece)
+			if (currentPieceType != PieceType::DefaultType)
 			{
-				if (!firstPiece)
+				if (firstPieceType == PieceType::DefaultType)
 				{
 					// Found the first piece in this direction
-					firstPiece	  = piece;
-					firstPiecePos = current;
+					firstPieceType	= currentPieceType;
+					firstPieceColor = currentPieceColor;
 				}
 				else
 				{
 					// Found the second piece in this direction
-					secondPiece = piece;
+					secondPieceType	 = currentPieceType;
+					secondPieceColor = currentPieceColor;
 					break;
 				}
 			}
@@ -452,10 +495,10 @@ bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player,
 		}
 
 		// Check if we have a valid skewer pattern
-		if (firstPiece && secondPiece && firstPiece->getColor() == opponent && secondPiece->getColor() == opponent)
+		if (firstPieceType != PieceType::DefaultType && secondPieceType != PieceType::DefaultType && firstPieceColor == opponent && secondPieceColor == opponent)
 		{
-			int firstPieceValue	 = getPieceValue(firstPiece->getType());
-			int secondPieceValue = getPieceValue(secondPiece->getType());
+			int firstPieceValue	 = getPieceValue(firstPieceType);
+			int secondPieceValue = getPieceValue(secondPieceType);
 
 			if (firstPieceValue > secondPieceValue)
 				return true;
@@ -467,18 +510,19 @@ bool MoveEvaluation::createsSkewer(const PossibleMove &move, PlayerColor player,
 
 bool MoveEvaluation::blocksEnemyThreats(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
-	PlayerColor opponent			   = getOpponentColor(player);
-	Position	ourKing				   = lightBoard ? lightBoard->getKingPosition(player) : mBoard->getKingsPosition(player);
+	PlayerColor opponent			 = getOpponentColor(player);
+	Position	ourKing				 = lightBoard ? lightBoard->getKingPosition(player) : mBoard->getKingsPosition(player);
 
 	// calculate threats in parallel
 
-	auto		currentThreatsFuture   = std::async(std::launch::async, [this, opponent, player]() { return calculateCurrentThreats(opponent, player); });
+	auto		currentThreatsFuture = std::async(std::launch::async, [this, opponent, player, lightBoard]() { return calculateCurrentThreats(opponent, player, lightBoard); });
 
-	auto		threatsAfterMoveFuture = std::async(std::launch::async, [this, move, opponent, player]() { return calculateThreatsAfterMove(move, player, opponent); });
+	auto		threatsAfterMoveFuture =
+		std::async(std::launch::async, [this, move, opponent, player, lightBoard]() { return calculateThreatsAfterMove(move, player, opponent, lightBoard); });
 
 	// Get results from both futures
-	auto		currentThreats		   = currentThreatsFuture.get();
-	auto		threatsAfterMove	   = threatsAfterMoveFuture.get();
+	auto currentThreats	  = currentThreatsFuture.get();
+	auto threatsAfterMove = threatsAfterMoveFuture.get();
 
 	// Analyze the results
 	return analyzeThreatReduction(currentThreats, threatsAfterMove, ourKing, move, player);
@@ -554,24 +598,53 @@ GamePhase MoveEvaluation::determineGamePhase(const LightChessBoard *lightBoard) 
 }
 
 
-MoveEvaluation::ThreatAnalysis MoveEvaluation::calculateCurrentThreats(PlayerColor opponent, PlayerColor player)
+MoveEvaluation::ThreatAnalysis MoveEvaluation::calculateCurrentThreats(PlayerColor opponent, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	std::vector<Position> threats;
-	Position			  ourKing = mBoard->getKingsPosition(player);
+	Position			  ourKing = lightBoard ? lightBoard->getKingPosition(player) : mBoard->getKingsPosition(player);
 
-	mGeneration->calculateAllLegalBasicMoves(opponent);
-	auto opponentPieces = mBoard->getPiecesFromPlayer(opponent);
-
-	for (const auto &[pos, piece] : opponentPieces)
+	if (lightBoard)
 	{
-		auto moves = mGeneration->getMovesForPosition(pos);
+		auto opponentPieces = lightBoard->getPiecePositions(opponent);
 
-		for (const auto &move : moves)
+		for (const auto &pos : opponentPieces)
 		{
-			auto &threatenedPiece = mBoard->getPiece(move.end);
-			if (threatenedPiece && threatenedPiece->getColor() == player)
+			// Generate moves for this opponent piece
+			auto moves = lightBoard->generateLegalMoves(opponent);
+
+			// Filter moves that start from this position
+			for (const auto &move : moves)
 			{
-				threats.push_back(move.end);
+				if (move.start == pos)
+				{
+					// Check if move threatens one of our pieces
+					PlayerColor threatenedPieceColor = getPieceColorFromPosition(move.end, lightBoard);
+
+					if (threatenedPieceColor == player)
+					{
+						threats.push_back(move.end);
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		mGeneration->calculateAllLegalBasicMoves(opponent);
+		auto opponentPieces = mBoard->getPiecesFromPlayer(opponent);
+
+		for (const auto &[pos, piece] : opponentPieces)
+		{
+			auto moves = mGeneration->getMovesForPosition(pos);
+
+			for (const auto &move : moves)
+			{
+				auto &threatenedPiece = mBoard->getPiece(move.end);
+
+				if (threatenedPiece && threatenedPiece->getColor() == player)
+				{
+					threats.push_back(move.end);
+				}
 			}
 		}
 	}
@@ -580,14 +653,27 @@ MoveEvaluation::ThreatAnalysis MoveEvaluation::calculateCurrentThreats(PlayerCol
 }
 
 
-MoveEvaluation::ThreatAnalysis MoveEvaluation::calculateThreatsAfterMove(const PossibleMove &move, PlayerColor player, PlayerColor opponent)
+MoveEvaluation::ThreatAnalysis MoveEvaluation::calculateThreatsAfterMove(const PossibleMove &move, PlayerColor player, PlayerColor opponent, const LightChessBoard *lightBoard)
 {
-	// Create a chessboard copy for simulating move
-	ChessBoard tmpBoard(*mBoard);
-	tmpBoard.movePiece(move.start, move.end);
-	Position			  ourKingAfterMove = tmpBoard.getKingsPosition(player);
+	Position ourKingAfterMove = lightBoard ? lightBoard->getKingPosition(player) : mBoard->getKingsPosition(player);
+	std::vector<Position> threats;
 
-	std::vector<Position> threats		   = calculateThreatsOnBoard(tmpBoard, opponent, player);
+	if (lightBoard)
+	{
+		LightChessBoard tmpBoard = *lightBoard;
+		auto			undoInfo = tmpBoard.makeMove(move);
+
+		// Calculate threats on the temporary board
+		threats					 = calculateThreatsOnBoard(opponent, player, tmpBoard);
+	}
+	else
+	{
+		// Create a chessboard copy for simulating move
+		ChessBoard tmpBoard(*mBoard);
+		tmpBoard.movePiece(move.start, move.end);
+
+		threats		   = calculateThreatsOnBoard(opponent, player, tmpBoard);
+	}
 
 	return ThreatAnalysis(threats, ourKingAfterMove);
 }
@@ -640,7 +726,7 @@ bool MoveEvaluation::physicallyBlocksAttack(const PossibleMove &move, PlayerColo
 }
 
 
-std::vector<Position> MoveEvaluation::calculateThreatsOnBoard(ChessBoard &board, PlayerColor opponent, PlayerColor player)
+std::vector<Position> MoveEvaluation::calculateThreatsOnBoard(PlayerColor opponent, PlayerColor player, ChessBoard &board)
 {
 	// Use lightweight move generation without proper validation
 
@@ -658,6 +744,36 @@ std::vector<Position> MoveEvaluation::calculateThreatsOnBoard(ChessBoard &board,
 			if (threatenedPiece && threatenedPiece->getColor() == player)
 			{
 				threats.push_back(move.end);
+			}
+		}
+	}
+
+	return threats;
+}
+
+
+std::vector<Position> MoveEvaluation::calculateThreatsOnBoard(PlayerColor opponent, PlayerColor player, LightChessBoard &board)
+{
+	std::vector<Position> threats;
+	auto				  opponentPieces = board.getPiecePositions(opponent);
+
+	for (const auto &pos : opponentPieces)
+	{
+		// Generate all legal moves for the opponent
+		auto moves = board.generateLegalMoves(opponent);
+
+		// Filter moves that start from this piece position
+		for (const auto &move : moves)
+		{
+			if (move.start == pos)
+			{
+				// Check if this move threatens one of our pieces
+				auto &threatenedPiece = board.getPiece(move.end);
+
+				if (!threatenedPiece.isEmpty() && threatenedPiece.color == player)
+				{
+					threats.push_back(move.end);
+				}
 			}
 		}
 	}
