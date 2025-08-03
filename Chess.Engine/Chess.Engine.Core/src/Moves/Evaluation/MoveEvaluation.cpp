@@ -309,20 +309,17 @@ int MoveEvaluation::evaluateDefensivePatterns(const PossibleMove &move, PlayerCo
 
 bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
-	auto &movingPiece = mBoard->getPiece(move.start);
-	if (!movingPiece)
-		return false;
+	PieceType movingPieceType = getPieceTypeFromPosition(move.start, lightBoard);
 
 	// Only long range pieces (rook, bishop and queen) can create pins
-	PieceType type = movingPiece->getType();
-	if (type != PieceType::Bishop && type != PieceType::Rook && type != PieceType::Queen)
+	if (movingPieceType != PieceType::Bishop && movingPieceType != PieceType::Rook && movingPieceType != PieceType::Queen)
 		return false;
 
-	PlayerColor opponnent	 = getOpponentColor(player);
-	Position	opponentKing = mBoard->getKingsPosition(opponnent);
+	PlayerColor opponent	 = getOpponentColor(player);
+	Position	opponentKing = lightBoard ? lightBoard->getKingPosition(opponent) : mBoard->getKingsPosition(opponent);
 
 	// Check if the piece after moving would be on the same line as the opponent's king
-	if (!areCollinear(move.end, opponentKing, type))
+	if (!areCollinear(move.end, opponentKing, movingPieceType))
 		return false;
 
 	// Determine direction from our piece to opponnent's king
@@ -345,9 +342,9 @@ bool MoveEvaluation::createsPin(const PossibleMove &move, PlayerColor player, co
 
 	while (current.isValid() && current != opponentKing)
 	{
-		auto &piece = mBoard->getPiece(current);
+		PlayerColor pieceColor = getPieceColorFromPosition(current, lightBoard);
 
-		if (piece && piece->getColor() == opponnent)
+		if (pieceColor == opponent)
 			piecesInBetween++;
 
 		current.x += stepX;
