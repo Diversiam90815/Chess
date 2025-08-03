@@ -39,7 +39,6 @@ set (FILEMANAGER_DIR        ${SOURCE_DIR}/FileManager)
 set (LOGGER_DIR             ${SOURCE_DIR}/Logger)
 set (USERSETTINGS_DIR       ${SOURCE_DIR}/UserSettings)
 set (COMMUNICATION_DIR      ${SOURCE_DIR}/Communication)
-set (CPUPLAYER_DIR          ${SOURCE_DIR}/CPUPlayer)
 set (NETWORK_DIR            ${SOURCE_DIR}/Network)
 set (MULTIPLAYER_DIR        ${SOURCE_DIR}/Multiplayer)
 set (STATEMACHINE_DIR       ${SOURCE_DIR}/StateMachine)
@@ -63,7 +62,6 @@ set(ALL_PROJECT_DIRS
 			${SOURCE_DIR}
 			${USERSETTINGS_DIR}
 			${COMMUNICATION_DIR}
-			${CPUPLAYER_DIR}
 			${NETWORK_DIR}
 			${MULTIPLAYER_DIR}
 			${STATEMACHINE_DIR}
@@ -121,10 +119,7 @@ set(GAME_MANAGER_FILES
 set(PLAYER_FILES
 	${PLAYER_DIR}/Player.h      	${PLAYER_DIR}/Player.cpp
 	${PLAYER_DIR}/PlayerName.h      ${PLAYER_DIR}/PlayerName.cpp
-)
-
-set(CPU_PLAYER_FILES
-	${CPUPLAYER_DIR}/CPUPlayer.h      	${CPUPLAYER_DIR}/CPUPlayer.cpp
+	${PLAYER_DIR}/CPUPlayer.h      	${PLAYER_DIR}/CPUPlayer.cpp
 )
 
 set(HELPER_FILES
@@ -189,7 +184,6 @@ set(ALL_FILES
 	${FILEMANAGER_FILES}
 	${USERSETTINGS_FILES}
 	${COMMUNICATION_FILES}
-	${CPU_PLAYER_FILES}
 	${NETWORK_FILES}
 	${MULTIPLAYER_FILES}
 	${STATEMACHINE_FILES}
