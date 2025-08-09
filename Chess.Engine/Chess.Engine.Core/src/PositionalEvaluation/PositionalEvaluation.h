@@ -27,12 +27,12 @@ struct PositionalEvaluationResult
 // Evaluation weights by game phase
 struct EvaluationWeights
 {
-	float materialWeight   = 1.0f; // TODO: Adjust values
-	float positionalWeight = 1.0f; // TODO: Adjust values
-	float kingSafetyWeight = 1.0f; // TODO: Adjust values
-	float mobilityWeight   = 1.0f; // TODO: Adjust values
-	float tacticalWeight   = 1.0f; // TODO: Adjust values
-	float structuralWeight = 1.0f; // TODO: Adjust values
+	float materialWeight   = 1.0f;
+	float positionalWeight = 0.3f;
+	float kingSafetyWeight = 0.8f;
+	float mobilityWeight   = 0.2f;
+	float tacticalWeight   = 0.6f;
+	float structuralWeight = 0.4f;
 };
 
 
@@ -45,15 +45,12 @@ public:
 	int						   evaluatePosition(const LightChessBoard &board, PlayerColor player);
 	PositionalEvaluationResult evaluatePositionDetailed(const LightChessBoard &board, PlayerColor player);
 
-	void					   setEvaluationWeights(EvaluationWeights &weights) { mEvaluationWeights = weights; }
-
 	int						   evaluateMaterial(const LightChessBoard &board, PlayerColor player);
 	int						   evaluatePositionalAdvantage(const LightChessBoard &board, PlayerColor player);
 	int						   evaluateKingSafety(const LightChessBoard &board, PlayerColor player);
 	int						   evaluateMobility(const LightChessBoard &board, PlayerColor player);
 	int						   evaluateTacticalOpportunities(const LightChessBoard &board, PlayerColor player);
 	int						   evaluatePawnStructure(const LightChessBoard &board, PlayerColor player);
-
 
 private:
 	GamePhase						determineGamePhase(const LightChessBoard &board) const;

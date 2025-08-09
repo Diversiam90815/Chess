@@ -211,23 +211,24 @@ EvaluationWeights PositionalEvaluation::getWeightsForPhase(GamePhase phase) cons
 	{
 	case GamePhase::Opening:
 	{
-		weights.kingSafetyWeight = 1.0f; // TODO: Adjust
-		weights.mobilityWeight	 = 1.0f; // TODO: Adjust
-		weights.tacticalWeight	 = 1.0f; // TODO: Adjust
+		weights.kingSafetyWeight = 1.0f;
+		weights.mobilityWeight	 = 0.3f;
+		weights.tacticalWeight	 = 0.4f;
 		break;
 	}
 	case GamePhase::MiddleGame:
 	{
-		weights.kingSafetyWeight = 1.0f; // TODO: Adjust
-		weights.mobilityWeight	 = 1.0f; // TODO: Adjust
-		weights.tacticalWeight	 = 1.0f; // TODO: Adjust
+		weights.kingSafetyWeight = 0.8f;
+		weights.mobilityWeight	 = 0.2f;
+		weights.tacticalWeight	 = 0.8f;
 		break;
 	}
 	case GamePhase::EndGame:
 	{
-		weights.kingSafetyWeight = 1.0f; // TODO: Adjust
-		weights.mobilityWeight	 = 1.0f; // TODO: Adjust
-		weights.tacticalWeight	 = 1.0f; // TODO: Adjust
+		weights.kingSafetyWeight = 0.2f; // King activity, not safety
+		weights.mobilityWeight	 = 0.4f;
+		weights.tacticalWeight	 = 0.3f;
+		weights.structuralWeight = 0.6f; // pawn structure is more important
 		break;
 	}
 	}
