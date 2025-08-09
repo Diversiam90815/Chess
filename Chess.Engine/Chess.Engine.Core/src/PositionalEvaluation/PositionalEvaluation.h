@@ -5,9 +5,7 @@
   ==============================================================================
 */
 
-
 #pragma once
-
 
 #include "Parameters.h"
 #include "LightChessBoard.h"
@@ -29,32 +27,42 @@ struct PositionalEvaluationResult
 // Evaluation weights by game phase
 struct EvaluationWeights
 {
-	float materialWeight   = 1.0f;
-	float positionalWeight = 1.0f;
-	float kingSafetyWeight = 1.0f;
-	float mobilityWeight   = 1.0f;
-	float tacticalWeight   = 1.0f;
-	float structuralWeight = 1.0f;
+	float materialWeight   = 1.0f; // TODO: Adjust values
+	float positionalWeight = 1.0f; // TODO: Adjust values
+	float kingSafetyWeight = 1.0f; // TODO: Adjust values
+	float mobilityWeight   = 1.0f; // TODO: Adjust values
+	float tacticalWeight   = 1.0f; // TODO: Adjust values
+	float structuralWeight = 1.0f; // TODO: Adjust values
 };
 
 
 class PositionalEvaluation
 {
 public:
-	PositionalEvaluation();
+	PositionalEvaluation(std::shared_ptr<MoveEvaluation> moveEvaluation);
 	~PositionalEvaluation();
 
 	int						   evaluatePosition(const LightChessBoard &board, PlayerColor player);
 	PositionalEvaluationResult evaluatePositionDetailed(const LightChessBoard &board, PlayerColor player);
 
-	GamePhase				   determineGamePhase(const LightChessBoard &board) const;
-	PlayerColor				   getOpponent(PlayerColor player) const;
-
 	void					   setEvaluationWeights(EvaluationWeights &weights) { mEvaluationWeights = weights; }
+
+	int						   evaluateMaterial(const LightChessBoard &board, PlayerColor player);
+	int						   evaluatePositionalAdvantage(const LightChessBoard &board, PlayerColor player);
+	int						   evaluateKingSafety(const LightChessBoard &board, PlayerColor player);
+	int						   evaluateMobility(const LightChessBoard &board, PlayerColor player);
+	int						   evaluateTacticalOpportunities(const LightChessBoard &board, PlayerColor player);
+	int						   evaluatePawnStructure(const LightChessBoard &board, PlayerColor player);
 
 
 private:
+	GamePhase						determineGamePhase(const LightChessBoard &board) const;
+
+	PlayerColor						getOpponent(PlayerColor player) const;
+
 	EvaluationWeights				getWeightsForPhase(GamePhase phase) const;
+
+	int								evaluateBestMovesOpportunity(const LightChessBoard &board, PlayerColor player, int maxMoves);
 
 	EvaluationWeights				mEvaluationWeights;
 
