@@ -387,7 +387,7 @@ int PositionalEvaluation::evaluatePawnChains(const LightChessBoard &board, Playe
 
 		// Bonus for longer chains
 		if (chainLength >= 3)
-			score += (chainLength - 2) * 15; // 15 points per extra pawn in chain	}
+			score += (chainLength - 2) * mPawnChainFactor;
 	}
 
 	return score;
