@@ -36,7 +36,7 @@ public:
 	int		  getMediumEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 	int		  getAdvancedEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
-	int		  getPieceValue(PieceType piece);
+	int		  getPieceValue(PieceType piece) const;
 	int		  getPositionValue(PieceType piece, const Position &pos, PlayerColor player, const LightChessBoard *lightBoard = nullptr) const;
 	int		  evaluateMaterialGain(const PossibleMove &move, const LightChessBoard *lightBoard = nullptr);
 	int		  evaluatePositionalGain(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);

@@ -1078,7 +1078,7 @@ PlayerColor MoveEvaluation::getPieceColorFromPosition(const Position &pos, const
 }
 
 
-constexpr int MoveEvaluation::getPieceValue(PieceType piece)
+int MoveEvaluation::getPieceValue(PieceType piece) const
 {
 	switch (piece)
 	{

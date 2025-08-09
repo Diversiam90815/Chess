@@ -292,9 +292,9 @@ void CPUPlayer::calculateMove(PlayerColor player)
 	switch (mConfig.difficulty)
 	{
 	case CPUDifficulty::Random: selectedMove = getRandomMove(allMoves); break;
-	case CPUDifficulty::Easy: selectedMove = getEasyMove(allMoves); break;
-	case CPUDifficulty::Medium: selectedMove = getMediumMove(allMoves); break;
-	case CPUDifficulty::Hard: selectedMove = getHardMove(allMoves); break;
+	case CPUDifficulty::Easy: selectedMove = (allMoves.size() > 20) ? getEasyMove(allMoves) : getMiniMaxMove(allMoves, 3); break;
+	case CPUDifficulty::Medium: selectedMove = getAlphaBetaMove(allMoves, 3); break;
+	case CPUDifficulty::Hard: selectedMove = getAlphaBetaMove(allMoves, 6); break;
 	default: selectedMove = getRandomMove(allMoves); break;
 	}
 
