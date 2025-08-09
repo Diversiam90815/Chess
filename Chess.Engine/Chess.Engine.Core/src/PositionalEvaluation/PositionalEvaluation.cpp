@@ -99,9 +99,9 @@ int PositionalEvaluation::evaluateKingSafety(const LightChessBoard &board, Playe
 	{
 		// Focus on King safety
 		if (board.isInCheck(player))
-			score -= 50;
+			score -= mCheckFactor;
 		if (board.isInCheck(opponent))
-			score += 50;
+			score += mCheckFactor;
 	}
 	else
 	{
@@ -147,28 +147,28 @@ int PositionalEvaluation::evaluatePawnStructure(const LightChessBoard &board, Pl
 		// Passed pawns are very valuable
 		if (mMoveEvaluation->isPasssedPawn(pawnPos, player))
 		{
-			score += 50;
+			score += mPassedPawnFactor;
 
 			// Advanced passed pawns are even more valuable
 			int advancement = (player == PlayerColor::White) ? (7 - pawnPos.y) : pawnPos.y;
-			score += advancement * 10; // Bonus increases as pawn advances
+			score += advancement * mPassedAdvancedPawnFactor; // Bonus increases as pawn advances
 		}
 
 		// Isolated pawns are weak
 		if (mMoveEvaluation->isIsolatedPawn(pawnPos, player))
-			score -= 20;
+			score -= mIsolatedPawnFactor;
 
 		// Doubled pawns are weak
 		if (mMoveEvaluation->isDoublePawn(pawnPos, player))
-			score -= 15;
+			score -= mDoublePawnFactor;
 
 		// Evaluate pawn chains and support
 		if (hasPawnSupport(board, pawnPos, player))
-			score += 10; // Supported pawns are stronger
+			score += mSupportedPawnFactor; // Supported pawns are stronger
 
 		// Central pawns are more valuable
 		if (mMoveEvaluation->isInCenter(pawnPos))
-			score += 15;
+			score += mCentralPawnFactor;
 	}
 
 
@@ -177,22 +177,22 @@ int PositionalEvaluation::evaluatePawnStructure(const LightChessBoard &board, Pl
 	{
 		if (mMoveEvaluation->isPasssedPawn(pawnPos, opponent))
 		{
-			score -= 50;
+			score -= mPassedPawnFactor;
 			int advancement = (opponent == PlayerColor::White) ? (7 - pawnPos.y) : pawnPos.y;
-			score -= advancement * 10;
+			score -= advancement * mPassedAdvancedPawnFactor;
 		}
 
 		if (mMoveEvaluation->isIsolatedPawn(pawnPos, opponent))
-			score += 20; // Opponent's weaknesses benefit us
+			score += mIsolatedPawnFactor; // Opponent's weaknesses benefit us
 
 		if (mMoveEvaluation->isDoublePawn(pawnPos, opponent))
-			score += 15;
+			score += mDoublePawnFactor;
 
 		if (hasPawnSupport(board, pawnPos, opponent))
-			score -= 10;
+			score -= mSupportedPawnFactor;
 
 		if (mMoveEvaluation->isInCenter(pawnPos))
-			score -= 15;
+			score -= mCentralPawnFactor;
 	}
 
 	score += evaluatePawnMajority(board, player);

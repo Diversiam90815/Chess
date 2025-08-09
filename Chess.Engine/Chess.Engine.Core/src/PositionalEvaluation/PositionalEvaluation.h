@@ -64,7 +64,6 @@ private:
 
 	int								evaluateBestMovesOpportunity(const LightChessBoard &board, PlayerColor player, int maxMoves);
 
-
 	bool							hasPawnSupport(const LightChessBoard &board, const Position &pawnPos, PlayerColor player) const;
 	int								evaluatePawnMajority(const LightChessBoard &board, PlayerColor player) const;
 	int								evaluatePawnChains(const LightChessBoard &board, PlayerColor player) const;
@@ -74,6 +73,13 @@ private:
 
 	std::shared_ptr<MoveEvaluation> mMoveEvaluation;
 
-	const int						mPawnMajorityFactor = 25;
-	const int						mPawnChainFactor	= 15;
+	const int						mCheckFactor			  = 50;
+	const int						mPassedPawnFactor		  = 50;
+	const int						mPassedAdvancedPawnFactor = 10;
+	const int						mIsolatedPawnFactor		  = 20;
+	const int						mDoublePawnFactor		  = 15;
+	const int						mCentralPawnFactor		  = 10;
+	const int						mSupportedPawnFactor	  = 10;
+	const int						mPawnMajorityFactor		  = 25;
+	const int						mPawnChainFactor		  = 15;
 };
