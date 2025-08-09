@@ -44,7 +44,6 @@ namespace Chess.UI.Services
             var chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
             chessBoardViewModel.IsMultiplayerGame = false;
 
-            // TODO: Set up local coop configuration
             return await _navigationService.NavigateToChessboardAsync(false);
         }
 
