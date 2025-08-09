@@ -358,7 +358,7 @@ int PositionalEvaluation::evaluatePawnChains(const LightChessBoard &board, Playe
 			checkPos.y += direction;
 
 			if (!checkPos.isValid())
-				continue;
+				break;
 
 			const auto &piece = board.getPiece(checkPos);
 
