@@ -148,20 +148,8 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 	std::sort(sortedMoves.begin(), sortedMoves.end(),
 			  [&](const PossibleMove &a, const PossibleMove &b)
 			  {
-				  int scoreA = 0, scoreB = 0;
-
-				  // prioritize captures
-				  if ((a.type & MoveType::Capture) == MoveType::Capture)
-					  scoreA += 1000;
-				  if ((b.type & MoveType::Capture) == MoveType::Capture)
-					  scoreB += 1000;
-
-				  // Prioritize checks
-				  if ((a.type & MoveType::Check) == MoveType::Check)
-					  scoreA += 500;
-				  if ((b.type & MoveType::Check) == MoveType::Check)
-					  scoreB += 500;
-
+				  int scoreA = mMoveEvaluation->getAdvancedEvaluation(a, mConfig.cpuColor, &lightBoard);
+				  int scoreB = mMoveEvaluation->getAdvancedEvaluation(b, mConfig.cpuColor, &lightBoard);
 				  return scoreA > scoreB;
 			  });
 
@@ -243,6 +231,9 @@ void CPUPlayer::calculateMove(PlayerColor player)
 		LOG_WARNING("No legal moves available for CPU player!");
 		return;
 	}
+
+	// Clear evaluation cache before starting a new search
+	mEvaluationCache.clear();
 
 	// Simulate thinking
 	simulateThinking();
