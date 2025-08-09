@@ -9,7 +9,7 @@
 
 #include "Parameters.h"
 #include "LightChessBoard.h"
-#include "Evaluation/MoveEvaluation.h";
+#include "Evaluation/MoveEvaluation.h"
 
 
 struct PositionalEvaluationResult
@@ -40,7 +40,7 @@ class PositionalEvaluation
 {
 public:
 	PositionalEvaluation(std::shared_ptr<MoveEvaluation> moveEvaluation);
-	~PositionalEvaluation();
+	~PositionalEvaluation() = default;
 
 	int						   evaluatePosition(const LightChessBoard &board, PlayerColor player);
 	PositionalEvaluationResult evaluatePositionDetailed(const LightChessBoard &board, PlayerColor player);
@@ -64,7 +64,16 @@ private:
 
 	int								evaluateBestMovesOpportunity(const LightChessBoard &board, PlayerColor player, int maxMoves);
 
+
+	bool							hasPawnSupport(const LightChessBoard &board, const Position &pawnPos, PlayerColor player) const;
+	int								evaluatePawnMajority(const LightChessBoard &board, PlayerColor player) const;
+	int								evaluatePawnChains(const LightChessBoard &board, PlayerColor player) const;
+
+
 	EvaluationWeights				mEvaluationWeights;
 
 	std::shared_ptr<MoveEvaluation> mMoveEvaluation;
+
+	const int						mPawnMajorityFactor = 25;
+	const int						mPawnChainFactor	= 15;
 };

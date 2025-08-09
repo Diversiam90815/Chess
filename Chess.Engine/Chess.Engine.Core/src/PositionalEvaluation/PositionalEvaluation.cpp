@@ -11,9 +11,6 @@
 PositionalEvaluation::PositionalEvaluation(std::shared_ptr<MoveEvaluation> moveEvaluation) : mMoveEvaluation(moveEvaluation) {}
 
 
-PositionalEvaluation::~PositionalEvaluation() {}
-
-
 int PositionalEvaluation::evaluatePosition(const LightChessBoard &board, PlayerColor player)
 {
 	return evaluatePositionDetailed(board, player).getTotalScore();
@@ -137,8 +134,71 @@ int PositionalEvaluation::evaluateTacticalOpportunities(const LightChessBoard &b
 
 int PositionalEvaluation::evaluatePawnStructure(const LightChessBoard &board, PlayerColor player)
 {
-	// TODO
-	return 0;
+	int			score		  = 0;
+	PlayerColor opponent	  = getOpponent(player);
+
+	// Get all pawn positions for both player
+	auto		playerPawns	  = board.getPiecePositions(player, PieceType::Pawn);
+	auto		opponentPawns = board.getPiecePositions(opponent, PieceType::Pawn);
+
+	// Evaluate our pawnStructure
+	for (const auto &pawnPos : playerPawns)
+	{
+		// Passed pawns are very valuable
+		if (mMoveEvaluation->isPasssedPawn(pawnPos, player))
+		{
+			score += 50;
+
+			// Advanced passed pawns are even more valuable
+			int advancement = (player == PlayerColor::White) ? (7 - pawnPos.y) : pawnPos.y;
+			score += advancement * 10; // Bonus increases as pawn advances
+		}
+
+		// Isolated pawns are weak
+		if (mMoveEvaluation->isIsolatedPawn(pawnPos, player))
+			score -= 20;
+
+		// Doubled pawns are weak
+		if (mMoveEvaluation->isDoublePawn(pawnPos, player))
+			score -= 15;
+
+		// Evaluate pawn chains and support
+		if (hasPawnSupport(board, pawnPos, player))
+			score += 10; // Supported pawns are stronger
+
+		// Central pawns are more valuable
+		if (mMoveEvaluation->isInCenter(pawnPos))
+			score += 15;
+	}
+
+
+	// Subtract opponent's pawn structure advantages
+	for (const auto &pawnPos : opponentPawns)
+	{
+		if (mMoveEvaluation->isPasssedPawn(pawnPos, opponent))
+		{
+			score -= 50;
+			int advancement = (opponent == PlayerColor::White) ? (7 - pawnPos.y) : pawnPos.y;
+			score -= advancement * 10;
+		}
+
+		if (mMoveEvaluation->isIsolatedPawn(pawnPos, opponent))
+			score += 20; // Opponent's weaknesses benefit us
+
+		if (mMoveEvaluation->isDoublePawn(pawnPos, opponent))
+			score += 15;
+
+		if (hasPawnSupport(board, pawnPos, opponent))
+			score -= 10;
+
+		if (mMoveEvaluation->isInCenter(pawnPos))
+			score -= 15;
+	}
+
+	score += evaluatePawnMajority(board, player);
+	score += evaluatePawnChains(board, player);
+
+	return score;
 }
 
 
@@ -197,4 +257,138 @@ int PositionalEvaluation::evaluateBestMovesOpportunity(const LightChessBoard &bo
 	}
 
 	return bestScore != -std::numeric_limits<int>::max() ? bestScore : 0;
+}
+
+
+bool PositionalEvaluation::hasPawnSupport(const LightChessBoard &board, const Position &pawnPos, PlayerColor player) const
+{
+	// Check if this pawn is defended by another pawn
+	int		 direction = (player == PlayerColor::White) ? 1 : -1; // Directions pawns move
+
+	// Check diagonal squares behind the pawn for supporting pawns
+	Position leftSupport{pawnPos.x - 1, pawnPos.y + direction};
+	Position rightSupport{pawnPos.x + 1, pawnPos.y + direction};
+
+	if (leftSupport.isValid())
+	{
+		const auto &piece = board.getPiece(leftSupport);
+
+		if (!piece.isEmpty() && piece.type == PieceType::Pawn && piece.color == player)
+			return true;
+	}
+
+	if (rightSupport.isValid())
+	{
+		const auto &piece = board.getPiece(rightSupport);
+
+		if (!piece.isEmpty() && piece.type == PieceType::Pawn && piece.color == player)
+			return true;
+	}
+
+	return false;
+}
+
+
+int PositionalEvaluation::evaluatePawnMajority(const LightChessBoard &board, PlayerColor player) const
+{
+	int			score				   = 0;
+	PlayerColor opponent			   = getOpponent(player);
+
+	// Cound pawns kingside (e-f) and queenside (a-d)
+	int			playerKingsidePawns	   = 0;
+	int			playerQueensidePawns   = 0;
+	int			opponentKingsidePawns  = 0;
+	int			opponentQueensidePawns = 0;
+
+	auto		playerPawns			   = board.getPiecePositions(player, PieceType::Pawn);
+	auto		opponentPawns		   = board.getPiecePositions(opponent, PieceType::Pawn);
+
+	for (const auto &pos : playerPawns)
+	{
+		if (pos.x >= 4) // Files e-h (kingside)
+			playerKingsidePawns++;
+		else			// Files a-d (queenside)
+			playerQueensidePawns++;
+	}
+
+	for (const auto &pos : opponentPawns)
+	{
+		if (pos.x >= 4)
+			opponentKingsidePawns++;
+		else
+			opponentQueensidePawns++;
+	}
+
+
+	// Bonus for pawn majority on each side
+	if (playerKingsidePawns > opponentKingsidePawns)
+		score += mPawnMajorityFactor;
+	if (playerQueensidePawns > opponentQueensidePawns)
+		score += mPawnMajorityFactor;
+
+	// Penalty for opponent's majorities
+	if (opponentKingsidePawns > playerKingsidePawns)
+		score -= mPawnMajorityFactor;
+	if (opponentQueensidePawns > playerQueensidePawns)
+		score -= mPawnMajorityFactor;
+
+	return score;
+}
+
+
+int PositionalEvaluation::evaluatePawnChains(const LightChessBoard &board, PlayerColor player) const
+{
+	int	 score		 = 0;
+	auto playerPawns = board.getPiecePositions(player, PieceType::Pawn);
+
+	// Look for connected pawns
+	for (const auto &pawnPos : playerPawns)
+	{
+		int		 chainLength = 1;
+
+		// check for connected pawns diagonally forward
+		int		 direction	 = (player == PlayerColor::White) ? -1 : 1;
+
+		// Count chain going forward
+		Position checkPos	 = pawnPos;
+		while (true)
+		{
+			checkPos.x += 1; // Check right diagonal
+			checkPos.y += direction;
+
+			if (!checkPos.isValid())
+				continue;
+
+			const auto &piece = board.getPiece(checkPos);
+
+			if (!piece.isEmpty() && piece.type == PieceType::Pawn && piece.color == player)
+				chainLength++;
+			else
+				break;
+		}
+
+		// Reset and check left diagonal
+		checkPos = pawnPos;
+		while (true)
+		{
+			checkPos.x -= 1; // Check left diagonal
+			checkPos.y += direction;
+
+			if (!checkPos.isValid())
+				break;
+
+			const auto &piece = board.getPiece(checkPos);
+
+			if (!piece.isEmpty() && piece.type == PieceType::Pawn && piece.color == player)
+				chainLength++;
+			else
+				break;
+		}
+
+		// Bonus for longer chains
+		if (chainLength >= 3)
+			score += (chainLength - 2) * 15; // 15 points per extra pawn in chain	}
+	}
+
+	return score;
 }

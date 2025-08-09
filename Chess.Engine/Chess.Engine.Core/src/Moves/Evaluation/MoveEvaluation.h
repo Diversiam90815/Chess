@@ -56,6 +56,11 @@ public:
 
 	GamePhase			 determineGamePhase(const LightChessBoard *lightBoard = nullptr) const;
 
+	bool				  isPasssedPawn(const Position &pos, PlayerColor player) const;
+	bool				  isIsolatedPawn(const Position &pos, PlayerColor player) const;
+	bool				  isDoublePawn(const Position &pos, PlayerColor player) const;
+	bool				  isInCenter(const Position &pos) const;
+
 
 private:
 	struct ThreatAnalysis
@@ -81,14 +86,9 @@ private:
 	std::vector<Position> calculateThreatsOnBoard(PlayerColor opponent, PlayerColor player, ChessBoard &board);
 	std::vector<Position> calculateThreatsOnBoard(PlayerColor opponent, PlayerColor player, LightChessBoard &board);
 
-
 	int					  calculateMobility(PlayerColor player) const;
 	int					  calculateKingSafetyScore(PlayerColor player) const;
 	int					  calculatePawnStructureScore(PlayerColor player) const;
-	bool				  isPasssedPawn(const Position &pos, PlayerColor player) const;
-	bool				  isIsolatedPawn(const Position &pos, PlayerColor player) const;
-	bool				  isDoublePawn(const Position &pos, PlayerColor player) const;
-	bool				  isInCenter(const Position &pos) const;
 	bool				  isNearKing(const Position &pos, const Position &kingPos) const;
 	std::vector<Position> getAttackedSquares(const Position &piecePos, PlayerColor player, const LightChessBoard *board = nullptr) const;
 	bool				  wouldExposeKing(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr) const;
