@@ -24,24 +24,25 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 #   PROJECT DIRECTORIES
 #==========================================
 
-set (SOURCE_DIR             ${PROJECT_SOURCE_DIR}/src)
-set (SUBMODULES_DIR         ${PROJECT_SOURCE_DIR}/submodule)
+set (SOURCE_DIR						${PROJECT_SOURCE_DIR}/src)
+set (SUBMODULES_DIR					${PROJECT_SOURCE_DIR}/submodule)
 	
-set (API_DIR				${SOURCE_DIR}/API)
-set (PIECE_DIR              ${SOURCE_DIR}/Piece)
-set (MOVE_DIR               ${SOURCE_DIR}/Moves)
-set (GAME_MANAGER_DIR       ${SOURCE_DIR}/GameManager)
-set (GAME_ENGINE_DIR		${SOURCE_DIR}/GameEngine)
-set (BOARD_DIR              ${SOURCE_DIR}/Board)
-set (PLAYER_DIR             ${SOURCE_DIR}/Player)
-set (HELPER_DIR             ${SOURCE_DIR}/Helper)
-set (FILEMANAGER_DIR        ${SOURCE_DIR}/FileManager)
-set (LOGGER_DIR             ${SOURCE_DIR}/Logger)
-set (USERSETTINGS_DIR       ${SOURCE_DIR}/UserSettings)
-set (COMMUNICATION_DIR      ${SOURCE_DIR}/Communication)
-set (NETWORK_DIR            ${SOURCE_DIR}/Network)
-set (MULTIPLAYER_DIR        ${SOURCE_DIR}/Multiplayer)
-set (STATEMACHINE_DIR       ${SOURCE_DIR}/StateMachine)
+set (API_DIR						${SOURCE_DIR}/API)
+set (PIECE_DIR						${SOURCE_DIR}/Piece)
+set (MOVE_DIR						${SOURCE_DIR}/Moves)
+set (GAME_MANAGER_DIR				${SOURCE_DIR}/GameManager)
+set (GAME_ENGINE_DIR				${SOURCE_DIR}/GameEngine)
+set (BOARD_DIR						${SOURCE_DIR}/Board)
+set (PLAYER_DIR						${SOURCE_DIR}/Player)
+set (HELPER_DIR						${SOURCE_DIR}/Helper)
+set (FILEMANAGER_DIR				${SOURCE_DIR}/FileManager)
+set (LOGGER_DIR						${SOURCE_DIR}/Logger)
+set (USERSETTINGS_DIR				${SOURCE_DIR}/UserSettings)
+set (COMMUNICATION_DIR				${SOURCE_DIR}/Communication)
+set (NETWORK_DIR					${SOURCE_DIR}/Network)
+set (MULTIPLAYER_DIR				${SOURCE_DIR}/Multiplayer)
+set (STATEMACHINE_DIR				${SOURCE_DIR}/StateMachine)
+set (POSITIONALEVALUATION_DIR       ${SOURCE_DIR}/PositionalEvaluation)
 
 
 #==========================================
@@ -65,6 +66,7 @@ set(ALL_PROJECT_DIRS
 			${NETWORK_DIR}
 			${MULTIPLAYER_DIR}
 			${STATEMACHINE_DIR}
+			${POSITIONALEVALUATION_DIR}
 )
 
 include_directories(${ALL_PROJECT_DIRS})
@@ -154,6 +156,10 @@ set(COMMUNICATION_FILES
 	${COMMUNICATION_DIR}/UICommunication.h    ${COMMUNICATION_DIR}/UICommunication.cpp
 )
 
+set(POSITIONALEVALUATION_FILES
+	${POSITIONALEVALUATION_DIR}/PositionalEvaluation.h  	${POSITIONALEVALUATION_DIR}/PositionalEvaluation.cpp  
+)
+
 set(MULTIPLAYER_FILES
 	${MULTIPLAYER_DIR}/ConnectionStatus.h
 	${MULTIPLAYER_DIR}/Discovery/DiscoveryEndpoint.h
@@ -187,6 +193,7 @@ set(ALL_FILES
 	${NETWORK_FILES}
 	${MULTIPLAYER_FILES}
 	${STATEMACHINE_FILES}
+	${POSITIONALEVALUATION_FILES}
 )
 
 
