@@ -11,6 +11,7 @@
 #include <vector>
 #include <future>
 
+#include "Parameters.h"
 #include "Move.h"
 #include "ChessBoard.h"
 #include "Generation/MoveGeneration.h"
@@ -31,35 +32,35 @@ public:
 	MoveEvaluation(std::shared_ptr<ChessBoard> chessboard, std::shared_ptr<MoveGeneration> generation);
 	~MoveEvaluation() = default;
 
-	int					 getBasicEvaluation(const PossibleMove &move);
-	int					 getMediumEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
-	int					 getAdvancedEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  getBasicEvaluation(const PossibleMove &move);
+	int		  getMediumEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  getAdvancedEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
-	static constexpr int getPieceValue(PieceType piece);
-	int					 getPositionValue(PieceType piece, const Position &pos, PlayerColor player, const LightChessBoard *lightBoard = nullptr) const;
-	int					 evaluateMaterialGain(const PossibleMove &move, const LightChessBoard *lightBoard = nullptr);
-	int					 evaluatePositionalGain(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
-	int					 evaluateThreatLevel(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
-	int					 evaluateKingSafety(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
-	int					 evaluateCenterControl(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
-	int					 evaluatePawnStructure(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
-	int					 evaluatePieceActivity(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
-	int					 evaluateDefensivePatterns(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  getPieceValue(PieceType piece);
+	int		  getPositionValue(PieceType piece, const Position &pos, PlayerColor player, const LightChessBoard *lightBoard = nullptr) const;
+	int		  evaluateMaterialGain(const PossibleMove &move, const LightChessBoard *lightBoard = nullptr);
+	int		  evaluatePositionalGain(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  evaluateThreatLevel(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  evaluateKingSafety(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  evaluateCenterControl(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  evaluatePawnStructure(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  evaluatePieceActivity(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  evaluateDefensivePatterns(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
-	bool				 createsPin(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
-	bool				 createsFork(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
-	bool				 createsSkewer(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
-	bool				 blocksEnemyThreats(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	bool	  createsPin(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	bool	  createsFork(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	bool	  createsSkewer(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	bool	  blocksEnemyThreats(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
-	int					 getStrategicEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
-	int					 getTacticalEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  getStrategicEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  getTacticalEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
-	GamePhase			 determineGamePhase(const LightChessBoard *lightBoard = nullptr) const;
+	GamePhase determineGamePhase(const LightChessBoard *lightBoard = nullptr) const;
 
-	bool				  isPasssedPawn(const Position &pos, PlayerColor player) const;
-	bool				  isIsolatedPawn(const Position &pos, PlayerColor player) const;
-	bool				  isDoublePawn(const Position &pos, PlayerColor player) const;
-	bool				  isInCenter(const Position &pos) const;
+	bool	  isPasssedPawn(const Position &pos, PlayerColor player) const;
+	bool	  isIsolatedPawn(const Position &pos, PlayerColor player) const;
+	bool	  isDoublePawn(const Position &pos, PlayerColor player) const;
+	bool	  isInCenter(const Position &pos) const;
 
 
 private:
@@ -101,111 +102,6 @@ private:
 	PlayerColor			  getPieceColorFromPosition(const Position &pos, const LightChessBoard *lightBoard = nullptr) const;
 
 
-	std::shared_ptr<ChessBoard>						   mBoard;
-	std::shared_ptr<MoveGeneration>					   mGeneration;
-
-	static constexpr int							   PAWN_VALUE			   = 100;
-	static constexpr int							   KNIGHT_VALUE			   = 320;
-	static constexpr int							   BISHOP_VALUE			   = 330;
-	static constexpr int							   ROOK_VALUE			   = 500;
-	static constexpr int							   QUEEN_VALUE			   = 900;
-
-	static constexpr int							   CHECKMATE_BONUS		   = 10000;
-	static constexpr int							   CHECK_BONUS			   = 50;
-	static constexpr int							   CAPTURE_BONUS		   = 25;
-	static constexpr int							   CASTLE_BONUS			   = 60;
-	static constexpr int							   PROMOTION_BONUS		   = 800;
-	static constexpr int							   CENTER_CONTROL_BONUS	   = 15;
-	static constexpr int							   KING_SAFETY_WEIGHT	   = 3;
-	static constexpr int							   MOBILITY_WEIGHT		   = 2;
-	static constexpr int							   THREAT_WEIGHT		   = 4;
-
-	static constexpr int							   FORK_BONUS			   = 150;
-	static constexpr int							   PIN_BONUS			   = 100;
-	static constexpr int							   SKEWER_BONUS			   = 120;
-	static constexpr int							   DISCOVERED_ATTACK_BONUS = 80;
-	static constexpr int							   THREAT_BLOCK_BONUS	   = 60;
-
-	// Position value tables (from white's perspective, flip for black)
-	static constexpr std::array<std::array<int, 8>, 8> PAWN_TABLE_MG		   = {{{0, 0, 0, 0, 0, 0, 0, 0},
-																				   {50, 50, 50, 50, 50, 50, 50, 50},
-																				   {10, 10, 20, 30, 30, 20, 10, 10},
-																				   {5, 5, 10, 27, 27, 10, 5, 5},
-																				   {0, 0, 0, 25, 25, 0, 0, 0},
-																				   {5, -5, -10, 0, 0, -10, -5, 5},
-																				   {5, 10, 10, -25, -25, 10, 10, 5},
-																				   {0, 0, 0, 0, 0, 0, 0, 0}}};
-
-	// Endgame tables (king activity is more important)
-	static constexpr std::array<std::array<int, 8>, 8> PAWN_TABLE_EG		   = {{{0, 0, 0, 0, 0, 0, 0, 0},
-																				   {80, 80, 80, 80, 80, 80, 80, 80},
-																				   {50, 50, 50, 50, 50, 50, 50, 50},
-																				   {30, 30, 30, 30, 30, 30, 30, 30},
-																				   {20, 20, 20, 20, 20, 20, 20, 20},
-																				   {10, 10, 10, 10, 10, 10, 10, 10},
-																				   {10, 10, 10, 10, 10, 10, 10, 10},
-																				   {0, 0, 0, 0, 0, 0, 0, 0}}};
-
-	static constexpr std::array<std::array<int, 8>, 8> KNIGHT_TABLE_MG		   = {{{-50, -40, -30, -30, -30, -30, -40, -50},
-																				   {-40, -20, 0, 0, 0, 0, -20, -40},
-																				   {-30, 0, 10, 15, 15, 10, 0, -30},
-																				   {-30, 5, 15, 20, 20, 15, 5, -30},
-																				   {-30, 0, 15, 20, 20, 15, 0, -30},
-																				   {-30, 5, 10, 15, 15, 10, 5, -30},
-																				   {-40, -20, 0, 5, 5, 0, -20, -40},
-																				   {-50, -40, -30, -30, -30, -30, -40, -50}}};
-
-	static constexpr std::array<std::array<int, 8>, 8> KNIGHT_TABLE_EG		   = {{{-50, -40, -30, -30, -30, -30, -40, -50},
-																				   {-40, -20, 0, 5, 5, 0, -20, -40},
-																				   {-30, 0, 10, 15, 15, 10, 0, -30},
-																				   {-30, 5, 15, 20, 20, 15, 5, -30},
-																				   {-30, 0, 15, 20, 20, 15, 0, -30},
-																				   {-30, 5, 10, 15, 15, 10, 5, -30},
-																				   {-40, -20, 0, 5, 5, 0, -20, -40},
-																				   {-50, -40, -30, -30, -30, -30, -40, -50}}};
-
-	static constexpr std::array<std::array<int, 8>, 8> BISHOP_TABLE			   = {{{-20, -10, -10, -10, -10, -10, -10, -20},
-																				   {-10, 0, 0, 0, 0, 0, 0, -10},
-																				   {-10, 0, 5, 10, 10, 5, 0, -10},
-																				   {-10, 5, 5, 10, 10, 5, 5, -10},
-																				   {-10, 0, 10, 10, 10, 10, 0, -10},
-																				   {-10, 10, 10, 10, 10, 10, 10, -10},
-																				   {-10, 5, 0, 0, 0, 0, 5, -10},
-																				   {-20, -10, -10, -10, -10, -10, -10, -20}}};
-
-	static constexpr std::array<std::array<int, 8>, 8> ROOK_TABLE			   = {{{0, 0, 0, 0, 0, 0, 0, 0},
-																				   {5, 10, 10, 10, 10, 10, 10, 5},
-																				   {-5, 0, 0, 0, 0, 0, 0, -5},
-																				   {-5, 0, 0, 0, 0, 0, 0, -5},
-																				   {-5, 0, 0, 0, 0, 0, 0, -5},
-																				   {-5, 0, 0, 0, 0, 0, 0, -5},
-																				   {-5, 0, 0, 0, 0, 0, 0, -5},
-																				   {0, 0, 0, 5, 5, 0, 0, 0}}};
-
-	static constexpr std::array<std::array<int, 8>, 8> QUEEN_TABLE			   = {{{-20, -10, -10, -5, -5, -10, -10, -20},
-																				   {-10, 0, 0, 0, 0, 0, 0, -10},
-																				   {-10, 0, 5, 5, 5, 5, 0, -10},
-																				   {-5, 0, 5, 5, 5, 5, 0, -5},
-																				   {0, 0, 5, 5, 5, 5, 0, -5},
-																				   {-10, 5, 5, 5, 5, 5, 0, -10},
-																				   {-10, 0, 5, 0, 0, 0, 0, -10},
-																				   {-20, -10, -10, -5, -5, -10, -10, -20}}};
-
-	static constexpr std::array<std::array<int, 8>, 8> KING_TABLE_MG		   = {{{-30, -40, -40, -50, -50, -40, -40, -30},
-																				   {-30, -40, -40, -50, -50, -40, -40, -30},
-																				   {-30, -40, -40, -50, -50, -40, -40, -30},
-																				   {-30, -40, -40, -50, -50, -40, -40, -30},
-																				   {-20, -30, -30, -40, -40, -30, -30, -20},
-																				   {-10, -20, -20, -20, -20, -20, -20, -10},
-																				   {20, 20, 0, 0, 0, 0, 20, 20},
-																				   {20, 30, 10, 0, 0, 10, 30, 20}}};
-
-	static constexpr std::array<std::array<int, 8>, 8> KING_TABLE_EG		   = {{{-50, -40, -30, -20, -20, -30, -40, -50},
-																				   {-30, -20, -10, 0, 0, -10, -20, -30},
-																				   {-30, -10, 20, 30, 30, 20, -10, -30},
-																				   {-30, -10, 30, 40, 40, 30, -10, -30},
-																				   {-30, -10, 30, 40, 40, 30, -10, -30},
-																				   {-30, -10, 20, 30, 30, 20, -10, -30},
-																				   {-30, -30, 0, 0, 0, 0, -30, -30},
-																				   {-50, -30, -30, -30, -30, -30, -30, -50}}};
+	std::shared_ptr<ChessBoard>		mBoard;
+	std::shared_ptr<MoveGeneration> mGeneration;
 };

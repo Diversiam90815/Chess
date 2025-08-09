@@ -174,18 +174,18 @@ int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor pla
 
 		// Penalize moves that expose our king
 		if (wouldExposeKing(move, player, lightBoard))
-			score -= 100;
+			score -= EXPOSE_KING_FACTOR;
 
 		// Reward moves that attack near the opponnents king
 		if (isNearKing(move.end, opponentKingPos))
-			score += 30;
+			score += ATTACK_NEAR_KING_FACTOR;
 
 		// Reward defensive moves near our king when under threat
 		if (isNearKing(move.end, kingPos))
 		{
 			int attackerCount = countAttackers(kingPos, getOpponentColor(player), lightBoard);
 			if (attackerCount > 0)
-				score += 25;
+				score += DEFENDING_KING_FACTOR;
 		}
 
 		score = score * KING_SAFETY_WEIGHT;
@@ -203,12 +203,10 @@ int MoveEvaluation::evaluateKingSafety(const PossibleMove &move, PlayerColor pla
 		int currentDistance = abs(move.start.x - 3.5) + abs(move.start.y - 3.5);
 
 		if (centerDistance < currentDistance)
-		{
-			score += 25; // Bonus for king centralization in endgame
-		}
+			score += KING_CENTRALIZATION_FACTOR; // Bonus for king centralization in endgame
 
 		// Additional bonus for king activity (any king move in endgame)
-		score += 10;
+		score += KING_ACTIVITY_FACTOR;
 	}
 
 	return score;
@@ -246,13 +244,13 @@ int MoveEvaluation::evaluatePawnStructure(const PossibleMove &move, PlayerColor 
 
 	// Check for pawn structure improvements
 	if (isPasssedPawn(move.end, player))
-		score += 50;
+		score += PASSED_PAWN_FACTOR;
 
 	if (isIsolatedPawn(move.end, player))
-		score -= 20;
+		score -= ISOLATED_PAWN_FACTOR;
 
 	if (isDoublePawn(move.end, player))
-		score -= 15;
+		score -= DOUBLE_PAWN_FACTOR;
 
 	return score;
 }
@@ -261,6 +259,7 @@ int MoveEvaluation::evaluatePawnStructure(const PossibleMove &move, PlayerColor 
 int MoveEvaluation::evaluatePieceActivity(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
 {
 	PieceType pieceType = getPieceTypeFromPosition(move.start, lightBoard);
+
 	if (pieceType == PieceType::DefaultType)
 		return 0;
 
@@ -282,6 +281,7 @@ int MoveEvaluation::evaluatePieceActivity(const PossibleMove &move, PlayerColor 
 		}
 
 		tmpBoard.unmakeMove(undoInfo);
+
 		return mobility * 2;
 	}
 	else
@@ -294,7 +294,9 @@ int MoveEvaluation::evaluatePieceActivity(const PossibleMove &move, PlayerColor 
 
 		ChessBoard tmpBoard(*mBoard);
 		tmpBoard.movePiece(move.start, move.end);
+
 		auto moves = piece->getPossibleMoves(move.end, tmpBoard, true);
+
 		return static_cast<int>(moves.size()) * 2;
 	}
 }
@@ -309,11 +311,11 @@ int MoveEvaluation::evaluateDefensivePatterns(const PossibleMove &move, PlayerCo
 
 	// Defending the king area
 	if (isNearKing(move.end, kingPos))
-		score += 15;
+		score += DEFENDING_KING_FACTOR;
 
 	// Defending important central squares
 	if (isInCenter(move.end))
-		score += 10;
+		score += CENTER_CONTROL_BONUS;
 
 	// Check if move blocks enemy attacks on our pieces
 	auto attackedSquares = getAttackedSquares(move.end, player, lightBoard);
@@ -323,7 +325,7 @@ int MoveEvaluation::evaluateDefensivePatterns(const PossibleMove &move, PlayerCo
 		PlayerColor pieceColor = getPieceColorFromPosition(square, lightBoard);
 
 		if (pieceColor == player)
-			score += 5;
+			score += BLOCK_ATTACK_FACTOR;
 	}
 
 	return score;
@@ -407,7 +409,8 @@ bool MoveEvaluation::createsFork(const PossibleMove &move, PlayerColor player, c
 		ChessBoard tmpBoard(*mBoard);
 		tmpBoard.movePiece(move.start, move.end);
 
-		auto piece = mBoard->getPiece(move.start);
+		auto &piece = mBoard->getPiece(move.start);
+
 		if (!piece)
 			return false;
 
@@ -587,10 +590,10 @@ GamePhase MoveEvaluation::determineGamePhase(const LightChessBoard *lightBoard) 
 	}
 
 	// Determine game phase based on material and piece count
-	if (totalMaterial > 6000 || totalPieces > 20)
+	if (totalMaterial > OPENING_MATERIAL_THRESHOLD || totalPieces > OPENING_PIECE_THRESHOLD)
 		return GamePhase::Opening;
 
-	else if (totalMaterial > 2500 || totalPieces > 12)
+	else if (totalMaterial > MIDDLEGAME_MATERIAL_THRESHOLD || totalPieces > MIDDLEGAME_PIECE_THRESHOLD)
 		return GamePhase::MiddleGame;
 
 	else
@@ -655,7 +658,7 @@ MoveEvaluation::ThreatAnalysis MoveEvaluation::calculateCurrentThreats(PlayerCol
 
 MoveEvaluation::ThreatAnalysis MoveEvaluation::calculateThreatsAfterMove(const PossibleMove &move, PlayerColor player, PlayerColor opponent, const LightChessBoard *lightBoard)
 {
-	Position ourKingAfterMove = lightBoard ? lightBoard->getKingPosition(player) : mBoard->getKingsPosition(player);
+	Position			  ourKingAfterMove = lightBoard ? lightBoard->getKingPosition(player) : mBoard->getKingsPosition(player);
 	std::vector<Position> threats;
 
 	if (lightBoard)
@@ -672,7 +675,7 @@ MoveEvaluation::ThreatAnalysis MoveEvaluation::calculateThreatsAfterMove(const P
 		ChessBoard tmpBoard(*mBoard);
 		tmpBoard.movePiece(move.start, move.end);
 
-		threats		   = calculateThreatsOnBoard(opponent, player, tmpBoard);
+		threats = calculateThreatsOnBoard(opponent, player, tmpBoard);
 	}
 
 	return ThreatAnalysis(threats, ourKingAfterMove);
@@ -807,7 +810,8 @@ int MoveEvaluation::calculateKingSafetyScore(PlayerColor player) const
 	// Count attackers near king
 	PlayerColor opponent  = getOpponentColor(player);
 	int			attackers = countAttackers(kingPos, opponent);
-	score -= 20 * attackers; // Penalty for each attacker
+
+	score -= ATTACKER_KING_FACTOR * attackers; // Penalty for each attacker
 
 	// bonus for each king protecting pieces near king
 	for (int dx = -1; dx <= 1; ++dx)
@@ -822,7 +826,7 @@ int MoveEvaluation::calculateKingSafetyScore(PlayerColor player) const
 			auto &piece = mBoard->getPiece(nearPos);
 
 			if (piece && piece->getColor() == player)
-				score += 5; // Bonus for friendly pieces near king
+				score += DEFENDING_KING_FACTOR; // Bonus for friendly pieces near king
 		}
 	}
 
@@ -842,13 +846,13 @@ int MoveEvaluation::calculatePawnStructureScore(PlayerColor player) const
 			continue;
 
 		if (isPasssedPawn(position, player))
-			score += 50;
+			score += PASSED_PAWN_FACTOR;
 
 		if (isIsolatedPawn(position, player))
-			score -= 20;
+			score -= ISOLATED_PAWN_FACTOR;
 
 		if (isDoublePawn(position, player))
-			score -= 15;
+			score -= DOUBLE_PAWN_FACTOR;
 	}
 
 	return score;
@@ -889,6 +893,7 @@ bool MoveEvaluation::isIsolatedPawn(const Position &pos, PlayerColor player) con
 		{
 			Position checkPos{checkFile, y};
 			auto	&piece = mBoard->getPiece(checkPos);
+
 			if (piece && piece->getType() == PieceType::Pawn && piece->getColor() == player)
 				return false; // Found friendly pawn on adjacent file
 		}

@@ -69,14 +69,4 @@ private:
 	EvaluationWeights				mEvaluationWeights;
 
 	std::shared_ptr<MoveEvaluation> mMoveEvaluation;
-
-	const int						mCheckFactor			  = 50;
-	const int						mPassedPawnFactor		  = 50;
-	const int						mPassedAdvancedPawnFactor = 10;
-	const int						mIsolatedPawnFactor		  = 20;
-	const int						mDoublePawnFactor		  = 15;
-	const int						mCentralPawnFactor		  = 10;
-	const int						mSupportedPawnFactor	  = 10;
-	const int						mPawnMajorityFactor		  = 25;
-	const int						mPawnChainFactor		  = 15;
 };
