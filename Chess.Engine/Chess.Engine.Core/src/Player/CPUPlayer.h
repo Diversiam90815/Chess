@@ -20,6 +20,7 @@
 #include "ChessBoard.h"
 #include "IObservable.h"
 #include "LightChessBoard.h"
+#include "PositionalEvaluation.h"
 
 
 enum class CPUDifficulty
@@ -115,13 +116,16 @@ private:
 	std::shared_ptr<MoveGeneration>					 mMoveGeneration;
 	std::shared_ptr<MoveEvaluation>					 mMoveEvaluation;
 	std::shared_ptr<ChessBoard>						 mBoard;
+	std::shared_ptr<PositionalEvaluation>			 mPositionalEvaluation;
 
 	std::unordered_map<uint64_t, TranspositionEntry> mTranspositionTable;
-	int												 mNodesSearched		= 0;
-	int												 mTranspositionHits = 0;
+	static constexpr size_t							 MAX_TRANSPOSITION_ENTRIES = 1000000;
+	int												 mNodesSearched			   = 0;
+	int												 mTranspositionHits		   = 0;
 
 	std::random_device								 mRandomDevice;
 	std::mt19937									 mRandomGenerator;
 
-	static constexpr size_t							 MAX_TRANSPOSITION_ENTRIES = 1000000;
+	mutable std::unordered_map<uint64_t, int>		 mEvaluationCache;
+	static constexpr size_t							 MAX_EVAL_CACHE_SIZE = 1000000;
 };

@@ -11,6 +11,7 @@
 CPUPlayer::CPUPlayer(std::shared_ptr<MoveGeneration> moveGeneration, std::shared_ptr<MoveEvaluation> moveEvaluation, std::shared_ptr<ChessBoard> board)
 	: mMoveGeneration(moveGeneration), mMoveEvaluation(moveEvaluation), mBoard(board), mRandomGenerator(mRandomDevice())
 {
+	mPositionalEvaluation = std::make_shared<PositionalEvaluation>(mMoveEvaluation);
 }
 
 
@@ -244,65 +245,20 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 
 int CPUPlayer::evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player)
 {
-	// TODO:	Utilize MoveEvaluation with LightChessBoard for better evaluation and improving the algorithms
+	uint64_t hash = board.getHashKey();
 
-	//int			score	 = 0;
-	//PlayerColor opponent = (player == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
+	// Check evaluation cache
+	auto	 it	  = mEvaluationCache.find(hash);
+	if (it != mEvaluationCache.end())
+		return it->second;
 
-	//// Material evaluation (from LightChessBoard)
-	//score += board.getMaterialValue(player) - board.getMaterialValue(opponent);
+	int score = mPositionalEvaluation->evaluatePosition(board, player);
 
-	//// Positional evaluation
-	//auto playerPieces	= board.getPiecePositions(player);
-	//auto opponentPieces = board.getPiecePositions(opponent);
+	// Cache the result
+	if (mEvaluationCache.size() < MAX_EVAL_CACHE_SIZE)
+		mEvaluationCache[hash] = score;
 
-	//for (const auto &pos : playerPieces)
-	//{
-	//	auto &piece = board.getPiece(pos);
-
-	//	if (!piece.isEmpty())
-	//		score += mMoveEvaluation->getPositionValue(piece.type, pos, player);
-	//}
-
-	//for (const auto &pos : opponentPieces)
-	//{
-	//	auto &piece = board.getPiece(pos);
-
-	//	if (!piece.isEmpty())
-	//		score -= mMoveEvaluation->getPositionValue(piece.type, pos, opponent);
-	//}
-
-	//// King safety evaluation
-	//if (!board.isEndgame())
-	//{
-	//	if (board.isInCheck(player))
-	//		score -= 50;
-
-	//	if (board.isInCheck(opponent))
-	//		score += 50;
-	//}
-	//else
-	//{
-	//	// Endgame: encourage king activity and centralization
-	//	Position playerKing			= board.getKingPosition(player);
-	//	Position opponentKing		= board.getKingPosition(opponent);
-
-	//	int		 playerCentrality	= 4 - std::max(std::abs(playerKing.x - 3.5), std::abs(playerKing.y - 3.5));
-	//	int		 opponentCentrality = 4 - std::max(std::abs(opponentKing.x - 3.5), std::abs(opponentKing.y - 3.5));
-
-	//	score += playerCentrality * 10;	  // our centralization is good
-	//	score -= opponentCentrality * 10; // opponnent centralization is bad for us
-	//}
-
-	//// Mobility evaluation
-	//auto playerMoves   = board.generateLegalMoves(player);
-	//auto opponentMoves = board.generateLegalMoves(opponent);
-
-	//score += static_cast<int>(playerMoves.size()) * 2;
-	//score -= static_cast<int>(opponentMoves.size()) * 2;
-
-	//return score;
-	return 0;
+	return score;
 }
 
 
