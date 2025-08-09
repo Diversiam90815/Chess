@@ -67,52 +67,11 @@ PossibleMove CPUPlayer::getRandomMove(const std::vector<PossibleMove> &moves)
 }
 
 
-PossibleMove CPUPlayer::getEasyMove(const std::vector<PossibleMove> &moves)
+PossibleMove CPUPlayer::getBestEvaluatedMove(const std::vector<PossibleMove> &moves)
 {
 	if (moves.empty())
 		return {};
 
-	// Easy: Basic move evaluation
-	std::vector<MoveCandidate> evaluatedMoves;
-
-	for (const auto &move : moves)
-	{
-		int score = mMoveEvaluation->getBasicEvaluation(move);
-		evaluatedMoves.emplace_back(move, score);
-	}
-
-	PossibleMove selectedMove = mConfig.enableRandomization ? selectMoveWithRandomization(evaluatedMoves) : selectBestMove(evaluatedMoves);
-
-	return selectedMove;
-}
-
-
-PossibleMove CPUPlayer::getMediumMove(const std::vector<PossibleMove> &moves)
-{
-	if (moves.empty())
-		return {};
-
-	// Medium: Enhanced evaluation with  positional awareness
-	std::vector<MoveCandidate> evaluatedMoves;
-
-	for (const auto &move : moves)
-	{
-		int score = mMoveEvaluation->getMediumEvaluation(move, mConfig.cpuColor);
-		evaluatedMoves.emplace_back(move, score);
-	}
-
-	PossibleMove selectedMove = mConfig.enableRandomization ? selectMoveWithRandomization(evaluatedMoves) : selectBestMove(evaluatedMoves);
-
-	return selectedMove;
-}
-
-
-PossibleMove CPUPlayer::getHardMove(const std::vector<PossibleMove> &moves)
-{
-	if (moves.empty())
-		return {};
-
-	// Hard: Advanced evaluation with deeper analysis
 	std::vector<MoveCandidate> evaluatedMoves;
 
 	for (const auto &move : moves)
@@ -292,7 +251,7 @@ void CPUPlayer::calculateMove(PlayerColor player)
 	switch (mConfig.difficulty)
 	{
 	case CPUDifficulty::Random: selectedMove = getRandomMove(allMoves); break;
-	case CPUDifficulty::Easy: selectedMove = (allMoves.size() > 20) ? getEasyMove(allMoves) : getMiniMaxMove(allMoves, 3); break;
+	case CPUDifficulty::Easy: selectedMove = (allMoves.size() > 20) ? getBestEvaluatedMove(allMoves) : getMiniMaxMove(allMoves, 3); break;
 	case CPUDifficulty::Medium: selectedMove = getAlphaBetaMove(allMoves, 3); break;
 	case CPUDifficulty::Hard: selectedMove = getAlphaBetaMove(allMoves, 6); break;
 	default: selectedMove = getRandomMove(allMoves); break;

@@ -182,7 +182,7 @@ TEST_F(CPUPlayerTests, GetRandomMoveReturnsValidMove)
 }
 
 
-TEST_F(CPUPlayerTests, GetEasyMovePrefersCheckmate)
+TEST_F(CPUPlayerTests, GetBestMovePrefersCheckmate)
 {
 	std::vector<PossibleMove> moves;
 
@@ -195,12 +195,11 @@ TEST_F(CPUPlayerTests, GetEasyMovePrefersCheckmate)
 	moves.push_back(captureMove);
 	moves.push_back(checkmateMove);
 
-	PossibleMove selectedMove = mCPUPlayer->getEasyMove(moves);
+	PossibleMove selectedMove = mCPUPlayer->getBestEvaluatedMove(moves);
 
 	// Checkmate should be selected as it has the highest basic evaluation score (1000)
-	EXPECT_TRUE(selectedMove == checkmateMove) << "Easy mode should select the move with highest basic evaluation (checkmate)";
+	EXPECT_TRUE(selectedMove == checkmateMove) << "Should select the move with highest basic evaluation (checkmate)";
 }
-
 
 
 TEST_F(CPUPlayerTests, GetMiniMaxMoveReturnsValidMove)
@@ -267,9 +266,7 @@ TEST_F(CPUPlayerTests, EmptyMoveListHandling)
 
 	// Test that CPU handles empty move lists gracefully
 	PossibleMove			  randomMove	= mCPUPlayer->getRandomMove(emptyMoves);
-	PossibleMove			  easyMove		= mCPUPlayer->getEasyMove(emptyMoves);
-	PossibleMove			  mediumMove	= mCPUPlayer->getMediumMove(emptyMoves);
-	PossibleMove			  hardMove		= mCPUPlayer->getHardMove(emptyMoves);
+	PossibleMove			  easyMove		= mCPUPlayer->getBestEvaluatedMove(emptyMoves);
 
 	PossibleMove			  alphaBetaMove = mCPUPlayer->getAlphaBetaMove(emptyMoves, 2);
 	PossibleMove			  minimaxMove	= mCPUPlayer->getMiniMaxMove(emptyMoves, 2);
@@ -278,8 +275,6 @@ TEST_F(CPUPlayerTests, EmptyMoveListHandling)
 	// Empty moves should result in empty/default moves
 	EXPECT_TRUE(randomMove.isEmpty()) << "Random move should be empty for empty input";
 	EXPECT_TRUE(easyMove.isEmpty()) << "Easy move should be empty for empty input";
-	EXPECT_TRUE(mediumMove.isEmpty()) << "Medium move should be empty for empty input";
-	EXPECT_TRUE(hardMove.isEmpty()) << "Hard move should be empty for empty input";
 	EXPECT_TRUE(alphaBetaMove.isEmpty()) << "Alpha-Beta move should be empty for empty input";
 	EXPECT_TRUE(minimaxMove.isEmpty()) << "Minimax move should be empty for empty input";
 }

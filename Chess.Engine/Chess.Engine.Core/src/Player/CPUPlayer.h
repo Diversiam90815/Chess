@@ -33,16 +33,16 @@ enum class CPUDifficulty
 
 struct TranspositionEntry
 {
-	uint64_t hash;
-	int		 depth;
-	int		 score;
+	uint64_t hash{};
+	int		 depth{};
+	int		 score{};
 	enum class NodeType
 	{
 		Exact,
 		Alpha,
 		Beta
 	} type;
-	PossibleMove move;
+	PossibleMove move{};
 };
 
 struct MoveCandidate
@@ -83,9 +83,8 @@ public:
 	void			 moveCalculated(PossibleMove calculatedMove) override;
 
 	PossibleMove	 getRandomMove(const std::vector<PossibleMove> &moves);
-	PossibleMove	 getEasyMove(const std::vector<PossibleMove> &moves);
-	PossibleMove	 getMediumMove(const std::vector<PossibleMove> &moves);
-	PossibleMove	 getHardMove(const std::vector<PossibleMove> &moves);
+
+	PossibleMove	 getBestEvaluatedMove(const std::vector<PossibleMove> &moves);
 
 	PossibleMove	 getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth);
 	PossibleMove	 getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth);
