@@ -130,11 +130,11 @@ namespace Chess.UI.Audio.Services
 
         public async Task HandleEndGameStateAsync(EndGameState gameState)
         {
+            // For now we just have a SFX for CheckMate
             var sfx = gameState switch
             {
                 EndGameState.Checkmate => SoundEffect.Checkmate,
-                //EndGameState.StaleMate => SoundEffect.Stalemate,
-                _ => SoundEffect.GameEnd
+                _ => SoundEffect.Checkmate
             };
 
             await _soundEffectsModule?.PlaySoundAsync(sfx, 0.8f);
@@ -144,12 +144,6 @@ namespace Chess.UI.Audio.Services
         public async Task HandleGameStartAsync()
         {
             await _soundEffectsModule?.PlaySoundAsync(SoundEffect.GameStart, 0.6f);
-        }
-
-
-        public async Task HandleGameEndAsync()
-        {
-            await _soundEffectsModule?.PlaySoundAsync(SoundEffect.GameEnd, 0.7f);
         }
 
 
@@ -278,10 +272,6 @@ namespace Chess.UI.Audio.Services
         {
             if (move.type.HasFlag(MoveTypeInstance.MoveType_Checkmate))
                 return SoundEffect.Checkmate;
-            //if (move.type.HasFlag(MoveTypeInstance.MoveType_Check))
-            //    return SoundEffect.Check;
-            //if (move.type.HasFlag(MoveTypeInstance.MoveType_PawnPromotion))
-            //    return SoundEffect.PawnPromotion;
             if (isCapture)
                 return SoundEffect.PieceCapture;
 

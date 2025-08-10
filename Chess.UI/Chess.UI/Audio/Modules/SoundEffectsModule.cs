@@ -14,28 +14,14 @@ namespace Chess.UI.Audio.Modules
 {
     public enum SoundEffect
     {
-        // Piece Movement
         PieceMove,
         PieceCapture,
-        //PawnPromotion,
-
-        // States
-        //Check,
         Checkmate,
-        //Stalemate,
-
-        // Flow
         GameStart,
-        GameEnd,
-
-        // UI
         ButtonClick,
         MenuOpen,
         ItemSelected,
         PieceSelected,
-
-        // Multiplayer
-        //ChatMessageReceived,    // chat feature not yet implemented, though prepared
     }
 
 
