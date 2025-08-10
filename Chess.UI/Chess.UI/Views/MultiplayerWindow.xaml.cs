@@ -13,6 +13,8 @@ namespace Chess.UI.Views
 
         private readonly MultiplayerViewModel _viewModel;
 
+        private readonly IWindowSizeService _windowSizeService;
+
 
         public MultiplayerWindow()
         {
@@ -20,11 +22,12 @@ namespace Chess.UI.Views
             AppWindow.SetIcon(Project.IconPath);
 
             _viewModel = App.Current.Services.GetService<MultiplayerViewModel>();
+            _windowSizeService = App.Current.Services.GetService<IWindowSizeService>();
 
             this.Rootgrid.DataContext = _viewModel;
 
             Init();
-            SetWindowSize(600, 400);
+            _windowSizeService.SetWindowSize(this, 600, 400);
         }
 
 
@@ -36,16 +39,6 @@ namespace Chess.UI.Views
 
             _viewModel.ResetViewState();
             _viewModel.StartMultiplayerSetup();
-        }
-
-
-        private void SetWindowSize(double width, double height)
-        {
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            float scalingFactor = EngineAPI.GetWindowScalingFactor(hwnd);
-            int scaledWidth = (int)(width * scalingFactor);
-            int scaledHeight = (int)(height * scalingFactor);
-            AppWindow.Resize(new(scaledWidth, scaledHeight));
         }
 
 

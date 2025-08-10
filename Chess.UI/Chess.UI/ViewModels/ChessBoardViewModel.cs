@@ -152,9 +152,9 @@ namespace Chess.UI.ViewModels
         }
 
 
-        public void StartGame()
+        public void StartGame(GameConfiguration config)
         {
-            EngineAPI.StartGame();  // Start the game and thus the StateMachine
+            EngineAPI.StartGame(config);  // Start the game and thus the StateMachine
         }
 
 

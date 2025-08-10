@@ -11,7 +11,7 @@ namespace Chess.UI.Services
 
         #region Defines
 
-        private const string LOGIC_API_PATH = @"Chess.Engine.dll";
+        private const string LOGIC_API_PATH = @"Chess.Engine.API.dll";
 
         #endregion // Defines
 
@@ -59,7 +59,7 @@ namespace Chess.UI.Services
         #region Game
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartGame", CharSet = CharSet.Unicode)]
-        public static extern void StartGame();
+        public static extern void StartGame([In, MarshalAs(UnmanagedType.Struct)] GameConfiguration config);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ResetGame", CharSet = CharSet.Unicode)]
         public static extern void ResetGame();
@@ -124,6 +124,9 @@ namespace Chess.UI.Services
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "LogWarningWithCaller", CharSet = CharSet.Unicode)]
         public static extern void LogWarningWithCaller([In()][MarshalAs(UnmanagedType.LPStr)] string message, [In()][MarshalAs(UnmanagedType.LPStr)] string functionName, [In()][MarshalAs(UnmanagedType.LPStr)] string className, int lineNumber);
+       
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "LogDebugWithCaller", CharSet = CharSet.Unicode)]
+        public static extern void LogDebugWithCaller([In()][MarshalAs(UnmanagedType.LPStr)] string message, [In()][MarshalAs(UnmanagedType.LPStr)] string functionName, [In()][MarshalAs(UnmanagedType.LPStr)] string className, int lineNumber);
 
         #endregion // Logging
 
@@ -314,7 +317,8 @@ namespace Chess.UI.Services
             ExecutingMove = 7,
             PawnPromotion = 8,
             WaitingForRemoteMove = 9,
-            GameOver = 10
+            WaitingForCPUMove = 10,
+            GameOver = 11,
         }
 
 
@@ -324,6 +328,14 @@ namespace Chess.UI.Services
             Checkmate = 2,
             StaleMate = 3,
             Reset = 4
+        }
+
+
+        public enum GameModeSelection
+        {
+            None,
+            LocalCoop,
+            VsCPU,
         }
 
 
@@ -440,6 +452,16 @@ namespace Chess.UI.Services
             public string name;
             public int id;
         }
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct GameConfiguration
+        {
+            public GameModeSelection Mode;
+            public PlayerColor PlayerColor;
+            public int CpuDifficulty;
+        }
+
 
 
         #endregion  // Structures and Enums

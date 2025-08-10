@@ -70,6 +70,10 @@ namespace Chess.UI
             services.AddSingleton<IChessCoordinate, ChessCoordinate>();
             services.AddSingleton<IStyleManager, StyleManager>();
             services.AddSingleton<IImageService, ImageServices>();
+            services.AddSingleton<INavigationService, NavigationService>();
+            services.AddSingleton<IDialogService, DialogService>();
+            services.AddSingleton<IGameConfigurationService, GameConfigurationService>();
+            services.AddSingleton<IWindowSizeService, WindowSizeService>();
 
             services.AddSingleton<IMoveModel, MoveModel>();
             services.AddSingleton<IScoreModel, ScoreModel>();

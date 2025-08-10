@@ -17,10 +17,15 @@ enable_testing()
 
 set(MoveTest_Dir            source/MoveTests)
 set(MultiplayerTest_Dir     source/MultiplayerTests)
+set(BoardTest_Dir           source/BoardTests)
 set(GameMechanicTest_Dir    source/GameMechanicTests)
+set(PlayerTest_Dir          source/PlayerTests)
 
 
 set(MoveTest_Files
+    ${MoveTest_Dir}/MoveTests.cpp
+    ${MoveTest_Dir}/PossibleMoveTests.cpp
+    ${MoveTest_Dir}/PositionTests.cpp
     ${MoveTest_Dir}/MoveGenerationTests.cpp
     ${MoveTest_Dir}/MoveValidationTests.cpp
     ${MoveTest_Dir}/MoveExecutionTests.cpp
@@ -28,6 +33,7 @@ set(MoveTest_Files
     ${MoveTest_Dir}/EnPassantTests.cpp
     ${MoveTest_Dir}/MoveHistoryTests.cpp
     ${MoveTest_Dir}/MoveNotationTests.cpp
+    ${MoveTest_Dir}/MoveEvaluationTests.cpp
 )
 
 
@@ -44,15 +50,29 @@ set(MultiplayerTest_Files
 
 
 set(GameMechanicTest_Files
-    ${GameMechanicTest_Dir}/ChessboardTests.cpp
     ${GameMechanicTest_Dir}/PawnPromotionTests.cpp
     ${GameMechanicTest_Dir}/EndgameTests.cpp
     ${GameMechanicTest_Dir}/UndoMoveTests.cpp
 )
 
 
+set(PlayerTest_Files
+    ${PlayerTest_Dir}/PlayerTests.cpp
+    ${PlayerTest_Dir}/CPUPlayerTests.cpp
+)
+
+
+set(BoardTest_Files
+    ${BoardTest_Dir}/ChessboardTests.cpp
+    ${BoardTest_Dir}/LightChessboardTests.cpp
+)
+
+
 set(Test_Files
+    source/main.cpp
     ${MoveTest_Files}
+    ${BoardTest_Files}
+    ${PlayerTest_Files}
     ${MultiplayerTest_Files}
     ${GameMechanicTest_Files}
 )
@@ -69,10 +89,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Test_Files})
 #   Setup Test Project
 #==========================================
 
-add_executable(${PROJECT_NAME}
-    source/main.cpp
-    ${Test_Files}
-)
+add_executable(${PROJECT_NAME} ${Test_Files})
 
 
 #==========================================
