@@ -280,11 +280,6 @@ namespace Chess.UI.Audio.Services
                 return SoundEffect.Checkmate;
             if (move.type.HasFlag(MoveTypeInstance.MoveType_Check))
                 return SoundEffect.Check;
-            if (move.type.HasFlag(MoveTypeInstance.MoveType_CastlingKingside) ||
-                move.type.HasFlag(MoveTypeInstance.MoveType_CastlingQueenside))
-                return SoundEffect.Castling;
-            if (move.type.HasFlag(MoveTypeInstance.MoveType_EnPassant))
-                return SoundEffect.EnPassant;
             if (move.type.HasFlag(MoveTypeInstance.MoveType_PawnPromotion))
                 return SoundEffect.PawnPromotion;
             if (isCapture)

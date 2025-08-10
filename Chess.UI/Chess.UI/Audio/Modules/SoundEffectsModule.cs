@@ -17,9 +17,7 @@ namespace Chess.UI.Audio.Modules
         // Piece Movement
         PieceMove,
         PieceCapture,
-        Castling,       // maybe removed
-        EnPassant,      // Maybe removed
-        PawnPromotion,  // Maybe removed
+        PawnPromotion,
 
         // States
         Check,
