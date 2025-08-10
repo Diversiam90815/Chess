@@ -211,7 +211,8 @@ protected:
 	void saveResultsToFile(const std::string &fileName, const CPUPerformanceStats &stats, const std::string &testDescription)
 	{
 		// Create directory if not exists yet
-		fs::path resultDir = "Test_Results";
+		fs::path resultDir = "CPU_VS_CPU_Results";
+
 		if (!fs::exists(resultDir))
 			fs::create_directories(resultDir);
 
@@ -219,23 +220,21 @@ protected:
 
 		std::ofstream file(fullPath, std::ios::app);
 
-		if (file.is_open())
-		{
-			file << "=== " << testDescription << " ===" << std::endl;
-			file << "Total Games: " << stats.totalGames << std::endl;
-			file << "Wins: " << stats.wins << std::endl;
-			file << "Losses: " << stats.losses << std::endl;
-			file << "Draws: " << stats.draws << std::endl;
-			file << "Win Rate: " << std::fixed << std::setprecision(2) << stats.winRate << "%" << std::endl;
-			file << "Average Game Duration: " << stats.averageGameDuration.count() << "ms" << std::endl;
-			file << "Average Move Count: " << stats.averageMoveCount << std::endl;
-			file << std::string(50, '-') << std::endl; // Separator line
-			file << std::endl;
+		if (!file.is_open())
+			return;
 
-			file.close();
+		file << "=== " << testDescription << " ===" << std::endl;
+		file << "Total Games: " << stats.totalGames << std::endl;
+		file << "Wins: " << stats.wins << std::endl;
+		file << "Losses: " << stats.losses << std::endl;
+		file << "Draws: " << stats.draws << std::endl;
+		file << "Win Rate: " << std::fixed << std::setprecision(2) << stats.winRate << "%" << std::endl;
+		file << "Average Game Duration: " << stats.averageGameDuration.count() << "ms" << std::endl;
+		file << "Average Move Count: " << stats.averageMoveCount << std::endl;
+		file << std::string(50, '-') << std::endl; // Separator line
+		file << std::endl;
 
-			std::cout << "Results saved to: " << fullPath << std::endl;
-		}
+		file.close();
 	}
 
 private:

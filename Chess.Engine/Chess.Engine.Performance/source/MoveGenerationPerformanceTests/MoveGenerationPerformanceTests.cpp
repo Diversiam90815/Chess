@@ -18,6 +18,7 @@
 #include "Execution/MoveExecution.h"
 #include "ChessBoard.h"
 
+namespace fs = std::filesystem;
 
 namespace PerformanceTests
 {
@@ -161,9 +162,17 @@ protected:
 	}
 
 
-	void saveResults(const std::vector<MoveGenerationPerformanceResult> &results)
+	void saveResults(const std::string fileName, const std::vector<MoveGenerationPerformanceResult> &results)
 	{
-		std::ofstream file("Test_Results/move_generation_performance.txt", std::ios::app);
+		// Create directory if not exists yet
+		fs::path resultDir = "MoveGeneration_Results";
+
+		if (!fs::exists(resultDir))
+			fs::create_directories(resultDir);
+
+		fs::path	  fullPath = resultDir / fileName;
+
+		std::ofstream file(fullPath, std::ios::app);
 
 		if (!file.is_open())
 			return;
@@ -194,7 +203,7 @@ TEST_F(MoveGenerationPerformanceTests, OpeningPositionPerformance)
 	EXPECT_GT(result.movesPerSecond, 10000) << "Move generation should be fast enough";
 
 	std::vector<MoveGenerationPerformanceResult> results = {result};
-	saveResults(results);
+	saveResults("Opening Game Position", results);
 }
 
 
@@ -206,7 +215,7 @@ TEST_F(MoveGenerationPerformanceTests, MiddlegamePositionPerformance)
 	EXPECT_GT(result.movesPerSecond, 5000) << "Complex position generation should still be reasonable";
 
 	std::vector<MoveGenerationPerformanceResult> results = {result};
-	saveResults(results);
+	saveResults("Middle Game Position" , results);
 }
 
 
@@ -218,7 +227,7 @@ TEST_F(MoveGenerationPerformanceTests, EndgamePositionPerformance)
 	EXPECT_GT(result.movesPerSecond, 15000) << "Endgame generation should be very fast";
 
 	std::vector<MoveGenerationPerformanceResult> results = {result};
-	saveResults(results);
+	saveResults("End Game Position", results);
 }
 
 
@@ -239,10 +248,7 @@ TEST_F(MoveGenerationPerformanceTests, ComprehensivePositionComparison)
 	// Performance should generally be: Endgame > Opening > Middlegame
 	EXPECT_GT(results[2].movesPerSecond, results[0].movesPerSecond) << "Endgame should be faster than opening";
 	EXPECT_GT(results[0].movesPerSecond, results[1].movesPerSecond) << "Opening should be faster than complex middlegame";
-
-	saveResults(results);
 }
-
 
 
 } // namespace PerformanceTests
