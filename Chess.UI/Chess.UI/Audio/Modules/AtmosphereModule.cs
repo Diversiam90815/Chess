@@ -14,7 +14,6 @@ namespace Chess.UI.Audio.Modules
 {
     public enum AtmosphereScenario
     {
-        Tavern,
         Fireplace,
         Forest,
     }

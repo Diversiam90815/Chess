@@ -17,12 +17,12 @@ namespace Chess.UI.Audio.Modules
         // Piece Movement
         PieceMove,
         PieceCapture,
-        PawnPromotion,
+        //PawnPromotion,
 
         // States
-        Check,
+        //Check,
         Checkmate,
-        Stalemate,
+        //Stalemate,
 
         // Flow
         GameStart,
@@ -35,7 +35,7 @@ namespace Chess.UI.Audio.Modules
         PieceSelected,
 
         // Multiplayer
-        ChatMessageReceived,    // chat feature not yet implemented, though prepared
+        //ChatMessageReceived,    // chat feature not yet implemented, though prepared
     }
 
 

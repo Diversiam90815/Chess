@@ -133,7 +133,7 @@ namespace Chess.UI.Audio.Services
             var sfx = gameState switch
             {
                 EndGameState.Checkmate => SoundEffect.Checkmate,
-                EndGameState.StaleMate => SoundEffect.Stalemate,
+                //EndGameState.StaleMate => SoundEffect.Stalemate,
                 _ => SoundEffect.GameEnd
             };
 
@@ -278,10 +278,10 @@ namespace Chess.UI.Audio.Services
         {
             if (move.type.HasFlag(MoveTypeInstance.MoveType_Checkmate))
                 return SoundEffect.Checkmate;
-            if (move.type.HasFlag(MoveTypeInstance.MoveType_Check))
-                return SoundEffect.Check;
-            if (move.type.HasFlag(MoveTypeInstance.MoveType_PawnPromotion))
-                return SoundEffect.PawnPromotion;
+            //if (move.type.HasFlag(MoveTypeInstance.MoveType_Check))
+            //    return SoundEffect.Check;
+            //if (move.type.HasFlag(MoveTypeInstance.MoveType_PawnPromotion))
+            //    return SoundEffect.PawnPromotion;
             if (isCapture)
                 return SoundEffect.PieceCapture;
 
