@@ -28,6 +28,8 @@ namespace Chess.UI.ViewModels
 
         private readonly IChessAudioService _audioService;
 
+        public event Action ItemSelected;
+
 
         public AudioPreferencesViewModel()
         {
@@ -84,6 +86,7 @@ namespace Chess.UI.ViewModels
             {
                 if (value == selectedAtmosphereSoundscape) return;
                 selectedAtmosphereSoundscape = value;
+                ItemSelected?.Invoke();
                 _audioService.SetAtmosphereAsync(value.Scenario);
             }
         }

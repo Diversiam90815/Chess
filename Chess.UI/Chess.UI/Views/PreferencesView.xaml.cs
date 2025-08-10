@@ -58,6 +58,8 @@ namespace Chess.UI.Views
                     viewModel = _settingsViewModel;
                 }
                 NavigationViewFrame.Navigate(viewType, viewModel);
+
+                ButtonClicked?.Invoke();
             }
         }
 

@@ -69,6 +69,9 @@ namespace Chess.UI.Audio.Services
 
             var multiplayerVM = App.Current.Services.GetService<MultiplayerViewModel>();
             multiplayerVM.ButtonClicked += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ButtonClick));
+
+            var audioPref = App.Current.Services.GetService<AudioPreferencesViewModel>();
+            audioPref.ItemSelected += () => _ = Task.Run(async () => await HandleUIInteractionAsync(UIInteraction.ItemSelected));
         }
 
 
@@ -225,6 +228,18 @@ namespace Chess.UI.Audio.Services
             if (_atmosphereModule.IsEnabled == enabled) return;
 
             _atmosphereModule.IsEnabled = enabled;
+
+            // If disabling, stop the current atmosphere playback
+            if (!enabled)
+            {
+                StopAtmosphereAsync();
+            }
+            // If enabling and there's a selected scenario, start playing it
+            else
+            {
+                var currentScrenario = _atmosphereModule.CurrentScenario;
+                _ = Task.Run(async () => await _atmosphereModule.SetAtmosphereAsync(currentScrenario));
+            }
 
             EngineAPI.SetAtmosEnabled(enabled);
         }
