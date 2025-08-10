@@ -175,7 +175,7 @@ TEST_F(MoveEvaluationPerformanceTests, BasicEvaluationPerformance)
 	EXPECT_GT(result.evaluationsPerSecond, 10000) << "Basic evaluation should be very fast";
 
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
-	saveResults("BasicEvaluation", results);
+	saveResults("Basic Evaluation", results);
 }
 
 
@@ -189,7 +189,7 @@ TEST_F(MoveEvaluationPerformanceTests, MediumEvaluationPerformance)
 	EXPECT_GT(result.evaluationsPerSecond, 5000) << "Medium evaluation should be reasonably fast";
 
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
-	saveResults("MediumEvaluation", results);
+	saveResults("Medium Evaluation", results);
 }
 
 
