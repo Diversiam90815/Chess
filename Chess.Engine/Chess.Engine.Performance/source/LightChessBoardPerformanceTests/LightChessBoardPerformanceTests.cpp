@@ -17,12 +17,12 @@ struct LightChessBoardPerformanceResult
 	std::string				  testName{};
 	std::string				  operation{};
 	std::chrono::microseconds duration{};
-	size_t					  operationsPerformed{};
+	int						  operationsPerformed{};
 	double					  operationsPerSecond{};
 	double					  averageOperationTime{};
 	std::string				  boardConfiguration{};
-	size_t					  moveCount{};
-	size_t					  positionCount{};
+	int						  moveCount{};
+	int						  positionCount{};
 };
 
 
