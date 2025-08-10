@@ -88,7 +88,19 @@ namespace Chess.UI.Audio.Modules
 
             try
             {
-                PreloadAtmosphereTracksAsync();
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        PreloadAtmosphereTracksAsync();
+                        StatusChanged?.Invoke(this, new AudioModuleEventArgs(ModuleName, "Preloading completed"));
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.LogError($"Background preloading failed: {ex.Message}");
+                    }
+                });
+
                 InitializeMediaPlayers();
 
                 _isInitialized = true;
@@ -240,20 +252,6 @@ namespace Chess.UI.Audio.Modules
                 Logger.LogWarning($"Failed to load atmosphere track {scenario}: {ex.Message}");
             }
         }
-
-
-        //private async Task<MediaSource> GetMediaSourceAsync(AtmosphereScenario scenario)
-        //{
-        //    if (_atmosphereCache.TryGetValue(scenario, out var mediaSource))
-        //    {
-        //        return mediaSource;
-        //    }
-
-        //    // Try to load on-demand if not in cache
-        //    await LoadAtmosphereTrackAsync(scenario);
-        //    _atmosphereCache.TryGetValue(scenario, out mediaSource);
-        //    return mediaSource;
-        //}
 
 
         private void InitializeMediaPlayers()
