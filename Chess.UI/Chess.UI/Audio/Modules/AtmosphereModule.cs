@@ -14,7 +14,6 @@ namespace Chess.UI.Audio.Modules
 {
     public enum AtmosphereScenario
     {
-        Tavern,
         Fireplace,
         Forest,
     }
@@ -51,10 +50,12 @@ namespace Chess.UI.Audio.Modules
 
     public class AtmosphereModule : IAtmosphereModule, IDisposable
     {
-        private readonly ConcurrentDictionary<AtmosphereScenario, MediaSource> _atmosphereCache;
+        private readonly ConcurrentDictionary<AtmosphereScenario, string> _atmosFilePaths;
         private MediaPlayer _currentPlayer;
         private MediaPlayer _crossfadePlayer;
         private readonly object _playerLock = new();
+
+        private bool _disposed = false;
 
         private float _moduleVolume = 1.0f;
         private float _masterVolume = 1.0f;
@@ -67,7 +68,7 @@ namespace Chess.UI.Audio.Modules
 
         // IAtmosphereModule Properties
         public AtmosphereScenario CurrentScenario { get; private set; } = AtmosphereScenario.Forest;
-        public bool IsPlaying => _currentPlayer?.PlaybackSession?.PlaybackState == MediaPlaybackState.Playing;
+        public bool IsPlaying => !_disposed && _currentPlayer?.PlaybackSession?.PlaybackState == MediaPlaybackState.Playing;
         public bool IsEnabled { get; set; } = true;
 
         // Events
@@ -77,7 +78,7 @@ namespace Chess.UI.Audio.Modules
 
         public AtmosphereModule()
         {
-            _atmosphereCache = new ConcurrentDictionary<AtmosphereScenario, MediaSource>();
+            _atmosFilePaths = new ConcurrentDictionary<AtmosphereScenario, string>();
         }
 
 
@@ -87,7 +88,7 @@ namespace Chess.UI.Audio.Modules
 
             try
             {
-                await PreloadAtmosphereTracksAsync();
+                PreloadAtmosphereTracksAsync();
                 InitializeMediaPlayers();
 
                 _isInitialized = true;
@@ -130,11 +131,30 @@ namespace Chess.UI.Audio.Modules
 
         public async Task SetAtmosphereAsync(AtmosphereScenario scenario)
         {
-            if (!_isInitialized || !IsEnabled) return;
+            if (!_isInitialized || _disposed) return;
 
             try
             {
-                var mediaSource = await GetMediaSourceAsync(scenario);
+                CurrentScenario = scenario;
+
+                lock (_playerLock)
+                {
+                    // If module is disabled, stop any current playback
+                    if (!IsEnabled)
+                    {
+                        StopAtmosphereAsync();
+                        return;
+                    }
+                }
+
+                var filePath = GetAtmosphereTrackPath(scenario);
+                if (!File.Exists(filePath))
+                {
+                    Logger.LogWarning($"Atmosphere track not found: {filePath}");
+                    return;
+                }
+
+                var mediaSource = await CreateMediaSourceAsync(filePath);
                 if (mediaSource == null) return;
 
                 float volume = GetEffectiveVolume();
@@ -154,7 +174,7 @@ namespace Chess.UI.Audio.Modules
                 }
 
                 CurrentScenario = scenario;
-                AtmosphereChanged?.Invoke(this, new AtmosphereChangedEventArgs(scenario, volume * GetEffectiveVolume()));
+                AtmosphereChanged?.Invoke(this, new AtmosphereChangedEventArgs(scenario, volume));
             }
             catch (Exception ex)
             {
@@ -178,20 +198,31 @@ namespace Chess.UI.Audio.Modules
         }
 
 
-        private async Task PreloadAtmosphereTracksAsync()
+        private void PreloadAtmosphereTracksAsync()
         {
-            var loadTasks = new List<Task>();
-
             foreach (AtmosphereScenario scenario in Enum.GetValues<AtmosphereScenario>())
             {
-                loadTasks.Add(LoadAtmosphereTrackAsync(scenario));
+                LoadAtmosphereTrackAsync(scenario);
             }
-
-            await Task.WhenAll(loadTasks);
         }
 
 
-        private async Task LoadAtmosphereTrackAsync(AtmosphereScenario scenario)
+        private async Task<MediaSource> CreateMediaSourceAsync(string filePath)
+        {
+            try
+            {
+                var file = await StorageFile.GetFileFromPathAsync(filePath);
+                return MediaSource.CreateFromStorageFile(file);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning($"Failed to create media source from {filePath}: {ex.Message}");
+                return null;
+            }
+        }
+
+
+        private void LoadAtmosphereTrackAsync(AtmosphereScenario scenario)
         {
             try
             {
@@ -202,10 +233,7 @@ namespace Chess.UI.Audio.Modules
                     return;
                 }
 
-                var file = await StorageFile.GetFileFromPathAsync(filePath);
-                var mediaSource = MediaSource.CreateFromStorageFile(file);
-
-                _atmosphereCache.TryAdd(scenario, mediaSource);
+                _atmosFilePaths.TryAdd(scenario, filePath);
             }
             catch (Exception ex)
             {
@@ -214,18 +242,18 @@ namespace Chess.UI.Audio.Modules
         }
 
 
-        private async Task<MediaSource> GetMediaSourceAsync(AtmosphereScenario scenario)
-        {
-            if (_atmosphereCache.TryGetValue(scenario, out var mediaSource))
-            {
-                return mediaSource;
-            }
+        //private async Task<MediaSource> GetMediaSourceAsync(AtmosphereScenario scenario)
+        //{
+        //    if (_atmosphereCache.TryGetValue(scenario, out var mediaSource))
+        //    {
+        //        return mediaSource;
+        //    }
 
-            // Try to load on-demand if not in cache
-            await LoadAtmosphereTrackAsync(scenario);
-            _atmosphereCache.TryGetValue(scenario, out mediaSource);
-            return mediaSource;
-        }
+        //    // Try to load on-demand if not in cache
+        //    await LoadAtmosphereTrackAsync(scenario);
+        //    _atmosphereCache.TryGetValue(scenario, out mediaSource);
+        //    return mediaSource;
+        //}
 
 
         private void InitializeMediaPlayers()
@@ -250,32 +278,48 @@ namespace Chess.UI.Audio.Modules
 
         private void StartDirectPlayback(MediaSource mediaSource, float volume)
         {
-            _currentPlayer.Source = mediaSource;
-            _currentPlayer.Volume = Math.Clamp(volume * GetEffectiveVolume(), 0.0f, 1.0f);
-            _currentPlayer.Play();
+            try
+            {
+                if (_currentPlayer == null) return;
+
+                _currentPlayer.Source = mediaSource;
+                _currentPlayer.Volume = Math.Clamp(volume, 0.0f, 1.0f);
+                _currentPlayer.Play();
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError($"Error in direct playback: {ex.Message}");
+            }
         }
 
 
         private void StartCrossfade(MediaSource mediaSource, float targetVolume)
         {
-            // Setup crossfade player
-            if (_crossfadePlayer is null)
+            try
             {
-                _crossfadePlayer = new MediaPlayer
+                // Setup crossfade player
+                if (_crossfadePlayer is null)
                 {
-                    AudioCategory = MediaPlayerAudioCategory.GameMedia,
-                    IsLoopingEnabled = true
-                };
-                _crossfadePlayer.MediaEnded += OnCrossfadePlayerEnded;
-                _crossfadePlayer.MediaFailed += OnMediaPlayerFailed;
+                    _crossfadePlayer = new MediaPlayer
+                    {
+                        AudioCategory = MediaPlayerAudioCategory.GameMedia,
+                        IsLoopingEnabled = true
+                    };
+                    _crossfadePlayer.MediaEnded += OnCrossfadePlayerEnded;
+                    _crossfadePlayer.MediaFailed += OnMediaPlayerFailed;
+                }
+
+                _crossfadePlayer.Source = mediaSource;
+                _crossfadePlayer.Volume = 0.0f;
+                _crossfadePlayer.Play();
+
+                // Start crossfade animation
+                Task.Run(async () => await PerformCrossfade(targetVolume));
             }
-
-            _crossfadePlayer.Source = mediaSource;
-            _crossfadePlayer.Volume = 0.0f;
-            _crossfadePlayer.Play();
-
-            // Start crossfade animation
-            Task.Run(async () => await PerformCrossfade(targetVolume));
+            catch (Exception ex)
+            {
+                Logger.LogError($"Error starting crossfade: {ex.Message}");
+            }
         }
 
 
@@ -283,10 +327,24 @@ namespace Chess.UI.Audio.Modules
         {
             lock (_playerLock)
             {
-                if (_currentPlayer != null)
+                try
                 {
-                    var currentVolume = _currentPlayer.Volume / Math.Max(0.001f, GetEffectiveVolume());
-                    _currentPlayer.Volume = Math.Clamp(currentVolume * GetEffectiveVolume(), 0.0f, 1.0f);
+                    if (_currentPlayer == null && !_disposed)
+                        return;
+
+                    if (IsEnabled)
+                    {
+                        _currentPlayer.Volume = Math.Clamp(GetEffectiveVolume(), 0.0f, 1.0f);
+                    }
+                    else
+                    {
+                        _currentPlayer.Volume = 0.0f;
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError($"Error updating player volume: {ex.Message}");
                 }
             }
         }
@@ -360,20 +418,39 @@ namespace Chess.UI.Audio.Modules
 
         public void Dispose()
         {
+            if (_disposed) return;
+            _disposed = true;
             _isInitialized = false;
 
             lock (_playerLock)
             {
-                _currentPlayer?.Dispose();
-                _crossfadePlayer?.Dispose();
+                try
+                {
+                    if (_currentPlayer != null)
+                    {
+                        _currentPlayer.MediaEnded -= OnMediaPlayerEnded;
+                        _currentPlayer.MediaFailed -= OnMediaPlayerFailed;
+                        _currentPlayer.Source = null;
+                        _currentPlayer.Dispose();
+                        _currentPlayer = null;
+                    }
+
+                    if (_crossfadePlayer != null)
+                    {
+                        _crossfadePlayer.MediaEnded -= OnCrossfadePlayerEnded;
+                        _crossfadePlayer.MediaFailed -= OnMediaPlayerFailed;
+                        _crossfadePlayer.Source = null;
+                        _crossfadePlayer.Dispose();
+                        _crossfadePlayer = null;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogError($"Error disposing atmosphere module: {ex.Message}");
+                }
             }
 
-            // Dispose all cached media sources
-            foreach (var mediaSource in _atmosphereCache.Values)
-            {
-                mediaSource?.Dispose();
-            }
-            _atmosphereCache.Clear();
+            _atmosFilePaths.Clear();
         }
     }
 }

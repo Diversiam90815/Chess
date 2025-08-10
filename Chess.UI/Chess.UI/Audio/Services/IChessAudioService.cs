@@ -22,7 +22,6 @@ namespace Chess.UI.Audio.Services
         Task HandleMoveAsync(PossibleMoveInstance move);
         Task HandleEndGameStateAsync(EndGameState state);
         Task HandleGameStartAsync();
-        Task HandleGameEndAsync();
 
         // UI Interaction
         Task HandleUIInteractionAsync(UIInteraction interaction);
