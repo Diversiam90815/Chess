@@ -243,7 +243,7 @@ TEST_F(CPUPlayerPerformanceTests, ComplexPositionPerformance)
 	auto									   result		 = benchmarkAlgorithm("AlphaBeta", 4, "Complex", alphaBetaFunc);
 	results.push_back(result);
 
-	saveResults("Compley Position", results);
+	saveResults("Complex Position", results);
 
 		// The results of this test are saved in the file
 	SUCCEED();
