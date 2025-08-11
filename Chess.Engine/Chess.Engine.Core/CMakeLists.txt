@@ -19,6 +19,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+#==========================================
+#   CONFIGURE PROJECT HEADER
+#==========================================
+
+configure_file("${PROJECT_SOURCE_DIR}/Project.h.in" "${PROJECT_BINARY_DIR}/Project.h")
+
 
 #==========================================
 #   PROJECT DIRECTORIES
