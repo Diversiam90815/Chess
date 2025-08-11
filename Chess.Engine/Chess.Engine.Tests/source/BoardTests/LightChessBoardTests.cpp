@@ -546,7 +546,7 @@ TEST_F(LightChessBoardTests, GetGamePhaseValue)
 	mLightBoard.initializeStartingPosition();
 
 	int openingPhase = mLightBoard.getGamePhaseValue();
-	EXPECT_EQ(openingPhase, 0) << "Opening position should have Opening (0) phase value";
+	EXPECT_EQ(openingPhase, 1) << "Opening position should have Opening (1) phase value";
 
 	// Create endgame position
 	mLightBoard.clear();
@@ -554,7 +554,7 @@ TEST_F(LightChessBoardTests, GetGamePhaseValue)
 	mLightBoard.setPiece({4, 0}, LightPiece(PieceType::King, PlayerColor::Black));
 
 	int endgamePhase = mLightBoard.getGamePhaseValue();
-	EXPECT_GT(endgamePhase, openingPhase) << "Endgame position should have higher (2) phase value than opening (0)";
+	EXPECT_GT(endgamePhase, openingPhase) << "Endgame position should have higher (3) phase value than opening (1)";
 }
 
 

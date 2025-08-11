@@ -15,15 +15,46 @@ enable_testing()
 #   Test Files
 #==========================================
 
-set(CPUPerformanceTests_Dir    source/CPUPerformanceTests)
+set(CPUPerformanceTests_Dir                     source/CPUPerformanceTests)
+set(MoveGenerationPerformanceTests_Dir          source/MoveGenerationPerformanceTests)
+set(MoveEvaluationPerformanceTests_Dir          source/MoveEvaluationPerformanceTests)
+set(CPUPlayerPerformanceTests_Dir               source/CPUPlayerPerformanceTests)
+set(PositionalEvaluationPerformanceTests_Dir    source/PositionalEvaluationPerformanceTests)
+set(LightChessBoardPerformanceTests_Dir         source/LightChessBoardPerformanceTests)
+
 
 set(CPUPerformanceTest_Files
     ${CPUPerformanceTests_Dir}/CPUPerformanceTests.cpp
 )
 
+set(MoveGenerationPerformanceTest_Files
+    ${MoveGenerationPerformanceTests_Dir}/MoveGenerationPerformanceTests.cpp
+)
+
+set(MoveEvaluationPerformanceTest_Files
+    ${MoveEvaluationPerformanceTests_Dir}/MoveEvaluationPerformanceTests.cpp
+)
+
+set(CPUPlayerPerformanceTest_Files
+    ${CPUPlayerPerformanceTests_Dir}/CPUPlayerPerformanceTests.cpp
+)
+
+set(PositionalEvaluationPerformanceTest_Files
+    ${PositionalEvaluationPerformanceTests_Dir}/PositionalEvaluationPerformanceTests.cpp
+)
+
+set(LightChessBoardPerformanceTest_Files
+    ${LightChessBoardPerformanceTests_Dir}/LightChessBoardPerformanceTests.cpp
+)
+
 
 set(Test_Files
     ${CPUPerformanceTest_Files}
+    ${MoveGenerationPerformanceTest_Files}
+    ${MoveEvaluationPerformanceTest_Files}
+    ${CPUPlayerPerformanceTest_Files}
+    ${PositionalEvaluationPerformanceTest_Files}
+    ${LightChessBoardPerformanceTest_Files}
 )
 
 
