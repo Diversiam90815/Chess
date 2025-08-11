@@ -56,8 +56,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ALL_FILES})
 #   CREATE TARGET
 #==========================================
 
-
-add_library(${PROJECT_NAME} SHARED  ${API_FILES})
+add_library(${PROJECT_NAME} SHARED ${API_FILES})
 
 
 #==========================================

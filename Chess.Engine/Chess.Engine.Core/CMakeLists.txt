@@ -27,7 +27,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set (SOURCE_DIR						${PROJECT_SOURCE_DIR}/src)
 set (SUBMODULES_DIR					${PROJECT_SOURCE_DIR}/submodule)
 	
-set (API_DIR						${SOURCE_DIR}/API)
 set (PIECE_DIR						${SOURCE_DIR}/Piece)
 set (MOVE_DIR						${SOURCE_DIR}/Moves)
 set (GAME_MANAGER_DIR				${SOURCE_DIR}/GameManager)
@@ -50,7 +49,6 @@ set (POSITIONALEVALUATION_DIR       ${SOURCE_DIR}/PositionalEvaluation)
 #==========================================
 
 set(ALL_PROJECT_DIRS 
-			${API_DIR}
 			${PIECE_DIR}
 			${MOVE_DIR}
 			${GAME_MANAGER_DIR}
@@ -75,10 +73,6 @@ include_directories(${ALL_PROJECT_DIRS})
 #==========================================
 #   SET THE FILES
 #==========================================
-
-set(API_FILES
-	${API_DIR}/EngineAPIDefines.h
-)
 
 set(STATEMACHINE_FILES
 	${STATEMACHINE_DIR}/StateMachine.h	${STATEMACHINE_DIR}/StateMachine.cpp
@@ -153,6 +147,7 @@ set(NETWORK_FILES
 )
 
 set(COMMUNICATION_FILES
+	${COMMUNICATION_DIR}/PlainCDefines.h   
 	${COMMUNICATION_DIR}/UICommunication.h    ${COMMUNICATION_DIR}/UICommunication.cpp
 )
 
@@ -178,7 +173,6 @@ set(MULTIPLAYER_FILES
 	
 
 set(ALL_FILES
-	${API_FILES}
 	${PIECE_FILES}
 	${GAMEENGINE_FILES}
 	${BOARD_FILES}

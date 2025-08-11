@@ -1,7 +1,7 @@
 /*
   ==============================================================================
-	Module:         ChessLogicAPI
-	Description:    Plain C API for the Chess logic
+	Module:         Engine API
+	Description:    Plain C API for the Chess engine
   ==============================================================================
 */
 

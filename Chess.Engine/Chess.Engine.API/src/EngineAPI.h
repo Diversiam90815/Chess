@@ -1,12 +1,14 @@
 /*
   ==============================================================================
-	Module:         ChessLogicAPI
-	Description:    Plain C API for the Chess logic
+	Module:         Engine API
+	Description:    Plain C API for the Chess engine 
   ==============================================================================
 */
 
+#include "PlainCDefines.h"
+#include "Parameters.h"
 
-#include "EngineAPIDefines.h"
+#define Engine_API __declspec(dllexport)
 
 
 #ifdef __cplusplus

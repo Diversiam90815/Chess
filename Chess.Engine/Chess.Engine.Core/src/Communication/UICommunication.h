@@ -12,7 +12,7 @@
 #include <mutex>
 
 #include "IObserver.h"
-#include "EngineAPIDefines.h"
+#include "PlainCDefines.h"
 #include "Player.h"
 
 
@@ -38,18 +38,12 @@ struct PlayerCapturedPieceEvent
 };
 
 
-struct CConnectionEvent
-{
-	int	 state;
-	char remoteName[MAX_STRING_LENGTH];
-	char errorMessage[MAX_STRING_LENGTH];
-};
-
 struct MoveHistoryEvent
 {
 	bool added;							  // false if cleared
 	char moveNotation[MAX_STRING_LENGTH]; // If move is being added, this is the move notation
 };
+
 
 struct EndgameStateEvent
 {

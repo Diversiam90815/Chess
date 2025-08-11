@@ -9,13 +9,9 @@
 
 #include <Windows.h>
 
-#include "Parameters.h"
-
 
 typedef void(CALLBACK *PFN_CALLBACK)(int messageId, void *pContext);
 
-
-#define Engine_API		  __declspec(dllexport)
 
 #define MAX_STRING_LENGTH 250
 
@@ -69,3 +65,11 @@ typedef struct NetworkAdapterInstance
 	unsigned int ID;
 	bool		 selectedByUser;
 } NetworkAdapterInstance;
+
+
+typedef struct CConnectionEvent
+{
+	int	 state;
+	char remoteName[MAX_STRING_LENGTH];
+	char errorMessage[MAX_STRING_LENGTH];
+} CConnectionEvent;
