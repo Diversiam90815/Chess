@@ -273,13 +273,13 @@
                             Click="UndoMove_Click"
                             Content="Undo"
                             Style="{StaticResource GameButtonStyle}"
-                            Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneWay}" />
+                            Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.IsKoopGame), Mode=OneWay}" />
                         <Button
                             x:Name="ResetGame"
                             Click="ResetGame_Click"
                             Content="Reset"
                             Style="{StaticResource GameButtonStyle}"
-                            Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneWay}" />
+                            Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.IsKoopGame), Mode=OneWay}" />
                         <Button
                             x:Name="EndGame"
                             Click="EndGame_Click"

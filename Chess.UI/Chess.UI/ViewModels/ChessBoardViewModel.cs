@@ -303,6 +303,20 @@ namespace Chess.UI.ViewModels
             }
         }
 
+        private bool _isKoopGame;
+        public bool IsKoopGame
+        {
+            get => _isKoopGame;
+            set
+            {
+                if (value != _isKoopGame)
+                {
+                    _isKoopGame = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
         public ImageSource BoardBackgroundImage
         {

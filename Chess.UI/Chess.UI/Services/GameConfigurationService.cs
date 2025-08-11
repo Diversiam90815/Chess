@@ -43,6 +43,7 @@ namespace Chess.UI.Services
         {
             var chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
             chessBoardViewModel.IsMultiplayerGame = false;
+            chessBoardViewModel.IsKoopGame = true;
 
             return await _navigationService.NavigateToChessboardAsync(false);
         }
@@ -52,6 +53,7 @@ namespace Chess.UI.Services
         {
             var chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
             chessBoardViewModel.IsMultiplayerGame = false;
+            chessBoardViewModel.IsKoopGame = false;
 
             return await _navigationService.NavigateToChessboardAsync(false, config);
         }
