@@ -155,5 +155,224 @@ protected:
 };
 
 
+TEST_F(LightChessBoardPerformanceTests, MakeMoveUnmoveMoveSpeed)
+{
+	auto		  moves		 = mBoard->generateLegalMoves(PlayerColor::White);
+	constexpr int iterations = 10000;
+
+	auto		  result	 = benchmarkOperation(
+		 "MakeUnmake", "Make/Unmake", "Opening",
+		 [this, &moves]()
+		 {
+			 for (const auto &move : moves)
+			 {
+				 auto undoInfo = mBoard->makeMove(move);
+				 mBoard->unmakeMove(undoInfo);
+			 }
+		 },
+		 iterations);
+
+	result.moveCount									  = moves.size();
+	result.operationsPerformed							  = iterations * moves.size();
+
+	// Recalculate with correct operation count
+	double seconds										  = result.duration.count() / 1000000.0;
+	result.operationsPerSecond							  = result.operationsPerformed / seconds;
+
+	std::vector<LightChessBoardPerformanceResult> results = {result};
+	saveResults("Make-Unmake Move", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(LightChessBoardPerformanceTests, MoveGenerationSpeed)
+{
+	constexpr int iterations = 5000;
+
+	auto		  result	 = benchmarkOperation(
+		 "MoveGen", "GenerateMoves", "Opening",
+		 [this]()
+		 {
+			 auto moves = mBoard->generateLegalMoves(PlayerColor::White);
+			 (void)moves; // Suppress unused variable warning
+		 },
+		 iterations);
+
+	std::vector<LightChessBoardPerformanceResult> results = {result};
+	saveResults("Move Generation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(LightChessBoardPerformanceTests, PositionEvaluationSpeed)
+{
+	constexpr int iterations = 10000;
+
+	auto		  result	 = benchmarkOperation(
+		 "PosEval", "GetMaterial", "Opening",
+		 [this]()
+		 {
+			 int whiteValue = mBoard->getMaterialValue(PlayerColor::White);
+			 int blackValue = mBoard->getMaterialValue(PlayerColor::Black);
+			 (void)whiteValue;
+			 (void)blackValue; // Suppress warnings
+		 },
+		 iterations);
+
+	std::vector<LightChessBoardPerformanceResult> results = {result};
+	saveResults("Position Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(LightChessBoardPerformanceTests, BoardCopyingSpeed)
+{
+	constexpr int iterations = 1000;
+
+	auto		  result	 = benchmarkOperation(
+		 "BoardCopy", "CopyBoard", "Opening",
+		 [this]()
+		 {
+			 LightChessBoard copy(*mBoard);
+			 (void)copy; // Suppress warning
+		 },
+		 iterations);
+
+	std::vector<LightChessBoardPerformanceResult> results = {result};
+	saveResults("Board Copying", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(LightChessBoardPerformanceTests, CheckDetectionSpeed)
+{
+	constexpr int iterations = 5000;
+
+	auto		  result	 = benchmarkOperation(
+		 "CheckDet", "IsInCheck", "Opening",
+		 [this]()
+		 {
+			 bool whiteCheck = mBoard->isInCheck(PlayerColor::White);
+			 bool blackCheck = mBoard->isInCheck(PlayerColor::Black);
+			 (void)whiteCheck;
+			 (void)blackCheck; // Suppress warnings
+		 },
+		 iterations);
+
+	std::vector<LightChessBoardPerformanceResult> results = {result};
+	saveResults("Check Detection", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(LightChessBoardPerformanceTests, MiddlegamePerformanceComparison)
+{
+	setupMiddlegamePosition();
+
+	std::vector<LightChessBoardPerformanceResult> results;
+
+	// Test different operations on middlegame position
+	auto										  moves			   = mBoard->generateLegalMoves(PlayerColor::White);
+
+	// Make/Unmake performance
+	auto										  makeUnmakeResult = benchmarkOperation(
+		 "MakeUnmake", "Make/Unmake", "Middlegame",
+		 [this, &moves]()
+		 {
+			 for (const auto &move : moves)
+			 {
+				 auto undoInfo = mBoard->makeMove(move);
+				 mBoard->unmakeMove(undoInfo);
+			 }
+		 },
+		 1000);
+	makeUnmakeResult.moveCount			 = moves.size();
+	makeUnmakeResult.operationsPerformed = 1000 * moves.size();
+	double seconds						 = makeUnmakeResult.duration.count() / 1000000.0;
+	makeUnmakeResult.operationsPerSecond = makeUnmakeResult.operationsPerformed / seconds;
+	results.push_back(makeUnmakeResult);
+
+	// Move generation performance
+	auto moveGenResult = benchmarkOperation(
+		"MoveGen", "GenerateMoves", "Middlegame",
+		[this]()
+		{
+			auto moves = mBoard->generateLegalMoves(PlayerColor::White);
+			(void)moves;
+		},
+		2000);
+	results.push_back(moveGenResult);
+
+	// Material evaluation performance
+	auto materialResult = benchmarkOperation(
+		"Material", "GetMaterial", "Middlegame",
+		[this]()
+		{
+			int value = mBoard->getMaterialValue(PlayerColor::White);
+			(void)value;
+		},
+		5000);
+	results.push_back(materialResult);
+
+	saveResults("Middle Game Comparison", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(LightChessBoardPerformanceTests, EndgamePerformanceComparison)
+{
+	setupEndgamePosition();
+
+	std::vector<LightChessBoardPerformanceResult> results;
+
+	auto										  moves			   = mBoard->generateLegalMoves(PlayerColor::White);
+
+	// Make/Unmake performance in endgame
+	auto										  makeUnmakeResult = benchmarkOperation(
+		 "MakeUnmake", "Make/Unmake", "Endgame",
+		 [this, &moves]()
+		 {
+			 for (const auto &move : moves)
+			 {
+				 auto undoInfo = mBoard->makeMove(move);
+				 mBoard->unmakeMove(undoInfo);
+			 }
+		 },
+		 2000);
+	makeUnmakeResult.moveCount			 = moves.size();
+	makeUnmakeResult.operationsPerformed = 2000 * moves.size();
+	double seconds						 = makeUnmakeResult.duration.count() / 1000000.0;
+	makeUnmakeResult.operationsPerSecond = makeUnmakeResult.operationsPerformed / seconds;
+	results.push_back(makeUnmakeResult);
+
+	// Move generation in endgame should be faster
+	auto moveGenResult = benchmarkOperation(
+		"MoveGen", "GenerateMoves", "Endgame",
+		[this]()
+		{
+			auto moves = mBoard->generateLegalMoves(PlayerColor::White);
+			(void)moves;
+		},
+		5000);
+	results.push_back(moveGenResult);
+
+	saveResults("Endgame Performance", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
 
 } // namespace PerformanceTests

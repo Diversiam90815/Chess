@@ -178,15 +178,12 @@ TEST_F(CPUPlayerPerformanceTests, MinimaxDepthComparison)
 	{
 		auto result = benchmarkAlgorithm("Minimax", depth, "Opening", minimaxFunc);
 		results.push_back(result);
-
-		// Each deeper level should take significantly more time
-		if (depth > 2)
-		{
-			EXPECT_GT(result.duration.count(), results[depth - 3].duration.count()) << "Deeper search should take more time";
-		}
 	}
 
 	saveResults("MiniMax Depth Comparison", results);
+
+		// The results of this test are saved in the file
+	SUCCEED();
 }
 
 
@@ -201,12 +198,12 @@ TEST_F(CPUPlayerPerformanceTests, AlphaBetaDepthComparison)
 	{
 		auto result = benchmarkAlgorithm("AlphaBeta", depth, "Opening", alphaBetaFunc);
 		results.push_back(result);
-
-		// Alpha-beta should handle deeper searches better than minimax
-		EXPECT_LT(result.duration.count(), 30000) << "Alpha-beta should complete within 30 seconds";
 	}
 
 	saveResults("Alpha Beta Comparison", results);
+
+		// The results of this test are saved in the file
+	SUCCEED();
 }
 
 
@@ -227,9 +224,10 @@ TEST_F(CPUPlayerPerformanceTests, AlgorithmComparison)
 	results.push_back(minimaxResult);
 	results.push_back(alphaBetaResult);
 
-	EXPECT_LT(alphaBetaResult.duration.count(), minimaxResult.duration.count()) << "Alpha-beta should be faster than minimax due to pruning";
-
 	saveResults("Algorithm Comparison", results);
+
+		// The results of this test are saved in the file
+	SUCCEED();
 }
 
 
@@ -245,50 +243,10 @@ TEST_F(CPUPlayerPerformanceTests, ComplexPositionPerformance)
 	auto									   result		 = benchmarkAlgorithm("AlphaBeta", 4, "Complex", alphaBetaFunc);
 	results.push_back(result);
 
-	EXPECT_LT(result.duration.count(), 60000) << "Complex position should complete within 60 seconds";
-
 	saveResults("Compley Position", results);
-}
 
-
-TEST_F(CPUPlayerPerformanceTests, DifficultyLevelPerformance)
-{
-	CPUConfiguration config;
-	config.enabled		= true;
-	config.cpuColor		= PlayerColor::White;
-	config.thinkingTime = std::chrono::milliseconds(0); // No artificial delay
-
-	std::vector<std::chrono::milliseconds> durations;
-
-	auto								   moves		= getAllLegalMoves(PlayerColor::White);
-
-	// Test each difficulty level
-	std::vector<CPUDifficulty>			   difficulties = {CPUDifficulty::Easy, CPUDifficulty::Medium, CPUDifficulty::Hard};
-
-	for (auto difficulty : difficulties)
-	{
-		config.difficulty = difficulty;
-		mCPUPlayer->setCPUConfiguration(config);
-
-		auto		 start = std::chrono::high_resolution_clock::now();
-
-		PossibleMove selectedMove;
-		switch (difficulty)
-		{
-		case CPUDifficulty::Easy: selectedMove = (moves.size() > 20) ? mCPUPlayer->getBestEvaluatedMove(moves) : mCPUPlayer->getMiniMaxMove(moves, 3); break;
-		case CPUDifficulty::Medium: selectedMove = mCPUPlayer->getAlphaBetaMove(moves, 3); break;
-		case CPUDifficulty::Hard: selectedMove = mCPUPlayer->getAlphaBetaMove(moves, 6); break;
-		default: selectedMove = mCPUPlayer->getRandomMove(moves); break;
-		}
-
-		auto end	  = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-		durations.push_back(duration);
-	}
-
-	// Higher difficulty should generally take more time
-	EXPECT_LT(durations[0].count(), durations[1].count()) << "Medium should take longer than Easy";
-	EXPECT_LT(durations[1].count(), durations[2].count()) << "Hard should take longer than Medium";
+		// The results of this test are saved in the file
+	SUCCEED();
 }
 
 

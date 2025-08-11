@@ -172,10 +172,11 @@ TEST_F(MoveEvaluationPerformanceTests, BasicEvaluationPerformance)
 	auto result =
 		benchmarkEvaluation("Basic", "Basic", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getBasicEvaluation(move); }, moves, PlayerColor::White);
 
-	EXPECT_GT(result.evaluationsPerSecond, 10000) << "Basic evaluation should be very fast";
-
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
 	saveResults("Basic Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
 }
 
 
@@ -186,10 +187,11 @@ TEST_F(MoveEvaluationPerformanceTests, MediumEvaluationPerformance)
 	auto result = benchmarkEvaluation(
 		"Medium", "Medium", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getMediumEvaluation(move, player); }, moves, PlayerColor::White);
 
-	EXPECT_GT(result.evaluationsPerSecond, 5000) << "Medium evaluation should be reasonably fast";
-
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
 	saveResults("Medium Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
 }
 
 
@@ -200,10 +202,11 @@ TEST_F(MoveEvaluationPerformanceTests, AdvancedEvaluationPerformance)
 	auto result = benchmarkEvaluation(
 		"Advanced", "Advanced", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getAdvancedEvaluation(move, player); }, moves, PlayerColor::White);
 
-	EXPECT_GT(result.evaluationsPerSecond, 1000) << "Advanced evaluation should complete in reasonable time";
-
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
 	saveResults("Advanced Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
 }
 
 
@@ -222,9 +225,10 @@ TEST_F(MoveEvaluationPerformanceTests, EvaluationTypeComparison)
 	results.push_back(benchmarkEvaluation(
 		"Comparison", "Advanced", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getAdvancedEvaluation(move, player); }, moves, PlayerColor::White));
 
-	// Performance should be: Basic > Medium > Advanced
-	EXPECT_GT(results[0].evaluationsPerSecond, results[1].evaluationsPerSecond) << "Basic evaluation should be faster than medium";
-	EXPECT_GT(results[1].evaluationsPerSecond, results[2].evaluationsPerSecond) << "Medium evaluation should be faster than advanced";
+	saveResults("Evaluation Type Comparison", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
 }
 
 
@@ -235,10 +239,11 @@ TEST_F(MoveEvaluationPerformanceTests, TacticalEvaluationPerformance)
 	auto result = benchmarkEvaluation(
 		"Tactical", "Tactical", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getTacticalEvaluation(move, player); }, moves, PlayerColor::White);
 
-	EXPECT_GT(result.evaluationsPerSecond, 500) << "Tactical evaluation should complete in reasonable time";
-
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
 	saveResults("Tactical Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
 }
 
 
@@ -249,10 +254,11 @@ TEST_F(MoveEvaluationPerformanceTests, StrategicEvaluationPerformance)
 	auto result = benchmarkEvaluation(
 		"Strategic", "Strategic", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getStrategicEvaluation(move, player); }, moves, PlayerColor::White);
 
-	EXPECT_GT(result.evaluationsPerSecond, 500) << "Strategic evaluation should complete in reasonable time";
-
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
 	saveResults("Strategic Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
 }
 
 

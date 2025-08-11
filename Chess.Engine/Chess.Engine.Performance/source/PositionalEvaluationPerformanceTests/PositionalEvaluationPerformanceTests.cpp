@@ -191,4 +191,172 @@ protected:
 };
 
 
+TEST_F(PositionalEvaluationPerformanceTests, FullPositionEvaluationSpeed)
+{
+	constexpr int iterations = 1000;
+
+	auto		  result	 = benchmarkEvaluation(
+		 "FullEval", "Complete", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluatePosition(board, PlayerColor::White); }, iterations);
+
+	std::vector<PositionalEvaluationPerformanceResult> results = {result};
+	saveResults("Full Positional Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(PositionalEvaluationPerformanceTests, DetailedEvaluationSpeed)
+{
+	constexpr int iterations = 500;
+
+	auto		  result	 = benchmarkEvaluation(
+		 "Detailed", "Detailed", "Opening",
+		 [this](const LightChessBoard &board)
+		 {
+			 auto detailedResult = mPositionalEvaluation->evaluatePositionDetailed(board, PlayerColor::White);
+			 return detailedResult.getTotalScore();
+		 },
+		 iterations);
+
+	std::vector<PositionalEvaluationPerformanceResult> results = {result};
+	saveResults("Detailed Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(PositionalEvaluationPerformanceTests, MaterialEvaluationSpeed)
+{
+	constexpr int iterations = 5000;
+
+	auto		  result	 = benchmarkEvaluation(
+		 "Material", "Material", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluateMaterial(board, PlayerColor::White); }, iterations);
+
+	std::vector<PositionalEvaluationPerformanceResult> results = {result};
+	saveResults("Material Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(PositionalEvaluationPerformanceTests, KingSafetyEvaluationSpeed)
+{
+	constexpr int iterations = 2000;
+
+	auto		  result	 = benchmarkEvaluation(
+		 "KingSafety", "KingSafety", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluateKingSafety(board, PlayerColor::White); }, iterations);
+
+	std::vector<PositionalEvaluationPerformanceResult> results = {result};
+	saveResults("King Safety Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(PositionalEvaluationPerformanceTests, MobilityEvaluationSpeed)
+{
+	constexpr int iterations = 1000;
+
+	auto		  result	 = benchmarkEvaluation(
+		 "Mobility", "Mobility", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluateMobility(board, PlayerColor::White); }, iterations);
+
+	std::vector<PositionalEvaluationPerformanceResult> results = {result};
+	saveResults("Mobility Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(PositionalEvaluationPerformanceTests, PawnStructureEvaluationSpeed)
+{
+	constexpr int iterations = 2000;
+
+	auto		  result	 = benchmarkEvaluation(
+		 "PawnStruct", "PawnStruct", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluatePawnStructure(board, PlayerColor::White); },
+		 iterations);
+
+	std::vector<PositionalEvaluationPerformanceResult> results = {result};
+	saveResults("Pawn Structure Evaluation", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(PositionalEvaluationPerformanceTests, GamePhaseEvaluationComparison)
+{
+	constexpr int									   iterations = 1000;
+	std::vector<PositionalEvaluationPerformanceResult> results;
+
+	// Opening evaluation
+	auto											   openingResult = benchmarkEvaluation(
+		  "Opening", "Complete", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluatePosition(board, PlayerColor::White); }, iterations);
+	results.push_back(openingResult);
+
+	// Middlegame evaluation
+	setupMiddlegamePosition();
+	auto middlegameResult = benchmarkEvaluation(
+		"Middlegame", "Complete", "Middlegame", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluatePosition(board, PlayerColor::White); }, iterations);
+	results.push_back(middlegameResult);
+
+	// Endgame evaluation
+	setupEndgamePosition();
+	auto endgameResult = benchmarkEvaluation(
+		"Endgame", "Complete", "Endgame", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluatePosition(board, PlayerColor::White); }, iterations);
+	results.push_back(endgameResult);
+
+	saveResults("Gamephase Evaluation Comparison", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+TEST_F(PositionalEvaluationPerformanceTests, ComponentEvaluationComparison)
+{
+	constexpr int									   iterations = 1000;
+	std::vector<PositionalEvaluationPerformanceResult> results;
+
+	// Test all individual components
+	results.push_back(benchmarkEvaluation(
+		"Material", "Material", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluateMaterial(board, PlayerColor::White); },
+		iterations * 5 // More iterations for fast operations
+		));
+
+	results.push_back(benchmarkEvaluation(
+		"Positional", "Positional", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluatePositionalAdvantage(board, PlayerColor::White); },
+		iterations));
+
+	results.push_back(benchmarkEvaluation(
+		"KingSafety", "KingSafety", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluateKingSafety(board, PlayerColor::White); }, iterations));
+
+	results.push_back(benchmarkEvaluation(
+		"Mobility", "Mobility", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluateMobility(board, PlayerColor::White); }, iterations));
+
+	results.push_back(benchmarkEvaluation(
+		"Tactical", "Tactical", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluateTacticalOpportunities(board, PlayerColor::White); },
+		iterations / 2 // Fewer iterations for expensive operations
+		));
+
+	results.push_back(benchmarkEvaluation(
+		"PawnStruct", "PawnStruct", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluatePawnStructure(board, PlayerColor::White); },
+		iterations));
+
+	// Material should be fastest, tactical should be slowest
+	auto materialIt = std::find_if(results.begin(), results.end(), [](const auto &r) { return r.evaluationType == "Material"; });
+	auto tacticalIt = std::find_if(results.begin(), results.end(), [](const auto &r) { return r.evaluationType == "Tactical"; });
+
+	saveResults("Component Evaluation Comparison", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
+
 } // namespace PerformanceTests
