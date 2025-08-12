@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Window
+    x:Class="Chess.UI.Views.GameConfigurationView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converter="using:Chess.UI.UI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:Chess.UI.Views"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Game Configuration"
+    mc:Ignorable="d">
+
+    <Grid Name="Rootgrid">
+
+        <!-- Select the game configuration : CPU vs Coop -->
+        <StackPanel Name="ConfigurationSelection" Orientation="Horizontal">
+
+            <Button Name="CPUGame"/>
+            <Button Name="CoopGame"/>
+
+            <StackPanel Name="CPUConfigView">
+                <Button Name="WhitePlayer"/>
+                <Button Name="BlackPlayer"/>
+
+                <StackPanel Name="DifficultyView">
+
+                </StackPanel>
+
+            </StackPanel>
+
+
+
+
+        </StackPanel>
+
+
+    </Grid>
+</Window>

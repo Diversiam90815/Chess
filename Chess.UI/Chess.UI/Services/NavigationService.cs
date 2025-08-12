@@ -37,7 +37,6 @@ namespace Chess.UI.Services
         }
 
 
-
         public void SetMainMenuWindow(MainMenuWindow mainMenuWindow)
         {
             _mainMenuWindow = mainMenuWindow;
