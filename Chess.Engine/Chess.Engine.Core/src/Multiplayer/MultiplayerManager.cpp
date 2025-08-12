@@ -6,7 +6,7 @@
 */
 
 #include "MultiplayerManager.h"
-
+#include "Project.h"
 
 
 MultiplayerManager::MultiplayerManager() : mWorkGuard(asio::make_work_guard(mIoContext))
@@ -160,14 +160,11 @@ void MultiplayerManager::onRemoteConnectionStateReceived(const ConnectionState &
 	if (mConnectionState == ConnectionState::ConnectionRequested && state == ConnectionState::Connected)
 		connectionStatusChanged(ConnectionState::SetPlayerColor);
 
-
 	else if (state == ConnectionState::SetPlayerColor)
 		connectionStatusChanged(ConnectionState::SetPlayerColor);
 
-
 	else if (state == ConnectionState::GameStarted)
 		connectionStatusChanged(ConnectionState::GameStarted);
-
 
 	else if (state == ConnectionState::Disconnected)
 		connectionStatusChanged(ConnectionState::Disconnected);
@@ -180,10 +177,11 @@ void MultiplayerManager::onRemoteInvitationReceived(const InvitationRequest &inv
 	ep.playerName = invite.playerName;
 
 	ConnectionStatusEvent event;
-	event.remoteEndpoint = ep;
-	event.state			 = ConnectionState::ConnectionRequested;
+	event.remoteEndpoint			 = ep;
+	event.state						 = ConnectionState::ConnectionRequested;
 
-	// TODO: Pre-Filter for version missmatch
+	const std::string &remoteVersion = invite.version;
+	LOG_DEBUG("Remote's app version : {}", remoteVersion);
 
 	connectionStatusChanged(event);
 }
@@ -340,11 +338,9 @@ void MultiplayerManager::setInternalObservers()
 
 void MultiplayerManager::sendConnectRequest()
 {
-	std::string		  localVersion = "1.0.0"; // TODO: For now leave it at 1.0.0 -> create project.h.in file for CMake
-
 	InvitationRequest invite;
 	invite.playerName = getLocalPlayerName();
-	invite.version	  = localVersion;
+	invite.version	  = PROJECT_VERSION;
 
 	mRemoteSender->sendConnectionInvite(invite);
 }
