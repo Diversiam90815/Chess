@@ -416,31 +416,16 @@ Engine_API int GetNetworkAdapterCount()
 
 Engine_API bool GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInstance *adapter)
 {
-	auto		adapters = GameManager::GetInstance()->getNetworkAdapters();
+	auto adapters = GameManager::GetInstance()->getNetworkAdapters();
 
-	std::string name{};
-	int			ID{0};
-	bool		selectedByUser{0};
-	int			counter{-1};
-
-	for (auto &adapter : adapters)
-	{
-		counter++;
-		if (counter == index)
-		{
-			name		   = adapter.description;
-			ID			   = adapter.ID;
-			selectedByUser = adapter.selected;
-			break;
-		}
-	}
-
-	if (name.empty() && ID == 0)
+	if (index >= adapters.size())
 		return false;
 
-	adapter->ID				= ID;
-	adapter->selectedByUser = selectedByUser;
-	StringCbCopyA(adapter->name, MAX_STRING_LENGTH, name.c_str());
+	const auto &foundAdapter = adapters[index];
+
+	adapter->ID				 = foundAdapter.ID;
+	adapter->selectedByUser	 = foundAdapter.selected;
+	StringCbCopyA(adapter->name, MAX_STRING_LENGTH, foundAdapter.description.c_str());
 	return true;
 }
 
