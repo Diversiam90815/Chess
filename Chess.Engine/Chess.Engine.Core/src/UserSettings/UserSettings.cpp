@@ -152,6 +152,19 @@ std::string UserSettings::getAtmosScenario()
 }
 
 
+void UserSettings::setDiscoveryPort(const int udpPort)
+{
+	storeSetting<int>(SettingsType::DiscoveryUDPPort, udpPort);
+	LOG_INFO("Set Discovery UDP Port to {}", udpPort);
+}
+
+
+int UserSettings::getDiscoveryPort()
+{
+	return readSetting<int>(SettingsType::DiscoveryUDPPort);
+}
+
+
 void UserSettings::initializeConfigFile(DefaultSettings settings)
 {
 	storeSetting(SettingsType::BoardStyle, settings.BoardStyle);

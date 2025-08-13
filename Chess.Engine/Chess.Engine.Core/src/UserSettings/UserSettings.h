@@ -16,14 +16,17 @@
 
 struct DefaultSettings
 {
-	const std::string BoardStyle	  = "Wood";
-	const std::string ChessPieceStyle = "Basic";
-	const std::string AtmosScenario	  = "Forest";
-	const float		  AtmosVolume	  = 1.0f;
-	const float		  SFXVolume		  = 1.0f;
-	const float		  MasterVolume	  = 1.0f;
-	const bool		  SFXEnabled	  = true;
-	const bool		  AtmosEnabled	  = true;
+	const std::string BoardStyle	   = "Wood";
+	const std::string ChessPieceStyle  = "Basic";
+
+	const std::string AtmosScenario	   = "Forest";
+	const float		  AtmosVolume	   = 1.0f;
+	const float		  SFXVolume		   = 1.0f;
+	const float		  MasterVolume	   = 1.0f;
+	const bool		  SFXEnabled	   = true;
+	const bool		  AtmosEnabled	   = true;
+
+	const int		  DiscoveryUDPPort = 5555;
 };
 
 
@@ -67,6 +70,9 @@ public:
 
 	void		setAtmosScenario(const std::string scenario);
 	std::string getAtmosScenario();
+
+	void		setDiscoveryPort(const int udpPort);
+	int			getDiscoveryPort();
 
 
 private:
@@ -134,6 +140,11 @@ inline void UserSettings::storeSetting(SettingsType setting, T value)
 	case SettingsType::AudioMasterVolume:
 	{
 		fmg->writeSettingToFile<T>(AudioMasterVolumeSetting, value);
+		break;
+	}
+	case SettingsType::DiscoveryUDPPort:
+	{
+		fmg->writeSettingToFile<T>(DiscoveryUDPPortSetting, value);
 		break;
 	}
 
@@ -204,6 +215,11 @@ inline T UserSettings::readSetting(SettingsType setting)
 	case SettingsType::AudioMasterVolume:
 	{
 		value = readOrDefault<float>(AudioMasterVolumeSetting, mDefaultSettings.MasterVolume, setting, "Audio Master Volume");
+		break;
+	}
+	case SettingsType::DiscoveryUDPPort:
+	{
+		value = readOrDefault<int>(DiscoveryUDPPortSetting, mDefaultSettings.DiscoveryUDPPort, setting, "Discovery UDP Port");
 		break;
 	}
 	default: return value;

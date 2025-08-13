@@ -18,6 +18,7 @@
 #include "Discovery/DiscoveryEndpoint.h"
 #include "ThreadBase.h"
 #include "IObservable.h"
+#include "UserSettings.h"
 
 
 using asio::ip::udp;
@@ -60,7 +61,7 @@ private:
 	void				   remoteFound(const Endpoint &remote) override;
 
 
-	const int			   mDiscoveryPort = 5555; // TODO: needs to be set from config later
+	int					   mDiscoveryPort{0};
 
 	std::string			   mLocalIPv4{};
 	int					   mTcpPort{0};
@@ -85,4 +86,6 @@ private:
 	const std::string	   broadCastAddress = "255.255.255.255";
 
 	asio::steady_timer	   mTimer;
+
+	UserSettings		   mUserSettings;
 };

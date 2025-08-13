@@ -82,6 +82,7 @@ enum class SettingsType
 	AudioAtmosVolume,
 	AudioAtmosScenario,
 	AudioMasterVolume,
+	DiscoveryUDPPort,
 };
 
 
@@ -126,6 +127,7 @@ constexpr auto								AudioAtmosVolumeSetting		  = "Audio_Atmos_Volume";
 constexpr auto								AudioAtmosEnabledSetting	  = "Audio_Atmos_Enabled";
 constexpr auto								AudioAtmosScenarioSetting	  = "Audio_Atmos_Scenario";
 constexpr auto								AudioMasterVolumeSetting	  = "Audio_Master_Volume";
+constexpr auto								DiscoveryUDPPortSetting		  = "Discovery_UDP_Port";
 
 
 //============================================================

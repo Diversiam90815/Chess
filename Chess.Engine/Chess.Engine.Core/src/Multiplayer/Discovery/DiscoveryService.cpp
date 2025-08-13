@@ -10,7 +10,9 @@
 
 DiscoveryService::DiscoveryService(asio::io_context &ioContext) : mSocket(ioContext), mTimer(ioContext)
 {
-	mIoContext = &ioContext;
+	mIoContext	   = &ioContext;
+
+	mDiscoveryPort = mUserSettings.getDiscoveryPort();
 }
 
 
@@ -100,11 +102,11 @@ void DiscoveryService::startDiscovery(DiscoveryMode mode)
 
 	if (mDiscoveryMode == DiscoveryMode::Server)
 	{
-		LOG_INFO("Starting discovery server...");
+		LOG_INFO("Starting discovery server on UDP port {} ...", mDiscoveryPort);
 	}
 	else if (mDiscoveryMode == DiscoveryMode::Client)
 	{
-		LOG_INFO("Starting discovery client...");
+		LOG_INFO("Starting discovery client on UDP port {}...", mDiscoveryPort);
 	}
 	else
 	{
