@@ -412,7 +412,8 @@ namespace Chess.UI.ViewModels
 
         private void HandleConnectionError(string errorMessage)
         {
-            // TODO: Display error
+            // TODO: Show error message. For now we just log
+            Logger.LogError($"Connection Error message received: {errorMessage}");
         }
 
 
