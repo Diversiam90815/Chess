@@ -42,11 +42,8 @@ private:
 
 	bool checkFileMoves(const Position &position, ChessBoard &board, const PlayerColor color);
 
-
 	template <std::size_t N>
 	bool checkMovesInDirection(const Position &position, ChessBoard &board, const PlayerColor color, const std::array<std::pair<int, int>, N> &directions, bool oneStep);
-
-
 
 	// Returns true if the X,Y are within the board
 	bool checkForBorders(const int x, const int y);
@@ -61,7 +58,6 @@ private:
 
 	std::array<std::pair<int, int>, 2> mPawnCaptureDirections = {{{1, 1}, {-1, 1}}};
 
-
 	std::array<std::pair<int, int>, 8> mAdjacentPositions	  = {{{1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}}};
 
 	std::array<std::pair<int, int>, 4> mDiagonalDirections	  = {{{1, 1}, {1, -1}, {-1, 1}, {-1, -1}}};
@@ -69,7 +65,6 @@ private:
 	std::array<std::pair<int, int>, 8> mLShapedDirections	  = {{{1, 2}, {2, 1}, {-1, 2}, {-2, 1}, {1, -2}, {2, -1}, {-1, -2}, {-2, -1}}};
 
 	std::array<std::pair<int, int>, 4> mFileDirections		  = {{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}};
-
 
 	std::vector<PossibleMove>		   mPossibleMovesAndCaptures;
 };

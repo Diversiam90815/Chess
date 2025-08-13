@@ -44,8 +44,6 @@ extern "C"
 
 	Engine_API void	 UndoMove();
 
-	Engine_API int	 GetEndgameState();
-
 	Engine_API bool	 GetBoardState(int *boardstate);
 
 

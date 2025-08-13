@@ -167,13 +167,6 @@ Engine_API void UndoMove()
 }
 
 
-Engine_API int GetEndgameState()
-{
-	// TODO
-	return 0;
-}
-
-
 Engine_API bool GetBoardState(int *boardState)
 {
 	if (!boardState)
