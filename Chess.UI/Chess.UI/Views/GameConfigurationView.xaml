@@ -13,24 +13,45 @@
     <Grid Name="Rootgrid">
 
         <!-- Select the game configuration : CPU vs Coop -->
-        <StackPanel Name="ConfigurationSelection" Orientation="Horizontal">
+        <StackPanel Name="GameTypeSelection" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="12" Visibility="Collapsed">
 
-            <Button Name="CPUGame"/>
-            <Button Name="CoopGame"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+                <Button Name="CPUGame" Content="Player vs CPU" Margin="12" Height="40" Click="CPUGame_Click"/>
+                <Button Name="CoopGame" Content="Player vs Player" Margin="12" Height="40" Click="CoopGame_Click"/>
+            </StackPanel>
 
-            <StackPanel Name="CPUConfigView">
-                <Button Name="WhitePlayer"/>
-                <Button Name="BlackPlayer"/>
+            <Border Height="110"/>
 
-                <StackPanel Name="DifficultyView">
+            <Button Name="PlayerReturnButton" Content="Back to menu" VerticalAlignment="Bottom" Click="PlayerReturnButton_Click" HorizontalAlignment="Right" Margin="15"/>
+
+        </StackPanel>
+
+
+        <StackPanel Name="CPUConfiguration" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center" Spacing="8" Visibility="Visible" Margin="12" >
+
+            <StackPanel Name="PlayerSelection" Orientation="Vertical" HorizontalAlignment="Center" Spacing="12">
+                <TextBlock Text="Play as" HorizontalAlignment="Center"/>
+
+                <StackPanel Name="PlayerColorSelectionButtons" Orientation="Horizontal" Spacing="16">
+                    <Button Content="White"/>
+                    <Button Content="Black"/>
 
                 </StackPanel>
+            </StackPanel>
 
+            <StackPanel Name="DifficultySelection" Orientation="Vertical" HorizontalAlignment="Stretch" Margin="16" Spacing="12" VerticalAlignment="Center">
+                <TextBlock Text="Choose CPU Difficulty" HorizontalAlignment="Center"/>
+
+                <StackPanel Name="DifficultySelectionButtons" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+                    <Button Content="Easy"/>
+                    <Button Content="Medium"/>
+                    <Button Content="Hard"/>
+
+                </StackPanel>
             </StackPanel>
 
 
-
-
+            <Button Name="DifficultyReturnButton" Content="Back to menu" VerticalAlignment="Bottom" Click="DifficultyReturnButton_Click" HorizontalAlignment="Right" Margin="15"/>
         </StackPanel>
 
 

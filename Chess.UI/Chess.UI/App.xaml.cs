@@ -91,6 +91,7 @@ namespace Chess.UI
             services.AddSingleton<StylesPreferencesViewModel>();
             services.AddSingleton<MultiplayerPreferencesViewModel>();
             services.AddSingleton<AudioPreferencesViewModel>();
+            services.AddSingleton<GameSetupViewModel>();
 
             services.AddTransient<MainMenuWindow>();
             services.AddTransient<ChessBoardWindow>();
@@ -98,6 +99,7 @@ namespace Chess.UI
             services.AddTransient<StylePreferencesView>();
             services.AddTransient<MultiplayerPreferencesView>();
             services.AddTransient<AudioPreferencesView>();
+            services.AddTransient<GameConfigurationView>();
 
             // Audio Services
             services.AddSingleton<IAudioEngine, AudioEngine>();

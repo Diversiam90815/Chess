@@ -13,6 +13,7 @@ namespace Chess.UI.Services
 {
     public interface INavigationService
     {
+        Task NavigateToGameConfigurationView();
         Task<bool> NavigateToChessboardAsync(bool isMutiplayer, GameConfiguration? config = null);
         Task<bool> NavigateToMultiplayerAsync();
         Task<bool> NavigateToMainMenuAsync();
@@ -25,6 +26,7 @@ namespace Chess.UI.Services
     {
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
+        private GameConfigurationView _gameConfigurationView;
         private ChessBoardWindow _chessBoardWindow;
         private MultiplayerWindow _multiplayerWindow;
         private MainMenuWindow _mainMenuWindow;
@@ -40,6 +42,24 @@ namespace Chess.UI.Services
         public void SetMainMenuWindow(MainMenuWindow mainMenuWindow)
         {
             _mainMenuWindow = mainMenuWindow;
+        }
+
+
+        public async Task NavigateToGameConfigurationView()
+        {
+            await Task.Run(() =>
+            {
+                _dispatcherQueue.TryEnqueue(() =>
+                {
+                    if (_gameConfigurationView == null)
+                    {
+                        _gameConfigurationView = App.Current.Services.GetService<GameConfigurationView>();
+                        _gameConfigurationView.Activate();
+
+                        _mainMenuWindow?.AppWindow.Hide();
+                    }
+                });
+            });
         }
 
 
