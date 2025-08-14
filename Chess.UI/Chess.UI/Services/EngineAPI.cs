@@ -124,7 +124,7 @@ namespace Chess.UI.Services
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "LogWarningWithCaller", CharSet = CharSet.Unicode)]
         public static extern void LogWarningWithCaller([In()][MarshalAs(UnmanagedType.LPStr)] string message, [In()][MarshalAs(UnmanagedType.LPStr)] string functionName, [In()][MarshalAs(UnmanagedType.LPStr)] string className, int lineNumber);
-       
+
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "LogDebugWithCaller", CharSet = CharSet.Unicode)]
         public static extern void LogDebugWithCaller([In()][MarshalAs(UnmanagedType.LPStr)] string message, [In()][MarshalAs(UnmanagedType.LPStr)] string functionName, [In()][MarshalAs(UnmanagedType.LPStr)] string className, int lineNumber);
 
@@ -286,6 +286,14 @@ namespace Chess.UI.Services
             NoColor,
             White,
             Black
+        }
+
+
+        public enum CPUDifficulty
+        {
+            Easy = 1,
+            Medium = 2,
+            Hard = 3,
         }
 
 
@@ -459,7 +467,7 @@ namespace Chess.UI.Services
         {
             public GameModeSelection Mode;
             public PlayerColor PlayerColor;
-            public int CpuDifficulty;
+            public CPUDifficulty CpuDifficulty;
         }
 
 

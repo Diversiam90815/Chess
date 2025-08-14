@@ -13,7 +13,7 @@
     <Grid Name="Rootgrid">
 
         <!-- Select the game configuration : CPU vs Coop -->
-        <StackPanel Name="GameTypeSelection" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="12" Visibility="Collapsed">
+        <StackPanel Name="GameTypeSelection" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="12" Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.PlayerConfigVisible), Mode=TwoWay}">
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
                 <Button Name="CPUGame" Content="Player vs CPU" Margin="12" Height="40" Click="CPUGame_Click"/>
@@ -27,14 +27,40 @@
         </StackPanel>
 
 
-        <StackPanel Name="CPUConfiguration" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center" Spacing="8" Visibility="Visible" Margin="12" >
+        <StackPanel Name="CPUConfiguration" Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center" Spacing="8" Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.CPUConfigVisible), Mode=TwoWay}" Margin="12" >
 
             <StackPanel Name="PlayerSelection" Orientation="Vertical" HorizontalAlignment="Center" Spacing="12">
                 <TextBlock Text="Play as" HorizontalAlignment="Center"/>
 
                 <StackPanel Name="PlayerColorSelectionButtons" Orientation="Horizontal" Spacing="16">
-                    <Button Content="White"/>
-                    <Button Content="Black"/>
+
+                    <!--  White King Button (Inverting player since we're selecting our player in UI and set CPU Player in config) -->
+                    <StackPanel>
+                        <Button
+                        Name="SelectWhiteButton"
+                        Width="70"
+                        Height="70"
+                        BorderBrush="Green"
+                        BorderThickness="{x:Bind converter:Converter.PlayerToBlackBorderThickness(_viewModel.CpuColor), Mode=OneWay}"
+                        Click="SelectWhiteButton_Click">
+                            <Image Source="ms-appx:///Assets/Pieces/Basic/KingW.png" Stretch="Uniform" />
+                        </Button>
+
+                    </StackPanel>
+
+                    <!--  Black King Button (Inverting player since we're selecting our player in UI and set CPU Player in config) -->
+                    <StackPanel>
+
+                        <Button
+                        Name="SelectBlackButton"
+                        Width="70"
+                        Height="70"
+                        BorderBrush="Green"
+                        BorderThickness="{x:Bind converter:Converter.PlayerToWhiteBorderThickness(_viewModel.CpuColor), Mode=OneWay}"
+                        Click="SelectBlackButton_Click">
+                            <Image Source="ms-appx:///Assets/Pieces/Basic/KingB.png" Stretch="Uniform" />
+                        </Button>
+                    </StackPanel>
 
                 </StackPanel>
             </StackPanel>
