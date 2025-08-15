@@ -55,6 +55,8 @@ namespace Chess.UI.Services
                     {
                         _gameConfigurationView = App.Current.Services.GetService<GameConfigurationView>();
                         _gameConfigurationView.Activate();
+                        _gameConfigurationView.Closed += OnGameConfigWindowClosed;
+
 
                         _mainMenuWindow?.AppWindow.Hide();
                     }
@@ -171,6 +173,15 @@ namespace Chess.UI.Services
             preferencesView.ButtonClicked += mainMenuViewModel.OnButtonClicked;
 
             await preferencesView.ShowAsync();
+        }
+
+
+        private void OnGameConfigWindowClosed(object sender, WindowEventArgs e)
+        {
+            _gameConfigurationView.Closed -= OnGameConfigWindowClosed;
+            _gameConfigurationView = null;
+
+            NavigateToMainMenuAsync();
         }
 
 

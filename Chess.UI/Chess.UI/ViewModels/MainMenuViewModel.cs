@@ -157,8 +157,6 @@ namespace Chess.UI.ViewModels
             try
             {
                 await _navigationService.NavigateToGameConfigurationView();
-                //var config = await _dialogService.ShowGameSetupDialogAsync(_ownerWindow);
-                //await _gameConfigurationService.StartGameAsync(config);
             }
             catch (Exception ex)
             {
