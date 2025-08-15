@@ -119,10 +119,24 @@
                     HorizontalAlignment="Center"
                     Orientation="Horizontal"
                     Spacing="12">
-                    <Button Content="Easy" />
-                    <Button Content="Medium" />
-                    <Button Content="Hard" />
-
+                    <Button
+                        Name="EasyDiffucultyButton"
+                        BorderBrush="Green"
+                        BorderThickness="{x:Bind converter:Converter.CpuDifficultyToEasyBorderThickness(_viewModel.CPUDifficulty), Mode=OneWay}"
+                        Click="EasyDiffucultyButton_Click"
+                        Content="Easy" />
+                    <Button
+                        Name="MediumDifficultyButton"
+                        BorderBrush="Green"
+                        BorderThickness="{x:Bind converter:Converter.CpuDifficultyToMediumBorderThickness(_viewModel.CPUDifficulty), Mode=OneWay}"
+                        Click="MediumDifficultyButton_Click"
+                        Content="Medium" />
+                    <Button
+                        Name="HardDifficultyButton"
+                        BorderBrush="Green"
+                        BorderThickness="{x:Bind converter:Converter.CpuDifficultyToHardBorderThickness(_viewModel.CPUDifficulty), Mode=OneWay}"
+                        Click="HardDifficultyButton_Click"
+                        Content="Hard" />
                 </StackPanel>
             </StackPanel>
 

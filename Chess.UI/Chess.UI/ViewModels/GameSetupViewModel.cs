@@ -19,30 +19,45 @@ namespace Chess.UI.ViewModels
 
         private readonly IGameConfigurationService _configurationService;
 
-        private readonly GameConfigurationBuilder _configurationBuilder;
-
 
         public GameSetupViewModel(IDispatcherQueueWrapper dispatcher)
         {
             _dispatcherQueue = dispatcher;
+
             _configuration = App.Current.Services.GetService<GameConfigurationBuilder>();
             _configurationService = App.Current.Services.GetService<IGameConfigurationService>();
-            _configurationBuilder = App.Current.Services.GetService<GameConfigurationBuilder>();
         }
 
 
-        public void StartGame()
+        public void LocalCoopInitiated()
+        {
+            GameMode = EngineAPI.GameModeSelection.LocalCoop;
+
+            StartGame();
+        }
+
+
+        public void CPUGameInitiated()
+        {
+            GameMode = EngineAPI.GameModeSelection.VsCPU;
+
+            PlayerConfigVisible = false;
+            CPUConfigVisible = true;
+        }
+
+
+        private void StartGame()
         {
             // Set the values 
-            _configurationBuilder.SetGameMode(GameMode);
+            _configuration.SetGameMode(GameMode);
 
             if (_gameMode == GameModeSelection.VsCPU)
             {
-                _configurationBuilder.SetPlayerColor(PlayerColor);
-                _configurationBuilder.SetCpuDifficulty(_cpudifficulty);
+                _configuration.SetPlayerColor(PlayerColor);
+                _configuration.SetCPUDifficulty(_cpudifficulty);
             }
 
-            var config = _configurationBuilder.GetConfiguration();
+            var config = _configuration.GetConfiguration();
 
             _configurationService.StartGameAsync(config);
         }

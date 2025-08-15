@@ -27,14 +27,13 @@ namespace Chess.UI.Views
 
         private void CPUGame_Click(object sender, RoutedEventArgs e)
         {
-            _viewModel.PlayerConfigVisible = false;
-            _viewModel.CPUConfigVisible = true;
+            _viewModel.CPUGameInitiated();
         }
 
 
         private void CoopGame_Click(object sender, RoutedEventArgs e)
         {
-            _viewModel.StartGame();
+            _viewModel.LocalCoopInitiated();
         }
 
 
@@ -60,6 +59,21 @@ namespace Chess.UI.Views
         private void SelectBlackButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.PlayerColor = EngineAPI.PlayerColor.Black;
+        }
+
+        private void EasyDiffucultyButton_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.CPUDifficulty = EngineAPI.CPUDifficulty.Easy;
+        }
+
+        private void MediumDifficultyButton_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.CPUDifficulty = EngineAPI.CPUDifficulty.Medium;
+        }
+
+        private void HardDifficultyButton_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.CPUDifficulty = EngineAPI.CPUDifficulty.Hard;
         }
     }
 }
