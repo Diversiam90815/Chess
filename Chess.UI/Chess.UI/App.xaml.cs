@@ -73,6 +73,7 @@ namespace Chess.UI
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<IGameConfigurationService, GameConfigurationService>();
+            services.AddSingleton<IGameConfigurationBuilder, GameConfigurationBuilder>();
             services.AddSingleton<IWindowSizeService, WindowSizeService>();
 
             services.AddSingleton<IMoveModel, MoveModel>();
