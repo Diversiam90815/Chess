@@ -21,7 +21,6 @@ namespace Chess.UI.Views
             _windowSizeService.SetWindowSize(this, 500, 350);
 
             _viewModel = App.Current.Services.GetService<GameSetupViewModel>();
-
         }
 
 

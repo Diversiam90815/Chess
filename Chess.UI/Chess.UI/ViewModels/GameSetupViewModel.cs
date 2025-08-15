@@ -13,7 +13,7 @@ namespace Chess.UI.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private GameConfigurationBuilder _configuration;
+        private IGameConfigurationBuilder _configuration;
 
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
@@ -24,14 +24,14 @@ namespace Chess.UI.ViewModels
         {
             _dispatcherQueue = dispatcher;
 
-            _configuration = App.Current.Services.GetService<GameConfigurationBuilder>();
+            _configuration = App.Current.Services.GetService<IGameConfigurationBuilder>();
             _configurationService = App.Current.Services.GetService<IGameConfigurationService>();
         }
 
 
         public void LocalCoopInitiated()
         {
-            GameMode = EngineAPI.GameModeSelection.LocalCoop;
+            GameMode = GameModeSelection.LocalCoop;
 
             StartGame();
         }
@@ -39,7 +39,7 @@ namespace Chess.UI.ViewModels
 
         public void CPUGameInitiated()
         {
-            GameMode = EngineAPI.GameModeSelection.VsCPU;
+            GameMode = GameModeSelection.VsCPU;
 
             PlayerConfigVisible = false;
             CPUConfigVisible = true;
@@ -109,8 +109,8 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private EngineAPI.PlayerColor _playerColor;
-        public EngineAPI.PlayerColor PlayerColor
+        private PlayerColor _playerColor;
+        public PlayerColor PlayerColor
         {
             get => _playerColor;
             set
@@ -124,8 +124,8 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private EngineAPI.CPUDifficulty _cpudifficulty;
-        public EngineAPI.CPUDifficulty CPUDifficulty
+        private CPUDifficulty _cpudifficulty;
+        public CPUDifficulty CPUDifficulty
         {
             get => _cpudifficulty;
             set

@@ -57,7 +57,6 @@ namespace Chess.UI.Services
                         _gameConfigurationView.Activate();
                         _gameConfigurationView.Closed += OnGameConfigWindowClosed;
 
-
                         _mainMenuWindow?.AppWindow.Hide();
                     }
                 });
@@ -80,7 +79,7 @@ namespace Chess.UI.Services
 
                         var chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
                         chessBoardViewModel.IsMultiplayerGame = isMultiplayer;
-
+                     
                         // Close multiplayer window when opening chessboard from multiplayer
                         if (isMultiplayer && _multiplayerWindow != null)
                         {
