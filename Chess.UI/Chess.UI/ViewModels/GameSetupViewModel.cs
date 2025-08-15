@@ -3,6 +3,8 @@ using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.Marshalling;
+using static Chess.UI.Services.EngineAPI;
 
 
 namespace Chess.UI.ViewModels
@@ -15,11 +17,49 @@ namespace Chess.UI.ViewModels
 
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
+        private readonly IGameConfigurationService _configurationService;
+
+        private readonly GameConfigurationBuilder _configurationBuilder;
+
 
         public GameSetupViewModel(IDispatcherQueueWrapper dispatcher)
         {
             _dispatcherQueue = dispatcher;
             _configuration = App.Current.Services.GetService<GameConfigurationBuilder>();
+            _configurationService = App.Current.Services.GetService<IGameConfigurationService>();
+            _configurationBuilder = App.Current.Services.GetService<GameConfigurationBuilder>();
+        }
+
+
+        public void StartGame()
+        {
+            // Set the values 
+            _configurationBuilder.SetGameMode(GameMode);
+
+            if (_gameMode == GameModeSelection.VsCPU)
+            {
+                _configurationBuilder.SetPlayerColor(PlayerColor);
+                _configurationBuilder.SetCpuDifficulty(_cpudifficulty);
+            }
+
+            var config = _configurationBuilder.GetConfiguration();
+
+            _configurationService.StartGameAsync(config);
+        }
+
+
+        private GameModeSelection _gameMode;
+        public GameModeSelection GameMode
+        {
+            get => _gameMode;
+            set
+            {
+                if (_gameMode != value)
+                {
+                    _gameMode = value;
+                    OnPropertyChanged();
+                }
+            }
         }
 
 
@@ -54,15 +94,15 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private EngineAPI.PlayerColor _cpuColor;
-        public EngineAPI.PlayerColor CpuColor
+        private EngineAPI.PlayerColor _playerColor;
+        public EngineAPI.PlayerColor PlayerColor
         {
-            get => _cpuColor;
+            get => _playerColor;
             set
             {
-                if (value != _cpuColor)
+                if (value != _playerColor)
                 {
-                    _cpuColor = value;
+                    _playerColor = value;
                     OnPropertyChanged();
                 }
             }

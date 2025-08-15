@@ -37,9 +37,9 @@ namespace Chess.UI.Services
         }
 
 
-        public void SetCpuDifficulty(int difficulty)
+        public void SetCpuDifficulty(CPUDifficulty difficulty)
         {
-            _config.CpuDifficulty = (CPUDifficulty)difficulty;
+            _config.CpuDifficulty = difficulty;
         }
 
 

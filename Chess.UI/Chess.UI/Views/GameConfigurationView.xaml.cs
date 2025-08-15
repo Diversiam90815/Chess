@@ -27,20 +27,20 @@ namespace Chess.UI.Views
 
         private void CPUGame_Click(object sender, RoutedEventArgs e)
         {
-
-        }
-
-
-        private void CoopGame_Click(object sender, RoutedEventArgs e)
-        {
             _viewModel.PlayerConfigVisible = false;
             _viewModel.CPUConfigVisible = true;
         }
 
 
+        private void CoopGame_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.StartGame();
+        }
+
+
         private void PlayerReturnButton_Click(object sender, RoutedEventArgs e)
         {
-
+            this.Close();
         }
 
 
@@ -53,15 +53,13 @@ namespace Chess.UI.Views
 
         private void SelectWhiteButton_Click(object sender, RoutedEventArgs e)
         {
-            // Inverting CPU Player since we select our player in the UI
-            _viewModel.CpuColor = EngineAPI.PlayerColor.Black;
+            _viewModel.PlayerColor = EngineAPI.PlayerColor.White;
         }
 
 
         private void SelectBlackButton_Click(object sender, RoutedEventArgs e)
         {
-            // Inverting CPU Player since we select our player in the UI
-            _viewModel.CpuColor = EngineAPI.PlayerColor.White;
+            _viewModel.PlayerColor = EngineAPI.PlayerColor.Black;
         }
     }
 }

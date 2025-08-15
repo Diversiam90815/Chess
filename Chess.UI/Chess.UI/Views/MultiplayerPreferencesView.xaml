@@ -35,7 +35,7 @@
                     HorizontalAlignment="Stretch"
                     DisplayMemberPath="Name"
                     ItemsSource="{x:Bind _viewModel.NetworkAdapters}"
-                    SelectedItem="{x:Bind _viewModel.SelectedAdapter, Mode=TwoWay}" 
+                    SelectedItem="{x:Bind _viewModel.SelectedAdapter, Mode=TwoWay}"
                     SelectionChanged="NetworkAdapterChanged"
                     Style="{StaticResource SettingComboBoxStyle}" />
 

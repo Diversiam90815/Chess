@@ -74,21 +74,21 @@
                     Orientation="Horizontal"
                     Spacing="16">
 
-                    <!--  White King Button (Inverting player since we're selecting our player in UI and set CPU Player in config)  -->
+                    <!--  White King Button  -->
                     <StackPanel>
                         <Button
                             Name="SelectWhiteButton"
                             Width="70"
                             Height="70"
                             BorderBrush="Green"
-                            BorderThickness="{x:Bind converter:Converter.PlayerToBlackBorderThickness(_viewModel.CpuColor), Mode=OneWay}"
+                            BorderThickness="{x:Bind converter:Converter.PlayerToWhiteBorderThickness(_viewModel.PlayerColor), Mode=OneWay}"
                             Click="SelectWhiteButton_Click">
                             <Image Source="ms-appx:///Assets/Pieces/Basic/KingW.png" Stretch="Uniform" />
                         </Button>
 
                     </StackPanel>
 
-                    <!--  Black King Button (Inverting player since we're selecting our player in UI and set CPU Player in config)  -->
+                    <!--  Black King Button  -->
                     <StackPanel>
 
                         <Button
@@ -96,7 +96,7 @@
                             Width="70"
                             Height="70"
                             BorderBrush="Green"
-                            BorderThickness="{x:Bind converter:Converter.PlayerToWhiteBorderThickness(_viewModel.CpuColor), Mode=OneWay}"
+                            BorderThickness="{x:Bind converter:Converter.PlayerToBlackBorderThickness(_viewModel.PlayerColor), Mode=OneWay}"
                             Click="SelectBlackButton_Click">
                             <Image Source="ms-appx:///Assets/Pieces/Basic/KingB.png" Stretch="Uniform" />
                         </Button>
