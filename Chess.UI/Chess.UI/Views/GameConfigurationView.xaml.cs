@@ -1,7 +1,6 @@
 using Chess.UI.Services;
 using Chess.UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 
 
@@ -60,19 +59,27 @@ namespace Chess.UI.Views
             _viewModel.PlayerColor = EngineAPI.PlayerColor.Black;
         }
 
+
         private void EasyDiffucultyButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.CPUDifficulty = EngineAPI.CPUDifficulty.Easy;
         }
+
 
         private void MediumDifficultyButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.CPUDifficulty = EngineAPI.CPUDifficulty.Medium;
         }
 
+
         private void HardDifficultyButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.CPUDifficulty = EngineAPI.CPUDifficulty.Hard;
+        }
+
+        private void StartCPUGameButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

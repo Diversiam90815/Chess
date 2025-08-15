@@ -140,6 +140,15 @@
                 </StackPanel>
             </StackPanel>
 
+            <StackPanel Name="Buttons" Orientation="Horizontal" />
+
+            <Button
+                Name="StartCPUGameButton"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Click="StartCPUGameButton_Click"
+                Content="Start Game"
+                Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.StartGameButtonVisible), Mode=OneWay}" />
 
             <Button
                 Name="DifficultyReturnButton"

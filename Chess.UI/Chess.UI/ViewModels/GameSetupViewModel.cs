@@ -3,7 +3,6 @@ using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.Marshalling;
 using static Chess.UI.Services.EngineAPI;
 
 
@@ -108,8 +107,13 @@ namespace Chess.UI.ViewModels
             }
         }
 
+        public bool StartGameButtonVisible
+        {
+            get { return (_cpudifficulty != CPUDifficulty.None && PlayerColor != PlayerColor.NoColor); }
+        }
 
-        private PlayerColor _playerColor;
+
+        private PlayerColor _playerColor = PlayerColor.NoColor;
         public PlayerColor PlayerColor
         {
             get => _playerColor;
@@ -119,12 +123,13 @@ namespace Chess.UI.ViewModels
                 {
                     _playerColor = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(StartGameButtonVisible));
                 }
             }
         }
 
 
-        private CPUDifficulty _cpudifficulty;
+        private CPUDifficulty _cpudifficulty = CPUDifficulty.None;
         public CPUDifficulty CPUDifficulty
         {
             get => _cpudifficulty;
@@ -134,6 +139,7 @@ namespace Chess.UI.ViewModels
                 {
                     _cpudifficulty = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(StartGameButtonVisible));
                 }
             }
         }

@@ -291,6 +291,7 @@ namespace Chess.UI.Services
 
         public enum CPUDifficulty
         {
+            None = 0,
             Easy = 1,
             Medium = 2,
             Hard = 3,
