@@ -212,7 +212,7 @@
                         Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
                         CornerRadius="8">
                         <Grid.RowDefinitions>
-                            <RowDefinition x:Name="Title" Height="40" />
+                            <RowDefinition x:Name="TitleRow" Height="40" />
                             <RowDefinition x:Name="Moves" Height="165" />
                         </Grid.RowDefinitions>
 

@@ -1,9 +1,12 @@
 ﻿using Chess.UI.Audio.Modules;
 using Chess.UI.Audio.Services;
+using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 
 
@@ -22,8 +25,13 @@ namespace Chess.UI.ViewModels
     }
 
 
-    public class AudioPreferencesViewModel
+    public class AudioPreferencesViewModel : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private readonly IDispatcherQueueWrapper _dispatcherQueue;
+
+
         public ObservableCollection<AtmosphereScenarioItem> AtmosphereSoundscapes { get; }
 
         private readonly IChessAudioService _audioService;
@@ -31,8 +39,10 @@ namespace Chess.UI.ViewModels
         public event Action ItemSelected;
 
 
-        public AudioPreferencesViewModel()
+        public AudioPreferencesViewModel(IDispatcherQueueWrapper dispatcher)
         {
+            _dispatcherQueue = dispatcher;
+
             _audioService = App.Current.Services.GetService<IChessAudioService>();
 
             AtmosphereSoundscapes = new ObservableCollection<AtmosphereScenarioItem>();
@@ -101,6 +111,7 @@ namespace Chess.UI.ViewModels
                 if (value == masterVolume) return;
                 masterVolume = value;
                 SetMasterVolumeInEngine(masterVolume);
+                OnPropertyChanged();
             }
         }
 
@@ -114,6 +125,7 @@ namespace Chess.UI.ViewModels
                 if (value == sfxVolume) return;
                 sfxVolume = value;
                 SetSfxVolumeInEngine(sfxVolume);
+                OnPropertyChanged();
             }
         }
 
@@ -127,6 +139,7 @@ namespace Chess.UI.ViewModels
                 if (value == atmosVolume) return;
                 atmosVolume = value;
                 SetAtmosVolumeInEngine(atmosVolume);
+                OnPropertyChanged();
             }
         }
 
@@ -140,6 +153,7 @@ namespace Chess.UI.ViewModels
                 if (value == sfxEnabled) return;
                 sfxEnabled = value;
                 _audioService.SetSFXEnabled(value);
+                OnPropertyChanged();
             }
         }
 
@@ -153,6 +167,7 @@ namespace Chess.UI.ViewModels
                 if (value == atmosEnabled) return;
                 atmosEnabled = value;
                 _audioService.SetAtmosphereEnabled(value);
+                OnPropertyChanged();
             }
         }
 
@@ -175,6 +190,15 @@ namespace Chess.UI.ViewModels
         {
             double engineVolume = Math.Round(volume / 100.0f, 1);
             _audioService.SetMasterVolume((float)engineVolume);
+        }
+
+
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            _dispatcherQueue.TryEnqueue(() =>
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            });
         }
     }
 }

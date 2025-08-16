@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using System;
 using System.Collections.Generic;
 
+#nullable enable
 
 namespace Chess.UI.Views
 {
@@ -16,7 +17,7 @@ namespace Chess.UI.Views
 
         private readonly StylesPreferencesViewModel _settingsViewModel;
 
-        public event Action ButtonClicked;
+        public event Action? ButtonClicked;
 
 
         public PreferencesView()

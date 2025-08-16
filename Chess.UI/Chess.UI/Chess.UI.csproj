@@ -7,7 +7,7 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+		<TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
 		<RootNamespace>Chess.UI</RootNamespace>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
@@ -55,7 +55,6 @@
 		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Debug'">..\..\Chess.Engine\build\Chess.Engine.API\Debug</LocalChessLogicFiles>
 		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
 		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-		<PackageCertificateThumbprint>F0B1A6F3B7078207995ED0EC06C1335832F2CD0F</PackageCertificateThumbprint>
 		<AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
 		<AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
 		<AppxSymbolPackageEnabled>True</AppxSymbolPackageEnabled>
