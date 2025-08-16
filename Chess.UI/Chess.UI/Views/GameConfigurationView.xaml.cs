@@ -43,6 +43,8 @@ namespace Chess.UI.Views
 
         private void DifficultyReturnButton_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.Reset();
+
             _viewModel.PlayerConfigVisible = true;
             _viewModel.CPUConfigVisible = false;
         }
@@ -77,9 +79,10 @@ namespace Chess.UI.Views
             _viewModel.CPUDifficulty = EngineAPI.CPUDifficulty.Hard;
         }
 
+
         private void StartCPUGameButton_Click(object sender, RoutedEventArgs e)
         {
-
+            _viewModel.StartGame();
         }
     }
 }

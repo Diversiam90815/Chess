@@ -28,6 +28,18 @@ namespace Chess.UI.ViewModels
         }
 
 
+        public void Reset()
+        {
+            _configuration.Reset();
+
+            CPUDifficulty = CPUDifficulty.None;
+            PlayerColor = PlayerColor.NoColor;
+
+            PlayerConfigVisible = true;
+            CPUConfigVisible = false;
+        }
+
+
         public void LocalCoopInitiated()
         {
             GameMode = GameModeSelection.LocalCoop;
@@ -45,7 +57,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private void StartGame()
+        public void StartGame()
         {
             // Set the values 
             _configuration.SetGameMode(GameMode);
@@ -59,6 +71,8 @@ namespace Chess.UI.ViewModels
             var config = _configuration.GetConfiguration();
 
             _configurationService.StartGameAsync(config);
+
+            Reset();
         }
 
 
