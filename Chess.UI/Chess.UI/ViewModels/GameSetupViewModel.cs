@@ -8,7 +8,7 @@ using static Chess.UI.Services.EngineAPI;
 
 namespace Chess.UI.ViewModels
 {
-    class GameSetupViewModel : INotifyPropertyChanged
+    public class GameSetupViewModel : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -44,7 +44,7 @@ namespace Chess.UI.ViewModels
         {
             GameMode = GameModeSelection.LocalCoop;
 
-            StartGame();
+            StartGameAsync();
         }
 
 
@@ -57,7 +57,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        public void StartGame()
+        public async void StartGameAsync()
         {
             // Set the values 
             _configuration.SetGameMode(GameMode);
@@ -65,12 +65,12 @@ namespace Chess.UI.ViewModels
             if (_gameMode == GameModeSelection.VsCPU)
             {
                 _configuration.SetPlayerColor(PlayerColor);
-                _configuration.SetCPUDifficulty(_cpudifficulty);
+                _configuration.SetCPUDifficulty(CPUDifficulty);
             }
 
             var config = _configuration.GetConfiguration();
 
-            _configurationService.StartGameAsync(config);
+            await _configurationService.StartGameAsync(config);
 
             Reset();
         }
@@ -124,7 +124,7 @@ namespace Chess.UI.ViewModels
 
         public bool StartGameButtonVisible
         {
-            get { return (_cpudifficulty != CPUDifficulty.None && PlayerColor != PlayerColor.NoColor); }
+            get { return (_cpuDifficulty != CPUDifficulty.None && PlayerColor != PlayerColor.NoColor); }
         }
 
 
@@ -144,15 +144,15 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private CPUDifficulty _cpudifficulty = CPUDifficulty.None;
+        private CPUDifficulty _cpuDifficulty = CPUDifficulty.None;
         public CPUDifficulty CPUDifficulty
         {
-            get => _cpudifficulty;
+            get => _cpuDifficulty;
             set
             {
-                if (value != _cpudifficulty)
+                if (value != _cpuDifficulty)
                 {
-                    _cpudifficulty = value;
+                    _cpuDifficulty = value;
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(StartGameButtonVisible));
                 }

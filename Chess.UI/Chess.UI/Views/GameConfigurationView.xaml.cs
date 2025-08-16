@@ -63,7 +63,7 @@ namespace Chess.UI.Views
         }
 
 
-        private void EasyDiffucultyButton_Click(object sender, RoutedEventArgs e)
+        private void EasyDifficultyButton_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.CPUDifficulty = EngineAPI.CPUDifficulty.Easy;
         }
@@ -83,7 +83,7 @@ namespace Chess.UI.Views
 
         private void StartCPUGameButton_Click(object sender, RoutedEventArgs e)
         {
-            _viewModel.StartGame();
+            _viewModel.StartGameAsync();
         }
     }
 }

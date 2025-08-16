@@ -129,10 +129,10 @@
                     Orientation="Horizontal"
                     Spacing="12">
                     <Button
-                        Name="EasyDiffucultyButton"
+                        Name="EasyDifficultyButton"
                         BorderBrush="Green"
                         BorderThickness="{x:Bind converter:Converter.CpuDifficultyToEasyBorderThickness(_viewModel.CPUDifficulty), Mode=OneWay}"
-                        Click="EasyDiffucultyButton_Click"
+                        Click="EasyDifficultyButton_Click"
                         Content="Easy" />
                     <Button
                         Name="MediumDifficultyButton"
