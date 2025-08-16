@@ -57,13 +57,5 @@ namespace Chess.UI.Services
         {
             return _config;
         }
-
-
-        public GameConfiguration GetCancelledConfiguration()
-        {
-            var cancelConfig = _config;
-            cancelConfig.Mode = GameModeSelection.None;
-            return cancelConfig;
-        }
     }
 }

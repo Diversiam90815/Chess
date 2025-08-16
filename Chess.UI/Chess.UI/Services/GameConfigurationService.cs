@@ -6,7 +6,6 @@ using static Chess.UI.Services.EngineAPI;
 
 namespace Chess.UI.Services
 {
-
     public interface IGameConfigurationService
     {
         Task<bool> StartGameAsync(GameConfiguration config);
