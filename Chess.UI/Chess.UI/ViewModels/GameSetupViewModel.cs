@@ -122,10 +122,7 @@ namespace Chess.UI.ViewModels
         }
 
 
-        public bool StartGameButtonVisible
-        {
-            get { return (_cpuDifficulty != CPUDifficulty.None && PlayerColor != PlayerColor.NoColor); }
-        }
+        public bool StartGameButtonVisible => (CPUDifficulty != CPUDifficulty.None && PlayerColor != PlayerColor.NoColor);
 
 
         private PlayerColor _playerColor = PlayerColor.NoColor;
