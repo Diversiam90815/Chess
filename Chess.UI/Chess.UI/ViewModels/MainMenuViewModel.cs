@@ -25,7 +25,6 @@ namespace Chess.UI.ViewModels
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
         private readonly IImageService _imageServices;
         private readonly INavigationService _navigationService;
-        private readonly IDialogService _dialogService;
         private readonly IGameConfigurationService _gameConfigurationService;
 
         private Window _ownerWindow;
@@ -35,13 +34,11 @@ namespace Chess.UI.ViewModels
           IDispatcherQueueWrapper dispatcher,
           IImageService imageServices,
           INavigationService navigationService,
-          IDialogService dialogService,
           IGameConfigurationService gameConfigurationService)
         {
             _dispatcherQueue = dispatcher;
             _imageServices = imageServices;
             _navigationService = navigationService;
-            _dialogService = dialogService;
             _gameConfigurationService = gameConfigurationService;
 
             Init();

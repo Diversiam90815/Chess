@@ -30,8 +30,10 @@ namespace Chess.UI.ViewModels
 
         // Events for audio feedback
         public event Action ButtonClicked;
-        public event Action ChatMessageReceived;    // TODO: Not yet implemented
 
+#pragma warning disable CS0067 // Event is never used - planned for future chat feature
+        public event Action ChatMessageReceived;    // TODO: Not yet implemented
+#pragma warning restore CS0067
 
         public MultiplayerViewModel(IDispatcherQueueWrapper dispatcher)
         {

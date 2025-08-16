@@ -150,7 +150,7 @@ namespace Chess.UI.Services
 
         public void CloseChessboard()
         {
-            _dispatcherQueue.TryEnqueue(() =>
+            _ = _dispatcherQueue.TryEnqueue(() =>
             {
                 if (_chessBoardWindow != null)
                 {
@@ -161,7 +161,7 @@ namespace Chess.UI.Services
                     var chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
                     chessBoardViewModel.ResetGame();
 
-                    NavigateToMainMenuAsync();
+                     _ = NavigateToMainMenuAsync();
                 }
             });
         }
@@ -224,7 +224,7 @@ namespace Chess.UI.Services
                 multiplayerViewModel.DisconnectMultiplayer();
             }
 
-            NavigateToMainMenuAsync();
+            _ = NavigateToMainMenuAsync();
         }
 
 

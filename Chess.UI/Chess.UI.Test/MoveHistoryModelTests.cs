@@ -49,7 +49,7 @@ namespace Chess.UI.Test
         {
             public List<string> MoveHistory { get; } = new List<string>();
 
-            public event Action MoveHistoryUpdated;
+            public event Action? MoveHistoryUpdated;
 
             public void RemoveLastMove()
             {

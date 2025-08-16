@@ -1,8 +1,5 @@
-﻿using Chess.UI.Images;
-using Chess.UI.Styles;
-using Chess.UI.Wrappers;
-using Microsoft.UI.Dispatching;
-using System;
+﻿using Chess.UI.Styles;
+
 
 namespace Chess.UI.Test.Helpers
 {

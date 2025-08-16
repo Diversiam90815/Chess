@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace Chess.UI.Test
 {
-    public class StyleManagerTests
+    public partial class StyleManagerTests
     {
         [Fact]
         public void CurrentBoardStyle_PropertyChanged_PropertyRaised()
@@ -12,7 +12,7 @@ namespace Chess.UI.Test
             // Arrange
             var mockStyleManager = new MockStyleManager();
             bool eventRaised = false;
-            string propertyNameChanged = null;
+            string? propertyNameChanged = null;
 
             mockStyleManager.PropertyChanged += (sender, e) =>
             {
@@ -34,7 +34,7 @@ namespace Chess.UI.Test
             // Arrange
             var mockStyleManager = new MockStyleManager();
             bool eventRaised = false;
-            string propertyNameChanged = null;
+            string? propertyNameChanged = null;
 
             mockStyleManager.PropertyChanged += (sender, e) =>
             {
@@ -52,12 +52,12 @@ namespace Chess.UI.Test
 
 
         // Mock implementation for testing
-        private class MockStyleManager : IStyleManager
+        private partial class MockStyleManager : IStyleManager
         {
             private BoardStyle _boardStyle;
             private PieceStyle _pieceStyle;
 
-            public event PropertyChangedEventHandler PropertyChanged;
+            public event PropertyChangedEventHandler? PropertyChanged;
 
             public BoardStyle CurrentBoardStyle
             {
