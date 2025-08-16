@@ -11,7 +11,7 @@ namespace Chess.UI.Services
 
         #region Defines
 
-        private const string LOGIC_API_PATH = @"Chess.Engine.dll";
+        private const string LOGIC_API_PATH = @"Chess.Engine.API.dll";
 
         #endregion // Defines
 
@@ -59,7 +59,7 @@ namespace Chess.UI.Services
         #region Game
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "StartGame", CharSet = CharSet.Unicode)]
-        public static extern void StartGame();
+        public static extern void StartGame([In, MarshalAs(UnmanagedType.Struct)] GameConfiguration config);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "ResetGame", CharSet = CharSet.Unicode)]
         public static extern void ResetGame();
@@ -125,6 +125,9 @@ namespace Chess.UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "LogWarningWithCaller", CharSet = CharSet.Unicode)]
         public static extern void LogWarningWithCaller([In()][MarshalAs(UnmanagedType.LPStr)] string message, [In()][MarshalAs(UnmanagedType.LPStr)] string functionName, [In()][MarshalAs(UnmanagedType.LPStr)] string className, int lineNumber);
 
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "LogDebugWithCaller", CharSet = CharSet.Unicode)]
+        public static extern void LogDebugWithCaller([In()][MarshalAs(UnmanagedType.LPStr)] string message, [In()][MarshalAs(UnmanagedType.LPStr)] string functionName, [In()][MarshalAs(UnmanagedType.LPStr)] string className, int lineNumber);
+
         #endregion // Logging
 
 
@@ -150,6 +153,45 @@ namespace Chess.UI.Services
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetLocalPlayerName", CharSet = CharSet.Unicode)]
         [return: MarshalAs(UnmanagedType.LPStr)]
         public static extern string GetLocalPlayerName();
+
+
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetSFXEnabled", CharSet = CharSet.Unicode)]
+        public static extern bool GetSFXEnabled();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetSFXEnabled", CharSet = CharSet.Unicode)]
+        public static extern void SetSFXEnabled(bool enabled);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetAtmosEnabled", CharSet = CharSet.Unicode)]
+        public static extern bool GetAtmosEnabled();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetAtmosEnabled", CharSet = CharSet.Unicode)]
+        public static extern void SetAtmosEnabled(bool enabled);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetSFXVolume", CharSet = CharSet.Unicode)]
+        public static extern void SetSFXVolume(float volume);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetSFXVolume", CharSet = CharSet.Unicode)]
+        public static extern float GetSFXVolume();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetAtmosVolume", CharSet = CharSet.Unicode)]
+        public static extern void SetAtmosVolume(float volume);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetAtmosVolume", CharSet = CharSet.Unicode)]
+        public static extern float GetAtmosVolume();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetMasterVolume", CharSet = CharSet.Unicode)]
+        public static extern void SetMasterVolume(float volume);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetMasterVolume", CharSet = CharSet.Unicode)]
+        public static extern float GetMasterVolume();
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "SetAtmosScenario", CharSet = CharSet.Unicode)]
+        public static extern void SetAtmosScenario([In()][MarshalAs(UnmanagedType.LPStr)] string scenario);
+
+        [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetAtmosScenario", CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.LPStr)]
+        public static extern string GetAtmosScenario();
 
         #endregion // User Config
 
@@ -247,6 +289,15 @@ namespace Chess.UI.Services
         }
 
 
+        public enum CPUDifficulty
+        {
+            None = 0,
+            Easy = 1,
+            Medium = 2,
+            Hard = 3,
+        }
+
+
         public enum ConnectionState
         {
             None = 0,
@@ -275,7 +326,8 @@ namespace Chess.UI.Services
             ExecutingMove = 7,
             PawnPromotion = 8,
             WaitingForRemoteMove = 9,
-            GameOver = 10
+            WaitingForCPUMove = 10,
+            GameOver = 11,
         }
 
 
@@ -285,6 +337,14 @@ namespace Chess.UI.Services
             Checkmate = 2,
             StaleMate = 3,
             Reset = 4
+        }
+
+
+        public enum GameModeSelection
+        {
+            None,
+            LocalCoop,
+            VsCPU,
         }
 
 
@@ -401,6 +461,16 @@ namespace Chess.UI.Services
             public string name;
             public int id;
         }
+
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct GameConfiguration
+        {
+            public GameModeSelection Mode;
+            public PlayerColor PlayerColor;
+            public CPUDifficulty CpuDifficulty;
+        }
+
 
 
         #endregion  // Structures and Enums

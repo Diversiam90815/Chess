@@ -1,8 +1,6 @@
 using Chess.UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
-using System;
-using System.Text.RegularExpressions;
 
 
 namespace Chess.UI.Views

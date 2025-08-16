@@ -1,6 +1,7 @@
 ﻿using Chess.UI.Multiplayer;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -15,6 +16,9 @@ namespace Chess.UI.ViewModels
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
         private readonly IMultiplayerPreferencesModel _model;
+
+        public event Action ItemSelected;
+        private bool _userInteractionEnabled = false;
 
 
         public MultiplayerPreferencesViewModel(IDispatcherQueueWrapper dispatcherQueue)
@@ -59,6 +63,9 @@ namespace Chess.UI.ViewModels
                     _selectedAdapter = value;
                     _model.ChangeNetworkAdapter(SelectedAdapter.ID);
                     OnPropertyChanged();
+
+                    if (_userInteractionEnabled)
+                        ItemSelected?.Invoke();
                 }
             }
         }
@@ -76,6 +83,7 @@ namespace Chess.UI.ViewModels
                     if (adapter != null && adapter.ID == savedAdapterID)
                     {
                         SelectedAdapter = adapter;
+                        _userInteractionEnabled = true;
                         return;
                     }
                 }
@@ -100,11 +108,11 @@ namespace Chess.UI.ViewModels
                 SelectPresavedNetworkAdapter();
             });
         }
+
         #endregion
 
 
         #region Player Name
-
 
         private string _localPlayerName;
         public string LocalPlayerName

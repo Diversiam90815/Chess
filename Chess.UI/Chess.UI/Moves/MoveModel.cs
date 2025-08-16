@@ -1,10 +1,6 @@
-﻿using Chess.UI.Models.Interfaces;
-using Chess.UI.Services;
+﻿using Chess.UI.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
 
 
@@ -32,7 +28,7 @@ namespace Chess.UI.Moves
             {
                 case GameState.InitSucceeded:
                     {
-                        HandleInitSucceeded();
+                        GameStateInitSucceeded?.Invoke();
                         break;
                     }
                 case GameState.WaitingForInput:
@@ -54,6 +50,11 @@ namespace Chess.UI.Moves
                         NewBoardFromBackendEvent?.Invoke();
                         break;
                     }
+                case GameState.WaitingForCPUMove:
+                    {
+                        NewBoardFromBackendEvent?.Invoke();
+                        break;
+                    }
                 case GameState.GameOver:
                     {
                         break;
@@ -66,18 +67,12 @@ namespace Chess.UI.Moves
                 case GameState.WaitingForRemoteMove:
                     {
                         NewBoardFromBackendEvent?.Invoke();
-                        HandleRemotePlayersTurn();
+                        RemotePlayersTurn?.Invoke();
                         break;
                     }
                 default:
                     break;
             }
-        }
-
-
-        public void HandleInitSucceeded()
-        {
-            GameStateInitSucceeded?.Invoke();
         }
 
 
@@ -93,6 +88,9 @@ namespace Chess.UI.Moves
         private void HandleWaitingForTarget()
         {
             Logger.LogInfo("Due to delegate message WaitingForTarget we start getting the moves!");
+
+            // We have selected a chesspiece and started the move cycle
+            ChesspieceSelected?.Invoke();
 
             PossibleMoves.Clear();
 
@@ -115,18 +113,13 @@ namespace Chess.UI.Moves
         }
 
 
-        private void HandleRemotePlayersTurn()
-        {
-            RemotePlayersTurn?.Invoke();
-        }
-
-
         public void HandlePlayerChanged(PlayerColor player)
         {
             PlayerChanged?.Invoke(player);
         }
 
 
+        public event Action ChesspieceSelected;
         public event Action PossibleMovesCalculated;
         public event Action<PlayerColor> PlayerChanged;
         public event Action RemotePlayersTurn;

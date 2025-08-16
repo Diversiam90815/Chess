@@ -1,6 +1,7 @@
 ﻿using Chess.UI.Board;
 using Chess.UI.Images;
 using Chess.UI.Services;
+using Chess.UI.Styles;
 using Chess.UI.ViewModels;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,13 +26,13 @@ namespace Chess.UI.Views
     {
         private readonly ChessBoardViewModel _viewModel;
 
-        private OverlappedPresenter Presenter;
-
         private PieceTypeInstance? ViewModelSelectedPiece { get; set; }
 
         private readonly IImageService _images;
 
         private readonly IDispatcherQueueWrapper _dispatcher;
+
+        private readonly IWindowSizeService _windowSizeService;
 
 
         public ChessBoardWindow()
@@ -42,56 +43,46 @@ namespace Chess.UI.Views
             _dispatcher = App.Current.Services.GetService<IDispatcherQueueWrapper>();
             _images = App.Current.Services.GetService<IImageService>();
             _viewModel = App.Current.Services.GetService<ChessBoardViewModel>();
+            _windowSizeService = App.Current.Services.GetService<IWindowSizeService>();
+
             RootPanel.DataContext = _viewModel;
 
             _viewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
             _viewModel.ShowEndGameDialog += OnGameOverState;
 
-            Init();
-            SetWindowSize(1100, 800);
-        }
-
-
-        private void SetWindowSize(double width, double height)
-        {
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
-            float scalingFactor = EngineAPI.GetWindowScalingFactor(hwnd);
-
-            int scaledWidth = (int)(width * scalingFactor);
-            int scaledHeight = (int)(height * scalingFactor);
-            AppWindow.Resize(new(scaledWidth, scaledHeight));
-            Logger.LogInfo(string.Format("Window size set to {0} - {1} with a scaling factor of {2}", scaledWidth.ToString(), scaledHeight.ToString(), scalingFactor.ToString()));
-        }
-
-
-        private void Init()
-        {
-            Presenter = AppWindow.Presenter as OverlappedPresenter;
-            Presenter.IsResizable = false;
+            _windowSizeService.SetWindowSize(this, 1100, 800);
+            _windowSizeService.SetWindowNonResizable(this);
         }
 
 
         private void UndoMove_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.UndoLastMove();
         }
 
 
         private void ResetGame_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
+
             _viewModel.ResetGame();
-            _viewModel.StartGame();
+            _viewModel.StartGame(new GameConfiguration());
         }
 
 
         private void EndGame_Click(object sender, RoutedEventArgs e)
         {
+            _viewModel.OnButtonClicked();
             this.Close();
         }
 
 
         private void ChessPiece_Clicked(object sender, TappedRoutedEventArgs e)
         {
+            _viewModel.OnSquareClicked();
+
             var grid = sender as FrameworkElement;
             var square = grid.DataContext as BoardSquare;
 
@@ -277,7 +268,7 @@ namespace Chess.UI.Views
             {
                 case ContentDialogResult.Primary: // New Game
                     _viewModel.ResetGame();
-                    _viewModel.StartGame();
+                    _viewModel.StartGame(new GameConfiguration());
                     break;
                 case ContentDialogResult.Secondary: // View Board
                     // Do nothing - just close dialog and let user examine the board
@@ -355,6 +346,7 @@ namespace Chess.UI.Views
 
             return grid;
         }
+
 
         private StackPanel CreatePlayerCapturedPanel(string title, PlayerColor player)
         {
@@ -455,7 +447,7 @@ namespace Chess.UI.Views
 
                     var image = new Image
                     {
-                        Source = _images.GetPieceImage(ImageServices.PieceTheme.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
+                        Source = _images.GetPieceImage(PieceStyle.Basic, currentPlayer, pieceType),       // Need to adapt to current theme!
                         Stretch = Stretch.Uniform
                     };
 

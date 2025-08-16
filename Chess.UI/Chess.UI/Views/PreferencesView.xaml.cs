@@ -14,14 +14,16 @@ namespace Chess.UI.Views
 
         private readonly Dictionary<string, object> _viewmodels = new();
 
-        private readonly ThemePreferencesViewModel _settingsViewModel;
+        private readonly StylesPreferencesViewModel _settingsViewModel;
+
+        public event Action ButtonClicked;
 
 
         public PreferencesView()
         {
             this.InitializeComponent();
 
-            _settingsViewModel = App.Current.Services.GetRequiredService<ThemePreferencesViewModel>();
+            _settingsViewModel = App.Current.Services.GetRequiredService<StylesPreferencesViewModel>();
         }
 
 
@@ -56,11 +58,15 @@ namespace Chess.UI.Views
                     viewModel = _settingsViewModel;
                 }
                 NavigationViewFrame.Navigate(viewType, viewModel);
+
+                ButtonClicked?.Invoke();
             }
         }
 
+
         private void ReturnButtonClick(object sender, RoutedEventArgs e)
         {
+            ButtonClicked?.Invoke();
             this.Hide();
         }
     }

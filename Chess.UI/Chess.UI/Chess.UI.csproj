@@ -51,8 +51,8 @@
 	</ItemGroup>
 
 	<PropertyGroup>
-		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Release'">..\..\Chess.Engine\build\Chess.Engine\Release</LocalChessLogicFiles>
-		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Debug'">..\..\Chess.Engine\build\Chess.Engine\Debug</LocalChessLogicFiles>
+		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Release'">..\..\Chess.Engine\build\Chess.Engine.API\Release</LocalChessLogicFiles>
+		<LocalChessLogicFiles Condition="'$(Configuration)' == 'Debug'">..\..\Chess.Engine\build\Chess.Engine.API\Debug</LocalChessLogicFiles>
 		<GenerateAppInstallerFile>False</GenerateAppInstallerFile>
 		<AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
 		<PackageCertificateThumbprint>F0B1A6F3B7078207995ED0EC06C1335832F2CD0F</PackageCertificateThumbprint>
@@ -64,11 +64,11 @@
 		<HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 		<PackageIcon>Assets\Logo\Chess.ico</PackageIcon>
 		<ApplicationIcon>Assets\Logo\Chess.ico</ApplicationIcon>
-		<AppxPackageDir>C:\Users\QA\Documents\Repositories\PrivateRepo\Chess-Game\Package\</AppxPackageDir>
+		<AppxPackageDir>Package\</AppxPackageDir>
 		<AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
 	</PropertyGroup>
 
-	<!-- Add the Chess Logic DLL library to project -->
+	<!-- Add the Chess Engine DLL library to project -->
 	<ItemGroup>
 		<None Include="$(LocalChessLogicFiles)\*.dll">
 			<Link>%(Filename)%(Extension)</Link>
@@ -80,11 +80,10 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-	  <None Remove="..\..\Chess.Engine\build\Chess.Engine\Debug\ChessEngine.dll" />
-	  <None Remove="..\..\Chess.Engine\build\Chess.Engine\Debug\ChessEngine.pdb" />
+	  <None Remove="Views\GameConfigurationView.xaml" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\..\Chess.Engine\build\Chess.Engine\Chess.Engine.vcxproj" />
+	  <ProjectReference Include="..\..\Chess.Engine\build\Chess.Engine.API\Chess.Engine.API.vcxproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Properties\Resources.Designer.cs">
@@ -104,6 +103,12 @@
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
+	  <Page Update="Views\GameConfigurationView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
+	  <Page Update="Views\AudioPreferencesView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	</ItemGroup>
 	<ItemGroup>
 	  <Page Update="Views\MultiplayerPreferencesView.xaml">
