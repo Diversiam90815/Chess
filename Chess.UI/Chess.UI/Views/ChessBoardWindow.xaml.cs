@@ -26,8 +26,6 @@ namespace Chess.UI.Views
     {
         private readonly ChessBoardViewModel _viewModel;
 
-        private OverlappedPresenter Presenter;
-
         private PieceTypeInstance? ViewModelSelectedPiece { get; set; }
 
         private readonly IImageService _images;
@@ -52,15 +50,8 @@ namespace Chess.UI.Views
             _viewModel.ShowPawnPromotionDialogRequested += OnShowPawnPromotionPieces;
             _viewModel.ShowEndGameDialog += OnGameOverState;
 
-            Init();
             _windowSizeService.SetWindowSize(this, 1100, 800);
-        }
-
-
-        private void Init()
-        {
-            Presenter = AppWindow.Presenter as OverlappedPresenter;
-            Presenter.IsResizable = false;
+            _windowSizeService.SetWindowNonResizable(this);
         }
 
 

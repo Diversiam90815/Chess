@@ -1,6 +1,5 @@
 ﻿using Chess.UI.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
 
@@ -11,7 +10,7 @@ namespace Chess.UI.Services
     public interface IGameConfigurationService
     {
         Task<bool> StartGameAsync(GameConfiguration config);
-        Task<bool> StartLocalCoopGameAsync();
+        Task<bool> StartLocalCoopGameAsync(GameConfiguration config);
         Task<bool> StartCpuGameAsync(GameConfiguration config);
     }
 
@@ -31,7 +30,7 @@ namespace Chess.UI.Services
         {
             return config.Mode switch
             {
-                GameModeSelection.LocalCoop => await StartLocalCoopGameAsync(),
+                GameModeSelection.LocalCoop => await StartLocalCoopGameAsync(config),
                 GameModeSelection.VsCPU => await StartCpuGameAsync(config),
                 GameModeSelection.None => false,
                 _ => false
@@ -39,13 +38,13 @@ namespace Chess.UI.Services
         }
 
 
-        public async Task<bool> StartLocalCoopGameAsync()
+        public async Task<bool> StartLocalCoopGameAsync(GameConfiguration config)
         {
             var chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
             chessBoardViewModel.IsMultiplayerGame = false;
             chessBoardViewModel.IsKoopGame = true;
 
-            return await _navigationService.NavigateToChessboardAsync(false);
+            return await _navigationService.NavigateToChessboardAsync(false, config);
         }
 
 

@@ -1,14 +1,12 @@
 ﻿using Chess.UI.Images;
 using Chess.UI.Services;
 using Chess.UI.Wrappers;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using static Chess.UI.Services.EngineAPI;
 
 
 namespace Chess.UI.ViewModels
@@ -158,8 +156,7 @@ namespace Chess.UI.ViewModels
         {
             try
             {
-                var config = await _dialogService.ShowGameSetupDialogAsync(_ownerWindow);
-                await _gameConfigurationService.StartGameAsync(config);
+                await _navigationService.NavigateToGameConfigurationView();
             }
             catch (Exception ex)
             {

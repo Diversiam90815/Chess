@@ -3,7 +3,17 @@
 
 namespace Chess.UI.Services
 {
-    public class GameConfigurationBuilder
+    public interface IGameConfigurationBuilder
+    {
+        void Reset();
+        void SetGameMode(GameModeSelection mode);
+        void SetPlayerColor(PlayerColor player);
+        void SetCPUDifficulty(CPUDifficulty difficulty);
+        GameConfiguration GetConfiguration();
+    }
+    
+    
+    public class GameConfigurationBuilder : IGameConfigurationBuilder
     {
         private GameConfiguration _config;
 
@@ -31,13 +41,13 @@ namespace Chess.UI.Services
         }
 
 
-        public void SetPlayerColor(PlayerColor color)
+        public void SetPlayerColor(PlayerColor player)
         {
-            _config.PlayerColor = color;
+            _config.PlayerColor = player;
         }
 
 
-        public void SetCpuDifficulty(int difficulty)
+        public void SetCPUDifficulty(CPUDifficulty difficulty)
         {
             _config.CpuDifficulty = difficulty;
         }

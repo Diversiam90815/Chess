@@ -9,8 +9,6 @@ namespace Chess.UI.Views
 {
     public sealed partial class MultiplayerWindow : Window
     {
-        private OverlappedPresenter Presenter;
-
         private readonly MultiplayerViewModel _viewModel;
 
         private readonly IWindowSizeService _windowSizeService;
@@ -28,15 +26,12 @@ namespace Chess.UI.Views
 
             Init();
             _windowSizeService.SetWindowSize(this, 600, 400);
+            _windowSizeService.SetWindowNonResizable(this);
         }
 
 
         private void Init()
         {
-            Presenter = AppWindow.Presenter as OverlappedPresenter;
-            Presenter.IsResizable = false;
-            Presenter.IsMaximizable = false;
-
             _viewModel.ResetViewState();
             _viewModel.StartMultiplayerSetup();
         }

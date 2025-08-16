@@ -1,6 +1,5 @@
 ﻿using Chess.UI.Services;
 using Chess.UI.ViewModels;
-using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -11,9 +10,7 @@ namespace Chess.UI
 {
     public sealed partial class MainMenuWindow : Window
     {
-        private OverlappedPresenter mPresenter;
         private readonly MainMenuViewModel _viewModel;
-        private readonly IDispatcherQueueWrapper _dispatcherQueue;
         private readonly INavigationService _navigationService;
         private readonly IWindowSizeService _windowSizeService;
 
@@ -24,7 +21,6 @@ namespace Chess.UI
 
             AppWindow.SetIcon(Project.IconPath);
 
-            _dispatcherQueue = App.Current.Services.GetRequiredService<IDispatcherQueueWrapper>();
             _viewModel = App.Current.Services.GetService<MainMenuViewModel>();
             _navigationService = App.Current.Services.GetService<INavigationService>();
             _windowSizeService = App.Current.Services.GetService<IWindowSizeService>();
@@ -38,15 +34,14 @@ namespace Chess.UI
             this.RootGrid.DataContext = _viewModel;
 
             Init();
+
             _windowSizeService.SetWindowSize(this, 800, 750);
+            _windowSizeService.SetWindowNonResizable(this);
         }
 
 
         private void Init()
         {
-            mPresenter = AppWindow.Presenter as OverlappedPresenter;
-            mPresenter.IsResizable = false;
-
             _viewModel.SetOwnerWindow(this);
 
             SubscribeToViewModelEvents();

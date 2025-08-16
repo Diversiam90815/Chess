@@ -13,6 +13,7 @@ namespace Chess.UI.Services
 {
     public interface INavigationService
     {
+        Task NavigateToGameConfigurationView();
         Task<bool> NavigateToChessboardAsync(bool isMutiplayer, GameConfiguration? config = null);
         Task<bool> NavigateToMultiplayerAsync();
         Task<bool> NavigateToMainMenuAsync();
@@ -25,10 +26,13 @@ namespace Chess.UI.Services
     {
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
+        private GameConfigurationView _gameConfigurationView;
         private ChessBoardWindow _chessBoardWindow;
         private MultiplayerWindow _multiplayerWindow;
         private MainMenuWindow _mainMenuWindow;
+
         private bool _multiplayerWindowClosedProgrammatically = false;
+        private bool _configurationWindowClosedProgrammatically = false;
 
 
         public NavigationService(IDispatcherQueueWrapper dispatcherQueue)
@@ -37,10 +41,28 @@ namespace Chess.UI.Services
         }
 
 
-
         public void SetMainMenuWindow(MainMenuWindow mainMenuWindow)
         {
             _mainMenuWindow = mainMenuWindow;
+        }
+
+
+        public async Task NavigateToGameConfigurationView()
+        {
+            await Task.Run(() =>
+            {
+                _dispatcherQueue.TryEnqueue(() =>
+                {
+                    if (_gameConfigurationView == null)
+                    {
+                        _gameConfigurationView = App.Current.Services.GetService<GameConfigurationView>();
+                        _gameConfigurationView.Activate();
+                        _gameConfigurationView.Closed += OnGameConfigWindowClosed;
+
+                        _mainMenuWindow?.AppWindow.Hide();
+                    }
+                });
+            });
         }
 
 
@@ -65,6 +87,13 @@ namespace Chess.UI.Services
                         {
                             _multiplayerWindowClosedProgrammatically = true;
                             _multiplayerWindow.Close();
+                        }
+
+                        // Close Game Configuration Window when opening chessboard
+                        if (_gameConfigurationView != null)
+                        {
+                            _configurationWindowClosedProgrammatically = true;
+                            _gameConfigurationView.Close();
                         }
 
                         if (!isMultiplayer && config.HasValue)
@@ -152,6 +181,31 @@ namespace Chess.UI.Services
             preferencesView.ButtonClicked += mainMenuViewModel.OnButtonClicked;
 
             await preferencesView.ShowAsync();
+        }
+
+
+        private void OnGameConfigWindowClosed(object sender, WindowEventArgs e)
+        {
+            _gameConfigurationView.Closed -= OnGameConfigWindowClosed;
+            _gameConfigurationView = null;
+
+            if (!_configurationWindowClosedProgrammatically)
+            {
+                try
+                {
+                    if (_mainMenuWindow?.AppWindow != null)
+                    {
+                        _mainMenuWindow.AppWindow.Show();
+                        _mainMenuWindow.Activate();
+                    }
+                }
+                catch (COMException)
+                {
+                    // Window may already be closed during application shutdown
+                }
+            }
+
+            _configurationWindowClosedProgrammatically = false;
         }
 
 

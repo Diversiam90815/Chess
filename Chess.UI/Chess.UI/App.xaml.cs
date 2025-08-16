@@ -73,6 +73,7 @@ namespace Chess.UI
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IDialogService, DialogService>();
             services.AddSingleton<IGameConfigurationService, GameConfigurationService>();
+            services.AddSingleton<IGameConfigurationBuilder, GameConfigurationBuilder>();
             services.AddSingleton<IWindowSizeService, WindowSizeService>();
 
             services.AddSingleton<IMoveModel, MoveModel>();
@@ -91,6 +92,7 @@ namespace Chess.UI
             services.AddSingleton<StylesPreferencesViewModel>();
             services.AddSingleton<MultiplayerPreferencesViewModel>();
             services.AddSingleton<AudioPreferencesViewModel>();
+            services.AddSingleton<GameSetupViewModel>();
 
             services.AddTransient<MainMenuWindow>();
             services.AddTransient<ChessBoardWindow>();
@@ -98,6 +100,7 @@ namespace Chess.UI
             services.AddTransient<StylePreferencesView>();
             services.AddTransient<MultiplayerPreferencesView>();
             services.AddTransient<AudioPreferencesView>();
+            services.AddTransient<GameConfigurationView>();
 
             // Audio Services
             services.AddSingleton<IAudioEngine, AudioEngine>();
