@@ -11,10 +11,16 @@
     mc:Ignorable="d">
 
     <Grid Name="Rootgrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
 
+        </Grid.RowDefinitions>
         <!--  Select the game configuration : CPU vs Coop  -->
         <StackPanel
             Name="GameTypeSelection"
+            Grid.Row="1"
             Margin="12"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center"
@@ -44,17 +50,20 @@
 
             <Button
                 Name="PlayerReturnButton"
-                Margin="15"
+                Grid.Row="2"
                 HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
                 Click="PlayerReturnButton_Click"
-                Content="Back to menu" />
+                Style="{ThemeResource PreferencesButtonStyle}">
+                <FontIcon Glyph="&#xEB97;" />
+            </Button>
 
         </StackPanel>
 
 
+        <!--  Adjust the cpu configuration : Your player color and CPU Difficulty  -->
         <StackPanel
             Name="CPUConfiguration"
+            Grid.Row="1"
             Margin="12"
             HorizontalAlignment="Stretch"
             VerticalAlignment="Center"
@@ -138,31 +147,36 @@
                         Click="HardDifficultyButton_Click"
                         Content="Hard" />
                 </StackPanel>
+
             </StackPanel>
 
-            <StackPanel
-                Name="Buttons"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Bottom"
-                Orientation="Horizontal" />
+            <Grid Name="Buttons">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <Button
-                Name="StartCPUGameButton"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Click="StartCPUGameButton_Click"
-                Content="Start Game"
-                Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.StartGameButtonVisible), Mode=OneWay}" />
+                <Button
+                    Name="StartCPUGameButton"
+                    Grid.Column="0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Click="StartCPUGameButton_Click"
+                    Content="Start Game"
+                    Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.StartGameButtonVisible), Mode=OneWay}" />
 
-            <Button
-                Name="DifficultyReturnButton"
-                Margin="15"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Bottom"
-                Click="DifficultyReturnButton_Click"
-                Content="Back to menu" />
+
+                <Button
+                    Name="DifficultyReturnButton"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    Click="DifficultyReturnButton_Click"
+                    Style="{ThemeResource PreferencesButtonStyle}">
+                    <FontIcon Glyph="&#xEB97;" />
+                </Button>
+
+            </Grid>
+
         </StackPanel>
-
-
     </Grid>
 </Window>

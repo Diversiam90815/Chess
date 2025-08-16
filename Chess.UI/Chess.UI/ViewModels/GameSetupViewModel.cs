@@ -12,7 +12,7 @@ namespace Chess.UI.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private IGameConfigurationBuilder _configuration;
+        private readonly IGameConfigurationBuilder _configuration;
 
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
@@ -120,6 +120,7 @@ namespace Chess.UI.ViewModels
                 }
             }
         }
+
 
         public bool StartGameButtonVisible
         {
