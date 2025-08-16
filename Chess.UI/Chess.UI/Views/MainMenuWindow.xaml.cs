@@ -10,7 +10,6 @@ namespace Chess.UI
 {
     public sealed partial class MainMenuWindow : Window
     {
-        private OverlappedPresenter mPresenter;
         private readonly MainMenuViewModel _viewModel;
         private readonly INavigationService _navigationService;
         private readonly IWindowSizeService _windowSizeService;
@@ -35,15 +34,14 @@ namespace Chess.UI
             this.RootGrid.DataContext = _viewModel;
 
             Init();
+
             _windowSizeService.SetWindowSize(this, 800, 750);
+            _windowSizeService.SetWindowNonResizable(this);
         }
 
 
         private void Init()
         {
-            mPresenter = AppWindow.Presenter as OverlappedPresenter;
-            mPresenter.IsResizable = false;
-
             _viewModel.SetOwnerWindow(this);
 
             SubscribeToViewModelEvents();
