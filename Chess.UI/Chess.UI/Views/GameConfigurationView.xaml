@@ -140,7 +140,11 @@
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel Name="Buttons" Orientation="Horizontal" />
+            <StackPanel
+                Name="Buttons"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom"
+                Orientation="Horizontal" />
 
             <Button
                 Name="StartCPUGameButton"

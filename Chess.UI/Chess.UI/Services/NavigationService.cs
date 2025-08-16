@@ -30,7 +30,9 @@ namespace Chess.UI.Services
         private ChessBoardWindow _chessBoardWindow;
         private MultiplayerWindow _multiplayerWindow;
         private MainMenuWindow _mainMenuWindow;
+
         private bool _multiplayerWindowClosedProgrammatically = false;
+        private bool _configurationWindowClosedProgrammatically = false;
 
 
         public NavigationService(IDispatcherQueueWrapper dispatcherQueue)
@@ -79,12 +81,19 @@ namespace Chess.UI.Services
 
                         var chessBoardViewModel = App.Current.Services.GetService<ChessBoardViewModel>();
                         chessBoardViewModel.IsMultiplayerGame = isMultiplayer;
-                     
+
                         // Close multiplayer window when opening chessboard from multiplayer
                         if (isMultiplayer && _multiplayerWindow != null)
                         {
                             _multiplayerWindowClosedProgrammatically = true;
                             _multiplayerWindow.Close();
+                        }
+
+                        // Close Game Configuration Window when opening chessboard
+                        if (_gameConfigurationView != null)
+                        {
+                            _configurationWindowClosedProgrammatically = true;
+                            _gameConfigurationView.Close();
                         }
 
                         if (!isMultiplayer && config.HasValue)
@@ -180,7 +189,23 @@ namespace Chess.UI.Services
             _gameConfigurationView.Closed -= OnGameConfigWindowClosed;
             _gameConfigurationView = null;
 
-            NavigateToMainMenuAsync();
+            if (!_configurationWindowClosedProgrammatically)
+            {
+                try
+                {
+                    if (_mainMenuWindow?.AppWindow != null)
+                    {
+                        _mainMenuWindow.AppWindow.Show();
+                        _mainMenuWindow.Activate();
+                    }
+                }
+                catch (COMException)
+                {
+                    // Window may already be closed during application shutdown
+                }
+            }
+
+            _configurationWindowClosedProgrammatically = false;
         }
 
 
