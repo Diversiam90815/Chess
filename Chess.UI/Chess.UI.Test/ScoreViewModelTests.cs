@@ -3,15 +3,10 @@ using Chess.UI.Score;
 using Chess.UI.Services;
 using Chess.UI.ViewModels;
 using Chess.UI.Wrappers;
-using Microsoft.UI.Xaml.Media;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
+
 
 namespace Chess.UI.Test
 {
@@ -46,8 +41,7 @@ namespace Chess.UI.Test
                 });
 
             // Setup image service mock
-            _images.Setup(i => i.GetCapturedPieceImage(It.IsAny<PlayerColor>(), It.IsAny<PieceTypeInstance>()))
-                .Returns(CreateDummyImageSource());
+            _images.Setup(i => i.GetCapturedPieceImage(It.IsAny<PlayerColor>(), It.IsAny<PieceTypeInstance>()));
 
             // Setup service provider
             _serviceProviderMock
@@ -133,12 +127,6 @@ namespace Chess.UI.Test
                 BindingFlags.Instance |
                 BindingFlags.NonPublic);
             field?.SetValue(obj, value);
-        }
-
-        // Helper methods
-        private ImageSource CreateDummyImageSource()
-        {
-            return null;
         }
     }
 }
