@@ -20,17 +20,22 @@
 #include "Execution/MoveExecution.h"
 #include "ChessBoard.h"
 
+
 namespace fs = std::filesystem;
+
 
 namespace PerformanceTests
 {
 struct CPUAlgorithmPerformanceResult
 {
-	std::string				  algorithmName{};
-	int						  depth;
-	std::chrono::milliseconds duration;
-	PossibleMove			  selectedMove;
-	std::string				  position;
+	std::string							  algorithmName{};
+	int									  depth;
+	std::chrono::milliseconds			  duration;
+	PossibleMove						  selectedMove;
+	std::string							  position;
+
+	std::chrono::system_clock::time_point timeStamp;
+	std::string							  version{"1.0.0"};
 };
 
 
@@ -123,6 +128,7 @@ protected:
 		result.algorithmName = algorithmName;
 		result.depth		 = depth;
 		result.position		 = position;
+		result.timeStamp	 = std::chrono::system_clock::now(); 
 
 		auto moves			 = getAllLegalMoves(PlayerColor::White);
 
@@ -151,17 +157,35 @@ protected:
 		if (!file.is_open())
 			return;
 
-		file << "=== CPU Algorithm Performance Test Results ===" << std::endl;
-		file << std::setw(12) << "Algorithm" << std::setw(8) << "Depth" << std::setw(12) << "Duration(ms)" << std::setw(12) << "Position" << std::setw(15) << "Selected Move"
-			 << std::endl;
-		file << std::string(90, '-') << std::endl;
+		// Add timestamp and iteration header
+		auto now	= std::chrono::system_clock::now();
+		auto time_t = std::chrono::system_clock::to_time_t(now);
+		auto tm		= *std::localtime(&time_t);
 
+		file << "=== PERFORMANCE_ITERATION_START ===" << std::endl;
+		file << "Timestamp: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << std::endl;
+		file << "TestGroup: CPU Algorithm Performance" << std::endl;
+		file << "TestFile: " << fileName << std::endl;
+
+		// Save each result with structured format
 		for (const auto &result : results)
 		{
-			file << std::setw(12) << result.algorithmName << std::setw(8) << result.depth << std::setw(12) << result.duration.count() << std::setw(12) << result.position
-				 << std::setw(15) << "Move" << std::endl; // Could format move notation here
+			// Convert timestamp to readable format
+			auto result_time_t = std::chrono::system_clock::to_time_t(result.timeStamp);
+			auto result_tm	   = *std::localtime(&result_time_t);
+
+			file << "Algorithm: " << result.algorithmName << std::endl;
+			file << "Depth: " << result.depth << std::endl;
+			file << "Duration: " << result.duration.count() << std::endl;
+			file << "Position: " << result.position << std::endl;
+			file << "TestTimestamp: " << std::put_time(&result_tm, "%Y-%m-%d %H:%M:%S") << std::endl;
+			file << "Version: " << result.version << std::endl;
+			file << "---" << std::endl; // Separator between results
 		}
+
+		file << "=== PERFORMANCE_ITERATION_END ===" << std::endl;
 		file << std::endl;
+
 		file.close();
 	}
 };
@@ -182,7 +206,7 @@ TEST_F(CPUPlayerPerformanceTests, MinimaxDepthComparison)
 
 	saveResults("MiniMax Depth Comparison", results);
 
-		// The results of this test are saved in the file
+	// The results of this test are saved in the file
 	SUCCEED();
 }
 
@@ -202,7 +226,7 @@ TEST_F(CPUPlayerPerformanceTests, AlphaBetaDepthComparison)
 
 	saveResults("Alpha Beta Comparison", results);
 
-		// The results of this test are saved in the file
+	// The results of this test are saved in the file
 	SUCCEED();
 }
 
@@ -226,7 +250,7 @@ TEST_F(CPUPlayerPerformanceTests, AlgorithmComparison)
 
 	saveResults("Algorithm Comparison", results);
 
-		// The results of this test are saved in the file
+	// The results of this test are saved in the file
 	SUCCEED();
 }
 
@@ -245,7 +269,7 @@ TEST_F(CPUPlayerPerformanceTests, ComplexPositionPerformance)
 
 	saveResults("Complex Position", results);
 
-		// The results of this test are saved in the file
+	// The results of this test are saved in the file
 	SUCCEED();
 }
 

@@ -24,12 +24,15 @@ namespace PerformanceTests
 {
 struct MoveGenerationPerformanceResult
 {
-	std::string				  testName{};
-	std::chrono::microseconds duration{};
-	size_t					  movesGenerated{};
-	double					  movesPerSecond{};
-	size_t					  positionsEvaluated{};
-	std::string				  boardConfiguration{};
+	std::string							  testName{};
+	std::chrono::microseconds			  duration{};
+	size_t								  movesGenerated{};
+	double								  movesPerSecond{};
+	size_t								  positionsEvaluated{};
+	std::string							  boardConfiguration{};
+
+	std::chrono::system_clock::time_point timestamp;
+	std::string							  version{"1.0.0"};
 };
 
 
@@ -122,6 +125,7 @@ protected:
 		result.boardConfiguration = boardConfig;
 		result.movesGenerated	  = 0;
 		result.positionsEvaluated = 0;
+		result.timestamp		  = std::chrono::system_clock::now(); 
 
 		auto start				  = std::chrono::high_resolution_clock::now();
 
@@ -177,18 +181,37 @@ protected:
 		if (!file.is_open())
 			return;
 
-		file << "=== Move Generation Performance Test Results ===" << std::endl;
-		file << std::setw(20) << "Test Name" << std::setw(15) << "Duration (μs)" << std::setw(15) << "Moves Gen" << std::setw(15) << "Moves/Sec" << std::setw(15) << "Positions"
-			 << std::setw(20) << "Board Config" << std::endl;
-		file << std::string(100, '-') << std::endl;
+		// Add timestamp and iteration header
+		auto now	= std::chrono::system_clock::now();
+		auto time_t = std::chrono::system_clock::to_time_t(now);
+		auto tm		= *std::localtime(&time_t);
 
+		file << "=== PERFORMANCE_ITERATION_START ===" << std::endl;
+		file << "Timestamp: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << std::endl;
+		file << "TestGroup: Move Generation Performance" << std::endl;
+		file << "TestFile: " << fileName << std::endl;
+
+		// Save each result with structured format
 		for (const auto &result : results)
 		{
-			file << std::setw(20) << result.testName << std::setw(15) << result.duration.count() << std::setw(15) << result.movesGenerated << std::setw(15)
-				 << static_cast<int>(result.movesPerSecond) << std::setw(15) << result.positionsEvaluated << std::setw(20) << result.boardConfiguration << std::endl;
+			// Convert timestamp to readable format
+			auto result_time_t = std::chrono::system_clock::to_time_t(result.timestamp);
+			auto result_tm	   = *std::localtime(&result_time_t);
+
+			file << "TestName: " << result.testName << std::endl;
+			file << "Duration: " << result.duration.count() << std::endl;
+			file << "MovesGenerated: " << result.movesGenerated << std::endl;
+			file << "MovesPerSecond: " << static_cast<int>(result.movesPerSecond) << std::endl;
+			file << "PositionsEvaluated: " << result.positionsEvaluated << std::endl;
+			file << "BoardConfiguration: " << result.boardConfiguration << std::endl;
+			file << "TestTimestamp: " << std::put_time(&result_tm, "%Y-%m-%d %H:%M:%S") << std::endl;
+			file << "Version: " << result.version << std::endl;
+			file << "---" << std::endl; // Separator between results
 		}
 
+		file << "=== PERFORMANCE_ITERATION_END ===" << std::endl;
 		file << std::endl;
+
 		file.close();
 	}
 };

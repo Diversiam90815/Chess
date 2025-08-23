@@ -14,15 +14,18 @@ namespace PerformanceTests
 
 struct LightChessBoardPerformanceResult
 {
-	std::string				  testName{};
-	std::string				  operation{};
-	std::chrono::microseconds duration{};
-	int						  operationsPerformed{};
-	double					  operationsPerSecond{};
-	double					  averageOperationTime{};
-	std::string				  boardConfiguration{};
-	int						  moveCount{};
-	int						  positionCount{};
+	std::string							  testName{};
+	std::string							  operation{};
+	std::chrono::microseconds			  duration{};
+	int									  operationsPerformed{};
+	double								  operationsPerSecond{};
+	double								  averageOperationTime{};
+	std::string							  boardConfiguration{};
+	int									  moveCount{};
+	int									  positionCount{};
+
+	std::chrono::system_clock::time_point timestamp;
+	std::string							  version{"1.0.0"};
 };
 
 
@@ -104,6 +107,7 @@ protected:
 		result.operation		   = operation;
 		result.boardConfiguration  = boardConfig;
 		result.operationsPerformed = iterations;
+		result.timestamp		   = std::chrono::system_clock::now(); 
 
 		auto start				   = std::chrono::high_resolution_clock::now();
 
@@ -138,18 +142,40 @@ protected:
 		if (!file.is_open())
 			return;
 
-		file << "=== LightChessBoard Performance Test Results ===" << std::endl;
-		file << std::setw(15) << "Test Name" << std::setw(15) << "Operation" << std::setw(15) << "Duration(μs)" << std::setw(12) << "Operations" << std::setw(15) << "Ops/Sec"
-			 << std::setw(15) << "Avg Time(μs)" << std::setw(15) << "Board Config" << std::setw(12) << "Moves" << std::setw(12) << "Positions" << std::endl;
-		file << std::string(140, '-') << std::endl;
+		// Add timestamp and iteration header
+		auto now	= std::chrono::system_clock::now();
+		auto time_t = std::chrono::system_clock::to_time_t(now);
+		auto tm		= *std::localtime(&time_t);
 
+		file << "=== PERFORMANCE_ITERATION_START ===" << std::endl;
+		file << "Timestamp: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << std::endl;
+		file << "TestGroup: LightChessBoard Performance" << std::endl;
+		file << "TestFile: " << fileName << std::endl;
+
+		// Save each result with structured format
 		for (const auto &result : results)
 		{
-			file << std::setw(15) << result.testName << std::setw(15) << result.operation << std::setw(15) << result.duration.count() << std::setw(12) << result.operationsPerformed
-				 << std::setw(15) << static_cast<int>(result.operationsPerSecond) << std::setw(15) << std::fixed << std::setprecision(2) << result.averageOperationTime
-				 << std::setw(15) << result.boardConfiguration << std::setw(12) << result.moveCount << std::setw(12) << result.positionCount << std::endl;
+			// Convert timestamp to readable format
+			auto result_time_t = std::chrono::system_clock::to_time_t(result.timestamp);
+			auto result_tm	   = *std::localtime(&result_time_t);
+
+			file << "TestName: " << result.testName << std::endl;
+			file << "Operation: " << result.operation << std::endl;
+			file << "Duration: " << result.duration.count() << std::endl;
+			file << "OperationsPerformed: " << result.operationsPerformed << std::endl;
+			file << "OperationsPerSecond: " << static_cast<int>(result.operationsPerSecond) << std::endl;
+			file << "AverageOperationTime: " << std::fixed << std::setprecision(2) << result.averageOperationTime << std::endl;
+			file << "BoardConfiguration: " << result.boardConfiguration << std::endl;
+			file << "MoveCount: " << result.moveCount << std::endl;
+			file << "PositionCount: " << result.positionCount << std::endl;
+			file << "TestTimestamp: " << std::put_time(&result_tm, "%Y-%m-%d %H:%M:%S") << std::endl;
+			file << "Version: " << result.version << std::endl;
+			file << "---" << std::endl; // Separator between results
 		}
+
+		file << "=== PERFORMANCE_ITERATION_END ===" << std::endl;
 		file << std::endl;
+
 		file.close();
 	}
 };

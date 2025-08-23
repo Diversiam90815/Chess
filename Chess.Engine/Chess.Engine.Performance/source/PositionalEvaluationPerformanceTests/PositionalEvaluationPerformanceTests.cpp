@@ -28,17 +28,20 @@ namespace PerformanceTests
 
 struct PositionalEvaluationPerformanceResult
 {
-	std::string				  testName{};
-	std::string				  evaluationType{};
-	std::chrono::microseconds duration{};
-	size_t					  evaluationsPerformed{};
-	double					  evaluationsPerSecond{};
-	double					  averageEvaluationTime{};
-	std::string				  gamePhase{};
-	int						  minScore{};
-	int						  maxScore{};
-	double					  averageScore{};
-	int						  pieceCount{};
+	std::string							  testName{};
+	std::string							  evaluationType{};
+	std::chrono::microseconds			  duration{};
+	size_t								  evaluationsPerformed{};
+	double								  evaluationsPerSecond{};
+	double								  averageEvaluationTime{};
+	std::string							  gamePhase{};
+	int									  minScore{};
+	int									  maxScore{};
+	double								  averageScore{};
+	int									  pieceCount{};
+
+	std::chrono::system_clock::time_point timestamp;		
+	std::string							  version{"1.0.0"}; 
 };
 
 
@@ -123,6 +126,7 @@ protected:
 		result.evaluationType		= evaluationType;
 		result.gamePhase			= gamePhase;
 		result.evaluationsPerformed = iterations;
+		result.timestamp			= std::chrono::system_clock::now();
 
 		LightChessBoard	 lightBoard(*mBoard);
 		std::vector<int> scores;
@@ -172,20 +176,42 @@ protected:
 		if (!file.is_open())
 			return;
 
-		file << "=== Positional Evaluation Performance Test Results ===" << std::endl;
-		file << std::setw(15) << "Test Name" << std::setw(12) << "Type" << std::setw(12) << "Duration(μs)" << std::setw(12) << "Count" << std::setw(12) << "Eval/Sec"
-			 << std::setw(12) << "Avg Time" << std::setw(12) << "Game Phase" << std::setw(10) << "Min Score" << std::setw(10) << "Max Score" << std::setw(12) << "Avg Score"
-			 << std::setw(10) << "Pieces" << std::endl;
-		file << std::string(140, '-') << std::endl;
+		// Add timestamp and iteration header
+		auto now	= std::chrono::system_clock::now();
+		auto time_t = std::chrono::system_clock::to_time_t(now);
+		auto tm		= *std::localtime(&time_t);
 
+		file << "=== PERFORMANCE_ITERATION_START ===" << std::endl;
+		file << "Timestamp: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << std::endl;
+		file << "TestGroup: Positional Evaluation Performance" << std::endl;
+		file << "TestFile: " << fileName << std::endl;
+
+		// Save each result with structured format
 		for (const auto &result : results)
 		{
-			file << std::setw(15) << result.testName << std::setw(12) << result.evaluationType << std::setw(12) << result.duration.count() << std::setw(12)
-				 << result.evaluationsPerformed << std::setw(12) << static_cast<int>(result.evaluationsPerSecond) << std::setw(12) << std::fixed << std::setprecision(2)
-				 << result.averageEvaluationTime << std::setw(12) << result.gamePhase << std::setw(10) << result.minScore << std::setw(10) << result.maxScore << std::setw(12)
-				 << std::fixed << std::setprecision(1) << result.averageScore << std::setw(10) << result.pieceCount << std::endl;
+			// Convert timestamp to readable format
+			auto result_time_t = std::chrono::system_clock::to_time_t(result.timestamp);
+			auto result_tm	   = *std::localtime(&result_time_t);
+
+			file << "TestName: " << result.testName << std::endl;
+			file << "EvaluationType: " << result.evaluationType << std::endl;
+			file << "Duration: " << result.duration.count() << std::endl;
+			file << "EvaluationsPerformed: " << result.evaluationsPerformed << std::endl;
+			file << "EvaluationsPerSecond: " << static_cast<int>(result.evaluationsPerSecond) << std::endl;
+			file << "AverageEvaluationTime: " << std::fixed << std::setprecision(2) << result.averageEvaluationTime << std::endl;
+			file << "GamePhase: " << result.gamePhase << std::endl;
+			file << "MinScore: " << result.minScore << std::endl;
+			file << "MaxScore: " << result.maxScore << std::endl;
+			file << "AverageScore: " << std::fixed << std::setprecision(1) << result.averageScore << std::endl;
+			file << "PieceCount: " << result.pieceCount << std::endl;
+			file << "TestTimestamp: " << std::put_time(&result_tm, "%Y-%m-%d %H:%M:%S") << std::endl;
+			file << "Version: " << result.version << std::endl;
+			file << "---" << std::endl; // Separator between results
 		}
+
+		file << "=== PERFORMANCE_ITERATION_END ===" << std::endl;
 		file << std::endl;
+
 		file.close();
 	}
 };

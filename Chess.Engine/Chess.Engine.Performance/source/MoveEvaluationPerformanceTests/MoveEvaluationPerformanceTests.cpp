@@ -25,15 +25,18 @@ namespace PerformanceTests
 
 struct MoveEvaluationPerformanceResult
 {
-	std::string				  testName{};
-	std::string				  evaluationType{};
-	std::chrono::microseconds duration{};
-	size_t					  movesEvaluated{};
-	double					  evaluationsPerSecond{};
-	double					  averageEvaluationTime{};
-	int						  minScore{};
-	int						  maxScore{};
-	double					  averageScore{};
+	std::string							  testName{};
+	std::string							  evaluationType{};
+	std::chrono::microseconds			  duration{};
+	size_t								  movesEvaluated{};
+	double								  evaluationsPerSecond{};
+	double								  averageEvaluationTime{};
+	int									  minScore{};
+	int									  maxScore{};
+	double								  averageScore{};
+
+	std::chrono::system_clock::time_point timestamp;
+	std::string							  version{"1.0.0"};
 };
 
 
@@ -102,6 +105,7 @@ protected:
 		result.testName		  = testName;
 		result.evaluationType = evaluationName;
 		result.movesEvaluated = moves.size();
+		result.timestamp	  = std::chrono::system_clock::now(); 
 
 		std::vector<int> scores;
 		scores.reserve(moves.size());
@@ -148,18 +152,40 @@ protected:
 		if (!file.is_open())
 			return;
 
-		file << "=== Move Evaluation Performance Test Results ===" << std::endl;
-		file << std::setw(15) << "Test Name" << std::setw(12) << "Type" << std::setw(12) << "Duration(μs)" << std::setw(12) << "Count" << std::setw(12) << "Eval/Sec"
-			 << std::setw(12) << "Avg Time" << std::setw(10) << "Min Score" << std::setw(10) << "Max Score" << std::setw(12) << "Avg Score" << std::endl;
-		file << std::string(120, '-') << std::endl;
+		// Add timestamp and iteration header
+		auto now	= std::chrono::system_clock::now();
+		auto time_t = std::chrono::system_clock::to_time_t(now);
+		auto tm		= *std::localtime(&time_t);
 
+		file << "=== PERFORMANCE_ITERATION_START ===" << std::endl;
+		file << "Timestamp: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << std::endl;
+		file << "TestGroup: Move Evaluation Performance" << std::endl;
+		file << "TestFile: " << fileName << std::endl;
+
+		// Save each result with structured format
 		for (const auto &result : results)
 		{
-			file << std::setw(15) << result.testName << std::setw(12) << result.evaluationType << std::setw(12) << result.duration.count() << std::setw(12) << result.movesEvaluated
-				 << std::setw(12) << static_cast<int>(result.evaluationsPerSecond) << std::setw(12) << std::fixed << std::setprecision(2) << result.averageEvaluationTime
-				 << std::setw(10) << result.minScore << std::setw(10) << result.maxScore << std::setw(12) << std::fixed << std::setprecision(1) << result.averageScore << std::endl;
+			// Convert timestamp to readable format
+			auto result_time_t = std::chrono::system_clock::to_time_t(result.timestamp);
+			auto result_tm	   = *std::localtime(&result_time_t);
+
+			file << "TestName: " << result.testName << std::endl;
+			file << "EvaluationType: " << result.evaluationType << std::endl;
+			file << "Duration: " << result.duration.count() << std::endl;
+			file << "MovesEvaluated: " << result.movesEvaluated << std::endl;
+			file << "EvaluationsPerSecond: " << static_cast<int>(result.evaluationsPerSecond) << std::endl;
+			file << "AverageEvaluationTime: " << std::fixed << std::setprecision(2) << result.averageEvaluationTime << std::endl;
+			file << "MinScore: " << result.minScore << std::endl;
+			file << "MaxScore: " << result.maxScore << std::endl;
+			file << "AverageScore: " << std::fixed << std::setprecision(1) << result.averageScore << std::endl;
+			file << "TestTimestamp: " << std::put_time(&result_tm, "%Y-%m-%d %H:%M:%S") << std::endl;
+			file << "Version: " << result.version << std::endl;
+			file << "---" << std::endl; // Separator between results
 		}
+
+		file << "=== PERFORMANCE_ITERATION_END ===" << std::endl;
 		file << std::endl;
+
 		file.close();
 	}
 };
