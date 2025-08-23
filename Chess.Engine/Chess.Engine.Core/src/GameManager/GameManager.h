@@ -97,7 +97,7 @@ public:
 
 	bool						isCPUPlayer(PlayerColor player) const;
 
-	void						requestCPUMoveAsync(PlayerColor player);
+	void						requestCPUMoveAsync();
 
 
 	void						setSFXEnabled(const bool enabled);

@@ -596,13 +596,11 @@ bool StateMachine::handleWaitingForCPUState()
 {
 	if (!mWaitingForCPUMove)
 	{
-		PlayerColor currentPlayer = GameManager::GetInstance()->getCurrentPlayer();
-
 		// Start CPU Move calculation async
-		GameManager::GetInstance()->requestCPUMoveAsync(currentPlayer);
+		GameManager::GetInstance()->requestCPUMoveAsync();
 		mWaitingForCPUMove = true;
 
-		LOG_INFO("Started CPU move calculation for player {}", LoggingHelper::playerColourToString(currentPlayer).c_str());
+		LOG_INFO("Started CPU move calculation for player");
 	}
 
 	return true;

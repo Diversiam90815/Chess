@@ -66,7 +66,7 @@ public:
 
 	bool					   isCPUPlayer(PlayerColor player) const;
 
-	void					   requestCPUMoveAsync(PlayerColor player);
+	void					   requestCPUMoveAsync();
 
 
 private:
