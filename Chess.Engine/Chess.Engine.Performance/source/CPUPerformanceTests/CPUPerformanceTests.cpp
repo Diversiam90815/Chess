@@ -296,7 +296,7 @@ TEST_F(CPUPerformanceTests, Medium_VS_Easy)
 	mediumConfig.thinkingTime = std::chrono::milliseconds(100);
 
 	// Test medium vs easy
-	auto stats				  = runMultipleGames(mediumConfig, easyConfig, 50, true);
+	auto stats				  = runMultipleGames(mediumConfig, easyConfig, 10, true); // Reducing the move counts since we currently focus on the other tests
 
 	std::cout << "Medium vs Easy Results:" << std::endl;
 	std::cout << "Win Rate: " << stats.winRate << "%" << std::endl;

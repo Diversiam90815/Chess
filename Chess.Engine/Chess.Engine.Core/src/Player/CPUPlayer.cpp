@@ -27,7 +27,6 @@ void CPUPlayer::setCPUConfiguration(const CPUConfiguration &config)
 
 void CPUPlayer::requestMoveAsync()
 {
-
 	// Start async calculation
 	std::thread([this]() { calculateMove(mConfig.cpuColor); }).detach();
 }
