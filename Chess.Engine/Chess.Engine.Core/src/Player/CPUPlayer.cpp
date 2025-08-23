@@ -25,16 +25,11 @@ void CPUPlayer::setCPUConfiguration(const CPUConfiguration &config)
 }
 
 
-void CPUPlayer::requestMoveAsync(PlayerColor player)
+void CPUPlayer::requestMoveAsync()
 {
-	if (!isCPUPlayer(player))
-	{
-		LOG_WARNING("requestMoveAsync called for non-CPU player");
-		return;
-	}
 
 	// Start async calculation
-	std::thread([this, player]() { calculateMove(player); }).detach();
+	std::thread([this]() { calculateMove(mConfig.cpuColor); }).detach();
 }
 
 

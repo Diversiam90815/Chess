@@ -76,7 +76,7 @@ public:
 	void			 setCPUConfiguration(const CPUConfiguration &config);
 	CPUConfiguration getCPUConfiguration() const { return mConfig; }
 
-	void			 requestMoveAsync(PlayerColor player);
+	void			 requestMoveAsync();
 
 	bool			 isCPUPlayer(PlayerColor player) const;
 	bool			 isCPUEnabled() const { return mConfig.enabled; }
