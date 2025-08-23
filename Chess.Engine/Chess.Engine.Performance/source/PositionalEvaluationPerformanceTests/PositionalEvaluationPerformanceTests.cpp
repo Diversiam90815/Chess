@@ -20,8 +20,11 @@
 #include "Generation/MoveGeneration.h"
 #include "Validation/MoveValidation.h"
 #include "Execution/MoveExecution.h"
+#include "Project.h"
+
 
 namespace fs = std::filesystem;
+
 
 namespace PerformanceTests
 {
@@ -41,7 +44,7 @@ struct PositionalEvaluationPerformanceResult
 	int									  pieceCount{};
 
 	std::chrono::system_clock::time_point timestamp;		
-	std::string							  version{"1.0.0"}; 
+	std::string							  version{ProjectInfo::Version};
 };
 
 

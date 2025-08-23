@@ -19,6 +19,7 @@
 #include "Validation/MoveValidation.h"
 #include "Execution/MoveExecution.h"
 #include "ChessBoard.h"
+#include "Project.h"
 
 
 namespace fs = std::filesystem;
@@ -35,7 +36,7 @@ struct CPUAlgorithmPerformanceResult
 	std::string							  position;
 
 	std::chrono::system_clock::time_point timeStamp;
-	std::string							  version{"1.0.0"};
+	std::string							  version{ProjectInfo::Version};
 };
 
 

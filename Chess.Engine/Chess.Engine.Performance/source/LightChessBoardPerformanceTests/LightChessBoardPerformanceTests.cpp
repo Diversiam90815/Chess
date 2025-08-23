@@ -7,7 +7,10 @@
 
 #include <gtest/gtest.h>
 #include <chrono>
+
 #include "Board/LightChessBoard.h"
+#include "Project.h"
+
 
 namespace PerformanceTests
 {
@@ -25,7 +28,7 @@ struct LightChessBoardPerformanceResult
 	int									  positionCount{};
 
 	std::chrono::system_clock::time_point timestamp;
-	std::string							  version{"1.0.0"};
+	std::string							  version{ProjectInfo::Version};
 };
 
 
