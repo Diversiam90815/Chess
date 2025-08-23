@@ -22,6 +22,8 @@
 #include "LightChessBoard.h"
 #include "PositionalEvaluation.h"
 
+#define DEBUG_MOVES 1
+
 
 enum class CPUDifficulty
 {

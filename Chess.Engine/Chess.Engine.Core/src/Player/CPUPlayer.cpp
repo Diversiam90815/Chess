@@ -235,6 +235,20 @@ void CPUPlayer::calculateMove(PlayerColor player)
 	// Clear evaluation cache before starting a new search
 	mEvaluationCache.clear();
 
+// Add debugging to see move evaluation spread
+#if DEBUG_MOVES
+
+	LOG_DEBUG("=== Move Evaluation Debug ===");
+	for (const auto &move : allMoves)
+	{
+		LightChessBoard testBoard(*mBoard);
+		int				score = evaluateMoveAndPosition(move, player, testBoard);
+		LOG_DEBUG("Move {}->{}: score = {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
+	}
+	LOG_DEBUG("=== End Debug ===");
+
+#endif
+
 	// Simulate thinking
 	simulateThinking();
 
@@ -567,10 +581,20 @@ int CPUPlayer::evaluateMoveAndPosition(const PossibleMove &move, PlayerColor pla
 	if (it != mEvaluationCache.end())
 		return it->second;
 
-	// Combine positional and move-specific evaluation
-	int score = 0;
-	score += mPositionalEvaluation->evaluatePosition(board, player);
-	score += mMoveEvaluation->getAdvancedEvaluation(move, player, &board);
+	// Combine positional and move-specific evaluation with proper scaling
+	int score			= 0;
+
+	// Get positional evaluation (board state)
+	int positionalScore = mPositionalEvaluation->evaluatePosition(board, player);
+
+	// Get move-specific evaluation
+	int moveScore		= mMoveEvaluation->getAdvancedEvaluation(move, player, &board);
+
+	// Combine with proper weighting
+	score				= positionalScore + moveScore;
+
+	// Add debugging to see what's happening
+	LOG_DEBUG("Position score: {}, Move score: {}, Total: {}", positionalScore, moveScore, score);
 
 	// Cache result
 	if (mEvaluationCache.size() < MAX_EVAL_CACHE_SIZE)
