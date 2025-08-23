@@ -312,13 +312,13 @@ int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int dep
 	{
 		int maxEval = -std::numeric_limits<int>::max();
 
-		for (const auto &move : moves)
+		for (const auto &currentMove : moves)
 		{
 			// make move
-			auto undoInfo = board.makeMove(move);
+			auto undoInfo = board.makeMove(currentMove);
 
 			// recursively evaluate (switch to minimizing player)
-			int	 eval	  = minimax(move, board, depth - 1, false, player);
+			int	 eval	  = minimax(currentMove, board, depth - 1, false, player);
 			maxEval		  = std::max(maxEval, eval);
 
 			// Unmake move
@@ -331,13 +331,13 @@ int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int dep
 	{
 		int minEval = std::numeric_limits<int>::max();
 
-		for (const auto &move : moves)
+		for (const auto &currentMove : moves)
 		{
 			// make move
-			auto undoInfo = board.makeMove(move);
+			auto undoInfo = board.makeMove(currentMove);
 
 			// recursively evaluate (switch to maximizing player)
-			int	 eval	  = minimax(move, board, depth - 1, true, player);
+			int	 eval	  = minimax(currentMove, board, depth - 1, true, player);
 			minEval		  = std::min(minEval, eval);
 
 			// unmake move
@@ -354,7 +354,7 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 	mNodesSearched++;
 
 	// Check transposition table first
-	uint64_t	 hashKey = board.getHashKey();
+	uint64_t	 hashKey = getHash(move, player, board);
 	int			 storedScore{0};
 	PossibleMove storedMove{};
 
@@ -411,13 +411,13 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 	{
 		int maxEval = -std::numeric_limits<int>::max();
 
-		for (const auto &move : moves)
+		for (const auto &currentMove : moves)
 		{
 			// make move
-			auto undoInfo = board.makeMove(move);
+			auto undoInfo = board.makeMove(currentMove);
 
 			// recursively evaluate (switch to minimizing player)
-			int	 eval	  = alphaBeta(move, board, depth - 1, alpha, beta, false, player);
+			int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, false, player);
 
 			// unmake move
 			board.unmakeMove(undoInfo);
@@ -425,7 +425,7 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 			if (eval > maxEval)
 			{
 				maxEval	 = eval;
-				bestMove = move;
+				bestMove = currentMove;
 			}
 
 			alpha = std::max(alpha, eval);
@@ -455,13 +455,13 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 	{
 		int minEval = std::numeric_limits<int>::max();
 
-		for (const auto &move : moves)
+		for (const auto &currentMove : moves)
 		{
 			// make move
-			auto undoInfo = board.makeMove(move);
+			auto undoInfo = board.makeMove(currentMove);
 
 			// Recursively evaluate (switch to maximizing player)
-			int	 eval	  = alphaBeta(move, board, depth - 1, alpha, beta, true, player);
+			int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, true, player);
 
 			// unmake move
 			board.unmakeMove(undoInfo);
@@ -469,7 +469,7 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 			if (eval < minEval)
 			{
 				minEval	 = eval;
-				bestMove = move;
+				bestMove = currentMove;
 			}
 
 			beta = std::min(beta, eval);
@@ -573,7 +573,7 @@ std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandid
 
 int CPUPlayer::evaluateMoveAndPosition(const PossibleMove &move, PlayerColor player, const LightChessBoard &board)
 {
-	uint64_t hash = board.getHashKey();
+	uint64_t hash = getHash(move, player, board);
 
 	// Check evaluation cache
 	auto	 it	  = mEvaluationCache.find(hash);
@@ -593,8 +593,9 @@ int CPUPlayer::evaluateMoveAndPosition(const PossibleMove &move, PlayerColor pla
 	// Combine with proper weighting
 	score				= positionalScore + moveScore;
 
-	// Add debugging to see what's happening
+#if DEBUG_MOVES
 	LOG_DEBUG("Position score: {}, Move score: {}, Total: {}", positionalScore, moveScore, score);
+#endif
 
 	// Cache result
 	if (mEvaluationCache.size() < MAX_EVAL_CACHE_SIZE)
@@ -634,4 +635,17 @@ bool CPUPlayer::lookupTransposition(uint64_t hash, int depth, int &score, Possib
 	}
 
 	return false;
+}
+
+
+uint64_t CPUPlayer::getHash(const PossibleMove &move, const PlayerColor player, const LightChessBoard &board)
+{
+	uint64_t boardHash	  = board.getHashKey();
+	uint64_t moveHash	  = std::hash<uint64_t>{}((static_cast<uint64_t>(move.start.x) << 48) | (static_cast<uint64_t>(move.start.y) << 40) |
+											  (static_cast<uint64_t>(move.end.x) << 32) | (static_cast<uint64_t>(move.end.y) << 24) | (static_cast<uint64_t>(move.type) << 16) |
+											  (static_cast<uint64_t>(move.promotionPiece) << 8) | static_cast<uint64_t>(player));
+
+	uint64_t combinedHash = boardHash ^ moveHash;
+
+	return combinedHash;
 }

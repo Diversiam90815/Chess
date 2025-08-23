@@ -112,6 +112,8 @@ private:
 	void								  storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move);
 	bool								  lookupTransposition(uint64_t hash, int depth, int &score, PossibleMove &move);
 
+	uint64_t							  getHash(const PossibleMove &move, const PlayerColor player, const LightChessBoard &board);
+
 
 	CPUConfiguration					  mConfig;
 
