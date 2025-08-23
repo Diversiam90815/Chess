@@ -25,16 +25,10 @@ void CPUPlayer::setCPUConfiguration(const CPUConfiguration &config)
 }
 
 
-void CPUPlayer::requestMoveAsync(PlayerColor player)
+void CPUPlayer::requestMoveAsync()
 {
-	if (!isCPUPlayer(player))
-	{
-		LOG_WARNING("requestMoveAsync called for non-CPU player");
-		return;
-	}
-
 	// Start async calculation
-	std::thread([this, player]() { calculateMove(player); }).detach();
+	std::thread([this]() { calculateMove(mConfig.cpuColor); }).detach();
 }
 
 
@@ -109,7 +103,7 @@ PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, i
 		auto undoInfo = lightBoard.makeMove(move);
 
 		// Evaluate using minimax (opp's turn -> minimizing)
-		int	 score	  = minimax(lightBoard, depth - 1, false, mConfig.cpuColor);
+		int	 score	  = minimax(move, lightBoard, depth - 1, false, mConfig.cpuColor);
 
 		// unmake move
 		lightBoard.unmakeMove(undoInfo);
@@ -166,7 +160,7 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 		auto undoInfo = lightBoard.makeMove(move);
 
 		// evaluate using alpha-beta (opp's turn, so minimizing)
-		int	 score	  = alphaBeta(lightBoard, depth - 1, alpha, beta, false, mConfig.cpuColor);
+		int	 score	  = alphaBeta(move, lightBoard, depth - 1, alpha, beta, false, mConfig.cpuColor);
 
 		// unmake move
 		lightBoard.unmakeMove(undoInfo);
@@ -235,6 +229,20 @@ void CPUPlayer::calculateMove(PlayerColor player)
 	// Clear evaluation cache before starting a new search
 	mEvaluationCache.clear();
 
+// Add debugging to see move evaluation spread
+#if DEBUG_MOVES
+
+	LOG_DEBUG("=== Move Evaluation Debug ===");
+	for (const auto &move : allMoves)
+	{
+		LightChessBoard testBoard(*mBoard);
+		int				score = evaluateMoveAndPosition(move, player, testBoard);
+		LOG_DEBUG("Move {}->{}: score = {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
+	}
+	LOG_DEBUG("=== End Debug ===");
+
+#endif
+
 	// Simulate thinking
 	simulateThinking();
 
@@ -268,13 +276,13 @@ void CPUPlayer::simulateThinking()
 }
 
 
-int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, PlayerColor player)
+int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player)
 {
 	mNodesSearched++;
 
 	// Terminal depth reached -> evaluate static position
 	if (depth == 0)
-		return evaluatePlayerPosition(board, player);
+		return evaluateMoveAndPosition(move, player, board);
 
 	// Generate legal moves for player
 	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
@@ -298,13 +306,13 @@ int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, Playe
 	{
 		int maxEval = -std::numeric_limits<int>::max();
 
-		for (const auto &move : moves)
+		for (const auto &currentMove : moves)
 		{
 			// make move
-			auto undoInfo = board.makeMove(move);
+			auto undoInfo = board.makeMove(currentMove);
 
 			// recursively evaluate (switch to minimizing player)
-			int	 eval	  = minimax(board, depth - 1, false, player);
+			int	 eval	  = minimax(currentMove, board, depth - 1, false, player);
 			maxEval		  = std::max(maxEval, eval);
 
 			// Unmake move
@@ -317,13 +325,13 @@ int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, Playe
 	{
 		int minEval = std::numeric_limits<int>::max();
 
-		for (const auto &move : moves)
+		for (const auto &currentMove : moves)
 		{
 			// make move
-			auto undoInfo = board.makeMove(move);
+			auto undoInfo = board.makeMove(currentMove);
 
 			// recursively evaluate (switch to maximizing player)
-			int	 eval	  = minimax(board, depth - 1, true, player);
+			int	 eval	  = minimax(currentMove, board, depth - 1, true, player);
 			minEval		  = std::min(minEval, eval);
 
 			// unmake move
@@ -335,12 +343,12 @@ int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, Playe
 }
 
 
-int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player)
+int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player)
 {
 	mNodesSearched++;
 
 	// Check transposition table first
-	uint64_t	 hashKey = board.getHashKey();
+	uint64_t	 hashKey = getHash(move, player, board);
 	int			 storedScore{0};
 	PossibleMove storedMove{};
 
@@ -353,7 +361,7 @@ int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta,
 	// Terminal depth reached -> evaluate static positon
 	if (depth == 0)
 	{
-		int score = evaluatePlayerPosition(board, player);
+		int score = evaluateMoveAndPosition(move, player, board);
 		storeTransposition(hashKey, depth, score, TranspositionEntry::NodeType::Exact, PossibleMove{});
 		return score;
 	}
@@ -397,13 +405,13 @@ int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta,
 	{
 		int maxEval = -std::numeric_limits<int>::max();
 
-		for (const auto &move : moves)
+		for (const auto &currentMove : moves)
 		{
 			// make move
-			auto undoInfo = board.makeMove(move);
+			auto undoInfo = board.makeMove(currentMove);
 
 			// recursively evaluate (switch to minimizing player)
-			int	 eval	  = alphaBeta(board, depth - 1, alpha, beta, false, player);
+			int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, false, player);
 
 			// unmake move
 			board.unmakeMove(undoInfo);
@@ -411,7 +419,7 @@ int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta,
 			if (eval > maxEval)
 			{
 				maxEval	 = eval;
-				bestMove = move;
+				bestMove = currentMove;
 			}
 
 			alpha = std::max(alpha, eval);
@@ -441,13 +449,13 @@ int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta,
 	{
 		int minEval = std::numeric_limits<int>::max();
 
-		for (const auto &move : moves)
+		for (const auto &currentMove : moves)
 		{
 			// make move
-			auto undoInfo = board.makeMove(move);
+			auto undoInfo = board.makeMove(currentMove);
 
 			// Recursively evaluate (switch to maximizing player)
-			int	 eval	  = alphaBeta(board, depth - 1, alpha, beta, true, player);
+			int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, true, player);
 
 			// unmake move
 			board.unmakeMove(undoInfo);
@@ -455,7 +463,7 @@ int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta,
 			if (eval < minEval)
 			{
 				minEval	 = eval;
-				bestMove = move;
+				bestMove = currentMove;
 			}
 
 			beta = std::min(beta, eval);
@@ -557,6 +565,40 @@ std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandid
 }
 
 
+int CPUPlayer::evaluateMoveAndPosition(const PossibleMove &move, PlayerColor player, const LightChessBoard &board)
+{
+	uint64_t hash = getHash(move, player, board);
+
+	// Check evaluation cache
+	auto	 it	  = mEvaluationCache.find(hash);
+
+	if (it != mEvaluationCache.end())
+		return it->second;
+
+	// Combine positional and move-specific evaluation with proper scaling
+	int score			= 0;
+
+	// Get positional evaluation (board state)
+	int positionalScore = mPositionalEvaluation->evaluatePosition(board, player);
+
+	// Get move-specific evaluation
+	int moveScore		= mMoveEvaluation->getAdvancedEvaluation(move, player, &board);
+
+	// Combine with proper weighting
+	score				= positionalScore + moveScore;
+
+#if DEBUG_MOVES
+	LOG_DEBUG("Position score: {}, Move score: {}, Total: {}", positionalScore, moveScore, score);
+#endif
+
+	// Cache result
+	if (mEvaluationCache.size() < MAX_EVAL_CACHE_SIZE)
+		mEvaluationCache[hash] = score;
+
+	return score;
+}
+
+
 void CPUPlayer::storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move)
 {
 	if (mTranspositionTable.size() >= MAX_TRANSPOSITION_ENTRIES)
@@ -587,4 +629,17 @@ bool CPUPlayer::lookupTransposition(uint64_t hash, int depth, int &score, Possib
 	}
 
 	return false;
+}
+
+
+uint64_t CPUPlayer::getHash(const PossibleMove &move, const PlayerColor player, const LightChessBoard &board)
+{
+	uint64_t boardHash	  = board.getHashKey();
+	uint64_t moveHash	  = std::hash<uint64_t>{}((static_cast<uint64_t>(move.start.x) << 48) | (static_cast<uint64_t>(move.start.y) << 40) |
+											  (static_cast<uint64_t>(move.end.x) << 32) | (static_cast<uint64_t>(move.end.y) << 24) | (static_cast<uint64_t>(move.type) << 16) |
+											  (static_cast<uint64_t>(move.promotionPiece) << 8) | static_cast<uint64_t>(player));
+
+	uint64_t combinedHash = boardHash ^ moveHash;
+
+	return combinedHash;
 }

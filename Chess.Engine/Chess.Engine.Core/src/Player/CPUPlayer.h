@@ -22,6 +22,8 @@
 #include "LightChessBoard.h"
 #include "PositionalEvaluation.h"
 
+#define DEBUG_MOVES 1
+
 
 enum class CPUDifficulty
 {
@@ -74,7 +76,7 @@ public:
 	void			 setCPUConfiguration(const CPUConfiguration &config);
 	CPUConfiguration getCPUConfiguration() const { return mConfig; }
 
-	void			 requestMoveAsync(PlayerColor player);
+	void			 requestMoveAsync();
 
 	bool			 isCPUPlayer(PlayerColor player) const;
 	bool			 isCPUEnabled() const { return mConfig.enabled; }
@@ -89,33 +91,36 @@ public:
 	PossibleMove	 getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth);
 	PossibleMove	 getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth);
 
+	int				 evaluateMoveAndPosition(const PossibleMove &move, PlayerColor player, const LightChessBoard &board);
 	int				 evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player);
 
 
 private:
-	void											 calculateMove(PlayerColor player);
+	void								  calculateMove(PlayerColor player);
 
-	void											 simulateThinking();
+	void								  simulateThinking();
 
-	int												 minimax(LightChessBoard &board, int depth, bool maximizing, PlayerColor player);
-	int												 alphaBeta(LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player);
+	int									  minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player);
+	int									  alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player);
 
-	PossibleMove									 selectBestMove(std::vector<MoveCandidate> &moves);
+	PossibleMove						  selectBestMove(std::vector<MoveCandidate> &moves);
 
-	PossibleMove									 selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
+	PossibleMove						  selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
 
-	std::vector<MoveCandidate>						 filterTopCandidates(std::vector<MoveCandidate> &allMoves);
+	std::vector<MoveCandidate>			  filterTopCandidates(std::vector<MoveCandidate> &allMoves);
 
-	void											 storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move);
-	bool											 lookupTransposition(uint64_t hash, int depth, int &score, PossibleMove &move);
+	void								  storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move);
+	bool								  lookupTransposition(uint64_t hash, int depth, int &score, PossibleMove &move);
+
+	uint64_t							  getHash(const PossibleMove &move, const PlayerColor player, const LightChessBoard &board);
 
 
-	CPUConfiguration								 mConfig;
+	CPUConfiguration					  mConfig;
 
-	std::shared_ptr<MoveGeneration>					 mMoveGeneration;
-	std::shared_ptr<MoveEvaluation>					 mMoveEvaluation;
-	std::shared_ptr<ChessBoard>						 mBoard;
-	std::shared_ptr<PositionalEvaluation>			 mPositionalEvaluation;
+	std::shared_ptr<MoveGeneration>		  mMoveGeneration;
+	std::shared_ptr<MoveEvaluation>		  mMoveEvaluation;
+	std::shared_ptr<ChessBoard>			  mBoard;
+	std::shared_ptr<PositionalEvaluation> mPositionalEvaluation;
 
 	std::unordered_map<uint64_t, TranspositionEntry> mTranspositionTable;
 	static constexpr size_t							 MAX_TRANSPOSITION_ENTRIES = 1000000;

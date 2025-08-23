@@ -404,8 +404,8 @@ bool GameEngine::isCPUPlayer(PlayerColor player) const
 }
 
 
-void GameEngine::requestCPUMoveAsync(PlayerColor player)
+void GameEngine::requestCPUMoveAsync()
 {
 	if (mCPUPlayer)
-		return mCPUPlayer->requestMoveAsync(player);
+		return mCPUPlayer->requestMoveAsync();
 }

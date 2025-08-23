@@ -244,22 +244,6 @@ TEST_F(CPUPlayerTests, GetAlphaBetaMoveReturnsValidMove)
 }
 
 
-TEST_F(CPUPlayerTests, RequestMoveAsyncDoesNothingForNonCPUPlayer)
-{
-	CPUConfiguration config;
-	config.enabled	= true;
-	config.cpuColor = PlayerColor::Black;
-
-	mCPUPlayer->setCPUConfiguration(config);
-
-	// This should not cause any issues and should return quickly
-	mCPUPlayer->requestMoveAsync(PlayerColor::White);
-
-	// If we reach this point without hanging, the test passes
-	SUCCEED() << "requestMoveAsync should handle non-CPU player gracefully";
-}
-
-
 TEST_F(CPUPlayerTests, EmptyMoveListHandling)
 {
 	std::vector<PossibleMove> emptyMoves;
