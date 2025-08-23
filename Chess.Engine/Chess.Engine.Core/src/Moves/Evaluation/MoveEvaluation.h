@@ -46,6 +46,7 @@ public:
 	int		  evaluatePawnStructure(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 	int		  evaluatePieceActivity(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 	int		  evaluateDefensivePatterns(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+	int		  evaluateOpeningPrinciples(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
 	bool	  createsPin(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 	bool	  createsFork(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
@@ -94,8 +95,12 @@ private:
 	std::vector<Position> getAttackedSquares(const Position &piecePos, PlayerColor player, const LightChessBoard *board = nullptr) const;
 	bool				  wouldExposeKing(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr) const;
 	int					  countAttackers(const Position &target, PlayerColor attackerPlayer, const LightChessBoard *lightBoard = nullptr) const;
-	PlayerColor			  getOpponentColor(PlayerColor player) const;
 
+	bool				  isDevelopmentMove(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr) const;
+	bool				  isPrematureQueenMove(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr) const;
+	bool				  controlsCenterSquares(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr) const;
+
+	PlayerColor			  getOpponentColor(PlayerColor player) const;
 	bool				  areCollinear(const Position &pos1, const Position &pos2, PieceType pieceType);
 
 	PieceType			  getPieceTypeFromPosition(const Position &pos, const LightChessBoard *lightBoard = nullptr) const;
