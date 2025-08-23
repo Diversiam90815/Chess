@@ -109,7 +109,7 @@ PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, i
 		auto undoInfo = lightBoard.makeMove(move);
 
 		// Evaluate using minimax (opp's turn -> minimizing)
-		int	 score	  = minimax(lightBoard, depth - 1, false, mConfig.cpuColor);
+		int	 score	  = minimax(move, lightBoard, depth - 1, false, mConfig.cpuColor);
 
 		// unmake move
 		lightBoard.unmakeMove(undoInfo);
@@ -166,7 +166,7 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 		auto undoInfo = lightBoard.makeMove(move);
 
 		// evaluate using alpha-beta (opp's turn, so minimizing)
-		int	 score	  = alphaBeta(lightBoard, depth - 1, alpha, beta, false, mConfig.cpuColor);
+		int	 score	  = alphaBeta(move, lightBoard, depth - 1, alpha, beta, false, mConfig.cpuColor);
 
 		// unmake move
 		lightBoard.unmakeMove(undoInfo);
@@ -268,13 +268,13 @@ void CPUPlayer::simulateThinking()
 }
 
 
-int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, PlayerColor player)
+int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player)
 {
 	mNodesSearched++;
 
 	// Terminal depth reached -> evaluate static position
 	if (depth == 0)
-		return evaluatePlayerPosition(board, player);
+		return evaluateMoveAndPosition(move, player, board);
 
 	// Generate legal moves for player
 	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
@@ -304,7 +304,7 @@ int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, Playe
 			auto undoInfo = board.makeMove(move);
 
 			// recursively evaluate (switch to minimizing player)
-			int	 eval	  = minimax(board, depth - 1, false, player);
+			int	 eval	  = minimax(move, board, depth - 1, false, player);
 			maxEval		  = std::max(maxEval, eval);
 
 			// Unmake move
@@ -323,7 +323,7 @@ int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, Playe
 			auto undoInfo = board.makeMove(move);
 
 			// recursively evaluate (switch to maximizing player)
-			int	 eval	  = minimax(board, depth - 1, true, player);
+			int	 eval	  = minimax(move, board, depth - 1, true, player);
 			minEval		  = std::min(minEval, eval);
 
 			// unmake move
@@ -335,7 +335,7 @@ int CPUPlayer::minimax(LightChessBoard &board, int depth, bool maximizing, Playe
 }
 
 
-int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player)
+int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player)
 {
 	mNodesSearched++;
 
@@ -353,7 +353,7 @@ int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta,
 	// Terminal depth reached -> evaluate static positon
 	if (depth == 0)
 	{
-		int score = evaluatePlayerPosition(board, player);
+		int score = evaluateMoveAndPosition(move, player, board);
 		storeTransposition(hashKey, depth, score, TranspositionEntry::NodeType::Exact, PossibleMove{});
 		return score;
 	}
@@ -403,7 +403,7 @@ int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta,
 			auto undoInfo = board.makeMove(move);
 
 			// recursively evaluate (switch to minimizing player)
-			int	 eval	  = alphaBeta(board, depth - 1, alpha, beta, false, player);
+			int	 eval	  = alphaBeta(move, board, depth - 1, alpha, beta, false, player);
 
 			// unmake move
 			board.unmakeMove(undoInfo);
@@ -447,7 +447,7 @@ int CPUPlayer::alphaBeta(LightChessBoard &board, int depth, int alpha, int beta,
 			auto undoInfo = board.makeMove(move);
 
 			// Recursively evaluate (switch to maximizing player)
-			int	 eval	  = alphaBeta(board, depth - 1, alpha, beta, true, player);
+			int	 eval	  = alphaBeta(move, board, depth - 1, alpha, beta, true, player);
 
 			// unmake move
 			board.unmakeMove(undoInfo);
@@ -554,6 +554,29 @@ std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandid
 	}
 
 	return topCandidates;
+}
+
+
+int CPUPlayer::evaluateMoveAndPosition(const PossibleMove &move, PlayerColor player, const LightChessBoard &board)
+{
+	uint64_t hash = board.getHashKey();
+
+	// Check evaluation cache
+	auto	 it	  = mEvaluationCache.find(hash);
+
+	if (it != mEvaluationCache.end())
+		return it->second;
+
+	// Combine positional and move-specific evaluation
+	int score = 0;
+	score += mPositionalEvaluation->evaluatePosition(board, player);
+	score += mMoveEvaluation->getAdvancedEvaluation(move, player, &board);
+
+	// Cache result
+	if (mEvaluationCache.size() < MAX_EVAL_CACHE_SIZE)
+		mEvaluationCache[hash] = score;
+
+	return score;
 }
 
 
