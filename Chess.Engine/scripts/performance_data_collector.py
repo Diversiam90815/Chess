@@ -7,6 +7,8 @@ for later analysis and visualization
 """
 
 import json
+import os
+import glob
 from datetime import datetime
 from dataclasses import dataclass, field
 from typing import Dict, List,Any
@@ -42,5 +44,34 @@ class DataCollection:
         if timeframe_key not in self.data_by_timeframe:
             self.data_by_timeframe[timeframe_key] = []
         self.data_by_timeframe[timeframe_key].append(perf_data)
+
+
+class PerformanceDataCollector:
+    """Collects and organizes Chess Engine Performance data"""
+
+    def __init__(self):
+        """ Intitialize the data collector"""
+        self.base_directory = os.path.join(os.getcwd(), "..", "build", "Chess.Engine.Performance", "Debug", "Performance_Results")  # adapt to config later
+        self.collection = DataCollection()
+        self.supported_test_types = ["move_generation", "positional_evaluation", "move_evaluation", "lightchessboard", "cpu_player", "cpu_performance"]
+
+    def find_json_files(self) -> List[str]:
+        """Find all JSON performance result files"""
+        search_patterns = [
+            "**/Performance_Results/*.json",
+            "**/CPU_VS_CPU_Results/*.json", 
+            "**/*performance*.json",
+            "**/*_performance_*.json"        
+            ]
+        
+        json_files = []
+        for pattern in search_patterns:
+            files = glob.glob(os.path.join(self.base_directory, pattern), recursive=True)
+            json_files.extend(files)
+
+        # remove duplicates and sort
+        return sorted(list(set(json_files)))
+    
+
 
 
