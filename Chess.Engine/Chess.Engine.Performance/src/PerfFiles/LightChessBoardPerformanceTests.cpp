@@ -20,14 +20,12 @@ class LightChessBoardPerformanceTests : public ::testing::Test
 protected:
 	std::unique_ptr<LightChessBoard> mBoard;
 
-
 	void							 SetUp() override
 	{
 		ChessBoard board;
 		board.initializeBoard();
 		mBoard = std::make_unique<LightChessBoard>(board);
 	}
-
 
 	void setupMiddlegamePosition()
 	{
@@ -60,7 +58,6 @@ protected:
 		mBoard = std::make_unique<LightChessBoard>(tempBoard);
 	}
 
-
 	void setupEndgamePosition()
 	{
 		ChessBoard tempBoard;
@@ -83,7 +80,6 @@ protected:
 
 		mBoard = std::make_unique<LightChessBoard>(tempBoard);
 	}
-
 
 	LightChessBoardPerformanceResult benchmarkOperation(
 		const std::string &testName, const std::string &operation, const std::string &boardConfig, std::function<void()> operationFunc, size_t iterations)
@@ -112,7 +108,6 @@ protected:
 		return result;
 	}
 
-	
 	void saveJsonResults(const std::string &fileName, const std::vector<LightChessBoardPerformanceResult> &results)
 	{
 		PerformanceJsonHelper::saveJsonResults(fileName, "LightChessBoard Performance", results);
@@ -145,7 +140,8 @@ TEST_F(LightChessBoardPerformanceTests, MakeMoveUnmoveMoveSpeed)
 	result.operationsPerSecond							  = result.operationsPerformed / seconds;
 
 	std::vector<LightChessBoardPerformanceResult> results = {result};
-	//saveResults("Make-Unmake Move", results);
+	
+	saveJsonResults("lightchessboard-make_unmake_move", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -166,7 +162,8 @@ TEST_F(LightChessBoardPerformanceTests, MoveGenerationSpeed)
 		 iterations);
 
 	std::vector<LightChessBoardPerformanceResult> results = {result};
-	//saveResults("Move Generation", results);
+	
+	saveJsonResults("lightchessboard-move_generation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -189,7 +186,8 @@ TEST_F(LightChessBoardPerformanceTests, PositionEvaluationSpeed)
 		 iterations);
 
 	std::vector<LightChessBoardPerformanceResult> results = {result};
-	//saveResults("Position Evaluation", results);
+	
+	saveJsonResults("lightchessboard-positional_evaluation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -210,7 +208,8 @@ TEST_F(LightChessBoardPerformanceTests, BoardCopyingSpeed)
 		 iterations);
 
 	std::vector<LightChessBoardPerformanceResult> results = {result};
-	//saveResults("Board Copying", results);
+	
+	saveJsonResults("lightchessboard-board_copying", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -233,7 +232,8 @@ TEST_F(LightChessBoardPerformanceTests, CheckDetectionSpeed)
 		 iterations);
 
 	std::vector<LightChessBoardPerformanceResult> results = {result};
-	//saveResults("Check Detection", results);
+	
+	saveJsonResults("lightchessboard-check_detection", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -289,7 +289,7 @@ TEST_F(LightChessBoardPerformanceTests, MiddlegamePerformanceComparison)
 		5000);
 	results.push_back(materialResult);
 
-	//saveResults("Middle Game Comparison", results);
+	saveJsonResults("lightchessboard-middle_game_comparison", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -333,11 +333,10 @@ TEST_F(LightChessBoardPerformanceTests, EndgamePerformanceComparison)
 		5000);
 	results.push_back(moveGenResult);
 
-	//saveResults("Endgame Performance", results);
+	saveJsonResults("lightchessboard-endgame_performance", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
 }
-
 
 } // namespace PerformanceTests

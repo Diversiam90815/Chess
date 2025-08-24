@@ -8,7 +8,7 @@
 #include <chrono>
 #include <random>
 
-#include "Moves/Evaluation/MoveEvaluation.h"
+#include "Evaluation/MoveEvaluation.h"
 #include "Generation/MoveGeneration.h"
 #include "Validation/MoveValidation.h"
 #include "Execution/MoveExecution.h"
@@ -21,7 +21,6 @@ namespace fs = std::filesystem;
 namespace PerformanceTests
 {
 
-
 class MoveEvaluationPerformanceTests : public ::testing::Test
 {
 protected:
@@ -30,7 +29,6 @@ protected:
 	std::shared_ptr<MoveExecution>	mExecution;
 	std::shared_ptr<MoveGeneration> mGeneration;
 	std::shared_ptr<MoveEvaluation> mEvaluation;
-
 
 	void							SetUp() override
 	{
@@ -41,7 +39,6 @@ protected:
 		mGeneration = std::make_shared<MoveGeneration>(mBoard, mValidation, mExecution);
 		mEvaluation = std::make_shared<MoveEvaluation>(mBoard, mGeneration);
 	}
-
 
 	std::vector<PossibleMove> generateTestMoves(int count = 1000)
 	{
@@ -78,7 +75,6 @@ protected:
 		return moves;
 	}
 
-
 	template <typename EvaluationFunc>
 	MoveEvaluationPerformanceResult benchmarkEvaluation(
 		const std::string &testName, const std::string &evaluationName, EvaluationFunc evaluationFunc, const std::vector<PossibleMove> &moves, PlayerColor player)
@@ -87,7 +83,7 @@ protected:
 		result.testName		  = testName;
 		result.evaluationType = evaluationName;
 		result.movesEvaluated = moves.size();
-		result.timestamp	  = std::chrono::system_clock::now(); 
+		result.timestamp	  = std::chrono::system_clock::now();
 
 		std::vector<int> scores;
 		scores.reserve(moves.size());
@@ -118,7 +114,6 @@ protected:
 		return result;
 	}
 
-
 	void saveJsonResults(const std::string &fileName, const std::vector<MoveEvaluationPerformanceResult> &results)
 	{
 		PerformanceJsonHelper::saveJsonResults(fileName, "Move Evaluation Performance", results);
@@ -134,7 +129,8 @@ TEST_F(MoveEvaluationPerformanceTests, BasicEvaluationPerformance)
 		benchmarkEvaluation("Basic", "Basic", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getBasicEvaluation(move); }, moves, PlayerColor::White);
 
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
-	//saveResults("Basic Evaluation", results);
+
+	saveJsonResults("move_evaluation-basic_evaluation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -149,7 +145,8 @@ TEST_F(MoveEvaluationPerformanceTests, MediumEvaluationPerformance)
 		"Medium", "Medium", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getMediumEvaluation(move, player); }, moves, PlayerColor::White);
 
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
-	//saveResults("Medium Evaluation", results);
+
+	saveJsonResults("move_evaluation-medium_evaluation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -164,7 +161,8 @@ TEST_F(MoveEvaluationPerformanceTests, AdvancedEvaluationPerformance)
 		"Advanced", "Advanced", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getAdvancedEvaluation(move, player); }, moves, PlayerColor::White);
 
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
-	//saveResults("Advanced Evaluation", results);
+
+	saveJsonResults("move_evaluation-advanced_evaluation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -186,7 +184,7 @@ TEST_F(MoveEvaluationPerformanceTests, EvaluationTypeComparison)
 	results.push_back(benchmarkEvaluation(
 		"Comparison", "Advanced", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getAdvancedEvaluation(move, player); }, moves, PlayerColor::White));
 
-	//saveResults("Evaluation Type Comparison", results);
+	saveJsonResults("move_evaluation-evaluation_type_comparison", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -201,7 +199,8 @@ TEST_F(MoveEvaluationPerformanceTests, TacticalEvaluationPerformance)
 		"Tactical", "Tactical", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getTacticalEvaluation(move, player); }, moves, PlayerColor::White);
 
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
-	//saveResults("Tactical Evaluation", results);
+
+	saveJsonResults("move_evaluation-tactical_evaluation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -216,7 +215,9 @@ TEST_F(MoveEvaluationPerformanceTests, StrategicEvaluationPerformance)
 		"Strategic", "Strategic", [this](const PossibleMove &move, PlayerColor player) { return mEvaluation->getStrategicEvaluation(move, player); }, moves, PlayerColor::White);
 
 	std::vector<MoveEvaluationPerformanceResult> results = {result};
-	//saveResults("Strategic Evaluation", results);
+
+	saveJsonResults("move_evaluation-strategic_evaluation", results);
+
 
 	// The results of this test are saved in the file
 	SUCCEED();

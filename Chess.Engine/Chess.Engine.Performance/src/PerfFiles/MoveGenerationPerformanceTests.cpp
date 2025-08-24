@@ -35,7 +35,6 @@ protected:
 	std::shared_ptr<MoveExecution>	mExecution;
 	std::shared_ptr<MoveGeneration> mGeneration;
 
-
 	void							SetUp() override
 	{
 		mBoard = std::make_shared<ChessBoard>();
@@ -46,13 +45,11 @@ protected:
 		mGeneration = std::make_shared<MoveGeneration>(mBoard, mValidation, mExecution);
 	}
 
-
 	void setupOpeningPosition()
 	{
 		mBoard->removeAllPiecesFromBoard();
 		mBoard->initializeBoard();
 	}
-
 
 	void setupMiddlegamePosition()
 	{
@@ -86,7 +83,6 @@ protected:
 		mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
 	}
 
-
 	void setupEndgamePosition()
 	{
 		mBoard->removeAllPiecesFromBoard();
@@ -107,7 +103,6 @@ protected:
 		mBoard->updateKingsPosition(whiteKingPos, PlayerColor::White);
 		mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
 	}
-
 
 	MoveGenerationPerformanceResult benchmarkMoveGeneration(const std::string &testName, const std::string &boardConfig, int iterations = 1000)
 	{
@@ -156,7 +151,6 @@ protected:
 		return result;
 	}
 
-
 	void saveJsonResults(const std::string &fileName, const std::vector<MoveGenerationPerformanceResult> &results)
 	{
 		PerformanceJsonHelper::saveJsonResults(fileName, "Move Generation Performance", results);
@@ -171,7 +165,8 @@ TEST_F(MoveGenerationPerformanceTests, OpeningPositionPerformance)
 	auto										 result	 = benchmarkMoveGeneration("Opening", "Standart_Start", 1000);
 
 	std::vector<MoveGenerationPerformanceResult> results = {result};
-	//saveResults("Opening Game Position", results);
+	
+	saveJsonResults("move_generation-opening_game_position", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -184,7 +179,8 @@ TEST_F(MoveGenerationPerformanceTests, MiddlegamePositionPerformance)
 	auto										 result	 = benchmarkMoveGeneration("Middlegame", "Complex_Middle", 1000);
 
 	std::vector<MoveGenerationPerformanceResult> results = {result};
-	//saveResults("Middle Game Position", results);
+
+	saveJsonResults("move_generation-middle_game_position", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -197,7 +193,8 @@ TEST_F(MoveGenerationPerformanceTests, EndgamePositionPerformance)
 	auto										 result	 = benchmarkMoveGeneration("Endgame", "Simple_End", 1000);
 
 	std::vector<MoveGenerationPerformanceResult> results = {result};
-	//saveResults("End Game Position", results);
+
+	saveJsonResults("move_generation-end_game_position", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();

@@ -141,4 +141,32 @@ inline json PerformanceJsonHelper::resultToJson(const struct MoveEvaluationPerfo
 				{"testMetadata", {{"timestamp", timestampToIsoString(result.timestamp)}, {"version", result.version}}}};
 }
 
+template <>
+inline json PerformanceJsonHelper::resultToJson(const struct MoveGenerationPerformanceResult &result)
+{
+	return json{{"testName", result.testName},
+				{"boardConfiguration", result.boardConfiguration},
+				{"performance",
+				 {{"durationMicroseconds", result.duration.count()},
+				  {"movesGenerated", result.movesGenerated},
+				  {"movesPerSecond", result.movesPerSecond},
+				  {"positionsEvaluated", result.positionsEvaluated}}},
+				{"testMetadata", {{"timestamp", timestampToIsoString(result.timestamp)}, {"version", result.version}}}};
+}
+
+template <>
+inline json PerformanceJsonHelper::resultToJson(const struct CPUAlgorithmPerformanceResult &result)
+{
+	return json{{"testName", result.testName},
+				{"depth", result.depth},
+				{"position", result.position},
+				{"selectedMove",
+				 {{"start", {{"x", result.selectedMove.start.x}, {"y", result.selectedMove.start.y}}},
+				  {"end", {{"x", result.selectedMove.end.x}, {"y", result.selectedMove.end.y}}},
+				  {"moveType", static_cast<int>(result.selectedMove.type)},
+				  {"isEmpty", result.selectedMove.isEmpty()}}},
+				{"performance", {{"durationMicroseconds", result.duration.count()}}},
+				{"testMetadata", {{"timestamp", timestampToIsoString(result.timestamp)}, {"version", result.version}}}};
+}
+
 } // namespace PerformanceTests
