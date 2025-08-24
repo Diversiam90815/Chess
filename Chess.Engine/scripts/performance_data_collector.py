@@ -28,4 +28,19 @@ class DataCollection:
     data_by_timeframe : Dict[str, List[PerformanceData]] = field(default_factory=dict)
     all_data: List[PerformanceData] = field(default_factory=list)
 
+    def add_data(self, perf_data: PerformanceData):
+        """Add performance data to the collection"""
+        self.all_data.append(perf_data)
+
+        # Group by version
+        if perf_data.app_version not in self.data_by_version:
+            self.data_by_version[perf_data.app_version]=[]
+        self.data_by_version[perf_data.app_version].append(perf_data)
+
+        # Groud by timeframe (daily)
+        timeframe_key = perf_data.timestamp.strftime("%Y-%m-%d")
+        if timeframe_key not in self.data_by_timeframe:
+            self.data_by_timeframe[timeframe_key] = []
+        self.data_by_timeframe[timeframe_key].append(perf_data)
+
 
