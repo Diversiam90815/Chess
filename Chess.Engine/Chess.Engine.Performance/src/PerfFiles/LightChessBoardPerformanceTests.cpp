@@ -9,29 +9,11 @@
 #include <chrono>
 
 #include "Board/LightChessBoard.h"
-#include "Project.h"
 #include "PerformanceJSONHelper.h"
 
 
 namespace PerformanceTests
 {
-
-//struct LightChessBoardPerformanceResult
-//{
-//	std::string							  testName{};
-//	std::string							  operation{};
-//	std::chrono::microseconds			  duration{};
-//	int									  operationsPerformed{};
-//	double								  operationsPerSecond{};
-//	double								  averageOperationTime{};
-//	std::string							  boardConfiguration{};
-//	int									  moveCount{};
-//	int									  positionCount{};
-//
-//	std::chrono::system_clock::time_point timestamp;
-//	std::string							  version{ProjectInfo::Version};
-//};
-
 
 class LightChessBoardPerformanceTests : public ::testing::Test
 {
@@ -130,59 +112,6 @@ protected:
 		return result;
 	}
 
-
-	void saveResults(const std::string &fileName, const std::vector<LightChessBoardPerformanceResult> &results)
-	{
-		// Create directory if not exists yet
-		fs::path resultDir = "LightChessBoard_Results";
-
-		if (!fs::exists(resultDir))
-			fs::create_directories(resultDir);
-
-		fs::path	  fullPath = resultDir / fileName;
-
-		std::ofstream file(fullPath, std::ios::app);
-
-		if (!file.is_open())
-			return;
-
-		// Add timestamp and iteration header
-		auto now	= std::chrono::system_clock::now();
-		auto time_t = std::chrono::system_clock::to_time_t(now);
-		auto tm		= *std::localtime(&time_t);
-
-		file << "=== PERFORMANCE_ITERATION_START ===" << std::endl;
-		file << "Timestamp: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << std::endl;
-		file << "TestGroup: LightChessBoard Performance" << std::endl;
-		file << "TestFile: " << fileName << std::endl;
-
-		// Save each result with structured format
-		for (const auto &result : results)
-		{
-			// Convert timestamp to readable format
-			auto result_time_t = std::chrono::system_clock::to_time_t(result.timestamp);
-			auto result_tm	   = *std::localtime(&result_time_t);
-
-			file << "TestName: " << result.testName << std::endl;
-			file << "Operation: " << result.operation << std::endl;
-			file << "Duration: " << result.duration.count() << std::endl;
-			file << "OperationsPerformed: " << result.operationsPerformed << std::endl;
-			file << "OperationsPerSecond: " << static_cast<int>(result.operationsPerSecond) << std::endl;
-			file << "AverageOperationTime: " << std::fixed << std::setprecision(2) << result.averageOperationTime << std::endl;
-			file << "BoardConfiguration: " << result.boardConfiguration << std::endl;
-			file << "MoveCount: " << result.moveCount << std::endl;
-			file << "PositionCount: " << result.positionCount << std::endl;
-			file << "TestTimestamp: " << std::put_time(&result_tm, "%Y-%m-%d %H:%M:%S") << std::endl;
-			file << "Version: " << result.version << std::endl;
-			file << "---" << std::endl; // Separator between results
-		}
-
-		file << "=== PERFORMANCE_ITERATION_END ===" << std::endl;
-		file << std::endl;
-
-		file.close();
-	}
-
 	
 	void saveJsonResults(const std::string &fileName, const std::vector<LightChessBoardPerformanceResult> &results)
 	{
@@ -216,7 +145,7 @@ TEST_F(LightChessBoardPerformanceTests, MakeMoveUnmoveMoveSpeed)
 	result.operationsPerSecond							  = result.operationsPerformed / seconds;
 
 	std::vector<LightChessBoardPerformanceResult> results = {result};
-	saveResults("Make-Unmake Move", results);
+	//saveResults("Make-Unmake Move", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -237,7 +166,7 @@ TEST_F(LightChessBoardPerformanceTests, MoveGenerationSpeed)
 		 iterations);
 
 	std::vector<LightChessBoardPerformanceResult> results = {result};
-	saveResults("Move Generation", results);
+	//saveResults("Move Generation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -260,7 +189,7 @@ TEST_F(LightChessBoardPerformanceTests, PositionEvaluationSpeed)
 		 iterations);
 
 	std::vector<LightChessBoardPerformanceResult> results = {result};
-	saveResults("Position Evaluation", results);
+	//saveResults("Position Evaluation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -281,7 +210,7 @@ TEST_F(LightChessBoardPerformanceTests, BoardCopyingSpeed)
 		 iterations);
 
 	std::vector<LightChessBoardPerformanceResult> results = {result};
-	saveResults("Board Copying", results);
+	//saveResults("Board Copying", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -304,7 +233,7 @@ TEST_F(LightChessBoardPerformanceTests, CheckDetectionSpeed)
 		 iterations);
 
 	std::vector<LightChessBoardPerformanceResult> results = {result};
-	saveResults("Check Detection", results);
+	//saveResults("Check Detection", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -360,7 +289,7 @@ TEST_F(LightChessBoardPerformanceTests, MiddlegamePerformanceComparison)
 		5000);
 	results.push_back(materialResult);
 
-	saveResults("Middle Game Comparison", results);
+	//saveResults("Middle Game Comparison", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -404,7 +333,7 @@ TEST_F(LightChessBoardPerformanceTests, EndgamePerformanceComparison)
 		5000);
 	results.push_back(moveGenResult);
 
-	saveResults("Endgame Performance", results);
+	//saveResults("Endgame Performance", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();

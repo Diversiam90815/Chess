@@ -8,10 +8,6 @@
 
 #include <gtest/gtest.h>
 #include <chrono>
-#include <memory>
-#include <vector>
-#include <fstream>
-#include <iomanip>
 
 #include "Player/CPUPlayer.h"
 #include "Generation/MoveGeneration.h"
@@ -28,18 +24,6 @@ namespace fs = std::filesystem;
 
 namespace PerformanceTests
 {
-//struct CPUAlgorithmPerformanceResult
-//{
-//	std::string							  algorithmName{};
-//	int									  depth;
-//	std::chrono::milliseconds			  duration;
-//	PossibleMove						  selectedMove;
-//	std::string							  position;
-//
-//	std::chrono::system_clock::time_point timeStamp;
-//	std::string							  version{ProjectInfo::Version};
-//};
-//
 
 class CPUPlayerPerformanceTests : public ::testing::Test
 {
@@ -127,10 +111,10 @@ protected:
 													 std::function<PossibleMove(const std::vector<PossibleMove> &, int)> algorithmFunc)
 	{
 		CPUAlgorithmPerformanceResult result;
-		result.algorithmName = algorithmName;
+		result.testName = algorithmName;
 		result.depth		 = depth;
 		result.position		 = position;
-		result.timeStamp	 = std::chrono::system_clock::now(); 
+		result.timestamp	 = std::chrono::system_clock::now(); 
 
 		auto moves			 = getAllLegalMoves(PlayerColor::White);
 
@@ -141,54 +125,6 @@ protected:
 		result.duration		 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
 		return result;
-	}
-
-
-	void saveResults(const std::string fileName, const std::vector<CPUAlgorithmPerformanceResult> &results)
-	{
-		// Create directory if not exists yet
-		fs::path resultDir = "CPUPlayer_Results";
-
-		if (!fs::exists(resultDir))
-			fs::create_directories(resultDir);
-
-		fs::path	  fullPath = resultDir / fileName;
-
-		std::ofstream file(fullPath, std::ios::app);
-
-		if (!file.is_open())
-			return;
-
-		// Add timestamp and iteration header
-		auto now	= std::chrono::system_clock::now();
-		auto time_t = std::chrono::system_clock::to_time_t(now);
-		auto tm		= *std::localtime(&time_t);
-
-		file << "=== PERFORMANCE_ITERATION_START ===" << std::endl;
-		file << "Timestamp: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << std::endl;
-		file << "TestGroup: CPU Algorithm Performance" << std::endl;
-		file << "TestFile: " << fileName << std::endl;
-
-		// Save each result with structured format
-		for (const auto &result : results)
-		{
-			// Convert timestamp to readable format
-			auto result_time_t = std::chrono::system_clock::to_time_t(result.timeStamp);
-			auto result_tm	   = *std::localtime(&result_time_t);
-
-			file << "Algorithm: " << result.algorithmName << std::endl;
-			file << "Depth: " << result.depth << std::endl;
-			file << "Duration: " << result.duration.count() << std::endl;
-			file << "Position: " << result.position << std::endl;
-			file << "TestTimestamp: " << std::put_time(&result_tm, "%Y-%m-%d %H:%M:%S") << std::endl;
-			file << "Version: " << result.version << std::endl;
-			file << "---" << std::endl; // Separator between results
-		}
-
-		file << "=== PERFORMANCE_ITERATION_END ===" << std::endl;
-		file << std::endl;
-
-		file.close();
 	}
 
 	
@@ -212,7 +148,7 @@ TEST_F(CPUPlayerPerformanceTests, MinimaxDepthComparison)
 		results.push_back(result);
 	}
 
-	saveResults("MiniMax Depth Comparison", results);
+	//saveResults("MiniMax Depth Comparison", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -232,7 +168,7 @@ TEST_F(CPUPlayerPerformanceTests, AlphaBetaDepthComparison)
 		results.push_back(result);
 	}
 
-	saveResults("Alpha Beta Comparison", results);
+	//saveResults("Alpha Beta Comparison", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -256,7 +192,7 @@ TEST_F(CPUPlayerPerformanceTests, AlgorithmComparison)
 	results.push_back(minimaxResult);
 	results.push_back(alphaBetaResult);
 
-	saveResults("Algorithm Comparison", results);
+	//saveResults("Algorithm Comparison", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -275,7 +211,7 @@ TEST_F(CPUPlayerPerformanceTests, ComplexPositionPerformance)
 	auto									   result		 = benchmarkAlgorithm("AlphaBeta", 4, "Complex", alphaBetaFunc);
 	results.push_back(result);
 
-	saveResults("Complex Position", results);
+	//saveResults("Complex Position", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();

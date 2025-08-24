@@ -15,8 +15,9 @@ enable_testing()
 #   Test Files
 #==========================================
 
-set(Perf_Dir            source/PerfFiles)
-set(Perf_Helper_Dir     source/PerfHelper)
+set(Perf_Dir            src/PerfFiles)
+set(Perf_Helper_Dir     src/PerfHelper)
+
 
 set(Perf_Files
     ${Perf_Dir}/CPUPerformanceTests.cpp
@@ -46,9 +47,9 @@ source_group("Helper Files"     FILES ${Perf_Helper_Files})
 #==========================================
 
 add_executable(${PROJECT_NAME}
-    source/main.cpp
-    ${Perf_Dir}
-    ${Perf_Helper_Dir}
+    src/main.cpp
+    ${Perf_Files}
+    ${Perf_Helper_Files}
 )
 
 
@@ -59,8 +60,8 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${GOOGLETEST_SOURCE_DIR}/googletest/include
-        ${Perf_Files}
-        ${Perf_Helper_Files}
+        ${Perf_Dir}
+        ${Perf_Helper_Dir}
 )
 
 include(GoogleTest)

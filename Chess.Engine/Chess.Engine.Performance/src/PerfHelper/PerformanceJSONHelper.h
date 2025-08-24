@@ -14,6 +14,9 @@
 #include <iomanip>
 #include <string>
 
+#include "PerfResults.h"
+
+
 namespace fs = std::filesystem;
 using json	 = nlohmann::json;
 
@@ -94,7 +97,7 @@ public:
 
 // Template specializations for different result types
 template <>
-json PerformanceJsonHelper::resultToJson(const struct PositionalEvaluationPerformanceResult &result)
+inline json PerformanceJsonHelper::resultToJson(const struct PositionalEvaluationPerformanceResult &result)
 {
 	return json{{"testName", result.testName},
 				{"evaluationType", result.evaluationType},
@@ -110,7 +113,7 @@ json PerformanceJsonHelper::resultToJson(const struct PositionalEvaluationPerfor
 }
 
 template <>
-json PerformanceJsonHelper::resultToJson(const struct LightChessBoardPerformanceResult &result)
+inline json PerformanceJsonHelper::resultToJson(const struct LightChessBoardPerformanceResult &result)
 {
 	return json{{"testName", result.testName},
 				{"operation", result.operation},
@@ -125,7 +128,7 @@ json PerformanceJsonHelper::resultToJson(const struct LightChessBoardPerformance
 }
 
 template <>
-json PerformanceJsonHelper::resultToJson(const struct MoveEvaluationPerformanceResult &result)
+inline json PerformanceJsonHelper::resultToJson(const struct MoveEvaluationPerformanceResult &result)
 {
 	return json{{"testName", result.testName},
 				{"evaluationType", result.evaluationType},

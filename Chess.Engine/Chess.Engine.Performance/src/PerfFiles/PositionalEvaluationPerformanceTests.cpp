@@ -20,12 +20,10 @@
 #include "Generation/MoveGeneration.h"
 #include "Validation/MoveValidation.h"
 #include "Execution/MoveExecution.h"
-#include "Project.h"
 #include "PerformanceJSONHelper.h"
-#include "PerfResults.h"
+
 
 namespace fs = std::filesystem;
-
 
 namespace PerformanceTests
 {

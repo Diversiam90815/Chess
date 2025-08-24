@@ -17,9 +17,7 @@
 #include "Validation/MoveValidation.h"
 #include "Execution/MoveExecution.h"
 #include "ChessBoard.h"
-#include "Project.h"
 #include "PerformanceJSONHelper.h"
-#include "PerfResults.h"
 
 
 namespace fs = std::filesystem;
@@ -27,18 +25,6 @@ namespace fs = std::filesystem;
 
 namespace PerformanceTests
 {
-//struct MoveGenerationPerformanceResult
-//{
-//	std::string							  testName{};
-//	std::chrono::microseconds			  duration{};
-//	size_t								  movesGenerated{};
-//	double								  movesPerSecond{};
-//	size_t								  positionsEvaluated{};
-//	std::string							  boardConfiguration{};
-//
-//	std::chrono::system_clock::time_point timestamp;
-//	std::string							  version{ProjectInfo::Version};
-//};
 
 
 class MoveGenerationPerformanceTests : public ::testing::Test
@@ -171,56 +157,6 @@ protected:
 	}
 
 
-	void saveResults(const std::string fileName, const std::vector<MoveGenerationPerformanceResult> &results)
-	{
-		// Create directory if not exists yet
-		fs::path resultDir = "MoveGeneration_Results";
-
-		if (!fs::exists(resultDir))
-			fs::create_directories(resultDir);
-
-		fs::path	  fullPath = resultDir / fileName;
-
-		std::ofstream file(fullPath, std::ios::app);
-
-		if (!file.is_open())
-			return;
-
-		// Add timestamp and iteration header
-		auto now	= std::chrono::system_clock::now();
-		auto time_t = std::chrono::system_clock::to_time_t(now);
-		auto tm		= *std::localtime(&time_t);
-
-		file << "=== PERFORMANCE_ITERATION_START ===" << std::endl;
-		file << "Timestamp: " << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << std::endl;
-		file << "TestGroup: Move Generation Performance" << std::endl;
-		file << "TestFile: " << fileName << std::endl;
-
-		// Save each result with structured format
-		for (const auto &result : results)
-		{
-			// Convert timestamp to readable format
-			auto result_time_t = std::chrono::system_clock::to_time_t(result.timestamp);
-			auto result_tm	   = *std::localtime(&result_time_t);
-
-			file << "TestName: " << result.testName << std::endl;
-			file << "Duration: " << result.duration.count() << std::endl;
-			file << "MovesGenerated: " << result.movesGenerated << std::endl;
-			file << "MovesPerSecond: " << static_cast<int>(result.movesPerSecond) << std::endl;
-			file << "PositionsEvaluated: " << result.positionsEvaluated << std::endl;
-			file << "BoardConfiguration: " << result.boardConfiguration << std::endl;
-			file << "TestTimestamp: " << std::put_time(&result_tm, "%Y-%m-%d %H:%M:%S") << std::endl;
-			file << "Version: " << result.version << std::endl;
-			file << "---" << std::endl; // Separator between results
-		}
-
-		file << "=== PERFORMANCE_ITERATION_END ===" << std::endl;
-		file << std::endl;
-
-		file.close();
-	}
-
-
 	void saveJsonResults(const std::string &fileName, const std::vector<MoveGenerationPerformanceResult> &results)
 	{
 		PerformanceJsonHelper::saveJsonResults(fileName, "Move Generation Performance", results);
@@ -235,7 +171,7 @@ TEST_F(MoveGenerationPerformanceTests, OpeningPositionPerformance)
 	auto										 result	 = benchmarkMoveGeneration("Opening", "Standart_Start", 1000);
 
 	std::vector<MoveGenerationPerformanceResult> results = {result};
-	saveResults("Opening Game Position", results);
+	//saveResults("Opening Game Position", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -248,7 +184,7 @@ TEST_F(MoveGenerationPerformanceTests, MiddlegamePositionPerformance)
 	auto										 result	 = benchmarkMoveGeneration("Middlegame", "Complex_Middle", 1000);
 
 	std::vector<MoveGenerationPerformanceResult> results = {result};
-	saveResults("Middle Game Position", results);
+	//saveResults("Middle Game Position", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -261,7 +197,7 @@ TEST_F(MoveGenerationPerformanceTests, EndgamePositionPerformance)
 	auto										 result	 = benchmarkMoveGeneration("Endgame", "Simple_End", 1000);
 
 	std::vector<MoveGenerationPerformanceResult> results = {result};
-	saveResults("End Game Position", results);
+	//saveResults("End Game Position", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
