@@ -15,7 +15,7 @@
 #include <string>
 
 namespace fs = std::filesystem;
-using json = nlohmann::json;
+using json	 = nlohmann::json;
 
 
 namespace PerformanceTests
@@ -47,10 +47,11 @@ public:
 
 	// Save JSON to file with proper formatting
 	template <typename ResultType>
-	static void saveJsonResults(const std::string &directoryName, const std::string &fileName, const std::string &testGroup, const std::vector<ResultType> &results)
+	static void saveJsonResults(const std::string &fileName, const std::string &testGroup, const std::vector<ResultType> &results)
 	{
 		// Create directory if it doesn't exist
-		fs::path resultDir = directoryName;
+		fs::path resultDir = resultDirectory;
+
 		if (!fs::exists(resultDir))
 			fs::create_directories(resultDir);
 
@@ -77,14 +78,17 @@ public:
 		std::ofstream file(fullPath);
 		if (file.is_open())
 		{
-			file << jsonOutput.dump(2); // Pretty print with 2-space indentation
+			file << jsonOutput.dump(2); // print with 2 space indentation
 			file.close();
 		}
 	}
 
-	// Convert PositionalEvaluationPerformanceResult to JSON
+	// Convert Result to JSON
 	template <typename T>
-	static json resultToJson(const T &result);
+	static json			  resultToJson(const T &result);
+
+
+	static constexpr auto resultDirectory = "Performance_Results";
 };
 
 

@@ -21,6 +21,8 @@
 #include "Validation/MoveValidation.h"
 #include "Execution/MoveExecution.h"
 #include "Project.h"
+#include "PerformanceJSONHelper.h"
+#include "PerfResult.h"
 
 
 namespace fs = std::filesystem;
@@ -29,23 +31,23 @@ namespace fs = std::filesystem;
 namespace PerformanceTests
 {
 
-struct PositionalEvaluationPerformanceResult
-{
-	std::string							  testName{};
-	std::string							  evaluationType{};
-	std::chrono::microseconds			  duration{};
-	size_t								  evaluationsPerformed{};
-	double								  evaluationsPerSecond{};
-	double								  averageEvaluationTime{};
-	std::string							  gamePhase{};
-	int									  minScore{};
-	int									  maxScore{};
-	double								  averageScore{};
-	int									  pieceCount{};
-
-	std::chrono::system_clock::time_point timestamp;
-	std::string							  version{ProjectInfo::Version};
-};
+//struct PositionalEvaluationPerformanceResult
+//{
+//	std::string							  testName{};
+//	std::string							  evaluationType{};
+//	std::chrono::microseconds			  duration{};
+//	size_t								  evaluationsPerformed{};
+//	double								  evaluationsPerSecond{};
+//	double								  averageEvaluationTime{};
+//	std::string							  gamePhase{};
+//	int									  minScore{};
+//	int									  maxScore{};
+//	double								  averageScore{};
+//	int									  pieceCount{};
+//
+//	std::chrono::system_clock::time_point timestamp;
+//	std::string							  version{ProjectInfo::Version};
+//};
 
 
 class PositionalEvaluationPerformanceTests : public ::testing::Test
@@ -220,7 +222,7 @@ protected:
 
 	void saveJsonResults(const std::string &fileName, const std::vector<PositionalEvaluationPerformanceResult> &results)
 	{
-		//PerformanceJsonHelper::saveJsonResults("PositionalEvaluation_Results_JSON", fileName, "Positional Evaluation Performance", results);
+		PerformanceJsonHelper::saveJsonResults(fileName, "Positional Evaluation Performance", results);
 	}
 };
 

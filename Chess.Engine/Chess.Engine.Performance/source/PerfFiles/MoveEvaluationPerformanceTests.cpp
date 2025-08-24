@@ -18,6 +18,7 @@
 #include "Execution/MoveExecution.h"
 #include "ChessBoard.h"
 #include "Project.h"
+#include "PerformanceJSONHelper.h"
 
 
 namespace fs = std::filesystem;
@@ -25,21 +26,21 @@ namespace fs = std::filesystem;
 namespace PerformanceTests
 {
 
-struct MoveEvaluationPerformanceResult
-{
-	std::string							  testName{};
-	std::string							  evaluationType{};
-	std::chrono::microseconds			  duration{};
-	size_t								  movesEvaluated{};
-	double								  evaluationsPerSecond{};
-	double								  averageEvaluationTime{};
-	int									  minScore{};
-	int									  maxScore{};
-	double								  averageScore{};
-
-	std::chrono::system_clock::time_point timestamp;
-	std::string							  version{ProjectInfo::Version};
-};
+//struct MoveEvaluationPerformanceResult
+//{
+//	std::string							  testName{};
+//	std::string							  evaluationType{};
+//	std::chrono::microseconds			  duration{};
+//	size_t								  movesEvaluated{};
+//	double								  evaluationsPerSecond{};
+//	double								  averageEvaluationTime{};
+//	int									  minScore{};
+//	int									  maxScore{};
+//	double								  averageScore{};
+//
+//	std::chrono::system_clock::time_point timestamp;
+//	std::string							  version{ProjectInfo::Version};
+//};
 
 
 class MoveEvaluationPerformanceTests : public ::testing::Test
@@ -189,6 +190,12 @@ protected:
 		file << std::endl;
 
 		file.close();
+	}
+
+	
+	void saveJsonResults(const std::string &fileName, const std::vector<MoveEvaluationPerformanceResult> &results)
+	{
+		PerformanceJsonHelper::saveJsonResults(fileName, "Move Evaluation Performance", results);
 	}
 };
 

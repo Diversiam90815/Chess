@@ -10,26 +10,27 @@
 
 #include "Board/LightChessBoard.h"
 #include "Project.h"
+#include "PerformanceJSONHelper.h"
 
 
 namespace PerformanceTests
 {
 
-struct LightChessBoardPerformanceResult
-{
-	std::string							  testName{};
-	std::string							  operation{};
-	std::chrono::microseconds			  duration{};
-	int									  operationsPerformed{};
-	double								  operationsPerSecond{};
-	double								  averageOperationTime{};
-	std::string							  boardConfiguration{};
-	int									  moveCount{};
-	int									  positionCount{};
-
-	std::chrono::system_clock::time_point timestamp;
-	std::string							  version{ProjectInfo::Version};
-};
+//struct LightChessBoardPerformanceResult
+//{
+//	std::string							  testName{};
+//	std::string							  operation{};
+//	std::chrono::microseconds			  duration{};
+//	int									  operationsPerformed{};
+//	double								  operationsPerSecond{};
+//	double								  averageOperationTime{};
+//	std::string							  boardConfiguration{};
+//	int									  moveCount{};
+//	int									  positionCount{};
+//
+//	std::chrono::system_clock::time_point timestamp;
+//	std::string							  version{ProjectInfo::Version};
+//};
 
 
 class LightChessBoardPerformanceTests : public ::testing::Test
@@ -180,6 +181,12 @@ protected:
 		file << std::endl;
 
 		file.close();
+	}
+
+	
+	void saveJsonResults(const std::string &fileName, const std::vector<LightChessBoardPerformanceResult> &results)
+	{
+		PerformanceJsonHelper::saveJsonResults(fileName, "LightChessBoard Performance", results);
 	}
 };
 

@@ -15,10 +15,10 @@ enable_testing()
 #   Test Files
 #==========================================
 
-set(Perf_Dir                             source/PerfFiles)
+set(Perf_Dir            source/PerfFiles)
+set(Perf_Helper_Dir     source/PerfHelper)
 
 set(Perf_Files
-    ${Perf_Dir}/PerformanceJSONHelper.h
     ${Perf_Dir}/CPUPerformanceTests.cpp
     ${Perf_Dir}/MoveGenerationPerformanceTests.cpp
     ${Perf_Dir}/MoveEvaluationPerformanceTests.cpp
@@ -27,12 +27,18 @@ set(Perf_Files
     ${Perf_Dir}/LightChessBoardPerformanceTests.cpp
 )
 
+set(Perf_Helper_Files
+    ${Perf_Helper_Dir}/PerformanceJSONHelper.h
+    ${Perf_Helper_Dir}/PerfResults.h
+)
+
 
 #==========================================
 #   Source Groups (VS)
 #==========================================
 
-source_group("Perf Files" FILES ${Perf_Files})
+source_group("Perf Files"       FILES ${Perf_Files})
+source_group("Helper Files"     FILES ${Perf_Helper_Files})
 
 
 #==========================================
@@ -42,6 +48,7 @@ source_group("Perf Files" FILES ${Perf_Files})
 add_executable(${PROJECT_NAME}
     source/main.cpp
     ${Perf_Files}
+    ${Perf_Helper_Files}
 )
 
 
@@ -52,6 +59,8 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${GOOGLETEST_SOURCE_DIR}/googletest/include
+        ${Perf_Files}
+        ${Perf_Helper_Files}
 )
 
 include(GoogleTest)

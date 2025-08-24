@@ -20,6 +20,7 @@
 #include "Execution/MoveExecution.h"
 #include "ChessBoard.h"
 #include "Project.h"
+#include "PerformanceJSONHelper.h"
 
 
 namespace fs = std::filesystem;
@@ -27,18 +28,18 @@ namespace fs = std::filesystem;
 
 namespace PerformanceTests
 {
-struct CPUAlgorithmPerformanceResult
-{
-	std::string							  algorithmName{};
-	int									  depth;
-	std::chrono::milliseconds			  duration;
-	PossibleMove						  selectedMove;
-	std::string							  position;
-
-	std::chrono::system_clock::time_point timeStamp;
-	std::string							  version{ProjectInfo::Version};
-};
-
+//struct CPUAlgorithmPerformanceResult
+//{
+//	std::string							  algorithmName{};
+//	int									  depth;
+//	std::chrono::milliseconds			  duration;
+//	PossibleMove						  selectedMove;
+//	std::string							  position;
+//
+//	std::chrono::system_clock::time_point timeStamp;
+//	std::string							  version{ProjectInfo::Version};
+//};
+//
 
 class CPUPlayerPerformanceTests : public ::testing::Test
 {
@@ -188,6 +189,12 @@ protected:
 		file << std::endl;
 
 		file.close();
+	}
+
+	
+	void saveJsonResults(const std::string &fileName, const std::vector<CPUAlgorithmPerformanceResult> &results)
+	{
+		PerformanceJsonHelper::saveJsonResults(fileName, "CPU Algorithm Performance", results);
 	}
 };
 

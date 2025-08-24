@@ -18,24 +18,26 @@
 #include "Execution/MoveExecution.h"
 #include "ChessBoard.h"
 #include "Project.h"
+#include "PerformanceJSONHelper.h"
 
 
 namespace fs = std::filesystem;
 
+
 namespace PerformanceTests
 {
-struct MoveGenerationPerformanceResult
-{
-	std::string							  testName{};
-	std::chrono::microseconds			  duration{};
-	size_t								  movesGenerated{};
-	double								  movesPerSecond{};
-	size_t								  positionsEvaluated{};
-	std::string							  boardConfiguration{};
-
-	std::chrono::system_clock::time_point timestamp;
-	std::string							  version{ProjectInfo::Version};
-};
+//struct MoveGenerationPerformanceResult
+//{
+//	std::string							  testName{};
+//	std::chrono::microseconds			  duration{};
+//	size_t								  movesGenerated{};
+//	double								  movesPerSecond{};
+//	size_t								  positionsEvaluated{};
+//	std::string							  boardConfiguration{};
+//
+//	std::chrono::system_clock::time_point timestamp;
+//	std::string							  version{ProjectInfo::Version};
+//};
 
 
 class MoveGenerationPerformanceTests : public ::testing::Test
@@ -215,6 +217,12 @@ protected:
 		file << std::endl;
 
 		file.close();
+	}
+
+
+	void saveJsonResults(const std::string &fileName, const std::vector<MoveGenerationPerformanceResult> &results)
+	{
+		PerformanceJsonHelper::saveJsonResults(fileName, "Move Generation Performance", results);
 	}
 };
 
