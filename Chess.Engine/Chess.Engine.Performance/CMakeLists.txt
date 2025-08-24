@@ -15,46 +15,16 @@ enable_testing()
 #   Test Files
 #==========================================
 
-set(CPUPerformanceTests_Dir                     source/CPUPerformanceTests)
-set(MoveGenerationPerformanceTests_Dir          source/MoveGenerationPerformanceTests)
-set(MoveEvaluationPerformanceTests_Dir          source/MoveEvaluationPerformanceTests)
-set(CPUPlayerPerformanceTests_Dir               source/CPUPlayerPerformanceTests)
-set(PositionalEvaluationPerformanceTests_Dir    source/PositionalEvaluationPerformanceTests)
-set(LightChessBoardPerformanceTests_Dir         source/LightChessBoardPerformanceTests)
+set(Perf_Dir                             source/PerfFiles)
 
-
-set(CPUPerformanceTest_Files
-    ${CPUPerformanceTests_Dir}/CPUPerformanceTests.cpp
-)
-
-set(MoveGenerationPerformanceTest_Files
-    ${MoveGenerationPerformanceTests_Dir}/MoveGenerationPerformanceTests.cpp
-)
-
-set(MoveEvaluationPerformanceTest_Files
-    ${MoveEvaluationPerformanceTests_Dir}/MoveEvaluationPerformanceTests.cpp
-)
-
-set(CPUPlayerPerformanceTest_Files
-    ${CPUPlayerPerformanceTests_Dir}/CPUPlayerPerformanceTests.cpp
-)
-
-set(PositionalEvaluationPerformanceTest_Files
-    ${PositionalEvaluationPerformanceTests_Dir}/PositionalEvaluationPerformanceTests.cpp
-)
-
-set(LightChessBoardPerformanceTest_Files
-    ${LightChessBoardPerformanceTests_Dir}/LightChessBoardPerformanceTests.cpp
-)
-
-
-set(Test_Files
-    ${CPUPerformanceTest_Files}
-    ${MoveGenerationPerformanceTest_Files}
-    ${MoveEvaluationPerformanceTest_Files}
-    ${CPUPlayerPerformanceTest_Files}
-    ${PositionalEvaluationPerformanceTest_Files}
-    ${LightChessBoardPerformanceTest_Files}
+set(Perf_Files
+    ${Perf_Dir}/PerformanceJSONHelper.h
+    ${Perf_Dir}/CPUPerformanceTests.cpp
+    ${Perf_Dir}/MoveGenerationPerformanceTests.cpp
+    ${Perf_Dir}/MoveEvaluationPerformanceTests.cpp
+    ${Perf_Dir}/CPUPlayerPerformanceTests.cpp
+    ${Perf_Dir}/PositionalEvaluationPerformanceTests.cpp
+    ${Perf_Dir}/LightChessBoardPerformanceTests.cpp
 )
 
 
@@ -62,7 +32,7 @@ set(Test_Files
 #   Source Groups (VS)
 #==========================================
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Test_Files})
+source_group("Perf Files" FILES ${Perf_Files})
 
 
 #==========================================
@@ -71,7 +41,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Test_Files})
 
 add_executable(${PROJECT_NAME}
     source/main.cpp
-    ${Test_Files}
+    ${Perf_Files}
 )
 
 

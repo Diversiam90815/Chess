@@ -43,7 +43,7 @@ struct PositionalEvaluationPerformanceResult
 	double								  averageScore{};
 	int									  pieceCount{};
 
-	std::chrono::system_clock::time_point timestamp;		
+	std::chrono::system_clock::time_point timestamp;
 	std::string							  version{ProjectInfo::Version};
 };
 
@@ -216,6 +216,11 @@ protected:
 		file << std::endl;
 
 		file.close();
+	}
+
+	void saveJsonResults(const std::string &fileName, const std::vector<PositionalEvaluationPerformanceResult> &results)
+	{
+		//PerformanceJsonHelper::saveJsonResults("PositionalEvaluation_Results_JSON", fileName, "Positional Evaluation Performance", results);
 	}
 };
 
