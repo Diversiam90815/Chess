@@ -19,6 +19,7 @@
 #include "ChessBoard.h"
 #include "Project.h"
 #include "PerformanceJSONHelper.h"
+#include "PerfResults.h"
 
 
 namespace fs = std::filesystem;

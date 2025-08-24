@@ -47,8 +47,8 @@ source_group("Helper Files"     FILES ${Perf_Helper_Files})
 
 add_executable(${PROJECT_NAME}
     source/main.cpp
-    ${Perf_Files}
-    ${Perf_Helper_Files}
+    ${Perf_Dir}
+    ${Perf_Helper_Dir}
 )
 
 
