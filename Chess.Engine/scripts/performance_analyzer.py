@@ -52,7 +52,7 @@ class ChessEngineAnalyzer:
 
             # Convert to DataFrame for easier analysis
             self.df = self._create_dataframe()
-            print(f'Loaded {len[self.df]} performance test results')
+            print(f'Loaded {len(self.df)} performance test results')
 
         except FileNotFoundError:
             print(f'Data file {self.data_file} not found. Please run the collector script first and set the correct path')
@@ -154,7 +154,7 @@ class ChessEngineAnalyzer:
         print("PERFORMANCE METRICS SUMMARY:")
 
         numeric_cols = self.df.select_dtypes(include=[np.number]).columns
-        if(len(numeric_cols)) > 0:
+        if len(numeric_cols) > 0:
             print(self.df[numeric_cols].describe())
 
 
@@ -308,7 +308,7 @@ class ChessEngineAnalyzer:
         return fig
     
 
-    def plot_test_type_analysis(self, save_html: bool = True):
+    def plot_test_type_analysis(self):
         '''Analyze performance by test type'''
 
         # Create heatmap of performance metrics by test type
@@ -549,3 +549,56 @@ class ChessEngineAnalyzer:
         summary_df = pd.DataFrame(summary_data)
         summary_df.to_csv(output_file, index=False)
         print(f"Performance summary exported to {output_file}")
+
+
+def main():
+    '''Main function with command line arguments'''
+
+    parser = argparse.ArgumentParser(description="Analyze chess engine performance data")
+    parser.add_argument('--data-file', default='chess_engine_performance_data.json', help="Path to the collected performance data JSON file")
+    parser.add_argument('--output-dir', default='./analysis_output', help="Directory to save analysis outputs")
+    parser.add_argument('--no-html', action='store_true', help="Skip HTML output generation")
+
+    args = parser.parse_args()
+
+    # Create output directory
+    os.makedirs(args.output_dir, exist_ok=True)
+    os.chdir(args.output_dir)
+
+    # Initialize analyzer
+    print("Initializing Chess Engine Performance Analyzer...")
+    analyzer = ChessEngineAnalyzer(args.data_file)
+
+    # Generate overview report
+    analyzer.generate_overview_report()
+
+    # Create visualizations
+    print("\nGenerating performance visualizations...")
+    
+    save_html = not args.no_html
+
+    try:
+        analyzer.plot_performance_trends(save_html=save_html)
+        analyzer.plot_version_comparison(save_html=save_html)
+        analyzer.create_performance_dashboard(save_html=save_html)
+        analyzer.plot_test_type_analysis()
+    except Exception as ex:
+        print(f'Error creating visualizations: {ex}')
+
+    # Generate reports
+    print("\nGenerating performance reports...")
+    analyzer.generate_performance_report()
+    analyzer.export_summary_csv()
+
+    print(f"\nAnalysis complete! Check the '{args.output_dir}' directory for results.")
+    print("Generated files:")
+    print("- performance_trends.html (if HTML enabled)")
+    print("- version_comparison.html (if HTML enabled)")
+    print("- performance_dashboard.html (if HTML enabled)")
+    print("- test_type_analysis.png")
+    print("- performance_report.txt")
+    print("- performance_summary.csv")
+
+
+if __name__ == "__main__":
+    main()
