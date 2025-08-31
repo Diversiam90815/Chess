@@ -14,6 +14,13 @@ This is a chess game developed in C++ and C# with the goal of creating a fully-f
 -   **Enhanced Gameplay Experience**:
     -   **Captured Pieces Display**: The UI keeps a visual tally of all captured pieces for both players.
     -   **Game Controls**: Easily undo your last move or reset the board to start a new game.
+    -   **Immersive Audio**: A dynamic audio engine provides sound effects for moves and captures, along with ambient background tracks to enhance the atmosphere.
+
+-   **Intelligent CPU Opponent**:
+    -   **Play Against the AI**: Challenge yourself in a single-player mode against a computer-controlled opponent.
+    -   **Adjustable Difficulty**: Choose from multiple difficulty levels, from random moves to advanced strategies using Minimax with Alpha-Beta pruning.
+    -   **Flexible Setup**: Decide whether to play as White or Black when starting a game against the CPU.
+    -   **Performance Optimizations**: The engine uses techniques like transposition tables to ensure responsive and intelligent AI gameplay.
 
 -   **Advanced Multiplayer**:
     -   **LAN Gaming**: Host or join games on your local network.
@@ -21,8 +28,12 @@ This is a chess game developed in C++ and C# with the goal of creating a fully-f
     -   **Network Selection**: For users with multiple network connections, you can choose the specific network for multiplayer games, ensuring a stable connection.
 
 -   **Personalization**:
-    -   **Custom Themes**: Tailor the look of the game by choosing from different styles for the board and pieces.
+    -   **Custom Styles**: Tailor the look of the game by choosing from different styles for the board and pieces.
     -   **Player Naming**: Set your own name for multiplayer sessions.
+    -   **Audio Controls**: Independently adjust the volume for sound effects, atmosphere, and the master output.
+
+-   **Performance Analysis Tools**:
+    -   Comprehensive Python-based analysis pipeline that automatically collects performance test data, generates interactive visualizations, and provides detailed reports to track engine optimization progress.
 
 
 ## Technology Stack
@@ -34,16 +45,31 @@ This is a chess game developed in C++ and C# with the goal of creating a fully-f
    - **C++**: GoogleTest
    - **C#**: xUnit, Moq
 - **Communication**: The C# frontend communicates with the C++ backend via P/Invoke
+- **Performance Analysis**: Python with pandas, matplotlib, seaborn, and plotly for data analysis and visualization
 
 
 ## Future Plans
 
-- **CPU opponent** 
-   - Implement a chess algorithm to play against.
-   - Implement move evaluation module
-- **Sound Engine**
-   - Implement a sound engine for playback of sound effects
-   - Integrate dynamic a dynamic music score
+- **CPU Evaluation Algorithms** 
+   - Refine and improve positional and move evaluation algorithms for different CPU difficulties
+- **Onboarding** 
+   - Create onboarding process
+- **Create score**
+   - Enhance the sound engine for playback of dynamic score
+   - Compose dynamic score
+
+
+## Project Structure
+
+- **Chess.UI**:
+    - **Chess.UI**: The main WinUI 3 project containing the user interface, view models, and services for the application.
+    - **Chess.UI.Test**: Contains unit tests (xUnit, Moq) for the `Chess.UI` project to ensure the reliability of the frontend logic.
+- **Chess.Engine**:
+    - **Chess.Engine.API**: A C++ DLL project that exposes the core engine functionalities through a C-style API, allowing the C# frontend to communicate with the C++ backend via P/Invoke.
+    - **Chess.Engine.Core**: The core of the chess engine, written in C++. It includes all the game logic, such as the chessboard representation, move generation, validation, and the game state machine.
+    - **Chess.Engine.Performance**: A project dedicated to performance testing of the C++ engine, helping to benchmark and optimize critical components like the CPU player's move evaluation.
+    - **Chess.Engine.Tests**: Contains unit tests (GoogleTest) for the C++ engine, verifying the correctness and stability of the core game logic.
+    - **scripts**: Contains Python scripts for the performance analysis pipeline for monitoring engine optimization progress.
 
 
 ## Prerequisites
@@ -134,6 +160,62 @@ The project includes a suite of tests for both the backend and the frontend UI t
 - **Frontend (Chess.UI.Tests)**: The C# UI and its view models are tested using **xUnit**, with **Moq** for creating mock objects.
 
 
+## Performance Analysis
+
+The Chess Engine includes comprehensive performance testing and analysis tools for monitoring and optimizing engine performance across different test scenarios.
+
+### Running Performance Analysis
+
+The performance analysis pipeline automatically collects JSON test data and generates detailed visualizations and reports. The scripts are located within the ***Chess.Engine/scripts/*** directory.
+
+#### Install Phython dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+#### Run complete analysis pipeline (collection + visualization)
+
+```bash
+python performance_pipeline.py          # Relative to the scripts directory
+```
+
+#### Specidy custom data directory
+
+```bash
+python performance_pipeline.py --data_dir ./my_performance_data
+```
+
+#### Save results to scpecific directory and disable HTML output
+
+```bash
+python performance_pipeline.py --output-dir ./my_analysis --no-html
+```
+
+#### Run only data collection
+
+```bash
+python performance_pipeline.py --collect-only
+```
+
+#### Run only analysis (requires existing data)
+
+```bash
+python performance_pipeline.py --analyze-only --output-dir ./existing_analysis
+```
+
+The pipeline searches for JSON performance files generated by the Chess Engine Performance Tests and creates a timestamped analysis directory containing:
+-   **Interactive HTML dashboards showing performance trends and comparisons**
+-   **Detailed text reports with insights and recommendations**
+-   **CSV exports for further analysis**
+-   **Static charts for move generation, evaluation and CPU Performance metrics**
+
+Results are automatically organized by app version and timeframe, making it easy to track performance improvements and identify optimization opportunities across different engine configurations.
+
+### Prerequisites for Performance Analysis
+
+- **Python 3.x**: For running analysis scripts
+- **Python Dependencies**: Install via 'pip install -r requirements.txt'
 
 ## License
 

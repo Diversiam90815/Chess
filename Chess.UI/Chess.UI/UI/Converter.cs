@@ -44,6 +44,30 @@ namespace Chess.UI.UI
             Thickness thicknessValue = new Thickness(value);
             return thicknessValue;
         }
+
+        public static Thickness CpuDifficultyToEasyBorderThickness(CPUDifficulty difficulty)
+        {
+            int value = difficulty == CPUDifficulty.Easy ? 1 : 0;
+
+            Thickness thicknessValue = new Thickness(value);
+            return thicknessValue;
+        }
+
+        public static Thickness CpuDifficultyToMediumBorderThickness(CPUDifficulty difficulty)
+        {
+            int value = difficulty == CPUDifficulty.Medium ? 1 : 0;
+
+            Thickness thicknessValue = new Thickness(value);
+            return thicknessValue;
+        }
+
+        public static Thickness CpuDifficultyToHardBorderThickness(CPUDifficulty difficulty)
+        {
+            int value = difficulty == CPUDifficulty.Hard ? 1 : 0;
+
+            Thickness thicknessValue = new Thickness(value);
+            return thicknessValue;
+        }
     }
 
 

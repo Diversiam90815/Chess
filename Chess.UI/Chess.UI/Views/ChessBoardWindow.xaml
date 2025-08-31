@@ -212,7 +212,7 @@
                         Background="{ThemeResource CardBackgroundFillColorSecondaryBrush}"
                         CornerRadius="8">
                         <Grid.RowDefinitions>
-                            <RowDefinition x:Name="Title" Height="40" />
+                            <RowDefinition x:Name="TitleRow" Height="40" />
                             <RowDefinition x:Name="Moves" Height="165" />
                         </Grid.RowDefinitions>
 
@@ -273,13 +273,13 @@
                             Click="UndoMove_Click"
                             Content="Undo"
                             Style="{StaticResource GameButtonStyle}"
-                            Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneWay}" />
+                            Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.IsKoopGame), Mode=OneWay}" />
                         <Button
                             x:Name="ResetGame"
                             Click="ResetGame_Click"
                             Content="Reset"
                             Style="{StaticResource GameButtonStyle}"
-                            Visibility="{x:Bind converter:Converter.BoolToCollapsed(_viewModel.IsMultiplayerGame), Mode=OneWay}" />
+                            Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.IsKoopGame), Mode=OneWay}" />
                         <Button
                             x:Name="EndGame"
                             Click="EndGame_Click"

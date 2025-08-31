@@ -1,10 +1,6 @@
 ﻿using Chess.UI.Communication_Layer.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
 
 
@@ -26,8 +22,9 @@ namespace Chess.UI.Services
             PlayerChanged = 4,
             GameStateChanged = 5,
             MoveHistoryUpdated = 6,
-            ConnectionStateChanged = 7,
-            MultiplayerPlayerChosen = 8,
+            MoveExecuted = 7,
+            ConnectionStateChanged = 8,
+            MultiplayerPlayerChosen = 9,
         }
 
 
@@ -84,6 +81,11 @@ namespace Chess.UI.Services
                         HandleMoveHistoryUpdated(data);
                         break;
                     }
+                case DelegateMessage.MoveExecuted:
+                    {
+                        HandleMoveExecuted(data);
+                        break;
+                    }
                 case DelegateMessage.PlayerCapturedPiece:
                     {
                         HandlePlayerCapturedPiece(data);
@@ -119,6 +121,13 @@ namespace Chess.UI.Services
         }
 
 
+        private void HandleMoveExecuted(nint data)
+        {
+            PossibleMoveInstance moveInstance = (PossibleMoveInstance)Marshal.PtrToStructure(data, typeof(PossibleMoveInstance));
+            MoveExecuted?.Invoke(moveInstance);
+        }
+
+
         private void HandlePlayerChanged(nint data)
         {
             int iPlayer = Marshal.ReadInt32(data);
@@ -129,9 +138,8 @@ namespace Chess.UI.Services
 
         private void HandleEndGameState(nint data)
         {
-            int endGame = Marshal.ReadInt32(data);
-            EndGameState state = (EndGameState)endGame;
-            EndGameStateEvent?.Invoke(state);
+            EndGameStateEvent endgameEvent = (EndGameStateEvent)Marshal.PtrToStructure(data, typeof(EndGameStateEvent));
+            EndGameStateEvent?.Invoke(endgameEvent);
         }
 
 
@@ -170,9 +178,10 @@ namespace Chess.UI.Services
         public event Action<PlayerColor> PlayerChanged;
         public event Action<GameState> GameStateChanged;
         public event Action<MoveHistoryEvent> MoveHistoryUpdated;
+        public event Action<PossibleMoveInstance> MoveExecuted;
         public event Action<PlayerCapturedPiece> PlayerCapturedPieceEvent;
         public event Action<EngineAPI.Score> PlayerScoreUpdated;
-        public event Action<EndGameState> EndGameStateEvent;
+        public event Action<EndGameStateEvent> EndGameStateEvent;
         public event Action<ConnectionStatusEvent> ConnectionStatusEvent;
         public event Action<PlayerColor> MultiPlayerChosenByRemote;
 

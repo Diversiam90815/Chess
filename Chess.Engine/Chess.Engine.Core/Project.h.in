@@ -1,0 +1,35 @@
+/*
+  ==============================================================================
+    Module:         Project Configuration
+    Description:    Auto-generated project information from CMake
+  ==============================================================================
+*/
+
+#pragma once
+
+#ifndef PROJECT_CONFIG_H
+#define PROJECT_CONFIG_H
+
+// Project Information
+#define PROJECT_NAME "@PROJECT_NAME@"
+#define PROJECT_VERSION "@PROJECT_VERSION@"
+#define PROJECT_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define PROJECT_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define PROJECT_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#define PROJECT_VERSION_BUILD @PROJECT_VERSION_TWEAK@
+
+// Derived information
+#define PROJECT_FULL_NAME "@PROJECT_NAME@ v@PROJECT_VERSION@"
+
+// String literals for C++ usage
+namespace ProjectInfo {
+    constexpr const char* Name = PROJECT_NAME;
+    constexpr const char* Version = PROJECT_VERSION;
+    constexpr const char* FullName = PROJECT_FULL_NAME;
+    constexpr int VersionMajor = PROJECT_VERSION_MAJOR;
+    constexpr int VersionMinor = PROJECT_VERSION_MINOR;
+    constexpr int VersionPatch = PROJECT_VERSION_PATCH;
+    constexpr int VersionBuild = PROJECT_VERSION_BUILD;
+}
+
+#endif // PROJECT_CONFIG_H

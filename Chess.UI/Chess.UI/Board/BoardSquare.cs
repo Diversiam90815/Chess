@@ -1,19 +1,10 @@
 ﻿using Chess.UI.Images;
-using Chess.UI.Services;
-using Chess.UI.Themes;
-using Chess.UI.Themes.Interfaces;
+using Chess.UI.Styles;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.System;
 using static Chess.UI.Services.EngineAPI;
 
 
@@ -25,9 +16,9 @@ namespace Chess.UI.Board
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ImageServices.PieceTheme PieceTheme { get; private set; }
+        public PieceStyle _pieceStyle { get; private set; }
 
-        private readonly IThemeManager _themeManager;
+        private readonly IStyleManager _styleManager;
 
         private IImageService _images;
 
@@ -38,11 +29,11 @@ namespace Chess.UI.Board
             colour = PlayerColor.NoColor;
 
             _dispatcherQueue = App.Current.Services.GetService<IDispatcherQueueWrapper>();
-            _themeManager = App.Current.Services.GetService<IThemeManager>();
+            _styleManager = App.Current.Services.GetService<IStyleManager>();
 
-            _themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+            _styleManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
-            PieceTheme = _themeManager.CurrentPieceTheme;
+            _pieceStyle = _styleManager.CurrentPieceStyle;
         }
 
 
@@ -53,26 +44,26 @@ namespace Chess.UI.Board
             colour = color;
 
             _dispatcherQueue = App.Current.Services.GetService<IDispatcherQueueWrapper>();
-            _themeManager = App.Current.Services.GetService<IThemeManager>();
+            _styleManager = App.Current.Services.GetService<IStyleManager>();
 
-            _themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+            _styleManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
-            PieceTheme = _themeManager.CurrentPieceTheme;
+            _pieceStyle = _styleManager.CurrentPieceStyle;
         }
 
 
         private void OnThemeManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ThemeManager.CurrentPieceTheme))
+            if (e.PropertyName == nameof(StyleManager.CurrentPieceStyle))
             {
-                UpdatePieceTheme(_themeManager.CurrentPieceTheme);
+                UpdatePieceTheme(_styleManager.CurrentPieceStyle);
             }
         }
 
 
-        public void UpdatePieceTheme(ImageServices.PieceTheme pieceTheme)
+        public void UpdatePieceTheme(PieceStyle pieceTheme)
         {
-            PieceTheme = pieceTheme;
+            _pieceStyle = pieceTheme;
         }
 
 
@@ -158,7 +149,7 @@ namespace Chess.UI.Board
 
                 _images = new ImageServices();
 
-                return _images.GetPieceImage(PieceTheme, colour, piece);
+                return _images.GetPieceImage(_pieceStyle, colour, piece);
             }
         }
 

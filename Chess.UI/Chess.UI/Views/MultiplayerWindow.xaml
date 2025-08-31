@@ -88,7 +88,10 @@
                 Style="{ThemeResource MPSubTitle}"
                 Text="Accept this request?" />
 
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="16">
+            <StackPanel
+                HorizontalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="16">
                 <Button
                     Name="HostAcceptButton"
                     Click="HostAcceptButton_Click"
@@ -130,7 +133,10 @@
                 Style="{ThemeResource MPSubTitle}"
                 Text="Do you want to join?" />
 
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="16">
+            <StackPanel
+                HorizontalAlignment="Center"
+                Orientation="Horizontal"
+                Spacing="16">
                 <Button
                     Name="JoinAcceptButton"
                     Click="JoinAcceptButton_Click"

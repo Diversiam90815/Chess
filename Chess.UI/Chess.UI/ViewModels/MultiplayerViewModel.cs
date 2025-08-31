@@ -9,7 +9,6 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using WinRT.Chess_GameVtableClasses;
 
 
 namespace Chess.UI.ViewModels
@@ -29,6 +28,12 @@ namespace Chess.UI.ViewModels
         public event Action RequestNavigationToChessboard;
         public event Action RequestCloseChessboard;
 
+        // Events for audio feedback
+        public event Action ButtonClicked;
+
+#pragma warning disable CS0067 // Event is never used - planned for future chat feature
+        public event Action ChatMessageReceived;    // TODO: Not yet implemented
+#pragma warning restore CS0067
 
         public MultiplayerViewModel(IDispatcherQueueWrapper dispatcher)
         {
@@ -39,7 +44,7 @@ namespace Chess.UI.ViewModels
 
             _preferencesModel = App.Current.Services.GetService<IMultiplayerPreferencesModel>();
             _preferencesModel.PlayerNameChanged += HandlePlayerNameChanged; // Subscribe to player name changes
-            LocalPlayerName = _preferencesModel.GetLocalPlayerName();   // and also initialize the value at first
+            LocalPlayerName = _preferencesModel.GetLocalPlayerName();       // and also initialize the value at first
 
             _model.OnConnectionErrorOccured += HandleConnectionError;
             _model.OnConnectionStatusChanged += HandleConnectionStatusUpdated;
@@ -306,6 +311,8 @@ namespace Chess.UI.ViewModels
 
         #endregion
 
+        public void OnButtonClicked() => ButtonClicked?.Invoke();
+
 
         private void HandlePlayerNameChanged(string newName)
         {
@@ -407,7 +414,8 @@ namespace Chess.UI.ViewModels
 
         private void HandleConnectionError(string errorMessage)
         {
-            // TODO: Display error
+            // TODO: Show error message. For now we just log
+            Logger.LogError($"Connection Error message received: {errorMessage}");
         }
 
 

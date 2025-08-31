@@ -1,4 +1,5 @@
 ﻿using Chess.UI.MoveHistory;
+using Chess.UI.Services;
 using Chess.UI.Wrappers;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -45,7 +46,6 @@ namespace Chess.UI.ViewModels
             {
                 column.Clear();
             }
-            // TODO: Clear move history in backend
         }
 
 

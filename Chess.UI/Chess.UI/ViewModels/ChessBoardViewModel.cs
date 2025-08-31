@@ -6,14 +6,13 @@ using static Chess.UI.Services.EngineAPI;
 using System.Collections.ObjectModel;
 using System;
 using System.Threading.Tasks;
-using Chess.UI.Themes;
+using Chess.UI.Styles;
 using Chess.UI.Board;
 using Chess.UI.Images;
 using Chess.UI.Wrappers;
-using Chess.UI.Themes.Interfaces;
-using Chess.UI.Services.Interfaces;
+using Chess.UI.Coordinates;
 using Microsoft.Extensions.DependencyInjection;
-using Chess.UI.Models.Interfaces;
+using Chess.UI.Moves;
 
 
 namespace Chess.UI.ViewModels
@@ -24,9 +23,12 @@ namespace Chess.UI.ViewModels
 
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
 
+        public event Action ButtonClicked;
+        public event Action SquareClicked;
+
         public ObservableCollection<BoardSquare> Board { get; set; }
 
-        public event Func<EndGameState, Task> ShowEndGameDialog;
+        public event Func<EndGameState, PlayerColor, Task> ShowEndGameDialog;
 
         public event Func<Task<PieceTypeInstance?>> ShowPawnPromotionDialogRequested;
 
@@ -36,7 +38,7 @@ namespace Chess.UI.ViewModels
 
         public MultiplayerViewModel MultiplayerViewModel { get; }
 
-        private readonly IThemeManager _themeManager;
+        private readonly IStyleManager _styleManager;
 
         private readonly IMoveModel _moveModel;
 
@@ -46,7 +48,7 @@ namespace Chess.UI.ViewModels
 
         private readonly IImageService _imageServices;
 
-        public ImageServices.BoardTheme CurrentBoardTheme;
+        public BoardStyle CurrentBoardStyle;
 
 
         public ChessBoardViewModel(IDispatcherQueueWrapper dispatcherQueue)
@@ -59,7 +61,7 @@ namespace Chess.UI.ViewModels
             _boardModel = App.Current.Services.GetService<IBoardModel>();
             _coordinate = App.Current.Services.GetService<IChessCoordinate>();
             _imageServices = App.Current.Services.GetService<IImageService>();
-            _themeManager = App.Current.Services.GetService<IThemeManager>();
+            _styleManager = App.Current.Services.GetService<IStyleManager>();
             MultiplayerViewModel = App.Current.Services.GetService<MultiplayerViewModel>();
 
             _moveModel.PossibleMovesCalculated += OnHighlightPossibleMoves;
@@ -68,11 +70,11 @@ namespace Chess.UI.ViewModels
             _moveModel.GameOverEvent += OnEndGameState;
             _moveModel.NewBoardFromBackendEvent += OnBoardFromBackendUpdated;
 
-            _themeManager.PropertyChanged += OnThemeManagerPropertyChanged;
+            _styleManager.PropertyChanged += OnThemeManagerPropertyChanged;
 
             _moveModel.PawnPromotionEvent += OnPromotionPiece;
 
-            this.CurrentBoardTheme = _themeManager.CurrentBoardTheme;
+            this.CurrentBoardStyle = _styleManager.CurrentBoardStyle;
 
             Board = [];
 
@@ -150,9 +152,9 @@ namespace Chess.UI.ViewModels
         }
 
 
-        public void StartGame()
+        public void StartGame(GameConfiguration config)
         {
-            EngineAPI.StartGame();  // Start the game and thus the StateMachine
+            EngineAPI.StartGame(config);  // Start the game and thus the StateMachine
         }
 
 
@@ -165,16 +167,16 @@ namespace Chess.UI.ViewModels
 
         private void OnThemeManagerPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == nameof(ThemeManager.CurrentBoardTheme))
+            if (e.PropertyName == nameof(StyleManager.CurrentBoardStyle))
             {
-                UpdateBoardTheme(_themeManager.CurrentBoardTheme);
+                UpdateBoardTheme(_styleManager.CurrentBoardStyle);
             }
         }
 
 
-        private void UpdateBoardTheme(ImageServices.BoardTheme boardTheme)
+        private void UpdateBoardTheme(BoardStyle boardTheme)
         {
-            CurrentBoardTheme = boardTheme;
+            CurrentBoardStyle = boardTheme;
         }
 
 
@@ -221,6 +223,18 @@ namespace Chess.UI.ViewModels
         }
 
 
+        public void OnButtonClicked()
+        {
+            ButtonClicked?.Invoke();
+        }
+
+
+        public void OnSquareClicked()
+        {
+            SquareClicked?.Invoke();
+        }
+
+
         public void ResetHighlightsOnBoard()
         {
             foreach (var square in Board)
@@ -248,9 +262,9 @@ namespace Chess.UI.ViewModels
         }
 
 
-        private void OnEndGameState(EndGameState state)
+        private void OnEndGameState(EndGameState state, PlayerColor winner)
         {
-            ShowEndGameDialog?.Invoke(state);
+            ShowEndGameDialog?.Invoke(state, winner);
         }
 
 
@@ -289,12 +303,26 @@ namespace Chess.UI.ViewModels
             }
         }
 
+        private bool _isKoopGame;
+        public bool IsKoopGame
+        {
+            get => _isKoopGame;
+            set
+            {
+                if (value != _isKoopGame)
+                {
+                    _isKoopGame = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
 
         public ImageSource BoardBackgroundImage
         {
             get
             {
-                return _imageServices.GetImage(CurrentBoardTheme);
+                return _imageServices.GetImage(CurrentBoardStyle);
             }
         }
 

@@ -1,15 +1,11 @@
 ﻿using Chess.UI.Images;
 using Chess.UI.Services;
 using Chess.UI.Wrappers;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading.Tasks;
 
 
@@ -19,14 +15,31 @@ namespace Chess.UI.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        // Specific events for different actions
+        public event Action ButtonClicked;
+        public event Func<Task> StartGameRequested;
+        public event Func<Task> SettingsRequested;
+        public event Func<Task> MultiplayerRequested;
+        public event Action QuitRequested;
+
         private readonly IDispatcherQueueWrapper _dispatcherQueue;
-
         private readonly IImageService _imageServices;
+        private readonly INavigationService _navigationService;
+        private readonly IGameConfigurationService _gameConfigurationService;
 
-        public MainMenuViewModel(IDispatcherQueueWrapper dispatcher)
+        private Window _ownerWindow;
+
+
+        public MainMenuViewModel(
+          IDispatcherQueueWrapper dispatcher,
+          IImageService imageServices,
+          INavigationService navigationService,
+          IGameConfigurationService gameConfigurationService)
         {
             _dispatcherQueue = dispatcher;
-            _imageServices = App.Current.Services.GetService<IImageService>();
+            _imageServices = imageServices;
+            _navigationService = navigationService;
+            _gameConfigurationService = gameConfigurationService;
 
             Init();
         }
@@ -39,6 +52,42 @@ namespace Chess.UI.ViewModels
             MultiplayerButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.Multiplayer);
             EndGameButtonImage = _imageServices.GetImage(ImageServices.MainMenuButton.EndGame);
         }
+
+        public void SetOwnerWindow(Window owner)
+        {
+            _ownerWindow = owner;
+        }
+
+
+        public void OnButtonClicked()
+        {
+            ButtonClicked?.Invoke();
+        }
+
+
+        public async Task OnStartGameRequestedAsync()
+        {
+            await (StartGameRequested?.Invoke() ?? Task.CompletedTask);
+        }
+
+
+        public async Task OnSettingsRequestedAsync()
+        {
+            await (SettingsRequested?.Invoke() ?? Task.CompletedTask);
+        }
+
+
+        public async Task OnMultiplayerRequestedAsync()
+        {
+            await (MultiplayerRequested?.Invoke() ?? Task.CompletedTask);
+        }
+
+
+        public void OnQuitRequested()
+        {
+            QuitRequested?.Invoke();
+        }
+
 
         private ImageSource startGameButtonImage;
         public ImageSource StartGameButtonImage
@@ -100,6 +149,32 @@ namespace Chess.UI.ViewModels
         }
 
 
+        public async Task HandleStartGameAsync()
+        {
+            try
+            {
+                await _navigationService.NavigateToGameConfigurationView();
+            }
+            catch (Exception ex)
+            {
+                // Handle error - could add error service here
+                Logger.LogError($"Failed to start game: {ex.Message}");
+            }
+        }
+
+
+        public async Task HandleSettingsAsync()
+        {
+            await _navigationService.ShowPreferencesAsync();
+        }
+
+
+        public async Task HandleMultiplayerAsync()
+        {
+            await _navigationService.NavigateToMultiplayerAsync();
+        }
+
+
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             _dispatcherQueue.TryEnqueue(() =>
@@ -107,6 +182,5 @@ namespace Chess.UI.ViewModels
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             });
         }
-
     }
 }

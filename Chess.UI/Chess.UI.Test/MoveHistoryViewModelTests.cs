@@ -1,13 +1,8 @@
 ﻿using Chess.UI.MoveHistory;
-using Chess.UI.Test.Helpers;
 using Chess.UI.ViewModels;
 using Chess.UI.Wrappers;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Chess.UI.Test
 {

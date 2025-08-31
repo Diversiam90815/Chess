@@ -1,9 +1,5 @@
 ﻿using Chess.UI.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
 
 
@@ -24,8 +20,9 @@ namespace Chess.UI.Communication_Layer.Interfaces
         event Action<MoveHistoryEvent> MoveHistoryUpdated;
         event Action<PlayerCapturedPiece> PlayerCapturedPieceEvent;
         event Action<EngineAPI.Score> PlayerScoreUpdated;
-        event Action<EndGameState> EndGameStateEvent;
+        event Action<EndGameStateEvent> EndGameStateEvent;
         event Action<ConnectionStatusEvent> ConnectionStatusEvent;
         event Action<PlayerColor> MultiPlayerChosenByRemote;
+        event Action<PossibleMoveInstance> MoveExecuted;
     }
 }

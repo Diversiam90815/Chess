@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
 
 
-namespace Chess.UI.Models.Interfaces
+namespace Chess.UI.Moves
 {
     public interface IMoveModel
     {
         List<PossibleMoveInstance> PossibleMoves { get; }
 
+        public event Action ChesspieceSelected;
         event Action PossibleMovesCalculated;
         event Action<PlayerColor> PlayerChanged;
         event Action GameStateInitSucceeded;
-        event Action<EndGameState> GameOverEvent;
+        event Action<EndGameState, PlayerColor> GameOverEvent;
         event Action NewBoardFromBackendEvent;
         event Action PawnPromotionEvent;
 

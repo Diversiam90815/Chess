@@ -1,10 +1,6 @@
-﻿using Chess.UI.Models.Interfaces;
-using Chess.UI.Services;
+﻿using Chess.UI.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Chess.UI.Services.EngineAPI;
 
 
@@ -32,7 +28,7 @@ namespace Chess.UI.Moves
             {
                 case GameState.InitSucceeded:
                     {
-                        HandleInitSucceeded();
+                        GameStateInitSucceeded?.Invoke();
                         break;
                     }
                 case GameState.WaitingForInput:
@@ -54,6 +50,11 @@ namespace Chess.UI.Moves
                         NewBoardFromBackendEvent?.Invoke();
                         break;
                     }
+                case GameState.WaitingForCPUMove:
+                    {
+                        NewBoardFromBackendEvent?.Invoke();
+                        break;
+                    }
                 case GameState.GameOver:
                     {
                         break;
@@ -66,7 +67,7 @@ namespace Chess.UI.Moves
                 case GameState.WaitingForRemoteMove:
                     {
                         NewBoardFromBackendEvent?.Invoke();
-                        HandleRemotePlayersTurn();
+                        RemotePlayersTurn?.Invoke();
                         break;
                     }
                 default:
@@ -75,21 +76,21 @@ namespace Chess.UI.Moves
         }
 
 
-        public void HandleInitSucceeded()
+        public void HandleEndGameState(EndGameStateEvent endgame)
         {
-            GameStateInitSucceeded?.Invoke();
-        }
+            EndGameState state = endgame.State;
+            PlayerColor winner = endgame.winner;
 
-
-        public void HandleEndGameState(EndGameState endgame)
-        {
-            GameOverEvent?.Invoke(endgame);
+            GameOverEvent?.Invoke(state, winner);
         }
 
 
         private void HandleWaitingForTarget()
         {
             Logger.LogInfo("Due to delegate message WaitingForTarget we start getting the moves!");
+
+            // We have selected a chesspiece and started the move cycle
+            ChesspieceSelected?.Invoke();
 
             PossibleMoves.Clear();
 
@@ -112,23 +113,18 @@ namespace Chess.UI.Moves
         }
 
 
-        private void HandleRemotePlayersTurn()
-        {
-            RemotePlayersTurn?.Invoke();
-        }
-
-
         public void HandlePlayerChanged(PlayerColor player)
         {
             PlayerChanged?.Invoke(player);
         }
 
 
+        public event Action ChesspieceSelected;
         public event Action PossibleMovesCalculated;
         public event Action<PlayerColor> PlayerChanged;
         public event Action RemotePlayersTurn;
         public event Action GameStateInitSucceeded;
-        public event Action<EndGameState> GameOverEvent;
+        public event Action<EndGameState, PlayerColor> GameOverEvent;
         public event Action NewBoardFromBackendEvent;
         public event Action PawnPromotionEvent;
     }

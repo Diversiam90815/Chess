@@ -36,6 +36,15 @@ namespace Chess.UI.Services
         }
 
 
+        public static void LogDebug(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0)
+        {
+            string fullMethodName = GetMethodName(memberName, filePath);
+            string className = GetClassName(filePath);
+
+            EngineAPI.LogDebugWithCaller(message, fullMethodName, className, lineNumber);
+        }
+
+
         private static string GetClassName(string filePath)
         {
             string className = System.IO.Path.GetFileNameWithoutExtension(filePath);
