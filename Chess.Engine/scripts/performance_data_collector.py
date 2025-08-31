@@ -27,6 +27,7 @@ class PerformanceData:
     results : List[Dict[str, Any]]
     file_path: str
 
+
 @dataclass
 class DataCollection:
     '''Main data collection container'''
@@ -172,7 +173,7 @@ class PerformanceDataCollector:
         for file_path in json_files:
             perf_data = self.parse_json_file(file_path)
             if perf_data:
-                self.collect_all_data(perf_data)
+                self.collection.add_data(perf_data)
                 processed_count += 1
 
         print(f'Successfully processed {processed_count} files')
@@ -195,10 +196,10 @@ class PerformanceDataCollector:
 
     def _get_date_range(self) -> Dict[str, str]:
         '''Get the date range of collected data'''
-        if not self.collect_all_data:
+        if not self.collection.all_data:
             return {'earliest' : 'N/A', 'latest':'N/A'}
         
-        timestamps = [data.timestamp for data in self.collect_all_data]
+        timestamps = [data.timestamp for data in self.collection.all_data]
         return {
             'earliest': min(timestamps).strftime("%Y-%m-%d %H:%M:%S"),
             'latest': max(timestamps).strftime("%Y-%m-%d %H:%M:%S")
@@ -208,7 +209,7 @@ class PerformanceDataCollector:
     def _get_test_groups(self) -> Dict[str, int]:
         '''Get count of test groups'''
         groups = {}
-        for data in self.collect_all_data:
+        for data in self.collection.all_data:
             group = data.test_group
             groups[group] = groups.get(group,0) + 1
         return groups
@@ -259,5 +260,4 @@ class PerformanceDataCollector:
             json.dump(export_data, f, indent=2, ensure_ascii=False)
 
         print(f'Data exported to {output_file}')
-
 
