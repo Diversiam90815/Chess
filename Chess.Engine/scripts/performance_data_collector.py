@@ -54,11 +54,23 @@ class DataCollection:
 class PerformanceDataCollector:
     '''Collects and organizes Chess Engine Performance data'''
 
-    def __init__(self):
-        '''Intitialize the data collector'''
-        self.base_directory = os.path.join(os.getcwd(), "..", "build", "Chess.Engine.Performance", "Debug", "Performance_Results")  # adapt to config later
+    def __init__(self,  base_directory: str = None):
+        '''
+        Intitialize the data collector
+        
+        Args:
+            base_directory: Base directory to search for JSON files. 
+                          If None, uses default relative path.
+        '''
+        
+        if base_directory:
+            self.base_directory = base_directory
+        else:
+            self.base_directory = os.path.join(os.getcwd(), "..", "build", "Chess.Engine.Performance", "Debug", "Performance_Results")
+        
         self.collection = DataCollection()
         self.supported_test_types = ["move_generation", "positional_evaluation", "move_evaluation", "lightchessboard", "cpu_player", "cpu_performance"]
+
 
     def find_json_files(self) -> List[str]:
         '''Find all JSON performance result files'''
@@ -77,6 +89,7 @@ class PerformanceDataCollector:
         # remove duplicates and sort
         return sorted(list(set(json_files)))
     
+
     def parse_json_file(self, file_path : str) -> Optional[PerformanceData]:
         '''Parse a single JSON performance file'''
         try:
@@ -96,7 +109,7 @@ class PerformanceDataCollector:
             # Create performance data object
             perf_data = PerformanceData(app_version=app_version, 
                                         timestamp=timestamp, 
-                                        test_group=metadata.get('testGroup', 'Unkown'), 
+                                        test_group=metadata.get('testGroup', 'Unknown'), 
                                         test_file=metadata.get('testFile', os.path.basename(file_path)),
                                         results=data.get('results', []), 
                                         file_path=file_path)
@@ -122,7 +135,7 @@ class PerformanceDataCollector:
                    ]
         for fmt in formats:
             try:
-                return datetime.strftime(timestamp_tr, fmt)
+                return datetime.strptime(timestamp_tr, fmt)
             except ValueError:
                 continue
 
@@ -220,14 +233,14 @@ class PerformanceDataCollector:
         return self.collection.data_by_version.get(version,[])
     
 
-    def filder_by_date_range(self, start_date: str, end_date: str) -> List[PerformanceData]:
+    def filter_by_date_range(self, start_date: str, end_date: str) -> List[PerformanceData]:
         '''Filter data by date range (YYYY-MM-DD format)'''
         try:
             start = datetime.strptime(start_date, "%Y-%m-%d")
             end = datetime.strptime(end_date, "%Y-%m-%d")
             
             filtered_data = []
-            for data in self.collect_all_data:
+            for data in self.collection.all_data:
                 if start <= data.timestamp <= end:
                     filtered_data.append(data)
             
@@ -291,4 +304,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
