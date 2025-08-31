@@ -261,3 +261,33 @@ class PerformanceDataCollector:
 
         print(f'Data exported to {output_file}')
 
+
+def main():
+    '''Main function to collect all performance data'''
+
+    # Initialize collector
+    collector = PerformanceDataCollector()
+
+    # Collect all data
+    print("Collecting Chess Engine Performance Data...")
+    collection = collector.collect_all_data()
+
+    # Print statistics
+    stats = collector.get_statistics()
+    print("\n=== Collection Statistics ===")
+    print(f"Total files processed: {stats['total_files']}")
+    print(f"Total test results: {stats['total_test_results']}")
+    print(f"App versions found: {stats['versions']}")
+    print(f"Version distribution: {stats['version_counts']}")
+    print(f"Date range: {stats['date_range']['earliest']} to {stats['date_range']['latest']}")
+    print(f"Test groups: {stats['test_groups']}")
+
+    # Export all data
+    collector.export_to_json("chess_engine_performance_data.json")
+
+    print("\nData collection completed")
+    return collection
+
+
+if __name__ == "__main__":
+    main()
