@@ -20,27 +20,13 @@
 #include "Generation/MoveGeneration.h"
 #include "Validation/MoveValidation.h"
 #include "Execution/MoveExecution.h"
+#include "PerformanceJSONHelper.h"
+
 
 namespace fs = std::filesystem;
 
 namespace PerformanceTests
 {
-
-struct PositionalEvaluationPerformanceResult
-{
-	std::string				  testName{};
-	std::string				  evaluationType{};
-	std::chrono::microseconds duration{};
-	size_t					  evaluationsPerformed{};
-	double					  evaluationsPerSecond{};
-	double					  averageEvaluationTime{};
-	std::string				  gamePhase{};
-	int						  minScore{};
-	int						  maxScore{};
-	double					  averageScore{};
-	int						  pieceCount{};
-};
-
 
 class PositionalEvaluationPerformanceTests : public ::testing::Test
 {
@@ -52,7 +38,6 @@ protected:
 	std::shared_ptr<MoveExecution>		  mExecution;
 	std::shared_ptr<MoveGeneration>		  mGeneration;
 
-
 	void								  SetUp() override
 	{
 		mBoard = std::make_shared<ChessBoard>();
@@ -63,7 +48,6 @@ protected:
 		mMoveEvaluation		  = std::make_shared<MoveEvaluation>(mBoard, mGeneration);
 		mPositionalEvaluation = std::make_shared<PositionalEvaluation>(mMoveEvaluation);
 	}
-
 
 	void setupMiddlegamePosition()
 	{
@@ -92,7 +76,6 @@ protected:
 		mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
 	}
 
-
 	void setupEndgamePosition()
 	{
 		mBoard->removeAllPiecesFromBoard();
@@ -113,7 +96,6 @@ protected:
 		mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
 	}
 
-
 	template <typename EvaluationFunc>
 	PositionalEvaluationPerformanceResult benchmarkEvaluation(
 		const std::string &testName, const std::string &evaluationType, const std::string &gamePhase, EvaluationFunc evaluationFunc, size_t iterations)
@@ -123,6 +105,7 @@ protected:
 		result.evaluationType		= evaluationType;
 		result.gamePhase			= gamePhase;
 		result.evaluationsPerformed = iterations;
+		result.timestamp			= std::chrono::system_clock::now();
 
 		LightChessBoard	 lightBoard(*mBoard);
 		std::vector<int> scores;
@@ -156,37 +139,9 @@ protected:
 		return result;
 	}
 
-
-	void saveResults(const std::string fileName, const std::vector<PositionalEvaluationPerformanceResult> &results)
+	void saveJsonResults(const std::string &fileName, const std::vector<PositionalEvaluationPerformanceResult> &results)
 	{
-		// Create directory if not exists yet
-		fs::path resultDir = "PositionalEvaluation_Results";
-
-		if (!fs::exists(resultDir))
-			fs::create_directories(resultDir);
-
-		fs::path	  fullPath = resultDir / fileName;
-
-		std::ofstream file(fullPath, std::ios::app);
-
-		if (!file.is_open())
-			return;
-
-		file << "=== Positional Evaluation Performance Test Results ===" << std::endl;
-		file << std::setw(15) << "Test Name" << std::setw(12) << "Type" << std::setw(12) << "Duration(μs)" << std::setw(12) << "Count" << std::setw(12) << "Eval/Sec"
-			 << std::setw(12) << "Avg Time" << std::setw(12) << "Game Phase" << std::setw(10) << "Min Score" << std::setw(10) << "Max Score" << std::setw(12) << "Avg Score"
-			 << std::setw(10) << "Pieces" << std::endl;
-		file << std::string(140, '-') << std::endl;
-
-		for (const auto &result : results)
-		{
-			file << std::setw(15) << result.testName << std::setw(12) << result.evaluationType << std::setw(12) << result.duration.count() << std::setw(12)
-				 << result.evaluationsPerformed << std::setw(12) << static_cast<int>(result.evaluationsPerSecond) << std::setw(12) << std::fixed << std::setprecision(2)
-				 << result.averageEvaluationTime << std::setw(12) << result.gamePhase << std::setw(10) << result.minScore << std::setw(10) << result.maxScore << std::setw(12)
-				 << std::fixed << std::setprecision(1) << result.averageScore << std::setw(10) << result.pieceCount << std::endl;
-		}
-		file << std::endl;
-		file.close();
+		PerformanceJsonHelper::saveJsonResults(fileName, "Positional Evaluation Performance", results);
 	}
 };
 
@@ -199,7 +154,8 @@ TEST_F(PositionalEvaluationPerformanceTests, FullPositionEvaluationSpeed)
 		 "FullEval", "Complete", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluatePosition(board, PlayerColor::White); }, iterations);
 
 	std::vector<PositionalEvaluationPerformanceResult> results = {result};
-	saveResults("Full Positional Evaluation", results);
+
+	saveJsonResults("postional_evaluation-full_position_evaluation_speed", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -220,7 +176,8 @@ TEST_F(PositionalEvaluationPerformanceTests, DetailedEvaluationSpeed)
 		 iterations);
 
 	std::vector<PositionalEvaluationPerformanceResult> results = {result};
-	saveResults("Detailed Evaluation", results);
+
+	saveJsonResults("postional_evaluation-detailed_evaluation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -235,7 +192,8 @@ TEST_F(PositionalEvaluationPerformanceTests, MaterialEvaluationSpeed)
 		 "Material", "Material", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluateMaterial(board, PlayerColor::White); }, iterations);
 
 	std::vector<PositionalEvaluationPerformanceResult> results = {result};
-	saveResults("Material Evaluation", results);
+
+	saveJsonResults("postional_evaluation-material_evaluation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -250,7 +208,8 @@ TEST_F(PositionalEvaluationPerformanceTests, KingSafetyEvaluationSpeed)
 		 "KingSafety", "KingSafety", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluateKingSafety(board, PlayerColor::White); }, iterations);
 
 	std::vector<PositionalEvaluationPerformanceResult> results = {result};
-	saveResults("King Safety Evaluation", results);
+
+	saveJsonResults("postional_evaluation-king_safety_evaluation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -265,7 +224,8 @@ TEST_F(PositionalEvaluationPerformanceTests, MobilityEvaluationSpeed)
 		 "Mobility", "Mobility", "Opening", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluateMobility(board, PlayerColor::White); }, iterations);
 
 	std::vector<PositionalEvaluationPerformanceResult> results = {result};
-	saveResults("Mobility Evaluation", results);
+
+	saveJsonResults("postional_evaluation-mobility_evaluation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -281,7 +241,8 @@ TEST_F(PositionalEvaluationPerformanceTests, PawnStructureEvaluationSpeed)
 		 iterations);
 
 	std::vector<PositionalEvaluationPerformanceResult> results = {result};
-	saveResults("Pawn Structure Evaluation", results);
+	
+	saveJsonResults("postional_evaluation-pawn_structure_evaluation", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -310,7 +271,7 @@ TEST_F(PositionalEvaluationPerformanceTests, GamePhaseEvaluationComparison)
 		"Endgame", "Complete", "Endgame", [this](const LightChessBoard &board) { return mPositionalEvaluation->evaluatePosition(board, PlayerColor::White); }, iterations);
 	results.push_back(endgameResult);
 
-	saveResults("Gamephase Evaluation Comparison", results);
+	saveJsonResults("postional_evaluation-gamephase_evaluation_comparison", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();
@@ -351,7 +312,7 @@ TEST_F(PositionalEvaluationPerformanceTests, ComponentEvaluationComparison)
 	auto materialIt = std::find_if(results.begin(), results.end(), [](const auto &r) { return r.evaluationType == "Material"; });
 	auto tacticalIt = std::find_if(results.begin(), results.end(), [](const auto &r) { return r.evaluationType == "Tactical"; });
 
-	saveResults("Component Evaluation Comparison", results);
+	saveJsonResults("postional_evaluation-component_evaluation_comparison", results);
 
 	// The results of this test are saved in the file
 	SUCCEED();

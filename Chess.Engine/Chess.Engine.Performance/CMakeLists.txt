@@ -15,46 +15,22 @@ enable_testing()
 #   Test Files
 #==========================================
 
-set(CPUPerformanceTests_Dir                     source/CPUPerformanceTests)
-set(MoveGenerationPerformanceTests_Dir          source/MoveGenerationPerformanceTests)
-set(MoveEvaluationPerformanceTests_Dir          source/MoveEvaluationPerformanceTests)
-set(CPUPlayerPerformanceTests_Dir               source/CPUPlayerPerformanceTests)
-set(PositionalEvaluationPerformanceTests_Dir    source/PositionalEvaluationPerformanceTests)
-set(LightChessBoardPerformanceTests_Dir         source/LightChessBoardPerformanceTests)
+set(Perf_Dir            src/PerfFiles)
+set(Perf_Helper_Dir     src/PerfHelper)
 
 
-set(CPUPerformanceTest_Files
-    ${CPUPerformanceTests_Dir}/CPUPerformanceTests.cpp
+set(Perf_Files
+    ${Perf_Dir}/CPUPerformanceTests.cpp
+    ${Perf_Dir}/MoveGenerationPerformanceTests.cpp
+    ${Perf_Dir}/MoveEvaluationPerformanceTests.cpp
+    ${Perf_Dir}/CPUPlayerPerformanceTests.cpp
+    ${Perf_Dir}/PositionalEvaluationPerformanceTests.cpp
+    ${Perf_Dir}/LightChessBoardPerformanceTests.cpp
 )
 
-set(MoveGenerationPerformanceTest_Files
-    ${MoveGenerationPerformanceTests_Dir}/MoveGenerationPerformanceTests.cpp
-)
-
-set(MoveEvaluationPerformanceTest_Files
-    ${MoveEvaluationPerformanceTests_Dir}/MoveEvaluationPerformanceTests.cpp
-)
-
-set(CPUPlayerPerformanceTest_Files
-    ${CPUPlayerPerformanceTests_Dir}/CPUPlayerPerformanceTests.cpp
-)
-
-set(PositionalEvaluationPerformanceTest_Files
-    ${PositionalEvaluationPerformanceTests_Dir}/PositionalEvaluationPerformanceTests.cpp
-)
-
-set(LightChessBoardPerformanceTest_Files
-    ${LightChessBoardPerformanceTests_Dir}/LightChessBoardPerformanceTests.cpp
-)
-
-
-set(Test_Files
-    ${CPUPerformanceTest_Files}
-    ${MoveGenerationPerformanceTest_Files}
-    ${MoveEvaluationPerformanceTest_Files}
-    ${CPUPlayerPerformanceTest_Files}
-    ${PositionalEvaluationPerformanceTest_Files}
-    ${LightChessBoardPerformanceTest_Files}
+set(Perf_Helper_Files
+    ${Perf_Helper_Dir}/PerformanceJSONHelper.h
+    ${Perf_Helper_Dir}/PerfResults.h
 )
 
 
@@ -62,7 +38,8 @@ set(Test_Files
 #   Source Groups (VS)
 #==========================================
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Test_Files})
+source_group("Perf Files"       FILES ${Perf_Files})
+source_group("Helper Files"     FILES ${Perf_Helper_Files})
 
 
 #==========================================
@@ -70,8 +47,9 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${Test_Files})
 #==========================================
 
 add_executable(${PROJECT_NAME}
-    source/main.cpp
-    ${Test_Files}
+    src/main.cpp
+    ${Perf_Files}
+    ${Perf_Helper_Files}
 )
 
 
@@ -82,6 +60,8 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${GOOGLETEST_SOURCE_DIR}/googletest/include
+        ${Perf_Dir}
+        ${Perf_Helper_Dir}
 )
 
 include(GoogleTest)
