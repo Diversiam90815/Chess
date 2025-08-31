@@ -8,10 +8,6 @@
 
 #include <gtest/gtest.h>
 #include <chrono>
-#include <memory>
-#include <vector>
-#include <fstream>
-#include <iomanip>
 
 #include "Player/CPUPlayer.h"
 #include "Generation/MoveGeneration.h"
@@ -19,20 +15,15 @@
 #include "Validation/MoveValidation.h"
 #include "Execution/MoveExecution.h"
 #include "ChessBoard.h"
+#include "Project.h"
+#include "PerformanceJSONHelper.h"
+
 
 namespace fs = std::filesystem;
 
+
 namespace PerformanceTests
 {
-struct CPUAlgorithmPerformanceResult
-{
-	std::string				  algorithmName{};
-	int						  depth;
-	std::chrono::milliseconds duration;
-	PossibleMove			  selectedMove;
-	std::string				  position;
-};
-
 
 class CPUPlayerPerformanceTests : public ::testing::Test
 {
@@ -43,7 +34,6 @@ protected:
 	std::shared_ptr<MoveGeneration> mGeneration;
 	std::shared_ptr<MoveEvaluation> mEvaluation;
 	std::shared_ptr<CPUPlayer>		mCPUPlayer;
-
 
 	void							SetUp() override
 	{
@@ -56,7 +46,6 @@ protected:
 		mEvaluation = std::make_shared<MoveEvaluation>(mBoard, mGeneration);
 		mCPUPlayer	= std::make_shared<CPUPlayer>(mGeneration, mEvaluation, mBoard);
 	}
-
 
 	std::vector<PossibleMove> getAllLegalMoves(PlayerColor player)
 	{
@@ -72,7 +61,6 @@ protected:
 
 		return allMoves;
 	}
-
 
 	void setupComplexPosition()
 	{
@@ -113,56 +101,31 @@ protected:
 		mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
 	}
 
-
 	CPUAlgorithmPerformanceResult benchmarkAlgorithm(const std::string													&algorithmName,
 													 int																 depth,
 													 const std::string													&position,
 													 std::function<PossibleMove(const std::vector<PossibleMove> &, int)> algorithmFunc)
 	{
 		CPUAlgorithmPerformanceResult result;
-		result.algorithmName = algorithmName;
-		result.depth		 = depth;
-		result.position		 = position;
+		result.testName		= algorithmName;
+		result.depth		= depth;
+		result.position		= position;
+		result.timestamp	= std::chrono::system_clock::now();
 
-		auto moves			 = getAllLegalMoves(PlayerColor::White);
+		auto moves			= getAllLegalMoves(PlayerColor::White);
 
-		auto start			 = std::chrono::high_resolution_clock::now();
-		result.selectedMove	 = algorithmFunc(moves, depth);
-		auto end			 = std::chrono::high_resolution_clock::now();
+		auto start			= std::chrono::high_resolution_clock::now();
+		result.selectedMove = algorithmFunc(moves, depth);
+		auto end			= std::chrono::high_resolution_clock::now();
 
-		result.duration		 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+		result.duration		= std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
 		return result;
 	}
 
-
-	void saveResults(const std::string fileName, const std::vector<CPUAlgorithmPerformanceResult> &results)
+	void saveJsonResults(const std::string &fileName, const std::vector<CPUAlgorithmPerformanceResult> &results)
 	{
-		// Create directory if not exists yet
-		fs::path resultDir = "CPUPlayer_Results";
-
-		if (!fs::exists(resultDir))
-			fs::create_directories(resultDir);
-
-		fs::path	  fullPath = resultDir / fileName;
-
-		std::ofstream file(fullPath, std::ios::app);
-
-		if (!file.is_open())
-			return;
-
-		file << "=== CPU Algorithm Performance Test Results ===" << std::endl;
-		file << std::setw(12) << "Algorithm" << std::setw(8) << "Depth" << std::setw(12) << "Duration(ms)" << std::setw(12) << "Position" << std::setw(15) << "Selected Move"
-			 << std::endl;
-		file << std::string(90, '-') << std::endl;
-
-		for (const auto &result : results)
-		{
-			file << std::setw(12) << result.algorithmName << std::setw(8) << result.depth << std::setw(12) << result.duration.count() << std::setw(12) << result.position
-				 << std::setw(15) << "Move" << std::endl; // Could format move notation here
-		}
-		file << std::endl;
-		file.close();
+		PerformanceJsonHelper::saveJsonResults(fileName, "CPU Algorithm Performance", results);
 	}
 };
 
@@ -180,9 +143,9 @@ TEST_F(CPUPlayerPerformanceTests, MinimaxDepthComparison)
 		results.push_back(result);
 	}
 
-	saveResults("MiniMax Depth Comparison", results);
+	saveJsonResults("cpu_player_performance-minimax_depth_comparison", results);
 
-		// The results of this test are saved in the file
+	// The results of this test are saved in the file
 	SUCCEED();
 }
 
@@ -200,9 +163,9 @@ TEST_F(CPUPlayerPerformanceTests, AlphaBetaDepthComparison)
 		results.push_back(result);
 	}
 
-	saveResults("Alpha Beta Comparison", results);
+	saveJsonResults("cpu_player_performance-alphabeta_comparison", results);
 
-		// The results of this test are saved in the file
+	// The results of this test are saved in the file
 	SUCCEED();
 }
 
@@ -224,9 +187,9 @@ TEST_F(CPUPlayerPerformanceTests, AlgorithmComparison)
 	results.push_back(minimaxResult);
 	results.push_back(alphaBetaResult);
 
-	saveResults("Algorithm Comparison", results);
+	saveJsonResults("cpu_player_performance-algorithm_comparison", results);
 
-		// The results of this test are saved in the file
+	// The results of this test are saved in the file
 	SUCCEED();
 }
 
@@ -243,11 +206,10 @@ TEST_F(CPUPlayerPerformanceTests, ComplexPositionPerformance)
 	auto									   result		 = benchmarkAlgorithm("AlphaBeta", 4, "Complex", alphaBetaFunc);
 	results.push_back(result);
 
-	saveResults("Complex Position", results);
+	saveJsonResults("cpu_player_performance-complex_position", results);
 
-		// The results of this test are saved in the file
+	// The results of this test are saved in the file
 	SUCCEED();
 }
-
 
 } // namespace PerformanceTests

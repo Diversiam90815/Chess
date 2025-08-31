@@ -50,11 +50,12 @@ int MoveEvaluation::getMediumEvaluation(const PossibleMove &move, PlayerColor pl
 {
 	int score = getBasicEvaluation(move);
 
-	score += evaluateMaterialGain(move, lightBoard);		   // Material evaluation
-	score += evaluatePositionalGain(move, player, lightBoard); // Positional evaluation
-	score += evaluateCenterControl(move, player, lightBoard);  // Center COntrol
-	score += evaluateKingSafety(move, player, lightBoard);	   // King Safety
-	score += evaluatePieceActivity(move, player, lightBoard);  // Piece activity
+	score += evaluateMaterialGain(move, lightBoard);			  // Material evaluation
+	score += evaluatePositionalGain(move, player, lightBoard);	  // Positional evaluation
+	score += evaluateCenterControl(move, player, lightBoard);	  // Center COntrol
+	score += evaluateKingSafety(move, player, lightBoard);		  // King Safety
+	score += evaluatePieceActivity(move, player, lightBoard);	  // Piece activity
+	score += evaluateOpeningPrinciples(move, player, lightBoard); // Opening game principles
 
 	return score;
 }
@@ -329,6 +330,39 @@ int MoveEvaluation::evaluateDefensivePatterns(const PossibleMove &move, PlayerCo
 	}
 
 	return score;
+}
+
+
+int MoveEvaluation::evaluateOpeningPrinciples(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard)
+{
+	if (determineGamePhase() != GamePhase::Opening)
+		return 0;
+
+	int bonus = 0;
+
+	// Reward piece development
+	if (isDevelopmentMove(move, player, lightBoard))
+		bonus += OPENING_DEVELOPING_MOVE_FACTOR; // Significant bonus for development
+
+	// Reward center control with pawns
+	PieceType movingPiece = getPieceTypeFromPosition(move.start, lightBoard);
+
+	if (movingPiece == PieceType::Pawn)
+	{
+		// e4, d4, e5, d5 moves
+		if (controlsCenterSquares(move, player, lightBoard))
+			bonus += OPENING_PAWN_CENTER_CONTROL_FACTOR;
+	}
+
+	// Penalize early queen moves
+	if (movingPiece == PieceType::Queen)
+		bonus -= OPENING_EARLY_QUEEN_MOVES_FACTOR; // Discourage early queen development
+
+	// Reward castling
+	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
+		bonus += OPENING_CASTLING_FACTOR;
+
+	return bonus;
 }
 
 
@@ -1012,6 +1046,48 @@ int MoveEvaluation::countAttackers(const Position &target, PlayerColor attackerP
 	}
 
 	return count;
+}
+
+
+bool MoveEvaluation::isDevelopmentMove(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard) const
+{
+	PieceType piece = getPieceTypeFromPosition(move.start, lightBoard);
+
+	// knights and bishops moving from starting squares
+	if (piece == PieceType::Knight || piece == PieceType::Bishop)
+	{
+		int backRank = (player == PlayerColor::White) ? 7 : 0;
+
+		// Moving back from the backrank (typical movement)
+		if (move.start.y == backRank)
+			return true;
+	}
+
+	return false;
+}
+
+
+bool MoveEvaluation::isPrematureQueenMove(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard) const
+{
+	PieceType piece = getPieceTypeFromPosition(move.start, lightBoard);
+
+	if (piece != PieceType::Queen)
+		return false;
+
+	int backRank = (player == PlayerColor::White) ? 7 : 0;
+
+	// Queen moving from starting square too early
+	if (move.start.y == backRank)
+		return true;
+
+	return false;
+}
+
+
+bool MoveEvaluation::controlsCenterSquares(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard) const
+{
+	// Center squares: d4, d5, e4, e5
+	return (move.end.x == 3 || move.end.x == 4) && (move.end.y == 3 || move.end.y == 4);
 }
 
 

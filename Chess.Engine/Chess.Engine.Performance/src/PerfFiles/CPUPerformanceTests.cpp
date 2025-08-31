@@ -13,6 +13,7 @@
 
 namespace fs = std::filesystem;
 
+
 namespace PerformanceTests
 {
 
@@ -282,31 +283,31 @@ private:
 	}
 };
 
-
-TEST_F(CPUPerformanceTests, Medium_VS_Easy)
-{
-	CPUConfiguration easyConfig;
-	easyConfig.difficulty	= CPUDifficulty::Easy;
-	easyConfig.enabled		= true;
-	easyConfig.thinkingTime = std::chrono::milliseconds(100);
-
-	CPUConfiguration mediumConfig;
-	mediumConfig.difficulty	  = CPUDifficulty::Medium;
-	mediumConfig.enabled	  = true;
-	mediumConfig.thinkingTime = std::chrono::milliseconds(100);
-
-	// Test medium vs easy
-	auto stats				  = runMultipleGames(mediumConfig, easyConfig, 50, true);
-
-	std::cout << "Medium vs Easy Results:" << std::endl;
-	std::cout << "Win Rate: " << stats.winRate << "%" << std::endl;
-	std::cout << "Total Games: " << stats.totalGames << std::endl;
-
-	saveResultsToFile("result_medium_vs_easy.txt", stats, "Medium vs Easy CPU Configuration Performance Tests");
-
-	// The results of this test are saved in the file
-	SUCCEED();
-}
+//
+//TEST_F(CPUPerformanceTests, Medium_VS_Easy)
+//{
+//	CPUConfiguration easyConfig;
+//	easyConfig.difficulty	= CPUDifficulty::Easy;
+//	easyConfig.enabled		= true;
+//	easyConfig.thinkingTime = std::chrono::milliseconds(100);
+//
+//	CPUConfiguration mediumConfig;
+//	mediumConfig.difficulty	  = CPUDifficulty::Medium;
+//	mediumConfig.enabled	  = true;
+//	mediumConfig.thinkingTime = std::chrono::milliseconds(100);
+//
+//	// Test medium vs easy
+//	auto stats				  = runMultipleGames(mediumConfig, easyConfig, 10, true); // Reducing the move counts since we currently focus on the other tests
+//
+//	std::cout << "Medium vs Easy Results:" << std::endl;
+//	std::cout << "Win Rate: " << stats.winRate << "%" << std::endl;
+//	std::cout << "Total Games: " << stats.totalGames << std::endl;
+//
+//	saveResultsToFile("result_medium_vs_easy.txt", stats, "Medium vs Easy CPU Configuration Performance Tests");
+//
+//	// The results of this test are saved in the file
+//	SUCCEED();
+//}
 
 
 
