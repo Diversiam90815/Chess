@@ -54,15 +54,15 @@ bool NetworkInformation::getNetworkInformationFromOS()
 	mOutBufLen		  = 0;
 	returnValue		  = GetAdaptersAddresses(AF_UNSPEC, flags, NULL, NULL, &mOutBufLen);
 
-	if (returnValue != ERROR_BUFFER_OVERFLOW)
-	{
-		LOG_ERROR("GetAdapterAddresses failed with error {}", returnValue);
-		return false;
-	}
-	else if (returnValue == ERROR_ACCESS_DENIED)
+	if (returnValue == ERROR_ACCESS_DENIED)
 	{
 		LOG_ERROR("Access denied: Running without admin privileges limits available information!");
 		flags = 0;
+	}
+	else if (returnValue != ERROR_BUFFER_OVERFLOW)
+	{
+		LOG_ERROR("GetAdapterAddresses failed with error {}", returnValue);
+		return false;
 	}
 
 	// Allocate buffer of the required size
@@ -160,7 +160,7 @@ void NetworkInformation::setCurrentNetworkAdapter(const NetworkAdapter &adapter)
 }
 
 
-NetworkAdapter NetworkInformation::getCurrentNetworkAdapter() const
+const NetworkAdapter &NetworkInformation::getCurrentNetworkAdapter() const
 {
 	return mCurrentNetworkAdapter;
 }
@@ -172,7 +172,7 @@ bool NetworkInformation::isAdapterCurrentlyAvailable(const NetworkAdapter &adapt
 }
 
 
-std::vector<NetworkAdapter> NetworkInformation::getAvailableNetworkAdapters() const
+const std::vector<NetworkAdapter> &NetworkInformation::getAvailableNetworkAdapters() const
 {
 	return mNetworkAdapters;
 }
@@ -260,7 +260,6 @@ AdapterVisibility NetworkInformation::determineAdapterVisibility(bool isDefaultR
 bool NetworkInformation::getDefaultInterfaces(std::vector<NET_LUID> &pLUIDs)
 {
 	MIB_IPFORWARD_TABLE2 *routingTable = nullptr;
-
 	pLUIDs.clear();
 
 	if (GetIpForwardTable2(AF_INET, &routingTable) != NO_ERROR)
@@ -299,62 +298,55 @@ std::string NetworkInformation::getHostName(const SOCKADDR *ip, const socklen_t 
 
 std::string NetworkInformation::getWifiSsid(const AdapterTypes type, const NET_LUID luid)
 {
-	std::string					networkName = "WiFi";
-	WLAN_CONNECTION_ATTRIBUTES *connection;
-	DOT11_SSID					ssid;
-	GUID						guid;
-	HANDLE						clientHandle{};
-	DWORD						negotiatedVersion;
-	DWORD						dataSize;
-	void					   *data = NULL;
-	DWORD						result;
+	std::string networkName = (type == AdapterTypes::Virtual) ? "Virtual WiFi" : "WiFi";
 
-	if (type == AdapterTypes::Virtual)
-		networkName = "Virtual " + networkName;
+	GUID		guid;
+	HANDLE		clientHandle{};
+	DWORD		negotiatedVersion;
+	DWORD		dataSize;
+	void	   *data = NULL;
 
-	result = ConvertInterfaceLuidToGuid(&luid, &guid);
-
-	if (result != NOERROR)
+	if (ConvertInterfaceLuidToGuid(&luid, &guid) != NOERROR)
 	{
 		LOG_ERROR("Could not convert network interface luid to guid!");
 		goto cleanup;
 	}
 
-	result = WlanOpenHandle(2, NULL, &negotiatedVersion, &clientHandle);
-
-	if (result != NOERROR)
+	if (WlanOpenHandle(2, NULL, &negotiatedVersion, &clientHandle) != NOERROR)
 	{
 		LOG_ERROR("Could not create wlan handle!");
 		goto cleanup;
 	}
 
-	result = WlanQueryInterface(clientHandle, &guid, wlan_intf_opcode_current_connection, NULL, &dataSize, &data, NULL);
+	{
+		const DWORD result = WlanQueryInterface(clientHandle, &guid, wlan_intf_opcode_current_connection, NULL, &dataSize, &data, NULL);
 
-	if (result == ERROR_ACCESS_DENIED)
-	{
-		LOG_WARNING("Network access denied!");
-		networkName = "Please allow network access";
-		goto cleanup;
-	}
-	else if (result != NO_ERROR || !data)
-	{
-		LOG_ERROR("Could not access network ssid");
-		goto cleanup;
-	}
-
-	connection = reinterpret_cast<WLAN_CONNECTION_ATTRIBUTES *>(data);
-	if (connection->isState != wlan_interface_state_connected)
-	{
-		networkName = "Not Connected";
-		goto cleanup;
+		if (result == ERROR_ACCESS_DENIED)
+		{
+			LOG_WARNING("Network access denied!");
+			networkName = "Please allow network access";
+			goto cleanup;
+		}
+		else if (result != NO_ERROR || !data)
+		{
+			LOG_ERROR("Could not access network ssid");
+			goto cleanup;
+		}
 	}
 
-	ssid = connection->wlanAssociationAttributes.dot11Ssid;
+	{
+		auto *connection = reinterpret_cast<WLAN_CONNECTION_ATTRIBUTES *>(data);
+		if (connection->isState != wlan_interface_state_connected)
+		{
+			networkName = "Not Connected";
+			goto cleanup;
+		}
 
-	if (ssid.uSSIDLength <= 0)
-		goto cleanup;
+		const DOT11_SSID &ssid = connection->wlanAssociationAttributes.dot11Ssid;
 
-	networkName.assign((char *)ssid.ucSSID, ssid.uSSIDLength);
+		if (ssid.uSSIDLength > 0)
+			networkName.assign(reinterpret_cast<const char *>(ssid.ucSSID), ssid.uSSIDLength);
+	}
 
 cleanup:
 	if (data)
@@ -393,7 +385,7 @@ std::string NetworkInformation::getNetworkGatename(const AdapterTypes type, cons
 		if (entry.DestinationPrefix.PrefixLength != 0 || entry.InterfaceIndex != interfaceIndex)
 			continue;
 
-        const SOCKADDR_INET &ip = entry.NextHop;
+		const SOCKADDR_INET &ip = entry.NextHop;
 
 		if (ip.si_family != AF_INET && ip.si_family != AF_INET6)
 			continue;

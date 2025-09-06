@@ -33,22 +33,22 @@ public:
 	NetworkInformation();
 	~NetworkInformation();
 
-	bool						init();
+	bool							   init();
 
-	void						deinit();
+	void							   deinit();
 
-	bool						getNetworkInformationFromOS();
+	bool							   getNetworkInformationFromOS();
 
-	void						processAdapter();
+	void							   processAdapter();
 
-	void						saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID, std::unordered_set<ULONG64> &defaultRouteLuidValues);
+	void							   saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID, std::unordered_set<ULONG64> &defaultRouteLuidValues);
 
-	void						setCurrentNetworkAdapter(const NetworkAdapter &adapter);
-	NetworkAdapter				getCurrentNetworkAdapter() const;
+	void							   setCurrentNetworkAdapter(const NetworkAdapter &adapter);
+	const NetworkAdapter			  &getCurrentNetworkAdapter() const;
 
-	bool						isAdapterCurrentlyAvailable(const NetworkAdapter &adapter);
+	bool							   isAdapterCurrentlyAvailable(const NetworkAdapter &adapter);
 
-	std::vector<NetworkAdapter> getAvailableNetworkAdapters() const;
+	const std::vector<NetworkAdapter> &getAvailableNetworkAdapters() const;
 
 
 private:
