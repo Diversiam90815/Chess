@@ -302,6 +302,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${Include_Dirs})
 
 set(PROJECT_LIBS	Logger
 					iphlpapi
+					windowscodecs
+					WindowsApp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_LIBS})

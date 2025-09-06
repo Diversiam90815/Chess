@@ -248,23 +248,159 @@ bool NetworkInformation::getDefaultInterfaces(std::vector<NET_LUID> &pLUIDs)
 
 std::string NetworkInformation::getHostName(const SOCKADDR *ip, const socklen_t ipLength)
 {
-	return std::string();
+	char nameBuffer[NI_MAXHOST];
+
+	int	 success = getnameinfo(ip, ipLength, nameBuffer, NI_MAXHOST, nullptr, 0, NI_NAMEREQD);
+
+	if (success != NULL)
+		return {};
+
+	return std::string(nameBuffer);
 }
 
 
 std::string NetworkInformation::getWifiSsid(const AdapterTypes type, const NET_LUID luid)
 {
-	return std::string();
+	std::string					networkName = "WiFi";
+	WLAN_CONNECTION_ATTRIBUTES *connection;
+	DOT11_SSID					ssid;
+	GUID						guid;
+	HANDLE						clientHandle{};
+	DWORD						negotiatedVersion;
+	DWORD						dataSize;
+	void					   *data = NULL;
+	DWORD						success;
+
+	if (type == AdapterTypes::Virtual)
+		networkName = "Virtual " + networkName;
+
+	success = ConvertInterfaceLuidToGuid(&luid, &guid);
+
+	if (success != NOERROR)
+	{
+		LOG_ERROR("Could not convert network interface luid to guid!");
+		goto cleanup;
+	}
+
+
+	success = WlanOpenHandle(2, NULL, &negotiatedVersion, &clientHandle);
+
+	if (success != NOERROR)
+	{
+		LOG_ERROR("Could not create wlan handle!");
+		goto cleanup;
+	}
+
+	success = WlanQueryInterface(clientHandle, &guid, wlan_intf_opcode_current_connection, NULL, &dataSize, &data, NULL);
+
+	if (success == ERROR_ACCESS_DENIED)
+	{
+		LOG_WARNING("Network access denied!");
+		networkName = "Please allow network access";
+		goto cleanup;
+	}
+	else if (success == NO_ERROR || !data)
+	{
+		LOG_ERROR("Could not access network ssid");
+		goto cleanup;
+	}
+
+	connection = reinterpret_cast<WLAN_CONNECTION_ATTRIBUTES *>(data);
+	if (connection->isState != wlan_interface_state_connected)
+	{
+		networkName = "Not Connected";
+		goto cleanup;
+	}
+
+	ssid = connection->wlanAssociationAttributes.dot11Ssid;
+
+	if (ssid.uSSIDLength <= 0)
+		goto cleanup;
+
+	networkName.assign((char *)ssid.ucSSID, ssid.uSSIDLength);
+
+cleanup:
+	if (data)
+		WlanFreeMemory(data);
+	if (clientHandle)
+		WlanCloseHandle(clientHandle, NULL);
+
+	return networkName;
 }
 
 
 std::string NetworkInformation::getNetworkGatename(const AdapterTypes type, const NET_LUID_LH luid, const std::string address)
 {
-	return std::string();
+	std::string			  networkName  = "Ethernet";
+	MIB_IPFORWARD_TABLE2 *routingTable = nullptr;
+	SOCKADDR_INET		  ip;
+	NET_IFINDEX			  interfaceIndex;
+	std::string			  hostName;
+	DWORD				  success;
+
+	if (type == AdapterTypes::Virtual)
+		networkName = "Virtual " + networkName;
+
+	success = ConvertInterfaceLuidToIndex(&luid, &interfaceIndex);
+
+	if (success != NOERROR)
+	{
+		LOG_ERROR("Could not convert network interfacve luid to index!");
+		goto cleanup;
+	}
+
+	success = GetIpForwardTable2(AF_UNSPEC, &routingTable);
+
+	if (success != NOERROR)
+	{
+		LOG_ERROR("Could not get IP routing table!");
+		goto cleanup;
+	}
+
+	for (int i = 0; i < routingTable->NumEntries; ++i)
+	{
+		if (routingTable->Table[i].DestinationPrefix.PrefixLength != 0 || routingTable->Table[i].InterfaceIndex != interfaceIndex)
+			continue;
+
+		ip = routingTable->Table[i].NextHop;
+
+		if (ip.si_family != AF_INET && ip.si_family != AF_INET6)
+			continue;
+
+		if (ip.si_family == AF_INET)
+			hostName = getHostName((SOCKADDR *)&ip, sizeof(ip.Ipv4));
+		else if (ip.si_family == AF_INET6)
+			hostName = getHostName((SOCKADDR *)&ip, sizeof(ip.Ipv6));
+
+		if (hostName.length() == 0)
+			continue;
+
+		networkName += " via " + hostName;
+		goto cleanup;
+	}
+
+	if (address.size() == 0)
+		goto cleanup;
+
+	networkName = networkName + " (" + address + ")";
+
+
+cleanup:
+	if (routingTable)
+		FreeMibTable(routingTable);
+
+	return networkName;
 }
 
 
 std::string NetworkInformation::getNetworkName(const AdapterTypes type, const NET_LUID_LH luid, const std::string address)
 {
-	return std::string();
+	std::string networkName = "";
+
+	if (type == AdapterTypes::WiFi)
+		networkName = getWifiSsid(type, luid);
+	else if (type == AdapterTypes::Ethernet)
+		networkName = getNetworkGatename(type, luid, address);
+
+	return networkName;
 }
