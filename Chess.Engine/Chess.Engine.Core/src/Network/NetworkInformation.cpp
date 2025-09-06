@@ -347,7 +347,7 @@ std::string NetworkInformation::getWifiSsid(const AdapterTypes type, const NET_L
 		networkName = "Please allow network access";
 		goto cleanup;
 	}
-	else if (result == NO_ERROR || !data)
+	else if (result != NO_ERROR || !data)
 	{
 		LOG_ERROR("Could not access network ssid");
 		goto cleanup;

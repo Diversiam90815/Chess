@@ -18,16 +18,12 @@
 #include <iphlpapi.h>
 #include <netioapi.h>
 #include <wlanapi.h>
-//
-// #pragma comment(lib, "Ws2_32.lib")
-// #pragma comment(lib, "Iphlpapi.lib")
 
 #include <vector>
 
 #include "Logging.h"
 #include "Conversion.h"
 #include "NetworkAdapter.h"
-
 
 
 class NetworkInformation
