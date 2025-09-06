@@ -23,7 +23,7 @@ void NetworkManager::init()
 }
 
 
-std::vector<NetworkAdapter> NetworkManager::getAvailableNetworkAdapters() const
+const std::vector<NetworkAdapter> &NetworkManager::getAvailableNetworkAdapters() const
 {
 	return mNetworkInfo.getAvailableNetworkAdapters();
 }
@@ -35,7 +35,7 @@ void NetworkManager::networkAdapterChanged(const NetworkAdapter &adapter)
 
 	if (currentAdapter != adapter)
 	{
-		LOG_INFO("Network Adapter has been changed to {} with IP", adapter.Description.c_str(), adapter.IPv4.c_str());
+		LOG_INFO("Network Adapter has been changed to {} with IP", adapter.AdapterName.c_str(), adapter.IPv4.c_str());
 
 		mNetworkInfo.setCurrentNetworkAdapter(adapter);
 
@@ -54,7 +54,7 @@ int NetworkManager::getCurrentNetworkAdapterID()
 }
 
 
-std::string NetworkManager::getCurrentIPv4()
+const std::string &NetworkManager::getCurrentIPv4()
 {
 	return mNetworkInfo.getCurrentNetworkAdapter().IPv4;
 }
@@ -85,7 +85,7 @@ bool NetworkManager::presetNetworkAdapter()
 
 	LOG_INFO("Since no adapter could been found in the config file, we are selecting one!");
 
-	NetworkAdapter adapter = {};	// Todo: Select the prefered network
+	NetworkAdapter adapter = {}; // Todo: Select the prefered network
 
 	networkAdapterChanged(adapter);
 

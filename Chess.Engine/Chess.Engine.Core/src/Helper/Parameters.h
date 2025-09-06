@@ -151,11 +151,9 @@ constexpr auto								PlayerReadyFlagKey				   = "PlayerReady";
 //============================================================
 
 constexpr auto								jNetworkAdapterID				   = "ID";
-constexpr auto								jNetworkAdapterDesc				   = "description";
+constexpr auto								jNetworkAdapterDesc				   = "adapterName";
 constexpr auto								jNetworkAdapterIP				   = "IPv4";
 constexpr auto								jNetworkAdapterISubnet			   = "subnet";
-constexpr auto								jNetworkAdapterIEligible		   = "eligible";
-constexpr auto								jNetworkAdapterISelected		   = "selected";
 
 constexpr auto								jPositionX						   = "x";
 constexpr auto								jPositionY						   = "y";

@@ -426,7 +426,7 @@ Engine_API bool GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInsta
 	adapter->ID				 = foundAdapter.ID;
 	adapter->type			 = static_cast<int>(foundAdapter.Type);
 	adapter->visibility		 = static_cast<int>(foundAdapter.Visibility);
-	StringCbCopyA(adapter->adapterName, MAX_STRING_LENGTH, foundAdapter.Description.c_str());
+	StringCbCopyA(adapter->adapterName, MAX_STRING_LENGTH, foundAdapter.AdapterName.c_str());
 	StringCbCopyA(adapter->networkName, MAX_STRING_LENGTH, foundAdapter.NetworkName.c_str());
 	return true;
 }

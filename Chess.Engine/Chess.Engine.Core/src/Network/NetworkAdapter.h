@@ -31,7 +31,7 @@ struct NetworkAdapter
 {
 	NetworkAdapter() = default;
 
-	NetworkAdapter(const std::string &description,
+	NetworkAdapter(const std::string &adapterName,
 				   const std::string &networkName,
 				   const std::string &ipv4,
 				   const std::string &subnet,
@@ -39,16 +39,16 @@ struct NetworkAdapter
 				   bool				  isDefaultRoute,
 				   AdapterTypes		  type,
 				   AdapterVisibility  visibility)
-		: Description(description), NetworkName(networkName), IPv4(ipv4), Subnet(subnet), ID(id), IsDefaultRoute(isDefaultRoute), Type(type), Visibility(visibility)
+		: AdapterName(adapterName), NetworkName(networkName), IPv4(ipv4), Subnet(subnet), ID(id), IsDefaultRoute(isDefaultRoute), Type(type), Visibility(visibility)
 	{
 	}
 
 
-	bool			  operator==(const NetworkAdapter &other) const { return std::tie(Description, Subnet) == std::tie(other.Description, other.Subnet); }
+	bool			  operator==(const NetworkAdapter &other) const { return std::tie(AdapterName, Subnet) == std::tie(other.AdapterName, other.Subnet); }
 	bool			  operator!=(const NetworkAdapter &other) const { return !(*this == other); }
 
 
-	std::string		  Description{};
+	std::string		  AdapterName{};
 	std::string		  NetworkName{};
 	std::string		  IPv4{};
 	std::string		  Subnet{};

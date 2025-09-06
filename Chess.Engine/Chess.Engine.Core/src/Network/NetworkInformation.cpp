@@ -19,69 +19,63 @@ NetworkInformation::~NetworkInformation()
 
 bool NetworkInformation::init()
 {
-	WSADATA wsaData;
-	int		result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	mWinsockSession = std::make_unique<WinsockSession>();
 
-	if (result != 0)
-	{
-		LOG_ERROR("WSAStartup failed with error {}", result);
+	if (!mWinsockSession->ok)
 		return false;
-	}
 
-	bool succeeded = getNetworkInformationFromOS();
-	return succeeded;
+	return getNetworkInformationFromOS();
 }
 
 
 void NetworkInformation::deinit()
 {
-	WSACleanup();
-
-	if (mAdapterAddresses)
-	{
-		free(mAdapterAddresses);
-		mAdapterAddresses = nullptr;
-	}
+	mAdapterAddresses.reset();
+	mNetworkAdapters.clear();
 }
 
 
 bool NetworkInformation::getNetworkInformationFromOS()
 {
-	DWORD returnValue = 0;
-	ULONG flags		  = GAA_FLAG_INCLUDE_PREFIX | GAA_FLAG_INCLUDE_GATEWAYS;
+	ULONG flags	 = GAA_FLAG_INCLUDE_PREFIX | GAA_FLAG_INCLUDE_GATEWAYS;
 
 	// Get the required buffer size by a first call
-	mOutBufLen		  = 0;
-	returnValue		  = GetAdaptersAddresses(AF_UNSPEC, flags, NULL, NULL, &mOutBufLen);
+	DWORD result = GetAdaptersAddresses(AF_UNSPEC, flags, NULL, NULL, &mOutBufLen);
 
-	if (returnValue == ERROR_ACCESS_DENIED)
+	if (result == ERROR_ACCESS_DENIED)
 	{
 		LOG_ERROR("Access denied: Running without admin privileges limits available information!");
 		flags = 0;
 	}
-	else if (returnValue != ERROR_BUFFER_OVERFLOW)
+	else if (result != ERROR_BUFFER_OVERFLOW)
 	{
-		LOG_ERROR("GetAdapterAddresses failed with error {}", returnValue);
+		LOG_ERROR("GetAdapterAddresses failed with error {}", result);
 		return false;
 	}
 
-	// Allocate buffer of the required size
-	mAdapterAddresses = (IP_ADAPTER_ADDRESSES *)malloc(mOutBufLen);
-	if (mAdapterAddresses == nullptr)
+	AdapterBuffer tmp(static_cast<IP_ADAPTER_ADDRESSES *>(malloc(mOutBufLen)),
+					  [](IP_ADAPTER_ADDRESSES *p)
+					  {
+						  if (p)
+							  free(p);
+					  });
+
+	if (!tmp)
 	{
-		LOG_ERROR("Error allocating memory for adapter addresses!");
+		LOG_ERROR("Allocation failed for adapter buffer ({} bytes)", mOutBufLen);
 		return false;
 	}
 
 	// Get the actual data by a second call
-	returnValue = GetAdaptersAddresses(AF_UNSPEC, flags, NULL, mAdapterAddresses, &mOutBufLen);
-	if (returnValue != NO_ERROR)
+	result = GetAdaptersAddresses(AF_UNSPEC, flags, NULL, tmp.get(), &mOutBufLen);
+
+	if (result != NO_ERROR)
 	{
-		LOG_ERROR("GetAdapterAddresses failed with error : {}", returnValue);
-		free(mAdapterAddresses);
-		mAdapterAddresses = nullptr;
+		LOG_ERROR("GetAdapterAddresses failed with error : {}", result);
 		return false;
 	}
+
+	mAdapterAddresses.reset(tmp.release());
 
 	return true;
 }
@@ -89,17 +83,9 @@ bool NetworkInformation::getNetworkInformationFromOS()
 
 void NetworkInformation::processAdapter()
 {
-	PIP_ADAPTER_ADDRESSES		adapter = mAdapterAddresses;
+	mNetworkAdapters.clear();
 
-	std::vector<NET_LUID>		defaultRouteAdapters;
-	std::unordered_set<ULONG64> defaultRouteLuidValues;
-
-	defaultRouteLuidValues.reserve(defaultRouteAdapters.size());
-
-	for (const auto &l : defaultRouteAdapters)
-		defaultRouteLuidValues.insert(l.Value);
-
-	int ID = 1; // Giving each network adapter an ID
+	std::vector<NET_LUID> defaultRouteAdapters;
 
 	if (!getDefaultInterfaces(defaultRouteAdapters))
 	{
@@ -107,18 +93,24 @@ void NetworkInformation::processAdapter()
 		defaultRouteAdapters.clear();
 	}
 
-	while (adapter)
+	std::unordered_set<ULONG64> defaultRouteLuidValues;
+	defaultRouteLuidValues.reserve(defaultRouteAdapters.size());
+
+	for (const auto &l : defaultRouteAdapters)
+		defaultRouteLuidValues.insert(l.Value);
+
+	int ID = 1; // Giving each network adapter an ID
+
+	for (auto *node = mAdapterAddresses.get(); node; node = node->Next, ++ID)
 	{
-		saveAdapter(adapter, ID, defaultRouteLuidValues);
-		++ID;
-		adapter = adapter->Next;
+		saveAdapter(node, ID, defaultRouteLuidValues);
 	}
 }
 
 
 void NetworkInformation::saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID, std::unordered_set<ULONG64> &defaultRouteLuidValues)
 {
-	std::string					description = WStringToStdString(adapter->Description);
+	std::string					adapterName = WStringToStdString(adapter->Description);
 
 	PIP_ADAPTER_UNICAST_ADDRESS unicast		= adapter->FirstUnicastAddress;
 
@@ -134,7 +126,7 @@ void NetworkInformation::saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const 
 			bool			  ipv4Enabled	   = adapter->Flags & 0x80;
 			AdapterVisibility visibility	   = determineAdapterVisibility(isDefaultRoute, ipv4Enabled, type, adapter->OperStatus);
 
-			auto			  createdAdapter   = NetworkAdapter(description, networkName, addressString, subnetMaskString, ID, isDefaultRoute, type, visibility);
+			auto			  createdAdapter   = NetworkAdapter(adapterName, networkName, addressString, subnetMaskString, ID, isDefaultRoute, type, visibility);
 
 			mNetworkAdapters.push_back(createdAdapter);
 		}
@@ -146,17 +138,17 @@ void NetworkInformation::saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const 
 
 void NetworkInformation::setCurrentNetworkAdapter(const NetworkAdapter &adapter)
 {
-	if (mCurrentNetworkAdapter != adapter)
-	{
-		mCurrentNetworkAdapter = adapter;
-		FileManager::GetInstance()->setSelectedNetworkAdapter(adapter);
+	if (mCurrentNetworkAdapter == adapter)
+		return;
 
-		LOG_INFO("Set user defined adapter to :");
-		LOG_INFO("\t Description:\t {}", adapter.Description);
-		LOG_INFO("\t IPv4: \t\t\t{}", adapter.IPv4);
-		LOG_INFO("\t Subnet: \t\t{}", adapter.Subnet);
-		LOG_INFO("\t ID: \t\t\t{}", adapter.ID);
-	}
+	mCurrentNetworkAdapter = adapter;
+	FileManager::GetInstance()->setSelectedNetworkAdapter(adapter);
+
+	LOG_INFO("Set user defined adapter to :");
+	LOG_INFO("\t Adapter:\t {}", adapter.AdapterName);
+	LOG_INFO("\t IPv4: \t\t\t{}", adapter.IPv4);
+	LOG_INFO("\t Subnet: \t\t{}", adapter.Subnet);
+	LOG_INFO("\t ID: \t\t\t{}", adapter.ID);
 }
 
 
@@ -301,58 +293,45 @@ std::string NetworkInformation::getWifiSsid(const AdapterTypes type, const NET_L
 	std::string networkName = (type == AdapterTypes::Virtual) ? "Virtual WiFi" : "WiFi";
 
 	GUID		guid;
-	HANDLE		clientHandle{};
-	DWORD		negotiatedVersion;
-	DWORD		dataSize;
-	void	   *data = NULL;
-
 	if (ConvertInterfaceLuidToGuid(&luid, &guid) != NOERROR)
 	{
 		LOG_ERROR("Could not convert network interface luid to guid!");
-		goto cleanup;
+		return networkName;
 	}
 
-	if (WlanOpenHandle(2, NULL, &negotiatedVersion, &clientHandle) != NOERROR)
+	WlanHandle wlan;
+	DWORD	   negotiatedVersion;
+	if (WlanOpenHandle(2, NULL, &negotiatedVersion, &wlan.h) != NOERROR)
 	{
 		LOG_ERROR("Could not create wlan handle!");
-		goto cleanup;
+		return networkName;
 	}
 
+	WlanQueryData queryData;
+	DWORD		  dataSize{};
+
+	const DWORD	  result = WlanQueryInterface(wlan.h, &guid, wlan_intf_opcode_current_connection, NULL, &dataSize, &queryData.ptr, NULL);
+
+	if (result == ERROR_ACCESS_DENIED)
 	{
-		const DWORD result = WlanQueryInterface(clientHandle, &guid, wlan_intf_opcode_current_connection, NULL, &dataSize, &data, NULL);
-
-		if (result == ERROR_ACCESS_DENIED)
-		{
-			LOG_WARNING("Network access denied!");
-			networkName = "Please allow network access";
-			goto cleanup;
-		}
-		else if (result != NO_ERROR || !data)
-		{
-			LOG_ERROR("Could not access network ssid");
-			goto cleanup;
-		}
+		LOG_WARNING("Network access denied!");
+		return std::string("Please allow network access");
 	}
-
+	else if (result != NO_ERROR || !queryData.ptr)
 	{
-		auto *connection = reinterpret_cast<WLAN_CONNECTION_ATTRIBUTES *>(data);
-		if (connection->isState != wlan_interface_state_connected)
-		{
-			networkName = "Not Connected";
-			goto cleanup;
-		}
-
-		const DOT11_SSID &ssid = connection->wlanAssociationAttributes.dot11Ssid;
-
-		if (ssid.uSSIDLength > 0)
-			networkName.assign(reinterpret_cast<const char *>(ssid.ucSSID), ssid.uSSIDLength);
+		LOG_ERROR("Could not access network ssid");
+		return networkName;
 	}
 
-cleanup:
-	if (data)
-		WlanFreeMemory(data);
-	if (clientHandle)
-		WlanCloseHandle(clientHandle, NULL);
+	auto *connection = reinterpret_cast<WLAN_CONNECTION_ATTRIBUTES *>(queryData.ptr);
+
+	if (connection->isState != wlan_interface_state_connected)
+		return std::string("Not Connected");
+
+	const DOT11_SSID &ssid = connection->wlanAssociationAttributes.dot11Ssid;
+
+	if (ssid.uSSIDLength > 0)
+		networkName.assign(reinterpret_cast<const char *>(ssid.ucSSID), ssid.uSSIDLength);
 
 	return networkName;
 }
@@ -360,27 +339,34 @@ cleanup:
 
 std::string NetworkInformation::getNetworkGatename(const AdapterTypes type, const NET_LUID_LH luid, const std::string address)
 {
-	std::string			  networkName  = (type == AdapterTypes::Virtual) ? "Virtual Ethernet" : "Ethernet";
+	std::string networkName = (type == AdapterTypes::Virtual) ? "Virtual Ethernet" : "Ethernet";
 
-	MIB_IPFORWARD_TABLE2 *routingTable = nullptr;
-	NET_IFINDEX			  interfaceIndex;
-	std::string			  hostName;
+	NET_IFINDEX interfaceIndex;
 
 	if (ConvertInterfaceLuidToIndex(&luid, &interfaceIndex) != NOERROR)
 	{
-		LOG_ERROR("Could not convert network interfacve luid to index!");
-		goto cleanup;
+		LOG_ERROR("Could not convert network interface luid to index!");
+
+		if (!address.empty())
+			networkName += " (" + address + ")";
+
+		return networkName;
 	}
 
-	if (GetIpForwardTable2(AF_UNSPEC, &routingTable) != NOERROR)
+	IpForwardTable table;
+	if (GetIpForwardTable2(AF_UNSPEC, &table.ptr) != NOERROR)
 	{
 		LOG_ERROR("Could not get IP routing table!");
-		goto cleanup;
+
+		if (!address.empty())
+			networkName += " (" + address + ")";
+
+		return networkName;
 	}
 
-	for (int i = 0; i < routingTable->NumEntries; ++i)
+	for (int i = 0; i < table.ptr->NumEntries; ++i)
 	{
-		const auto &entry = routingTable->Table[i];
+		const auto &entry = table.ptr->Table[i];
 
 		if (entry.DestinationPrefix.PrefixLength != 0 || entry.InterfaceIndex != interfaceIndex)
 			continue;
@@ -390,27 +376,22 @@ std::string NetworkInformation::getNetworkGatename(const AdapterTypes type, cons
 		if (ip.si_family != AF_INET && ip.si_family != AF_INET6)
 			continue;
 
+		std::string host{};
+
 		if (ip.si_family == AF_INET)
-			hostName = getHostName((SOCKADDR *)&ip, sizeof(ip.Ipv4));
+			host = getHostName((SOCKADDR *)&ip, sizeof(ip.Ipv4));
 		else if (ip.si_family == AF_INET6)
-			hostName = getHostName((SOCKADDR *)&ip, sizeof(ip.Ipv6));
+			host = getHostName((SOCKADDR *)&ip, sizeof(ip.Ipv6));
 
-		if (hostName.empty())
-			continue;
-
-		networkName += " via " + hostName;
-		goto cleanup;
+		if (!host.empty())
+		{
+			networkName += " via " + host;
+			return networkName;
+		}
 	}
 
-	if (address.empty())
-		goto cleanup;
-
-	networkName = networkName + " (" + address + ")";
-
-
-cleanup:
-	if (routingTable)
-		FreeMibTable(routingTable);
+	if (!address.empty())
+		return networkName + " (" + address + ")";
 
 	return networkName;
 }
