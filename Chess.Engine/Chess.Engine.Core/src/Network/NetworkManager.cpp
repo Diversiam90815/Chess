@@ -35,7 +35,7 @@ void NetworkManager::networkAdapterChanged(const NetworkAdapter &adapter)
 
 	if (currentAdapter != adapter)
 	{
-		LOG_INFO("Network Adapter has been changed to {} with IP", adapter.description.c_str(), adapter.IPv4.c_str());
+		LOG_INFO("Network Adapter has been changed to {} with IP", adapter.Description.c_str(), adapter.IPv4.c_str());
 
 		mNetworkInfo.setCurrentNetworkAdapter(adapter);
 
@@ -85,7 +85,7 @@ bool NetworkManager::presetNetworkAdapter()
 
 	LOG_INFO("Since no adapter could been found in the config file, we are selecting one!");
 
-	auto adapter = mNetworkInfo.getFirstEligibleAdapter();
+	NetworkAdapter adapter = {};	// Todo: Select the prefered network
 
 	networkAdapterChanged(adapter);
 

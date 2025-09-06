@@ -133,9 +133,9 @@ void NetworkInformation::setCurrentNetworkAdapter(const NetworkAdapter &adapter)
 		FileManager::GetInstance()->setSelectedNetworkAdapter(adapter);
 
 		LOG_INFO("Set user defined adapter to :");
-		LOG_INFO("\t Description:\t {}", adapter.description);
+		LOG_INFO("\t Description:\t {}", adapter.Description);
 		LOG_INFO("\t IPv4: \t\t\t{}", adapter.IPv4);
-		LOG_INFO("\t Subnet: \t\t{}", adapter.subnet);
+		LOG_INFO("\t Subnet: \t\t{}", adapter.Subnet);
 		LOG_INFO("\t ID: \t\t\t{}", adapter.ID);
 	}
 }
@@ -168,17 +168,6 @@ bool NetworkInformation::isAdapterCurrentlyAvailable(const NetworkAdapter &adapt
 			return true;
 	}
 	return false;
-}
-
-
-NetworkAdapter NetworkInformation::getFirstEligibleAdapter() const
-{
-	for (auto &adapter : mNetworkAdapters)
-	{
-		if (adapter.eligible)
-			return adapter;
-	}
-	return {};
 }
 
 
@@ -227,4 +216,55 @@ std::string NetworkInformation::prefixLengthToSubnetMask(USHORT family, ULONG pr
 	}
 
 	return {};
+}
+
+
+bool NetworkInformation::getDefaultInterfaces(std::vector<NET_LUID> &pLUIDs)
+{
+	MIB_IPFORWARD_TABLE2 *routingTable = nullptr;
+
+	pLUIDs.clear();
+
+	if (GetIpForwardTable2(AF_INET, &routingTable) != NO_ERROR)
+	{
+		LOG_WARNING("Could not retrieve Routing Table!");
+
+		if (routingTable)
+			FreeMibTable(routingTable);
+
+		return false;
+	}
+
+	for (ULONG i = 0; i < routingTable->NumEntries; ++i)
+	{
+		if (routingTable->Table[i].DestinationPrefix.PrefixLength == 0)
+			pLUIDs.push_back(routingTable->Table[i].InterfaceLuid);
+	}
+
+	FreeMibTable(routingTable);
+	return true;
+}
+
+
+std::string NetworkInformation::getHostName(const SOCKADDR *ip, const socklen_t ipLength)
+{
+	return std::string();
+}
+
+
+std::string NetworkInformation::getWifiSsid(const AdapterTypes type, const NET_LUID luid)
+{
+	return std::string();
+}
+
+
+std::string NetworkInformation::getNetworkGatename(const AdapterTypes type, const NET_LUID_LH luid, const std::string address)
+{
+	return std::string();
+}
+
+
+std::string NetworkInformation::getNetworkName(const AdapterTypes type, const NET_LUID_LH luid, const std::string address)
+{
+	return std::string();
 }

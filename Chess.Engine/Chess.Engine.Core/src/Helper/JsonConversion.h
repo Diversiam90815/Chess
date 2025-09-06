@@ -25,19 +25,17 @@ using json = nlohmann::json;
 
 inline void to_json(json &j, const NetworkAdapter &adapter)
 {
-	j = json{{jNetworkAdapterID, adapter.ID},		   {jNetworkAdapterDesc, adapter.description},	 {jNetworkAdapterIP, adapter.IPv4},
-			 {jNetworkAdapterISubnet, adapter.subnet}, {jNetworkAdapterIEligible, adapter.eligible}, {jNetworkAdapterISelected, adapter.selected}};
+	j = json{{jNetworkAdapterID, adapter.ID},		   {jNetworkAdapterDesc, adapter.Description},	 {jNetworkAdapterIP, adapter.IPv4},
+			 {jNetworkAdapterISubnet, adapter.Subnet}};
 }
 
 
 inline void from_json(const json &j, NetworkAdapter &adapter)
 {
 	j.at(jNetworkAdapterID).get_to(adapter.ID);
-	j.at(jNetworkAdapterDesc).get_to(adapter.description);
+	j.at(jNetworkAdapterDesc).get_to(adapter.Description);
 	j.at(jNetworkAdapterIP).get_to(adapter.IPv4);
-	j.at(jNetworkAdapterISubnet).get_to(adapter.subnet);
-	j.at(jNetworkAdapterIEligible).get_to(adapter.eligible);
-	j.at(jNetworkAdapterISelected).get_to(adapter.selected);
+	j.at(jNetworkAdapterISubnet).get_to(adapter.Subnet);
 }
 
 

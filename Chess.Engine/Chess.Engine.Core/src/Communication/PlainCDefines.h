@@ -63,7 +63,6 @@ typedef struct NetworkAdapterInstance
 {
 	char		 name[MAX_STRING_LENGTH];
 	unsigned int ID;
-	bool		 selectedByUser;
 } NetworkAdapterInstance;
 
 

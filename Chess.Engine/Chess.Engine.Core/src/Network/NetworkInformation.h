@@ -13,13 +13,14 @@
 
 #include <windows.h>
 #include <winsock2.h>
-#include <iphlpapi.h>
 #include <ws2tcpip.h>
 #include <iptypes.h>
-
-#pragma comment(lib, "Ws2_32.lib")
-#pragma comment(lib, "Iphlpapi.lib")
-
+#include <iphlpapi.h>
+#include <netioapi.h>
+#include <wlanapi.h>
+//
+//#pragma comment(lib, "Ws2_32.lib")
+//#pragma comment(lib, "Iphlpapi.lib")
 
 #include <vector>
 
@@ -52,14 +53,22 @@ public:
 
 	bool						isAdapterCurrentlyAvailable(const NetworkAdapter &adapter);
 
-	NetworkAdapter				getFirstEligibleAdapter() const;
-
 	std::vector<NetworkAdapter> getAvailableNetworkAdapters() const;
 
 
 private:
 	std::string					sockaddrToString(SOCKADDR *sa) const;
 	std::string					prefixLengthToSubnetMask(USHORT family, ULONG prefixLength) const;
+
+	bool						getDefaultInterfaces(std::vector<NET_LUID> &pLUIDs);
+
+	std::string					getHostName(const SOCKADDR *ip, const socklen_t ipLength);
+
+	std::string					getWifiSsid(const AdapterTypes type, const NET_LUID luid);
+
+	std::string					getNetworkGatename(const AdapterTypes type, const NET_LUID_LH luid, const std::string address);
+
+	std::string					getNetworkName(const AdapterTypes type, const NET_LUID_LH luid, const std::string address);
 
 
 	PIP_ADAPTER_ADDRESSES		mAdapterAddresses = nullptr;

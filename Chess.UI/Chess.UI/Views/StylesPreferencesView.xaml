@@ -61,7 +61,7 @@
 
             </Grid>
 
-            <TextBlock Style="{ThemeResource SettingsDescription}" Text="Choose between multiple chesspiece styles" />
+            <TextBlock Style="{ThemeResource SettingsDescription}" Text="Choose between mutliple chesspiece styles" />
         </StackPanel>
 
 
