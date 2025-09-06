@@ -44,7 +44,7 @@ public:
 
 	void						processAdapter();
 
-	void						saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID);
+	void						saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID, std::vector<NET_LUID> &defaultRouteAdapters);
 
 	void						setCurrentNetworkAdapter(const NetworkAdapter &adapter);
 	NetworkAdapter				getCurrentNetworkAdapter() const;
@@ -60,6 +60,7 @@ private:
 	std::string					sockaddrToString(SOCKADDR *sa) const;
 	std::string					prefixLengthToSubnetMask(USHORT family, ULONG prefixLength) const;
 	AdapterTypes				filterAdapterType(const DWORD Type) const;
+	AdapterVisibility			determineAdapterVisibility(bool isDefaultRoute, bool IPv4Enabled, AdapterTypes type, IF_OPER_STATUS status);
 
 	bool						getDefaultInterfaces(std::vector<NET_LUID> &pLUIDs);
 
