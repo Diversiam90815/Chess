@@ -6,8 +6,21 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Chess.UI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="using:Chess.UI.UI"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary Source="/UI/ComboboxTemplates.xaml" />
+        </ResourceDictionary>
+
+        <ui:SectionedTemplateSelector
+            x:Key="NetworkAdapterSelector"
+            DividerTemplate="{StaticResource DividerTemplate}"
+            HeaderTemplate="{StaticResource HeaderTemplate}"
+            ItemTemplate="{StaticResource NetworkAdapterTemplate}" />
+
+    </Page.Resources>
 
     <StackPanel
         Width="Auto"
