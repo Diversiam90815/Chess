@@ -16,7 +16,7 @@ namespace Chess.UI.UI
     public interface IComboNode
     {
         ComboNodeKind Kind { get; }
-        bool IsPlaceHolder { get; }
+        bool IsPlaceHolderItem { get; }
     }
 
 
@@ -26,13 +26,13 @@ namespace Chess.UI.UI
 
         public string HeadingText { get; }
         public ComboNodeKind Kind => ComboNodeKind.Header;
-        public bool IsPlaceHolder => true;
+        public bool IsPlaceHolderItem => true;
     }
 
     public sealed class ComboDivider : IComboNode
     {
         public ComboNodeKind Kind => ComboNodeKind.Divider;
-        public bool IsPlaceHolder => true;
+        public bool IsPlaceHolderItem => true;
     }
 
     public sealed class NetworkAdapterComboItem : IComboNode
@@ -41,6 +41,6 @@ namespace Chess.UI.UI
 
         public NetworkAdapter NetworkAdapter { get; }
         public ComboNodeKind Kind => ComboNodeKind.Item;
-        public bool IsPlaceHolder => false;
+        public bool IsPlaceHolderItem => false;
     }
 }

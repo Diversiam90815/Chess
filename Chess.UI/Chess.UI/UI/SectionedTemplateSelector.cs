@@ -13,12 +13,12 @@ namespace Chess.UI.UI
         public Style? EnabledItemStyle { get; set; }
         public Style? DisabledItemStyle { get; set; }
 
-        protected override Style SelectStyleCore(object item, DependencyObject container)
+        protected override Style? SelectStyleCore(object item, DependencyObject container)
         {
             if (item is IComboNode node)
             {
                 // Placeholder items should be disabled
-                return node.IsPlaceHolder ? DisabledItemStyle : EnabledItemStyle;
+                return node.IsPlaceHolderItem ? DisabledItemStyle : EnabledItemStyle;
             }
 
             // Default to enabled item style

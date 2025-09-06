@@ -12,6 +12,10 @@
     <Page.Resources>
 
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ms-appx:///UI/ComboBoxTemplates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
             <ui:SectionedTemplateSelector
                 x:Key="NetworkAdapterSelector"
                 DividerTemplate="{StaticResource DividerTemplate}"
@@ -45,6 +49,7 @@
                     Grid.Column="1"
                     Width="200"
                     HorizontalAlignment="Stretch"
+                    ItemContainerStyleSelector="{StaticResource ComboBoxItemContainerStyleSelector}"
                     ItemTemplateSelector="{StaticResource NetworkAdapterSelector}"
                     ItemsSource="{x:Bind _viewModel.NetworkAdapterNodes}"
                     SelectedItem="{x:Bind _viewModel.SelectedNetworkAdaperNode, Mode=TwoWay}"
