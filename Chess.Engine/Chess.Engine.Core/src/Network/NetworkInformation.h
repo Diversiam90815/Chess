@@ -19,8 +19,8 @@
 #include <netioapi.h>
 #include <wlanapi.h>
 //
-//#pragma comment(lib, "Ws2_32.lib")
-//#pragma comment(lib, "Iphlpapi.lib")
+// #pragma comment(lib, "Ws2_32.lib")
+// #pragma comment(lib, "Iphlpapi.lib")
 
 #include <vector>
 
@@ -59,6 +59,7 @@ public:
 private:
 	std::string					sockaddrToString(SOCKADDR *sa) const;
 	std::string					prefixLengthToSubnetMask(USHORT family, ULONG prefixLength) const;
+	AdapterTypes				filterAdapterType(const DWORD Type) const;
 
 	bool						getDefaultInterfaces(std::vector<NET_LUID> &pLUIDs);
 

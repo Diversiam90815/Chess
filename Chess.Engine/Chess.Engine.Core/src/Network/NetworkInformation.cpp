@@ -219,6 +219,19 @@ std::string NetworkInformation::prefixLengthToSubnetMask(USHORT family, ULONG pr
 }
 
 
+AdapterTypes NetworkInformation::filterAdapterType(const DWORD Type) const
+{
+	switch (Type)
+	{
+	case IF_TYPE_ETHERNET_CSMACD: return AdapterTypes::Ethernet;
+	case IF_TYPE_IEEE80211: return AdapterTypes::WiFi;
+	case IF_TYPE_SOFTWARE_LOOPBACK: return AdapterTypes::Loopback;
+	case IF_TYPE_PROP_VIRTUAL: return AdapterTypes::Virtual;
+	default: return AdapterTypes::Other;
+	}
+}
+
+
 bool NetworkInformation::getDefaultInterfaces(std::vector<NET_LUID> &pLUIDs)
 {
 	MIB_IPFORWARD_TABLE2 *routingTable = nullptr;
