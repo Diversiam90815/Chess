@@ -102,6 +102,9 @@
 	    <Pack>True</Pack>
 	    <PackagePath>\</PackagePath>
 	  </None>
+	  <Page Update="UI\ComboboxTemplates.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </Page>
 	  <Page Update="Views\GameConfigurationView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </Page>

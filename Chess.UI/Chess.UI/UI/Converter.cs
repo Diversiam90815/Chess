@@ -1,11 +1,39 @@
 ﻿using Chess.UI.Images;
+using Chess.UI.Multiplayer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
+using System;
 using static Chess.UI.Services.EngineAPI;
+
 
 namespace Chess.UI.UI
 {
+    public partial class NetworkAdapterToIconConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is NetworkAdapter adapter)
+            {
+                string iconglyph = adapter.Type switch
+                {
+                    AdapterType.Ethernet => "\uE839",
+                    AdapterType.WiFi => "\uE701",
+                    _ => "\uE701",
+                };
+
+                return iconglyph;
+            }
+            return "";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class Converter
     {
         public static ImageSource PlayerToPawnImage(PlayerColor player)
