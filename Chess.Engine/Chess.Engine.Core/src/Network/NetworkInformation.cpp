@@ -89,9 +89,17 @@ bool NetworkInformation::getNetworkInformationFromOS()
 
 void NetworkInformation::processAdapter()
 {
-	PIP_ADAPTER_ADDRESSES adapter = mAdapterAddresses;
-	std::vector<NET_LUID> defaultRouteAdapters; // List of adapter LUIDs which are marked as default route
-	int					  ID = 1;				// Giving each network adapter an ID
+	PIP_ADAPTER_ADDRESSES		adapter = mAdapterAddresses;
+
+	std::vector<NET_LUID>		defaultRouteAdapters;
+	std::unordered_set<ULONG64> defaultRouteLuidValues;
+
+	defaultRouteLuidValues.reserve(defaultRouteAdapters.size());
+
+	for (const auto &l : defaultRouteAdapters)
+		defaultRouteLuidValues.insert(l.Value);
+
+	int ID = 1; // Giving each network adapter an ID
 
 	if (!getDefaultInterfaces(defaultRouteAdapters))
 	{
@@ -101,14 +109,14 @@ void NetworkInformation::processAdapter()
 
 	while (adapter)
 	{
-		saveAdapter(adapter, ID, defaultRouteAdapters);
+		saveAdapter(adapter, ID, defaultRouteLuidValues);
 		++ID;
 		adapter = adapter->Next;
 	}
 }
 
 
-void NetworkInformation::saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID, std::vector<NET_LUID> &defaultRouteAdapters)
+void NetworkInformation::saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID, std::unordered_set<ULONG64> &defaultRouteLuidValues)
 {
 	std::string					description = WStringToStdString(adapter->Description);
 
@@ -122,14 +130,13 @@ void NetworkInformation::saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const 
 			std::string		  subnetMaskString = prefixLengthToSubnetMask(unicast->Address.lpSockaddr->sa_family, unicast->OnLinkPrefixLength);
 			AdapterTypes	  type			   = filterAdapterType(adapter->IfType);
 			std::string		  networkName	   = getNetworkName(type, adapter->Luid, addressString);
-			bool			  isDefaultRoute   = (std::find_if(defaultRouteAdapters.begin(), defaultRouteAdapters.end(),
-															   [&adapter](const NET_LUID &luid) { return (luid.Value == adapter->Luid.Value); }) != defaultRouteAdapters.end());
+			const bool		  isDefaultRoute   = defaultRouteLuidValues.find(adapter->Luid.Value) != defaultRouteLuidValues.end();
 			bool			  ipv4Enabled	   = adapter->Flags & 0x80;
 			AdapterVisibility visibility	   = determineAdapterVisibility(isDefaultRoute, ipv4Enabled, type, adapter->OperStatus);
 
-			auto			  adapter		   = NetworkAdapter(description, networkName, addressString, subnetMaskString, ID, isDefaultRoute, type, visibility);
+			auto			  createdAdapter   = NetworkAdapter(description, networkName, addressString, subnetMaskString, ID, isDefaultRoute, type, visibility);
 
-			mNetworkAdapters.push_back(adapter);
+			mNetworkAdapters.push_back(createdAdapter);
 		}
 
 		unicast = unicast->Next;
@@ -159,27 +166,9 @@ NetworkAdapter NetworkInformation::getCurrentNetworkAdapter() const
 }
 
 
-void NetworkInformation::updateNetworkAdapter(NetworkAdapter &adapter)
-{
-	for (auto &it : mNetworkAdapters)
-	{
-		if (it == adapter)
-		{
-			it = adapter;
-			break;
-		}
-	}
-}
-
-
 bool NetworkInformation::isAdapterCurrentlyAvailable(const NetworkAdapter &adapter)
 {
-	for (auto &localAdapter : mNetworkAdapters)
-	{
-		if (adapter == localAdapter)
-			return true;
-	}
-	return false;
+	return std::any_of(mNetworkAdapters.begin(), mNetworkAdapters.end(), [&adapter](const NetworkAdapter &a) { return a == adapter; });
 }
 
 
@@ -213,7 +202,7 @@ std::string NetworkInformation::prefixLengthToSubnetMask(USHORT family, ULONG pr
 	if (family == AF_INET && prefixLength <= 32)
 	{
 		DWORD		   mask = (prefixLength == 0) ? 0 : (~0U << (32 - prefixLength));
-		struct in_addr maskAddr;
+		struct in_addr maskAddr{};
 		maskAddr.s_addr = htonl(mask);
 
 		char maskBuffer[INET_ADDRSTRLEN];
@@ -379,27 +368,19 @@ cleanup:
 
 std::string NetworkInformation::getNetworkGatename(const AdapterTypes type, const NET_LUID_LH luid, const std::string address)
 {
-	std::string			  networkName  = "Ethernet";
+	std::string			  networkName  = (type == AdapterTypes::Virtual) ? "Virtual Ethernet" : "Ethernet";
+
 	MIB_IPFORWARD_TABLE2 *routingTable = nullptr;
-	SOCKADDR_INET		  ip;
 	NET_IFINDEX			  interfaceIndex;
 	std::string			  hostName;
-	DWORD				  result;
 
-	if (type == AdapterTypes::Virtual)
-		networkName = "Virtual " + networkName;
-
-	result = ConvertInterfaceLuidToIndex(&luid, &interfaceIndex);
-
-	if (result != NOERROR)
+	if (ConvertInterfaceLuidToIndex(&luid, &interfaceIndex) != NOERROR)
 	{
 		LOG_ERROR("Could not convert network interfacve luid to index!");
 		goto cleanup;
 	}
 
-	result = GetIpForwardTable2(AF_UNSPEC, &routingTable);
-
-	if (result != NOERROR)
+	if (GetIpForwardTable2(AF_UNSPEC, &routingTable) != NOERROR)
 	{
 		LOG_ERROR("Could not get IP routing table!");
 		goto cleanup;
@@ -407,10 +388,12 @@ std::string NetworkInformation::getNetworkGatename(const AdapterTypes type, cons
 
 	for (int i = 0; i < routingTable->NumEntries; ++i)
 	{
-		if (routingTable->Table[i].DestinationPrefix.PrefixLength != 0 || routingTable->Table[i].InterfaceIndex != interfaceIndex)
+		const auto &entry = routingTable->Table[i];
+
+		if (entry.DestinationPrefix.PrefixLength != 0 || entry.InterfaceIndex != interfaceIndex)
 			continue;
 
-		ip = routingTable->Table[i].NextHop;
+        const SOCKADDR_INET &ip = entry.NextHop;
 
 		if (ip.si_family != AF_INET && ip.si_family != AF_INET6)
 			continue;
@@ -420,14 +403,14 @@ std::string NetworkInformation::getNetworkGatename(const AdapterTypes type, cons
 		else if (ip.si_family == AF_INET6)
 			hostName = getHostName((SOCKADDR *)&ip, sizeof(ip.Ipv6));
 
-		if (hostName.length() == 0)
+		if (hostName.empty())
 			continue;
 
 		networkName += " via " + hostName;
 		goto cleanup;
 	}
 
-	if (address.size() == 0)
+	if (address.empty())
 		goto cleanup;
 
 	networkName = networkName + " (" + address + ")";

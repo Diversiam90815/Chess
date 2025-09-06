@@ -24,6 +24,7 @@
 #include "Logging.h"
 #include "Conversion.h"
 #include "NetworkAdapter.h"
+#include <unordered_set>
 
 
 class NetworkInformation
@@ -40,12 +41,10 @@ public:
 
 	void						processAdapter();
 
-	void						saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID, std::vector<NET_LUID> &defaultRouteAdapters);
+	void						saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID, std::unordered_set<ULONG64> &defaultRouteLuidValues);
 
 	void						setCurrentNetworkAdapter(const NetworkAdapter &adapter);
 	NetworkAdapter				getCurrentNetworkAdapter() const;
-
-	void						updateNetworkAdapter(NetworkAdapter &adapter);
 
 	bool						isAdapterCurrentlyAvailable(const NetworkAdapter &adapter);
 
