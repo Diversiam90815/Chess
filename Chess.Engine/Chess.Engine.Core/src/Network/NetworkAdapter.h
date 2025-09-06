@@ -31,9 +31,15 @@ struct NetworkAdapter
 {
 	NetworkAdapter() = default;
 
-	NetworkAdapter(
-		const std::string &description, const std::string &ipv4, const std::string &subnet, const int id, bool isDefaultRoute, AdapterTypes type, AdapterVisibility visibility)
-		: Description(description), IPv4(ipv4), Subnet(subnet), ID(id), IsDefaultRoute(isDefaultRoute), Type(type), Visibility(visibility)
+	NetworkAdapter(const std::string &description,
+				   const std::string &networkName,
+				   const std::string &ipv4,
+				   const std::string &subnet,
+				   const int		  id,
+				   bool				  isDefaultRoute,
+				   AdapterTypes		  type,
+				   AdapterVisibility  visibility)
+		: Description(description), NetworkName(networkName), IPv4(ipv4), Subnet(subnet), ID(id), IsDefaultRoute(isDefaultRoute), Type(type), Visibility(visibility)
 	{
 	}
 

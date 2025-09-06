@@ -10,16 +10,15 @@
     mc:Ignorable="d">
 
     <Page.Resources>
+
         <ResourceDictionary>
-            <ResourceDictionary Source="/UI/ComboboxTemplates.xaml" />
+            <ui:SectionedTemplateSelector
+                x:Key="NetworkAdapterSelector"
+                DividerTemplate="{StaticResource DividerTemplate}"
+                HeaderTemplate="{StaticResource HeaderTemplate}"
+                ItemTemplate="{StaticResource NetworkAdapterTemplate}" />
+
         </ResourceDictionary>
-
-        <ui:SectionedTemplateSelector
-            x:Key="NetworkAdapterSelector"
-            DividerTemplate="{StaticResource DividerTemplate}"
-            HeaderTemplate="{StaticResource HeaderTemplate}"
-            ItemTemplate="{StaticResource NetworkAdapterTemplate}" />
-
     </Page.Resources>
 
     <StackPanel
@@ -46,11 +45,10 @@
                     Grid.Column="1"
                     Width="200"
                     HorizontalAlignment="Stretch"
-                    DisplayMemberPath="Name"
-                    ItemsSource="{x:Bind _viewModel.NetworkAdapters}"
-                    SelectedItem="{x:Bind _viewModel.SelectedAdapter, Mode=TwoWay}"
-                    SelectionChanged="NetworkAdapterChanged"
-                    Style="{StaticResource SettingComboBoxStyle}" />
+                    ItemTemplateSelector="{StaticResource NetworkAdapterSelector}"
+                    ItemsSource="{x:Bind _viewModel.NetworkAdapterNodes}"
+                    SelectedItem="{x:Bind _viewModel.SelectedNetworkAdaperNode, Mode=TwoWay}"
+                    SelectionChanged="NetworkAdapterChanged" />
 
             </Grid>
 

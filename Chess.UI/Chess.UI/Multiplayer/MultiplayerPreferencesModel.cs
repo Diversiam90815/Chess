@@ -18,9 +18,9 @@ namespace Chess.UI.Multiplayer
 
     public enum AdapterVisibility
     {
-        Hidden = 0,
-        Visible = 1,
-        Recommended = 2,
+        Hidden = 1,
+        Visible = 2,
+        Recommended = 3,
     }
 
 

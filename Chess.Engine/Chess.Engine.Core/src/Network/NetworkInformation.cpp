@@ -121,13 +121,13 @@ void NetworkInformation::saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const 
 			std::string		  addressString	   = sockaddrToString(unicast->Address.lpSockaddr);
 			std::string		  subnetMaskString = prefixLengthToSubnetMask(unicast->Address.lpSockaddr->sa_family, unicast->OnLinkPrefixLength);
 			AdapterTypes	  type			   = filterAdapterType(adapter->IfType);
-			std::string		  netowkrName	   = getNetworkName(type, adapter->Luid, addressString);
+			std::string		  networkName	   = getNetworkName(type, adapter->Luid, addressString);
 			bool			  isDefaultRoute   = (std::find_if(defaultRouteAdapters.begin(), defaultRouteAdapters.end(),
 															   [&adapter](const NET_LUID &luid) { return (luid.Value == adapter->Luid.Value); }) != defaultRouteAdapters.end());
 			bool			  ipv4Enabled	   = adapter->Flags & 0x80;
 			AdapterVisibility visibility	   = determineAdapterVisibility(isDefaultRoute, ipv4Enabled, type, adapter->OperStatus);
 
-			auto			  adapter		   = NetworkAdapter(description, addressString, subnetMaskString, ID, isDefaultRoute, type, visibility);
+			auto			  adapter		   = NetworkAdapter(description, networkName, addressString, subnetMaskString, ID, isDefaultRoute, type, visibility);
 
 			mNetworkAdapters.push_back(adapter);
 		}
