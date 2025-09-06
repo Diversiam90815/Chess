@@ -11,6 +11,7 @@
 #include "FileManager.h"
 #include "IObservable.h"
 
+
 class NetworkManager : public INetworkObservable
 {
 public:

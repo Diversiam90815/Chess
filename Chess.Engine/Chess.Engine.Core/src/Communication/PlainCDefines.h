@@ -61,8 +61,12 @@ typedef struct PossibleMoveInstance
 
 typedef struct NetworkAdapterInstance
 {
-	char		 name[MAX_STRING_LENGTH];
+	char		 adapterName[MAX_STRING_LENGTH];
+	char		 networkName[MAX_STRING_LENGTH];
 	unsigned int ID;
+	int			 visibility;
+	int			 type;
+
 } NetworkAdapterInstance;
 
 

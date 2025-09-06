@@ -7,10 +7,45 @@ using System.Threading.Tasks;
 
 namespace Chess.UI.Multiplayer
 {
+    public enum AdapterType
+    {
+        Ethernet = 1,
+        WiFi = 2,
+        Loopback = 3,
+        Virtual = 4,
+        Other = 5,
+    }
+
+    public enum AdapterVisibility
+    {
+        Hidden = 0,
+        Visible = 1,
+        Recommended = 2,
+    }
+
+
     public record NetworkAdapter
     {
-        public string Name { get; set; }
+        public string AdapterName { get; set; }
+        public string NetworkName { get; set; }
         public int ID { get; set; }
+        public AdapterVisibility Visibility { get; set; }
+        public AdapterType Type { get; set; }
+
+        public bool IsValid()
+        {
+            return ID != 0 && !string.IsNullOrWhiteSpace(NetworkName);
+        }
+
+        public bool IsVisible()
+        {
+            return Visibility != AdapterVisibility.Hidden;
+        }
+
+        public bool IsRecommended()
+        {
+            return Visibility == AdapterVisibility.Recommended;
+        }
     }
 
 
@@ -34,15 +69,19 @@ namespace Chess.UI.Multiplayer
 
             for (uint i = 0; i < adapterCount; ++i)
             {
-                EngineAPI.GetNetworkAdapterAtIndex(i, out EngineAPI.NetworkAdapter adapter);
+                EngineAPI.GetNetworkAdapterAtIndex(i, out EngineAPI.NetworkAdapterInstance adapter);
 
                 NetworkAdapter networkAdapter = new()
                 {
-                    Name = adapter.name,
-                    ID = adapter.id
+                    AdapterName = adapter.AdapterName,
+                    NetworkName = adapter.NetworkName,
+                    ID = adapter.ID,
+                    Visibility = (AdapterVisibility)adapter.Visibility,
+                    Type = (AdapterType)adapter.Type,
+
                 };
 
-                if (networkAdapter.ID == 0 && networkAdapter.Name == null)
+                if (!networkAdapter.IsValid())
                     continue;
 
                 _adapters.Add(networkAdapter);

@@ -27,6 +27,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set (SOURCE_DIR             ${PROJECT_SOURCE_DIR}/src)
 
 
+
 #==========================================
 #   INCLUDE DIRECTORIES
 #==========================================
@@ -49,7 +50,7 @@ set(API_FILES
 #   SOURCE GROUPS
 #==========================================
 
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${ALL_FILES})
+source_group("API" FILES ${API_FILES})
 
 
 #==========================================
