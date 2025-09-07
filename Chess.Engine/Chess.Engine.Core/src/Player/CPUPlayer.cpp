@@ -243,9 +243,6 @@ void CPUPlayer::calculateMove(PlayerColor player)
 
 #endif
 
-	// Simulate thinking
-	simulateThinking();
-
 	// Select move based on difficulty
 	switch (mConfig.difficulty)
 	{
@@ -264,15 +261,6 @@ void CPUPlayer::calculateMove(PlayerColor player)
 	}
 
 	moveCalculated(selectedMove);
-}
-
-
-void CPUPlayer::simulateThinking()
-{
-	if (mConfig.thinkingTime.count() > 0)
-	{
-		std::this_thread::sleep_for(mConfig.thinkingTime);
-	}
 }
 
 
