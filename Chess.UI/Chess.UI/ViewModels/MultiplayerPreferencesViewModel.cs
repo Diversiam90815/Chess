@@ -1,9 +1,12 @@
 ﻿using Chess.UI.Multiplayer;
+using Chess.UI.UI;
 using Chess.UI.Wrappers;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 
@@ -21,6 +24,7 @@ namespace Chess.UI.ViewModels
         private bool _userInteractionEnabled = false;
 
 
+
         public MultiplayerPreferencesViewModel(IDispatcherQueueWrapper dispatcherQueue)
         {
             _dispatcherQueue = dispatcherQueue;
@@ -36,6 +40,7 @@ namespace Chess.UI.ViewModels
 
 
         #region Network
+        public ObservableCollection<IComboNode> NetworkAdapterNodes { get; } = new();
 
         private ObservableCollection<NetworkAdapter> _networkAdapters;
         public ObservableCollection<NetworkAdapter> NetworkAdapters
@@ -66,6 +71,20 @@ namespace Chess.UI.ViewModels
 
                     if (_userInteractionEnabled)
                         ItemSelected?.Invoke();
+                }
+            }
+        }
+
+
+        public NetworkAdapterComboItem SelectedNetworkAdaperNode
+        {
+            get => NetworkAdapterNodes.OfType<NetworkAdapterComboItem>().FirstOrDefault(node => node.NetworkAdapter.Equals(SelectedAdapter));
+            set
+            {
+                if (value?.NetworkAdapter != null && value.NetworkAdapter != SelectedAdapter)
+                {
+                    SelectedAdapter = value.NetworkAdapter;
+                    OnPropertyChanged();
                 }
             }
         }
@@ -105,8 +124,38 @@ namespace Chess.UI.ViewModels
                         NetworkAdapters.Add(adapter);
                     }
                 }
+
+                BuildNetworkAdaperNodes(adapters);
+
                 SelectPresavedNetworkAdapter();
             });
+        }
+
+
+        private void BuildNetworkAdaperNodes(IEnumerable<NetworkAdapter> adapters)
+        {
+            NetworkAdapterNodes.Clear();
+
+            // Add recommended adapters
+            foreach (NetworkAdapter adapter in adapters.OrderBy(adapter => adapter.NetworkName, StringComparer.OrdinalIgnoreCase))
+            {
+                if (adapter.IsRecommended() && adapter.IsVisible())
+                    NetworkAdapterNodes.Add(new NetworkAdapterComboItem(adapter));
+            }
+
+            // Add Divider and Heading if there are non-recommended adapters
+            var nonRecommendedAdapters = adapters.Where(adapter => !adapter.IsRecommended() && adapter.IsVisible()).ToList();
+            if (nonRecommendedAdapters.Any())
+            {
+                NetworkAdapterNodes.Add(new ComboDivider());
+                NetworkAdapterNodes.Add(new ComboHeader("Not recommended:"));
+
+                // Add not recommended but visible adapters
+                foreach (NetworkAdapter adapter in nonRecommendedAdapters.OrderBy(adapter => adapter.NetworkName, StringComparer.OrdinalIgnoreCase))
+                {
+                    NetworkAdapterNodes.Add(new NetworkAdapterComboItem(adapter));
+                }
+            }
         }
 
         #endregion

@@ -8,8 +8,9 @@
 #pragma once
 
 #include "NetworkInformation.h"
-#include "FileManager.h"
 #include "IObservable.h"
+#include "UserSettings.h"
+
 
 class NetworkManager : public INetworkObservable
 {
@@ -17,23 +18,25 @@ public:
 	NetworkManager()  = default;
 	~NetworkManager() = default;
 
-	void						init();
+	void							   init();
 
-	std::vector<NetworkAdapter> getAvailableNetworkAdapters() const;
-	void						networkAdapterChanged(const NetworkAdapter &adapter) override;
+	const std::vector<NetworkAdapter> &getAvailableNetworkAdapters() const;
+	void							   networkAdapterChanged(const NetworkAdapter &adapter) override;
 
-	int							getCurrentNetworkAdapterID();
+	int								   getCurrentNetworkAdapterID();
 
-	bool						isInitialized() const { return initialized.load(); }
-	void						setInitialized(const bool value) { initialized.store(value); }
+	bool							   isInitialized() const { return initialized.load(); }
+	void							   setInitialized(const bool value) { initialized.store(value); }
 
-	std::string					getCurrentIPv4();
-	bool						changeCurrentNetworkAdapter(const int ID);
+	const std::string				  &getCurrentIPv4();
+	bool							   changeCurrentNetworkAdapter(const int ID);
 
 private:
-	bool			   presetNetworkAdapter();
+	void			   initializeNetworkAdapter();
 
-	bool			   setNetworkAdapterFromConfig();
+	void			   initAdapterInConfig();
+
+	UserSettings	   mUserSettings;
 
 	NetworkInformation mNetworkInfo;
 

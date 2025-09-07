@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-set(CHESS_VERSION 1.1.0.923)
+set(CHESS_VERSION 1.1.0.934)
 
 project(Chess.Engine.Core VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
@@ -257,6 +257,8 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
 	WIN32_LEAN_AND_MEAN
 	_WINSOCK_DEPRECATED_NO_WARNING
 	_WIN32_WINNT=0x0A00
+	WINVER=0x0A00
+	NTDDI_VERSION=NTDDI_WIN10 
 )
 
 
@@ -298,7 +300,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${Include_Dirs})
 #   LINK LIBRARIES
 #==========================================
 
-set(PROJECT_LIBS Logger)
+set(PROJECT_LIBS	Logger
+					iphlpapi
+					windowscodecs
+					WindowsApp
+)
 
 target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_LIBS})
 

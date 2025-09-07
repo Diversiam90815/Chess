@@ -27,14 +27,6 @@ namespace Chess.UI.Views
                 // This is the first initialization of the Combobox
                 return;
             }
-            else
-            {
-                Multiplayer.NetworkAdapter selectedAdapter = (Multiplayer.NetworkAdapter)e.AddedItems[0];
-                if (selectedAdapter != null)
-                {
-                    _viewModel.SelectedAdapter = selectedAdapter;
-                }
-            }
         }
     }
 }

@@ -165,6 +165,23 @@ int UserSettings::getDiscoveryPort()
 }
 
 
+void UserSettings::setNetworkAdapter(const NetworkAdapter &adapter)
+{
+	FileManager::GetInstance()->setSelectedNetworkAdapter(adapter);
+}
+
+
+NetworkAdapter UserSettings::getNetworkAdapter() const
+{
+	auto adapterOpt = FileManager::GetInstance()->readSelectedNetworkAdapter();
+
+	if (adapterOpt.has_value())
+		return adapterOpt.value();
+
+	return {};
+}
+
+
 void UserSettings::initializeConfigFile(DefaultSettings settings)
 {
 	storeSetting(SettingsType::BoardStyle, settings.BoardStyle);
