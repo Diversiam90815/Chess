@@ -243,9 +243,6 @@ void CPUPlayer::calculateMove(PlayerColor player)
 
 #endif
 
-	// Simulate thinking
-	simulateThinking();
-
 	// Select move based on difficulty
 	switch (mConfig.difficulty)
 	{
@@ -264,15 +261,6 @@ void CPUPlayer::calculateMove(PlayerColor player)
 	}
 
 	moveCalculated(selectedMove);
-}
-
-
-void CPUPlayer::simulateThinking()
-{
-	if (mConfig.thinkingTime.count() > 0)
-	{
-		std::this_thread::sleep_for(mConfig.thinkingTime);
-	}
 }
 
 
@@ -348,7 +336,7 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 	mNodesSearched++;
 
 	// Check transposition table first
-	uint64_t	 hashKey = getHash(move, player, board);
+	uint64_t	 hashKey = board.getHashKey();
 	int			 storedScore{0};
 	PossibleMove storedMove{};
 
@@ -361,7 +349,7 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 	// Terminal depth reached -> evaluate static positon
 	if (depth == 0)
 	{
-		int score = evaluateMoveAndPosition(move, player, board);
+		int score = quiescence(board, alpha, beta, player);
 		storeTransposition(hashKey, depth, score, TranspositionEntry::NodeType::Exact, PossibleMove{});
 		return score;
 	}
@@ -391,12 +379,19 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 	// Move ordering : try best move from transposition table first if available
 	if (!storedMove.isEmpty())
 	{
-		// find stored move in our moves list and put it first
-		auto it = std::find_if(moves.begin(), moves.end(), [&storedMove](const PossibleMove &move) { return move == storedMove; });
-
+		auto it = std::find(moves.begin(), moves.end(), storedMove);
 		if (it != moves.end())
 			std::swap(*moves.begin(), *it);
 	}
+
+	// Simple capture prioritization (stable)
+	std::stable_sort(moves.begin(), moves.end(),
+					 [](const PossibleMove &a, const PossibleMove &b)
+					 {
+						 bool ac = (a.type & MoveType::Capture) == MoveType::Capture;
+						 bool bc = (b.type & MoveType::Capture) == MoveType::Capture;
+						 return ac > bc;
+					 });
 
 	PossibleMove				 bestMove{};
 	TranspositionEntry::NodeType nodeType = TranspositionEntry::NodeType::Alpha;
@@ -492,6 +487,39 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 }
 
 
+int CPUPlayer::quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player)
+{
+	// Stand-pat - just positional evaluation from players perspective
+	int stand = evaluatePlayerPosition(board, player);
+
+	if (stand >= beta)
+		return stand;
+	if (stand > alpha)
+		alpha = stand;
+
+	// Generate legal moves (only consider captures though)
+	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
+
+	for (const auto &move : moves)
+	{
+		if ((move.type & MoveType::Capture) != MoveType::Capture)
+			continue;
+
+		auto undo  = board.makeMove(move);
+
+		int	 score = -quiescence(board, -beta, -alpha, player);
+		board.unmakeMove(undo);
+
+		if (score >= beta)
+			return score;
+		if (score > alpha)
+			alpha = score;
+	}
+
+	return alpha;
+}
+
+
 PossibleMove CPUPlayer::selectBestMove(std::vector<MoveCandidate> &moves)
 {
 	auto topCandidates = filterTopCandidates(moves);
@@ -567,7 +595,7 @@ std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandid
 
 int CPUPlayer::evaluateMoveAndPosition(const PossibleMove &move, PlayerColor player, const LightChessBoard &board)
 {
-	uint64_t hash = getHash(move, player, board);
+	uint64_t hash = makeEvalKey(move, player, board);
 
 	// Check evaluation cache
 	auto	 it	  = mEvaluationCache.find(hash);
@@ -629,17 +657,4 @@ bool CPUPlayer::lookupTransposition(uint64_t hash, int depth, int &score, Possib
 	}
 
 	return false;
-}
-
-
-uint64_t CPUPlayer::getHash(const PossibleMove &move, const PlayerColor player, const LightChessBoard &board)
-{
-	uint64_t boardHash	  = board.getHashKey();
-	uint64_t moveHash	  = std::hash<uint64_t>{}((static_cast<uint64_t>(move.start.x) << 48) | (static_cast<uint64_t>(move.start.y) << 40) |
-											  (static_cast<uint64_t>(move.end.x) << 32) | (static_cast<uint64_t>(move.end.y) << 24) | (static_cast<uint64_t>(move.type) << 16) |
-											  (static_cast<uint64_t>(move.promotionPiece) << 8) | static_cast<uint64_t>(player));
-
-	uint64_t combinedHash = boardHash ^ moveHash;
-
-	return combinedHash;
 }

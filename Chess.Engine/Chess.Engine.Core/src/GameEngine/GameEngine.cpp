@@ -73,6 +73,8 @@ bool GameEngine::getBoardState(BoardStateArray boardState)
 	if (!mChessBoard)
 		return false;
 
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	return mChessBoard->getBoardState(boardState);
 }
 
@@ -264,7 +266,8 @@ void GameEngine::executeMove(PossibleMove &tmpMove, bool fromRemote)
 		}
 	}
 
-	Move executedMove = mMoveExecution->executeMove(moveToExecute, fromRemote);
+	std::lock_guard<std::mutex> lock(mMutex);
+	Move						executedMove = mMoveExecution->executeMove(moveToExecute, fromRemote);
 
 	LoggingHelper::logMove(executedMove);
 
