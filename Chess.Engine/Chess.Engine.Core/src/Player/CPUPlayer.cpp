@@ -348,7 +348,7 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 	mNodesSearched++;
 
 	// Check transposition table first
-	uint64_t	 hashKey = getHash(move, player, board);
+	uint64_t	 hashKey = board.getHashKey();
 	int			 storedScore{0};
 	PossibleMove storedMove{};
 
@@ -567,7 +567,7 @@ std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandid
 
 int CPUPlayer::evaluateMoveAndPosition(const PossibleMove &move, PlayerColor player, const LightChessBoard &board)
 {
-	uint64_t hash = getHash(move, player, board);
+	uint64_t hash = makeEvalKey(move, player, board);
 
 	// Check evaluation cache
 	auto	 it	  = mEvaluationCache.find(hash);
@@ -629,17 +629,4 @@ bool CPUPlayer::lookupTransposition(uint64_t hash, int depth, int &score, Possib
 	}
 
 	return false;
-}
-
-
-uint64_t CPUPlayer::getHash(const PossibleMove &move, const PlayerColor player, const LightChessBoard &board)
-{
-	uint64_t boardHash	  = board.getHashKey();
-	uint64_t moveHash	  = std::hash<uint64_t>{}((static_cast<uint64_t>(move.start.x) << 48) | (static_cast<uint64_t>(move.start.y) << 40) |
-											  (static_cast<uint64_t>(move.end.x) << 32) | (static_cast<uint64_t>(move.end.y) << 24) | (static_cast<uint64_t>(move.type) << 16) |
-											  (static_cast<uint64_t>(move.promotionPiece) << 8) | static_cast<uint64_t>(player));
-
-	uint64_t combinedHash = boardHash ^ moveHash;
-
-	return combinedHash;
 }
