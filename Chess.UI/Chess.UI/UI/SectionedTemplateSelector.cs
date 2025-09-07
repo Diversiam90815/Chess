@@ -1,6 +1,7 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
+#nullable enable
 
 namespace Chess.UI.UI
 {
@@ -24,13 +25,13 @@ namespace Chess.UI.UI
 
     public sealed partial class SectionedTemplateSelector : DataTemplateSelector
     {
-        public DataTemplateSelector ItemTemplateSelector { get; set; }
+        public DataTemplateSelector? ItemTemplateSelector { get; set; }
 
-        public DataTemplate ItemTemplate { get; set; }
-        public DataTemplate DividerTemplate { get; set; }
-        public DataTemplate HeaderTemplate { get; set; }
+        public DataTemplate? ItemTemplate { get; set; }
+        public DataTemplate? DividerTemplate { get; set; }
+        public DataTemplate? HeaderTemplate { get; set; }
 
-        private DataTemplate Select(object item, DependencyObject container)
+        private DataTemplate? Select(object item, DependencyObject? container)
         {
             if (item is IComboNode node)
             {
@@ -45,9 +46,9 @@ namespace Chess.UI.UI
             return ItemTemplateSelector?.SelectTemplate(item, container) ?? ItemTemplate;
         }
 
-        protected override DataTemplate SelectTemplateCore(object item) => Select(item, null);
+        protected override DataTemplate? SelectTemplateCore(object item) => Select(item, null);
 
-        protected override DataTemplate SelectTemplateCore(object item, DependencyObject container) => Select(item, container);
+        protected override DataTemplate? SelectTemplateCore(object item, DependencyObject container) => Select(item, container);
     }
 }
 

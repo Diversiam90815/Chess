@@ -20,7 +20,11 @@
                 x:Key="NetworkAdapterSelector"
                 DividerTemplate="{StaticResource DividerTemplate}"
                 HeaderTemplate="{StaticResource HeaderTemplate}"
-                ItemTemplate="{StaticResource NetworkAdapterTemplate}" />
+                ItemTemplate="{StaticResource NetworkAdapterTemplate}">
+                <ui:SectionedTemplateSelector.ItemTemplateSelector>
+                    <ui:ComboboxItemTemplateSelector ItemTemplate="{StaticResource NetworkAdapterTemplate}" SelectedItemContentTemplate="{StaticResource SelectedNetworkAdapterTemplate}" />
+                </ui:SectionedTemplateSelector.ItemTemplateSelector>
+            </ui:SectionedTemplateSelector>
 
         </ResourceDictionary>
     </Page.Resources>
