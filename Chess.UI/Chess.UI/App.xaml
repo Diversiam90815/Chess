@@ -12,6 +12,7 @@
                 <!--  Other merged dictionaries here  -->
 
                 <ResourceDictionary Source="ms-appx:///Views/Styles.xaml" />
+                <ResourceDictionary Source="ms-appx:///UI/ComboboxTemplates.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

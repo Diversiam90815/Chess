@@ -13,20 +13,18 @@
 
 #include <windows.h>
 #include <winsock2.h>
-#include <iphlpapi.h>
 #include <ws2tcpip.h>
 #include <iptypes.h>
-
-#pragma comment(lib, "Ws2_32.lib")
-#pragma comment(lib, "Iphlpapi.lib")
-
+#include <iphlpapi.h>
+#include <netioapi.h>
+#include <wlanapi.h>
 
 #include <vector>
+#include <unordered_set>
 
 #include "Logging.h"
 #include "Conversion.h"
 #include "NetworkAdapter.h"
-
 
 
 class NetworkInformation
@@ -35,38 +33,97 @@ public:
 	NetworkInformation();
 	~NetworkInformation();
 
-	bool						init();
+	bool							   init();
 
-	void						deinit();
+	void							   deinit();
 
-	bool						getNetworkInformationFromOS();
+	void							   processAdapter();
 
-	void						processAdapter();
+	void							   setCurrentNetworkAdapter(const NetworkAdapter &adapter);
+	const NetworkAdapter			  &getCurrentNetworkAdapter() const;
 
-	void						saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID);
+	NetworkAdapter					   isAdapterCurrentlyAvailable(const NetworkAdapter &adapter);
 
-	void						setCurrentNetworkAdapter(const NetworkAdapter &adapter);
-	NetworkAdapter				getCurrentNetworkAdapter() const;
-
-	void						updateNetworkAdapter(NetworkAdapter &adapter);
-
-	bool						isAdapterCurrentlyAvailable(const NetworkAdapter &adapter);
-
-	NetworkAdapter				getFirstEligibleAdapter() const;
-
-	std::vector<NetworkAdapter> getAvailableNetworkAdapters() const;
+	const std::vector<NetworkAdapter> &getAvailableNetworkAdapters() const;
 
 
 private:
-	std::string					sockaddrToString(SOCKADDR *sa) const;
-	std::string					prefixLengthToSubnetMask(USHORT family, ULONG prefixLength) const;
+	// RAII helpers
+	struct WinsockSession
+	{
+		bool ok{false};
+		WinsockSession()
+		{
+			WSADATA wsa{};
+			ok = (WSAStartup(MAKEWORD(2, 2), &wsa) == 0);
+
+			if (!ok)
+				LOG_ERROR("WSAStartup failed!");
+		}
+
+		~WinsockSession()
+		{
+			if (ok)
+				WSACleanup();
+		}
+	};
+
+	struct IpForwardTable
+	{
+		MIB_IPFORWARD_TABLE2 *ptr{nullptr};
+		~IpForwardTable()
+		{
+			if (ptr)
+				FreeMibTable(ptr);
+		}
+	};
+
+	struct WlanHandle
+	{
+		HANDLE h{};
+		~WlanHandle()
+		{
+			if (h)
+				WlanCloseHandle(h, nullptr);
+		}
+	};
+
+	struct WlanQueryData
+	{
+		void *ptr{};
+		~WlanQueryData()
+		{
+			if (ptr)
+				WlanFreeMemory(ptr);
+		}
+	};
+
+	using AdapterBuffer = std::unique_ptr<IP_ADAPTER_ADDRESSES, void (*)(IP_ADAPTER_ADDRESSES *)>;
+
+	void							saveAdapter(const PIP_ADAPTER_ADDRESSES adapter, const int ID, std::unordered_set<ULONG64> &defaultRouteLuidValues);
+	bool							getNetworkInformationFromOS();
+
+	std::string						sockaddrToString(SOCKADDR *sa) const;
+	std::string						prefixLengthToSubnetMask(USHORT family, ULONG prefixLength) const;
+	AdapterTypes					filterAdapterType(const DWORD Type) const;
+	AdapterVisibility				determineAdapterVisibility(bool isDefaultRoute, bool IPv4Enabled, AdapterTypes type, IF_OPER_STATUS status);
+
+	bool							getDefaultInterfaces(std::vector<NET_LUID> &pLUIDs);
+	std::string						getHostName(const SOCKADDR *ip, const socklen_t ipLength);
+	std::string						getWifiSsid(const AdapterTypes type, const NET_LUID luid);
+	std::string						getNetworkGatename(const AdapterTypes type, const NET_LUID_LH luid, const std::string address);
+	std::string						getNetworkName(const AdapterTypes type, const NET_LUID_LH luid, const std::string address);
 
 
-	PIP_ADAPTER_ADDRESSES		mAdapterAddresses = nullptr;
+	AdapterBuffer					mAdapterAddresses{nullptr, [](IP_ADAPTER_ADDRESSES *p)
+									  {
+										  if (p)
+											  free(p);
+									  }};
+	ULONG							mOutBufLen{0};
 
-	ULONG						mOutBufLen{0};
+	std::unique_ptr<WinsockSession> mWinsockSession;
 
-	std::vector<NetworkAdapter> mNetworkAdapters{};
-
-	NetworkAdapter				mCurrentNetworkAdapter{};
+	std::vector<NetworkAdapter>		mNetworkAdapters{};
+	NetworkAdapter					mCurrentNetworkAdapter{};
 };

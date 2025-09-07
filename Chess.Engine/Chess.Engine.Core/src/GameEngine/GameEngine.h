@@ -88,5 +88,7 @@ private:
 
 	std::shared_ptr<CPUPlayer>		mCPUPlayer;
 
+	std::mutex						mMutex;
+
 	friend class GameManager;
 };

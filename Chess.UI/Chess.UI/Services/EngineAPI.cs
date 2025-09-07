@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text;
 using static Chess.UI.Services.CommunicationLayer;
 
 
@@ -202,7 +203,7 @@ namespace Chess.UI.Services
         public static extern int GetNetworkAdapterCount();
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetNetworkAdapterAtIndex", CharSet = CharSet.Unicode)]
-        public static extern bool GetNetworkAdapterAtIndex(uint index, out NetworkAdapter adapter);
+        public static extern bool GetNetworkAdapterAtIndex(uint index, out NetworkAdapterInstance adapter);
 
         [DllImport(LOGIC_API_PATH, CallingConvention = CallingConvention.Cdecl, EntryPoint = "GetSavedAdapterID", CharSet = CharSet.Unicode)]
         public static extern int GetSavedAdapterID();
@@ -455,11 +456,43 @@ namespace Chess.UI.Services
 
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Ansi)]
-        public struct NetworkAdapter
+        public struct NetworkAdapterInstance
         {
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 250)]
-            public string name;
-            public int id;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 250)]
+            private byte[] _adapterNameBytes;
+
+            public string AdapterName
+            {
+                get
+                {
+                    // Find null terminator in the byte array
+                    int nullIndex = Array.IndexOf(_adapterNameBytes, (byte)0);
+                    int length = (nullIndex >= 0) ? nullIndex : _adapterNameBytes.Length;
+
+                    // Convert bytes to a string using UTF-8 encoding
+                    return Encoding.UTF8.GetString(_adapterNameBytes, 0, length);
+                }
+            }
+
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 250)]
+            private byte[] _networkNameBytes;
+
+            public string NetworkName
+            {
+                get
+                {
+                    // Find null terminator in the byte array
+                    int nullIndex = Array.IndexOf(_networkNameBytes, (byte)0);
+                    int length = (nullIndex >= 0) ? nullIndex : _networkNameBytes.Length;
+
+                    // Convert bytes to a string using UTF-8 encoding
+                    return Encoding.UTF8.GetString(_networkNameBytes, 0, length);
+                }
+            }
+
+            public int ID;
+            public int Visibility;
+            public int Type;
         }
 
 

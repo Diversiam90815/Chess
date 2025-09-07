@@ -42,38 +42,40 @@ public:
 	void storeSetting(SettingsType setting, T value);
 
 	template <typename T>
-	T			readSetting(SettingsType setting);
+	T			   readSetting(SettingsType setting);
 
-	void		setCurrentBoardTheme(std::string theme);
-	std::string getCurrentBoardTheme();
+	void		   setCurrentBoardTheme(std::string theme);
+	std::string	   getCurrentBoardTheme();
 
-	void		setCurrentPieceTheme(std::string theme);
-	std::string getCurrentPieceTheme();
+	void		   setCurrentPieceTheme(std::string theme);
+	std::string	   getCurrentPieceTheme();
 
-	void		setLocalPlayerName(const std::string name);
-	std::string getLocalPlayerName();
+	void		   setLocalPlayerName(const std::string name);
+	std::string	   getLocalPlayerName();
 
-	void		setSFXEnabled(const bool enabled);
-	bool		getSFXEnabled();
+	void		   setSFXEnabled(const bool enabled);
+	bool		   getSFXEnabled();
 
-	void		setAtmosEnabled(const bool enabled);
-	bool		getAtmosEnabled();
+	void		   setAtmosEnabled(const bool enabled);
+	bool		   getAtmosEnabled();
 
-	void		setSFXVolume(const float volume);
-	float		getSFXVolume();
+	void		   setSFXVolume(const float volume);
+	float		   getSFXVolume();
 
-	void		setAtmosVolume(const float volume);
-	float		getAtmosVolume();
+	void		   setAtmosVolume(const float volume);
+	float		   getAtmosVolume();
 
-	void		setMasterAudioVolume(const float volume);
-	float		getMasterVolume();
+	void		   setMasterAudioVolume(const float volume);
+	float		   getMasterVolume();
 
-	void		setAtmosScenario(const std::string scenario);
-	std::string getAtmosScenario();
+	void		   setAtmosScenario(const std::string scenario);
+	std::string	   getAtmosScenario();
 
-	void		setDiscoveryPort(const int udpPort);
-	int			getDiscoveryPort();
+	void		   setDiscoveryPort(const int udpPort);
+	int			   getDiscoveryPort();
 
+	void		   setNetworkAdapter(const NetworkAdapter &adapter);
+	NetworkAdapter getNetworkAdapter() const;
 
 private:
 	bool doesConfigFileExist();

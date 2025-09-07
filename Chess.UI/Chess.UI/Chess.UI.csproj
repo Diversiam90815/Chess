@@ -79,9 +79,6 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-	  <None Remove="Views\GameConfigurationView.xaml" />
-	</ItemGroup>
-	<ItemGroup>
 	  <ProjectReference Include="..\..\Chess.Engine\build\Chess.Engine.API\Chess.Engine.API.vcxproj" />
 	</ItemGroup>
 	<ItemGroup>
@@ -96,28 +93,6 @@
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
-	</ItemGroup>
-	<ItemGroup>
-	  <None Update="Assets\Logo\Chess_Logo.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
-	  <Page Update="Views\GameConfigurationView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	  <Page Update="Views\AudioPreferencesView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	</ItemGroup>
-	<ItemGroup>
-	  <Page Update="Views\MultiplayerPreferencesView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
-	</ItemGroup>
-	<ItemGroup>
-	  <Page Update="Views\PreferencesView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </Page>
 	</ItemGroup>
 
 

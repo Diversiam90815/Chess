@@ -424,8 +424,10 @@ Engine_API bool GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInsta
 	const auto &foundAdapter = adapters[index];
 
 	adapter->ID				 = foundAdapter.ID;
-	adapter->selectedByUser	 = foundAdapter.selected;
-	StringCbCopyA(adapter->name, MAX_STRING_LENGTH, foundAdapter.description.c_str());
+	adapter->type			 = static_cast<int>(foundAdapter.Type);
+	adapter->visibility		 = static_cast<int>(foundAdapter.Visibility);
+	StringCbCopyA(adapter->adapterName, MAX_STRING_LENGTH, foundAdapter.AdapterName.c_str());
+	StringCbCopyA(adapter->networkName, MAX_STRING_LENGTH, foundAdapter.NetworkName.c_str());
 	return true;
 }
 

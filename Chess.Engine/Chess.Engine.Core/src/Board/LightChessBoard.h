@@ -117,7 +117,6 @@ public:
 	bool					  canPieceMove(Position from, Position to, PieceType piece, PlayerColor player) const;
 	std::vector<PossibleMove> generatePseudoLegalMoves(PlayerColor player) const;
 	std::vector<PossibleMove> generateLegalMoves(PlayerColor player) const; // Filters out moves leaving king in check
-	bool					  isMoveLegal(const PossibleMove &move, PlayerColor player) const;
 
 	// Utility
 	uint64_t				  getHashKey() const;

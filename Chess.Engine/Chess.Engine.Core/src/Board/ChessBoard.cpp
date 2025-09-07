@@ -55,10 +55,21 @@ void ChessBoard::setPiece(Position pos, std::shared_ptr<ChessPiece> piece)
 }
 
 
+std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos) 
+{
+	static std::shared_ptr<ChessPiece> nullPiece = nullptr;
+
+	if (!pos.isValid())
+		return nullPiece;
+
+	return squares[pos.y][pos.x].piece;
+}
+
+
 std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PlayerColor playerColor)
 {
 	std::vector<PlayerPiece> playerPieces;
-	playerPieces.reserve(PLAYER_PIECES_NUM * sizeof(PlayerPiece));
+	playerPieces.reserve(PLAYER_PIECES_NUM);
 
 	for (int y = 0; y < BOARD_SIZE; ++y)
 	{
@@ -77,21 +88,13 @@ std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PlayerColor playerColor
 }
 
 
-std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos) 
-{
-	static std::shared_ptr<ChessPiece> nullPiece = nullptr;
-
-	if (!pos.isValid())
-		return nullPiece;
-
-	return squares[pos.y][pos.x].piece;
-}
-
-
 void ChessBoard::removePiece(Position pos)
 {
 	if (CHESSBOARD_DEBUG)
 		LOG_DEBUG("removePiece called at {}", LoggingHelper::positionToString(pos).c_str());
+
+	if (!pos.isValid())
+		return;
 
 	squares[pos.y][pos.x].piece = nullptr;
 }
@@ -117,6 +120,9 @@ bool ChessBoard::movePiece(Position start, Position end)
 
 bool ChessBoard::isEmpty(Position pos) const
 {
+	if (!pos.isValid())
+		return true;
+
 	return squares[pos.y][pos.x].piece == nullptr;
 }
 

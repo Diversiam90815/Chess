@@ -649,27 +649,22 @@ std::vector<PossibleMove> LightChessBoard::generateLegalMoves(PlayerColor player
 {
 	auto					  pseudoLegalMoves = generatePseudoLegalMoves(player);
 	std::vector<PossibleMove> legalMoves;
+	legalMoves.reserve(pseudoLegalMoves.size());
 
 	for (const auto &move : pseudoLegalMoves)
 	{
-		if (isMoveLegal(move, player))
-		{
+		// const_cast safe: we revert with unmake
+		auto	*mutableThis = const_cast<LightChessBoard *>(this);
+		MoveUndo undo		 = mutableThis->makeMove(move);
+
+		bool	 safe		 = !mutableThis->isInCheck(player);
+		mutableThis->unmakeMove(undo);
+
+		if (safe)
 			legalMoves.push_back(move);
-		}
 	}
 
 	return legalMoves;
-}
-
-
-bool LightChessBoard::isMoveLegal(const PossibleMove &move, PlayerColor player) const
-{
-	// Make a copy to test the move
-	LightChessBoard testBoard(*this);
-	testBoard.makeMove(move);
-
-	// Check if this move leaves the king in check
-	return !testBoard.isInCheck(player);
 }
 
 

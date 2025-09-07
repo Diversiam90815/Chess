@@ -71,7 +71,7 @@ class CPUPlayer : public ICPUMoveObservable
 {
 public:
 	CPUPlayer(std::shared_ptr<MoveGeneration> moveGeneration, std::shared_ptr<MoveEvaluation> moveEvaluation, std::shared_ptr<ChessBoard> board);
-	~CPUPlayer() = default;
+	~CPUPlayer();
 
 	void			 setCPUConfiguration(const CPUConfiguration &config);
 	CPUConfiguration getCPUConfiguration() const { return mConfig; }
@@ -88,39 +88,51 @@ public:
 
 	PossibleMove	 getBestEvaluatedMove(const std::vector<PossibleMove> &moves);
 
-	PossibleMove	 getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth);
-	PossibleMove	 getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth);
+	PossibleMove	 getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
+	PossibleMove	 getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
 
 	int				 evaluateMoveAndPosition(const PossibleMove &move, PlayerColor player, const LightChessBoard &board);
 	int				 evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player);
 
 
 private:
-	void								  calculateMove(PlayerColor player);
+	PossibleMove computeBestMove(PlayerColor player, std::stop_token stopToken = {});
 
-	void								  simulateThinking();
+	int			 minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
+	int			 alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
+	int			 quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player, std::stop_token stopToken = {});
 
-	int									  minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player);
-	int									  alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player);
+	PossibleMove selectBestMove(std::vector<MoveCandidate> &moves);
 
-	PossibleMove						  selectBestMove(std::vector<MoveCandidate> &moves);
+	PossibleMove selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
 
-	PossibleMove						  selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
+	std::vector<MoveCandidate> filterTopCandidates(std::vector<MoveCandidate> &allMoves) const;
 
-	std::vector<MoveCandidate>			  filterTopCandidates(std::vector<MoveCandidate> &allMoves);
+	void					   storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move);
+	bool					   lookupTransposition(uint64_t hash, int depth, int &score, PossibleMove &move);
 
-	void								  storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move);
-	bool								  lookupTransposition(uint64_t hash, int depth, int &score, PossibleMove &move);
+	void					   launchSearchAsync(PlayerColor player);
+	inline bool				   cancelled(std::stop_token token) const { return token.stop_requested(); }
 
-	uint64_t							  getHash(const PossibleMove &move, const PlayerColor player, const LightChessBoard &board);
+	inline uint64_t			   makeEvalKey(const PossibleMove &move, PlayerColor player, const LightChessBoard &board) const
+	{
+		uint64_t h = board.getHashKey();
+		uint64_t m = (uint64_t(move.start.x & 7) << 48) | (uint64_t(move.start.y & 7) << 45) | (uint64_t(move.end.x & 7) << 42) | (uint64_t(move.end.y & 7) << 39) |
+					 (uint64_t(move.type) << 16) | (uint64_t(move.promotionPiece) << 8) | uint64_t(player);
+		// mix
+		return h ^ (m + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2));
+	}
 
 
-	CPUConfiguration					  mConfig;
 
-	std::shared_ptr<MoveGeneration>		  mMoveGeneration;
-	std::shared_ptr<MoveEvaluation>		  mMoveEvaluation;
-	std::shared_ptr<ChessBoard>			  mBoard;
-	std::shared_ptr<PositionalEvaluation> mPositionalEvaluation;
+	CPUConfiguration								 mConfig;
+
+	std::shared_ptr<MoveGeneration>					 mMoveGeneration;
+	std::shared_ptr<MoveEvaluation>					 mMoveEvaluation;
+	std::shared_ptr<ChessBoard>						 mBoard;
+	std::shared_ptr<PositionalEvaluation>			 mPositionalEvaluation;
+
+	std::jthread									 mSearchThread;
 
 	std::unordered_map<uint64_t, TranspositionEntry> mTranspositionTable;
 	static constexpr size_t							 MAX_TRANSPOSITION_ENTRIES = 1000000;
