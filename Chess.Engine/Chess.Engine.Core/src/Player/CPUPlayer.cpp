@@ -506,7 +506,7 @@ int CPUPlayer::quiescence(LightChessBoard &board, int alpha, int beta, PlayerCol
 
 	if (stand >= beta)
 		return stand;
-	if (stand < alpha)
+	if (stand > alpha)
 		alpha = stand;
 
 	// Generate legal moves (only consider captures though)
