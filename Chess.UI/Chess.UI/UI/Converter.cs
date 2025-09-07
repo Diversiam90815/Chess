@@ -1,10 +1,12 @@
 ﻿using Chess.UI.Images;
 using Chess.UI.Multiplayer;
+using Chess.UI.Styles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
 using System;
+using System.Collections.Generic;
 using static Chess.UI.Services.EngineAPI;
 
 
@@ -27,12 +29,60 @@ namespace Chess.UI.UI
             }
             return "";
         }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
-        }
+        public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
     }
+
+
+    public partial class PieceStylePreviewConverter : IValueConverter
+    {
+        private static readonly Dictionary<PieceStyle, ImageSource> _cache = new();
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is PieceStyle style)
+            {
+                if (_cache.TryGetValue(style, out var cached))
+                    return cached;
+
+                var imgService = App.Current.Services.GetService<IImageService>();
+                // Using a white pawn as representative icon
+                var img = imgService?.GetPieceImage(style, PlayerColor.White, PieceTypeInstance.Pawn);
+
+                if (img != null)
+                    _cache[style] = img;
+
+                return img;
+            }
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
+    }
+
+
+    public partial class BoardStylePreviewConverter : IValueConverter
+    {
+        private static readonly Dictionary<BoardStyle, ImageSource> _cache = new();
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is BoardStyle style)
+            {
+                if (_cache.TryGetValue(style, out var cached))
+                    return cached;
+
+                var imgService = App.Current.Services.GetService<IImageService>();
+                var img = imgService?.GetImage(style);
+
+                if (img != null)
+                    _cache[style] = img;
+
+                return img;
+            }
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language) => throw new NotSupportedException();
+    }
+
 
     public class Converter
     {

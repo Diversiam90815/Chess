@@ -6,7 +6,39 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:Chess.UI.Views"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:styles="using:Chess.UI.Styles"
+    xmlns:ui="using:Chess.UI.UI"
     mc:Ignorable="d">
+
+    <Page.Resources>
+        <ui:PieceStylePreviewConverter x:Key="PieceStylePreviewConverter" />
+        <ui:BoardStylePreviewConverter x:Key="BoardStylePreviewConverter" />
+
+        <!--  Piece Style Item Template  -->
+        <DataTemplate x:Key="PieceStyleItemTemplate" x:DataType="styles:PieceStyleInfo">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Image
+                    Width="28"
+                    Height="28"
+                    Source="{Binding Style, Converter={StaticResource PieceStylePreviewConverter}}" />
+                <TextBlock VerticalAlignment="Center" Text="{x:Bind DisplayName}" />
+            </StackPanel>
+        </DataTemplate>
+
+        <!--  Board Style Item Template  -->
+        <DataTemplate x:Key="BoardStyleItemTemplate" x:DataType="styles:BoardStyleInfo">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <Border
+                    Width="40"
+                    Height="28"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="4">
+                    <Image Source="{Binding Style, Converter={StaticResource BoardStylePreviewConverter}}" Stretch="UniformToFill" />
+                </Border>
+                <TextBlock VerticalAlignment="Center" Text="{x:Bind DisplayName}" />
+            </StackPanel>
+        </DataTemplate>
+    </Page.Resources>
 
     <StackPanel
         Width="Auto"
@@ -31,7 +63,7 @@
                 <ComboBox
                     Grid.Column="1"
                     HorizontalAlignment="Stretch"
-                    DisplayMemberPath="Name"
+                    ItemTemplate="{StaticResource BoardStyleItemTemplate}"
                     ItemsSource="{x:Bind _viewModel.BoardThemes}"
                     SelectedItem="{x:Bind _viewModel.SelectedBoardTheme, Mode=TwoWay}"
                     Style="{StaticResource SettingComboBoxStyle}" />
@@ -54,7 +86,7 @@
                 <ComboBox
                     Grid.Column="1"
                     HorizontalAlignment="Stretch"
-                    DisplayMemberPath="Name"
+                    ItemTemplate="{StaticResource PieceStyleItemTemplate}"
                     ItemsSource="{x:Bind _viewModel.PieceThemes}"
                     SelectedItem="{x:Bind _viewModel.SelectedPieceTheme, Mode=TwoWay}"
                     Style="{StaticResource SettingComboBoxStyle}" />
