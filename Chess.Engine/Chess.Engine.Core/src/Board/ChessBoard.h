@@ -9,7 +9,6 @@
 
 #include <array>
 #include <memory>
-#include <shared_mutex>
 
 #include "Move.h"
 #include "Pawn.h"
