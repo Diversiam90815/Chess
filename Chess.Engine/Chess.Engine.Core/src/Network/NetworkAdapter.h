@@ -41,12 +41,16 @@ struct NetworkAdapter
 				   AdapterVisibility  visibility)
 		: AdapterName(adapterName), NetworkName(networkName), IPv4(ipv4), Subnet(subnet), ID(id), IsDefaultRoute(isDefaultRoute), Type(type), Visibility(visibility)
 	{
+		eligible = filterSubnetMask();
 	}
 
 
 	bool			  operator==(const NetworkAdapter &other) const { return std::tie(AdapterName, Subnet) == std::tie(other.AdapterName, other.Subnet); }
 	bool			  operator!=(const NetworkAdapter &other) const { return !(*this == other); }
 
+	bool			  isValid() const { return !AdapterName.empty() && !IPv4.empty() && ID != 0; }
+
+	bool			  filterSubnetMask() const { return Subnet == "255.255.255.0"; }
 
 	std::string		  AdapterName{};
 	std::string		  NetworkName{};
@@ -56,4 +60,5 @@ struct NetworkAdapter
 	bool			  IsDefaultRoute{false};
 	AdapterTypes	  Type{AdapterTypes::Other};
 	AdapterVisibility Visibility{};
+	bool			  eligible;
 };

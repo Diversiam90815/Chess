@@ -14,10 +14,7 @@ void NetworkManager::init()
 
 	mNetworkInfo.processAdapter();
 
-	if (!setNetworkAdapterFromConfig()) // Will return false if we find an adapter in config file
-	{
-		presetNetworkAdapter();
-	}
+	initializeNetworkAdapter();
 
 	setInitialized(true);
 }
@@ -31,7 +28,7 @@ const std::vector<NetworkAdapter> &NetworkManager::getAvailableNetworkAdapters()
 
 void NetworkManager::networkAdapterChanged(const NetworkAdapter &adapter)
 {
-	auto currentAdapter = mNetworkInfo.getCurrentNetworkAdapter();
+	auto &currentAdapter = mNetworkInfo.getCurrentNetworkAdapter();
 
 	if (currentAdapter != adapter)
 	{
@@ -62,7 +59,7 @@ const std::string &NetworkManager::getCurrentIPv4()
 
 bool NetworkManager::changeCurrentNetworkAdapter(const int ID)
 {
-	auto adapters = getAvailableNetworkAdapters();
+	auto &adapters = getAvailableNetworkAdapters();
 
 	for (auto &adapter : adapters)
 	{
@@ -76,38 +73,72 @@ bool NetworkManager::changeCurrentNetworkAdapter(const int ID)
 }
 
 
-bool NetworkManager::presetNetworkAdapter()
+void NetworkManager::initializeNetworkAdapter()
 {
-	auto adapterInFile = FileManager::GetInstance()->readSelectedNetworkAdapter();
+	auto		   adapterFromConfig		= mUserSettings.getNetworkAdapter();
+	bool		   adapterFromConfigIsValid = adapterFromConfig.isValid();
 
-	if (adapterInFile.has_value())
-		return false; // No need to preset if we have stored a selected adapter
+	// Let's see if the adapter found in the config is currently available
+	NetworkAdapter currentConfigAdapter		= mNetworkInfo.isAdapterCurrentlyAvailable(adapterFromConfig);
+	bool		   isAvailable				= currentConfigAdapter.isValid(); // If the adapter exists, we receive the current version of the adapter, else an empty adapter
 
-	LOG_INFO("Since no adapter could been found in the config file, we are selecting one!");
+	if (!adapterFromConfigIsValid)
+		LOG_INFO("Adapter from config is not valid!");
 
-	NetworkAdapter adapter = {}; // Todo: Select the prefered network
+	if (!isAvailable)
+		LOG_INFO("Adapter from config is currently not available!");
 
-	networkAdapterChanged(adapter);
-
-	return true;
+	if (adapterFromConfigIsValid && isAvailable)
+		networkAdapterChanged(currentConfigAdapter);
+	else
+		initAdapterInConfig();
 }
 
 
-bool NetworkManager::setNetworkAdapterFromConfig()
+void NetworkManager::initAdapterInConfig()
 {
-	auto adapterInFile = FileManager::GetInstance()->readSelectedNetworkAdapter();
+	auto &adapters = mNetworkInfo.getAvailableNetworkAdapters();
 
-	if (!adapterInFile.has_value())
-		return false;
+	LOG_INFO("Filtering from {} adapters for new standard network adapter", adapters.size());
 
-	LOG_INFO("Found a network adapter in the config file!");
+	for (auto &adapter : adapters)
+	{
+		if ((adapter.IsDefaultRoute) && (adapter.Type == AdapterTypes::Ethernet || adapter.Type == AdapterTypes::WiFi))
+		{
+			networkAdapterChanged(adapter);
+			return;
+		}
+	}
 
-	auto &userSetAdapter = adapterInFile.value();
+	LOG_INFO("Could not find adapter fulfilling first set of settings. Trying a more relaxed search!");
 
-	if (!mNetworkInfo.isAdapterCurrentlyAvailable(userSetAdapter))
-		return false;
+	for (auto &adapter : adapters)
+	{
+		if (adapter.IsDefaultRoute && (adapter.Type != AdapterTypes::Loopback && adapter.Type != AdapterTypes::Virtual))
+		{
+			networkAdapterChanged(adapter);
+			return;
+		}
+	}
 
-	networkAdapterChanged(userSetAdapter);
+	LOG_WARNING("Could not find an adapter fulfilling the set of settings.. Falling back to eligibility setting via subnet mask!");
 
-	return true;
+	for (auto &adapter : adapters)
+	{
+		if (adapter.eligible)
+		{
+			networkAdapterChanged(adapter);
+			return;
+		}
+	}
+
+	LOG_WARNING("Could not find eligible adapter with proper subnet mask. We are forced to pick the first adapter in list now..");
+
+	if (adapters.size() >0)
+	{
+		networkAdapterChanged(adapters[0]);
+		return;
+	}
+
+	LOG_ERROR("Could not find any adapter to select as default! No adapters available!");
 }

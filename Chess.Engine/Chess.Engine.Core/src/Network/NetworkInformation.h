@@ -42,7 +42,7 @@ public:
 	void							   setCurrentNetworkAdapter(const NetworkAdapter &adapter);
 	const NetworkAdapter			  &getCurrentNetworkAdapter() const;
 
-	bool							   isAdapterCurrentlyAvailable(const NetworkAdapter &adapter);
+	NetworkAdapter					   isAdapterCurrentlyAvailable(const NetworkAdapter &adapter);
 
 	const std::vector<NetworkAdapter> &getAvailableNetworkAdapters() const;
 

@@ -158,9 +158,16 @@ const NetworkAdapter &NetworkInformation::getCurrentNetworkAdapter() const
 }
 
 
-bool NetworkInformation::isAdapterCurrentlyAvailable(const NetworkAdapter &adapter)
+NetworkAdapter NetworkInformation::isAdapterCurrentlyAvailable(const NetworkAdapter &adapter)
 {
-	return std::any_of(mNetworkAdapters.begin(), mNetworkAdapters.end(), [&adapter](const NetworkAdapter &a) { return a == adapter; });
+	// If the adapter is available we return the adapter current version (with maybe a new ID set)
+	for (auto &it : mNetworkAdapters)
+	{
+		if (it == adapter)
+			return it;
+	}
+
+	return {};
 }
 
 

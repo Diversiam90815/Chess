@@ -8,8 +8,8 @@
 #pragma once
 
 #include "NetworkInformation.h"
-#include "FileManager.h"
 #include "IObservable.h"
+#include "UserSettings.h"
 
 
 class NetworkManager : public INetworkObservable
@@ -32,9 +32,11 @@ public:
 	bool							   changeCurrentNetworkAdapter(const int ID);
 
 private:
-	bool			   presetNetworkAdapter();
+	void			   initializeNetworkAdapter();
 
-	bool			   setNetworkAdapterFromConfig();
+	void			   initAdapterInConfig();
+
+	UserSettings	   mUserSettings;
 
 	NetworkInformation mNetworkInfo;
 
