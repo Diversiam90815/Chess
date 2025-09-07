@@ -14,6 +14,15 @@ CPUPlayer::CPUPlayer(std::shared_ptr<MoveGeneration> moveGeneration, std::shared
 	mPositionalEvaluation = std::make_shared<PositionalEvaluation>(mMoveEvaluation);
 }
 
+CPUPlayer::~CPUPlayer()
+{
+	if (mSearchThread.joinable())
+	{
+		mSearchThread.request_stop();
+		mSearchThread.join();
+	}
+}
+
 
 void CPUPlayer::setCPUConfiguration(const CPUConfiguration &config)
 {
@@ -28,7 +37,10 @@ void CPUPlayer::setCPUConfiguration(const CPUConfiguration &config)
 void CPUPlayer::requestMoveAsync()
 {
 	// Start async calculation
-	std::thread([this]() { calculateMove(mConfig.cpuColor); }).detach();
+	if (!mConfig.enabled)
+		return;
+
+	launchSearchAsync(mConfig.cpuColor);
 }
 
 
@@ -80,7 +92,7 @@ PossibleMove CPUPlayer::getBestEvaluatedMove(const std::vector<PossibleMove> &mo
 }
 
 
-PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth)
+PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken)
 {
 	if (moves.empty())
 		return {};
@@ -99,6 +111,9 @@ PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, i
 
 	for (const auto &move : moves)
 	{
+		if (cancelled(stopToken))
+			break;
+
 		// make the move
 		auto undoInfo = lightBoard.makeMove(move);
 
@@ -124,7 +139,7 @@ PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, i
 }
 
 
-PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth)
+PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken)
 {
 	if (moves.empty())
 		return {};
@@ -156,6 +171,9 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 
 	for (const auto &move : sortedMoves)
 	{
+		if (cancelled(stopToken)) // Check if thread was asked to cancel operation
+			break;
+
 		// make move
 		auto undoInfo = lightBoard.makeMove(move);
 
@@ -203,12 +221,15 @@ int CPUPlayer::evaluatePlayerPosition(const LightChessBoard &board, PlayerColor 
 }
 
 
-void CPUPlayer::calculateMove(PlayerColor player)
+PossibleMove CPUPlayer::computeBestMove(PlayerColor player, std::stop_token stopToken)
 {
 	PossibleMove selectedMove{};
 
 	// Generate all legal moves
 	mMoveGeneration->calculateAllLegalBasicMoves(player);
+
+	if (cancelled(stopToken)) // Check if thread was asked to cancel operation
+		return {};
 
 	// Get all possible moves for all pieces
 	auto					  playerPieces = mBoard->getPiecesFromPlayer(player);
@@ -223,7 +244,7 @@ void CPUPlayer::calculateMove(PlayerColor player)
 	if (allMoves.empty())
 	{
 		LOG_WARNING("No legal moves available for CPU player!");
-		return;
+		return {};
 	}
 
 	// Clear evaluation cache before starting a new search
@@ -243,13 +264,16 @@ void CPUPlayer::calculateMove(PlayerColor player)
 
 #endif
 
+	if (cancelled(stopToken)) // Check if thread was asked to cancel operation
+		return {};
+
 	// Select move based on difficulty
 	switch (mConfig.difficulty)
 	{
 	case CPUDifficulty::Random: selectedMove = getRandomMove(allMoves); break;
-	case CPUDifficulty::Easy: selectedMove = (allMoves.size() > 20) ? getBestEvaluatedMove(allMoves) : getMiniMaxMove(allMoves, 3); break;
-	case CPUDifficulty::Medium: selectedMove = getAlphaBetaMove(allMoves, 3); break;
-	case CPUDifficulty::Hard: selectedMove = getAlphaBetaMove(allMoves, 6); break;
+	case CPUDifficulty::Easy: selectedMove = (allMoves.size() > 20) ? getBestEvaluatedMove(allMoves) : getMiniMaxMove(allMoves, 3, stopToken); break;
+	case CPUDifficulty::Medium: selectedMove = getAlphaBetaMove(allMoves, 3, stopToken); break;
+	case CPUDifficulty::Hard: selectedMove = getAlphaBetaMove(allMoves, 6, stopToken); break;
 	default: selectedMove = getRandomMove(allMoves); break;
 	}
 
@@ -260,7 +284,7 @@ void CPUPlayer::calculateMove(PlayerColor player)
 		LOG_INFO("CPU selected pawn promotion to Queen");
 	}
 
-	moveCalculated(selectedMove);
+	return cancelled(stopToken) ? PossibleMove{} : selectedMove;
 }
 
 
@@ -574,7 +598,7 @@ PossibleMove CPUPlayer::selectMoveWithRandomization(std::vector<MoveCandidate> &
 }
 
 
-std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandidate> &allMoves)
+std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandidate> &allMoves) const
 {
 	std::vector<MoveCandidate> topCandidates;
 	topCandidates.reserve(mConfig.candidateMoveCount);
@@ -657,4 +681,25 @@ bool CPUPlayer::lookupTransposition(uint64_t hash, int depth, int &score, Possib
 	}
 
 	return false;
+}
+
+
+void CPUPlayer::launchSearchAsync(PlayerColor player)
+{
+	if (mSearchThread.joinable())
+	{
+		mSearchThread.request_stop();
+		mSearchThread.join();
+	}
+
+	mSearchThread = std::jthread(
+		[this, player](std::stop_token token)
+		{
+			PossibleMove mv = computeBestMove(player, token);
+
+			if (!mv.isEmpty())
+			{
+				moveCalculated(mv);
+			}
+		});
 }
