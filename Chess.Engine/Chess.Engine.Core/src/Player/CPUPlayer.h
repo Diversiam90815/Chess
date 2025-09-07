@@ -102,6 +102,7 @@ private:
 
 	int						   minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player);
 	int						   alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player);
+	int						   quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player);
 
 	PossibleMove			   selectBestMove(std::vector<MoveCandidate> &moves);
 

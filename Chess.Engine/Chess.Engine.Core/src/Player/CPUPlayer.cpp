@@ -361,7 +361,7 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 	// Terminal depth reached -> evaluate static positon
 	if (depth == 0)
 	{
-		int score = evaluateMoveAndPosition(move, player, board);
+		int score = quiescence(board, alpha, beta, player);
 		storeTransposition(hashKey, depth, score, TranspositionEntry::NodeType::Exact, PossibleMove{});
 		return score;
 	}
@@ -391,12 +391,19 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 	// Move ordering : try best move from transposition table first if available
 	if (!storedMove.isEmpty())
 	{
-		// find stored move in our moves list and put it first
-		auto it = std::find_if(moves.begin(), moves.end(), [&storedMove](const PossibleMove &move) { return move == storedMove; });
-
+		auto it = std::find(moves.begin(), moves.end(), storedMove);
 		if (it != moves.end())
 			std::swap(*moves.begin(), *it);
 	}
+
+	// Simple capture prioritization (stable)
+	std::stable_sort(moves.begin(), moves.end(),
+					 [](const PossibleMove &a, const PossibleMove &b)
+					 {
+						 bool ac = (a.type & MoveType::Capture) == MoveType::Capture;
+						 bool bc = (b.type & MoveType::Capture) == MoveType::Capture;
+						 return ac > bc;
+					 });
 
 	PossibleMove				 bestMove{};
 	TranspositionEntry::NodeType nodeType = TranspositionEntry::NodeType::Alpha;
@@ -489,6 +496,39 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 
 		return minEval;
 	}
+}
+
+
+int CPUPlayer::quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player)
+{
+	// Stand-pat - just positional evaluation from players perspective
+	int stand = evaluatePlayerPosition(board, player);
+
+	if (stand >= beta)
+		return stand;
+	if (stand < alpha)
+		alpha - stand;
+
+	// Generate legal moves (only consider captures though)
+	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
+
+	for (const auto &move : moves)
+	{
+		if ((move.type & MoveType::Capture) != MoveType::Capture)
+			continue;
+
+		auto undo  = board.makeMove(move);
+
+		int	 score = -quiescence(board, -beta, -alpha, player);
+		board.unmakeMove(undo);
+
+		if (score >= beta)
+			return score;
+		if (score > alpha)
+			alpha = score;
+	}
+
+	return alpha;
 }
 
 
