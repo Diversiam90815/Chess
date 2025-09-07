@@ -153,18 +153,18 @@
             <Grid Name="Buttons">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <Button
                     Name="StartCPUGameButton"
                     Grid.Column="0"
+                    Width="200"
                     HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
+                    VerticalAlignment="Top"
                     Click="StartCPUGameButton_Click"
                     Content="Start Game"
                     Visibility="{x:Bind converter:Converter.BoolToVisibility(_viewModel.StartGameButtonVisible), Mode=OneWay}" />
-
 
                 <Button
                     Name="DifficultyReturnButton"
