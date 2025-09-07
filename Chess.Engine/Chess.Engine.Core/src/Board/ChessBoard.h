@@ -9,7 +9,7 @@
 
 #include <array>
 #include <memory>
-#include <mutex>
+#include <shared_mutex>
 
 #include "Move.h"
 #include "Pawn.h"
@@ -19,7 +19,9 @@
 #include "Queen.h"
 #include "King.h"
 
+
 #define CHESSBOARD_DEBUG false
+
 
 using PlayerPiece	  = std::pair<Position, std::shared_ptr<ChessPiece>>;
 using BoardStateArray = int[BOARD_SIZE][BOARD_SIZE];
