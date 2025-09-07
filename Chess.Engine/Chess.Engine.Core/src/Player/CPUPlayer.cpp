@@ -507,7 +507,7 @@ int CPUPlayer::quiescence(LightChessBoard &board, int alpha, int beta, PlayerCol
 	if (stand >= beta)
 		return stand;
 	if (stand < alpha)
-		alpha - stand;
+		alpha = stand;
 
 	// Generate legal moves (only consider captures though)
 	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
