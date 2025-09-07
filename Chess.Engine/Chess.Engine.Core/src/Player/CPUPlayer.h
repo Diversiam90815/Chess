@@ -23,7 +23,7 @@
 #include "PositionalEvaluation.h"
 
 
-#define DEBUG_MOVES 0
+#define DEBUG_MOVES 1
 
 
 enum class CPUDifficulty
