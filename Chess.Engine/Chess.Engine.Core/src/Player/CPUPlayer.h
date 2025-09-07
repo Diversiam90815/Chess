@@ -96,15 +96,15 @@ public:
 
 
 private:
-	PossibleMove			   computeBestMove(PlayerColor player, std::stop_token stopToken = {});
+	PossibleMove computeBestMove(PlayerColor player, std::stop_token stopToken = {});
 
-	int						   minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player);
-	int						   alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player);
-	int						   quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player);
+	int			 minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
+	int			 alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
+	int			 quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player, std::stop_token stopToken = {});
 
-	PossibleMove			   selectBestMove(std::vector<MoveCandidate> &moves);
+	PossibleMove selectBestMove(std::vector<MoveCandidate> &moves);
 
-	PossibleMove			   selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
+	PossibleMove selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
 
 	std::vector<MoveCandidate> filterTopCandidates(std::vector<MoveCandidate> &allMoves) const;
 

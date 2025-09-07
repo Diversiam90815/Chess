@@ -178,7 +178,7 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 		auto undoInfo = lightBoard.makeMove(move);
 
 		// evaluate using alpha-beta (opp's turn, so minimizing)
-		int	 score	  = alphaBeta(move, lightBoard, depth - 1, alpha, beta, false, mConfig.cpuColor);
+		int	 score	  = alphaBeta(move, lightBoard, depth - 1, alpha, beta, false, mConfig.cpuColor, stopToken);
 
 		// unmake move
 		lightBoard.unmakeMove(undoInfo);
@@ -288,8 +288,11 @@ PossibleMove CPUPlayer::computeBestMove(PlayerColor player, std::stop_token stop
 }
 
 
-int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player)
+int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player, std::stop_token stopToken)
 {
+	if (cancelled(stopToken))
+		return 0;
+
 	mNodesSearched++;
 
 	// Terminal depth reached -> evaluate static position
@@ -320,11 +323,14 @@ int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int dep
 
 		for (const auto &currentMove : moves)
 		{
+			if (cancelled(stopToken)) // Check if thread was asked to quit operation
+				break;
+
 			// make move
 			auto undoInfo = board.makeMove(currentMove);
 
 			// recursively evaluate (switch to minimizing player)
-			int	 eval	  = minimax(currentMove, board, depth - 1, false, player);
+			int	 eval	  = minimax(currentMove, board, depth - 1, false, player, stopToken);
 			maxEval		  = std::max(maxEval, eval);
 
 			// Unmake move
@@ -339,11 +345,14 @@ int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int dep
 
 		for (const auto &currentMove : moves)
 		{
+			if (cancelled(stopToken)) // Check if thread was asked to quit operation
+				break;
+
 			// make move
 			auto undoInfo = board.makeMove(currentMove);
 
 			// recursively evaluate (switch to maximizing player)
-			int	 eval	  = minimax(currentMove, board, depth - 1, true, player);
+			int	 eval	  = minimax(currentMove, board, depth - 1, true, player, stopToken);
 			minEval		  = std::min(minEval, eval);
 
 			// unmake move
@@ -355,8 +364,11 @@ int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int dep
 }
 
 
-int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player)
+int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player, std::stop_token stopToken)
 {
+	if (cancelled(stopToken))
+		return 0;
+
 	mNodesSearched++;
 
 	// Check transposition table first
@@ -373,7 +385,7 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 	// Terminal depth reached -> evaluate static positon
 	if (depth == 0)
 	{
-		int score = quiescence(board, alpha, beta, player);
+		int score = quiescence(board, alpha, beta, player, stopToken);
 		storeTransposition(hashKey, depth, score, TranspositionEntry::NodeType::Exact, PossibleMove{});
 		return score;
 	}
@@ -426,11 +438,14 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 
 		for (const auto &currentMove : moves)
 		{
+			if (cancelled(stopToken)) // Check if thread was asked to quit operation
+				break;
+
 			// make move
 			auto undoInfo = board.makeMove(currentMove);
 
 			// recursively evaluate (switch to minimizing player)
-			int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, false, player);
+			int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, false, player, stopToken);
 
 			// unmake move
 			board.unmakeMove(undoInfo);
@@ -474,7 +489,7 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 			auto undoInfo = board.makeMove(currentMove);
 
 			// Recursively evaluate (switch to maximizing player)
-			int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, true, player);
+			int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, true, player, stopToken);
 
 			// unmake move
 			board.unmakeMove(undoInfo);
@@ -511,8 +526,11 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 }
 
 
-int CPUPlayer::quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player)
+int CPUPlayer::quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player, std::stop_token stopToken)
 {
+	if (cancelled(stopToken)) // Check if thread was asked to quit operation
+		return alpha;
+
 	// Stand-pat - just positional evaluation from players perspective
 	int stand = evaluatePlayerPosition(board, player);
 
@@ -526,6 +544,9 @@ int CPUPlayer::quiescence(LightChessBoard &board, int alpha, int beta, PlayerCol
 
 	for (const auto &move : moves)
 	{
+		if (cancelled(stopToken)) // Check if thread was asked to quit operation
+			break;
+
 		if ((move.type & MoveType::Capture) != MoveType::Capture)
 			continue;
 
