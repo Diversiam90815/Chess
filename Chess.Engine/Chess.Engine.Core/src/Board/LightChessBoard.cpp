@@ -685,22 +685,18 @@ bool LightChessBoard::isEndgame() const
 	int totalMaterial = getMaterialValue(PlayerColor::White) + getMaterialValue(PlayerColor::Black);
 	int totalPieces	  = getPieceCount(PlayerColor::White) + getPieceCount(PlayerColor::Black);
 
-	return totalMaterial < 2500 || totalPieces <= 12;
+	return totalMaterial < mEndgameMaterial || totalPieces <= 12;
 }
 
 
 int LightChessBoard::getGamePhaseValue() const
 {
 	// Calculate game phase based on remaining material
-	int		  totalMaterial		= getMaterialValue(PlayerColor::White) + getMaterialValue(PlayerColor::Black);
+	int totalMaterial = getMaterialValue(PlayerColor::White) + getMaterialValue(PlayerColor::Black);
 
-	// Starting material is approximately 7800 (39*2*100)
-	const int STARTING_MATERIAL = 7800;
-	const int ENDGAME_MATERIAL	= 2500;
-
-	if (totalMaterial >= STARTING_MATERIAL)
+	if (totalMaterial >= mStartingMaterial)
 		return 1; // Opening
-	else if (totalMaterial <= ENDGAME_MATERIAL)
+	else if (totalMaterial <= mEndgameMaterial)
 		return 3; // Endgame
 	else
 		return 2; // Middlegame

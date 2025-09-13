@@ -163,6 +163,9 @@ private:
 	Position												   mBlackKingPos			= {4, 0};
 	Position												   mEnPassantTarget			= {-1, -1};
 
+	const int												   mStartingMaterial		= 7800;
+	const int												   mEndgameMaterial			= 2500;
+
 	// Castling rights
 	bool													   mWhiteCanCastleKingside	= true;
 	bool													   mWhiteCanCastleQueenside = true;
