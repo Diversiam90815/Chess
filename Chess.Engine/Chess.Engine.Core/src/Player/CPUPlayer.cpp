@@ -118,7 +118,7 @@ PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, i
 		auto undoInfo = lightBoard.makeMove(move);
 
 		// Evaluate using minimax (opp's turn -> minimizing)
-		int	 score	  = minimax(move, lightBoard, depth - 1, false, mConfig.cpuColor);
+		int	 score	  = minimax(move, lightBoard, depth - 1, false, mConfig.cpuColor, stopToken);
 
 		// unmake move
 		lightBoard.unmakeMove(undoInfo);
@@ -271,7 +271,7 @@ PossibleMove CPUPlayer::computeBestMove(PlayerColor player, std::stop_token stop
 	switch (mConfig.difficulty)
 	{
 	case CPUDifficulty::Random: selectedMove = getRandomMove(allMoves); break;
-	case CPUDifficulty::Easy: selectedMove = (allMoves.size() > 20) ? getBestEvaluatedMove(allMoves) : getMiniMaxMove(allMoves, 3, stopToken); break;
+	case CPUDifficulty::Easy: selectedMove = getMiniMaxMove(allMoves, 3, stopToken); break;
 	case CPUDifficulty::Medium: selectedMove = getAlphaBetaMove(allMoves, 3, stopToken); break;
 	case CPUDifficulty::Hard: selectedMove = getAlphaBetaMove(allMoves, 6, stopToken); break;
 	default: selectedMove = getRandomMove(allMoves); break;
