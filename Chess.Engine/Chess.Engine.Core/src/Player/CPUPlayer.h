@@ -59,12 +59,20 @@ struct CPUConfiguration
 {
 	CPUDifficulty			  difficulty = CPUDifficulty::Random;
 	std::chrono::milliseconds thinkingTime{1000};
-	bool					  enabled			  = false;
-	PlayerColor				  cpuColor			  = PlayerColor::Black; // Default to black
+	bool					  enabled					 = false;
+	PlayerColor				  cpuColor					 = PlayerColor::Black; // Default to black
 
-	bool					  enableRandomization = true;				// Add some randomness to move selection
-	float					  randomizationFactor = 0.1f;				// How much randomness? Between 0.0 and 1.0
-	int						  candidateMoveCount  = 5;					// Number of top moves to consider
+	bool					  enableRandomization		 = true;			   // Add some randomness to move selection
+	float					  randomizationFactor		 = 0.1f;			   // How much randomness? Between 0.0 and 1.0
+	int						  candidateMoveCount		 = 5;				   // Number of top moves to consider
+
+	// --- Iterative Deepening / Adaptive Search  ---
+	bool					  iterativeDeepeningEnabled	 = true;
+	int						  baseDepthEasy				 = 3;
+	int						  baseDepthMedium			 = 3;
+	int						  baseDepthHard				 = 6;
+	int						  maxAdditionalDepthAdaptive = 3; // Max extra depth when few moves
+	int						  endgameAdditionalDepth	 = 1; // Extra depth allowed in endgame
 };
 
 
@@ -103,8 +111,10 @@ private:
 	int			 quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player, std::stop_token stopToken = {});
 
 	PossibleMove selectBestMove(std::vector<MoveCandidate> &moves);
-
 	PossibleMove selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
+
+	int			 computeAdaptiveMaxDepth(int baseDepth, int moveCount, bool endgame);
+	bool		 isEndgame(const LightChessBoard &board) const;
 
 	std::vector<MoveCandidate> filterTopCandidates(std::vector<MoveCandidate> &allMoves) const;
 

@@ -622,6 +622,34 @@ PossibleMove CPUPlayer::selectMoveWithRandomization(std::vector<MoveCandidate> &
 }
 
 
+int CPUPlayer::computeAdaptiveMaxDepth(int baseDepth, int moveCount, bool endgame)
+{
+	int extra = 0;
+
+	if (moveCount > 35)
+		extra = 0;
+	else if (moveCount > 28)
+		extra = 1;
+	else if (moveCount > 18)
+		extra = 2;
+	else
+		extra = 3;
+
+	extra = (std::min)(extra, mConfig.maxAdditionalDepthAdaptive);
+
+	if (endgame)
+		extra += mConfig.endgameAdditionalDepth;
+
+	return baseDepth + extra;
+}
+
+
+bool CPUPlayer::isEndgame(const LightChessBoard &board) const
+{
+	return board.isEndgame();
+}
+
+
 std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandidate> &allMoves) const
 {
 	std::vector<MoveCandidate> topCandidates;
