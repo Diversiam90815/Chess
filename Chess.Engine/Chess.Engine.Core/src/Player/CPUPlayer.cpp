@@ -622,7 +622,7 @@ PossibleMove CPUPlayer::selectMoveWithRandomization(std::vector<MoveCandidate> &
 }
 
 
-int CPUPlayer::computeAdaptiveMaxDepth(int baseDepth, int moveCount, bool endgame)
+int CPUPlayer::computeAdaptiveMaxDepth(int baseDepth, int moveCount, bool endgame) const
 {
 	int extra = 0;
 

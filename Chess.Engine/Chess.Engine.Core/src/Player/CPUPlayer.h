@@ -113,7 +113,7 @@ private:
 	PossibleMove selectBestMove(std::vector<MoveCandidate> &moves);
 	PossibleMove selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
 
-	int			 computeAdaptiveMaxDepth(int baseDepth, int moveCount, bool endgame);
+	int			 computeAdaptiveMaxDepth(int baseDepth, int moveCount, bool endgame) const;
 	bool		 isEndgame(const LightChessBoard &board) const;
 
 	std::vector<MoveCandidate> filterTopCandidates(std::vector<MoveCandidate> &allMoves) const;
