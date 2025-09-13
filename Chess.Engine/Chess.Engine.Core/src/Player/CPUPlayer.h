@@ -92,7 +92,6 @@ public:
 	PossibleMove	 getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
 	PossibleMove	 getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
 
-	int				 evaluateMoveAndPosition(const PossibleMove &move, PlayerColor player, const LightChessBoard &board);
 	int				 evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player);
 
 

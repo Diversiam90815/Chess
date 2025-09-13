@@ -102,14 +102,24 @@ PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, i
 	mTranspositionHits = 0;
 
 	// Create lightweight board from current board data
-	LightChessBoard lightBoard(*mBoard);
+	LightChessBoard			  lightBoard(*mBoard);
 
-	PossibleMove	bestMove  = moves[0];
-	int				bestScore = -std::numeric_limits<int>::max();
+	// Basic ordering : captures first
+	std::vector<PossibleMove> sortedMoves = moves;
+	std::stable_sort(sortedMoves.begin(), sortedMoves.end(),
+					 [&](const PossibleMove &a, const PossibleMove &b)
+					 {
+						 int scoreA = mMoveEvaluation->getMediumEvaluation(a, mConfig.cpuColor, &lightBoard);
+						 int scoreB = mMoveEvaluation->getMediumEvaluation(b, mConfig.cpuColor, &lightBoard);
+						 return scoreA > scoreB;
+					 });
+
+	PossibleMove bestMove  = moves[0];
+	int			 bestScore = -std::numeric_limits<int>::max();
 
 	LOG_INFO("Starting minimax search with depth {}", depth);
 
-	for (const auto &move : moves)
+	for (const auto &move : sortedMoves)
 	{
 		if (cancelled(stopToken))
 			break;
@@ -257,8 +267,8 @@ PossibleMove CPUPlayer::computeBestMove(PlayerColor player, std::stop_token stop
 	for (const auto &move : allMoves)
 	{
 		LightChessBoard testBoard(*mBoard);
-		int				score = evaluateMoveAndPosition(move, player, testBoard);
-		LOG_DEBUG("Move {}->{}: score = {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
+		int				score = evaluatePlayerPosition(testBoard, player);
+		LOG_DEBUG("Move {}->{}: positional score = {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
 	}
 	LOG_DEBUG("=== End Debug ===");
 
@@ -297,7 +307,7 @@ int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int dep
 
 	// Terminal depth reached -> evaluate static position
 	if (depth == 0)
-		return evaluateMoveAndPosition(move, player, board);
+		return evaluatePlayerPosition(board, player);
 
 	// Generate legal moves for player
 	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
@@ -306,15 +316,8 @@ int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int dep
 	if (moves.empty())
 	{
 		if (board.isInCheck(board.getCurrentPlayer()))
-		{
-			// Checkmate -> return large signed value based on perspective (prefer quicker mates by adding depth to score
-			return maximizing ? (-10000 + depth) : (10000 - depth);
-		}
-		else
-		{
-			// Stalemate
-			return 0;
-		}
+			return maximizing ? (-10000 + depth) : (10000 - depth); // depth bias keeps faster mates
+		return 0;													// stalemate
 	}
 
 	if (maximizing)
@@ -635,40 +638,6 @@ std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandid
 	}
 
 	return topCandidates;
-}
-
-
-int CPUPlayer::evaluateMoveAndPosition(const PossibleMove &move, PlayerColor player, const LightChessBoard &board)
-{
-	uint64_t hash = makeEvalKey(move, player, board);
-
-	// Check evaluation cache
-	auto	 it	  = mEvaluationCache.find(hash);
-
-	if (it != mEvaluationCache.end())
-		return it->second;
-
-	// Combine positional and move-specific evaluation with proper scaling
-	int score			= 0;
-
-	// Get positional evaluation (board state)
-	int positionalScore = mPositionalEvaluation->evaluatePosition(board, player);
-
-	// Get move-specific evaluation
-	int moveScore		= mMoveEvaluation->getAdvancedEvaluation(move, player, &board);
-
-	// Combine with proper weighting
-	score				= positionalScore + moveScore;
-
-#if DEBUG_MOVES
-	LOG_DEBUG("Position score: {}, Move score: {}, Total: {}", positionalScore, moveScore, score);
-#endif
-
-	// Cache result
-	if (mEvaluationCache.size() < MAX_EVAL_CACHE_SIZE)
-		mEvaluationCache[hash] = score;
-
-	return score;
 }
 
 
