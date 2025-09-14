@@ -219,10 +219,19 @@ PossibleMove CPUPlayer::searchIterativeAlphaBeta(const std::vector<PossibleMove>
 			bestScore		 = depthBestScore;
 			finalRootResults = depthResults;
 
-			// Move best to front
-			auto it			 = std::find(sortedMoves.begin(), sortedMoves.end(), depthBest);
-			if (it != sortedMoves.end())
-				std::rotate(sortedMoves.begin(), it, it + 1);
+			std::sort(sortedMoves.begin(), sortedMoves.end(),
+					  [&](const PossibleMove &a, const PossibleMove &b)
+					  {
+						  int sa = 0, sb = 0;
+						  for (auto &c : depthResults)
+						  {
+							  if (c.move == a)
+								  sa = c.score;
+							  else if (c.move == b)
+								  sb = c.score;
+						  }
+						  return sa > sb;
+					  });
 		}
 
 		LOG_INFO("ID depth {} complete. Best score {} Nodes {}", depth, bestScore, mNodesSearched);
@@ -390,9 +399,9 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 	std::stable_sort(moves.begin(), moves.end(),
 					 [&](const PossibleMove &a, const PossibleMove &b)
 					 {
-						 int sa = mMoveEvaluation->getAdvancedEvaluation(a, mConfig.cpuColor, &board);
-						 int sb = mMoveEvaluation->getAdvancedEvaluation(b, mConfig.cpuColor, &board);
-						 return sa > sb;
+						 int scoreA = mMoveEvaluation->getAdvancedEvaluation(a, mConfig.cpuColor, &board);
+						 int scoreB = mMoveEvaluation->getAdvancedEvaluation(b, mConfig.cpuColor, &board);
+						 return scoreA > scoreB;
 					 });
 
 	PossibleMove				 bestMove{};

@@ -51,7 +51,6 @@ TEST_F(CPUPlayerTests, ConstructorInitializeCorrectly)
 	EXPECT_EQ(config.thinkingTime.count(), 1000) << "Default thinking time should be 1000ms";
 	EXPECT_TRUE(config.enableRandomization) << "Randomization should be enabled by default";
 	EXPECT_FLOAT_EQ(config.randomizationFactor, 0.1f) << "Default randomization factor should be 0.1";
-	EXPECT_EQ(config.candidateMoveCount, 5) << "Default candidate move count should be 5";
 }
 
 
@@ -64,7 +63,6 @@ TEST_F(CPUPlayerTests, SetCPUConfigurationUpdatesCorrectly)
 	config.thinkingTime		   = std::chrono::milliseconds(2000);
 	config.enableRandomization = false;
 	config.randomizationFactor = 0.3f;
-	config.candidateMoveCount  = 10;
 
 	mCPUPlayer->setCPUConfiguration(config);
 	CPUConfiguration retrievedConfig = mCPUPlayer->getCPUConfiguration();
@@ -75,7 +73,6 @@ TEST_F(CPUPlayerTests, SetCPUConfigurationUpdatesCorrectly)
 	EXPECT_EQ(retrievedConfig.thinkingTime.count(), 2000) << "Thinking time should be updated to 2000ms";
 	EXPECT_FALSE(retrievedConfig.enableRandomization) << "Randomization should be disabled";
 	EXPECT_FLOAT_EQ(retrievedConfig.randomizationFactor, 0.3f) << "Randomization factor should be updated to 0.3";
-	EXPECT_EQ(retrievedConfig.candidateMoveCount, 10) << "Candidate move count should be updated to 10";
 }
 
 

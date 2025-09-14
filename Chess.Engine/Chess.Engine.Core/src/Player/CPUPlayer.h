@@ -57,25 +57,23 @@ struct MoveCandidate
 struct CPUConfiguration
 {
 	CPUDifficulty			  difficulty;
-	std::chrono::milliseconds thinkingTime{5000};
+	std::chrono::milliseconds thinkingTime{0};
 	bool					  enabled					   = false;
 	PlayerColor				  cpuColor					   = PlayerColor::Black; // Default to black
-
-	bool					  enableRandomization		   = true;				 // Add some randomness to move selection
-	float					  randomizationFactor		   = 0.1f;				 // How much randomness? Between 0.0 and 1.0
-	int						  candidateMoveCount		   = 5;					 // Number of top moves to consider
 
 	// --- Iterative Deepening / Adaptive Search  ---
 	bool					  iterativeDeepeningEnabled	   = true;
 	int						  baseDepthEasy				   = 2;
 	int						  baseDepthMedium			   = 3;
-	int						  baseDepthHard				   = 6;
+	int						  baseDepthHard				   = 5;
 	int						  maxAdditionalDepthAdaptive   = 3; // Max extra depth when few moves
 	int						  endgameAdditionalDepth	   = 1; // Extra depth allowed in endgame
 
 	// Root move randomization
-	int						  rootRandomizationTopN		   = 5;	 // Consider top N searched moves
-	int						  randomizationScoreMargin	   = 25; // Accept moves within this score of best
+	bool					  enableRandomization		   = false; // Add some randomness to move selection
+	int						  rootRandomizationTopN		   = 5;		// Consider top N searched moves
+	int						  randomizationScoreMargin	   = 25;	// Accept moves within this score of best
+	float					  randomizationFactor		   = 0.01f;
 	float					  openingRandomizationScale	   = 1.0f;
 	float					  middlegameRandomizationScale = 0.6f;
 	float					  endgameRandomizationFactor   = 0.0f;
