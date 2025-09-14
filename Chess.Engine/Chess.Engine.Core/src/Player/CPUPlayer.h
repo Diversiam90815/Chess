@@ -58,24 +58,30 @@ struct CPUConfiguration
 {
 	CPUDifficulty			  difficulty;
 	std::chrono::milliseconds thinkingTime{5000};
-	bool					  enabled					 = false;
-	PlayerColor				  cpuColor					 = PlayerColor::Black; // Default to black
+	bool					  enabled					   = false;
+	PlayerColor				  cpuColor					   = PlayerColor::Black; // Default to black
 
-	bool					  enableRandomization		 = true;			   // Add some randomness to move selection
-	float					  randomizationFactor		 = 0.1f;			   // How much randomness? Between 0.0 and 1.0
-	int						  candidateMoveCount		 = 5;				   // Number of top moves to consider
+	bool					  enableRandomization		   = true;				 // Add some randomness to move selection
+	float					  randomizationFactor		   = 0.1f;				 // How much randomness? Between 0.0 and 1.0
+	int						  candidateMoveCount		   = 5;					 // Number of top moves to consider
 
 	// --- Iterative Deepening / Adaptive Search  ---
-	bool					  iterativeDeepeningEnabled	 = true;
-	int						  baseDepthEasy				 = 3;
-	int						  baseDepthMedium			 = 3;
-	int						  baseDepthHard				 = 6;
-	int						  maxAdditionalDepthAdaptive = 3; // Max extra depth when few moves
-	int						  endgameAdditionalDepth	 = 1; // Extra depth allowed in endgame
+	bool					  iterativeDeepeningEnabled	   = true;
+	int						  baseDepthEasy				   = 2;
+	int						  baseDepthMedium			   = 3;
+	int						  baseDepthHard				   = 6;
+	int						  maxAdditionalDepthAdaptive   = 3; // Max extra depth when few moves
+	int						  endgameAdditionalDepth	   = 1; // Extra depth allowed in endgame
 
 	// Root move randomization
-	int						  rootRandomizationTopN		 = 5;  // Consider top N searched moves
-	int						  randomizationScoreMargin	 = 25; // Accept moves within this score of best
+	int						  rootRandomizationTopN		   = 5;	 // Consider top N searched moves
+	int						  randomizationScoreMargin	   = 25; // Accept moves within this score of best
+	float					  openingRandomizationScale	   = 1.0f;
+	float					  middlegameRandomizationScale = 0.6f;
+	float					  endgameRandomizationFactor   = 0.0f;
+	float					  easyDifficultyRandomScale	   = 1.3f;
+	float					  mediumDifficultyRandomScale  = 1.0f;
+	float					  hardDifficultyRandomScale	   = 0.40f;
 };
 
 
@@ -129,6 +135,7 @@ private:
 	}
 
 	float											 getPhaseRandomizationScale(const LightChessBoard &board) const;
+	float											 getDifficultyRandomizationScale() const;
 	PossibleMove									 pickRandomizedRootMove(std::vector<MoveCandidate> &moves, const LightChessBoard &board) const;
 
 
@@ -147,7 +154,7 @@ private:
 	int												 mTranspositionHits		   = 0;
 
 	std::random_device								 mRandomDevice;
-	std::mt19937									 mRandomGenerator;
+	mutable std::mt19937							 mRandomGenerator;
 
 	mutable std::unordered_map<uint64_t, int>		 mEvaluationCache;
 	static constexpr size_t							 MAX_EVAL_CACHE_SIZE	= 1000000;

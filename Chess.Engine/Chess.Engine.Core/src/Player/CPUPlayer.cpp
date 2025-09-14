@@ -619,10 +619,22 @@ float CPUPlayer::getPhaseRandomizationScale(const LightChessBoard &board) const
 
 	switch (phase)
 	{
-	case GamePhase::Opening: return 1.0f;
-	case GamePhase::MiddleGame: return 0.6f;
-	case GamePhase::EndGame: return 0.0f;
+	case GamePhase::Opening: return mConfig.openingRandomizationScale;
+	case GamePhase::MiddleGame: return mConfig.middlegameRandomizationScale;
+	case GamePhase::EndGame: return mConfig.endgameRandomizationFactor;
 	default: return 0.0f;
+	}
+}
+
+
+float CPUPlayer::getDifficultyRandomizationScale() const
+{
+	switch (mConfig.difficulty)
+	{
+	case CPUDifficulty::Easy: return mConfig.easyDifficultyRandomScale;
+	case CPUDifficulty::Medium: return mConfig.mediumDifficultyRandomScale;
+	case CPUDifficulty::Hard: return mConfig.hardDifficultyRandomScale;
+	default: return 1.0f;
 	}
 }
 
@@ -639,7 +651,9 @@ PossibleMove CPUPlayer::pickRandomizedRootMove(std::vector<MoveCandidate> &moves
 	if (!mConfig.enableRandomization || gamePhaseScale <= 0.0f)
 		return moves.front().move;
 
-	int						   bestScore = moves.front().score;
+	float					   difficultyScale = getDifficultyRandomizationScale();
+
+	int						   bestScore	   = moves.front().score;
 
 	// Filter top N moves within score margin
 	std::vector<MoveCandidate> movePool;
@@ -658,15 +672,16 @@ PossibleMove CPUPlayer::pickRandomizedRootMove(std::vector<MoveCandidate> &moves
 
 	// temperature controls how sharp the prob. distribution is (low -> strongly favor best move, high -> more variety)
 	// clamped to at least 0.001 to avoid division by 0 / overflow
-	float			   temperature = std::max(0.001f, mConfig.randomizationFactor * gamePhaseScale);
+	float			   baseTemp	   = mConfig.randomizationFactor;
+	float			   temperature = std::max(0.001f, baseTemp * difficultyScale * gamePhaseScale);
 	std::vector<float> weights;
 	weights.reserve(movePool.size());
-	float sum				  = 0.0f;
-	float distDampeningFactor = (1 / (randomizationDampening * temperature));
+	float sum	  = 0.0f;
+	float invDamp = 1.0f / (randomizationDampening * temperature);
 
 	for (const auto &c : movePool)
 	{
-		float w = std::exp((c.score - bestScore) * distDampeningFactor);
+		float w = std::exp((c.score - bestScore) * invDamp);
 		sum += w;
 		weights.push_back(w);
 	}
