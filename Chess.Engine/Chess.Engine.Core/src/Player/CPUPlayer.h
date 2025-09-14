@@ -57,7 +57,7 @@ struct MoveCandidate
 struct CPUConfiguration
 {
 	CPUDifficulty			  difficulty;
-	std::chrono::milliseconds thinkingTime{1000};
+	std::chrono::milliseconds thinkingTime{5000};
 	bool					  enabled					 = false;
 	PlayerColor				  cpuColor					 = PlayerColor::Black; // Default to black
 
