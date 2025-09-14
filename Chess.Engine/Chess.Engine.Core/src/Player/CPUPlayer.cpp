@@ -73,25 +73,6 @@ PossibleMove CPUPlayer::getRandomMove(const std::vector<PossibleMove> &moves)
 }
 
 
-PossibleMove CPUPlayer::getBestEvaluatedMove(const std::vector<PossibleMove> &moves)
-{
-	if (moves.empty())
-		return {};
-
-	std::vector<MoveCandidate> evaluatedMoves;
-
-	for (const auto &move : moves)
-	{
-		int score = mMoveEvaluation->getAdvancedEvaluation(move, mConfig.cpuColor);
-		evaluatedMoves.emplace_back(move, score);
-	}
-
-	PossibleMove selectedMove = mConfig.enableRandomization ? selectMoveWithRandomization(evaluatedMoves) : selectBestMove(evaluatedMoves);
-
-	return selectedMove;
-}
-
-
 PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken)
 {
 	if (moves.empty())

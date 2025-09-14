@@ -181,26 +181,6 @@ TEST_F(CPUPlayerTests, GetRandomMoveReturnsValidMove)
 }
 
 
-TEST_F(CPUPlayerTests, GetBestMovePrefersCheckmate)
-{
-	std::vector<PossibleMove> moves;
-
-	// Create moves with different basic evaluation scores
-	PossibleMove			  normalMove{{0, 1}, {0, 2}, MoveType::Normal};
-	PossibleMove			  captureMove{{1, 1}, {1, 2}, MoveType::Capture};
-	PossibleMove			  checkmateMove{{2, 1}, {2, 2}, MoveType::Checkmate};
-
-	moves.push_back(normalMove);
-	moves.push_back(captureMove);
-	moves.push_back(checkmateMove);
-
-	PossibleMove selectedMove = mCPUPlayer->getBestEvaluatedMove(moves);
-
-	// Checkmate should be selected as it has the highest basic evaluation score (1000)
-	EXPECT_TRUE(selectedMove == checkmateMove) << "Should select the move with highest basic evaluation (checkmate)";
-}
-
-
 TEST_F(CPUPlayerTests, GetMiniMaxMoveReturnsValidMove)
 {
 	std::vector<PossibleMove> moves;
@@ -249,15 +229,12 @@ TEST_F(CPUPlayerTests, EmptyMoveListHandling)
 
 	// Test that CPU handles empty move lists gracefully
 	PossibleMove			  randomMove	= mCPUPlayer->getRandomMove(emptyMoves);
-	PossibleMove			  easyMove		= mCPUPlayer->getBestEvaluatedMove(emptyMoves);
-
 	PossibleMove			  alphaBetaMove = mCPUPlayer->getAlphaBetaMove(emptyMoves, 2);
 	PossibleMove			  minimaxMove	= mCPUPlayer->getMiniMaxMove(emptyMoves, 2);
 
 
 	// Empty moves should result in empty/default moves
 	EXPECT_TRUE(randomMove.isEmpty()) << "Random move should be empty for empty input";
-	EXPECT_TRUE(easyMove.isEmpty()) << "Easy move should be empty for empty input";
 	EXPECT_TRUE(alphaBetaMove.isEmpty()) << "Alpha-Beta move should be empty for empty input";
 	EXPECT_TRUE(minimaxMove.isEmpty()) << "Minimax move should be empty for empty input";
 }

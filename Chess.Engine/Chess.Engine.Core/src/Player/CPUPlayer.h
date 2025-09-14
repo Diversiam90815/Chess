@@ -94,14 +94,11 @@ public:
 
 	PossibleMove	 getRandomMove(const std::vector<PossibleMove> &moves);
 
-	PossibleMove	 getBestEvaluatedMove(const std::vector<PossibleMove> &moves);
-
 	PossibleMove	 getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
 	PossibleMove	 getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
 	PossibleMove	 searchIterativeAlphaBeta(const std::vector<PossibleMove> &moves, int baseDepth, std::stop_token stopToken = {});
 
 	int				 evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player);
-
 
 
 private:
@@ -133,7 +130,6 @@ private:
 		// mix
 		return h ^ (m + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2));
 	}
-
 
 
 	CPUConfiguration								 mConfig;
