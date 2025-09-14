@@ -395,12 +395,11 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 			std::swap(*moves.begin(), *it);
 	}
 
-	// Simple capture prioritization (stable)
 	std::stable_sort(moves.begin(), moves.end(),
 					 [&](const PossibleMove &a, const PossibleMove &b)
 					 {
-						 int scoreA = mMoveEvaluation->getAdvancedEvaluation(a, mConfig.cpuColor, &board);
-						 int scoreB = mMoveEvaluation->getAdvancedEvaluation(b, mConfig.cpuColor, &board);
+						 int scoreA = mMoveEvaluation->getMediumEvaluation(a, mConfig.cpuColor, &board);
+						 int scoreB = mMoveEvaluation->getMediumEvaluation(b, mConfig.cpuColor, &board);
 						 return scoreA > scoreB;
 					 });
 
