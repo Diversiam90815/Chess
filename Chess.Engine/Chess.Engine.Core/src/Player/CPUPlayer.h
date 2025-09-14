@@ -72,6 +72,10 @@ struct CPUConfiguration
 	int						  baseDepthHard				 = 6;
 	int						  maxAdditionalDepthAdaptive = 3; // Max extra depth when few moves
 	int						  endgameAdditionalDepth	 = 1; // Extra depth allowed in endgame
+
+	// Root move randomization
+	int						  rootRandomizationTopN		 = 5;  // Consider top N searched moves
+	int						  randomizationScoreMargin	 = 25; // Accept moves within this score of best
 };
 
 
@@ -124,6 +128,9 @@ private:
 		return h ^ (m + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2));
 	}
 
+	float											 getPhaseRandomizationScale(const LightChessBoard &board) const;
+	PossibleMove									 pickRandomitedRootMove(std::vector<MoveCandidate> &moves, const LightChessBoard &board) const;
+
 
 	CPUConfiguration								 mConfig;
 
@@ -143,5 +150,7 @@ private:
 	std::mt19937									 mRandomGenerator;
 
 	mutable std::unordered_map<uint64_t, int>		 mEvaluationCache;
-	static constexpr size_t							 MAX_EVAL_CACHE_SIZE = 1000000;
+	static constexpr size_t							 MAX_EVAL_CACHE_SIZE	= 1000000;
+
+	static constexpr float							 randomizationDampening = 50.0f;
 };

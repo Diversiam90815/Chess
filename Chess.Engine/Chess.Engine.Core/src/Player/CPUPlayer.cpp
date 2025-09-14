@@ -186,9 +186,9 @@ PossibleMove CPUPlayer::searchIterativeAlphaBeta(const std::vector<PossibleMove>
 			if (cancelled(stopToken))
 				break;
 
-			auto& move  = sortedMoves[i];
-			auto undo  = board.makeMove(move);
-			int	 score = alphaBeta(move, board, depth - 1, alpha, beta, false, mConfig.cpuColor, stopToken);
+			auto &move	= sortedMoves[i];
+			auto  undo	= board.makeMove(move);
+			int	  score = alphaBeta(move, board, depth - 1, alpha, beta, false, mConfig.cpuColor, stopToken);
 			board.unmakeMove(undo);
 
 			if (score > depthBestScore)
@@ -594,4 +594,75 @@ void CPUPlayer::launchSearchAsync(PlayerColor player)
 				moveCalculated(mv);
 			}
 		});
+}
+
+
+float CPUPlayer::getPhaseRandomizationScale(const LightChessBoard &board) const
+{
+	GamePhase phase = mMoveEvaluation->determineGamePhase(&board);
+
+	switch (phase)
+	{
+	case GamePhase::Opening: return 1.0f;
+	case GamePhase::MiddleGame: return 0.6f;
+	case GamePhase::EndGame: return 0.0f;
+	default: return 0.0f;
+	}
+}
+
+
+PossibleMove CPUPlayer::pickRandomitedRootMove(std::vector<MoveCandidate> &moves, const LightChessBoard &board) const
+{
+	if (moves.empty())
+		return {};
+
+	// Sort (should already be, but ensure)
+	std::sort(moves.begin(), moves.end(), [](const auto &a, const auto &b) { return a.score > b.score; });
+
+	float gamePhaseScale = getPhaseRandomizationScale(board);
+	if (!mConfig.enableRandomization || gamePhaseScale <= 0.0f)
+		return moves.front().move;
+
+	int						   bestScore = moves.front().score;
+
+	// Filter top N moves within score margin
+	std::vector<MoveCandidate> movePool;
+	movePool.reserve(mConfig.rootRandomizationTopN);
+
+	for (size_t i = 0; i < moves.size() && static_cast<int>(i) < mConfig.rootRandomizationTopN; ++i)
+	{
+		if (bestScore - moves[i].score <= mConfig.randomizationScoreMargin)
+			movePool.push_back(moves[i]);
+	}
+
+	if (movePool.size() <= 1)
+		return movePool.empty() ? moves.front().move : movePool.front().move;
+
+	// Picking randomized move via softmax function
+
+	// temperature controls how sharp the prob. distribution is (low -> strongly favor best move, high -> more variety)
+	// clamped to at least 0.001 to avoid division by 0 / overflow
+	float			   temperature = std::max(0.001f, mConfig.randomizationFactor * gamePhaseScale);
+	std::vector<float> weights;
+	weights.reserve(movePool.size());
+	float sum = 0.0f;
+
+	for (const auto &c : movePool)
+	{
+		float w = std::exp((c.score - bestScore) / (randomizationDampening * temperature));
+		sum += w;
+		weights.push_back(w);
+	}
+
+	std::uniform_real_distribution<float> dist(0.0f, sum);
+	float								  r = dist(mRandomGenerator);
+
+	for (size_t i = 0; i < movePool.size(); ++i)
+	{
+		if (r <= weights[i])
+			return movePool[i].move;
+		r -= weights[i];
+	}
+
+	return movePool.front().move;
 }
