@@ -47,12 +47,6 @@ struct TranspositionEntry
 	PossibleMove move{};
 };
 
-struct MoveCandidate
-{
-	PossibleMove move;
-	int			 score;
-};
-
 
 struct CPUConfiguration
 {
@@ -108,13 +102,8 @@ private:
 	int			 alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
 	int			 quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player, std::stop_token stopToken = {});
 
-	PossibleMove selectBestMove(std::vector<MoveCandidate> &moves);
-	PossibleMove selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
-
 	int			 computeAdaptiveMaxDepth(int baseDepth, int moveCount, bool endgame) const;
 	bool		 isEndgame(const LightChessBoard &board) const;
-
-	std::vector<MoveCandidate> filterTopCandidates(std::vector<MoveCandidate> &allMoves) const;
 
 	void					   storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move);
 	bool					   lookupTransposition(uint64_t hash, int depth, int &score, PossibleMove &move);

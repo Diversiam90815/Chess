@@ -641,60 +641,6 @@ int CPUPlayer::quiescence(LightChessBoard &board, int alpha, int beta, PlayerCol
 }
 
 
-PossibleMove CPUPlayer::selectBestMove(std::vector<MoveCandidate> &moves)
-{
-	auto topCandidates = filterTopCandidates(moves);
-
-	if (topCandidates.empty())
-		return {};
-
-	return topCandidates[0].move;
-}
-
-
-PossibleMove CPUPlayer::selectMoveWithRandomization(std::vector<MoveCandidate> &moves)
-{
-	auto topCandidates = filterTopCandidates(moves);
-
-	if (topCandidates.empty())
-		return {};
-
-	if (topCandidates.size() == 1 || !mConfig.enableRandomization)
-		return topCandidates[0].move;
-
-	// weigh moves depending on score difference to the best move and randomization factor
-	int											bestScore = topCandidates[0].score;
-	std::vector<std::pair<PossibleMove, float>> weightedMoves;
-
-	for (const auto &candidate : topCandidates)
-	{
-		float scoreDiff = static_cast<float>(bestScore - candidate.score);
-		float weight	= std::exp(-scoreDiff * mConfig.randomizationFactor);
-		weightedMoves.emplace_back(candidate.move, weight);
-	}
-
-	// Select best on weight
-	std::uniform_real_distribution<float> dist(0.0f, 1.0f);
-	float								  randomValue = dist(mRandomGenerator);
-	float								  totalWeight = 0.0f;
-
-	for (const auto &[move, weight] : weightedMoves)
-	{
-		totalWeight += weight;
-	}
-
-	float accumulatedWeight = 0.0f;
-	for (const auto &[move, weight] : weightedMoves)
-	{
-		accumulatedWeight += weight / totalWeight;
-		if (randomValue <= accumulatedWeight)
-			return move;
-	}
-
-	return topCandidates[0].move;
-}
-
-
 int CPUPlayer::computeAdaptiveMaxDepth(int baseDepth, int moveCount, bool endgame) const
 {
 	int extra = 0;
@@ -720,25 +666,6 @@ int CPUPlayer::computeAdaptiveMaxDepth(int baseDepth, int moveCount, bool endgam
 bool CPUPlayer::isEndgame(const LightChessBoard &board) const
 {
 	return board.isEndgame();
-}
-
-
-std::vector<MoveCandidate> CPUPlayer::filterTopCandidates(std::vector<MoveCandidate> &allMoves) const
-{
-	std::vector<MoveCandidate> topCandidates;
-	topCandidates.reserve(mConfig.candidateMoveCount);
-
-	// Sort by score (descending order)
-	std::sort(allMoves.begin(), allMoves.end(), [](const auto &a, const auto &b) { return a.score > b.score; });
-
-	int actualCount = (std::min)(mConfig.candidateMoveCount, static_cast<int>(allMoves.size()));
-
-	for (int i = 0; i < actualCount; ++i)
-	{
-		topCandidates.push_back(allMoves[i]);
-	}
-
-	return topCandidates;
 }
 
 
