@@ -611,7 +611,7 @@ float CPUPlayer::getPhaseRandomizationScale(const LightChessBoard &board) const
 }
 
 
-PossibleMove CPUPlayer::pickRandomitedRootMove(std::vector<MoveCandidate> &moves, const LightChessBoard &board) const
+PossibleMove CPUPlayer::pickRandomizedRootMove(std::vector<MoveCandidate> &moves, const LightChessBoard &board) const
 {
 	if (moves.empty())
 		return {};
@@ -645,11 +645,12 @@ PossibleMove CPUPlayer::pickRandomitedRootMove(std::vector<MoveCandidate> &moves
 	float			   temperature = std::max(0.001f, mConfig.randomizationFactor * gamePhaseScale);
 	std::vector<float> weights;
 	weights.reserve(movePool.size());
-	float sum = 0.0f;
+	float sum				  = 0.0f;
+	float distDampeningFactor = (1 / (randomizationDampening * temperature));
 
 	for (const auto &c : movePool)
 	{
-		float w = std::exp((c.score - bestScore) / (randomizationDampening * temperature));
+		float w = std::exp((c.score - bestScore) * distDampeningFactor);
 		sum += w;
 		weights.push_back(w);
 	}

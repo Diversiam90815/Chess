@@ -129,7 +129,7 @@ private:
 	}
 
 	float											 getPhaseRandomizationScale(const LightChessBoard &board) const;
-	PossibleMove									 pickRandomitedRootMove(std::vector<MoveCandidate> &moves, const LightChessBoard &board) const;
+	PossibleMove									 pickRandomizedRootMove(std::vector<MoveCandidate> &moves, const LightChessBoard &board) const;
 
 
 	CPUConfiguration								 mConfig;
