@@ -150,18 +150,41 @@ TEST_F(CPUPlayerPerformanceTests, AlphaBetaDepthComparison)
 }
 
 
+TEST_F(CPUPlayerPerformanceTests, IterativeDeepeningDepthComparison)
+{
+	std::vector<CPUAlgorithmPerformanceResult> results;
+
+	auto iterativeDeepeningFunc = [this](const std::vector<PossibleMove> &moves, int depth) { return mCPUPlayer->searchIterativeAlphaBeta(moves, depth); };
+
+	// Test different depths
+	for (int depth = 2; depth <= 6; ++depth)
+	{
+		auto result = benchmarkAlgorithm("IterativeDeepening", depth, "Opening", iterativeDeepeningFunc);
+		results.push_back(result);
+	}
+
+	saveJsonResults("cpu_player_performance-iterativdeepening_comparison", results);
+
+	// The results of this test are saved in the file
+	SUCCEED();
+}
+
+
 TEST_F(CPUPlayerPerformanceTests, AlgorithmComparison)
 {
 	std::vector<CPUAlgorithmPerformanceResult> results;
 
-	auto									   alphaBetaFunc   = [this](const std::vector<PossibleMove> &moves, int depth) { return mCPUPlayer->getAlphaBetaMove(moves, depth); };
+	auto									   alphaBetaFunc = [this](const std::vector<PossibleMove> &moves, int depth) { return mCPUPlayer->getAlphaBetaMove(moves, depth); };
+	auto iterativeSearch	   = [this](const std::vector<PossibleMove> &moves, int depth) { return mCPUPlayer->searchIterativeAlphaBeta(moves, depth); };
 
-	int										   testDepth	   = 4;
+	int	 testDepth			   = 4;
 
 	// Test both algorithms at same depth
-	auto									   alphaBetaResult = benchmarkAlgorithm("AlphaBeta", testDepth, "Opening", alphaBetaFunc);
+	auto alphaBetaResult	   = benchmarkAlgorithm("AlphaBeta", testDepth, "Opening", alphaBetaFunc);
+	auto iterativeSearchResult = benchmarkAlgorithm("IterativeSearch", testDepth, "Opening", iterativeSearch);
 
 	results.push_back(alphaBetaResult);
+	results.push_back(iterativeSearchResult);
 
 	saveJsonResults("cpu_player_performance-algorithm_comparison", results);
 
@@ -177,10 +200,14 @@ TEST_F(CPUPlayerPerformanceTests, ComplexPositionPerformance)
 	std::vector<CPUAlgorithmPerformanceResult> results;
 
 	auto									   alphaBetaFunc = [this](const std::vector<PossibleMove> &moves, int depth) { return mCPUPlayer->getAlphaBetaMove(moves, depth); };
+	auto iterativeSearch	   = [this](const std::vector<PossibleMove> &moves, int depth) { return mCPUPlayer->searchIterativeAlphaBeta(moves, depth); };
 
 	// Test performance on complex tactical position
-	auto									   result		 = benchmarkAlgorithm("AlphaBeta", 4, "Complex", alphaBetaFunc);
-	results.push_back(result);
+	auto alphaBetaResult	   = benchmarkAlgorithm("AlphaBeta", 4, "Complex", alphaBetaFunc);
+	auto iterativeSearchResult = benchmarkAlgorithm("IterativeSearch", 4, "Complex", iterativeSearch);
+
+	results.push_back(alphaBetaResult);
+	results.push_back(iterativeSearchResult);
 
 	saveJsonResults("cpu_player_performance-complex_position", results);
 
