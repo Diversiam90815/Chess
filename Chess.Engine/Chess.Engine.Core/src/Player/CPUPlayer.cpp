@@ -96,6 +96,9 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 				  return scoreA > scoreB;
 			  });
 
+	std::vector<MoveCandidate> rootResults;
+	rootResults.reserve(sortedMoves.size());
+
 	PossibleMove bestMove  = sortedMoves[0];
 	int			 bestScore = -std::numeric_limits<int>::max();
 	int			 alpha	   = -std::numeric_limits<int>::max();
@@ -117,6 +120,8 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 		// unmake move
 		lightBoard.unmakeMove(undoInfo);
 
+		rootResults.emplace_back(MoveCandidate{move, score});
+
 		// update best move if this is better
 		if (score > bestScore)
 		{
@@ -129,6 +134,9 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 
 		LOG_DEBUG("Move from {} to {} scored: {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
 	}
+
+	// Ranomize selection (only in early/mid game) after full root search
+	bestMove = pickRandomizedRootMove(rootResults, lightBoard);
 
 	LOG_INFO("Alpha-Beta search completed. Best score: {}, Nodes searched: {}, Transposition hits: {}", bestScore, mNodesSearched, mTranspositionHits);
 
@@ -153,19 +161,20 @@ PossibleMove CPUPlayer::searchIterativeAlphaBeta(const std::vector<PossibleMove>
 						 return scoreA > scoreB;
 					 });
 
-	bool endgame			 = isEndgame(board);
-	int	 maxDepth			 = computeAdaptiveMaxDepth(baseDepth, static_cast<int>(sortedMoves.size()), endgame);
+	bool endgame						   = isEndgame(board);
+	int	 maxDepth						   = computeAdaptiveMaxDepth(baseDepth, static_cast<int>(sortedMoves.size()), endgame);
 
-	mNodesSearched			 = 0;
-	mTranspositionHits		 = 0;
+	mNodesSearched						   = 0;
+	mTranspositionHits					   = 0;
 
 	// Time Control
-	auto		 startTime	 = std::chrono::steady_clock::now();
-	auto		 timeBudget	 = mConfig.thinkingTime;
-	bool		 timeLimited = timeBudget.count() > 0;
+	auto					   startTime   = std::chrono::steady_clock::now();
+	auto					   timeBudget  = mConfig.thinkingTime;
+	bool					   timeLimited = timeBudget.count() > 0;
 
-	PossibleMove bestMove{};
-	int			 bestScore = -std::numeric_limits<int>::max();
+	PossibleMove			   bestMove{};
+	int						   bestScore = -std::numeric_limits<int>::max();
+	std::vector<MoveCandidate> finalRootResults; // From last completed depth
 
 	for (int depth = 1; depth <= maxDepth; ++depth)
 	{
@@ -175,11 +184,13 @@ PossibleMove CPUPlayer::searchIterativeAlphaBeta(const std::vector<PossibleMove>
 		if (timeLimited && (std::chrono::steady_clock::now() - startTime) >= timeBudget)
 			break;
 
-		int			 alpha = -std::numeric_limits<int>::max();
-		int			 beta  = std::numeric_limits<int>::max();
+		int						   alpha = -std::numeric_limits<int>::max();
+		int						   beta	 = std::numeric_limits<int>::max();
 
-		PossibleMove depthBest{};
-		int			 depthBestScore = -std::numeric_limits<int>::max();
+		PossibleMove			   depthBest{};
+		int						   depthBestScore = -std::numeric_limits<int>::max();
+		std::vector<MoveCandidate> depthResults;
+		depthResults.reserve(sortedMoves.size());
 
 		for (size_t i = 0; i < sortedMoves.size(); ++i)
 		{
@@ -190,6 +201,8 @@ PossibleMove CPUPlayer::searchIterativeAlphaBeta(const std::vector<PossibleMove>
 			auto  undo	= board.makeMove(move);
 			int	  score = alphaBeta(move, board, depth - 1, alpha, beta, false, mConfig.cpuColor, stopToken);
 			board.unmakeMove(undo);
+
+			depthResults.emplace_back(MoveCandidate{move, score});
 
 			if (score > depthBestScore)
 			{
@@ -202,18 +215,21 @@ PossibleMove CPUPlayer::searchIterativeAlphaBeta(const std::vector<PossibleMove>
 
 		if (!depthBest.isEmpty())
 		{
-			bestMove  = depthBest;
-			bestScore = depthBestScore;
+			bestMove		 = depthBest;
+			bestScore		 = depthBestScore;
+			finalRootResults = depthResults;
 
 			// Move best to front
-			auto it	  = std::find(sortedMoves.begin(), sortedMoves.end(), depthBest);
-
+			auto it			 = std::find(sortedMoves.begin(), sortedMoves.end(), depthBest);
 			if (it != sortedMoves.end())
 				std::rotate(sortedMoves.begin(), it, it + 1);
 		}
 
 		LOG_INFO("ID depth {} complete. Best score {} Nodes {}", depth, bestScore, mNodesSearched);
 	}
+
+	// Apply phase aware randomization only after last completed iteration
+	bestMove = pickRandomizedRootMove(finalRootResults, board);
 
 	return bestMove;
 }
