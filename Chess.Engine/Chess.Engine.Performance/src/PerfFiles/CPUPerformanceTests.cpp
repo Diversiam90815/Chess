@@ -250,7 +250,6 @@ private:
 
 		switch (config.difficulty)
 		{
-		case CPUDifficulty::Random: return cpu->getRandomMove(allMoves);
 		case CPUDifficulty::Easy: return (allMoves.size() > 20) ? cpu->getBestEvaluatedMove(allMoves) : cpu->getMiniMaxMove(allMoves, 3);
 		case CPUDifficulty::Medium: return cpu->getAlphaBetaMove(allMoves, 3);
 		case CPUDifficulty::Hard: return cpu->getAlphaBetaMove(allMoves, 6);

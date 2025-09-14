@@ -46,7 +46,6 @@ TEST_F(CPUPlayerTests, ConstructorInitializeCorrectly)
 	// Verify CPU player is constructed with correct default values
 	CPUConfiguration config = mCPUPlayer->getCPUConfiguration();
 
-	EXPECT_EQ(config.difficulty, CPUDifficulty::Random) << "Default difficulty should be Random";
 	EXPECT_EQ(config.cpuColor, PlayerColor::Black) << "Default CPU color should be Black";
 	EXPECT_FALSE(config.enabled) << "CPU should be disabled by default";
 	EXPECT_EQ(config.thinkingTime.count(), 1000) << "Default thinking time should be 1000ms";

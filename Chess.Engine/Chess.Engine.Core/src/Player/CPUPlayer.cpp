@@ -212,6 +212,81 @@ PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves,
 }
 
 
+PossibleMove CPUPlayer::searchIterativeAlphaBeta(const std::vector<PossibleMove> &moves, int baseDepth, std::stop_token stopToken)
+{
+	if (moves.empty())
+		return {};
+
+	LightChessBoard			  board(*mBoard);
+
+	// Initial ordering
+	std::vector<PossibleMove> sortedMoves = moves;
+	std::stable_sort(sortedMoves.begin(), sortedMoves.end(),
+					 [&](const PossibleMove &a, const PossibleMove &b)
+					 {
+						 int scoreA = mMoveEvaluation->getAdvancedEvaluation(a, mConfig.cpuColor, &board);
+						 int scoreB = mMoveEvaluation->getAdvancedEvaluation(b, mConfig.cpuColor, &board);
+						 return scoreA > scoreB;
+					 });
+
+	bool endgame	   = isEndgame(board);
+	int	 maxDepth	   = computeAdaptiveMaxDepth(baseDepth, static_cast<int>(sortedMoves.size()), endgame);
+
+	mNodesSearched	   = 0;
+	mTranspositionHits = 0;
+
+	PossibleMove bestMove{};
+	int			 bestScore = -std::numeric_limits<int>::max();
+
+	for (int depth = 1; depth <= maxDepth; ++depth)
+	{
+		if (cancelled(stopToken))
+			break;
+
+		int			 alpha = -std::numeric_limits<int>::max();
+		int			 beta  = std::numeric_limits<int>::max();
+
+		PossibleMove depthBest{};
+		int			 depthBestScore = -std::numeric_limits<int>::max();
+
+		for (size_t i = 0; i < sortedMoves.size(); ++i)
+		{
+			if (cancelled(stopToken))
+				break;
+
+			auto move  = sortedMoves[i];
+			auto undo  = board.makeMove(move);
+			int	 score = alphaBeta(move, board, depth - 1, alpha, beta, false, mConfig.cpuColor, stopToken);
+			board.unmakeMove(undo);
+
+			if (score > depthBestScore)
+			{
+				depthBestScore = score;
+				depthBest	   = move;
+			}
+
+			alpha = std::max(alpha, score);
+		}
+
+		if (!depthBest.isEmpty())
+		{
+			bestMove  = depthBest;
+			bestScore = depthBestScore;
+
+			// Move best to front
+			auto it	  = std::find(sortedMoves.begin(), sortedMoves.end(), depthBest);
+
+			if (it != sortedMoves.end())
+				std::rotate(sortedMoves.begin(), it, it + 1);
+		}
+
+		LOG_INFO("ID depth {} complete. Best score {} Nodes {}", depth, bestScore, mNodesSearched);
+	}
+
+	return bestMove;
+}
+
+
 int CPUPlayer::evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player)
 {
 	uint64_t hash = board.getHashKey();
@@ -264,10 +339,13 @@ PossibleMove CPUPlayer::computeBestMove(PlayerColor player, std::stop_token stop
 #if DEBUG_MOVES
 
 	LOG_DEBUG("=== Move Evaluation Debug ===");
+	LightChessBoard tmpBoard(*mBoard);
+	bool			endgame = isEndgame(tmpBoard);
+	LOG_DEBUG("Endgame detected: {}", LoggingHelper::boolToString(endgame).c_str());
+
 	for (const auto &move : allMoves)
 	{
-		LightChessBoard testBoard(*mBoard);
-		int				score = evaluatePlayerPosition(testBoard, player);
+		int score = evaluatePlayerPosition(tmpBoard, player);
 		LOG_DEBUG("Move {}->{}: positional score = {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
 	}
 	LOG_DEBUG("=== End Debug ===");
@@ -280,10 +358,16 @@ PossibleMove CPUPlayer::computeBestMove(PlayerColor player, std::stop_token stop
 	// Select move based on difficulty
 	switch (mConfig.difficulty)
 	{
-	case CPUDifficulty::Random: selectedMove = getRandomMove(allMoves); break;
-	case CPUDifficulty::Easy: selectedMove = getMiniMaxMove(allMoves, 3, stopToken); break;
-	case CPUDifficulty::Medium: selectedMove = getAlphaBetaMove(allMoves, 3, stopToken); break;
-	case CPUDifficulty::Hard: selectedMove = getAlphaBetaMove(allMoves, 6, stopToken); break;
+	case CPUDifficulty::Easy: selectedMove = getMiniMaxMove(allMoves, mConfig.baseDepthEasy, stopToken); break;
+	case CPUDifficulty::Medium: selectedMove = getAlphaBetaMove(allMoves, mConfig.baseDepthMedium, stopToken); break;
+	case CPUDifficulty::Hard:
+	{
+		if (mConfig.iterativeDeepeningEnabled)
+			selectedMove = searchIterativeAlphaBeta(allMoves, mConfig.baseDepthHard, stopToken);
+		else
+			selectedMove = getAlphaBetaMove(allMoves, mConfig.baseDepthHard, stopToken);
+		break;
+	}
 	default: selectedMove = getRandomMove(allMoves); break;
 	}
 
@@ -425,11 +509,11 @@ int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int d
 
 	// Simple capture prioritization (stable)
 	std::stable_sort(moves.begin(), moves.end(),
-					 [](const PossibleMove &a, const PossibleMove &b)
+					 [&](const PossibleMove &a, const PossibleMove &b)
 					 {
-						 bool ac = (a.type & MoveType::Capture) == MoveType::Capture;
-						 bool bc = (b.type & MoveType::Capture) == MoveType::Capture;
-						 return ac > bc;
+						 int sa = mMoveEvaluation->getAdvancedEvaluation(a, mConfig.cpuColor, &board);
+						 int sb = mMoveEvaluation->getAdvancedEvaluation(b, mConfig.cpuColor, &board);
+						 return sa > sb;
 					 });
 
 	PossibleMove				 bestMove{};

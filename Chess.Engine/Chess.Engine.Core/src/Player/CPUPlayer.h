@@ -28,7 +28,6 @@
 
 enum class CPUDifficulty
 {
-	Random = 0,
 	Easy   = 1,
 	Medium = 2,
 	Hard   = 3
@@ -57,7 +56,7 @@ struct MoveCandidate
 
 struct CPUConfiguration
 {
-	CPUDifficulty			  difficulty = CPUDifficulty::Random;
+	CPUDifficulty			  difficulty;
 	std::chrono::milliseconds thinkingTime{1000};
 	bool					  enabled					 = false;
 	PlayerColor				  cpuColor					 = PlayerColor::Black; // Default to black
@@ -99,8 +98,10 @@ public:
 
 	PossibleMove	 getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
 	PossibleMove	 getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
+	PossibleMove	 searchIterativeAlphaBeta(const std::vector<PossibleMove> &moves, int baseDepth, std::stop_token stopToken = {});
 
 	int				 evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player);
+
 
 
 private:
