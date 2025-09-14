@@ -47,6 +47,12 @@ struct TranspositionEntry
 	PossibleMove move{};
 };
 
+struct MoveCandidate
+{
+	PossibleMove move;
+	int			 score;
+};
+
 
 struct CPUConfiguration
 {
@@ -88,7 +94,6 @@ public:
 
 	PossibleMove	 getRandomMove(const std::vector<PossibleMove> &moves);
 
-	PossibleMove	 getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
 	PossibleMove	 getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
 	PossibleMove	 searchIterativeAlphaBeta(const std::vector<PossibleMove> &moves, int baseDepth, std::stop_token stopToken = {});
 
@@ -98,20 +103,19 @@ public:
 private:
 	PossibleMove computeBestMove(PlayerColor player, std::stop_token stopToken = {});
 
-	int			 minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
 	int			 alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
 	int			 quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player, std::stop_token stopToken = {});
 
 	int			 computeAdaptiveMaxDepth(int baseDepth, int moveCount, bool endgame) const;
 	bool		 isEndgame(const LightChessBoard &board) const;
 
-	void					   storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move);
-	bool					   lookupTransposition(uint64_t hash, int depth, int &score, PossibleMove &move);
+	void		 storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move);
+	bool		 lookupTransposition(uint64_t hash, int depth, int &score, PossibleMove &move);
 
-	void					   launchSearchAsync(PlayerColor player);
-	inline bool				   cancelled(std::stop_token token) const { return token.stop_requested(); }
+	void		 launchSearchAsync(PlayerColor player);
+	inline bool	 cancelled(std::stop_token token) const { return token.stop_requested(); }
 
-	inline uint64_t			   makeEvalKey(const PossibleMove &move, PlayerColor player, const LightChessBoard &board) const
+	inline uint64_t makeEvalKey(const PossibleMove &move, PlayerColor player, const LightChessBoard &board) const
 	{
 		uint64_t h = board.getHashKey();
 		uint64_t m = (uint64_t(move.start.x & 7) << 48) | (uint64_t(move.start.y & 7) << 45) | (uint64_t(move.end.x & 7) << 42) | (uint64_t(move.end.y & 7) << 39) |

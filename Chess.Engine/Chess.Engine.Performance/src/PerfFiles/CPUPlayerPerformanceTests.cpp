@@ -130,26 +130,6 @@ protected:
 };
 
 
-TEST_F(CPUPlayerPerformanceTests, MinimaxDepthComparison)
-{
-	std::vector<CPUAlgorithmPerformanceResult> results;
-
-	auto									   minimaxFunc = [this](const std::vector<PossibleMove> &moves, int depth) { return mCPUPlayer->getMiniMaxMove(moves, depth); };
-
-	// Test different depths
-	for (int depth = 2; depth <= 5; ++depth)
-	{
-		auto result = benchmarkAlgorithm("Minimax", depth, "Opening", minimaxFunc);
-		results.push_back(result);
-	}
-
-	saveJsonResults("cpu_player_performance-minimax_depth_comparison", results);
-
-	// The results of this test are saved in the file
-	SUCCEED();
-}
-
-
 TEST_F(CPUPlayerPerformanceTests, AlphaBetaDepthComparison)
 {
 	std::vector<CPUAlgorithmPerformanceResult> results;
@@ -174,17 +154,13 @@ TEST_F(CPUPlayerPerformanceTests, AlgorithmComparison)
 {
 	std::vector<CPUAlgorithmPerformanceResult> results;
 
-	auto									   minimaxFunc	   = [this](const std::vector<PossibleMove> &moves, int depth) { return mCPUPlayer->getMiniMaxMove(moves, depth); };
-
 	auto									   alphaBetaFunc   = [this](const std::vector<PossibleMove> &moves, int depth) { return mCPUPlayer->getAlphaBetaMove(moves, depth); };
 
 	int										   testDepth	   = 4;
 
 	// Test both algorithms at same depth
-	auto									   minimaxResult   = benchmarkAlgorithm("Minimax", testDepth, "Opening", minimaxFunc);
 	auto									   alphaBetaResult = benchmarkAlgorithm("AlphaBeta", testDepth, "Opening", alphaBetaFunc);
 
-	results.push_back(minimaxResult);
 	results.push_back(alphaBetaResult);
 
 	saveJsonResults("cpu_player_performance-algorithm_comparison", results);

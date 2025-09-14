@@ -73,63 +73,6 @@ PossibleMove CPUPlayer::getRandomMove(const std::vector<PossibleMove> &moves)
 }
 
 
-PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken)
-{
-	if (moves.empty())
-		return {};
-
-	// Reset search statistics
-	mNodesSearched	   = 0;
-	mTranspositionHits = 0;
-
-	// Create lightweight board from current board data
-	LightChessBoard			  lightBoard(*mBoard);
-
-	// Basic ordering : captures first
-	std::vector<PossibleMove> sortedMoves = moves;
-	std::stable_sort(sortedMoves.begin(), sortedMoves.end(),
-					 [&](const PossibleMove &a, const PossibleMove &b)
-					 {
-						 int scoreA = mMoveEvaluation->getMediumEvaluation(a, mConfig.cpuColor, &lightBoard);
-						 int scoreB = mMoveEvaluation->getMediumEvaluation(b, mConfig.cpuColor, &lightBoard);
-						 return scoreA > scoreB;
-					 });
-
-	PossibleMove bestMove  = moves[0];
-	int			 bestScore = -std::numeric_limits<int>::max();
-
-	LOG_INFO("Starting minimax search with depth {}", depth);
-
-	for (const auto &move : sortedMoves)
-	{
-		if (cancelled(stopToken))
-			break;
-
-		// make the move
-		auto undoInfo = lightBoard.makeMove(move);
-
-		// Evaluate using minimax (opp's turn -> minimizing)
-		int	 score	  = minimax(move, lightBoard, depth - 1, false, mConfig.cpuColor, stopToken);
-
-		// unmake move
-		lightBoard.unmakeMove(undoInfo);
-
-		// update best move if this is better
-		if (score > bestScore)
-		{
-			bestScore = score;
-			bestMove  = move;
-		}
-
-		LOG_DEBUG("Move from {} to {} scored: {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
-	}
-
-	LOG_INFO("Minimax search completed. Best score: {}, Nodes searched: {}", bestScore, mNodesSearched);
-
-	return bestMove;
-}
-
-
 PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken)
 {
 	if (moves.empty())
@@ -243,7 +186,7 @@ PossibleMove CPUPlayer::searchIterativeAlphaBeta(const std::vector<PossibleMove>
 			if (cancelled(stopToken))
 				break;
 
-			auto move  = sortedMoves[i];
+			auto& move  = sortedMoves[i];
 			auto undo  = board.makeMove(move);
 			int	 score = alphaBeta(move, board, depth - 1, alpha, beta, false, mConfig.cpuColor, stopToken);
 			board.unmakeMove(undo);
@@ -347,7 +290,7 @@ PossibleMove CPUPlayer::computeBestMove(PlayerColor player, std::stop_token stop
 	// Select move based on difficulty
 	switch (mConfig.difficulty)
 	{
-	case CPUDifficulty::Easy: selectedMove = getMiniMaxMove(allMoves, mConfig.baseDepthEasy, stopToken); break;
+	case CPUDifficulty::Easy: selectedMove = getAlphaBetaMove(allMoves, mConfig.baseDepthEasy, stopToken); break;
 	case CPUDifficulty::Medium: selectedMove = getAlphaBetaMove(allMoves, mConfig.baseDepthMedium, stopToken); break;
 	case CPUDifficulty::Hard:
 	{
@@ -368,75 +311,6 @@ PossibleMove CPUPlayer::computeBestMove(PlayerColor player, std::stop_token stop
 	}
 
 	return cancelled(stopToken) ? PossibleMove{} : selectedMove;
-}
-
-
-int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player, std::stop_token stopToken)
-{
-	if (cancelled(stopToken))
-		return 0;
-
-	mNodesSearched++;
-
-	// Terminal depth reached -> evaluate static position
-	if (depth == 0)
-		return evaluatePlayerPosition(board, player);
-
-	// Generate legal moves for player
-	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
-
-	// Terminal position check (checkmate/stalemate)
-	if (moves.empty())
-	{
-		if (board.isInCheck(board.getCurrentPlayer()))
-			return maximizing ? (-10000 + depth) : (10000 - depth); // depth bias keeps faster mates
-		return 0;													// stalemate
-	}
-
-	if (maximizing)
-	{
-		int maxEval = -std::numeric_limits<int>::max();
-
-		for (const auto &currentMove : moves)
-		{
-			if (cancelled(stopToken)) // Check if thread was asked to quit operation
-				break;
-
-			// make move
-			auto undoInfo = board.makeMove(currentMove);
-
-			// recursively evaluate (switch to minimizing player)
-			int	 eval	  = minimax(currentMove, board, depth - 1, false, player, stopToken);
-			maxEval		  = std::max(maxEval, eval);
-
-			// Unmake move
-			board.unmakeMove(undoInfo);
-		}
-
-		return maxEval;
-	}
-	else
-	{
-		int minEval = std::numeric_limits<int>::max();
-
-		for (const auto &currentMove : moves)
-		{
-			if (cancelled(stopToken)) // Check if thread was asked to quit operation
-				break;
-
-			// make move
-			auto undoInfo = board.makeMove(currentMove);
-
-			// recursively evaluate (switch to maximizing player)
-			int	 eval	  = minimax(currentMove, board, depth - 1, true, player, stopToken);
-			minEval		  = std::min(minEval, eval);
-
-			// unmake move
-			board.unmakeMove(undoInfo);
-		}
-
-		return minEval;
-	}
 }
 
 

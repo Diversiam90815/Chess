@@ -181,27 +181,6 @@ TEST_F(CPUPlayerTests, GetRandomMoveReturnsValidMove)
 }
 
 
-TEST_F(CPUPlayerTests, GetMiniMaxMoveReturnsValidMove)
-{
-	std::vector<PossibleMove> moves;
-
-	// Create some test moves
-	PossibleMove			  move1{{4, 6}, {4, 4}, MoveType::Normal}; // e2-e4
-	PossibleMove			  move2{{3, 6}, {3, 4}, MoveType::Normal}; // d2-d4
-	PossibleMove			  move3{{6, 7}, {5, 5}, MoveType::Normal}; // g1-f3
-
-	moves.push_back(move1);
-	moves.push_back(move2);
-	moves.push_back(move3);
-
-	PossibleMove selectedMove = mCPUPlayer->getMiniMaxMove(moves, 2);
-
-	// MiniMax should select a valid move from the provided options
-	bool		 isValidMove  = (selectedMove == move1) || (selectedMove == move2) || (selectedMove == move3);
-	EXPECT_TRUE(isValidMove) << "MiniMax move should be one of the provided moves";
-}
-
-
 TEST_F(CPUPlayerTests, GetAlphaBetaMoveReturnsValidMove)
 {
 	std::vector<PossibleMove> moves;
@@ -230,13 +209,11 @@ TEST_F(CPUPlayerTests, EmptyMoveListHandling)
 	// Test that CPU handles empty move lists gracefully
 	PossibleMove			  randomMove	= mCPUPlayer->getRandomMove(emptyMoves);
 	PossibleMove			  alphaBetaMove = mCPUPlayer->getAlphaBetaMove(emptyMoves, 2);
-	PossibleMove			  minimaxMove	= mCPUPlayer->getMiniMaxMove(emptyMoves, 2);
 
 
 	// Empty moves should result in empty/default moves
 	EXPECT_TRUE(randomMove.isEmpty()) << "Random move should be empty for empty input";
 	EXPECT_TRUE(alphaBetaMove.isEmpty()) << "Alpha-Beta move should be empty for empty input";
-	EXPECT_TRUE(minimaxMove.isEmpty()) << "Minimax move should be empty for empty input";
 }
 
 
