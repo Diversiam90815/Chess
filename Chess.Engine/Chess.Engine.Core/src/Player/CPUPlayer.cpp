@@ -229,11 +229,16 @@ PossibleMove CPUPlayer::searchIterativeAlphaBeta(const std::vector<PossibleMove>
 						 return scoreA > scoreB;
 					 });
 
-	bool endgame	   = isEndgame(board);
-	int	 maxDepth	   = computeAdaptiveMaxDepth(baseDepth, static_cast<int>(sortedMoves.size()), endgame);
+	bool endgame			 = isEndgame(board);
+	int	 maxDepth			 = computeAdaptiveMaxDepth(baseDepth, static_cast<int>(sortedMoves.size()), endgame);
 
-	mNodesSearched	   = 0;
-	mTranspositionHits = 0;
+	mNodesSearched			 = 0;
+	mTranspositionHits		 = 0;
+
+	// Time Control
+	auto		 startTime	 = std::chrono::steady_clock::now();
+	auto		 timeBudget	 = mConfig.thinkingTime;
+	bool		 timeLimited = timeBudget.count() > 0;
 
 	PossibleMove bestMove{};
 	int			 bestScore = -std::numeric_limits<int>::max();
@@ -241,6 +246,9 @@ PossibleMove CPUPlayer::searchIterativeAlphaBeta(const std::vector<PossibleMove>
 	for (int depth = 1; depth <= maxDepth; ++depth)
 	{
 		if (cancelled(stopToken))
+			break;
+
+		if (timeLimited && (std::chrono::steady_clock::now() - startTime) >= timeBudget)
 			break;
 
 		int			 alpha = -std::numeric_limits<int>::max();
