@@ -1,0 +1,62 @@
+# Documentation on 
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+
+Standard: c++17
+Language: Cpp
+BasedOnStyle: Microsoft
+
+IndentWidth: 4
+UseTab: Always 
+
+ColumnLimit: 180
+
+#===============================================================================
+# ALIGNMENT
+#===============================================================================
+
+# Function parameters
+AlignAfterOpenBracket: Align
+BinPackParameters: false
+
+AlignConsecutiveAssignments: AcrossEmptyLinesAndComments
+
+AlignConsecutiveBitFields: AcrossEmptyLinesAndComments
+
+AlignConsecutiveDeclarations: AcrossEmptyLinesAndComments
+
+AlignConsecutiveMacros: AcrossEmptyLinesAndComments
+
+AlignEscapedNewlines: Left 
+
+AlignOperands: AlignAfterOperator 
+
+AlignTrailingComments: 
+  Kind: Always
+  OverEmptyLines: 2
+
+IndentCaseLabels: false
+
+AllowShortFunctionsOnASingleLine: Inline
+
+
+#===============================================================================
+# OTHER OPTIONS
+#===============================================================================
+
+AccessModifierOffset: -4
+
+AllowShortEnumsOnASingleLine: true
+
+AllowShortCaseLabelsOnASingleLine: true
+
+AlwaysBreakTemplateDeclarations: Yes 
+
+BreakBeforeBraces: Allman
+
+EmptyLineBeforeAccessModifier: LogicalBlock
+
+FixNamespaceComments: true
+
+MaxEmptyLinesToKeep: 3
+
+SortIncludes: Never 
