@@ -10,7 +10,7 @@ CPMAddPackage(
 function(Doxygen target input)
   set(NAME "doxygen-${target}")
   set(DOXYGEN_GENERATE_HTML YES)
-  set(DOXYGEN_HTML_OUTPUT   ${PROJECT_BINARY_DIR}/${output})
+  set(DOXYGEN_HTML_OUTPUT   "${PROJECT_BINARY_DIR}/doxygen")
 
   UseDoxygenAwesomeCss()
   UseDoxygenAwesomeExtensions()
