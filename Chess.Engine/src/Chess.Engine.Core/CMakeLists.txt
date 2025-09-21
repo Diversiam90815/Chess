@@ -171,14 +171,16 @@ set(ALL_FILES
 
 
 #==========================================
-#   SUBMODULES
+#   PACKAGES
 #==========================================
+
 include(cpm)
 
-# Logger
-add_subdirectory(${SUBMODULES_DIR}/Logger)
-set(LOGGER_INCLUDE_FILE   ${SUBMODULES_DIR}/Logger/include)
-
+CPMAddPackage(
+  NAME Logger
+  GITHUB_REPOSITORY Diversiam90815/Logger
+  VERSION 1.3.81
+)
 
 CPMAddPackage(
   NAME nlohmann_json
