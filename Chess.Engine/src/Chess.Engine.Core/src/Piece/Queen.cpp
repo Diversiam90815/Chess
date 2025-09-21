@@ -12,7 +12,7 @@
 
 std::vector<PossibleMove> Queen::getPossibleMoves(const Position &pos, ChessBoard &board, bool attackOnly) const
 {
-	MoveHelper helper;
+	MoveHelper	helper;
 	PlayerColor color = getColor();
 	helper.checkAvailableMoves(pos, board, color, PieceType::Queen, attackOnly);
 	auto moves = helper.getAvailableMoves();

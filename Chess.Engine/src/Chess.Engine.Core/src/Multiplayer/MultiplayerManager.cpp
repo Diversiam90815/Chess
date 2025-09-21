@@ -51,7 +51,7 @@ void MultiplayerManager::reset()
 	if (mDiscovery)
 		mDiscovery->stop();
 
-	if(mServer)
+	if (mServer)
 		mServer.reset();
 
 	if (mClient)

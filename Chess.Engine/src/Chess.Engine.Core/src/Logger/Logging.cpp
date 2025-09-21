@@ -11,12 +11,12 @@
 
 void Logging::initLogging()
 {
-	FileManager *fmg	 = FileManager::GetInstance();
+	FileManager *fmg	  = FileManager::GetInstance();
 
-	auto		 logPath = fmg->getLoggingPath();
-	auto		 log	 = logPath / LogFile;
+	auto		 logPath  = fmg->getLoggingPath();
+	auto		 log	  = logPath / LogFile;
 
-	std::string fileName = log.string();
+	std::string	 fileName = log.string();
 
 	logging::addFileOutput()
 		.setFilename(fileName)

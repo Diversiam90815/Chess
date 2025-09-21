@@ -1,4 +1,3 @@
-include(Coverage)
 include(Format)
 include(CppCheck)
 

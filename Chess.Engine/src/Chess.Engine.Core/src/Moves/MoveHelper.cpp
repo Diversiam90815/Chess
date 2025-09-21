@@ -9,14 +9,10 @@
 #include "MoveHelper.h"
 
 
-MoveHelper::MoveHelper()
-{
-}
+MoveHelper::MoveHelper() {}
 
 
-MoveHelper::~MoveHelper()
-{
-}
+MoveHelper::~MoveHelper() {}
 
 
 bool MoveHelper::checkAvailableMoves(const Position &position, ChessBoard &board, const PlayerColor color, PieceType piece, bool hasMoved, bool attackOnly)
@@ -143,7 +139,7 @@ bool MoveHelper::checkPawnCaptureMovement(const Position &position, ChessBoard &
 				PossibleMove move;
 				move.start = position;
 				move.end   = newPosition;
-				move.type = MoveType::Capture;
+				move.type  = MoveType::Capture;
 
 				if ((color == PlayerColor::White && newY == 0) || (color == PlayerColor::Black && newY == 7))
 				{

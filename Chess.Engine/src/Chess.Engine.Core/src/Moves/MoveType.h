@@ -3,7 +3,7 @@
 	Module:         MoveType
 	Description:    Defining Bitmask enum MoveType to store multiple moves
   ==============================================================================
-*/ 
+*/
 
 #pragma once
 

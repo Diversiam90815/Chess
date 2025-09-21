@@ -37,9 +37,8 @@ public:
 
 
 private:
+	bool						isSquareAttacked(const Position &square, PlayerColor attackerColor);
+	bool						isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard &chessboard);
 
-	bool								isSquareAttacked(const Position &square, PlayerColor attackerColor);
-	bool								isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard &chessboard);
-
-	std::shared_ptr<ChessBoard>			mChessBoard;
+	std::shared_ptr<ChessBoard> mChessBoard;
 };

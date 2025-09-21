@@ -42,13 +42,13 @@ public:
 
 
 private:
-	std::shared_ptr<ChessBoard>			mChessBoard;
+	std::shared_ptr<ChessBoard>		mChessBoard;
 
-	std::shared_ptr<MoveValidation>		mValidation;
+	std::shared_ptr<MoveValidation> mValidation;
 
-	std::shared_ptr<MoveNotation>		mMoveNotation;
+	std::shared_ptr<MoveNotation>	mMoveNotation;
 
-	std::set<Move>						mMoveHistory;
+	std::set<Move>					mMoveHistory;
 
-	std::mutex							mExecutionMutex;
+	std::mutex						mExecutionMutex;
 };

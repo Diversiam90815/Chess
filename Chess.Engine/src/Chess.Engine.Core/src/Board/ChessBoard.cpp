@@ -55,7 +55,7 @@ void ChessBoard::setPiece(Position pos, std::shared_ptr<ChessPiece> piece)
 }
 
 
-std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos) 
+std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos)
 {
 	static std::shared_ptr<ChessPiece> nullPiece = nullptr;
 

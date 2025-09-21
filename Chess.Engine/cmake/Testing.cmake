@@ -12,13 +12,11 @@ CPMAddPackage(
         )
 
 include(GoogleTest)
-include(Coverage)
 include(Memcheck)
 
 macro(AddTests target)
     message("Adding tests to ${target}")
     target_link_libraries(${target} PRIVATE gtest_main gmock)
     gtest_discover_tests(${target})
-    AddCoverage(${target})
     AddMemcheck(${target})
 endmacro()

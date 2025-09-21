@@ -54,7 +54,7 @@ std::vector<PossibleMove> MoveGeneration::getMovesForPosition(const Position &po
 
 	if (GENERATION_DEBUG)
 		LOG_DEBUG("Position {} has {} possible moves!", LoggingHelper::positionToString(position).c_str(), possibleMoves.size());
-	
+
 	return possibleMoves;
 }
 
@@ -162,7 +162,7 @@ bool MoveGeneration::canCastle(const Position &kingposition, PlayerColor player,
 	if (king->hasMoved())
 		return false;
 
-	if(mValidation->isKingInCheck(kingposition, player))
+	if (mValidation->isKingInCheck(kingposition, player))
 		return false;
 
 	// Define the y-coordinate and king's x-coordinate

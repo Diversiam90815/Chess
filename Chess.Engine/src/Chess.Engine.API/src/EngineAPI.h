@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 	Module:         Engine API
-	Description:    Plain C API for the Chess engine 
+	Description:    Plain C API for the Chess engine
   ==============================================================================
 */
 

@@ -37,30 +37,30 @@ void TCPClient::connect(const std::string &host, unsigned short port)
 	auto		  endpoints = resolver.resolve(host, std::to_string(port));
 
 	asio::async_connect(session->socket(), endpoints,
-							   [session, timer, this](const asio::error_code &error, const tcp::endpoint &endpoint)
-							   {
-								   // Cancel timeout timer
-								   timer->cancel();
+						[session, timer, this](const asio::error_code &error, const tcp::endpoint &endpoint)
+						{
+							// Cancel timeout timer
+							timer->cancel();
 
-								   if (!error)
-								   {
-									   LOG_INFO("TCPClient connected to {}", endpoint.address().to_string().c_str());
+							if (!error)
+							{
+								LOG_INFO("TCPClient connected to {}", endpoint.address().to_string().c_str());
 
-									   if (mConnectHandler)
-										   mConnectHandler(session);
-								   }
-								   else
-								   {
-									   LOG_ERROR("TCPClient connect error : {}!", error.message().c_str());
+								if (mConnectHandler)
+									mConnectHandler(session);
+							}
+							else
+							{
+								LOG_ERROR("TCPClient connect error : {}!", error.message().c_str());
 
-									   // Call the timeout handler if it is a timeout-related error
-									   if (error == asio::error::timed_out || error == asio::error::connection_refused)
-									   {
-										   if (mConnectTimeoutHandler)
-											   mConnectTimeoutHandler();
-									   }
-								   }
-							   });
+								// Call the timeout handler if it is a timeout-related error
+								if (error == asio::error::timed_out || error == asio::error::connection_refused)
+								{
+									if (mConnectTimeoutHandler)
+										mConnectTimeoutHandler();
+								}
+							}
+						});
 }
 
 

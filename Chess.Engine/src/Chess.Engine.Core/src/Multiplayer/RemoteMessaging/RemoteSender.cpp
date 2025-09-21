@@ -74,9 +74,9 @@ void RemoteSender::onLocalPlayerChosen(const PlayerColor localPlayer)
 void RemoteSender::onLocalReadyFlagSet(const bool flag)
 {
 	json j;
-	j[PlayerReadyFlagKey]	   = flag;
+	j[PlayerReadyFlagKey] = flag;
 
-	auto data				   = convertDataToByteVector(j);
+	auto data			  = convertDataToByteVector(j);
 
 	sendMessage(MultiplayerMessageType::PlayerReadyForGameFlag, data);
 }

@@ -15,11 +15,7 @@
 class King : public ChessPiece
 {
 public:
-	King(PlayerColor color) : ChessPiece(PieceType::King, color)
-	{
-	}
+	King(PlayerColor color) : ChessPiece(PieceType::King, color) {}
 
 	std::vector<PossibleMove> getPossibleMoves(const Position &pos, ChessBoard &board, bool attackOnly = false) const override;
-
-
 };

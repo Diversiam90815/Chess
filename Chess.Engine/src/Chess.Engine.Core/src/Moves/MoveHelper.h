@@ -24,7 +24,7 @@ public:
 	~MoveHelper();
 
 
-	bool					  checkAvailableMoves(const Position &position, ChessBoard &board, const PlayerColor color, const PieceType piece, bool hasMoved = false, bool attackOnly = false);
+	bool checkAvailableMoves(const Position &position, ChessBoard &board, const PlayerColor color, const PieceType piece, bool hasMoved = false, bool attackOnly = false);
 
 	std::vector<PossibleMove> getAvailableMoves();
 

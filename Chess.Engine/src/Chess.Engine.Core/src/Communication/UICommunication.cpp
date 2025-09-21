@@ -50,7 +50,7 @@ void UICommunication::onExecuteMove(const PossibleMove &move, bool fromRemote)
 	moveInstance.end.x	 = move.end.x;
 	moveInstance.end.y	 = move.end.y;
 
-	moveInstance.type = static_cast<MoveTypeInstance>(move.type);
+	moveInstance.type	 = static_cast<MoveTypeInstance>(move.type);
 
 	communicateToUI(MessageType::MoveExecuted, &moveInstance);
 }

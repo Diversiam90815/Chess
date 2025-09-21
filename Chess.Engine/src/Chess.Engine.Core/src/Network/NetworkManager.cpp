@@ -134,7 +134,7 @@ void NetworkManager::initAdapterInConfig()
 
 	LOG_WARNING("Could not find eligible adapter with proper subnet mask. We are forced to pick the first adapter in list now..");
 
-	if (adapters.size() >0)
+	if (adapters.size() > 0)
 	{
 		networkAdapterChanged(adapters[0]);
 		return;
