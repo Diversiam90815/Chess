@@ -8,10 +8,10 @@
 #pragma once
 
 #include <memory>
+#include <nlohmann/json.hpp>
 
 #include "IObserver.h"
 #include "Move.h"
-#include "json.hpp"
 #include "Multiplayer/RemoteMessaging/MultiplayerMessageStruct.h"
 
 

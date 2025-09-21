@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 
 #include "Move.h"
 #include "Parameters.h"

@@ -201,6 +201,14 @@ add_library(${TARGET_NAME} STATIC ${ALL_FILES})
 
 
 #==========================================
+#   BUILD INFO
+#==========================================
+
+include(BuildInfo)
+BuildInfo(${TARGET_NAME})
+
+
+#==========================================
 #   COMPILE DEFINITIONS
 #==========================================
 

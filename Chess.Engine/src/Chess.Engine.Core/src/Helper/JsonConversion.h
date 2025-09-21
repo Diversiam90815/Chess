@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "json.hpp"
+#include <nlohmann/json.hpp>
+
 #include "NetworkAdapter.h"
 #include "Move.h"
 #include "RemoteMessaging/MultiplayerMessageStruct.h"

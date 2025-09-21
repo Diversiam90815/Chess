@@ -6,7 +6,7 @@
 */
 
 #include "MultiplayerManager.h"
-#include "Project.h"
+#include "buildinfo.h"
 
 
 MultiplayerManager::MultiplayerManager() : mWorkGuard(asio::make_work_guard(mIoContext))
@@ -344,7 +344,7 @@ void MultiplayerManager::sendConnectRequest()
 {
 	InvitationRequest invite;
 	invite.playerName = getLocalPlayerName();
-	invite.version	  = PROJECT_VERSION;
+	invite.version	  = BuildInfo::Version;
 
 	mRemoteSender->sendConnectionInvite(invite);
 }
