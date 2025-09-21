@@ -190,7 +190,7 @@ AddCppCheck(${TARGET_NAME})
 
 Format(${TARGET_NAME} .)
 
-Doxygen(${TARGET_NAME} ${ALL_FILES})
+Doxygen(Chess_Engine ${ALL_FILES})
 
 
 target_compile_definitions(${TARGET_NAME} PUBLIC
