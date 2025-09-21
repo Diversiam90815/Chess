@@ -1,9 +1,5 @@
 set(TARGET_NAME Chess.Engine.Core)
 
-#==========================================
-#   PROJECT DIRECTORIES
-#==========================================
-
 set (SOURCE_DIR						${CMAKE_CURRENT_SOURCE_DIR}/src)
 set (SUBMODULES_DIR					${CMAKE_CURRENT_SOURCE_DIR}/submodule)
 	
@@ -23,10 +19,6 @@ set (MULTIPLAYER_DIR				${SOURCE_DIR}/Multiplayer)
 set (STATEMACHINE_DIR				${SOURCE_DIR}/StateMachine)
 set (POSITIONALEVALUATION_DIR       ${SOURCE_DIR}/PositionalEvaluation)
 
-
-#==========================================
-#   INCLUDE DIRECTORIES
-#==========================================
 
 set(ALL_PROJECT_DIRS 
 			${PIECE_DIR}
@@ -49,10 +41,6 @@ set(ALL_PROJECT_DIRS
 
 include_directories(${ALL_PROJECT_DIRS})
 
-
-#==========================================
-#   SET THE FILES
-#==========================================
 
 set(STATEMACHINE_FILES
 	${STATEMACHINE_DIR}/StateMachine.h	${STATEMACHINE_DIR}/StateMachine.cpp
@@ -170,10 +158,6 @@ set(ALL_FILES
 )
 
 
-#==========================================
-#   PACKAGES
-#==========================================
-
 include(cpm)
 
 CPMAddPackage(
@@ -195,31 +179,19 @@ CPMAddPackage(
   OPTIONS "ASIO_STANDALONE ON"
 )
 
-#==========================================
-#   CREATE TARGET
-#==========================================
-
 add_library(${TARGET_NAME} STATIC ${ALL_FILES})
-
-
-#==========================================
-#   BUILD INFO
-#==========================================
 
 include(BuildInfo)
 BuildInfo(${TARGET_NAME})
 
-
-#==========================================
-#   SOURCE GROUP
-#==========================================
-
 source_group(TREE ${SOURCE_DIR} FILES ${ALL_FILES})
 
+InstrumentForCoverage(${TARGET_NAME})
 
-#==========================================
-#   COMPILE DEFINITIONS
-#==========================================
+AddCppCheck(${TARGET_NAME})
+
+Format(${TARGET_NAME} .)
+
 
 target_compile_definitions(${TARGET_NAME} PUBLIC
 	ENV_DEVELOPMENT
@@ -235,10 +207,6 @@ target_compile_definitions(${TARGET_NAME} PUBLIC
 	ASIO_STANDALONE
 )
 
-#==========================================
-#   COMPILE OPTIONS
-#==========================================
-
 target_compile_options(${TARGET_NAME} PRIVATE
 	$<$<CONFIG:Release>:
 		/Oi
@@ -253,10 +221,6 @@ target_compile_options(${TARGET_NAME} PRIVATE
 	/WX-        # Don't treat warnings as errors
 )
 
-#==========================================
-#   TARGET INCLUDE DIRECTORIES
-#==========================================
-
 set(Include_Dirs 
 		${PROJECT_BINARY_DIR}
 		${ALL_PROJECT_DIRS}
@@ -265,10 +229,6 @@ set(Include_Dirs
 )
 
 target_include_directories(${TARGET_NAME} PUBLIC ${Include_Dirs})
-
-#==========================================
-#   LINK LIBRARIES
-#==========================================
 
 set(TARGET_LIBS		Logger
 					iphlpapi

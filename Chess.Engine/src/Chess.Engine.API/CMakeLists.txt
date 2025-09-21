@@ -16,6 +16,8 @@ source_group("API" FILES ${API_FILES})
 
 add_library(Chess.Engine.API SHARED ${API_FILES})
 
+Format(Chess.Engine.API .)
+
 target_include_directories(Chess.Engine.API PUBLIC ${Include_Dirs})
 
 target_link_libraries(Chess.Engine.API PUBLIC ${PROJECT_LIBS})
