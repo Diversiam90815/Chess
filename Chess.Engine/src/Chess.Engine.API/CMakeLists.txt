@@ -1,110 +1,21 @@
-#==========================================
-#   Chess Engine API
-#       by Jens W. Langenberg
-#==========================================
 
-cmake_minimum_required(VERSION 3.25)
+set (API_FILES_DIR      ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-project(Chess.Engine.API)
+set (API_FILES			${API_FILES_DIR}/EngineAPI.h    
+						${API_FILES_DIR}/EngineAPI.cpp)
+
+set (Include_Dirs 		${PROJECT_BINARY_DIR}			
+						${API_FILES_DIR})
+
+set (PROJECT_LIBS		Chess.Engine.Core)
 
 
-#==========================================
-#   CPP AND PROJECT STANDARDS
-#==========================================
-
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-#==========================================
-#   PROJECT DIRECTORIES
-#==========================================
-
-set (SOURCE_DIR             ${PROJECT_SOURCE_DIR}/src)
-
-#==========================================
-#   INCLUDE DIRECTORIES
-#==========================================
-
-set(ALL_PROJECT_DIRS ${SOURCE_DIR})
-
-include_directories(${ALL_PROJECT_DIRS})
-
-#==========================================
-#   SET THE FILES
-#==========================================
-
-set(API_FILES	${SOURCE_DIR}/EngineAPI.h    ${SOURCE_DIR}/EngineAPI.cpp)
-
-#==========================================
-#   SOURCE GROUPS
-#==========================================
+include_directories(${API_FILES_DIR})
 
 source_group("API" FILES ${API_FILES})
 
-#==========================================
-#   CREATE TARGET
-#==========================================
+add_library(Chess.Engine.API SHARED ${API_FILES})
 
-add_library(${PROJECT_NAME} SHARED ${API_FILES})
+target_include_directories(Chess.Engine.API PUBLIC ${Include_Dirs})
 
-#==========================================
-#   OUTPUT PROPERTIES
-#==========================================
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-	OUTPUT_NAME "${PROJECT_NAME}"
-)
-
-#==========================================
-#   COMPILE DEFINITIONS
-#==========================================
-
-target_compile_definitions(${PROJECT_NAME} PUBLIC
-	-DENV_DEVELOPMENT
-	_CRT_SECURE_NO_WARNINGS
-	_SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING 
-
-	_WINDOWS
-	WIN32_LEAN_AND_MEAN
-	_WINSOCK_DEPRECATED_NO_WARNING
-	_WIN32_WINNT=0x0A00
-)
-
-#==========================================
-#   COMPILE OPTIONS
-#==========================================
-
-target_compile_options(${PROJECT_NAME} PRIVATE
-	$<$<CONFIG:Release>:
-		/Oi
-		/Gy
-	>
-	$<$<CONFIG:Debug>:
-		/Od
-		/Z7
-	>
-	/sdl
-	/MP
-	/WX-        # Don't treat warnings as errors
-)
-
-#==========================================
-#   TARGET INCLUDE DIRECTORIES
-#==========================================
-
-set(Include_Dirs 
-		${PROJECT_BINARY_DIR}
-		${ALL_PROJECT_DIRS}
-)
-
-target_include_directories(${PROJECT_NAME} PUBLIC ${Include_Dirs})
-
-#==========================================
-#   LINK LIBRARIES
-#==========================================
-
-set(PROJECT_LIBS Chess.Engine.Core)
-
-target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_LIBS})
+target_link_libraries(Chess.Engine.API PUBLIC ${PROJECT_LIBS})
