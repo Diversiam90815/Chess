@@ -195,7 +195,7 @@ if(ENABLE_FORMAT)
 endif()
 
 if(ENABLE_DOXYGEN)
-	Doxygen(Chess_Engine ${ALL_FILES})
+	Doxygen(Chess_Engine ${SOURCE_DIR})
 endif()
 
 target_compile_definitions(${TARGET_NAME} PUBLIC
