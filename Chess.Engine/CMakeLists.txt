@@ -5,28 +5,22 @@
 
 cmake_minimum_required(VERSION 3.25)
 
-project ("Chess")
+set(CHESS_VERSION 1.1.0.981)
 
-## Setting the lib directory for project included packages
-set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
+project(Chess.Engine VERSION ${CHESS_VERSION} LANGUAGES CXX)
 
-## Include the CPM
-include(cmake/cpm.cmake)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-CPMAddPackage(
-        NAME GOOGLETEST
-        GITHUB_REPOSITORY google/googletest
-        VERSION 1.15.2
-        SOURCE_DIR ${LIB_DIR}/googletest
-        OPTIONS
-        "INSTALL_GTEST OFF"
-        "gtest_force_shared_crt ON"
-        )
-        
-enable_testing()
+option(ENABLE_FORMAT    "Run clang-format on sources during build"          ON)
+option(ENABLE_CPPCHECK  "Run cppcheck static analysis on C++ targets"       ON)
+option(ENABLE_DOXYGEN   "Add doxygen documentation target"                  ON)
+option(ENABLE_MEMCHECK  "Add memcheck target "                              OFF)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+
+include(CTest)
 
 # Include sub-projects.
-add_subdirectory (Chess.Engine.Core)
-add_subdirectory (Chess.Engine.API)
-add_subdirectory (Chess.Engine.Tests)
-add_subdirectory (Chess.Engine.Performance)
+add_subdirectory (src)
+add_subdirectory (tests)
