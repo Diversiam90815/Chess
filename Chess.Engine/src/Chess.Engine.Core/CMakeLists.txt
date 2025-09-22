@@ -186,12 +186,17 @@ BuildInfo(${TARGET_NAME})
 
 source_group(TREE ${SOURCE_DIR} FILES ${ALL_FILES})
 
-AddCppCheck(${TARGET_NAME})
+if(ENABLE_CPPCHECK)
+	AddCppCheck(${TARGET_NAME})
+endif()
 
-Format(${TARGET_NAME} .)
+if(ENABLE_FORMAT)
+	Format(${TARGET_NAME} .)
+endif()
 
-Doxygen(Chess_Engine ${ALL_FILES})
-
+if(ENABLE_DOXYGEN)
+	Doxygen(Chess_Engine ${ALL_FILES})
+endif()
 
 target_compile_definitions(${TARGET_NAME} PUBLIC
 	ENV_DEVELOPMENT

@@ -1,6 +1,14 @@
-include(Format)
-include(CppCheck)
-include(Doxygen)
+if(ENABLE_FORMAT) 
+    include(Format)
+endif()
+
+if(ENABLE_CPPCHECK)
+    include(CppCheck)
+endif()
+
+if(ENABLE_DOXYGEN)
+    include(Doxygen)
+endif()
 
 add_subdirectory(Chess.Engine.Core)
 add_subdirectory(Chess.Engine.API)
