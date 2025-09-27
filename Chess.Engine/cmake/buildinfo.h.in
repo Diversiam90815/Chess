@@ -13,8 +13,4 @@ struct BuildInfo{
     static inline const std::string SystemName          = "@SYS_NAME@";
     static inline const std::string SystemVersion       = "@SYS_VER@";
     static inline const std::string SystemCPU           = "@SYS_CPU@";
-    static inline const std::string HostSystem          = "@HOST_SYS@";
-    static inline const std::string HostSystemVersion   = "@HOST_VER@";
-    static inline const std::string BuildHost           = "@BUILD_HOST@";
-    static inline const std::string BuildUser           = "@BUILD_USER@";
 };
