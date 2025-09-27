@@ -9,7 +9,9 @@
 
 #include <string>
 
-
+/// <summary>
+/// Represents a network endpoint with an IP address, TCP port, and player name.
+/// </summary>
 struct Endpoint
 {
 	std::string IPAddress{};

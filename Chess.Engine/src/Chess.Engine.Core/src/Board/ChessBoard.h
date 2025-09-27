@@ -26,6 +26,9 @@ using PlayerPiece	  = std::pair<Position, std::shared_ptr<ChessPiece>>;
 using BoardStateArray = int[BOARD_SIZE][BOARD_SIZE];
 
 
+/// <summary>
+/// Represents a square on a chessboard, including its position and an optional chess piece.
+/// </summary>
 struct Square
 {
 	Position					pos;
@@ -37,6 +40,9 @@ struct Square
 };
 
 
+/// <summary>
+/// Represents a chessboard and provides methods to manage and query its state, including piece placement, movement, and board initialization.
+/// </summary>
 class ChessBoard
 {
 public:

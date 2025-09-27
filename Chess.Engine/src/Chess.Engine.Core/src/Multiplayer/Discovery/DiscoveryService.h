@@ -23,7 +23,9 @@
 
 using asio::ip::udp;
 
-
+/// <summary>
+/// Enumerates the possible discovery modes.
+/// </summary>
 enum class DiscoveryMode
 {
 	None   = 1,
@@ -32,32 +34,76 @@ enum class DiscoveryMode
 };
 
 
+/**
+ * @brief Provides network discovery services to detect remote devices advertising
+ *        a multiplayer host or to broadcast this instance as a host.
+ *
+ * Thread model: Inherits ThreadBase. Network operations use async handlers
+ * posted into supplied io_context.
+ */
 class DiscoveryService : public ThreadBase, public IDiscoveryObservable
 {
 public:
 	DiscoveryService(asio::io_context &ioContext);
 	~DiscoveryService();
 
+	/**
+	 * @brief Initialize discovery context and prepare socket.
+	 * @param playerName Local display name.
+	 * @param localIPv4 IPv4 bound for outbound/broadcast.
+	 * @param tcpPort Intended TCP port for session negotiation.
+	 * @return true if initialization succeeded.
+	 */
 	bool	 init(const std::string &playerName, std::string localIPv4, unsigned short tcpPort);
+
+	/**
+	 * @brief Deinitialize and close socket (safe to call multiple times).
+	 */
 	void	 deinit();
 
+	/**
+	 * @brief Start discovery loop in provided mode (Host advertise / Client search).
+	 */
 	void	 startDiscovery(DiscoveryMode mode);
 
+	/**
+	 * @brief Construct endpoint wrapper from IPv4 string (lookup inside known list if present).
+	 */
 	Endpoint getEndpointFromIP(const std::string &IPv4);
 
+	/**
+	 * @brief Add a newly discovered remote endpoint (filtered for duplicates).
+	 */
 	void	 addRemoteToList(Endpoint remote);
 
 
+
 private:
+	/**
+	 * @brief Thread loop: schedules periodic broadcast & receive operations.
+	 */
 	void				   run() override;
 
+	/**
+	 * @brief Send a discovery packet (advertise or probe).
+	 */
 	void				   sendPackage();
+
+	/**
+	 * @brief Post async receive for incoming discovery packets.
+	 */
 	void				   receivePackage();
 
+	/**
+	 * @brief Handle completion of async receive; parses and may register remote.
+	 */
 	void				   handleReceive(const asio::error_code &error, size_t bytesReceived);
 
 	bool				   isInitialized() const { return mInitialized.load(); }
 
+	/**
+	 * @brief Notify observers a remote was found (override from observable base).
+	 */
 	void				   remoteFound(const Endpoint &remote) override;
 
 

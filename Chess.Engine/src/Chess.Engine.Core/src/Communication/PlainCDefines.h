@@ -15,7 +15,9 @@ typedef void(CALLBACK *PFN_CALLBACK)(int messageId, void *pContext);
 
 #define MAX_STRING_LENGTH 250
 
-
+/// <summary>
+/// Defines a plain C structure representing a position with x and y coordinates.
+/// </summary>
 typedef struct PositionInstance
 {
 	int x;
@@ -23,6 +25,9 @@ typedef struct PositionInstance
 } PositionInstance;
 
 
+/// <summary>
+/// Defines the possible types of moves in a chess game as an enumeration.
+/// </summary>
 typedef enum MoveTypeInstance
 {
 	MoveType_None			   = 0,
@@ -38,6 +43,9 @@ typedef enum MoveTypeInstance
 } MoveTypeInstance;
 
 
+/// <summary>
+/// Defines the different types of chess pieces.
+/// </summary>
 typedef enum PieceTypeInstance
 {
 	DefaultType,
@@ -50,6 +58,9 @@ typedef enum PieceTypeInstance
 } PieceTypeInstance;
 
 
+/// <summary>
+/// Represents a possible move in a game, including start and end positions, move type, and optional promotion piece.
+/// </summary>
 typedef struct PossibleMoveInstance
 {
 	PositionInstance  start;
@@ -59,6 +70,9 @@ typedef struct PossibleMoveInstance
 } PossibleMoveInstance;
 
 
+/// <summary>
+/// Represents a plain C instance of a network adapter with associated properties.
+/// </summary>
 typedef struct NetworkAdapterInstance
 {
 	char		 adapterName[MAX_STRING_LENGTH];
@@ -70,6 +84,9 @@ typedef struct NetworkAdapterInstance
 } NetworkAdapterInstance;
 
 
+/// <summary>
+/// Represents a plain C connection event, including its state, the remote name, and an error message.
+/// </summary>
 typedef struct CConnectionEvent
 {
 	int	 state;

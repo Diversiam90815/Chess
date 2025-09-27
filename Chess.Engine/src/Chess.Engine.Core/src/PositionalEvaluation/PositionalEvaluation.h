@@ -11,7 +11,9 @@
 #include "LightChessBoard.h"
 #include "Evaluation/MoveEvaluation.h"
 
-
+/// <summary>
+/// Represents the result of a positional evaluation, including various chess scoring components.
+/// </summary>
 struct PositionalEvaluationResult
 {
 	int materialScore	= 0;
@@ -24,7 +26,9 @@ struct PositionalEvaluationResult
 	int getTotalScore() const { return materialScore + positionalScore + kingSafetyScore + mobilityScore + tacticalScore + structuralScore; }
 };
 
-// Evaluation weights by game phase
+/// <summary>
+/// Represents a set of weights used for evaluating different aspects of a position, such as in a chess engine.
+/// </summary>
 struct EvaluationWeights
 {
 	float materialWeight   = 1.0f;
@@ -35,7 +39,9 @@ struct EvaluationWeights
 	float structuralWeight = 0.4f;
 };
 
-
+/// <summary>
+/// Evaluation of chess positions based on various positional and material factors.
+/// </summary>
 class PositionalEvaluation
 {
 public:

@@ -37,6 +37,9 @@ enum class PieceType
 };
 
 
+/// <summary>
+/// Represents the possible colors for a player.
+/// </summary>
 enum class PlayerColor
 {
 	NoColor,
@@ -45,6 +48,9 @@ enum class PlayerColor
 };
 
 
+/// <summary>
+/// Represents the possible end states of a chess game.
+/// </summary>
 enum class EndGameState
 {
 	OnGoing	  = 1,
@@ -54,6 +60,9 @@ enum class EndGameState
 };
 
 
+/// <summary>
+/// Represents the various states of a game used in the StateMachine.
+/// </summary>
 enum class GameState
 {
 	Undefined			 = 0,
@@ -71,6 +80,9 @@ enum class GameState
 };
 
 
+/// <summary>
+/// Enumerates the different types of settings available.
+/// </summary>
 enum class SettingsType
 {
 	BoardStyle,
@@ -86,6 +98,9 @@ enum class SettingsType
 };
 
 
+/// <summary>
+/// Enumerates the available game mode selections.
+/// </summary>
 enum class GameModeSelection
 {
 	None	  = 0,
@@ -94,6 +109,9 @@ enum class GameModeSelection
 };
 
 
+/// <summary>
+/// Represents the configuration settings for a game session.
+/// </summary>
 struct GameConfiguration
 {
 	GameModeSelection mode;

@@ -11,7 +11,9 @@
 
 class RemoteCommunication;
 
-
+/// <summary>
+/// A thread class responsible for handling sending operations in remote communication.
+/// </summary>
 class SendThread : public ThreadBase
 {
 public:
@@ -24,7 +26,9 @@ private:
 	RemoteCommunication *mOwner = nullptr;
 };
 
-
+/// <summary>
+/// A thread class responsible for handling data reception in remote communication.
+/// </summary>
 class ReceiveThread : public ThreadBase
 {
 public:

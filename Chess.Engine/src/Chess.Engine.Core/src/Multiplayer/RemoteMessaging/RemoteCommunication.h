@@ -11,7 +11,9 @@
 #include "TCPConnection/TCPSession.h"
 #include "CommunicationThreads.h"
 
-
+/// <summary>
+/// Manages remote communication for multiplayer messaging, handling sending and receiving messages over a TCP session.
+/// </summary>
 class RemoteCommunication : public IRemoteReceiverObservable, public IRemoteSenderObserver
 {
 public:

@@ -18,12 +18,19 @@
 using asio::ip::tcp;
 
 
+/**
+ * @brief Implements a TCP client responsible for connecting to a remote host
+ *        and establishing a TCPSession.
+ */
 class TCPClient : public ITCPClient
 {
 public:
 	TCPClient(asio::io_context &ioContext);
 	~TCPClient() = default;
 
+	/**
+	 * @brief Initiate asynchronous connection to host:port.
+	 */
 	void connect(const std::string &host, unsigned short port) override;
 
 	void setConnectHandler(ConnectHandler handler) override;

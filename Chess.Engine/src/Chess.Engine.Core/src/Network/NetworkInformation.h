@@ -26,7 +26,9 @@
 #include "Conversion.h"
 #include "NetworkAdapter.h"
 
-
+/// <summary>
+/// Provides functionality to query and manage network adapter information on the system.
+/// </summary>
 class NetworkInformation
 {
 public:

@@ -10,7 +10,9 @@
 #include "buildinfo.h"
 #include "Logging.h"
 
-
+/// <summary>
+/// Logs detailed information about the system and build configuration to the application log.
+/// </summary>
 class SystemInfo
 {
 public:

@@ -11,7 +11,10 @@
 #include "JsonConversion.h"
 #include "Logging.h"
 
-
+/// <summary>
+/// Manages receiving messages and handling connection and move events in a multiplayer environment.
+/// It implements interfaces for observing remote receiver events, move events, and connection status changes.
+/// </summary>
 class RemoteReceiver : public IRemoteReceiverObserver, public IRemoteMessagesObservable
 {
 public:

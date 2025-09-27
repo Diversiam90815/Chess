@@ -12,7 +12,9 @@
 #include "UserSettings.h"
 #include "Logging.h"
 
-
+/// <summary>
+/// Represents and manages the local player's name, including setting and retrieving it.
+/// </summary>
 class PlayerName
 {
 public:

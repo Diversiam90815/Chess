@@ -14,7 +14,9 @@
 
 #include "IObservable.h"
 
-
+/// <summary>
+/// Represents a player's score, including the player's color and score value.
+/// </summary>
 struct Score
 {
 	Score(PlayerColor player, int value) : player(player), value(value) {};
@@ -30,7 +32,10 @@ private:
 	int			value  = 0;
 };
 
-
+/// <summary>
+/// Manages a player in the game, tracking their color, score, captured pieces, and local status. 
+/// Implements the IPlayerObservable interface for game state updates.
+/// </summary>
 class Player : public IPlayerObservable
 {
 public:

@@ -10,7 +10,9 @@
 #include <string>
 #include <vector>
 
-
+/// <summary>
+/// Defines the types of messages that can be exchanged in a multiplayer environment.
+/// </summary>
 enum class MultiplayerMessageType : uint32_t
 {
 	Default				   = 0,
@@ -23,14 +25,18 @@ enum class MultiplayerMessageType : uint32_t
 	LocalPlayer			   = 7,
 };
 
-
+/// <summary>
+/// Represents a message used in multiplayer communication, containing a message type and associated data.
+/// </summary>
 struct MultiplayerMessageStruct
 {
 	MultiplayerMessageType type = MultiplayerMessageType::Default;
 	std::vector<uint8_t>   data;
 };
 
-
+/// <summary>
+/// Represents a request to invite a player, including the player's name and a version string for compatibility checks.
+/// </summary>
 struct InvitationRequest
 {
 	std::string playerName; // Player Name
@@ -39,6 +45,9 @@ struct InvitationRequest
 	bool		isValid() const { return !playerName.empty(); }
 };
 
+/// <summary>
+/// Represents a response to an invitation, including acceptance status, player name, and an optional reason for declining.
+/// </summary>
 struct InvitationResponse
 {
 	bool		accepted;	// Was the request accpeted?

@@ -7,6 +7,9 @@
 
 #pragma once
 
+/// <summary>
+/// Defines the types of moves that can occur in a chess game.
+/// </summary>
 enum class MoveType : int
 {
 	None			  = 0,

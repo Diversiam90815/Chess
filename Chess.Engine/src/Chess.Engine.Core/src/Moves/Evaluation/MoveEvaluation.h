@@ -17,7 +17,9 @@
 #include "Generation/MoveGeneration.h"
 #include "LightChessBoard.h"
 
-
+/// <summary>
+/// Enumerates the different phases of a game.
+/// </summary>
 enum class GamePhase
 {
 	Opening	   = 1,
@@ -26,14 +28,31 @@ enum class GamePhase
 };
 
 
+/**
+ * @brief Provides layered (basic / medium / advanced) evaluation scores for moves
+ *        and exposes granular heuristics for tactical and strategic analysis.
+ *
+ * Returned scores: Positive values favor the side executing the move.
+ */
 class MoveEvaluation
 {
 public:
 	MoveEvaluation(std::shared_ptr<ChessBoard> chessboard, std::shared_ptr<MoveGeneration> generation);
 	~MoveEvaluation() = default;
 
+	/**
+	 * @brief Fast evaluation (material + immediate heuristics).
+	 */
 	int		  getBasicEvaluation(const PossibleMove &move);
+
+	/**
+	 * @brief Intermediate evaluation including positional aspects.
+	 */
 	int		  getMediumEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
+
+	/**
+	 * @brief Advanced evaluation factoring broader strategic dimensions.
+	 */
 	int		  getAdvancedEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
 	int		  getPieceValue(PieceType piece) const;
@@ -56,6 +75,9 @@ public:
 	int		  getStrategicEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 	int		  getTacticalEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
+	/**
+	 * @brief Infer phase of game (used to weight heuristics).
+	 */
 	GamePhase determineGamePhase(const LightChessBoard *lightBoard = nullptr) const;
 
 	bool	  isPasssedPawn(const Position &pos, PlayerColor player) const;

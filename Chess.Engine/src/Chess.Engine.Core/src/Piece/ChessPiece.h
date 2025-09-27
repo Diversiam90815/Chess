@@ -17,7 +17,10 @@
 
 class ChessBoard;
 
-
+/// <summary>
+/// Class defining general behaviour and characteristics of Chess Pieces. This class is designed so that the individual piece classes inherit from it.
+/// Inheriting classes need to override getPossibleMoves(..).
+/// </summary>
 class ChessPiece
 {
 public:

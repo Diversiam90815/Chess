@@ -10,7 +10,9 @@
 #include "ChessPiece.h"
 #include "Parameters.h"
 
-
+/// <summary>
+/// Pawn class inheriting from ChesPiece
+/// </summary>
 class Pawn : public ChessPiece
 {
 public:

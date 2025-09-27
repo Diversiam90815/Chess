@@ -14,11 +14,13 @@
 #include "Parameters.h"
 #include "MoveType.h"
 
-
+/// <summary>
+/// Represents a position on a board and provides utility functions for validation and comparison.
+/// </summary>
 struct Position
 {
-	int	 x = 0;
-	int	 y = 0;
+	int	 x = 0; // File
+	int	 y = 0; // Rank
 
 	bool isValid() const { return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE; }
 
@@ -42,6 +44,10 @@ struct hash<Position>
 } // namespace std
 
 
+/// <summary>
+/// Represents a possible move in a game, including its start and end positions, move type, and optional promotion piece.
+/// This PossibleMove is used to generate a final Move object once the move is made.
+/// </summary>
 struct PossibleMove
 {
 	Position  start{-1, -1};
@@ -54,6 +60,9 @@ struct PossibleMove
 };
 
 
+/// <summary>
+/// Represents a final chess move, including its positions, piece types, move type, and additional metadata.
+/// </summary>
 class Move
 {
 public:

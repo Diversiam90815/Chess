@@ -16,6 +16,9 @@
 #include "Player.h"
 
 
+/// <summary>
+/// Enumerates the different types of messages that can be sent or received in the game.
+/// </summary>
 enum class MessageType
 {
 	EndGameState			= 1,
@@ -30,6 +33,9 @@ enum class MessageType
 };
 
 
+/// <summary>
+/// Represents an event where a player captures or uncaptures a piece.
+/// </summary>
 struct PlayerCapturedPieceEvent
 {
 	PlayerColor playerColor;
@@ -38,6 +44,9 @@ struct PlayerCapturedPieceEvent
 };
 
 
+/// <summary>
+/// Represents an event in the move history, indicating whether a move was added or the history was cleared.
+/// </summary>
 struct MoveHistoryEvent
 {
 	bool added;							  // false if cleared
@@ -45,6 +54,9 @@ struct MoveHistoryEvent
 };
 
 
+/// <summary>
+/// Represents an event indicating the end state of a game, including the winner if applicable.
+/// </summary>
 struct EndgameStateEvent
 {
 	EndGameState state;
@@ -52,6 +64,9 @@ struct EndgameStateEvent
 };
 
 
+/// <summary>
+/// UICommunication manages communication between the user interface and the game logic, observing and handling various game and connection events.
+/// </summary>
 class UICommunication : public IMoveObserver, public IGameObserver, public IPlayerObserver, public IGameStateObserver, public IConnectionStatusObserver
 {
 public:
