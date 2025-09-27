@@ -46,5 +46,5 @@ endif()
 configure_file("${BUILDINFO_TEMPLATE_DIR}/buildinfo.h.in" "${DESTINATION}/buildinfo.h" @ONLY)
 
 function(BuildInfo target)
-    target_include_directories(${target} PRIVATE ${DESTINATION})
+    target_include_directories(${target} PUBLIC ${DESTINATION})
 endfunction()

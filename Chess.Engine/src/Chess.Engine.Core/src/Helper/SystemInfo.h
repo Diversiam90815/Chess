@@ -37,9 +37,8 @@ public:
 		LOG_INFO("System Version:\t\t {}", BuildInfo::SystemVersion);
 		LOG_INFO("System CPU:\t\t {}", BuildInfo::SystemCPU);
 
-		LOG_INFO("Compiler:\t\t\t {}", BuildInfo::CompilerID);
+		LOG_INFO("Compiler:\t\t {}", BuildInfo::CompilerID);
 		LOG_INFO("Compiler Version:\t {}", BuildInfo::CompilerVersion);
-
 
 		LOG_INFO("================= END =================");
 		LOG_INFO("=======================================");
