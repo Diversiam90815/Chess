@@ -7,7 +7,6 @@
 
 #pragma once
 
-// #include "EngineAPIDefines.h"
 #include "GameEngine.h"
 #include "Player.h"
 #include "Logging.h"
@@ -17,6 +16,7 @@
 #include "NetworkManager.h"
 #include "MultiplayerManager.h"
 #include "PlayerName.h"
+#include "SystemInfo.h"
 
 
 class StateMachine;
