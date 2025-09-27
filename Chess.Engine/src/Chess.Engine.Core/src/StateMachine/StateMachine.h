@@ -36,27 +36,27 @@ public:
 	~StateMachine();
 
 	/**
-	 * @brief Begin a new game using supplied configuration (UI trigger).
+	 * @brief	Begin a new game using supplied configuration (UI trigger).
 	 */
 	void	  onGameStarted(GameConfiguration config);
 
 	/**
-	 * @brief Start a multiplayer game session (UI trigger).
+	 * @brief	Start a multiplayer game session (UI trigger).
 	 */
 	void	  onMultiplayerGameStarted();
 
 	/**
-	 * @brief UI square selection event (first selects source, second destination).
+	 * @brief	UI square selection event (first selects source, second destination).
 	 */
 	void	  onSquareSelected(const Position &pos);
 
 	/**
-	 * @brief UI selection of a promotion piece type.
+	 * @brief	UI selection of a promotion piece type.
 	 */
 	void	  onPawnPromotionChosen(PieceType promotion);
 
 	/**
-	 * @brief Observer callback when an external component changes game state.
+	 * @brief	Observer callback when an external component changes game state.
 	 */
 	void	  gameStateChanged(const GameState state) override;
 
@@ -72,27 +72,27 @@ public:
 	void	  onRemotePlayerReadyFlagReceived(const bool flag) override {};
 
 	/**
-	 * @brief CPU engine produced a move. Consumed when entering WaitingForCPUMove -> ExecutingMove.
+	 * @brief	CPU engine produced a move. Consumed when entering WaitingForCPUMove -> ExecutingMove.
 	 */
 	void	  onMoveCalculated(PossibleMove cpuMove) override;
 
-    /**
-	 * @brief Whether initial setup completed.
+	/**
+	 * @brief	Whether initial setup completed.
 	 */
 	bool	  isInitialized() const;
 
 	/**
-	 * @brief Set initialization flag (internal).
+	 * @brief	Set initialization flag (internal).
 	 */
 	void	  setInitialized(const bool value);
 
 	/**
-	 * @brief Reset all runtime state to start a fresh game.
+	 * @brief	Reset all runtime state to start a fresh game.
 	 */
 	void	  resetGame();
 
 	/**
-	 * @brief Handle user request to undo last move (transitions if valid).
+	 * @brief	Handle user request to undo last move (transitions if valid).
 	 */
 	void	  reactToUndoMove();
 
@@ -100,7 +100,7 @@ private:
 	StateMachine();
 
 	/**
-	 * @brief Thread loop dispatching state handlers until stopped.
+	 * @brief	Thread loop dispatching state handlers until stopped.
 	 */
 	void				   run() override;
 
@@ -115,15 +115,15 @@ private:
 	bool				   handleWaitingForRemoteState();
 	bool				   handleWaitingForCPUState();
 
-    /**
-	 * @brief Apply pending state transition (if requested).
+	/**
+	 * @brief	Apply pending state transition (if requested).
 	 */
 	void				   switchToNextState();
 
 	bool				   isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
 
-    /**
-	 * @brief Clear current in-progress move structure.
+	/**
+	 * @brief	Clear current in-progress move structure.
 	 */
 	void				   resetCurrentPossibleMove();
 

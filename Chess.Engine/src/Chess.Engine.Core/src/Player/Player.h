@@ -33,7 +33,7 @@ private:
 };
 
 /// <summary>
-/// Manages a player in the game, tracking their color, score, captured pieces, and local status. 
+/// Manages a player in the game, tracking their color, score, captured pieces, and local status.
 /// Implements the IPlayerObservable interface for game state updates.
 /// </summary>
 class Player : public IPlayerObservable

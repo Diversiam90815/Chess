@@ -14,8 +14,8 @@
 
 
 /**
- * @class ThreadBase
- * @brief Lightweight base class that encapsulates a single worker thread whose execution loop is implemented by a derived class via run().
+ * @class	ThreadBase
+ * @brief	Lightweight base class that encapsulates a single worker thread whose execution loop is implemented by a derived class via run().
  *
  * The class offers:
  *  - Deterministic start / stop lifecycle (idempotent).
@@ -56,10 +56,10 @@
  * Lifetime:
  *  - The derived object must outlive the internal thread (stop() before destruction).
  *
- * @warning Calling stop() from inside run() will deadlock (self-join). Instead, let run()
- *          exit naturally by observing isRunning().
+ * @warning		Calling stop() from inside run() will deadlock (self-join). Instead, let run()
+ *				exit naturally by observing isRunning().
  *
- * @note start() and stop() are idempotent; redundant calls are cheap no-ops.
+ * @note	start() and stop() are idempotent; redundant calls are cheap no-ops.
  */
 class ThreadBase
 {
@@ -68,10 +68,9 @@ public:
 	virtual ~ThreadBase() = default;
 
 	/**
-	 * @brief Starts the worker thread if not already running.
-	 *
-	 * Calls the derived run() method on a new std::thread.
-	 * Subsequent calls while running are ignored.
+	 * @brief	Starts the worker thread if not already running.
+	 *			Calls the derived run() method on a new std::thread.
+	 *			Subsequent calls while running are ignored.
 	 */
 	void start()
 	{
@@ -83,14 +82,14 @@ public:
 	}
 
 	/**
-	 * @brief Requests the thread to stop and joins it.
+	 * @brief	Requests the thread to stop and joins it.
 	 *
 	 * Sets the running flag to false, signals the condition variable to wake
 	 * a blocked waitForEvent(), then joins the thread.
 	 *
 	 * Safe to call multiple times; only the first effective call performs work.
 	 *
-	 * @note Must NOT be invoked from inside the worker thread (would deadlock).
+	 * @note	Must NOT be invoked from inside the worker thread (would deadlock).
 	 */
 	void stop()
 	{
@@ -105,10 +104,9 @@ public:
 	}
 
 	/**
-	 * @brief Triggers an event waking at most one thread waiting in waitForEvent().
-	 *
-	 * Sets an internal flag consumed by waitForEvent(). If multiple triggers
-	 * happen before the waiter wakes, they coalesce into a single observed event.
+	 * @brief	Triggers an event waking at most one thread waiting in waitForEvent().
+	 *			Sets an internal flag consumed by waitForEvent(). If multiple triggers
+	 *			happen before the waiter wakes, they coalesce into a single observed event.
 	 */
 	void triggerEvent()
 	{
@@ -120,24 +118,24 @@ public:
 	}
 
 	/**
-	 * @brief Indicates whether the worker thread is currently marked as running.
-	 * @return true if running flag is set, false otherwise.
+	 * @brief	Indicates whether the worker thread is currently marked as running.
+	 * @return	true if running flag is set, false otherwise.
 	 */
 	bool isRunning() const { return mRunning.load(); }
 
 
 protected:
 	/**
-	 * @brief Main execution function executed in the spawned thread context.
+	 * @brief	Main execution function executed in the spawned thread context.
 	 *
 	 * Derived classes must implement a cooperative loop!
 	 */
 	virtual void run() = 0;
 
 	/**
-	 * @brief Blocks until an event is triggered or the thread is asked to stop.
+	 * @brief	Blocks until an event is triggered or the thread is asked to stop.
 	 *
-	 * @param timeoutMS Optional timeout in milliseconds. 0 (default) means wait indefinitely.
+	 * @param	timeoutMS Optional timeout in milliseconds. 0 (default) means wait indefinitely.
 	 *
 	 * Behavior:
 	 *  - Returns true only if an event was signaled (triggerEvent()) AND the thread
@@ -148,8 +146,8 @@ protected:
 	 *
 	 * The internal event flag is automatically reset (consumed) before returning.
 	 *
-	 * @note Multiple triggerEvent() calls before the wait unblocks are coalesced.
-	 * @return true if an event was consumed while still running; false otherwise.
+	 * @note	Multiple triggerEvent() calls before the wait unblocks are coalesced.
+	 * @return	true if an event was consumed while still running; false otherwise.
 	 */
 	bool		 waitForEvent(unsigned long timeoutMS = 0)
 	{

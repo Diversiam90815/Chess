@@ -17,6 +17,7 @@
 #include "Generation/MoveGeneration.h"
 #include "LightChessBoard.h"
 
+
 /// <summary>
 /// Enumerates the different phases of a game.
 /// </summary>
@@ -41,17 +42,27 @@ public:
 	~MoveEvaluation() = default;
 
 	/**
-	 * @brief Fast evaluation (material + immediate heuristics).
+	 * @brief	Fast evaluation (material + immediate heuristics).
+	 * @param	move -> Possible move to be evaluated
+	 * @return	score value
 	 */
 	int		  getBasicEvaluation(const PossibleMove &move);
 
 	/**
-	 * @brief Intermediate evaluation including positional aspects.
+	 * @brief	Intermediate evaluation including positional aspects.
+	 * @param	move -> Possible move to be evaluated
+	 * @param	player -> our player color
+	 * @param	lightBoard -> optional reference to a LightChessBoard instance for faster calculation (deprecated soon).
+	 * @return	score value
 	 */
 	int		  getMediumEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
 	/**
-	 * @brief Advanced evaluation factoring broader strategic dimensions.
+	 * @brief	Advanced evaluation factoring broader strategic dimensions.
+	 * @param	move -> Possible move to be evaluated
+	 * @param	player -> our player color
+	 * @param	lightBoard -> optional reference to a LightChessBoard instance for faster calculation (deprecated soon).
+	 * @return	score value
 	 */
 	int		  getAdvancedEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
@@ -76,7 +87,7 @@ public:
 	int		  getTacticalEvaluation(const PossibleMove &move, PlayerColor player, const LightChessBoard *lightBoard = nullptr);
 
 	/**
-	 * @brief Infer phase of game (used to weight heuristics).
+	 * @brief	Infer phase of game (used to weight heuristics).
 	 */
 	GamePhase determineGamePhase(const LightChessBoard *lightBoard = nullptr) const;
 

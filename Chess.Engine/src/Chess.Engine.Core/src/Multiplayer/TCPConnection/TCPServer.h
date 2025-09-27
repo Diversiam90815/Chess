@@ -19,8 +19,8 @@ using asio::ip::tcp;
 
 
 /**
- * @brief Implements a TCP server that listens for and accepts incoming connections,
- *        creating TCPSession instances for each accepted socket.
+ * @brief	Implements a TCP server that listens for and accepts incoming connections,
+ *			creating TCPSession instances for each accepted socket.
  */
 class TCPServer : public ITCPServer
 {
@@ -29,20 +29,20 @@ public:
 	~TCPServer();
 
 	/**
-	 * @brief Begin asynchronous accept loop. Each accepted connection invokes session handler.
+	 * @brief	Begin asynchronous accept loop. Each accepted connection invokes session handler.
 	 */
 	void startAccept() override;
 
 	int	 getBoundPort() const override;
 
 	/**
-	 * @brief Register callback for accepted session creation.
+	 * @brief	Register callback for accepted session creation.
 	 */
 	void setSessionHandler(SessionHandler handler) override;
 
 	/**
-	 * @brief Respond to a pending connection request (e.g., handshake).
-	 * @param accepted True to allow session progression, false to close.
+	 * @brief	Respond to a pending connection request (e.g., handshake).
+	 * @param	accepted -> True to allow session progression, false to close.
 	 */
 	void respondToConnectionRequest(bool accepted) override;
 

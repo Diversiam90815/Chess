@@ -19,7 +19,7 @@
 using asio::ip::tcp;
 
 /**
- * @brief Represents the state of an asynchronous read operation currently in progress.
+ * @brief	Represents the state of an asynchronous read operation currently in progress.
  */
 struct AsyncReadState
 {
@@ -29,7 +29,7 @@ struct AsyncReadState
 
 
 /**
- * @brief Concrete TCP session implementing message-based async read/write abstraction.
+ * @brief	Concrete TCP session implementing message-based async read/write abstraction.
  *
  * Life-cycle:
  *  - Created via static create() helpers (shared_ptr managed).
@@ -47,17 +47,17 @@ public:
 	typedef std::shared_ptr<TCPSession> pointer;
 
 	/**
-	 * @brief Factory: allocate session owning its own socket (not yet connected).
+	 * @brief	Factory: allocate session owning its own socket (not yet connected).
 	 */
 	static pointer						create(asio::io_context &io_context) { return pointer(new TCPSession(io_context)); }
 
 	/**
-	 * @brief Factory: wrap an already accepted or connected socket.
+	 * @brief	Factory: wrap an already accepted or connected socket.
 	 */
 	static pointer						create(tcp::socket socket) { return pointer(new TCPSession(std::move(socket))); }
 
 	/**
-	 * @brief Access underlying socket (for low-level operations).
+	 * @brief	Access underlying socket (for low-level operations).
 	 */
 	tcp::socket						   &socket();
 
@@ -65,18 +65,18 @@ public:
 	bool								isConnected() const override;
 
 	/**
-	 * @brief Serialize and send a multiplayer message (may queue internally).
-	 * @return true if dispatch initiated.
+	 * @brief	Serialize and send a multiplayer message (may queue internally).
+	 * @return	true if dispatch initiated.
 	 */
 	bool								sendMessage(MultiplayerMessageStruct &message) override;
 
 	/**
-	 * @brief Start async read loop delivering complete messages to callback.
+	 * @brief	Start async read loop delivering complete messages to callback.
 	 */
 	void								startReadAsync(MessageReceivedCallback callback) override;
 
 	/**
-	 * @brief Stop current async read loop (safe if not active).
+	 * @brief	Stop current async read loop (safe if not active).
 	 */
 	void								stopReadAsync() override;
 
@@ -86,7 +86,7 @@ private:
 	explicit TCPSession(tcp::socket &&socket);
 
 	/**
-	 * @brief Internal continuation-based async read dispatcher handling headers and payload.
+	 * @brief	Internal continuation-based async read dispatcher handling headers and payload.
 	 */
 	void					readMessageAsync();
 
