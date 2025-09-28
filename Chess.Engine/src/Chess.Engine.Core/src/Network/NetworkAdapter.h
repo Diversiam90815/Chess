@@ -9,7 +9,9 @@
 
 #include <string>
 
-
+/// <summary>
+/// Enumerates the types of network adapters.
+/// </summary>
 enum class AdapterTypes
 {
 	Ethernet = 1,
@@ -19,6 +21,9 @@ enum class AdapterTypes
 	Other	 = 5
 };
 
+/// <summary>
+/// Defines the visibility states for an adapter.
+/// </summary>
 enum class AdapterVisibility
 {
 	Hidden		= 1,
@@ -26,7 +31,9 @@ enum class AdapterVisibility
 	Recommended = 3
 };
 
-
+/// <summary>
+/// Represents a network adapter with associated properties and utility functions.
+/// </summary>
 struct NetworkAdapter
 {
 	NetworkAdapter() = default;
@@ -58,7 +65,7 @@ struct NetworkAdapter
 	std::string		  Subnet{};
 	int				  ID{0};
 	bool			  IsDefaultRoute{false};
+	bool			  eligible{false};
 	AdapterTypes	  Type{AdapterTypes::Other};
 	AdapterVisibility Visibility{};
-	bool			  eligible;
 };

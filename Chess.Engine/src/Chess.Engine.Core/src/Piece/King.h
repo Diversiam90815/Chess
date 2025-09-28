@@ -11,7 +11,9 @@
 #include "Parameters.h"
 #include "MoveHelper.h"
 
-
+/// <summary>
+/// King class inheriting from ChessPiece
+/// </summary>
 class King : public ChessPiece
 {
 public:

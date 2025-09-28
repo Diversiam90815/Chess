@@ -13,7 +13,10 @@
 #include "Logging.h"
 #include "Parameters.h"
 
-
+/// <summary>
+/// Represents the default configuration settings for a chess application.
+/// If no config was found, these settings will take effect.
+/// </summary>
 struct DefaultSettings
 {
 	const std::string BoardStyle	   = "Wood";
@@ -30,17 +33,44 @@ struct DefaultSettings
 };
 
 
+/**
+ * @brief Manages user-specific application settings (themes, player name, audio,
+ *        networking). Provides typed store / read helpers that fallback to defaults.
+ *
+ * Persistence strategy:
+ *  - On first run (no config file) a default config is created.
+ *  - Individual setters update in-memory values and persist immediately.
+ *
+ * Thread-safety: Not inherently thread-safe; external synchronization required
+ * if accessed from multiple threads concurrently.
+ */
 class UserSettings
 {
 public:
 	UserSettings()	= default;
 	~UserSettings() = default;
 
+	/**
+	 * @brief	Initialize settings storage (creates config file if missing, loads values).
+	 *			Safe to call multiple times; subsequent calls are no-ops.
+	 */
 	void init();
 
+	/**
+	 * @brief	Store a typed setting value.
+	 * @tparam	T		->	Serializable value type.
+	 * @param	setting	->	Enum key.
+	 * @param	value	->	Value to persist.
+	 */
 	template <typename T>
 	void storeSetting(SettingsType setting, T value);
 
+	/**
+	 * @brief	Read a typed setting value.
+	 * @tparam	T		->	Target type (must match stored type).
+	 * @param	setting	->	Enum key.
+	 * @return	Stored value or default if missing / type mismatch.
+	 */
 	template <typename T>
 	T			   readSetting(SettingsType setting);
 
@@ -78,13 +108,30 @@ public:
 	NetworkAdapter getNetworkAdapter() const;
 
 private:
+	/**
+	 * @brief	Check for existing configuration file on disk.
+	 */
 	bool doesConfigFileExist();
 
+	/**
+	 * @brief	Read typed value from config file or return provided default.
+	 * @tparam	T	->	Desired type.
+	 * @param	fileKey Key	-> string in storage.
+	 * @param	defaultValue -> Fallback value.
+	 * @param	setting ->	Enum (for logging / mapping).
+	 * @param	logName	->	Friendly name for diagnostics.
+	 */
 	template <typename T>
 	T				readOrDefault(const std::string &fileKey, const T &defaultValue, SettingsType setting, const std::string &logName);
 
+	/**
+	 * @brief	Create initial configuration file using provided defaults.
+	 */
 	void			initializeConfigFile(DefaultSettings settings);
 
+	/**
+	 * @brief	Emit current effective settings to log (debug / support aid).
+	 */
 	void			logUserSettings();
 
 

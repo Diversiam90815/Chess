@@ -16,6 +16,9 @@
 #include "Player.h"
 
 
+/// <summary>
+/// Helper class for determining available chess moves for a given piece and position.
+/// </summary>
 class MoveHelper
 {
 public:

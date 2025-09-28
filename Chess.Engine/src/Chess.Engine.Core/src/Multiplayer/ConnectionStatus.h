@@ -11,7 +11,9 @@
 #include <string>
 #include "Discovery/DiscoveryEndpoint.h"
 
-
+/// <summary>
+/// Represents the various states of a network connection.
+/// </summary>
 enum class ConnectionState
 {
 	None				= 0,
@@ -27,7 +29,9 @@ enum class ConnectionState
 	GameStarted			= 11,
 };
 
-
+/// <summary>
+/// Represents an event indicating the status of a connection, including its state, an optional error message, and an optional remote endpoint.
+/// </summary>
 struct ConnectionStatusEvent
 {
 	ConnectionStatusEvent() {};

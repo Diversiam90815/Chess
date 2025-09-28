@@ -40,6 +40,9 @@ void GameManager::ReleaseInstance()
 bool GameManager::init()
 {
 	mLog.initLogging();
+
+	SystemInfo::logSystemInfo();
+
 	mUserSettings.init();
 
 	mUiCommunicationLayer = std::make_shared<UICommunication>();

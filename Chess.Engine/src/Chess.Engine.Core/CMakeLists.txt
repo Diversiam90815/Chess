@@ -87,6 +87,7 @@ set(PLAYER_FILES
 )
 
 set(HELPER_FILES
+	${HELPER_DIR}/SystemInfo.h
 	${HELPER_DIR}/JsonConversion.h
 	${HELPER_DIR}/Parameters.h
 	${HELPER_DIR}/ThreadBase.h

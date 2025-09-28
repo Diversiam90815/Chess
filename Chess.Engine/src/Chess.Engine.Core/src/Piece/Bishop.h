@@ -12,7 +12,9 @@
 #include "Parameters.h"
 #include "MoveHelper.h"
 
-
+/// <summary>
+/// Bishop chess piece inheriting from ChessPiece.
+/// </summary>
 class Bishop : public ChessPiece
 {
 public:

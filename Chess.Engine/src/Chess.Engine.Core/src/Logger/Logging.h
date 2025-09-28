@@ -15,7 +15,9 @@
 #include "FileManager.h"
 #include "LoggingHelper.h"
 
-
+/// <summary>
+/// Provides logging functionality, including initialization of the logging system.
+/// </summary>
 class Logging
 {
 public:

@@ -16,6 +16,9 @@
 #include "ChessBoard.h"
 
 
+/// <summary>
+/// Represents a lightweight chess piece with type, color, and movement status.
+/// </summary>
 struct LightPiece
 {
 	PieceType	type	 = PieceType::DefaultType;
@@ -30,6 +33,9 @@ struct LightPiece
 };
 
 
+/// <summary>
+/// Represents the information needed to undo a chess move.
+/// </summary>
 struct MoveUndo
 {
 	PossibleMove move;
@@ -44,6 +50,9 @@ struct MoveUndo
 };
 
 
+/// <summary>
+/// Represents a lightweight chessboard for fast move generation, evaluation, and state management in chess engines or applications.
+/// </summary>
 class LightChessBoard
 {
 public:

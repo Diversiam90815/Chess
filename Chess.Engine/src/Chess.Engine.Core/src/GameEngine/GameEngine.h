@@ -19,6 +19,9 @@
 #include "Parameters.h"
 
 
+/// <summary>
+/// Main engine for managing and controlling the state and logic of a chess game.
+/// </summary>
 class GameEngine : public IGameObservable
 {
 public:
