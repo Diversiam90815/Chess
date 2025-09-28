@@ -1,4 +1,4 @@
-/*
+﻿/*
   ==============================================================================
 	Module:         MultiplayerMessageStruct
 	Description:    Base struct defining the messages being sent/received
@@ -10,9 +10,39 @@
 #include <string>
 #include <vector>
 
-/// <summary>
-/// Defines the types of messages that can be exchanged in a multiplayer environment.
-/// </summary>
+/**
+ * @file	MultiplayerMessageStruct.h
+ * @brief	Core multiplayer messaging primitives.
+ *
+ * Serialization model:
+ *  - All messages are sent as a small header (message type enum value) followed by
+ *    an opaque byte vector ('std::vector<uint8_t>').
+ *  - Higher level systems (RemoteSender / RemoteReceiver) JSON‑serialize
+ *    domain objects into the 'data' buffer but the container
+ *    itself is agnostic.
+ *
+ * Threading:
+ *  - These structs are POD-like and intentionally lightweight; they are copied
+ *    between producer (sender thread) and consumer (receiver thread) queues.
+ *
+ * Validation:
+ *  - Lightweight 'isValid()' helpers allow early rejection before deeper parsing.
+ */
+
+
+/**
+ * @brief	Discriminant for the semantic meaning / payload contract of a message.
+ *
+ * Value meanings:
+ *  - Default:					Uninitialized / placeholder (should not normally be transmitted).
+ *  - ConnectionState:			Broadcast or directed update of current connection state machine.
+ *  - Move:						Encodes a single chess move (origin, destination, promotion, etc.).
+ *  - Chat:						Plain text chat message between peers.
+ *  - InvitationRequest:		Client -> Host connection attempt (includes player name / version).
+ *  - InvitationResponse:		Host -> Client accept / reject decision.
+ *  - PlayerReadyForGameFlag:	Ready toggle used to synchronize actual game start.
+ *  - LocalPlayer:				Selection of local player's color communicated to the peer.
+ */
 enum class MultiplayerMessageType : uint32_t
 {
 	Default				   = 0,
@@ -25,34 +55,62 @@ enum class MultiplayerMessageType : uint32_t
 	LocalPlayer			   = 7,
 };
 
-/// <summary>
-/// Represents a message used in multiplayer communication, containing a message type and associated data.
-/// </summary>
+
+/**
+ * @brief	Wire envelope: type discriminator + raw (already serialized) payload bytes.
+ *
+ * Life-cycle:
+ *  - Filled by sender just before enqueue.
+ *  - Transport layer (ITCPSession) writes raw buffer.
+ *  - Receiver reconstructs the struct and routes by 'type'.
+ *
+ * Invariants:
+ *  - 'type' must not remain Default when placed on an outgoing queue.
+ *  - 'data' may be empty for messages whose semantic payload is entirely implicit
+ *    (e.g. a ready flag toggle encoded as a single boolean, depending on protocol design).
+ */
 struct MultiplayerMessageStruct
 {
 	MultiplayerMessageType type = MultiplayerMessageType::Default;
 	std::vector<uint8_t>   data;
 };
 
-/// <summary>
-/// Represents a request to invite a player, including the player's name and a version string for compatibility checks.
-/// </summary>
+
+/**
+ * @brief	Client -> Host initial connection negotiation payload.
+ *
+ * Fields:
+ *  - playerName:	Display name advertised to host (required, non-empty).
+ *  - version:		Application version string (future negotiation).
+ *
+ * Validation:
+ *  - 'isValid()' rejects empty player names.
+ */
 struct InvitationRequest
 {
-	std::string playerName; // Player Name
-	std::string version;	// For future compatibility checks
+	std::string playerName;
+	std::string version;
 
 	bool		isValid() const { return !playerName.empty(); }
 };
 
-/// <summary>
-/// Represents a response to an invitation, including acceptance status, player name, and an optional reason for declining.
-/// </summary>
+
+/**
+ * @brief	Host -> Client response to earlier invitation.
+ *
+ * Fields:
+ *  - accepted:		True if client request approved.
+ *  - playerName:	Host (or reassigned) name context.
+ *  - reason:		Optional human-readable rejection cause (only meaningful if !accepted).
+ *
+ * Validation:
+ *  - 'isValid()' ensures a non-empty player name (aligning with request contract).
+ */
 struct InvitationResponse
 {
-	bool		accepted;	// Was the request accpeted?
-	std::string playerName; // Playername
-	std::string reason;		// Specify reason if declined
+	bool		accepted;
+	std::string playerName;
+	std::string reason;
 
 	bool		isValid() const { return !playerName.empty(); }
 };

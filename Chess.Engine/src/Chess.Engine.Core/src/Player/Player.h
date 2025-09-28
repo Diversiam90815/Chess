@@ -14,9 +14,24 @@
 
 #include "IObservable.h"
 
-/// <summary>
-/// Represents a player's score, including the player's color and score value.
-/// </summary>
+
+/**
+ * @brief	Immutable pairing of a player color with a numeric evaluation (material or aggregate).
+ *
+ * Semantics:
+ *  - Represents ONLY the numeric value; it does not auto-update. Owning code is responsible
+ *    for recomputation (e.g., after captures) and replacing the value via Player::setScore().
+ *  - Value convention: positive magnitudes only (sign not used to distinguish players; the
+ *    PlayerColor field does that explicitly).
+ *
+ * Usage Patterns:
+ *  - Stored inside Player for quick retrieval and UI display.
+ *  - Can be compared directly with another Score (same color + value).
+ *
+ * Invariants:
+ *  - `player` is always a valid PlayerColor (may be NoColor before initialization).
+ *  - `value` is non-negative (not enforced programmatically; callers should avoid negatives).
+ */
 struct Score
 {
 	Score(PlayerColor player, int value) : player(player), value(value) {};
@@ -32,10 +47,20 @@ private:
 	int			value  = 0;
 };
 
-/// <summary>
-/// Manages a player in the game, tracking their color, score, captured pieces, and local status.
-/// Implements the IPlayerObservable interface for game state updates.
-/// </summary>
+
+/**
+ * @brief	Lightweight aggregation of per-player state (material score, captured pieces,
+ *			color assignment, local/remote designation).
+ *
+ * Responsibilities:
+ *  - Maintain incremental material score (updated via 'updateScore()' after captures).
+ *  - Track captured opponent pieces for UI / analytics.
+ *  - Distinguish local vs remote (used by multiplayer logic / input gating).
+ *
+ * Design Notes:
+ *  - Score is stored as a 'Score' domain object (supports color association).
+ *  - Does not enforce turn ownership; that is orchestrated by StateMachine.
+ */
 class Player : public IPlayerObservable
 {
 public:
@@ -49,13 +74,27 @@ public:
 	PlayerColor	  getPlayerColor() const;
 	void		  setPlayerColor(PlayerColor value);
 
+	/**
+	 * @brief	Record a newly captured opponent piece.
+	 */
 	void		  addCapturedPiece(const PieceType piece) override;
+
+	/**
+	 * @brief	Remove the most recently captured piece (undo support).
+	 */
 	void		  removeLastCapturedPiece() override;
 
+	/**
+	 * @brief	Recalculate material score based on captured pieces (and/or board state
+	 *			depending on implementation).
+	 */
 	void		  updateScore() override;
 
 	constexpr int getPieceValue(PieceType piece);
 
+	/**
+	 * @brief	Reset player state to initial (fresh game).
+	 */
 	void		  reset();
 
 	bool		  isLocalPlayer() const { return mIsLocalPlayer; }
