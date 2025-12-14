@@ -12,3 +12,4 @@ endif()
 
 add_subdirectory(Chess.Engine.Core)
 add_subdirectory(Chess.Engine.API)
+add_subdirectory((Chess.Engine.ConsoleApp))
