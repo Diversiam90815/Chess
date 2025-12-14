@@ -61,6 +61,8 @@ set(PIECE_FILES
 )
 
 set(BOARD_FILES
+	${BOARD_DIR}/BitboardHelper.h
+	${BOARD_DIR}/Bitboard.h				${BOARD_DIR}/Bitboard.cpp
 	${BOARD_DIR}/ChessBoard.h			${BOARD_DIR}/ChessBoard.cpp
 	${BOARD_DIR}/LightChessBoard.h		${BOARD_DIR}/LightChessBoard.cpp
 )
