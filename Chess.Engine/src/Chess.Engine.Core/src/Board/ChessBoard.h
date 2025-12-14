@@ -10,6 +10,7 @@
 #include <array>
 #include <memory>
 
+#include "Logging.h"
 #include "Move.h"
 #include "Pawn.h"
 #include "Knight.h"

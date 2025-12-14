@@ -10,6 +10,7 @@
 #include <memory>
 
 #include "ChessBoard.h"
+#include "Logging.h"
 
 #define VALIDATION_DEBUG false
 

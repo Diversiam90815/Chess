@@ -59,7 +59,7 @@ constexpr U64 not_HG_file = 0x3F3F3F3F3F3F3F3F;
 
 // board squares
 // clang-format off
-enum Square
+enum
 {
 	a8, b8, c8, d8, e8, f8, g8, h8,
 	a7, b7, c7, d7, e7, f7, g7, h7,

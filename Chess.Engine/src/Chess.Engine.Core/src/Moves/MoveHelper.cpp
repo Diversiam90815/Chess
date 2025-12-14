@@ -124,3 +124,64 @@ U64 MoveHelper::maskKingAttacks(int square)
 
 	return attacks;
 }
+
+
+U64 MoveHelper::maskBishopAttacks(int square)
+{
+	// result attacks bitboard
+	U64 attacks = 0ULL;
+
+	// init rank, files
+	int r		= 0;
+	int f		= 0;
+
+	// init target rank & files
+	int tr		= square / 8;
+	int tf		= square % 8;
+
+	// mask relevant bishop occupancy bits
+	for (r = tr + 1, f = tf + 1; r <= 6 && f <= 6; r++, f++)
+		attacks |= (1ULL << (r * 8 + f));
+
+	for (r = tr + 1, f = tf - 1; r <= 6 && f >= 1; r++, f--)
+		attacks |= (1ULL << (r * 8 + f));
+
+	for (r = tr - 1, f = tf + 1; r >= 1 && f <= 6; r--, f++)
+		attacks |= (1ULL << (r * 8 + f));
+
+	for (r = tr - 1, f = tf - 1; r >= 1 && f >= 1; r--, f--)
+		attacks |= (1ULL << (r * 8 + f));
+
+	return attacks;
+}
+
+
+U64 MoveHelper::maskRookAttacks(int square)
+{
+	// result attacks bitboard
+	U64 attacks = 0ULL;
+
+	// init rank, files
+	int r		= 0;
+	int f		= 0;
+
+	// init target rank & files
+	int tr		= square / 8;
+	int tf		= square % 8;
+
+	// mask relevant rook occupancy bits
+	for (r = tr + 1; r <= 6; r++)
+		attacks |= (1ULL << (r * 8 + tf));
+
+	for (r = tr - 1; r >= 6; r--)
+		attacks |= (1ULL << (r * 8 + tf));
+
+	for (f = tf + 1; f <= 6; f++)
+		attacks |= (1ULL << (tr * 8 + f));
+
+	for (f = tf - 1; f >= 1; f--)
+		attacks |= (1ULL >> (tr * 8 + f));
+
+
+	return attacks;
+}
