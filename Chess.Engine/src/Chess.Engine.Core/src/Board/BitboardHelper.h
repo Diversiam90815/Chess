@@ -50,10 +50,10 @@ enum Side
 		a  b  c  d  e  f  g  h
 */
 
-constexpr U64 not_A_file  = 0xBFBFBFBFBFBFBFBF;
-constexpr U64 not_AB_file = 0xFCFCFCFCFCFCFCFC;
-constexpr U64 not_H_file  = 0x7F7F7F7F7F7F7F7F;
-constexpr U64 not_HG_file = 0x3F3F3F3F3F3F3F3F;
+constexpr U64 not_A_file  = 18374403900871474942ULL;
+constexpr U64 not_H_file  = 9187201950435737471ULL;
+constexpr U64 not_AB_file = 18229723555195321596ULL;
+constexpr U64 not_HG_file = 4557430888798830399ULL;
 
 
 

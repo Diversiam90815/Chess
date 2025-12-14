@@ -15,7 +15,6 @@ public:
 	MoveHelper()  = default;
 	~MoveHelper() = default;
 
-private:
 	void initLeaperAttacks();
 
 	U64	 maskPawnAttacks(int side, int square);
