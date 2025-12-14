@@ -16,6 +16,7 @@
 #include "Notation/MoveNotation.h"
 #include "Move.h"
 #include "IObservable.h"
+#include "Logging.h"
 
 
 /**

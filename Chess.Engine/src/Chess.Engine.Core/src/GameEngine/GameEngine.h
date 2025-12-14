@@ -17,6 +17,7 @@
 #include "CPUPlayer.h"
 #include "IObservable.h"
 #include "Parameters.h"
+#include "Player.h"
 
 
 /// <summary>

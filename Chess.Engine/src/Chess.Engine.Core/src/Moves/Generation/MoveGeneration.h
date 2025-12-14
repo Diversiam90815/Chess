@@ -13,6 +13,7 @@
 #include <memory>
 
 #include "ChessBoard.h"
+#include "Logging.h"
 #include "Move.h"
 #include "Validation/MoveValidation.h"
 #include "Execution/MoveExecution.h"
