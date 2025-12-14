@@ -255,14 +255,17 @@
 //}
 
 
-void MoveHelper::initPawnAttackTable()
+void MoveHelper::initLeaperAttacks()
 {
 	for (int square = 0; square < 64; ++square)
 	{
 		mPawnAttacks[Side::White][square] = maskPawnAttacks(Side::White, square);
 		mPawnAttacks[Side::Black][square] = maskPawnAttacks(Side::Black, square);
+
+		mKnightAttacks[square]			  = maskKnightAttacks(square);
 	}
 }
+
 
 
 U64 MoveHelper::maskPawnAttacks(int side, int square)
@@ -274,7 +277,7 @@ U64 MoveHelper::maskPawnAttacks(int side, int square)
 	U64 bitboard = 0ULL;
 
 	// Set bit on board
-	set_bit(bitboard, static_cast<int>(square));
+	set_bit(bitboard, square);
 
 	// white pawns
 	if (!(side == Side::White))
@@ -294,4 +297,40 @@ U64 MoveHelper::maskPawnAttacks(int side, int square)
 		if ((bitboard << 9) & not_H_file)
 			attacks |= (bitboard << 9);
 	}
+
+	return attacks;
+}
+
+
+U64 MoveHelper::maskKnightAttacks(int square)
+{
+	// result attacks bitboard
+	U64 attacks	 = 0ULL;
+
+	// piece bitboard
+	U64 bitboard = 0ULL;
+
+	// Set bit on board
+	set_bit(bitboard, square);
+
+	// generate knight attacks (Bitboard offsets 6, 10, 15, 17)
+	if ((bitboard >> 17) & not_H_file)
+		attacks |= (bitboard >> 17);
+	if ((bitboard >> 15) & not_A_file)
+		attacks |= (bitboard >> 15);
+	if ((bitboard >> 10) & not_HG_file)
+		attacks |= (bitboard >> 10);
+	if ((bitboard >> 6) & not_AB_file)
+		attacks |= (bitboard >> 6);
+
+	if ((bitboard << 17) & not_A_file)
+		attacks |= (bitboard << 17);
+	if ((bitboard << 15) & not_H_file)
+		attacks |= (bitboard << 15);
+	if ((bitboard << 10) & not_AB_file)
+		attacks |= (bitboard << 10);
+	if ((bitboard << 6) & not_HG_file)
+		attacks |= (bitboard << 6);
+
+	return attacks;
 }

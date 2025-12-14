@@ -82,10 +82,11 @@ public:
 	~MoveHelper() = default;
 
 private:
-	void initPawnAttackTable();
+	void initLeaperAttacks();
 
 	U64	 maskPawnAttacks(int side, int square);
-
+	U64	 maskKnightAttacks(int square);
 
 	U64	 mPawnAttacks[2][64]; // pawn attack table [side][square]
+	U64	 mKnightAttacks[64];  // knight attack table [square]
 };
