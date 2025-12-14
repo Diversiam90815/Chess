@@ -1,17 +1,22 @@
+/*
+  ==============================================================================
+	Module:         ConsoleApp - main
+	Description:    Console App for the Chess Engine for debugging
+  ==============================================================================
+*/
+
 #include <iostream>
 
 #include "Bitboard.h"
 #include "MoveHelper.h"
 
 
-void printBitboard(U64 bitboard)
+static void printBitboard(U64 bitboard)
 {
 	printf("\n");
 
-	// loop over board ranks
 	for (int rank = 0; rank < 8; rank++)
 	{
-		// loop over board files
 		for (int file = 0; file < 8; file++)
 		{
 			// convert file & rank into square index
@@ -25,14 +30,10 @@ void printBitboard(U64 bitboard)
 			printf(" %d", get_bit(bitboard, square) ? 1 : 0);
 		}
 
-		// print new line every rank
 		printf("\n");
 	}
 
-	// print board files
 	printf("\n     a b c d e f g h\n\n");
-
-	// print bitboard as unsigned decimal number
 	printf("     Bitboard: %llud\n\n", bitboard);
 }
 
@@ -40,14 +41,14 @@ void printBitboard(U64 bitboard)
 
 int main()
 {
-    std::cout << "Console app starting..\n";
-	
-	MoveHelper helper;
+	std::cout << "Console app starting..\n";
+
+	MoveHelper helper{};
 	helper.initLeaperAttacks();
 
-	for (int i = 0; i <64; ++i)
-		printBitboard(helper.maskKingAttacks(i));
+	for (int i = 0; i < 64; ++i)
+		printBitboard(helper.maskBishopAttacks(i));
 
-    std::cout << "Done.";
-    return 0;
+	std::cout << "Done.";
+	return 0;
 }
