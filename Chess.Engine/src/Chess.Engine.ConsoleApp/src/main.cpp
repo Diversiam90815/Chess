@@ -51,9 +51,17 @@ int main()
 	set_bit(blocker, f7);
 	set_bit(blocker, e5);
 
-	printBitboard(helper.generateRookAttacks(d5, blocker));
+	printBitboard(blocker);
 
-	printf("Bit count: %i \n", countBits(blocker));
+	printf("Bit count: %d \n", countBits(blocker));
+
+	printf("Index: %d\n", getLeastSignificantFirstBitIndex(blocker));
+	printf("Coordinate: %s\n", square_to_coordinates[getLeastSignificantFirstBitIndex(blocker)]);
+
+	// Test bitboard
+	U64 test = 0ULL;
+	set_bit(test, getLeastSignificantFirstBitIndex(blocker));
+	printBitboard(test);
 
 	std::cout << "Done.\n";
 	return 0;
