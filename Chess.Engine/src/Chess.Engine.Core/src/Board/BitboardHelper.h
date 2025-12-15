@@ -136,6 +136,7 @@ static inline int countBits(U64 bitboard)
 	return count;
 }
 
+
 // Get least significant 1st bit index
 static inline int getLeastSignificantFirstBitIndex(U64 bitboard)
 {
@@ -166,12 +167,13 @@ static inline U64 setOccupancy(int index, int bitsInMask, U64 attackMask)
 	return occupancy;
 }
 
-static inline unsigned int state = 1804289383;
+
+static inline unsigned int random_state = 1804289383;
 
 // generate 32bit pseudo legal numbers
-static inline int		   getRandomNumber()
+static inline int		   getRandomU32Number()
 {
-	unsigned int number = state;
+	unsigned int number = random_state;
 
 	// XOR shift algorithm
 	number ^= number << 13;
@@ -179,7 +181,35 @@ static inline int		   getRandomNumber()
 	number ^= number << 5;
 
 	// update random number state
-	state = number;
+	random_state = number;
 
 	return number;
 }
+
+
+static inline U64 getRandomU64Number()
+{
+	// define 4 random numbers
+	U64 n1, n2, n3, n4;
+
+	// init random numbers slicing 16 bits from MS1b
+	n1 = (U64)(getRandomU32Number()) & 0xFFFF;
+	n2 = (U64)(getRandomU32Number()) & 0xFFFF;
+	n3 = (U64)(getRandomU32Number()) & 0xFFFF;
+	n4 = (U64)(getRandomU32Number()) & 0xFFFF;
+
+	// return random number
+	return n1 | (n2 << 16) | (n3 << 32) | (n4 << 48);
+}
+
+
+static inline U64 generateMagicNumbers()
+{
+	return getRandomU64Number() & getRandomU64Number() & getRandomU64Number();
+}
+
+enum
+{
+	rook,
+	bishop
+};

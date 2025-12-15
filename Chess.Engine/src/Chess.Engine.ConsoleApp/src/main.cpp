@@ -45,11 +45,9 @@ int main()
 
 	MoveHelper helper{};
 	helper.initLeaperAttacks();
-
-	printf("%ud\n", getRandomNumber());
-	printf("%ud\n", getRandomNumber());
-	printf("%ud\n", getRandomNumber());
-	printf("%ud\n", getRandomNumber());
+	
+	Bitboard bitboard{};
+	bitboard.initMagicNumbers();
 
 	std::cout << "Done.\n";
 	return 0;
