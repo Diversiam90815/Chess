@@ -20,8 +20,8 @@ public:
 	U64	 maskPawnAttacks(int side, int square);
 	U64	 maskKnightAttacks(int square);
 	U64	 maskKingAttacks(int square);
-	U64	 maskRookAttacks(int square);
 
+	U64	 generateRookAttacks(int square, U64 blocker);
 	U64	 generateBishopAttacks(int square, U64 blocker);
 
 	U64	 mPawnAttacks[2][64]; // pawn attack table [side][square]

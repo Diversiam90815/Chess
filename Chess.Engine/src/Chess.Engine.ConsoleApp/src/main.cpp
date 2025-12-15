@@ -49,8 +49,9 @@ int main()
 	U64 blocker = 0ULL;
 	set_bit(blocker, e4);
 	set_bit(blocker, f7);
+	set_bit(blocker, e5);
 
-	printBitboard(helper.generateBishopAttacks(d5, blocker));
+	printBitboard(helper.generateRookAttacks(d5, blocker));
 
 	std::cout << "Done.\n";
 	return 0;

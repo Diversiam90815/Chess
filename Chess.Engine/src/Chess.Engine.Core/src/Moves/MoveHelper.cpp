@@ -139,7 +139,7 @@ U64 MoveHelper::generateBishopAttacks(int square, U64 blocker)
 	int tr		= square / 8;
 	int tf		= square % 8;
 
-	// mask relevant bishop occupancy bits
+	// generate bishop attacks
 	for (r = tr + 1, f = tf + 1; r <= 7 && f <= 7; r++, f++)
 	{
 		attacks |= (1ULL << (r * 8 + f));
@@ -172,7 +172,7 @@ U64 MoveHelper::generateBishopAttacks(int square, U64 blocker)
 }
 
 
-U64 MoveHelper::maskRookAttacks(int square)
+U64 MoveHelper::generateRookAttacks(int square, U64 blocker)
 {
 	// result attacks bitboard
 	U64 attacks = 0ULL;
@@ -185,19 +185,34 @@ U64 MoveHelper::maskRookAttacks(int square)
 	int tr		= square / 8;
 	int tf		= square % 8;
 
-	// mask relevant rook occupancy bits
-	for (r = tr + 1; r <= 6; r++)
+	// generate rook attacks
+	for (r = tr + 1; r <= 7; r++)
+	{
 		attacks |= (1ULL << (r * 8 + tf));
+		if ((1ULL << (r * 8 + tf)) & blocker)
+			break;
+	}
 
-	for (r = tr - 1; r >= 6; r--)
+	for (r = tr - 1; r >= 0; r--)
+	{
 		attacks |= (1ULL << (r * 8 + tf));
+		if ((1ULL << (r * 8 + tf)) & blocker)
+			break;
+	}
 
-	for (f = tf + 1; f <= 6; f++)
+	for (f = tf + 1; f <= 7; f++)
+	{
 		attacks |= (1ULL << (tr * 8 + f));
+		if ((1ULL << (tr * 8 + f)) & blocker)
+			break;
+	}
 
-	for (f = tf - 1; f >= 1; f--)
-		attacks |= (1ULL >> (tr * 8 + f));
-
+	for (f = tf - 1; f >= 0; f--)
+	{
+		attacks |= (1ULL << (tr * 8 + f));
+		if ((1ULL << (tr * 8 + f)) & blocker)
+			break;
+	}
 
 	return attacks;
 }
