@@ -24,4 +24,7 @@ private:
 
 
 	MoveHelper mMoveHelper;
+
+	U64		   mRookMagicNumbers[64];
+	U64		   mBishopMagicNumbers[64];
 };
