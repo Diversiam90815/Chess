@@ -46,22 +46,16 @@ int main()
 	MoveHelper helper{};
 	helper.initLeaperAttacks();
 
-	U64 blocker = 0ULL;
-	set_bit(blocker, e4);
-	set_bit(blocker, f7);
-	set_bit(blocker, e5);
+	for (int rank = 0; rank < 8; rank++)
+	{
+		for (int file = 0; file < 8; file++)
+		{
+			int square = rank * 8 + file;
+			printf("%d, ", countBits(helper.maskRookAttacks(square)));
+		}
 
-	printBitboard(blocker);
-
-	printf("Bit count: %d \n", countBits(blocker));
-
-	printf("Index: %d\n", getLeastSignificantFirstBitIndex(blocker));
-	printf("Coordinate: %s\n", square_to_coordinates[getLeastSignificantFirstBitIndex(blocker)]);
-
-	// Test bitboard
-	U64 test = 0ULL;
-	set_bit(test, getLeastSignificantFirstBitIndex(blocker));
-	printBitboard(test);
+		printf("\n");
+	}
 
 	std::cout << "Done.\n";
 	return 0;

@@ -57,10 +57,35 @@ constexpr U64 not_H_file  = 9187201950435737471ULL;
 constexpr U64 not_AB_file = 18229723555195321596ULL;
 constexpr U64 not_HG_file = 4557430888798830399ULL;
 
+// clang-format off
+
+// relevant occupancy bit count for every square on board
+constexpr int bishop_relevant_bits[64] = 
+{
+	6, 5, 5, 5, 5, 5, 5, 6, 
+	5, 5, 5, 5, 5, 5, 5, 5, 
+	5, 5, 7, 7, 7, 7, 5, 5, 
+	5, 5, 7, 9, 9, 7, 5, 5,
+	5, 5, 7, 9, 9, 7, 5, 5, 
+	5, 5, 7, 7, 7, 7, 5, 5, 
+	5, 5, 5, 5, 5, 5, 5, 5, 
+	6, 5, 5, 5, 5, 5, 5, 6,
+};
+
+constexpr int rook_relevant_bits[64] = 
+{
+	12, 11, 11, 11, 11, 11, 11, 12,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	11, 10, 10, 10, 10, 10, 10, 11,
+	12, 11, 11, 11, 11, 11, 11, 12,
+};
 
 
 // board squares
-// clang-format off
 enum
 {
 	a8, b8, c8, d8, e8, f8, g8, h8,
@@ -123,7 +148,7 @@ static inline int getLeastSignificantFirstBitIndex(U64 bitboard)
 }
 
 
-U64 setOccupancy(int index, int bitsInMask, U64 attackMask)
+static inline U64 setOccupancy(int index, int bitsInMask, U64 attackMask)
 {
 	U64 occupancy = 0ULL; // Occupancy map
 

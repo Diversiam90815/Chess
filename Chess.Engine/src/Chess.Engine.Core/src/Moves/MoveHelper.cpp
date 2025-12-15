@@ -218,7 +218,7 @@ U64 MoveHelper::generateRookAttacks(int square, U64 blocker)
 }
 
 
-U64 MoveHelper::mask_bishop_attacks(int square)
+U64 MoveHelper::maskBishopAttacks(int square)
 {
 	// result attacks bitboard
 	U64 attacks = 0ULL;
@@ -244,7 +244,7 @@ U64 MoveHelper::mask_bishop_attacks(int square)
 }
 
 
-U64 MoveHelper::mask_rook_attacks(int square)
+U64 MoveHelper::maskRookAttacks(int square)
 {
 	// result attacks bitboard
 	U64 attacks = 0ULL;
@@ -268,4 +268,3 @@ U64 MoveHelper::mask_rook_attacks(int square)
 
 	return attacks;
 }
-
