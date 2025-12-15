@@ -46,7 +46,11 @@ int main()
 	MoveHelper helper{};
 	helper.initLeaperAttacks();
 
-	printBitboard(helper.maskBishopAttacks(e4));
+	U64 blocker = 0ULL;
+	set_bit(blocker, e4);
+	set_bit(blocker, f7);
+
+	printBitboard(helper.generateBishopAttacks(d5, blocker));
 
 	std::cout << "Done.\n";
 	return 0;

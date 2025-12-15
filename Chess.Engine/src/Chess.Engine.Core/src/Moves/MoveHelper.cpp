@@ -126,7 +126,7 @@ U64 MoveHelper::maskKingAttacks(int square)
 }
 
 
-U64 MoveHelper::maskBishopAttacks(int square)
+U64 MoveHelper::generateBishopAttacks(int square, U64 blocker)
 {
 	// result attacks bitboard
 	U64 attacks = 0ULL;
@@ -141,16 +141,32 @@ U64 MoveHelper::maskBishopAttacks(int square)
 
 	// mask relevant bishop occupancy bits
 	for (r = tr + 1, f = tf + 1; r <= 7 && f <= 7; r++, f++)
+	{
 		attacks |= (1ULL << (r * 8 + f));
+		if ((1ULL << (r * 8 + f)) & blocker)
+			break;
+	}
 
 	for (r = tr + 1, f = tf - 1; r <= 7 && f >= 0; r++, f--)
+	{
 		attacks |= (1ULL << (r * 8 + f));
+		if ((1ULL << (r * 8 + f)) & blocker)
+			break;
+	}
 
 	for (r = tr - 1, f = tf + 1; r >= 0 && f <= 7; r--, f++)
+	{
 		attacks |= (1ULL << (r * 8 + f));
+		if ((1ULL << (r * 8 + f)) & blocker)
+			break;
+	}
 
 	for (r = tr - 1, f = tf - 1; r >= 0 && f >= 0; r--, f--)
+	{
 		attacks |= (1ULL << (r * 8 + f));
+		if ((1ULL << (r * 8 + f)) & blocker)
+			break;
+	}
 
 	return attacks;
 }
