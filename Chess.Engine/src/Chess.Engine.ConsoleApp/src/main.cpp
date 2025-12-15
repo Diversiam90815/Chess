@@ -46,16 +46,10 @@ int main()
 	MoveHelper helper{};
 	helper.initLeaperAttacks();
 
-	for (int rank = 0; rank < 8; rank++)
-	{
-		for (int file = 0; file < 8; file++)
-		{
-			int square = rank * 8 + file;
-			printf("%d, ", countBits(helper.maskRookAttacks(square)));
-		}
-
-		printf("\n");
-	}
+	printf("%ud\n", getRandomNumber());
+	printf("%ud\n", getRandomNumber());
+	printf("%ud\n", getRandomNumber());
+	printf("%ud\n", getRandomNumber());
 
 	std::cout << "Done.\n";
 	return 0;

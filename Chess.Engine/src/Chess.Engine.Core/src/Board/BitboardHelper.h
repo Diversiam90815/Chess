@@ -20,7 +20,7 @@ enum Side
 };
 
 /*
-		Bitboard representation (0ULL)
+	Bitboard representation (0ULL)
 
 	8	0  0  0  0  0  0  0  0
 	7	0  0  0  0  0  0  0  0
@@ -116,9 +116,7 @@ inline const char* square_to_coordinates[] =
 // Bit manipulation
 
 #define get_bit(bitboard, square) (bitboard & (1ULL << square))
-
 #define set_bit(bitboard, square) (bitboard |= (1ULL << square))
-
 #define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (1ULL << square) : 0)
 
 
@@ -166,4 +164,22 @@ static inline U64 setOccupancy(int index, int bitsInMask, U64 attackMask)
 	}
 
 	return occupancy;
+}
+
+static inline unsigned int state = 1804289383;
+
+// generate 32bit pseudo legal numbers
+static inline int		   getRandomNumber()
+{
+	unsigned int number = state;
+
+	// XOR shift algorithm
+	number ^= number << 13;
+	number ^= number >> 17;
+	number ^= number << 5;
+
+	// update random number state
+	state = number;
+
+	return number;
 }
