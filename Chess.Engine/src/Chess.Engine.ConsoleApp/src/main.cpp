@@ -53,6 +53,8 @@ int main()
 
 	printBitboard(helper.generateRookAttacks(d5, blocker));
 
+	printf("Bit count: %i \n", countBits(blocker));
+
 	std::cout << "Done.\n";
 	return 0;
 }

@@ -92,3 +92,21 @@ enum
 #define set_bit(bitboard, square) (bitboard |= (1ULL << square))
 
 #define pop_bit(bitboard, square) (get_bit(bitboard, square) ? bitboard ^= (1ULL << square) : 0)
+
+
+// Count bits within a bitboard
+
+static inline int countBits(U64 bitboard)
+{
+	int count = 0;
+
+	// consecutively reset least significant 1st bit
+	while (bitboard)
+	{
+		count++;				  // Increment count
+
+		bitboard &= bitboard - 1; // Reset least significant 1st bit
+	}
+
+	return count;
+}
