@@ -46,9 +46,8 @@ int main()
 	MoveHelper helper{};
 	helper.initLeaperAttacks();
 
-	for (int i = 0; i < 64; ++i)
-		printBitboard(helper.maskBishopAttacks(i));
+	printBitboard(helper.maskBishopAttacks(e4));
 
-	std::cout << "Done.";
+	std::cout << "Done.\n";
 	return 0;
 }

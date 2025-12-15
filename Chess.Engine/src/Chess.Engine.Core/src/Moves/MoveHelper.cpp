@@ -140,16 +140,16 @@ U64 MoveHelper::maskBishopAttacks(int square)
 	int tf		= square % 8;
 
 	// mask relevant bishop occupancy bits
-	for (r = tr + 1, f = tf + 1; r <= 6 && f <= 6; r++, f++)
+	for (r = tr + 1, f = tf + 1; r <= 7 && f <= 7; r++, f++)
 		attacks |= (1ULL << (r * 8 + f));
 
-	for (r = tr + 1, f = tf - 1; r <= 6 && f >= 1; r++, f--)
+	for (r = tr + 1, f = tf - 1; r <= 7 && f >= 0; r++, f--)
 		attacks |= (1ULL << (r * 8 + f));
 
-	for (r = tr - 1, f = tf + 1; r >= 1 && f <= 6; r--, f++)
+	for (r = tr - 1, f = tf + 1; r >= 0 && f <= 7; r--, f++)
 		attacks |= (1ULL << (r * 8 + f));
 
-	for (r = tr - 1, f = tf - 1; r >= 1 && f >= 1; r--, f--)
+	for (r = tr - 1, f = tf - 1; r >= 0 && f >= 0; r--, f--)
 		attacks |= (1ULL << (r * 8 + f));
 
 	return attacks;
