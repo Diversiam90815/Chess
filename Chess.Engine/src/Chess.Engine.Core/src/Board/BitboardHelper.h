@@ -121,3 +121,24 @@ static inline int getLeastSignificantFirstBitIndex(U64 bitboard)
 
 	return countBits((bitboard & ~bitboard + 1) - 1);
 }
+
+
+U64 setOccupancy(int index, int bitsInMask, U64 attackMask)
+{
+	U64 occupancy = 0ULL; // Occupancy map
+
+	for (int count = 0; count < bitsInMask; ++count)
+	{
+		// get least significant 1st bit of attack mask
+		int square = getLeastSignificantFirstBitIndex(attackMask);
+
+		// pop least significant 1st bit in attack map
+		pop_bit(attackMask, square);
+
+		// make sure occupancy is on board
+		if (index & (1 << count))
+			occupancy |= (1ULL << square); // populate occupancy map
+	}
+
+	return occupancy;
+}
