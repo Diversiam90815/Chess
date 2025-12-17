@@ -1,15 +1,14 @@
 /*
   ==============================================================================
-	Module:         MoveHelper
-	Description:    Helper class for generating general moves in chess
+	Module:         AttackTables
+	Description:    Precomputed attack tables for all pieces
   ==============================================================================
 */
 
+#include "AttackTables.h"
 
-#include "MoveHelper.h"
 
-
-void MoveHelper::initLeaperAttacks()
+void AttackTables::initLeaperAttacks()
 {
 	for (int square = 0; square < 64; ++square)
 	{
@@ -23,7 +22,7 @@ void MoveHelper::initLeaperAttacks()
 }
 
 
-U64 MoveHelper::maskPawnAttacks(int side, int square)
+U64 AttackTables::maskPawnAttacks(int side, int square)
 {
 	// result attacks bitboard
 	U64 attacks	 = 0ULL;
@@ -32,7 +31,7 @@ U64 MoveHelper::maskPawnAttacks(int side, int square)
 	U64 bitboard = 0ULL;
 
 	// Set bit on board
-	set_bit(bitboard, square);
+	BitUtils::setBit(bitboard, square);
 
 	// Generate attacks for
 	// white pawns
@@ -58,7 +57,7 @@ U64 MoveHelper::maskPawnAttacks(int side, int square)
 }
 
 
-U64 MoveHelper::maskKnightAttacks(int square)
+U64 AttackTables::maskKnightAttacks(int square)
 {
 	// result attacks bitboard
 	U64 attacks	 = 0ULL;
@@ -67,7 +66,7 @@ U64 MoveHelper::maskKnightAttacks(int square)
 	U64 bitboard = 0ULL;
 
 	// Set bit on board
-	set_bit(bitboard, square);
+	BitUtils::setBit(bitboard, square);
 
 	// generate knight attacks (Bitboard offsets 6, 10, 15, 17)
 	if ((bitboard >> 17) & not_H_file)
@@ -92,7 +91,7 @@ U64 MoveHelper::maskKnightAttacks(int square)
 }
 
 
-U64 MoveHelper::maskKingAttacks(int square)
+U64 AttackTables::maskKingAttacks(int square)
 {
 	// result attacks bitboard
 	U64 attacks	 = 0ULL;
@@ -101,7 +100,7 @@ U64 MoveHelper::maskKingAttacks(int square)
 	U64 bitboard = 0ULL;
 
 	// Set bit on board
-	set_bit(bitboard, square);
+	BitUtils::setBit(bitboard, square);
 
 	// generate king attacks
 	if (bitboard >> 8)
@@ -126,7 +125,7 @@ U64 MoveHelper::maskKingAttacks(int square)
 }
 
 
-U64 MoveHelper::generateBishopAttacks(int square, U64 blocker)
+U64 AttackTables::generateBishopAttacks(int square, U64 blocker)
 {
 	// result attacks bitboard
 	U64 attacks = 0ULL;
@@ -172,7 +171,7 @@ U64 MoveHelper::generateBishopAttacks(int square, U64 blocker)
 }
 
 
-U64 MoveHelper::generateRookAttacks(int square, U64 blocker)
+U64 AttackTables::generateRookAttacks(int square, U64 blocker)
 {
 	// result attacks bitboard
 	U64 attacks = 0ULL;
@@ -218,7 +217,7 @@ U64 MoveHelper::generateRookAttacks(int square, U64 blocker)
 }
 
 
-U64 MoveHelper::maskBishopAttacks(int square)
+U64 AttackTables::maskBishopAttacks(int square)
 {
 	// result attacks bitboard
 	U64 attacks = 0ULL;
@@ -244,7 +243,7 @@ U64 MoveHelper::maskBishopAttacks(int square)
 }
 
 
-U64 MoveHelper::maskRookAttacks(int square)
+U64 AttackTables::maskRookAttacks(int square)
 {
 	// result attacks bitboard
 	U64 attacks = 0ULL;
@@ -267,4 +266,25 @@ U64 MoveHelper::maskRookAttacks(int square)
 		attacks |= (1ULL << (tr * 8 + f));
 
 	return attacks;
+}
+
+
+U64 AttackTables::setOccupancy(int index, int bitsInMask, U64 attackMask)
+{
+	U64 occupancy = 0ULL; // Occupancy map
+
+	for (int count = 0; count < bitsInMask; ++count)
+	{
+		// get least significant 1st bit of attack mask
+		int square = BitUtils::lsb(attackMask);
+
+		// pop least significant 1st bit in attack map
+		BitUtils::popBit(attackMask, square);
+
+		// make sure occupancy is on board
+		if (index & (1 << count))
+			occupancy |= (1ULL << square); // populate occupancy map
+	}
+
+	return occupancy;
 }

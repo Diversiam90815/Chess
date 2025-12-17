@@ -62,7 +62,11 @@ set(PIECE_FILES
 
 set(BOARD_FILES
 	${BOARD_DIR}/BitboardHelper.h
+	${BOARD_DIR}/BitboardUtils.h
+	${BOARD_DIR}/BitboardTypes.h
+	${BOARD_DIR}/MagicGenerator.h
 	${BOARD_DIR}/Bitboard.h				${BOARD_DIR}/Bitboard.cpp
+	${BOARD_DIR}/AttackTables.h			${BOARD_DIR}/AttackTables.cpp
 	${BOARD_DIR}/ChessBoard.h			${BOARD_DIR}/ChessBoard.cpp
 	${BOARD_DIR}/LightChessBoard.h		${BOARD_DIR}/LightChessBoard.cpp
 )
@@ -70,8 +74,7 @@ set(BOARD_FILES
 set(MOVE_FILES
 	${MOVE_DIR}/MoveType.h
 	${MOVE_DIR}/Move.h
-	${MOVE_DIR}/MoveHelper.h					${MOVE_DIR}/MoveHelper.cpp
-	${MOVE_DIR}/generation/MoveGeneration.h		${MOVE_DIR}/Generation/MoveGeneration.cpp
+	${MOVE_DIR}/Generation/MoveGeneration.h		${MOVE_DIR}/Generation/MoveGeneration.cpp
 	${MOVE_DIR}/Validation/MoveValidation.h		${MOVE_DIR}/Validation/MoveValidation.cpp
 	${MOVE_DIR}/Execution/MoveExecution.h		${MOVE_DIR}/Execution/MoveExecution.cpp
 	${MOVE_DIR}/Evaluation/MoveEvaluation.h		${MOVE_DIR}/Evaluation/MoveEvaluation.cpp

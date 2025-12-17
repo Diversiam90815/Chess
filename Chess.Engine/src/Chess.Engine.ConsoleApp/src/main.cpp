@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include "Bitboard.h"
-#include "MoveHelper.h"
 
 
 static void printBitboard(U64 bitboard)
@@ -27,7 +26,7 @@ static void printBitboard(U64 bitboard)
 				printf("  %d ", 8 - rank);
 
 			// print bit state (either 1 or 0)
-			printf(" %d", get_bit(bitboard, square) ? 1 : 0);
+			printf(" %d", BitUtils::getBit(bitboard, square) ? 1 : 0);
 		}
 
 		printf("\n");
@@ -43,11 +42,6 @@ int main()
 {
 	std::cout << "Console app starting..\n";
 
-	MoveHelper helper{};
-	helper.initLeaperAttacks();
-	
-	Bitboard bitboard{};
-	bitboard.initMagicNumbers();
 
 	std::cout << "Done.\n";
 	return 0;

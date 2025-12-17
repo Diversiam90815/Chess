@@ -9,7 +9,6 @@
 
 #include "ChessPiece.h"
 #include "Parameters.h"
-#include "MoveHelper.h"
 
 /// <summary>
 /// King class inheriting from ChessPiece

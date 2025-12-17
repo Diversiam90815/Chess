@@ -10,7 +10,6 @@
 
 #include "ChessPiece.h"
 #include "Parameters.h"
-#include "MoveHelper.h"
 
 /// <summary>
 /// Bishop chess piece inheriting from ChessPiece.

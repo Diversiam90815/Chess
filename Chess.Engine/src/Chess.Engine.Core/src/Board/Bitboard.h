@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "BitboardHelper.h"
-#include "MoveHelper.h"
+#include "BitboardTypes.h"
+#include "AttackTables.h"
 
 
 class Bitboard
@@ -17,14 +17,7 @@ public:
 	Bitboard()	= default;
 	~Bitboard() = default;
 
-	void initMagicNumbers();
+	void init();
 
 private:
-	U64		   findMagicNumber(int square, int relavantBits, int bishop);
-
-
-	MoveHelper mMoveHelper;
-
-	U64		   mRookMagicNumbers[64];
-	U64		   mBishopMagicNumbers[64];
 };
