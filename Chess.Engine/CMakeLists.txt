@@ -3,9 +3,9 @@
 #       by Jens W. Langenberg
 ###########################################
 
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 4.2)
 
-set(PROJECT_VERSION 1.1.0.1027)
+set(PROJECT_VERSION 1.1.0.1029)
 
 project(Chess.Engine VERSION ${PROJECT_VERSION} LANGUAGES CXX)
 
