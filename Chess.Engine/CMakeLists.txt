@@ -5,7 +5,7 @@
 
 cmake_minimum_required(VERSION 4.2)
 
-set(PROJECT_VERSION 1.1.0.1029)
+set(PROJECT_VERSION 1.1.0.1031)
 
 project(Chess.Engine VERSION ${PROJECT_VERSION} LANGUAGES CXX)
 
