@@ -288,3 +288,75 @@ U64 AttackTables::setOccupancy(int index, int bitsInMask, U64 attackMask)
 
 	return occupancy;
 }
+
+
+void AttackTables::initSliderAttacks(int bishop)
+{
+	// loop over all squares
+	for (int square = 0; square < 64; ++square)
+	{
+		// init bishop & rook masks
+		mBishopMasks[square]  = maskBishopAttacks(square);
+		mRookMasks[square]	  = maskRookAttacks(square);
+
+		// ini current maks
+		U64 attackMask		  = bishop ? mBishopMasks[square] : mRookMasks[square];
+
+		// init relevant occupancy bit count
+		int relevantBitsCount = BitUtils::countBits(attackMask);
+
+		// init occupancy indicies
+		int occupancyIndicies = (1 << relevantBitsCount);
+
+		// loop over occupancy indicies
+		for (int index = 0; index < occupancyIndicies; ++index)
+		{
+			// bishop
+			if (bishop)
+			{
+				// init current occupancy variation
+				U64 occupancy					   = setOccupancy(index, relevantBitsCount, attackMask);
+
+				// init magic index
+				int magicIndex					   = (occupancy * mBishopMagicNumbers[square]) >> (64 - bishop_relevant_bits[square]);
+
+				// init bishop attacks
+				mBishopAttacks[square][magicIndex] = generateBishopAttacks(square, occupancy);
+			}
+			// rook
+			else
+			{
+				// init current occupancy variation
+				U64 occupancy					 = setOccupancy(index, relevantBitsCount, attackMask);
+
+				// init magic index
+				int magicIndex					 = (occupancy * mRookMagicNumbers[square]) >> (64 - rook_relevant_bits[square]);
+
+				// init rook attacks
+				mRookAttacks[square][magicIndex] = generateRookAttacks(square, occupancy);
+			}
+		}
+	}
+}
+
+
+U64 AttackTables::getBishopAttacks(int square, U64 occupancy)
+{
+	// get bishop attacks assuming current board occupancy
+	occupancy &= mBishopMasks[square];
+	occupancy *= mBishopMagicNumbers[square];
+	occupancy >>= 64 - bishop_relevant_bits[square];
+
+	return occupancy;
+}
+
+
+U64 AttackTables::getRookAttacks(int square, U64 occupancy)
+{
+	// get rook attacks assuming current board occupancy
+	occupancy &= mRookMasks[square];
+	occupancy *= mRookMagicNumbers[square];
+	occupancy >>= 64 - bishop_relevant_bits[square];
+
+	return occupancy;
+}

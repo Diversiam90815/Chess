@@ -42,6 +42,11 @@ int main()
 {
 	std::cout << "Console app starting..\n";
 
+	AttackTables *attackTables = new AttackTables();
+
+	attackTables->initLeaperAttacks();
+	attackTables->initSliderAttacks(0);
+	attackTables->initSliderAttacks(1);
 
 	std::cout << "Done.\n";
 	return 0;

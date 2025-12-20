@@ -18,23 +18,31 @@ public:
 	AttackTables()	= default;
 	~AttackTables() = default;
 
-	void	   initLeaperAttacks();
+	void initLeaperAttacks();
 
-	static U64 maskPawnAttacks(int side, int square);
-	static U64 maskKnightAttacks(int square);
-	static U64 maskKingAttacks(int square);
-	static U64 maskBishopAttacks(int square);
-	static U64 maskRookAttacks(int square);
+	U64	 maskPawnAttacks(int side, int square);
+	U64	 maskKnightAttacks(int square);
+	U64	 maskKingAttacks(int square);
+	U64	 maskBishopAttacks(int square);
+	U64	 maskRookAttacks(int square);
 
-	static U64 generateRookAttacks(int square, U64 blocker);
-	static U64 generateBishopAttacks(int square, U64 blocker);
-	static U64 setOccupancy(int index, int bitsInMask, U64 attackMask);
+	U64	 generateRookAttacks(int square, U64 blocker);
+	U64	 generateBishopAttacks(int square, U64 blocker);
+	U64	 setOccupancy(int index, int bitsInMask, U64 attackMask);
+
+	void initSliderAttacks(int bishop);
+	U64	 getBishopAttacks(int square, U64 occupancy);
+	U64	 getRookAttacks(int square, U64 occupancy);
 
 private:
-	U64 mPawnAttacks[2][64]; // pawn attack table [side][square]
-	U64 mKnightAttacks[64];	 // knight attack table [square]
-	U64 mKingAttacks[64];	 // Kings attack table [square]
+	U64 mPawnAttacks[2][64];	 // pawn attack table [side][square]
+	U64 mKnightAttacks[64];		 // knight attack table [square]
+	U64 mKingAttacks[64];		 // Kings attack table [square]
+	U64 mBishopAttacks[64][512]; // bishop attack table [square][occupancy]
+	U64 mRookAttacks[64][4096];	 // rook attack table [square][occupancy]
 
+	U64 mBishopMasks[64];		 // bishop occupancy masks [square]
+	U64 mRookMasks[64];			 // rook occupancy masks [square]
 
 	U64 mRookMagicNumbers[64]	= {0x8a80104000800020ULL, 0x140002000100040ULL,	 0x2801880a0017001ULL,	0x100081001000420ULL,  0x200020010080420ULL,  0x3001c0002010008ULL,
 								   0x8480008002000100ULL, 0x2080088004402900ULL, 0x800098204000ULL,		0x2024401000200040ULL, 0x100802000801000ULL,  0x120800800801000ULL,

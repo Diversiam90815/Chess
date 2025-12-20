@@ -6,3 +6,8 @@
 */
 
 #pragma once
+
+#include "MagicGenerator.h"
+#include "AttackTables.h"
+#include "BitboardTypes.h"
+#include "BitboardUtils.h"
