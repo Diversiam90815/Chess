@@ -48,6 +48,12 @@ int main()
 	attackTables->initSliderAttacks(0);
 	attackTables->initSliderAttacks(1);
 
+	U64 occupancy = 0ULL;
+
+	printBitboard(occupancy);
+
+	printBitboard(attackTables->getBishopAttacks(d4, occupancy));
+
 	std::cout << "Done.\n";
 	return 0;
 }

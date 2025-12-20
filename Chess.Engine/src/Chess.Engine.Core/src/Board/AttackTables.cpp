@@ -347,8 +347,8 @@ U64 AttackTables::getBishopAttacks(int square, U64 occupancy)
 	occupancy *= mBishopMagicNumbers[square];
 	occupancy >>= 64 - bishop_relevant_bits[square];
 
-	return occupancy;
-}
+	return mBishopAttacks[square][occupancy];
+};
 
 
 U64 AttackTables::getRookAttacks(int square, U64 occupancy)
@@ -358,5 +358,5 @@ U64 AttackTables::getRookAttacks(int square, U64 occupancy)
 	occupancy *= mRookMagicNumbers[square];
 	occupancy >>= 64 - bishop_relevant_bits[square];
 
-	return occupancy;
+	return mRookAttacks[square][occupancy];
 }
