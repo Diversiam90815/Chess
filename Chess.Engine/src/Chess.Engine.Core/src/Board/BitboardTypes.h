@@ -27,8 +27,10 @@ using U64 = std::uint64_t;
 
 enum Side
 {
+	None = 0,
 	White,
-	Black
+	Black,
+	Both // For all occupancies
 };
 
 
@@ -94,6 +96,7 @@ enum
 	a3, b3, c3, d3, e3, f3, g3, h3,
 	a2, b2, c2, d2, e2, f2, g2, h2,
 	a1, b1, c1, d1, e1, f1, g1, h1,
+	no_square
 };
 
 
