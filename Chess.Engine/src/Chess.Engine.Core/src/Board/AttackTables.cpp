@@ -356,7 +356,7 @@ U64 AttackTables::getRookAttacks(int square, U64 occupancy)
 	// get rook attacks assuming current board occupancy
 	occupancy &= mRookMasks[square];
 	occupancy *= mRookMagicNumbers[square];
-	occupancy >>= 64 - bishop_relevant_bits[square];
+	occupancy >>= 64 - rook_relevant_bits[square];
 
 	return mRookAttacks[square][occupancy];
 }

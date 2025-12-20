@@ -50,9 +50,18 @@ int main()
 
 	U64 occupancy = 0ULL;
 
+	BitUtils::setBit(occupancy, c5);
+	BitUtils::setBit(occupancy, f3);
+	BitUtils::setBit(occupancy, g7);
+	BitUtils::setBit(occupancy, d3);
+
 	printBitboard(occupancy);
 
 	printBitboard(attackTables->getBishopAttacks(d4, occupancy));
+
+	printBitboard(attackTables->getRookAttacks(d5, occupancy));
+
+	delete attackTables;
 
 	std::cout << "Done.\n";
 	return 0;
