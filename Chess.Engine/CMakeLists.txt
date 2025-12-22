@@ -3,7 +3,7 @@
 #       by Jens W. Langenberg
 ###########################################
 
-cmake_minimum_required(VERSION 4.2)
+cmake_minimum_required(VERSION 4.0)
 
 set(PROJECT_VERSION 1.1.0.1031)
 
