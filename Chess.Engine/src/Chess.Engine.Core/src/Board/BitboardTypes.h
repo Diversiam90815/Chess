@@ -1,4 +1,4 @@
-/*
+﻿/*
   ==============================================================================
 	Module:         BitboardTypes
 	Description:    Core types, constants, and enums for bitboard operations
@@ -112,3 +112,48 @@ inline const char* square_to_coordinates[] =
 	"a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
 };
 // clang-format on
+
+
+// Defining the different chess pieces
+enum PieceTypes
+{
+	WKing	= 0,
+	WQueen	= 1,
+	WPawn	= 2,
+	WKnight = 3,
+	WBishop = 4,
+	WRook	= 5,
+	BKing	= 6,
+	BQueen	= 7,
+	BPawn	= 8,
+	BKnight = 9,
+	BBishop = 10,
+	BRook	= 11
+};
+
+// ASCII pieces with the enum values as indecies
+// (capital letters for white, small letters for black)
+constexpr char		  asciiPieces[13]	= "KQPNBRkqpnbr";
+
+constexpr const char *unicodePieces[12] = {"♚", "♛", "♟︎", "♞", "♝", "♜", "♔", "♕", "♙", "♘", "♗", "♖"};
+
+// convert ASCII character pieces to encoded constants
+inline int			  GetPieceTypeFromChar(char c)
+{
+	switch (c)
+	{
+	case 'K': return PieceTypes::WKing;
+	case 'Q': return PieceTypes::WQueen;
+	case 'P': return PieceTypes::WPawn;
+	case 'N': return PieceTypes::WKnight;
+	case 'B': return PieceTypes::WBishop;
+	case 'R': return PieceTypes::WRook;
+	case 'k': return PieceTypes::BKing;
+	case 'q': return PieceTypes::BQueen;
+	case 'p': return PieceTypes::BPawn;
+	case 'n': return PieceTypes::BKnight;
+	case 'b': return PieceTypes::BBishop;
+	case 'r': return PieceTypes::BRook;
+	default: return 0;
+	}
+}

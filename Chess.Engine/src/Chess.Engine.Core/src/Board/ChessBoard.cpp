@@ -169,7 +169,7 @@ bool ChessBoard::getBoardState(BoardStateArray boardState)
 			if (piece)
 			{
 				colorVal = static_cast<int>(piece->getColor()) & 0xF;
-				typeVal	 = static_cast<int>(piece->getType())  & 0xF;
+				typeVal	 = static_cast<int>(piece->getType()) & 0xF;
 			}
 
 			// Pack color in high nibble, type in low nibble:
