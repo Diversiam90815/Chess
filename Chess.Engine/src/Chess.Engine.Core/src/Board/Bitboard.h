@@ -129,11 +129,10 @@ public:
 
 	void init();
 
-private:
-	U64	 mBitBoards[12];		 // Array of all bitboards
-	U64	 mOccupancyBitboards[3]; // Occupancies
+	U64	 mBitBoards[12]			= {};		  // Array of all bitboards
+	U64	 mOccupancyBitboards[3] = {};		  // Occupancies
 
-	Side side	   = Side::None; // side to move
-	int	 enPassant = no_square;	 // enpassant square
-	int	 castle	   = 0;			 // castling rights
+	Side side					= Side::None; // side to move
+	int	 enPassant				= no_square;  // enpassant square
+	int	 castle					= 0;		  // castling rights
 };

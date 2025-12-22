@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "Bitboard.h"
+#include "BitboardHelper.h"
 
 
 static void printBitboard(U64 bitboard)
@@ -42,26 +43,17 @@ int main()
 {
 	std::cout << "Console app starting..\n";
 
-	AttackTables *attackTables = new AttackTables();
+	Bitboard board;
 
-	attackTables->initLeaperAttacks();
-	attackTables->initSliderAttacks(0);
-	attackTables->initSliderAttacks(1);
+	board.mBitBoards[PieceTypes::WPawn] = 0ULL;
 
-	U64 occupancy = 0ULL;
+	BitUtils::setBit(board.mBitBoards[PieceTypes::WPawn], e2);
 
-	BitUtils::setBit(occupancy, c5);
-	BitUtils::setBit(occupancy, f3);
-	BitUtils::setBit(occupancy, g7);
-	BitUtils::setBit(occupancy, d3);
+	printBitboard(board.mBitBoards[PieceTypes::WPawn]);
 
-	printBitboard(occupancy);
-
-	printBitboard(attackTables->getBishopAttacks(d4, occupancy));
-
-	printBitboard(attackTables->getRookAttacks(d5, occupancy));
-
-	delete attackTables;
+	// print piece
+	printf("piece: %c\n", asciiPieces[PieceTypes::WPawn]);
+	// printf("piece: %s\n", unicodePieces[PieceTypes::WPawn]);
 
 	std::cout << "Done.\n";
 	return 0;

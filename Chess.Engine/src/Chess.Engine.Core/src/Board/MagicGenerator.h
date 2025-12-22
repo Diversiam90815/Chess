@@ -20,6 +20,47 @@
 namespace MagicGenerator
 {
 
+static inline unsigned int random_state = 1804289383;
+
+// generate 32bit pseudo legal numbers
+static inline int		   getRandomU32Number()
+{
+	unsigned int number = random_state;
+
+	// XOR shift algorithm
+	number ^= number << 13;
+	number ^= number >> 17;
+	number ^= number << 5;
+
+	// update random number state
+	random_state = number;
+
+	return number;
+}
+
+
+static inline U64 getRandomU64Number()
+{
+	// define 4 random numbers
+	U64 n1, n2, n3, n4;
+
+	// init random numbers slicing 16 bits from MS1b
+	n1 = (U64)(getRandomU32Number()) & 0xFFFF;
+	n2 = (U64)(getRandomU32Number()) & 0xFFFF;
+	n3 = (U64)(getRandomU32Number()) & 0xFFFF;
+	n4 = (U64)(getRandomU32Number()) & 0xFFFF;
+
+	// return random number
+	return n1 | (n2 << 16) | (n3 << 32) | (n4 << 48);
+}
+
+
+static inline U64 generateMagicNumbers()
+{
+	return getRandomU64Number() & getRandomU64Number() & getRandomU64Number();
+}
+
+
 static inline U64 findMagicNumber(int square, int relevantBits, int bishop)
 {
 	AttackTables attackTables;
@@ -92,48 +133,6 @@ static inline U64 findMagicNumber(int square, int relevantBits, int bishop)
 	printf("  Magic number fails!\n");
 	return 0ULL;
 }
-
-
-static inline unsigned int random_state = 1804289383;
-
-// generate 32bit pseudo legal numbers
-static inline int		   getRandomU32Number()
-{
-	unsigned int number = random_state;
-
-	// XOR shift algorithm
-	number ^= number << 13;
-	number ^= number >> 17;
-	number ^= number << 5;
-
-	// update random number state
-	random_state = number;
-
-	return number;
-}
-
-
-static inline U64 getRandomU64Number()
-{
-	// define 4 random numbers
-	U64 n1, n2, n3, n4;
-
-	// init random numbers slicing 16 bits from MS1b
-	n1 = (U64)(getRandomU32Number()) & 0xFFFF;
-	n2 = (U64)(getRandomU32Number()) & 0xFFFF;
-	n3 = (U64)(getRandomU32Number()) & 0xFFFF;
-	n4 = (U64)(getRandomU32Number()) & 0xFFFF;
-
-	// return random number
-	return n1 | (n2 << 16) | (n3 << 32) | (n4 << 48);
-}
-
-
-static inline U64 generateMagicNumbers()
-{
-	return getRandomU64Number() & getRandomU64Number() & getRandomU64Number();
-}
-
 
 } // namespace MagicGenerator
 

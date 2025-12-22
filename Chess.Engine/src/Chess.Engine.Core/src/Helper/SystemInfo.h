@@ -35,10 +35,6 @@ public:
 		LOG_INFO("Generator:\t\t {}", BuildInfo::Generator);
 		LOG_INFO("CPP Version:\t\t {}", BuildInfo::CxxStandard);
 
-		LOG_INFO("System Name:\t\t {}", BuildInfo::SystemName);
-		LOG_INFO("System Version:\t\t {}", BuildInfo::SystemVersion);
-		LOG_INFO("System CPU:\t\t {}", BuildInfo::SystemCPU);
-
 		LOG_INFO("Compiler:\t\t {}", BuildInfo::CompilerID);
 		LOG_INFO("Compiler Version:\t {}", BuildInfo::CompilerVersion);
 
