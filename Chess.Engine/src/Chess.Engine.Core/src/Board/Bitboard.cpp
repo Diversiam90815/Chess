@@ -23,7 +23,7 @@ void Bitboard::clear()
 	mOccupancyBitboards.fill(0);
 	side	  = Side::None;
 	enPassant = no_square;
-	castle	  = 0;
+	castle	  = Castling::None;
 }
 
 
@@ -85,10 +85,10 @@ void Bitboard::parseFEN(std::string_view fen)
 	{
 		switch (fen[i])
 		{
-		case 'K': castle |= wk; break;
-		case 'Q': castle |= wq; break;
-		case 'k': castle |= bk; break;
-		case 'q': castle |= bq; break;
+		case 'K': castle |= Castling::WK; break;
+		case 'Q': castle |= Castling::WQ; break;
+		case 'k': castle |= Castling::BK; break;
+		case 'q': castle |= Castling::BQ; break;
 		case '-': break;
 		}
 		++i;
@@ -109,11 +109,11 @@ void Bitboard::parseFEN(std::string_view fen)
 	}
 
 	// 5 occupancies
-	mOccupancyBitboards[Side::White] = mBitBoards[WKing] | mBitBoards[WQueen] | mBitBoards[WPawn] | mBitBoards[WKnight] | mBitBoards[WBishop] | mBitBoards[WRook];
-	mOccupancyBitboards[Side::Black] = mBitBoards[BKing] | mBitBoards[BQueen] | mBitBoards[BPawn] | mBitBoards[BKnight] | mBitBoards[BBishop] | mBitBoards[BRook];
+	mOccupancyBitboards[to_index(Side::White)] = mBitBoards[WKing] | mBitBoards[WQueen] | mBitBoards[WPawn] | mBitBoards[WKnight] | mBitBoards[WBishop] | mBitBoards[WRook];
+	mOccupancyBitboards[to_index(Side::Black)] = mBitBoards[BKing] | mBitBoards[BQueen] | mBitBoards[BPawn] | mBitBoards[BKnight] | mBitBoards[BBishop] | mBitBoards[BRook];
 
-	mOccupancyBitboards[Side::Both] |= mOccupancyBitboards[Side::White];
-	mOccupancyBitboards[Side::Both] |= mOccupancyBitboards[Side::Black];
+	mOccupancyBitboards[to_index(Side::Both)] |= mOccupancyBitboards[to_index(Side::White)];
+	mOccupancyBitboards[to_index(Side::Both)] |= mOccupancyBitboards[to_index(Side::Black)];
 }
 
 
@@ -121,11 +121,11 @@ void Bitboard::parseFEN(std::string_view fen)
 bool Bitboard::isSquareAttacked(int square, Side side)
 {
 	// attacked by white pawns
-	if ((side == Side::White) && (mAttackTables.mPawnAttacks[Side::Black][square] & mBitBoards[WPawn]))
+	if ((side == Side::White) && (mAttackTables.mPawnAttacks[to_index(Side::Black)][square] & mBitBoards[WPawn]))
 		return true;
 
 	// attacked by black pawns
-	if ((side == Side::Black) && (mAttackTables.mPawnAttacks[Side::White][square] & mBitBoards[BPawn]))
+	if ((side == Side::Black) && (mAttackTables.mPawnAttacks[to_index(Side::White)][square] & mBitBoards[BPawn]))
 		return true;
 
 	// attacked by knights
@@ -137,15 +137,15 @@ bool Bitboard::isSquareAttacked(int square, Side side)
 		return true;
 
 	// attacked by rooks
-	if (mAttackTables.getRookAttacks(square, mOccupancyBitboards[Side::Both]) & ((side == Side::White) ? mBitBoards[WRook] : mBitBoards[BRook]))
+	if (mAttackTables.getRookAttacks(square, mOccupancyBitboards[to_index(Side::Both)]) & ((side == Side::White) ? mBitBoards[WRook] : mBitBoards[BRook]))
 		return true;
 
 	// attacked by bishops
-	if (mAttackTables.getBishopAttacks(square, mOccupancyBitboards[Side::Both]) & ((side == Side::White) ? mBitBoards[WBishop] : mBitBoards[BBishop]))
+	if (mAttackTables.getBishopAttacks(square, mOccupancyBitboards[to_index(Side::Both)]) & ((side == Side::White) ? mBitBoards[WBishop] : mBitBoards[BBishop]))
 		return true;
 
 	// attacked by queens
-	if (mAttackTables.getQueenAttacks(square, mOccupancyBitboards[Side::Both]) & ((side == Side::White) ? mBitBoards[WQueen] : mBitBoards[BQueen]))
+	if (mAttackTables.getQueenAttacks(square, mOccupancyBitboards[to_index(Side::Both)]) & ((side == Side::White) ? mBitBoards[WQueen] : mBitBoards[BQueen]))
 		return true;
 
 	return false;

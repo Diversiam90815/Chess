@@ -23,18 +23,14 @@
 
 		a  b  c  d  e  f  g  h
 */
-using U64 = std::uint64_t;
-
-enum Side
-{
-	None  = -1,
-	White = 0,
-	Black = 1,
-	Both  = 2 // For all occupancies
-};
+using U64				  = std::uint64_t;
 
 
-// Offboard constants
+/*
+=========================================
+		OFFBOARD CONSTANTS
+=========================================
+*/
 
 /*
 	Example:	not A file:
@@ -85,7 +81,12 @@ constexpr int rook_relevant_bits[64] =
 };
 
 
-// board squares
+/*
+=========================================
+		BOARD SQUARES
+=========================================
+*/
+
 enum
 {
 	a8, b8, c8, d8, e8, f8, g8, h8,
@@ -114,7 +115,13 @@ inline const char* square_to_coordinates[] =
 // clang-format on
 
 
-// Defining the different chess pieces
+
+/*
+=========================================
+		PIECE TYPES
+=========================================
+*/
+
 enum PieceTypes
 {
 	WKing	= 0,
@@ -156,4 +163,74 @@ inline int			  GetPieceTypeFromChar(char c)
 	case 'r': return PieceTypes::BRook;
 	default: return 0;
 	}
+}
+
+/*
+=========================================
+		SIDE
+=========================================
+*/
+
+enum class Side : int8_t
+{
+	None  = -1,
+	White = 0,
+	Black = 1,
+	Both  = 2 // For all occupancies
+};
+
+constexpr int to_index(Side s) noexcept
+{
+	return static_cast<int>(s);
+}
+
+
+/*
+=========================================
+		CASTLING
+=========================================
+*/
+
+/*
+	bin  dec
+
+   0001    1  white king can castle to the king side
+   0010    2  white king can castle to the queen side
+   0100    4  black king can castle to the king side
+   1000    8  black king can castle to the queen side
+
+   examples
+
+   1111       both sides an castle both directions
+   1001       black king => queen side
+			  white king => king side
+*/
+enum class Castling : uint8_t
+{
+	None = 0,
+	WK	 = 1 << 0,
+	WQ	 = 1 << 1,
+	BK	 = 1 << 2,
+	BQ	 = 1 << 3
+};
+
+constexpr Castling operator|(Castling a, Castling b) noexcept
+{
+	return static_cast<Castling>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
+}
+
+constexpr Castling operator&(Castling a, Castling b) noexcept
+{
+	return static_cast<Castling>(static_cast<uint8_t>(a) & static_cast<uint8_t>(b));
+}
+
+constexpr Castling &operator|=(Castling &a, Castling b) noexcept
+{
+	a = a | b;
+	return a;
+}
+
+constexpr bool has(Castling value, Castling flag) noexcept
+{
+	return (static_cast<uint8_t>(value & flag) != 0);
 }

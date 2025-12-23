@@ -12,17 +12,17 @@ void AttackTables::initLeaperAttacks()
 {
 	for (int square = 0; square < 64; ++square)
 	{
-		mPawnAttacks[Side::White][square] = maskPawnAttacks(Side::White, square);
-		mPawnAttacks[Side::Black][square] = maskPawnAttacks(Side::Black, square);
+		mPawnAttacks[to_index(Side::White)][square] = maskPawnAttacks(Side::White, square);
+		mPawnAttacks[to_index(Side::Black)][square] = maskPawnAttacks(Side::Black, square);
 
-		mKnightAttacks[square]			  = maskKnightAttacks(square);
+		mKnightAttacks[square]						= maskKnightAttacks(square);
 
-		mKingAttacks[square]			  = maskKingAttacks(square);
+		mKingAttacks[square]						= maskKingAttacks(square);
 	}
 }
 
 
-U64 AttackTables::maskPawnAttacks(int side, int square)
+U64 AttackTables::maskPawnAttacks(Side side, int square)
 {
 	// result attacks bitboard
 	U64 attacks	 = 0ULL;
@@ -376,14 +376,14 @@ U64 AttackTables::getQueenAttacks(int square, U64 occupancy)
 	bishopOccupancy *= mBishopMagicNumbers[square];
 	bishopOccupancy >>= 64 - bishop_relevant_bits[square];
 
-	queenAttacks = mBishopAttacks[square][occupancy];
+	queenAttacks = mBishopAttacks[square][bishopOccupancy];
 
 	// get rook attacks assuming current board occupancy
 	rookOccupancy &= mRookMasks[square];
 	rookOccupancy *= mRookMagicNumbers[square];
 	rookOccupancy >>= 64 - rook_relevant_bits[square];
 
-	queenAttacks |= mRookAttacks[square][occupancy];
+	queenAttacks |= mRookAttacks[square][rookOccupancy];
 
 	return queenAttacks;
 }

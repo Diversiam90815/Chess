@@ -102,29 +102,6 @@
   1  1 1 1 1 1 1 1 1    1  0 0 0 0 0 0 0 0    1  1 1 1 1 1 1 1 1
 */
 
-/*
-	bin  dec
-
-   0001    1  white king can castle to the king side
-   0010    2  white king can castle to the queen side
-   0100    4  black king can castle to the king side
-   1000    8  black king can castle to the queen side
-
-   examples
-
-   1111       both sides an castle both directions
-   1001       black king => queen side
-			  white king => king side
-*/
-enum Castling
-{
-	wk = 1,
-	wq = 2,
-	bk = 4,
-	bq = 8
-};
-
-
 class Bitboard
 {
 public:
@@ -146,20 +123,20 @@ public:
 	const Occupancies &occ() const noexcept { return mOccupancyBitboards; }
 
 	Side			   getCurrentSide() const noexcept { return side; }
-	int				   getCurrentCastlingRights() const noexcept { return castle; }
+	Castling		   getCurrentCastlingRights() const noexcept { return castle; }
 	int				   getCurrentEnPassantSqaure() const noexcept { return enPassant; }
 
 private:
-	Bitboards	 mBitBoards{};			 // Array of all bitboards
-	Occupancies	 mOccupancyBitboards{};	 // Occupancies
+	Bitboards		  mBitBoards{};				  // Array of all bitboards
+	Occupancies		  mOccupancyBitboards{};	  // Occupancies
 
-	Side		 side	   = Side::None; // side to move
-	int			 enPassant = no_square;	 // enpassant square
-	int			 castle	   = 0;			 // castling rights
+	Side			  side		= Side::None;	  // side to move
+	int				  enPassant = no_square;	  // enpassant square
+	Castling		  castle	= Castling::None; // castling rights
 
-	AttackTables mAttackTables;
+	AttackTables	  mAttackTables;
 
 	// FEN positions
-	const char	*mEmptyBoard	= "8/8/8/8/8/8/8/8 w - - ";
-	const char	*mStartPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
+	const std::string mEmptyBoard	 = "8/8/8/8/8/8/8/8 w - - ";
+	const std::string mStartPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 };

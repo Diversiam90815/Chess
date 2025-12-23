@@ -38,7 +38,7 @@ static void printBitboard(U64 bitboard)
 }
 
 
-static void printBoard(Bitboard& board)
+static void printBoard(Bitboard &board)
 {
 	printf("\n"); // print offset
 
@@ -80,8 +80,9 @@ static void printBoard(Bitboard& board)
 
 	printf("   Enpassant:     %s\n", (board.getCurrentEnPassantSqaure() != no_square) ? square_to_coordinates[board.getCurrentEnPassantSqaure()] : "no");
 
-	printf("   Castling:    %c%c%c%c\n\n", (board.getCurrentCastlingRights() & wk) ? 'K' : '-', (board.getCurrentCastlingRights() & wq) ? 'K' : '-',
-		   (board.getCurrentCastlingRights() & wk) ? 'Q' : '-', (board.getCurrentCastlingRights() & bk) ? 'k' : '-', (board.getCurrentCastlingRights() & bq) ? 'q' : '-');
+	printf("   Castling:    %c%c%c%c\n\n", static_cast<int>(board.getCurrentCastlingRights() & Castling::WK) ? 'K' : '-',
+		   static_cast<int>(board.getCurrentCastlingRights() & Castling::WQ) ? 'Q' : '-', static_cast<int>(board.getCurrentCastlingRights() & Castling::BK) ? 'k' : '-',
+		   static_cast<int>(board.getCurrentCastlingRights() & Castling::BQ) ? 'q' : '-');
 }
 
 
@@ -114,10 +115,14 @@ static void printAttackedSquares(Bitboard &board, Side side)
 int main()
 {
 	std::cout << "Console app starting..\n";
-	Bitboard board;
-	board.init();
 
-	printAttackedSquares(board, Side::White);
+	Bitboard *board = new Bitboard();
+
+	board->init();
+
+	printAttackedSquares(*board, Side::White);
+
+	delete board;
 
 	std::cout << "Done.\n";
 	return 0;
