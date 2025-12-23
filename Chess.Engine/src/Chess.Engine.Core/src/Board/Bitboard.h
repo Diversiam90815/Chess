@@ -8,6 +8,7 @@
 #pragma once
 
 #include <string>
+#include <array>
 
 #include "BitboardTypes.h"
 #include "AttackTables.h"
@@ -125,22 +126,38 @@ enum Castling
 class Bitboard
 {
 public:
-	Bitboard()	= default;
-	~Bitboard() = default;
+	Bitboard()		  = default;
+	~Bitboard()		  = default;
 
-	void		init();
+	using Bitboards	  = std::array<U64, 12>;
+	using Occupancies = std::array<U64, 3>;
 
-	void		parseFEN(const char *fen);
+	void			   init();
+	void			   clear();
 
+	void			   parseFEN(const char *fen);
 
-	U64			mBitBoards[12]		   = {};		 // Array of all bitboards
-	U64			mOccupancyBitboards[3] = {};		 // Occupancies
+	// IS the current given square attacked by the current given side
+	bool			   isSquareAttacked(int square, Side side);
 
-	Side		side				   = Side::None; // side to move
-	int			enPassant			   = no_square;	 // enpassant square
-	int			castle				   = 0;			 // castling rights
+	const Bitboards	  &pieces() const noexcept { return mBitBoards; }
+	const Occupancies &occ() const noexcept { return mOccupancyBitboards; }
+
+	Side			   getCurrentSide() const noexcept { return side; }
+	int				   getCurrentCastlingRights() const noexcept { return castle; }
+	int				   getCurrentEnPassantSqaure() const noexcept { return enPassant; }
+
+private:
+	Bitboards	 mBitBoards{};			 // Array of all bitboards
+	Occupancies	 mOccupancyBitboards{};	 // Occupancies
+
+	Side		 side	   = Side::None; // side to move
+	int			 enPassant = no_square;	 // enpassant square
+	int			 castle	   = 0;			 // castling rights
+
+	AttackTables mAttackTables;
 
 	// FEN positions
-	const char *mEmptyBoard			   = "8/8/8/8/8/8/8/8 w - - ";
-	const char *mStartPosition		   = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
+	const char	*mEmptyBoard	= "8/8/8/8/8/8/8/8 w - - ";
+	const char	*mStartPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 };

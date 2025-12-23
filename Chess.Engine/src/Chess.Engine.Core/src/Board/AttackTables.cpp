@@ -387,12 +387,3 @@ U64 AttackTables::getQueenAttacks(int square, U64 occupancy)
 
 	return queenAttacks;
 }
-
-
-bool AttackTables::isSquareAttacked(int sqaure, Side side)
-{
-
-
-
-	return false;
-}

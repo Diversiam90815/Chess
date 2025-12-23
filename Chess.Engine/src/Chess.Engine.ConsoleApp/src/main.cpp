@@ -37,11 +37,9 @@ static void printBitboard(U64 bitboard)
 	printf("     Bitboard: %llud\n\n", bitboard);
 }
 
-static void printBoard()
-{
-	Bitboard board;
-	board.init();
 
+static void printBoard(Bitboard& board)
+{
 	printf("\n"); // print offset
 
 	for (int rank = 0; rank < 8; ++rank)
@@ -61,7 +59,7 @@ static void printBoard()
 			// loop over all piece bitboards
 			for (int bbPiece = 0; bbPiece < 12; bbPiece++)
 			{
-				if (BitUtils::getBit(board.mBitBoards[bbPiece], square))
+				if (BitUtils::getBit(board.pieces()[bbPiece], square))
 					piece = bbPiece;
 			}
 
@@ -78,13 +76,37 @@ static void printBoard()
 
 	printf("\n    a b c d e f g h\n\n"); // print board files
 
-	printf("   Side:       %s\n", board.side == Side::White ? "White" : board.side == Side::Black ? "Black" : "--");
+	printf("   Side:       %s\n", board.getCurrentSide() == Side::White ? "White" : board.getCurrentSide() == Side::Black ? "Black" : "--");
 
-	printf("   Enpassant:     %s\n", (board.enPassant != no_square) ? square_to_coordinates[board.enPassant] : "no");
+	printf("   Enpassant:     %s\n", (board.getCurrentEnPassantSqaure() != no_square) ? square_to_coordinates[board.getCurrentEnPassantSqaure()] : "no");
 
-	printf("   Castling:    %c%c%c%c\n\n", (board.castle & wk) ? 'K' : '-', (board.castle & wq) ? 'K' : '-', (board.castle & wk) ? 'Q' : '-', (board.castle & bk) ? 'k' : '-',
-		   (board.castle & bq) ? 'q' : '-');
+	printf("   Castling:    %c%c%c%c\n\n", (board.getCurrentCastlingRights() & wk) ? 'K' : '-', (board.getCurrentCastlingRights() & wq) ? 'K' : '-',
+		   (board.getCurrentCastlingRights() & wk) ? 'Q' : '-', (board.getCurrentCastlingRights() & bk) ? 'k' : '-', (board.getCurrentCastlingRights() & bq) ? 'q' : '-');
+}
 
+
+static void printAttackedSquares(Bitboard &board, Side side)
+{
+	printf("\n");
+
+	for (int rank = 0; rank < 8; ++rank)
+	{
+		for (int file = 0; file < 8; ++file)
+		{
+			int square = rank * 8 + file;
+
+			if (!file)
+				printf("  %d ", 8 - rank);
+
+			// check whether the current square is attacked
+			bool squareAttacked = board.isSquareAttacked(square, side);
+			printf(" %d", squareAttacked ? 1 : 0);
+		}
+
+		printf("\n");
+	}
+
+	printf("\n     a b c d e f g h\n\n");
 }
 
 
@@ -92,8 +114,10 @@ static void printBoard()
 int main()
 {
 	std::cout << "Console app starting..\n";
+	Bitboard board;
+	board.init();
 
-	printBoard();
+	printAttackedSquares(board, Side::White);
 
 	std::cout << "Done.\n";
 	return 0;

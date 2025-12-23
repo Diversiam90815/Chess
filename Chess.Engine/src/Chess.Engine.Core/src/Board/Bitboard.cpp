@@ -17,16 +17,19 @@ void Bitboard::init()
 }
 
 
-void Bitboard::parseFEN(const char *fen)
+void Bitboard::clear()
 {
-	// Reset boards
-	memset(mBitBoards, 0ULL, sizeof(mBitBoards));
-	memset(mOccupancyBitboards, 0ULL, sizeof(mOccupancyBitboards));
-
-	// reset game state variables
+	mBitBoards.fill(0);
+	mOccupancyBitboards.fill(0);
 	side	  = Side::None;
 	enPassant = no_square;
 	castle	  = 0;
+}
+
+
+void Bitboard::parseFEN(const char *fen)
+{
+	clear();
 
 	for (int rank = 0; rank < 8; ++rank)
 	{
@@ -128,4 +131,39 @@ void Bitboard::parseFEN(const char *fen)
 
 	mOccupancyBitboards[Side::Both] |= mOccupancyBitboards[Side::White];
 	mOccupancyBitboards[Side::Both] |= mOccupancyBitboards[Side::Black];
+}
+
+
+
+bool Bitboard::isSquareAttacked(int square, Side side)
+{
+	// attacked by white pawns
+	if ((side == Side::White) && (mAttackTables.mPawnAttacks[Side::Black][square] & mBitBoards[WPawn]))
+		return true;
+
+	// attacked by black pawns
+	if ((side == Side::Black) && (mAttackTables.mPawnAttacks[Side::White][square] & mBitBoards[BPawn]))
+		return true;
+
+	// attacked by knights
+	if (mAttackTables.mKnightAttacks[square] & ((side == Side::White) ? mBitBoards[WKnight] : mBitBoards[BKnight]))
+		return true;
+
+	// attacked by kings
+	if (mAttackTables.mKingAttacks[square] & ((side == Side::White) ? mBitBoards[WKing] : mBitBoards[BKing]))
+		return true;
+
+	// attacked by rooks
+	if (mAttackTables.getRookAttacks(square, mOccupancyBitboards[Side::Both]) & ((side == Side::White) ? mBitBoards[WRook] : mBitBoards[BRook]))
+		return true;
+
+	// attacked by bishops
+	if (mAttackTables.getBishopAttacks(square, mOccupancyBitboards[Side::Both]) & ((side == Side::White) ? mBitBoards[WBishop] : mBitBoards[BBishop]))
+		return true;
+
+	// attacked by queens
+	if (mAttackTables.getQueenAttacks(square, mOccupancyBitboards[Side::Both]) & ((side == Side::White) ? mBitBoards[WQueen] : mBitBoards[BQueen]))
+		return true;
+
+	return false;
 }
