@@ -7,9 +7,10 @@
 
 #pragma once
 
+#include <string>
+
 #include "BitboardTypes.h"
 #include "AttackTables.h"
-
 
 /*
 							ALL TOGETHER
@@ -127,12 +128,19 @@ public:
 	Bitboard()	= default;
 	~Bitboard() = default;
 
-	void init();
+	void		init();
 
-	U64	 mBitBoards[12]			= {};		  // Array of all bitboards
-	U64	 mOccupancyBitboards[3] = {};		  // Occupancies
+	void		parseFEN(const char *fen);
 
-	Side side					= Side::None; // side to move
-	int	 enPassant				= no_square;  // enpassant square
-	int	 castle					= 0;		  // castling rights
+
+	U64			mBitBoards[12]		   = {};		 // Array of all bitboards
+	U64			mOccupancyBitboards[3] = {};		 // Occupancies
+
+	Side		side				   = Side::None; // side to move
+	int			enPassant			   = no_square;	 // enpassant square
+	int			castle				   = 0;			 // castling rights
+
+	// FEN positions
+	const char *mEmptyBoard			   = "8/8/8/8/8/8/8/8 w - - ";
+	const char *mStartPosition		   = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 };

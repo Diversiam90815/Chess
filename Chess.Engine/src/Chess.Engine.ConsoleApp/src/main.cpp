@@ -37,7 +37,7 @@ static void printBitboard(U64 bitboard)
 	printf("     Bitboard: %llud\n\n", bitboard);
 }
 
-void printBoard()
+static void printBoard()
 {
 	Bitboard board;
 	board.init();

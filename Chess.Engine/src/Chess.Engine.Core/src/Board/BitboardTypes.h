@@ -27,10 +27,10 @@ using U64 = std::uint64_t;
 
 enum Side
 {
-	None = 0,
-	White,
-	Black,
-	Both // For all occupancies
+	None  = -1,
+	White = 0,
+	Black = 1,
+	Both  = 2 // For all occupancies
 };
 
 
