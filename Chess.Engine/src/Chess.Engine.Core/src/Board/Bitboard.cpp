@@ -27,107 +27,90 @@ void Bitboard::clear()
 }
 
 
-void Bitboard::parseFEN(const char *fen)
+void Bitboard::parseFEN(std::string_view fen)
 {
 	clear();
 
-	for (int rank = 0; rank < 8; ++rank)
+	size_t i		  = 0;
+
+	auto   skipSpaces = [&]()
 	{
-		for (int file = 0; file < 8; ++file)
+		while (i < fen.size() && fen[i] == ' ')
+			++i;
+	};
+
+	// 1 Piece placement
+	int rank = 0;
+	int file = 0;
+
+	while (i < fen.size() && fen[i] != ' ')
+	{
+		char c = fen[i++];
+
+		if (c == '/')
 		{
+			++rank;
+			file = 0;
+			continue;
+		}
+
+		if (c >= '1' && c <= '8')
+		{
+			file += (c - '0');
+			continue;
+		}
+
+		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
+		{
+			int piece  = GetPieceTypeFromChar(c);
 			int square = rank * 8 + file;
-
-			// match ascii pieces within FEN string
-			if ((*fen >= 'a' && *fen <= 'z') || (*fen >= 'A' && *fen <= 'Z'))
-			{
-				int piece = GetPieceTypeFromChar(*fen);
-
-				BitUtils::setBit(mBitBoards[piece], square);
-
-				*fen++; // increment pointer to fen string
-			}
-
-			// match empty square numbers within FEN string
-			if (*fen >= '0' && *fen <= '9')
-			{
-				int offset = *fen - '0';
-
-				// define piece variable
-				int piece  = -1;
-
-				// loop over all piece bitboards
-				for (int bbPiece = 0; bbPiece < 12; bbPiece++)
-				{
-					// if there is a piece on the current square
-					if (BitUtils::getBit(mBitBoards[bbPiece], square))
-						piece = bbPiece; // get piece code
-				}
-
-				// on empty current square
-				if (piece == -1)
-					file--;		// decrement the file
-
-				file += offset; // adjust file counter
-
-				*fen++;			// increment pointer to fen string
-			}
-
-			// match rank separator
-			if (*fen == '/')
-			{
-				*fen++; // increment pointer to FEN string
-			}
+			BitUtils::setBit(mBitBoards[piece], square);
+			++file;
 		}
 	}
 
-	// go to parsing side to move (increment pointer to FEN to skip whitespace)
-	*fen++;
+	skipSpaces();
 
-	// parse side to move
-	*fen == 'w' ? side = Side::White : side = Side::Black;
-
-	// go to parsing castling rights (increment pointer twice)
-	fen += 2;
-
-	// parse castling rights
-	while (*fen != ' ')
+	// 2 Side to move
+	if (i <= fen.size())
 	{
-		switch (*fen)
+		side = (fen[i] == 'w') ? Side::White : Side::Black;
+		++i;
+	}
+
+	skipSpaces();
+
+	// 3 Castling
+	while (i < fen.size() && fen[i] != ' ')
+	{
+		switch (fen[i])
 		{
 		case 'K': castle |= wk; break;
 		case 'Q': castle |= wq; break;
 		case 'k': castle |= bk; break;
 		case 'q': castle |= bq; break;
 		case '-': break;
-		};
-
-		*fen++;
+		}
+		++i;
 	}
 
-	// go to parsing enpassant square(increment pointer to FEN to skip whitespace)
-	*fen++;
+	skipSpaces();
 
-	// parsing en passant square
-	if (*fen != '-')
+	// 4 En Passant
+	if (i < fen.size() && fen[i] != '-')
 	{
-		int file  = fen[0] - 'a';
-		int rank  = 8 - (fen[1] - 'a');
-
-		enPassant = rank * 8 + file;
+		int epFile = fen[i + 0] - 'a';
+		int epRank = 8 - (fen[i + 1] - '0');
+		enPassant  = epRank * 8 + epFile;
 	}
 	else
 	{
-		// no en passant square
 		enPassant = no_square;
 	}
 
-	// init occupancies
-
-	for (int piece = WKing; piece <= WRook; piece++)
-		mOccupancyBitboards[Side::White] |= mBitBoards[piece];
-
-	for (int piece = BKing; piece <= BRook; piece++)
-		mOccupancyBitboards[Side::Black] |= mBitBoards[piece];
+	// 5 occupancies
+	mOccupancyBitboards[Side::White] = mBitBoards[WKing] | mBitBoards[WQueen] | mBitBoards[WPawn] | mBitBoards[WKnight] | mBitBoards[WBishop] | mBitBoards[WRook];
+	mOccupancyBitboards[Side::Black] = mBitBoards[BKing] | mBitBoards[BQueen] | mBitBoards[BPawn] | mBitBoards[BKnight] | mBitBoards[BBishop] | mBitBoards[BRook];
 
 	mOccupancyBitboards[Side::Both] |= mOccupancyBitboards[Side::White];
 	mOccupancyBitboards[Side::Both] |= mOccupancyBitboards[Side::Black];

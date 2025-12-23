@@ -8,6 +8,8 @@
 #pragma once
 
 #include <string>
+#include <algorithm>
+#include <cctype>
 #include <array>
 
 #include "BitboardTypes.h"
@@ -135,7 +137,7 @@ public:
 	void			   init();
 	void			   clear();
 
-	void			   parseFEN(const char *fen);
+	void			   parseFEN(std::string_view fen);
 
 	// IS the current given square attacked by the current given side
 	bool			   isSquareAttacked(int square, Side side);
