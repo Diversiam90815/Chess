@@ -118,34 +118,37 @@ void Bitboard::parseFEN(std::string_view fen)
 
 
 
-bool Bitboard::isSquareAttacked(int square, Side side)
+bool Bitboard::isSquareAttacked(int square, Side side) const
 {
+	const auto &at		= AttackTables::instance();
+	const U64	occBoth = mOccupancyBitboards[to_index(Side::Both)];
+
 	// attacked by white pawns
-	if ((side == Side::White) && (mAttackTables.mPawnAttacks[to_index(Side::Black)][square] & mBitBoards[WPawn]))
+	if ((side == Side::White) && (at.pawnAttacks(Side::Black, square) & mBitBoards[WPawn]))
 		return true;
 
 	// attacked by black pawns
-	if ((side == Side::Black) && (mAttackTables.mPawnAttacks[to_index(Side::White)][square] & mBitBoards[BPawn]))
+	if ((side == Side::Black) && (at.pawnAttacks(Side::White, square) & mBitBoards[BPawn]))
 		return true;
 
 	// attacked by knights
-	if (mAttackTables.mKnightAttacks[square] & ((side == Side::White) ? mBitBoards[WKnight] : mBitBoards[BKnight]))
+	if (at.knightAttacks(square) & ((side == Side::White) ? mBitBoards[WKnight] : mBitBoards[BKnight]))
 		return true;
 
 	// attacked by kings
-	if (mAttackTables.mKingAttacks[square] & ((side == Side::White) ? mBitBoards[WKing] : mBitBoards[BKing]))
+	if (at.kingAttacks(square) & ((side == Side::White) ? mBitBoards[WKing] : mBitBoards[BKing]))
 		return true;
 
 	// attacked by rooks
-	if (mAttackTables.getRookAttacks(square, mOccupancyBitboards[to_index(Side::Both)]) & ((side == Side::White) ? mBitBoards[WRook] : mBitBoards[BRook]))
+	if (at.rookAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WRook] : mBitBoards[BRook]))
 		return true;
 
 	// attacked by bishops
-	if (mAttackTables.getBishopAttacks(square, mOccupancyBitboards[to_index(Side::Both)]) & ((side == Side::White) ? mBitBoards[WBishop] : mBitBoards[BBishop]))
+	if (at.bishopAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WBishop] : mBitBoards[BBishop]))
 		return true;
 
 	// attacked by queens
-	if (mAttackTables.getQueenAttacks(square, mOccupancyBitboards[to_index(Side::Both)]) & ((side == Side::White) ? mBitBoards[WQueen] : mBitBoards[BQueen]))
+	if (at.queenAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WQueen] : mBitBoards[BQueen]))
 		return true;
 
 	return false;

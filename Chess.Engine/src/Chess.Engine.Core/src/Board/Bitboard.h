@@ -117,7 +117,7 @@ public:
 	void			   parseFEN(std::string_view fen);
 
 	// IS the current given square attacked by the current given side
-	bool			   isSquareAttacked(int square, Side side);
+	bool			   isSquareAttacked(int square, Side side) const;
 
 	const Bitboards	  &pieces() const noexcept { return mBitBoards; }
 	const Occupancies &occ() const noexcept { return mOccupancyBitboards; }
@@ -127,14 +127,12 @@ public:
 	int				   getCurrentEnPassantSqaure() const noexcept { return enPassant; }
 
 private:
-	Bitboards		  mBitBoards{};				  // Array of all bitboards
-	Occupancies		  mOccupancyBitboards{};	  // Occupancies
+	Bitboards		  mBitBoards{};					   // Array of all bitboards
+	Occupancies		  mOccupancyBitboards{};		   // Occupancies
 
-	Side			  side		= Side::None;	  // side to move
-	int				  enPassant = no_square;	  // enpassant square
-	Castling		  castle	= Castling::None; // castling rights
-
-	AttackTables	  mAttackTables;
+	Side			  side			 = Side::None;	   // side to move
+	int				  enPassant		 = no_square;	   // enpassant square
+	Castling		  castle		 = Castling::None; // castling rights
 
 	// FEN positions
 	const std::string mEmptyBoard	 = "8/8/8/8/8/8/8/8 w - - ";

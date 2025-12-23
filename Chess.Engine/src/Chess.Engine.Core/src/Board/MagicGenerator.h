@@ -12,7 +12,7 @@
 #include "BitboardTypes.h"
 #include "AttackTables.h"
 
-#define CHESS_DEV_TOOLS
+// #define CHESS_DEV_TOOLS
 
 
 #ifdef CHESS_DEV_TOOLS

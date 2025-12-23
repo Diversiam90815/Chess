@@ -340,7 +340,7 @@ void AttackTables::initSliderAttacks(int bishop)
 }
 
 
-U64 AttackTables::getBishopAttacks(int square, U64 occupancy)
+U64 AttackTables::getBishopAttacks(int square, U64 occupancy) const
 {
 	// get bishop attacks assuming current board occupancy
 	occupancy &= mBishopMasks[square];
@@ -351,7 +351,7 @@ U64 AttackTables::getBishopAttacks(int square, U64 occupancy)
 };
 
 
-U64 AttackTables::getRookAttacks(int square, U64 occupancy)
+U64 AttackTables::getRookAttacks(int square, U64 occupancy) const
 {
 	// get rook attacks assuming current board occupancy
 	occupancy &= mRookMasks[square];
@@ -362,7 +362,7 @@ U64 AttackTables::getRookAttacks(int square, U64 occupancy)
 }
 
 
-U64 AttackTables::getQueenAttacks(int square, U64 occupancy)
+U64 AttackTables::getQueenAttacks(int square, U64 occupancy) const
 {
 	// init result attacks
 	U64 queenAttacks	= 0ULL;

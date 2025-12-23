@@ -15,8 +15,28 @@
 class AttackTables
 {
 public:
-	AttackTables()	= default;
+	static const AttackTables &instance()
+	{
+		static AttackTables at;
+		return at;
+	}
+
 	~AttackTables() = default;
+
+	U64 pawnAttacks(Side s, int sq) const noexcept { return mPawnAttacks[to_index(s)][sq]; }
+	U64 knightAttacks(int sq) const noexcept { return mKnightAttacks[sq]; }
+	U64 kingAttacks(int sq) const noexcept { return mKingAttacks[sq]; }
+	U64 bishopAttacks(int sq, U64 occ) const noexcept { return getBishopAttacks(sq, occ); }
+	U64 rookAttacks(int sq, U64 occ) const noexcept { return getRookAttacks(sq, occ); }
+	U64 queenAttacks(int sq, U64 occ) const noexcept { return getQueenAttacks(sq, occ); }
+
+private:
+	AttackTables()
+	{
+		initLeaperAttacks();
+		initSliderAttacks(/*bishop=*/1);
+		initSliderAttacks(/*bishop=*/0);
+	}
 
 	void initLeaperAttacks();
 
@@ -31,11 +51,10 @@ public:
 	U64	 setOccupancy(int index, int bitsInMask, U64 attackMask);
 
 	void initSliderAttacks(int bishop);
-	U64	 getBishopAttacks(int square, U64 occupancy);
-	U64	 getRookAttacks(int square, U64 occupancy);
-	U64	 getQueenAttacks(int square, U64 occupancy);
+	U64	 getBishopAttacks(int square, U64 occupancy) const;
+	U64	 getRookAttacks(int square, U64 occupancy) const;
+	U64	 getQueenAttacks(int square, U64 occupancy) const;
 
-	// private:
 	U64	 mPawnAttacks[2][64];	  // pawn attack table [side][square]
 	U64	 mKnightAttacks[64];	  // knight attack table [square]
 	U64	 mKingAttacks[64];		  // Kings attack table [square]
