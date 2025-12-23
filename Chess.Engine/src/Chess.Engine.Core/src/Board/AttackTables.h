@@ -33,6 +33,9 @@ public:
 	void initSliderAttacks(int bishop);
 	U64	 getBishopAttacks(int square, U64 occupancy);
 	U64	 getRookAttacks(int square, U64 occupancy);
+	U64	 getQueenAttacks(int square, U64 occupancy);
+
+	bool isSquareAttacked(int sqaure, Side side);
 
 private:
 	U64 mPawnAttacks[2][64];	 // pawn attack table [side][square]

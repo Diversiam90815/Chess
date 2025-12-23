@@ -360,3 +360,39 @@ U64 AttackTables::getRookAttacks(int square, U64 occupancy)
 
 	return mRookAttacks[square][occupancy];
 }
+
+
+U64 AttackTables::getQueenAttacks(int square, U64 occupancy)
+{
+	// init result attacks
+	U64 queenAttacks	= 0ULL;
+
+	// init bishop & rook occupancies
+	U64 bishopOccupancy = occupancy;
+	U64 rookOccupancy	= occupancy;
+
+	// get bishop attacks assuming current board occupancy
+	bishopOccupancy &= mBishopMasks[square];
+	bishopOccupancy *= mBishopMagicNumbers[square];
+	bishopOccupancy >>= 64 - bishop_relevant_bits[square];
+
+	queenAttacks = mBishopAttacks[square][occupancy];
+
+	// get rook attacks assuming current board occupancy
+	rookOccupancy &= mRookMasks[square];
+	rookOccupancy *= mRookMagicNumbers[square];
+	rookOccupancy >>= 64 - rook_relevant_bits[square];
+
+	queenAttacks |= mRookAttacks[square][occupancy];
+
+	return queenAttacks;
+}
+
+
+bool AttackTables::isSquareAttacked(int sqaure, Side side)
+{
+
+
+
+	return false;
+}
