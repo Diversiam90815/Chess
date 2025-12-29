@@ -260,7 +260,7 @@ bool MoveGeneration::canEnPassant(const Position &position, PlayerColor player)
 }
 
 
-bool MoveGeneration::isSquareAttacked(int square, Side side) const
+bool MoveGeneration::isSquareAttacked(Square square, Side side) const
 {
 	const auto &at		= AttackTables::instance();
 	const U64	occBoth = mChessBoard.occ()[to_index(Side::Both)];
@@ -294,4 +294,40 @@ bool MoveGeneration::isSquareAttacked(int square, Side side) const
 		return true;
 
 	return false;
+}
+
+
+void MoveGeneration::generateAllMoves()
+{
+	Square sourceSquare = Square::None;
+	Square targetSqaure = Square::None;
+
+	U64	   bitboard		= 0ULL;
+	U64	   attacks		= 0ULL;
+
+	Side   currentSide	= mChessBoard.getCurrentSide(); // TODO:: need to refactor
+
+	// loop over all PieceTypes (TODO: Refactor later)
+	for (int piece = WKing; piece <= BRook; piece++)
+	{
+		bitboard = mChessBoard.pieces()[piece]; // Get a copy of the piece's bitboard
+
+		// generate pawn & castling moves
+		if (currentSide == Side::White)
+		{
+		}
+		else
+		{
+		}
+
+		// generate knight moves
+
+		// generate bishop moves
+
+		// generate rook moves
+
+		// generate queen moves
+
+		// generate king moves
+	}
 }

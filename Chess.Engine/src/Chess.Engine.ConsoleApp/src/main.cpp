@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "Chessboard.h"
+#include "Moves/Generation/MoveGeneration.h"
 #include "BitboardHelper.h"
 
 
@@ -78,7 +79,7 @@ static void printBoard(Chessboard &board)
 
 	printf("   Side:       %s\n", board.getCurrentSide() == Side::White ? "White" : board.getCurrentSide() == Side::Black ? "Black" : "--");
 
-	printf("   Enpassant:     %s\n", (board.getCurrentEnPassantSqaure() != no_square) ? square_to_coordinates[board.getCurrentEnPassantSqaure()] : "no");
+	printf("   Enpassant:     %s\n", (board.getCurrentEnPassantSqaure() != Square::None) ? square_to_coordinates[to_index(board.getCurrentEnPassantSqaure())] : "no");
 
 	printf("   Castling:    %c%c%c%c\n\n", static_cast<int>(board.getCurrentCastlingRights() & Castling::WK) ? 'K' : '-',
 		   static_cast<int>(board.getCurrentCastlingRights() & Castling::WQ) ? 'Q' : '-', static_cast<int>(board.getCurrentCastlingRights() & Castling::BK) ? 'k' : '-',
@@ -86,7 +87,7 @@ static void printBoard(Chessboard &board)
 }
 
 
-static void printAttackedSquares(Chessboard &board, Side side)
+static void printAttackedSquares(MoveGeneration &gen, Side side)
 {
 	printf("\n");
 
@@ -100,7 +101,7 @@ static void printAttackedSquares(Chessboard &board, Side side)
 				printf("  %d ", 8 - rank);
 
 			// check whether the current square is attacked
-			bool squareAttacked = board.isSquareAttacked(square, side);
+			bool squareAttacked = gen.isSquareAttacked(Square(square), side);
 			printf(" %d", squareAttacked ? 1 : 0);
 		}
 

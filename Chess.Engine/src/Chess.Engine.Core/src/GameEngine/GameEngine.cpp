@@ -50,7 +50,7 @@ void GameEngine::resetGame()
 
 	reset();
 }
-//
+
 //
 // PieceType GameEngine::getCurrentPieceTypeAtPosition(const Position position)
 //{

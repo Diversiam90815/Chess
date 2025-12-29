@@ -32,10 +32,10 @@ public:
 	bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
 
 
+	bool					  isSquareAttacked(Square square, Side side) const;
+	void					  generateAllMoves();
+
 private:
-	bool													isSquareAttacked(int square, Side side) const;
-
-
 	std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PlayerColor player);
 
 	bool													canCastle(const Position &kingposition, PlayerColor player, bool kingside);

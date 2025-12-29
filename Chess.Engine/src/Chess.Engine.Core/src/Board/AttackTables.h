@@ -23,12 +23,12 @@ public:
 
 	~AttackTables() = default;
 
-	U64 pawnAttacks(Side s, int sq) const noexcept { return mPawnAttacks[to_index(s)][sq]; }
-	U64 knightAttacks(int sq) const noexcept { return mKnightAttacks[sq]; }
-	U64 kingAttacks(int sq) const noexcept { return mKingAttacks[sq]; }
-	U64 bishopAttacks(int sq, U64 occ) const noexcept { return getBishopAttacks(sq, occ); }
-	U64 rookAttacks(int sq, U64 occ) const noexcept { return getRookAttacks(sq, occ); }
-	U64 queenAttacks(int sq, U64 occ) const noexcept { return getQueenAttacks(sq, occ); }
+	U64 pawnAttacks(Side s, Square sq) const noexcept { return mPawnAttacks[to_index(s)][to_index(sq)]; }
+	U64 knightAttacks(Square sq) const noexcept { return mKnightAttacks[to_index(sq)]; }
+	U64 kingAttacks(Square sq) const noexcept { return mKingAttacks[to_index(sq)]; }
+	U64 bishopAttacks(Square sq, U64 occ) const noexcept { return getBishopAttacks(to_index(sq), occ); }
+	U64 rookAttacks(Square sq, U64 occ) const noexcept { return getRookAttacks(to_index(sq), occ); }
+	U64 queenAttacks(Square sq, U64 occ) const noexcept { return getQueenAttacks(to_index(sq), occ); }
 
 private:
 	AttackTables()

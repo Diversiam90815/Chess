@@ -124,14 +124,14 @@ public:
 
 	Side			   getCurrentSide() const noexcept { return side; }
 	Castling		   getCurrentCastlingRights() const noexcept { return castle; }
-	int				   getCurrentEnPassantSqaure() const noexcept { return enPassant; }
+	Square			   getCurrentEnPassantSqaure() const noexcept { return enPassant; }
 
 private:
 	Bitboards		  mBitBoards{};					   // Array of all bitboards
 	Occupancies		  mOccupancyBitboards{};		   // Occupancies
 
 	Side			  side			 = Side::None;	   // side to move
-	int				  enPassant		 = no_square;	   // enpassant square
+	Square			  enPassant		 = Square::None;   // enpassant square
 	Castling		  castle		 = Castling::None; // castling rights
 
 	// FEN positions

@@ -22,7 +22,7 @@ void Chessboard::clear()
 	mBitBoards.fill(0);
 	mOccupancyBitboards.fill(0);
 	side	  = Side::None;
-	enPassant = no_square;
+	enPassant = Square::None;
 	castle	  = Castling::None;
 }
 
@@ -101,11 +101,11 @@ void Chessboard::parseFEN(std::string_view fen)
 	{
 		int epFile = fen[i + 0] - 'a';
 		int epRank = 8 - (fen[i + 1] - '0');
-		enPassant  = epRank * 8 + epFile;
+		enPassant  = (Square)(epRank * 8 + epFile);
 	}
 	else
 	{
-		enPassant = no_square;
+		enPassant = Square::None;
 	}
 
 	// 5 occupancies
@@ -115,41 +115,3 @@ void Chessboard::parseFEN(std::string_view fen)
 	mOccupancyBitboards[to_index(Side::Both)] |= mOccupancyBitboards[to_index(Side::White)];
 	mOccupancyBitboards[to_index(Side::Both)] |= mOccupancyBitboards[to_index(Side::Black)];
 }
-
-
-//
-// bool Chessboard::isSquareAttacked(int square, Side side) const
-//{
-//	const auto &at		= AttackTables::instance();
-//	const U64	occBoth = mOccupancyBitboards[to_index(Side::Both)];
-//
-//	// attacked by white pawns
-//	if ((side == Side::White) && (at.pawnAttacks(Side::Black, square) & mBitBoards[WPawn]))
-//		return true;
-//
-//	// attacked by black pawns
-//	if ((side == Side::Black) && (at.pawnAttacks(Side::White, square) & mBitBoards[BPawn]))
-//		return true;
-//
-//	// attacked by knights
-//	if (at.knightAttacks(square) & ((side == Side::White) ? mBitBoards[WKnight] : mBitBoards[BKnight]))
-//		return true;
-//
-//	// attacked by kings
-//	if (at.kingAttacks(square) & ((side == Side::White) ? mBitBoards[WKing] : mBitBoards[BKing]))
-//		return true;
-//
-//	// attacked by rooks
-//	if (at.rookAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WRook] : mBitBoards[BRook]))
-//		return true;
-//
-//	// attacked by bishops
-//	if (at.bishopAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WBishop] : mBitBoards[BBishop]))
-//		return true;
-//
-//	// attacked by queens
-//	if (at.queenAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WQueen] : mBitBoards[BQueen]))
-//		return true;
-//
-//	return false;
-//}
