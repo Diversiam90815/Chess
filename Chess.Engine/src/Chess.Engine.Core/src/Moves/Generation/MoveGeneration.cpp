@@ -262,3 +262,40 @@ bool MoveGeneration::canEnPassant(const Position &position, PlayerColor player)
 
 	return true;
 }
+
+
+bool MoveGeneration::isSquareAttacked(int square, Side side) const
+{
+	const auto &at		= AttackTables::instance();
+	const U64	occBoth = mChessBoard.occ()[to_index(Side::Both)];
+
+	// attacked by white pawns
+	if ((side == Side::White) && (at.pawnAttacks(Side::Black, square) & mChessBoard.pieces()[WPawn]))
+		return true;
+
+	// attacked by black pawns
+	if ((side == Side::Black) && (at.pawnAttacks(Side::White, square) & mChessBoard.pieces()[BPawn]))
+		return true;
+
+	// attacked by knights
+	if (at.knightAttacks(square) & ((side == Side::White) ? mChessBoard.pieces()[WKnight] : mChessBoard.pieces()[BKnight]))
+		return true;
+
+	// attacked by kings
+	if (at.kingAttacks(square) & ((side == Side::White) ? mChessBoard.pieces()[WKing] : mChessBoard.pieces()[BKing]))
+		return true;
+
+	// attacked by rooks
+	if (at.rookAttacks(square, occBoth) & ((side == Side::White) ? mChessBoard.pieces()[WRook] : mChessBoard.pieces()[BRook]))
+		return true;
+
+	// attacked by bishops
+	if (at.bishopAttacks(square, occBoth) & ((side == Side::White) ? mChessBoard.pieces()[WBishop] : mChessBoard.pieces()[BBishop]))
+		return true;
+
+	// attacked by queens
+	if (at.queenAttacks(square, occBoth) & ((side == Side::White) ? mChessBoard.pieces()[WQueen] : mChessBoard.pieces()[BQueen]))
+		return true;
+
+	return false;
+}

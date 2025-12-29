@@ -117,39 +117,39 @@ void Chessboard::parseFEN(std::string_view fen)
 }
 
 
-
-bool Chessboard::isSquareAttacked(int square, Side side) const
-{
-	const auto &at		= AttackTables::instance();
-	const U64	occBoth = mOccupancyBitboards[to_index(Side::Both)];
-
-	// attacked by white pawns
-	if ((side == Side::White) && (at.pawnAttacks(Side::Black, square) & mBitBoards[WPawn]))
-		return true;
-
-	// attacked by black pawns
-	if ((side == Side::Black) && (at.pawnAttacks(Side::White, square) & mBitBoards[BPawn]))
-		return true;
-
-	// attacked by knights
-	if (at.knightAttacks(square) & ((side == Side::White) ? mBitBoards[WKnight] : mBitBoards[BKnight]))
-		return true;
-
-	// attacked by kings
-	if (at.kingAttacks(square) & ((side == Side::White) ? mBitBoards[WKing] : mBitBoards[BKing]))
-		return true;
-
-	// attacked by rooks
-	if (at.rookAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WRook] : mBitBoards[BRook]))
-		return true;
-
-	// attacked by bishops
-	if (at.bishopAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WBishop] : mBitBoards[BBishop]))
-		return true;
-
-	// attacked by queens
-	if (at.queenAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WQueen] : mBitBoards[BQueen]))
-		return true;
-
-	return false;
-}
+//
+//bool Chessboard::isSquareAttacked(int square, Side side) const
+//{
+//	const auto &at		= AttackTables::instance();
+//	const U64	occBoth = mOccupancyBitboards[to_index(Side::Both)];
+//
+//	// attacked by white pawns
+//	if ((side == Side::White) && (at.pawnAttacks(Side::Black, square) & mBitBoards[WPawn]))
+//		return true;
+//
+//	// attacked by black pawns
+//	if ((side == Side::Black) && (at.pawnAttacks(Side::White, square) & mBitBoards[BPawn]))
+//		return true;
+//
+//	// attacked by knights
+//	if (at.knightAttacks(square) & ((side == Side::White) ? mBitBoards[WKnight] : mBitBoards[BKnight]))
+//		return true;
+//
+//	// attacked by kings
+//	if (at.kingAttacks(square) & ((side == Side::White) ? mBitBoards[WKing] : mBitBoards[BKing]))
+//		return true;
+//
+//	// attacked by rooks
+//	if (at.rookAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WRook] : mBitBoards[BRook]))
+//		return true;
+//
+//	// attacked by bishops
+//	if (at.bishopAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WBishop] : mBitBoards[BBishop]))
+//		return true;
+//
+//	// attacked by queens
+//	if (at.queenAttacks(square, occBoth) & ((side == Side::White) ? mBitBoards[WQueen] : mBitBoards[BQueen]))
+//		return true;
+//
+//	return false;
+//}

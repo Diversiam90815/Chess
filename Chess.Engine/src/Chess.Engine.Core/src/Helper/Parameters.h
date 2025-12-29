@@ -25,26 +25,26 @@ constexpr int BOARD_SIZE		= 8;
 constexpr int PLAYER_PIECES_NUM = 2 * BOARD_SIZE;
 
 
-enum class PieceType
-{
-	DefaultType,
-	Pawn,
-	Knight,
-	Bishop,
-	Rook,
-	Queen,
-	King
-};
-
+//enum class PieceType
+//{
+//	DefaultType,
+//	Pawn,
+//	Knight,
+//	Bishop,
+//	Rook,
+//	Queen,
+//	King
+//};
+//
 
 /// <summary>
 /// Represents the possible colors for a player.
 /// </summary>
 enum class PlayerColor
 {
-	NoColor,
-	White,
-	Black
+	None  = 0,
+	White = 1,
+	Black = 2
 };
 
 

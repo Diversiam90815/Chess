@@ -9,7 +9,7 @@
 #include <strsafe.h>
 
 
-MoveExecution::MoveExecution(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation) : mChessBoard(board), mValidation(validation) {}
+MoveExecution::MoveExecution(Chessboard& board) : mChessBoard(board) {}
 
 
 Move MoveExecution::executeMove(PossibleMove &possibleMove, bool fromRemote)
@@ -17,112 +17,112 @@ Move MoveExecution::executeMove(PossibleMove &possibleMove, bool fromRemote)
 	// Store positions in Move from executed PossibleMove
 	Move  executedMove = Move(possibleMove);
 
-	// Store the moved piece type
-	auto &movedPiece   = mChessBoard->getPiece(possibleMove.start);
+	//// Store the moved piece type
+	//auto &movedPiece   = mChessBoard->getPiece(possibleMove.start);
 
-	if (!movedPiece)
-	{
-		LOG_ERROR("The piece that has been moved is empty. Position was x:{}, y:{}", possibleMove.start.x, possibleMove.start.y);
-		return {};
-	}
+	//if (!movedPiece)
+	//{
+	//	LOG_ERROR("The piece that has been moved is empty. Position was x:{}, y:{}", possibleMove.start.x, possibleMove.start.y);
+	//	return {};
+	//}
 
-	auto movedPieceType		= movedPiece->getType();
-	auto player				= mChessBoard->getPiece(possibleMove.start)->getColor();
+	//auto movedPieceType		= movedPiece->getType();
+	//auto player				= mChessBoard->getPiece(possibleMove.start)->getColor();
 
-	executedMove.movedPiece = movedPieceType;
-	executedMove.player		= player;
-	bool capturedPiece		= false;
+	//executedMove.movedPiece = movedPieceType;
+	//executedMove.player		= player;
+	//bool capturedPiece		= false;
 
-	{
-		std::lock_guard<std::mutex> lock(mExecutionMutex);
+	//{
+	//	std::lock_guard<std::mutex> lock(mExecutionMutex);
 
-		movedPiece->increaseMoveCounter();
+	//	movedPiece->increaseMoveCounter();
 
-		if (movedPieceType == PieceType::King)
-		{
-			mChessBoard->updateKingsPosition(executedMove.endingPosition, movedPiece->getColor());
-		}
+	//	if (movedPieceType == PieceType::King)
+	//	{
+	//		mChessBoard->updateKingsPosition(executedMove.endingPosition, movedPiece->getColor());
+	//	}
 
-		// Store if this move captured another piece
-		capturedPiece = (possibleMove.type & MoveType::Capture) == MoveType::Capture;
-		if (capturedPiece)
-		{
-			auto &pieceCaptured = mChessBoard->getPiece(possibleMove.end);
-			if (pieceCaptured)
-			{
-				auto capturedPieceType	   = pieceCaptured->getType();
-				executedMove.capturedPiece = capturedPieceType;
-				mChessBoard->movePiece(possibleMove.start, possibleMove.end);
-			}
-		}
+	//	// Store if this move captured another piece
+	//	capturedPiece = (possibleMove.type & MoveType::Capture) == MoveType::Capture;
+	//	if (capturedPiece)
+	//	{
+	//		auto &pieceCaptured = mChessBoard->getPiece(possibleMove.end);
+	//		if (pieceCaptured)
+	//		{
+	//			auto capturedPieceType	   = pieceCaptured->getType();
+	//			executedMove.capturedPiece = capturedPieceType;
+	//			mChessBoard->movePiece(possibleMove.start, possibleMove.end);
+	//		}
+	//	}
 
 
-		if ((possibleMove.type & MoveType::EnPassant) == MoveType::EnPassant)
-		{
-			bool result = executeEnPassantMove(possibleMove, player);
-			if (result)
-			{
-				executedMove.capturedPiece = PieceType::Pawn;
-			}
-		}
+	//	if ((possibleMove.type & MoveType::EnPassant) == MoveType::EnPassant)
+	//	{
+	//		bool result = executeEnPassantMove(possibleMove, player);
+	//		if (result)
+	//		{
+	//			executedMove.capturedPiece = PieceType::Pawn;
+	//		}
+	//	}
 
-		if ((possibleMove.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (possibleMove.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
-		{
-			executeCastlingMove(possibleMove);
-		}
+	//	if ((possibleMove.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (possibleMove.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
+	//	{
+	//		executeCastlingMove(possibleMove);
+	//	}
 
-		if ((possibleMove.type & MoveType::Normal) == MoveType::Normal || (possibleMove.type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush)
-		{
-			mChessBoard->movePiece(possibleMove.start, possibleMove.end);
-		}
+	//	if ((possibleMove.type & MoveType::Normal) == MoveType::Normal || (possibleMove.type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush)
+	//	{
+	//		mChessBoard->movePiece(possibleMove.start, possibleMove.end);
+	//	}
 
-		if ((possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
-		{
-			executePawnPromotion(possibleMove, executedMove.player);
-			executedMove.promotionType = possibleMove.promotionPiece;
-		}
+	//	if ((possibleMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
+	//	{
+	//		executePawnPromotion(possibleMove, executedMove.player);
+	//		executedMove.promotionType = possibleMove.promotionPiece;
+	//	}
 
-	} // End critical section
+	//} // End critical section
 
-	PlayerColor opponent	 = player == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
-	auto		opponentKing = mChessBoard->getKingsPosition(opponent);
+	//PlayerColor opponent	 = player == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
+	//auto		opponentKing = mChessBoard->getKingsPosition(opponent);
 
-	if (mValidation->isCheckmate(opponent))
-	{
-		executedMove.type |= MoveType::Checkmate;
-	}
-	else if (mValidation->isKingInCheck(opponentKing, opponent))
-	{
-		executedMove.type |= MoveType::Check;
-	}
+	//if (mValidation->isCheckmate(opponent))
+	//{
+	//	executedMove.type |= MoveType::Checkmate;
+	//}
+	//else if (mValidation->isKingInCheck(opponentKing, opponent))
+	//{
+	//	executedMove.type |= MoveType::Check;
+	//}
 
-	// Increment or reset the halfMoveClock
+	//// Increment or reset the halfMoveClock
 
-	int previousHalfMoveClock = 0;
+	//int previousHalfMoveClock = 0;
 
-	if (!mMoveHistory.empty())
-	{
-		previousHalfMoveClock = getLastMove()->halfMoveClock;
-	}
+	//if (!mMoveHistory.empty())
+	//{
+	//	previousHalfMoveClock = getLastMove()->halfMoveClock;
+	//}
 
-	if (movedPieceType != PieceType::Pawn && !capturedPiece)
-	{
-		executedMove.halfMoveClock = previousHalfMoveClock + 1;
-	}
-	else
-	{
-		executedMove.halfMoveClock = 0;
-	}
+	//if (movedPieceType != PieceType::Pawn && !capturedPiece)
+	//{
+	//	executedMove.halfMoveClock = previousHalfMoveClock + 1;
+	//}
+	//else
+	//{
+	//	executedMove.halfMoveClock = 0;
+	//}
 
-	executedMove.notation = mMoveNotation->generateStandardAlgebraicNotation(executedMove);
+	//executedMove.notation = mMoveNotation->generateStandardAlgebraicNotation(executedMove);
 
-	for (auto &observer : mObservers)
-	{
-		if (auto obs = observer.lock())
-			obs->onExecuteMove(possibleMove, fromRemote);
-	}
+	//for (auto &observer : mObservers)
+	//{
+	//	if (auto obs = observer.lock())
+	//		obs->onExecuteMove(possibleMove, fromRemote);
+	//}
 
-	addMoveToHistory(executedMove);
+	//addMoveToHistory(executedMove);
 
 	return executedMove;
 }
@@ -148,8 +148,8 @@ bool MoveExecution::executeCastlingMove(PossibleMove &move)
 		rookEnd	  = Position(kingStart.x - 1, kingStart.y); // Rook moves to the square right of the king
 	}
 
-	mChessBoard->movePiece(kingStart, kingEnd);
-	mChessBoard->movePiece(rookStart, rookEnd);
+	//mChessBoard->movePiece(kingStart, kingEnd);
+	//mChessBoard->movePiece(rookStart, rookEnd);
 
 	return true;
 }
@@ -167,8 +167,8 @@ bool MoveExecution::executeEnPassantMove(PossibleMove &move, PlayerColor player)
 		capturedPawnPosition = Position(move.end.x, move.end.y - 1);
 	}
 
-	mChessBoard->movePiece(move.start, move.end);
-	mChessBoard->removePiece(capturedPawnPosition);
+	//mChessBoard->movePiece(move.start, move.end);
+	//mChessBoard->removePiece(capturedPawnPosition);
 
 	return true;
 }
@@ -176,27 +176,27 @@ bool MoveExecution::executeEnPassantMove(PossibleMove &move, PlayerColor player)
 
 bool MoveExecution::executePawnPromotion(const PossibleMove &move, PlayerColor player)
 {
-	if ((move.type & MoveType::PawnPromotion) != MoveType::PawnPromotion)
-		return false;
+	//if ((move.type & MoveType::PawnPromotion) != MoveType::PawnPromotion)
+	//	return false;
 
-	PieceType promotedPieceType = move.promotionPiece;
+	//PieceType promotedPieceType = move.promotionPiece;
 
-	// Validate promoted piece
-	if ((promotedPieceType != PieceType::Queen) && (promotedPieceType != PieceType::Rook) && (promotedPieceType != PieceType::Knight) && (promotedPieceType != PieceType::Bishop))
-		return false;
+	//// Validate promoted piece
+	//if ((promotedPieceType != PieceType::Queen) && (promotedPieceType != PieceType::Rook) && (promotedPieceType != PieceType::Knight) && (promotedPieceType != PieceType::Bishop))
+	//	return false;
 
-	mChessBoard->removePiece(move.start);
+	//mChessBoard->removePiece(move.start);
 
-	// Place promoted piece
-	std::shared_ptr<ChessPiece> promotedPiece = nullptr;
+	//// Place promoted piece
+	//std::shared_ptr<ChessPiece> promotedPiece = nullptr;
 
-	promotedPiece							  = ChessPiece::CreatePiece(promotedPieceType, player);
+	//promotedPiece							  = ChessPiece::CreatePiece(promotedPieceType, player);
 
-	if (promotedPiece)
-	{
-		mChessBoard->setPiece(move.end, promotedPiece);
-		return true;
-	}
+	//if (promotedPiece)
+	//{
+	//	mChessBoard->setPiece(move.end, promotedPiece);
+	//	return true;
+	//}
 	return false;
 }
 

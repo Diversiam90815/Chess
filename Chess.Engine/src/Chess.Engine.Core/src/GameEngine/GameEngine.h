@@ -37,7 +37,7 @@ public:
 	void					   executeMove(PossibleMove &tmpMove, bool fromRemote = false);
 	void					   undoMove();
 
-	PieceType				   getCurrentPieceTypeAtPosition(const Position position);
+	//PieceType				   getCurrentPieceTypeAtPosition(const Position position);
 
 	std::vector<PossibleMove>  getPossibleMoveForPosition();
 
@@ -78,7 +78,7 @@ private:
 	Player					  mWhitePlayer;
 	Player					  mBlackPlayer;
 
-	PlayerColor				  mCurrentPlayer = PlayerColor::NoColor;
+	PlayerColor				  mCurrentPlayer = PlayerColor::None;
 
 	std::vector<PossibleMove> mAllMovesForPosition;
 

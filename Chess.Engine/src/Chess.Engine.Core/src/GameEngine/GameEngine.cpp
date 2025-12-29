@@ -191,7 +191,7 @@ void GameEngine::switchTurns()
 {
 	mMovesGeneratedForCurrentTurn = false;			// Reset flag for the new turn
 
-	if (getCurrentPlayer() == PlayerColor::NoColor) // We are in init state and set the first round's player : white
+	if (getCurrentPlayer() == PlayerColor::None) // We are in init state and set the first round's player : white
 	{
 		LOG_INFO("Since we setup the game now, we select the white player as the current player!");
 		changeCurrentPlayer(PlayerColor::White);

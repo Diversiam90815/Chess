@@ -116,8 +116,8 @@ public:
 
 	void			   parseFEN(std::string_view fen);
 
-	// IS the current given square attacked by the current given side
-	bool			   isSquareAttacked(int square, Side side) const;
+	//// IS the current given square attacked by the current given side
+	//bool			   isSquareAttacked(int square, Side side) const;
 
 	const Bitboards	  &pieces() const noexcept { return mBitBoards; }
 	const Occupancies &occ() const noexcept { return mOccupancyBitboards; }
