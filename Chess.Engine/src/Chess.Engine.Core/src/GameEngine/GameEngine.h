@@ -12,7 +12,6 @@
 
 #include "Execution/MoveExecution.h"
 #include "Generation/MoveGeneration.h"
-#include "Validation/MoveValidation.h"
 #include "Evaluation/MoveEvaluation.h"
 #include "CPUPlayer.h"
 #include "IObservable.h"
@@ -86,7 +85,6 @@ private:
 	Chessboard				  mChessBoard;
 
 	MoveGeneration			  mMoveGeneration;
-	MoveValidation			  mMoveValidation;
 	MoveExecution			  mMoveExecution;
 	MoveEvaluation			  mMoveEvaluation;
 

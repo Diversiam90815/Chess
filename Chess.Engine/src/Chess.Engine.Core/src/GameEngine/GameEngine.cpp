@@ -133,19 +133,20 @@ EndGameState GameEngine::checkForEndGameConditions()
 		}
 
 		mMoveGeneration.calculateAllLegalBasicMoves(getCurrentPlayer()); // Calculate all legal moves to check if we have a stalemate (no valid moves left)
-		bool isStaleMate = mMoveValidation.isStalemate(getCurrentPlayer());
-		if (isStaleMate)
-		{
-			LOG_INFO("Detected a Stalemate");
 
-			auto winner = getWinner();
-			if (winner.has_value())
-				endGame(EndGameState::StaleMate, winner.value());
-			else
-				endGame(EndGameState::StaleMate);
+		//bool isStaleMate = mMoveValidation.isStalemate(getCurrentPlayer());
+		//if (isStaleMate)
+		//{
+		//	LOG_INFO("Detected a Stalemate");
 
-			return EndGameState::StaleMate;
-		}
+		//	auto winner = getWinner();
+		//	if (winner.has_value())
+		//		endGame(EndGameState::StaleMate, winner.value());
+		//	else
+		//		endGame(EndGameState::StaleMate);
+
+		//	return EndGameState::StaleMate;
+		//}
 
 		LOG_INFO("Game is still on-going. We switch player's turns!");
 		return EndGameState::OnGoing;
