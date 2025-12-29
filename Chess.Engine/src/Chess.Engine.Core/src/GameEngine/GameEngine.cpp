@@ -11,14 +11,14 @@
 
 void GameEngine::init()
 {
-	mChessBoard		= std::make_shared<ChessBoard>();
+	//mChessBoard		= std::make_shared<ChessBoard>();
 
-	mMoveValidation = std::make_shared<MoveValidation>(mChessBoard);
-	mMoveExecution	= std::make_shared<MoveExecution>(mChessBoard, mMoveValidation);
-	mMoveGeneration = std::make_shared<MoveGeneration>(mChessBoard, mMoveValidation, mMoveExecution);
-	mMoveEvaluation = std::make_shared<MoveEvaluation>(mChessBoard, mMoveGeneration);
+	//mMoveValidation = std::make_shared<MoveValidation>(mChessBoard);
+	//mMoveExecution	= std::make_shared<MoveExecution>(mChessBoard, mMoveValidation);
+	//mMoveGeneration = std::make_shared<MoveGeneration>(mChessBoard, mMoveValidation, mMoveExecution);
+	//mMoveEvaluation = std::make_shared<MoveEvaluation>(mChessBoard, mMoveGeneration);
 
-	mCPUPlayer		= std::make_shared<CPUPlayer>(mMoveGeneration, mMoveEvaluation, mChessBoard);
+	//mCPUPlayer		= std::make_shared<CPUPlayer>(mMoveGeneration, mMoveEvaluation, mChessBoard);
 
 	mWhitePlayer.setPlayerColor(PlayerColor::White);
 	mBlackPlayer.setPlayerColor(PlayerColor::Black);
@@ -36,10 +36,10 @@ void GameEngine::reset()
 
 void GameEngine::resetGame()
 {
-	mChessBoard->removeAllPiecesFromBoard();
-	mChessBoard->initializeBoard();
+	//mChessBoard->removeAllPiecesFromBoard();
+	//mChessBoard->initializeBoard();
 
-	mMoveExecution->clearMoveHistory();
+	//mMoveExecution->clearMoveHistory();
 
 	mWhitePlayer.reset();
 	mBlackPlayer.reset();
@@ -50,13 +50,13 @@ void GameEngine::resetGame()
 
 PieceType GameEngine::getCurrentPieceTypeAtPosition(const Position position)
 {
-	if (!mChessBoard)
-		return PieceType::DefaultType;
+	//if (!mChessBoard)
+	//	return PieceType::DefaultType;
 
-	auto &chessPiece = mChessBoard->getPiece(position);
+	//auto &chessPiece = mChessBoard->getPiece(position);
 
-	if (chessPiece)
-		return chessPiece->getType();
+	//if (chessPiece)
+	//	return chessPiece->getType();
 
 	return PieceType::DefaultType;
 }
@@ -67,16 +67,16 @@ std::vector<PossibleMove> GameEngine::getPossibleMoveForPosition()
 	return mAllMovesForPosition;
 }
 
-
-bool GameEngine::getBoardState(BoardStateArray boardState)
-{
-	if (!mChessBoard)
-		return false;
-
-	std::lock_guard<std::mutex> lock(mMutex);
-
-	return mChessBoard->getBoardState(boardState);
-}
+//
+//bool GameEngine::getBoardState(BoardStateArray boardState)
+//{
+//	if (!mChessBoard)
+//		return false;
+//
+//	std::lock_guard<std::mutex> lock(mMutex);
+//
+//	return mChessBoard->getBoardState(boardState);
+//}
 
 
 void GameEngine::startGame()
@@ -85,7 +85,7 @@ void GameEngine::startGame()
 
 	switchTurns();
 
-	mChessBoard->initializeBoard(); // Reset the board
+	//mChessBoard->initializeBoard(); // Reset the board
 }
 
 
@@ -114,7 +114,7 @@ PlayerColor GameEngine::getCurrentPlayer() const
 
 EndGameState GameEngine::checkForEndGameConditions()
 {
-	const Move *lastMove = mMoveExecution->getLastMove();
+	const Move *lastMove = mMoveExecution.getLastMove();
 
 	if (lastMove)
 	{
@@ -132,8 +132,8 @@ EndGameState GameEngine::checkForEndGameConditions()
 			return EndGameState::Checkmate;
 		}
 
-		mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer()); // Calculate all legal moves to check if we have a stalemate (no valid moves left)
-		bool isStaleMate = mMoveValidation->isStalemate(getCurrentPlayer());
+		mMoveGeneration.calculateAllLegalBasicMoves(getCurrentPlayer()); // Calculate all legal moves to check if we have a stalemate (no valid moves left)
+		bool isStaleMate = mMoveValidation.isStalemate(getCurrentPlayer());
 		if (isStaleMate)
 		{
 			LOG_INFO("Detected a Stalemate");
@@ -216,7 +216,7 @@ bool GameEngine::calculateAllMovesForPlayer()
 	if (!mMovesGeneratedForCurrentTurn)
 	{
 		LOG_INFO("We start calculating this player's possible moves!");
-		bool result					  = mMoveGeneration->calculateAllLegalBasicMoves(getCurrentPlayer());
+		bool result					  = mMoveGeneration.calculateAllLegalBasicMoves(getCurrentPlayer());
 		mMovesGeneratedForCurrentTurn = true;
 		return result;
 	}
@@ -230,7 +230,7 @@ bool GameEngine::initiateMove(const Position &startPosition)
 
 	mAllMovesForPosition.clear();
 
-	auto possibleMoves = mMoveGeneration->getMovesForPosition(startPosition);
+	auto possibleMoves = mMoveGeneration.getMovesForPosition(startPosition);
 
 	mAllMovesForPosition.reserve(possibleMoves.size());
 	mAllMovesForPosition = possibleMoves;
@@ -267,7 +267,7 @@ void GameEngine::executeMove(PossibleMove &tmpMove, bool fromRemote)
 	}
 
 	std::lock_guard<std::mutex> lock(mMutex);
-	Move						executedMove = mMoveExecution->executeMove(moveToExecute, fromRemote);
+	Move						executedMove = mMoveExecution.executeMove(moveToExecute, fromRemote);
 
 	LoggingHelper::logMove(executedMove);
 
@@ -291,7 +291,7 @@ void GameEngine::executeMove(PossibleMove &tmpMove, bool fromRemote)
 
 void GameEngine::undoMove()
 {
-	const Move *lastMove = mMoveExecution->getLastMove();
+	const Move *lastMove = mMoveExecution.getLastMove();
 
 	if (!lastMove)
 	{
@@ -299,17 +299,17 @@ void GameEngine::undoMove()
 		return;
 	}
 
-	mChessBoard->movePiece(lastMove->endingPosition, lastMove->startingPosition);
+	//mChessBoard->movePiece(lastMove->endingPosition, lastMove->startingPosition);
 
 	if (lastMove->capturedPiece != PieceType::DefaultType)
 	{
 		PlayerColor capturedColor  = (lastMove->player == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
-		auto		pieceToRestore = ChessPiece::CreatePiece(lastMove->capturedPiece, capturedColor);
+		//auto		pieceToRestore = ChessPiece::CreatePiece(lastMove->capturedPiece, capturedColor);
 
-		if (pieceToRestore)
-		{
-			mChessBoard->setPiece(lastMove->endingPosition, pieceToRestore);
-		}
+		//if (pieceToRestore)
+		//{
+		//	mChessBoard->setPiece(lastMove->endingPosition, pieceToRestore);
+		//}
 
 		if (lastMove->player == PlayerColor::White)
 		{
@@ -319,14 +319,15 @@ void GameEngine::undoMove()
 		{
 			mBlackPlayer.removeLastCapturedPiece();
 		}
-	}
+	}/*
 
 	auto &piece = mChessBoard->getPiece(lastMove->startingPosition);
 
 	if (piece)
 		piece->decreaseMoveCounter();
 
-	mMoveExecution->removeLastMove();
+	*/
+	mMoveExecution.removeLastMove();
 }
 
 
@@ -344,7 +345,7 @@ void GameEngine::endGame(EndGameState state, PlayerColor player)
 
 std::optional<PlayerColor> GameEngine::getWinner() const
 {
-	const Move *lastMove = mMoveExecution->getLastMove();
+	const Move *lastMove = mMoveExecution.getLastMove();
 
 	if (!lastMove)
 		return std::nullopt;
@@ -387,28 +388,28 @@ bool GameEngine::checkForPawnPromotionMove(const PossibleMove &move)
 
 void GameEngine::setCPUConfiguration(const CPUConfiguration &config)
 {
-	if (mCPUPlayer)
-		mCPUPlayer->setCPUConfiguration(config);
+	//if (mCPUPlayer)
+		mCPUPlayer.setCPUConfiguration(config);
 }
 
 
 CPUConfiguration GameEngine::getCPUConfiguration() const
 {
-	if (mCPUPlayer)
-		return mCPUPlayer->getCPUConfiguration();
+	//if (mCPUPlayer)
+		return mCPUPlayer.getCPUConfiguration();
 
-	return {};
+	//return {};
 }
 
 
 bool GameEngine::isCPUPlayer(PlayerColor player) const
 {
-	return mCPUPlayer && mCPUPlayer->isCPUPlayer(player);
+	return /*mCPUPlayer &&*/ mCPUPlayer.isCPUPlayer(player);
 }
 
 
 void GameEngine::requestCPUMoveAsync()
 {
-	if (mCPUPlayer)
-		return mCPUPlayer->requestMoveAsync();
+	//if (mCPUPlayer)
+		return mCPUPlayer.requestMoveAsync();
 }

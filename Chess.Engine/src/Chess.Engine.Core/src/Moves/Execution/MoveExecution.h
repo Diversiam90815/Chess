@@ -57,7 +57,7 @@ public:
 	 * @brief	Gets the last executed move in history.
 	 * @return	const pointer to the move, or nullptr is none
 	 */
-	const Move *getLastMove();
+	const Move *getLastMove() const;
 
 	/**
 	 * @brief	Add move to internal history (observer callback contract).

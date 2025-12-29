@@ -33,7 +33,7 @@
 class MoveGeneration
 {
 public:
-	MoveGeneration(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation, std::shared_ptr<MoveExecution> execution);
+	MoveGeneration(Chessboard &board);
 	~MoveGeneration();
 
 	/**
@@ -76,9 +76,8 @@ private:
 	void													loadMoveToMap(Position pos, std::vector<PossibleMove> moves);
 
 
-	std::shared_ptr<ChessBoard>								mChessBoard;
-	std::shared_ptr<MoveValidation>							mValidation;
-	std::shared_ptr<MoveExecution>							mExecution;
+	Chessboard											   &mChessBoard;
+
 	std::unordered_map<Position, std::vector<PossibleMove>> mAllLegalMovesForCurrentRound;
 	std::mutex												mMoveMutex;
 };

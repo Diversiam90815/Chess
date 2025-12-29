@@ -42,7 +42,7 @@ public:
 
 	std::vector<PossibleMove>  getPossibleMoveForPosition();
 
-	bool					   getBoardState(BoardStateArray boardState);
+	// bool					   getBoardState(BoardStateArray boardState);
 
 	bool					   checkForValidMoves(const PossibleMove &move);
 	bool					   checkForPawnPromotionMove(const PossibleMove &move);
@@ -74,25 +74,25 @@ public:
 
 
 private:
-	bool							mMovesGeneratedForCurrentTurn = false;
+	bool					  mMovesGeneratedForCurrentTurn = false;
 
-	Player							mWhitePlayer;
-	Player							mBlackPlayer;
+	Player					  mWhitePlayer;
+	Player					  mBlackPlayer;
 
-	PlayerColor						mCurrentPlayer = PlayerColor::NoColor;
+	PlayerColor				  mCurrentPlayer = PlayerColor::NoColor;
 
-	std::vector<PossibleMove>		mAllMovesForPosition;
+	std::vector<PossibleMove> mAllMovesForPosition;
 
-	std::shared_ptr<ChessBoard>		mChessBoard;
+	Chessboard				  mChessBoard;
 
-	std::shared_ptr<MoveGeneration> mMoveGeneration;
-	std::shared_ptr<MoveValidation> mMoveValidation;
-	std::shared_ptr<MoveExecution>	mMoveExecution;
-	std::shared_ptr<MoveEvaluation> mMoveEvaluation;
+	MoveGeneration			  mMoveGeneration;
+	MoveValidation			  mMoveValidation;
+	MoveExecution			  mMoveExecution;
+	MoveEvaluation			  mMoveEvaluation;
 
-	std::shared_ptr<CPUPlayer>		mCPUPlayer;
+	CPUPlayer				  mCPUPlayer;
 
-	std::mutex						mMutex;
+	std::mutex				  mMutex;
 
 	friend class GameManager;
 };

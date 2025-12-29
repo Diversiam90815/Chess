@@ -102,11 +102,11 @@
   1  1 1 1 1 1 1 1 1    1  0 0 0 0 0 0 0 0    1  1 1 1 1 1 1 1 1
 */
 
-class Bitboard
+class Chessboard
 {
 public:
-	Bitboard()		  = default;
-	~Bitboard()		  = default;
+	Chessboard()		  = default;
+	~Chessboard()		  = default;
 
 	using Bitboards	  = std::array<U64, 12>;
 	using Occupancies = std::array<U64, 3>;

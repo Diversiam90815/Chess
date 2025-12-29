@@ -201,7 +201,7 @@ bool MoveExecution::executePawnPromotion(const PossibleMove &move, PlayerColor p
 }
 
 
-const Move *MoveExecution::getLastMove()
+const Move *MoveExecution::getLastMove() const
 {
 	if (mMoveHistory.empty())
 		return nullptr;

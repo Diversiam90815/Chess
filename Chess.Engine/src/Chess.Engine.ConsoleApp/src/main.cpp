@@ -38,7 +38,7 @@ static void printBitboard(U64 bitboard)
 }
 
 
-static void printBoard(Bitboard &board)
+static void printBoard(Chessboard &board)
 {
 	printf("\n"); // print offset
 
@@ -86,7 +86,7 @@ static void printBoard(Bitboard &board)
 }
 
 
-static void printAttackedSquares(Bitboard &board, Side side)
+static void printAttackedSquares(Chessboard &board, Side side)
 {
 	printf("\n");
 
@@ -116,7 +116,7 @@ int main()
 {
 	std::cout << "Console app starting..\n";
 
-	Bitboard *board = new Bitboard();
+	Chessboard *board = new Chessboard();
 
 	board->init();
 

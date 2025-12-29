@@ -10,14 +10,14 @@
 #include <string.h>
 
 
-void Bitboard::init()
+void Chessboard::init()
 {
 	// parse FEN starting position
 	parseFEN(mStartPosition);
 }
 
 
-void Bitboard::clear()
+void Chessboard::clear()
 {
 	mBitBoards.fill(0);
 	mOccupancyBitboards.fill(0);
@@ -27,7 +27,7 @@ void Bitboard::clear()
 }
 
 
-void Bitboard::parseFEN(std::string_view fen)
+void Chessboard::parseFEN(std::string_view fen)
 {
 	clear();
 
@@ -118,7 +118,7 @@ void Bitboard::parseFEN(std::string_view fen)
 
 
 
-bool Bitboard::isSquareAttacked(int square, Side side) const
+bool Chessboard::isSquareAttacked(int square, Side side) const
 {
 	const auto &at		= AttackTables::instance();
 	const U64	occBoth = mOccupancyBitboards[to_index(Side::Both)];
