@@ -1,83 +1,140 @@
-/*
+﻿/*
   ==============================================================================
-	Module:         ChessBoard
-	Description:    Class characterizing a virtual chess board
+	Module:         Bitboard
+	Description:    A bitboard representing a chess board
   ==============================================================================
 */
 
 #pragma once
 
+#include <string>
+#include <algorithm>
+#include <cctype>
 #include <array>
-#include <memory>
 
-#include "Logging.h"
-#include "Move.h"
-#include "Pawn.h"
-#include "Knight.h"
-#include "Bishop.h"
-#include "Rook.h"
-#include "Queen.h"
-#include "King.h"
+#include "BitboardTypes.h"
+#include "AttackTables.h"
 
+/*
+							ALL TOGETHER
 
-#define CHESSBOARD_DEBUG false
+						8  ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+						7  ♟︎ ♟︎ ♟︎ ♟︎ ♟︎ ♟︎ ♟︎ ♟︎
+						6  . . . . . . . .
+						5  . . . . . . . .
+						4  . . . . . . . .
+						3  . . . . . . . .
+						2  ♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙
+						1  ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
 
-
-using PlayerPiece	  = std::pair<Position, std::shared_ptr<ChessPiece>>;
-using BoardStateArray = int[BOARD_SIZE][BOARD_SIZE];
-
-
-/// <summary>
-/// Represents a square on a chessboard, including its position and an optional chess piece.
-/// </summary>
-struct Square
-{
-	Position					pos;
-	std::shared_ptr<ChessPiece> piece;
-
-	Square(int x, int y) : pos{x, y}, piece(nullptr) {}
-
-	Square() : pos{0, 0}, piece(nullptr) {}
-};
+						   a b c d e f g h
 
 
-/// <summary>
-/// Represents a chessboard and provides methods to manage and query its state, including piece placement, movement, and board initialization.
-/// </summary>
-class ChessBoard
+							WHITE PIECES
+
+		Pawns                  Knights              Bishops
+
+  8  0 0 0 0 0 0 0 0    8  0 0 0 0 0 0 0 0    8  0 0 0 0 0 0 0 0
+  7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0
+  6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0
+  5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0
+  4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0
+  3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0
+  2  1 1 1 1 1 1 1 1    2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0
+  1  0 0 0 0 0 0 0 0    1  0 1 0 0 0 0 1 0    1  0 0 1 0 0 1 0 0
+
+	 a b c d e f g h       a b c d e f g h       a b c d e f g h
+
+		 Rooks                 Queens                 King
+
+  8  0 0 0 0 0 0 0 0    8  0 0 0 0 0 0 0 0    8  0 0 0 0 0 0 0 0
+  7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0
+  6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0
+  5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0
+  4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0
+  3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0
+  2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0
+  1  1 0 0 0 0 0 0 1    1  0 0 0 1 0 0 0 0    1  0 0 0 0 1 0 0 0
+
+	 a b c d e f g h       a b c d e f g h       a b c d e f g h
+
+
+							BLACK PIECES
+
+		Pawns                  Knights              Bishops
+
+  8  0 0 0 0 0 0 0 0    8  0 1 0 0 0 0 1 0    8  0 0 1 0 0 1 0 0
+  7  1 1 1 1 1 1 1 1    7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0
+  6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0
+  5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0
+  4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0
+  3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0
+  2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0
+  1  0 0 0 0 0 0 0 0    1  0 0 0 0 0 0 0 0    1  0 0 0 0 0 0 0 0
+
+	 a b c d e f g h       a b c d e f g h       a b c d e f g h
+
+		 Rooks                 Queens                 King
+
+  8  1 0 0 0 0 0 0 1    8  0 0 0 1 0 0 0 0    8  0 0 0 0 1 0 0 0
+  7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0
+  6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0
+  5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0
+  4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0
+  3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0
+  2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0
+  1  0 0 0 0 0 0 0 0    1  0 0 0 0 0 0 0 0    1  0 0 0 0 0 0 0 0
+
+	 a b c d e f g h       a b c d e f g h       a b c d e f g h
+
+
+							 OCCUPANCIES
+
+	 White occupancy       Black occupancy       All occupancies
+
+  8  0 0 0 0 0 0 0 0    8  1 1 1 1 1 1 1 1    8  1 1 1 1 1 1 1 1
+  7  0 0 0 0 0 0 0 0    7  1 1 1 1 1 1 1 1    7  1 1 1 1 1 1 1 1
+  6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0
+  5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0
+  4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0
+  3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0
+  2  1 1 1 1 1 1 1 1    2  0 0 0 0 0 0 0 0    2  1 1 1 1 1 1 1 1
+  1  1 1 1 1 1 1 1 1    1  0 0 0 0 0 0 0 0    1  1 1 1 1 1 1 1 1
+*/
+
+class Bitboard
 {
 public:
-	ChessBoard();
-	ChessBoard(const ChessBoard &other);
-	~ChessBoard();
+	Bitboard()		  = default;
+	~Bitboard()		  = default;
 
-	void						 initializeBoard();
+	using Bitboards	  = std::array<U64, 12>;
+	using Occupancies = std::array<U64, 3>;
 
-	Square						&getSquare(Position pos);
+	void			   init();
+	void			   clear();
 
-	void						 setPiece(Position pos, std::shared_ptr<ChessPiece> piece);
-	std::shared_ptr<ChessPiece> &getPiece(Position pos);
+	void			   parseFEN(std::string_view fen);
 
-	std::vector<PlayerPiece>	 getPiecesFromPlayer(PlayerColor playerColor);
+	// IS the current given square attacked by the current given side
+	bool			   isSquareAttacked(int square, Side side) const;
 
-	bool						 movePiece(Position start, Position end);
-	void						 removePiece(Position pos);
+	const Bitboards	  &pieces() const noexcept { return mBitBoards; }
+	const Occupancies &occ() const noexcept { return mOccupancyBitboards; }
 
-	bool						 isEmpty(Position pos) const;
-
-	void						 updateKingsPosition(Position &pos, PlayerColor player);
-	Position					 getKingsPosition(PlayerColor player) const;
-
-	void						 removeAllPiecesFromBoard();
-
-	bool						 getBoardState(BoardStateArray boardState);
+	Side			   getCurrentSide() const noexcept { return side; }
+	Castling		   getCurrentCastlingRights() const noexcept { return castle; }
+	int				   getCurrentEnPassantSqaure() const noexcept { return enPassant; }
 
 private:
-	std::vector<std::vector<Square>> squares;
+	Bitboards		  mBitBoards{};					   // Array of all bitboards
+	Occupancies		  mOccupancyBitboards{};		   // Occupancies
 
-	Position						 mWhiteKingPosition = Position{-1, -1};
+	Side			  side			 = Side::None;	   // side to move
+	int				  enPassant		 = no_square;	   // enpassant square
+	Castling		  castle		 = Castling::None; // castling rights
 
-	Position						 mBlackKingPosition = Position{-1, -1};
-
-	bool							 mInitialized		= false;
+	// FEN positions
+	const std::string mEmptyBoard	 = "8/8/8/8/8/8/8/8 w - - ";
+	const std::string mStartPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 };

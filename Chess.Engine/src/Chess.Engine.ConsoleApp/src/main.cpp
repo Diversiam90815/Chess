@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-#include "Bitboard.h"
+#include "Chessboard.h"
 #include "BitboardHelper.h"
 
 

@@ -3,7 +3,6 @@ set(TARGET_NAME Chess.Engine.Core)
 set (SOURCE_DIR						${CMAKE_CURRENT_SOURCE_DIR}/src)
 set (SUBMODULES_DIR					${CMAKE_CURRENT_SOURCE_DIR}/submodule)
 	
-set (PIECE_DIR						${SOURCE_DIR}/Piece)
 set (MOVE_DIR						${SOURCE_DIR}/Moves)
 set (GAME_MANAGER_DIR				${SOURCE_DIR}/GameManager)
 set (GAME_ENGINE_DIR				${SOURCE_DIR}/GameEngine)
@@ -21,7 +20,6 @@ set (POSITIONALEVALUATION_DIR       ${SOURCE_DIR}/PositionalEvaluation)
 
 
 set(ALL_PROJECT_DIRS 
-			${PIECE_DIR}
 			${MOVE_DIR}
 			${GAME_MANAGER_DIR}
 			${GAME_ENGINE_DIR}
@@ -50,25 +48,13 @@ set(GAMEENGINE_FILES
 	${GAME_ENGINE_DIR}/GameEngine.h	${GAME_ENGINE_DIR}/GameEngine.cpp
 )
 
-set(PIECE_FILES
-	${PIECE_DIR}/ChessPiece.h   ${PIECE_DIR}/ChessPiece.cpp
-	${PIECE_DIR}/Pawn.h         ${PIECE_DIR}/Pawn.cpp
-	${PIECE_DIR}/Knight.h       ${PIECE_DIR}/Knight.cpp
-	${PIECE_DIR}/Bishop.h       ${PIECE_DIR}/Bishop.cpp
-	${PIECE_DIR}/Rook.h         ${PIECE_DIR}/Rook.cpp
-	${PIECE_DIR}/Queen.h        ${PIECE_DIR}/Queen.cpp
-	${PIECE_DIR}/King.h         ${PIECE_DIR}/King.cpp
-)
-
 set(BOARD_FILES
 	${BOARD_DIR}/BitboardHelper.h
 	${BOARD_DIR}/BitboardUtils.h
 	${BOARD_DIR}/BitboardTypes.h
 	${BOARD_DIR}/MagicGenerator.h
-	${BOARD_DIR}/Bitboard.h				${BOARD_DIR}/Bitboard.cpp
+	${BOARD_DIR}/Chessboard.h			${BOARD_DIR}/Chessboard.cpp
 	${BOARD_DIR}/AttackTables.h			${BOARD_DIR}/AttackTables.cpp
-	${BOARD_DIR}/ChessBoard.h			${BOARD_DIR}/ChessBoard.cpp
-	${BOARD_DIR}/LightChessBoard.h		${BOARD_DIR}/LightChessBoard.cpp
 )
 	
 set(MOVE_FILES
@@ -146,7 +132,6 @@ set(MULTIPLAYER_FILES
 )
 
 set(ALL_FILES
-	${PIECE_FILES}
 	${GAMEENGINE_FILES}
 	${BOARD_FILES}
 	${MOVE_FILES}
