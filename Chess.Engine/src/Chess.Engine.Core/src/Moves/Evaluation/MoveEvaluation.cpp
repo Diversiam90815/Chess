@@ -9,7 +9,7 @@
 #include "MoveEvaluation.h"
 
 
-MoveEvaluation::MoveEvaluation(Chessboard &board, std::shared_ptr<MoveGeneration> generation) : mBoard(board), mGeneration(generation) {}
+MoveEvaluation::MoveEvaluation(Chessboard &board, MoveGeneration &generation) : mBoard(board), mGeneration(generation) {}
 
 
 int MoveEvaluation::getBasicEvaluation(const PossibleMove &move)
@@ -29,7 +29,7 @@ int MoveEvaluation::getBasicEvaluation(const PossibleMove &move)
 		score += CHECKMATE_BONUS;
 
 	//// Promotion bonus
-	//if ((move.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
+	// if ((move.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
 	//{
 	//	score += PROMOTION_BONUS;
 
@@ -74,7 +74,7 @@ int MoveEvaluation::getAdvancedEvaluation(const PossibleMove &move, PlayerColor 
 }
 
 //
-//int MoveEvaluation::getPositionValue(PieceType piece, const Position &pos, PlayerColor player) const
+// int MoveEvaluation::getPositionValue(PieceType piece, const Position &pos, PlayerColor player) const
 //{
 //	// Ensure position is valid
 //	if (!pos.isValid())
@@ -734,13 +734,13 @@ bool MoveEvaluation::analyzeThreatReduction(const ThreatAnalysis &before, const 
 
 	bool reducedTotalThreats = after.threatenedPieces.size() < before.threatenedPieces.size();
 
-	bool physicalBlock		 = physicallyBlocksAttack(move, player, *mBoard);
+	bool physicalBlock		 = physicallyBlocksAttack(move, player);
 
 	return reducedKingThreats || reducedTotalThreats || physicalBlock;
 }
 
 
-bool MoveEvaluation::physicallyBlocksAttack(const PossibleMove &move, PlayerColor player, Chessboard &board)
+bool MoveEvaluation::physicallyBlocksAttack(const PossibleMove &move, PlayerColor player)
 {
 	// Position	ourKing		   = board.getKingsPosition(player);
 	// PlayerColor oponent		   = getOpponentColor(player);
@@ -830,6 +830,8 @@ std::vector<Position> MoveEvaluation::calculateThreatsOnBoard(PlayerColor oppone
 	//}
 
 	// return threats;
+
+	return {};
 }
 
 
@@ -988,8 +990,8 @@ std::vector<Position> MoveEvaluation::getAttackedSquares(const Position &piecePo
 	std::vector<Position>	  attackedSquares;
 	std::vector<PossibleMove> moves;
 
-	mGeneration->calculateAllLegalBasicMoves(player);
-	moves = mGeneration->getMovesForPosition(piecePos);
+	mGeneration.calculateAllLegalBasicMoves(player);
+	moves = mGeneration.getMovesForPosition(piecePos);
 
 	attackedSquares.reserve(moves.size());
 
@@ -1135,16 +1137,16 @@ bool MoveEvaluation::areCollinear(const Position &pos1, const Position &pos2, Pi
 
 PlayerColor MoveEvaluation::getPieceColorFromPosition(const Position &pos) const
 {
-	//auto &piece = mBoard->getPiece(pos);
+	// auto &piece = mBoard->getPiece(pos);
 
-	//if (piece)
+	// if (piece)
 	//	return piece->getColor();
 	//
 	return PlayerColor::None;
 }
 
 //
-//int MoveEvaluation::getPieceValue(PieceType piece) const
+// int MoveEvaluation::getPieceValue(PieceType piece) const
 //{
 //	switch (piece)
 //	{

@@ -13,7 +13,7 @@ std::string LoggingHelper::playerColourToString(PlayerColor player)
 {
 	switch (player)
 	{
-	case PlayerColor::NoColor: return "No Color";
+	case PlayerColor::None: return "None";
 	case PlayerColor::White: return "White";
 	case PlayerColor::Black: return "Black";
 	default: return "Unknown PlayerColor";

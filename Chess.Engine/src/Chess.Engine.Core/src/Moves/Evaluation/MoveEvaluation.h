@@ -37,7 +37,7 @@ enum class GamePhase
 class MoveEvaluation
 {
 public:
-	MoveEvaluation(Chessboard& board, std::shared_ptr<MoveGeneration> generation);
+	MoveEvaluation(Chessboard &board, MoveGeneration &generation);
 	~MoveEvaluation() = default;
 
 	int		  getBasicEvaluation(const PossibleMove &move);
@@ -46,8 +46,8 @@ public:
 
 	int		  getAdvancedEvaluation(const PossibleMove &move, PlayerColor player);
 
-	//int		  getPieceValue(PieceType piece) const;
-	//int		  getPositionValue(PieceType piece, const Position &pos, PlayerColor player) const;
+	// int		  getPieceValue(PieceType piece) const;
+	// int		  getPositionValue(PieceType piece, const Position &pos, PlayerColor player) const;
 	int		  evaluateMaterialGain(const PossibleMove &move);
 	int		  evaluatePositionalGain(const PossibleMove &move, PlayerColor player);
 	int		  evaluateThreatLevel(const PossibleMove &move, PlayerColor player);
@@ -97,7 +97,7 @@ private:
 	ThreatAnalysis		  calculateCurrentThreats(PlayerColor opponent, PlayerColor player);
 	ThreatAnalysis		  calculateThreatsAfterMove(const PossibleMove &move, PlayerColor player, PlayerColor opponent);
 	bool				  analyzeThreatReduction(const ThreatAnalysis &before, const ThreatAnalysis &after, const Position &ourKing, const PossibleMove &move, PlayerColor player);
-	bool				  physicallyBlocksAttack(const PossibleMove &move, PlayerColor player, Chessboard &board);
+	bool				  physicallyBlocksAttack(const PossibleMove &move, PlayerColor player);
 	std::vector<Position> calculateThreatsOnBoard(PlayerColor opponent, PlayerColor player, Chessboard &board);
 	std::vector<Position> calculateThreatsOnBoard(PlayerColor opponent, PlayerColor player);
 
@@ -116,10 +116,10 @@ private:
 	PlayerColor			  getOpponentColor(PlayerColor player) const;
 	bool				  areCollinear(const Position &pos1, const Position &pos2, PieceType pieceType);
 
-	//PieceType			  getPieceTypeFromPosition(const Position &pos) const;
+	// PieceType			  getPieceTypeFromPosition(const Position &pos) const;
 	PlayerColor			  getPieceColorFromPosition(const Position &pos) const;
 
 
-	Chessboard&		mBoard;
-	std::shared_ptr<MoveGeneration> mGeneration;
+	Chessboard			 &mBoard;
+	MoveGeneration		 &mGeneration;
 };

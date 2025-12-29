@@ -8,10 +8,9 @@
 #include "CPUPlayer.h"
 
 
-CPUPlayer::CPUPlayer(std::shared_ptr<MoveGeneration> moveGeneration, std::shared_ptr<MoveEvaluation> moveEvaluation, std::shared_ptr<ChessBoard> board)
-	: mMoveGeneration(moveGeneration), mMoveEvaluation(moveEvaluation), mBoard(board), mRandomGenerator(mRandomDevice())
+CPUPlayer::CPUPlayer(MoveGeneration &moveGeneration, MoveEvaluation &moveEvaluation, Chessboard &board)
+	: mMoveGeneration(moveGeneration), mMoveEvaluation(moveEvaluation), mBoard(board), mRandomGenerator(mRandomDevice()), mPositionalEvaluation(mMoveEvaluation)
 {
-	mPositionalEvaluation = std::make_shared<PositionalEvaluation>(mMoveEvaluation);
 }
 
 CPUPlayer::~CPUPlayer()
@@ -82,7 +81,7 @@ PossibleMove CPUPlayer::getBestEvaluatedMove(const std::vector<PossibleMove> &mo
 
 	for (const auto &move : moves)
 	{
-		int score = mMoveEvaluation->getAdvancedEvaluation(move, mConfig.cpuColor);
+		int score = mMoveEvaluation.getAdvancedEvaluation(move, mConfig.cpuColor);
 		evaluatedMoves.emplace_back(move, score);
 	}
 
@@ -94,477 +93,485 @@ PossibleMove CPUPlayer::getBestEvaluatedMove(const std::vector<PossibleMove> &mo
 
 PossibleMove CPUPlayer::getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken)
 {
-	if (moves.empty())
-		return {};
+	// if (moves.empty())
+	//	return {};
 
-	// Reset search statistics
-	mNodesSearched	   = 0;
-	mTranspositionHits = 0;
+	//// Reset search statistics
+	// mNodesSearched	   = 0;
+	// mTranspositionHits = 0;
 
-	// Create lightweight board from current board data
-	LightChessBoard			  lightBoard(*mBoard);
+	//// Basic ordering : captures first
+	// std::vector<PossibleMove> sortedMoves = moves;
+	// std::stable_sort(sortedMoves.begin(), sortedMoves.end(),
+	//				 [&](const PossibleMove &a, const PossibleMove &b)
+	//				 {
+	//					 int scoreA = mMoveEvaluation->getMediumEvaluation(a, mConfig.cpuColor, &lightBoard);
+	//					 int scoreB = mMoveEvaluation->getMediumEvaluation(b, mConfig.cpuColor, &lightBoard);
+	//					 return scoreA > scoreB;
+	//				 });
 
-	// Basic ordering : captures first
-	std::vector<PossibleMove> sortedMoves = moves;
-	std::stable_sort(sortedMoves.begin(), sortedMoves.end(),
-					 [&](const PossibleMove &a, const PossibleMove &b)
-					 {
-						 int scoreA = mMoveEvaluation->getMediumEvaluation(a, mConfig.cpuColor, &lightBoard);
-						 int scoreB = mMoveEvaluation->getMediumEvaluation(b, mConfig.cpuColor, &lightBoard);
-						 return scoreA > scoreB;
-					 });
+	// PossibleMove bestMove  = moves[0];
+	// int			 bestScore = -std::numeric_limits<int>::max();
 
-	PossibleMove bestMove  = moves[0];
-	int			 bestScore = -std::numeric_limits<int>::max();
+	// LOG_INFO("Starting minimax search with depth {}", depth);
 
-	LOG_INFO("Starting minimax search with depth {}", depth);
+	// for (const auto &move : sortedMoves)
+	//{
+	//	if (cancelled(stopToken))
+	//		break;
 
-	for (const auto &move : sortedMoves)
-	{
-		if (cancelled(stopToken))
-			break;
+	//	// make the move
+	//	auto undoInfo = lightBoard.makeMove(move);
 
-		// make the move
-		auto undoInfo = lightBoard.makeMove(move);
+	//	// Evaluate using minimax (opp's turn -> minimizing)
+	//	int	 score	  = minimax(move, lightBoard, depth - 1, false, mConfig.cpuColor, stopToken);
 
-		// Evaluate using minimax (opp's turn -> minimizing)
-		int	 score	  = minimax(move, lightBoard, depth - 1, false, mConfig.cpuColor, stopToken);
+	//	// unmake move
+	//	lightBoard.unmakeMove(undoInfo);
 
-		// unmake move
-		lightBoard.unmakeMove(undoInfo);
+	//	// update best move if this is better
+	//	if (score > bestScore)
+	//	{
+	//		bestScore = score;
+	//		bestMove  = move;
+	//	}
 
-		// update best move if this is better
-		if (score > bestScore)
-		{
-			bestScore = score;
-			bestMove  = move;
-		}
+	//	LOG_DEBUG("Move from {} to {} scored: {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
+	//}
 
-		LOG_DEBUG("Move from {} to {} scored: {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
-	}
+	// LOG_INFO("Minimax search completed. Best score: {}, Nodes searched: {}", bestScore, mNodesSearched);
 
-	LOG_INFO("Minimax search completed. Best score: {}, Nodes searched: {}", bestScore, mNodesSearched);
+	// return bestMove;
 
-	return bestMove;
+	return {};
 }
 
 
 PossibleMove CPUPlayer::getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken)
 {
-	if (moves.empty())
-		return {};
+	// if (moves.empty())
+	//	return {};
 
-	// reset statistics
-	mNodesSearched	   = 0;
-	mTranspositionHits = 0;
+	//// reset statistics
+	// mNodesSearched	   = 0;
+	// mTranspositionHits = 0;
 
-	// create lightweight board from current board
-	LightChessBoard			  lightBoard(*mBoard);
+	// std::vector<PossibleMove> sortedMoves = moves;
 
-	std::vector<PossibleMove> sortedMoves = moves;
+	//// Sort moves for better pruning
+	// std::sort(sortedMoves.begin(), sortedMoves.end(),
+	//		  [&](const PossibleMove &a, const PossibleMove &b)
+	//		  {
+	//			  int scoreA = mMoveEvaluation->getAdvancedEvaluation(a, mConfig.cpuColor, &lightBoard);
+	//			  int scoreB = mMoveEvaluation->getAdvancedEvaluation(b, mConfig.cpuColor, &lightBoard);
+	//			  return scoreA > scoreB;
+	//		  });
 
-	// Sort moves for better pruning
-	std::sort(sortedMoves.begin(), sortedMoves.end(),
-			  [&](const PossibleMove &a, const PossibleMove &b)
-			  {
-				  int scoreA = mMoveEvaluation->getAdvancedEvaluation(a, mConfig.cpuColor, &lightBoard);
-				  int scoreB = mMoveEvaluation->getAdvancedEvaluation(b, mConfig.cpuColor, &lightBoard);
-				  return scoreA > scoreB;
-			  });
+	// PossibleMove bestMove  = sortedMoves[0];
+	// int			 bestScore = -std::numeric_limits<int>::max();
+	// int			 alpha	   = -std::numeric_limits<int>::max();
+	// int			 beta	   = std::numeric_limits<int>::max();
 
-	PossibleMove bestMove  = sortedMoves[0];
-	int			 bestScore = -std::numeric_limits<int>::max();
-	int			 alpha	   = -std::numeric_limits<int>::max();
-	int			 beta	   = std::numeric_limits<int>::max();
+	// LOG_INFO("Starting alpha-beta search with depth {}", depth);
 
-	LOG_INFO("Starting alpha-beta search with depth {}", depth);
+	// for (const auto &move : sortedMoves)
+	//{
+	//	if (cancelled(stopToken)) // Check if thread was asked to cancel operation
+	//		break;
 
-	for (const auto &move : sortedMoves)
-	{
-		if (cancelled(stopToken)) // Check if thread was asked to cancel operation
-			break;
+	//	// make move
+	//	auto undoInfo = lightBoard.makeMove(move);
 
-		// make move
-		auto undoInfo = lightBoard.makeMove(move);
+	//	// evaluate using alpha-beta (opp's turn, so minimizing)
+	//	int	 score	  = alphaBeta(move, lightBoard, depth - 1, alpha, beta, false, mConfig.cpuColor, stopToken);
 
-		// evaluate using alpha-beta (opp's turn, so minimizing)
-		int	 score	  = alphaBeta(move, lightBoard, depth - 1, alpha, beta, false, mConfig.cpuColor, stopToken);
+	//	// unmake move
+	//	lightBoard.unmakeMove(undoInfo);
 
-		// unmake move
-		lightBoard.unmakeMove(undoInfo);
+	//	// update best move if this is better
+	//	if (score > bestScore)
+	//	{
+	//		bestScore = score;
+	//		bestMove  = move;
+	//	}
 
-		// update best move if this is better
-		if (score > bestScore)
-		{
-			bestScore = score;
-			bestMove  = move;
-		}
+	//	// update alpha for pruning at root level
+	//	alpha = std::max(alpha, score);
 
-		// update alpha for pruning at root level
-		alpha = std::max(alpha, score);
+	//	LOG_DEBUG("Move from {} to {} scored: {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
+	//}
 
-		LOG_DEBUG("Move from {} to {} scored: {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
-	}
+	// LOG_INFO("Alpha-Beta search completed. Best score: {}, Nodes searched: {}, Transposition hits: {}", bestScore, mNodesSearched, mTranspositionHits);
 
-	LOG_INFO("Alpha-Beta search completed. Best score: {}, Nodes searched: {}, Transposition hits: {}", bestScore, mNodesSearched, mTranspositionHits);
+	// return bestMove;
 
-	return bestMove;
+	return {};
 }
 
 
-int CPUPlayer::evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player)
+int CPUPlayer::evaluatePlayerPosition(PlayerColor player)
 {
-	uint64_t hash = board.getHashKey();
+	// uint64_t hash = board.getHashKey();
 
-	// Check evaluation cache
-	auto	 it	  = mEvaluationCache.find(hash);
-	if (it != mEvaluationCache.end())
-		return it->second;
+	//// Check evaluation cache
+	// auto	 it	  = mEvaluationCache.find(hash);
+	// if (it != mEvaluationCache.end())
+	//	return it->second;
 
-	int score = mPositionalEvaluation->evaluatePosition(board, player);
+	// int score = mPositionalEvaluation->evaluatePosition(board, player);
 
-	// Cache the result
-	if (mEvaluationCache.size() < MAX_EVAL_CACHE_SIZE)
-		mEvaluationCache[hash] = score;
+	//// Cache the result
+	// if (mEvaluationCache.size() < MAX_EVAL_CACHE_SIZE)
+	//	mEvaluationCache[hash] = score;
 
-	return score;
+	// return score;
+
+	return 0;
 }
 
 
 PossibleMove CPUPlayer::computeBestMove(PlayerColor player, std::stop_token stopToken)
 {
-	PossibleMove selectedMove{};
+	//	PossibleMove selectedMove{};
+	//
+	//	// Generate all legal moves
+	//	mMoveGeneration->calculateAllLegalBasicMoves(player);
+	//
+	//	if (cancelled(stopToken)) // Check if thread was asked to cancel operation
+	//		return {};
+	//
+	//	// Get all possible moves for all pieces
+	//	auto					  playerPieces = mBoard->getPiecesFromPlayer(player);
+	//	std::vector<PossibleMove> allMoves;
+	//
+	//	for (const auto &[position, piece] : playerPieces)
+	//	{
+	//		auto moves = mMoveGeneration->getMovesForPosition(position);
+	//		allMoves.insert(allMoves.end(), moves.begin(), moves.end());
+	//	}
+	//
+	//	if (allMoves.empty())
+	//	{
+	//		LOG_WARNING("No legal moves available for CPU player!");
+	//		return {};
+	//	}
+	//
+	//	// Clear evaluation cache before starting a new search
+	//	mEvaluationCache.clear();
+	//
+	//// Add debugging to see move evaluation spread
+	// #if DEBUG_MOVES
+	//
+	//	LOG_DEBUG("=== Move Evaluation Debug ===");
+	//	for (const auto &move : allMoves)
+	//	{
+	//		LightChessBoard testBoard(*mBoard);
+	//		int				score = evaluatePlayerPosition(testBoard, player);
+	//		LOG_DEBUG("Move {}->{}: positional score = {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
+	//	}
+	//	LOG_DEBUG("=== End Debug ===");
+	//
+	// #endif
+	//
+	//	if (cancelled(stopToken)) // Check if thread was asked to cancel operation
+	//		return {};
+	//
+	//	// Select move based on difficulty
+	//	switch (mConfig.difficulty)
+	//	{
+	//	case CPUDifficulty::Random: selectedMove = getRandomMove(allMoves); break;
+	//	case CPUDifficulty::Easy: selectedMove = getMiniMaxMove(allMoves, 3, stopToken); break;
+	//	case CPUDifficulty::Medium: selectedMove = getAlphaBetaMove(allMoves, 3, stopToken); break;
+	//	case CPUDifficulty::Hard: selectedMove = getAlphaBetaMove(allMoves, 6, stopToken); break;
+	//	default: selectedMove = getRandomMove(allMoves); break;
+	//	}
+	//
+	//	// Set promotion piece for pawn promotion moves
+	//	if ((selectedMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
+	//	{
+	//		selectedMove.promotionPiece = PieceType::Queen; // CPU always promotes to Queen
+	//		LOG_INFO("CPU selected pawn promotion to Queen");
+	//	}
+	//
+	//	return cancelled(stopToken) ? PossibleMove{} : selectedMove;
 
-	// Generate all legal moves
-	mMoveGeneration->calculateAllLegalBasicMoves(player);
-
-	if (cancelled(stopToken)) // Check if thread was asked to cancel operation
-		return {};
-
-	// Get all possible moves for all pieces
-	auto					  playerPieces = mBoard->getPiecesFromPlayer(player);
-	std::vector<PossibleMove> allMoves;
-
-	for (const auto &[position, piece] : playerPieces)
-	{
-		auto moves = mMoveGeneration->getMovesForPosition(position);
-		allMoves.insert(allMoves.end(), moves.begin(), moves.end());
-	}
-
-	if (allMoves.empty())
-	{
-		LOG_WARNING("No legal moves available for CPU player!");
-		return {};
-	}
-
-	// Clear evaluation cache before starting a new search
-	mEvaluationCache.clear();
-
-// Add debugging to see move evaluation spread
-#if DEBUG_MOVES
-
-	LOG_DEBUG("=== Move Evaluation Debug ===");
-	for (const auto &move : allMoves)
-	{
-		LightChessBoard testBoard(*mBoard);
-		int				score = evaluatePlayerPosition(testBoard, player);
-		LOG_DEBUG("Move {}->{}: positional score = {}", LoggingHelper::positionToString(move.start).c_str(), LoggingHelper::positionToString(move.end).c_str(), score);
-	}
-	LOG_DEBUG("=== End Debug ===");
-
-#endif
-
-	if (cancelled(stopToken)) // Check if thread was asked to cancel operation
-		return {};
-
-	// Select move based on difficulty
-	switch (mConfig.difficulty)
-	{
-	case CPUDifficulty::Random: selectedMove = getRandomMove(allMoves); break;
-	case CPUDifficulty::Easy: selectedMove = getMiniMaxMove(allMoves, 3, stopToken); break;
-	case CPUDifficulty::Medium: selectedMove = getAlphaBetaMove(allMoves, 3, stopToken); break;
-	case CPUDifficulty::Hard: selectedMove = getAlphaBetaMove(allMoves, 6, stopToken); break;
-	default: selectedMove = getRandomMove(allMoves); break;
-	}
-
-	// Set promotion piece for pawn promotion moves
-	if ((selectedMove.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
-	{
-		selectedMove.promotionPiece = PieceType::Queen; // CPU always promotes to Queen
-		LOG_INFO("CPU selected pawn promotion to Queen");
-	}
-
-	return cancelled(stopToken) ? PossibleMove{} : selectedMove;
+	return {};
 }
 
 
-int CPUPlayer::minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player, std::stop_token stopToken)
+int CPUPlayer::minimax(const PossibleMove &move, int depth, bool maximizing, PlayerColor player, std::stop_token stopToken)
 {
-	if (cancelled(stopToken))
-		return 0;
+	// if (cancelled(stopToken))
+	//	return 0;
 
-	mNodesSearched++;
+	// mNodesSearched++;
 
-	// Terminal depth reached -> evaluate static position
-	if (depth == 0)
-		return evaluatePlayerPosition(board, player);
+	//// Terminal depth reached -> evaluate static position
+	// if (depth == 0)
+	//	return evaluatePlayerPosition(player);
 
-	// Generate legal moves for player
-	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
+	//// Generate legal moves for player
+	// auto moves = board.generateLegalMoves(board.getCurrentPlayer());
 
-	// Terminal position check (checkmate/stalemate)
-	if (moves.empty())
-	{
-		if (board.isInCheck(board.getCurrentPlayer()))
-			return maximizing ? (-10000 + depth) : (10000 - depth); // depth bias keeps faster mates
-		return 0;													// stalemate
-	}
+	//// Terminal position check (checkmate/stalemate)
+	// if (moves.empty())
+	//{
+	//	if (board.isInCheck(board.getCurrentPlayer()))
+	//		return maximizing ? (-10000 + depth) : (10000 - depth); // depth bias keeps faster mates
+	//	return 0;													// stalemate
+	// }
 
-	if (maximizing)
-	{
-		int maxEval = -std::numeric_limits<int>::max();
+	// if (maximizing)
+	//{
+	//	int maxEval = -std::numeric_limits<int>::max();
 
-		for (const auto &currentMove : moves)
-		{
-			if (cancelled(stopToken)) // Check if thread was asked to quit operation
-				break;
+	//	for (const auto &currentMove : moves)
+	//	{
+	//		if (cancelled(stopToken)) // Check if thread was asked to quit operation
+	//			break;
 
-			// make move
-			auto undoInfo = board.makeMove(currentMove);
+	//		// make move
+	//		auto undoInfo = board.makeMove(currentMove);
 
-			// recursively evaluate (switch to minimizing player)
-			int	 eval	  = minimax(currentMove, board, depth - 1, false, player, stopToken);
-			maxEval		  = std::max(maxEval, eval);
+	//		// recursively evaluate (switch to minimizing player)
+	//		int	 eval	  = minimax(currentMove, board, depth - 1, false, player, stopToken);
+	//		maxEval		  = std::max(maxEval, eval);
 
-			// Unmake move
-			board.unmakeMove(undoInfo);
-		}
+	//		// Unmake move
+	//		board.unmakeMove(undoInfo);
+	//	}
 
-		return maxEval;
-	}
-	else
-	{
-		int minEval = std::numeric_limits<int>::max();
+	//	return maxEval;
+	//}
+	// else
+	//{
+	//	int minEval = std::numeric_limits<int>::max();
 
-		for (const auto &currentMove : moves)
-		{
-			if (cancelled(stopToken)) // Check if thread was asked to quit operation
-				break;
+	//	for (const auto &currentMove : moves)
+	//	{
+	//		if (cancelled(stopToken)) // Check if thread was asked to quit operation
+	//			break;
 
-			// make move
-			auto undoInfo = board.makeMove(currentMove);
+	//		// make move
+	//		auto undoInfo = board.makeMove(currentMove);
 
-			// recursively evaluate (switch to maximizing player)
-			int	 eval	  = minimax(currentMove, board, depth - 1, true, player, stopToken);
-			minEval		  = std::min(minEval, eval);
+	//		// recursively evaluate (switch to maximizing player)
+	//		int	 eval	  = minimax(currentMove, board, depth - 1, true, player, stopToken);
+	//		minEval		  = std::min(minEval, eval);
 
-			// unmake move
-			board.unmakeMove(undoInfo);
-		}
+	//		// unmake move
+	//		board.unmakeMove(undoInfo);
+	//	}
 
-		return minEval;
-	}
+	//	return minEval;
+	//}
+
+	return 0;
 }
 
 
-int CPUPlayer::alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player, std::stop_token stopToken)
+int CPUPlayer::alphaBeta(const PossibleMove &move, int depth, int alpha, int beta, bool maximizing, PlayerColor player, std::stop_token stopToken)
 {
-	if (cancelled(stopToken))
-		return 0;
+	// if (cancelled(stopToken))
+	//	return 0;
 
-	mNodesSearched++;
+	// mNodesSearched++;
 
-	// Check transposition table first
-	uint64_t	 hashKey = board.getHashKey();
-	int			 storedScore{0};
-	PossibleMove storedMove{};
+	//// Check transposition table first
+	// uint64_t	 hashKey = board.getHashKey();
+	// int			 storedScore{0};
+	// PossibleMove storedMove{};
 
-	if (lookupTransposition(hashKey, depth, storedScore, storedMove))
-	{
-		mTranspositionHits++;
-		return storedScore;
-	}
+	// if (lookupTransposition(hashKey, depth, storedScore, storedMove))
+	//{
+	//	mTranspositionHits++;
+	//	return storedScore;
+	// }
 
-	// Terminal depth reached -> evaluate static positon
-	if (depth == 0)
-	{
-		int score = quiescence(board, alpha, beta, player, stopToken);
-		storeTransposition(hashKey, depth, score, TranspositionEntry::NodeType::Exact, PossibleMove{});
-		return score;
-	}
+	//// Terminal depth reached -> evaluate static positon
+	// if (depth == 0)
+	//{
+	//	int score = quiescence(alpha, beta, player, stopToken);
+	//	storeTransposition(hashKey, depth, score, TranspositionEntry::NodeType::Exact, PossibleMove{});
+	//	return score;
+	// }
 
-	// Generate legal mvoes for current player
-	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
+	//// Generate legal mvoes for current player
+	// auto moves = board.generateLegalMoves(board.getCurrentPlayer());
 
-	// Terminal positon check (checkmate/stalemate)
-	if (moves.empty())
-	{
-		int score{0};
-		if (board.isInCheck(board.getCurrentPlayer()))
-		{
-			// checkmate -> return large signed value based on perspective (prefer quicker mates by adding depth to score
-			score = maximizing ? (-10000 + depth) : (10000 - depth);
-		}
-		else
-		{
-			// stalemate
-			score = 0;
-		}
+	//// Terminal positon check (checkmate/stalemate)
+	// if (moves.empty())
+	//{
+	//	int score{0};
+	//	if (board.isInCheck(board.getCurrentPlayer()))
+	//	{
+	//		// checkmate -> return large signed value based on perspective (prefer quicker mates by adding depth to score
+	//		score = maximizing ? (-10000 + depth) : (10000 - depth);
+	//	}
+	//	else
+	//	{
+	//		// stalemate
+	//		score = 0;
+	//	}
 
-		storeTransposition(hashKey, depth, score, TranspositionEntry::NodeType::Exact, PossibleMove{});
-		return score;
-	}
+	//	storeTransposition(hashKey, depth, score, TranspositionEntry::NodeType::Exact, PossibleMove{});
+	//	return score;
+	//}
 
-	// Move ordering : try best move from transposition table first if available
-	if (!storedMove.isEmpty())
-	{
-		auto it = std::find(moves.begin(), moves.end(), storedMove);
-		if (it != moves.end())
-			std::swap(*moves.begin(), *it);
-	}
+	//// Move ordering : try best move from transposition table first if available
+	// if (!storedMove.isEmpty())
+	//{
+	//	auto it = std::find(moves.begin(), moves.end(), storedMove);
+	//	if (it != moves.end())
+	//		std::swap(*moves.begin(), *it);
+	// }
 
-	// Simple capture prioritization (stable)
-	std::stable_sort(moves.begin(), moves.end(),
-					 [](const PossibleMove &a, const PossibleMove &b)
-					 {
-						 bool ac = (a.type & MoveType::Capture) == MoveType::Capture;
-						 bool bc = (b.type & MoveType::Capture) == MoveType::Capture;
-						 return ac > bc;
-					 });
+	//// Simple capture prioritization (stable)
+	// std::stable_sort(moves.begin(), moves.end(),
+	//				 [](const PossibleMove &a, const PossibleMove &b)
+	//				 {
+	//					 bool ac = (a.type & MoveType::Capture) == MoveType::Capture;
+	//					 bool bc = (b.type & MoveType::Capture) == MoveType::Capture;
+	//					 return ac > bc;
+	//				 });
 
-	PossibleMove				 bestMove{};
-	TranspositionEntry::NodeType nodeType = TranspositionEntry::NodeType::Alpha;
+	// PossibleMove				 bestMove{};
+	// TranspositionEntry::NodeType nodeType = TranspositionEntry::NodeType::Alpha;
 
-	if (maximizing)
-	{
-		int maxEval = -std::numeric_limits<int>::max();
+	// if (maximizing)
+	//{
+	//	int maxEval = -std::numeric_limits<int>::max();
 
-		for (const auto &currentMove : moves)
-		{
-			if (cancelled(stopToken)) // Check if thread was asked to quit operation
-				break;
+	//	for (const auto &currentMove : moves)
+	//	{
+	//		if (cancelled(stopToken)) // Check if thread was asked to quit operation
+	//			break;
 
-			// make move
-			auto undoInfo = board.makeMove(currentMove);
+	//		// make move
+	//		auto undoInfo = board.makeMove(currentMove);
 
-			// recursively evaluate (switch to minimizing player)
-			int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, false, player, stopToken);
+	//		// recursively evaluate (switch to minimizing player)
+	//		int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, false, player, stopToken);
 
-			// unmake move
-			board.unmakeMove(undoInfo);
+	//		// unmake move
+	//		board.unmakeMove(undoInfo);
 
-			if (eval > maxEval)
-			{
-				maxEval	 = eval;
-				bestMove = currentMove;
-			}
+	//		if (eval > maxEval)
+	//		{
+	//			maxEval	 = eval;
+	//			bestMove = currentMove;
+	//		}
 
-			alpha = std::max(alpha, eval);
+	//		alpha = std::max(alpha, eval);
 
-			// alpha beta prunning
-			if (beta <= alpha)
-			{
-				nodeType = TranspositionEntry::NodeType::Beta;
-				break; // Beta cutoff
-			}
-		}
+	//		// alpha beta prunning
+	//		if (beta <= alpha)
+	//		{
+	//			nodeType = TranspositionEntry::NodeType::Beta;
+	//			break; // Beta cutoff
+	//		}
+	//	}
 
-		// determine node type for transpotion table
-		if (maxEval >= beta)
-			nodeType = TranspositionEntry::NodeType::Beta;
-		else if (maxEval <= alpha)
-			nodeType = TranspositionEntry::NodeType::Alpha;
-		else
-			nodeType = TranspositionEntry::NodeType::Exact;
+	//	// determine node type for transpotion table
+	//	if (maxEval >= beta)
+	//		nodeType = TranspositionEntry::NodeType::Beta;
+	//	else if (maxEval <= alpha)
+	//		nodeType = TranspositionEntry::NodeType::Alpha;
+	//	else
+	//		nodeType = TranspositionEntry::NodeType::Exact;
 
-		// store it in transposition table
-		storeTransposition(hashKey, depth, maxEval, nodeType, bestMove);
+	//	// store it in transposition table
+	//	storeTransposition(hashKey, depth, maxEval, nodeType, bestMove);
 
-		return maxEval;
-	}
-	else
-	{
-		int minEval = std::numeric_limits<int>::max();
+	//	return maxEval;
+	//}
+	// else
+	//{
+	//	int minEval = std::numeric_limits<int>::max();
 
-		for (const auto &currentMove : moves)
-		{
-			// make move
-			auto undoInfo = board.makeMove(currentMove);
+	//	for (const auto &currentMove : moves)
+	//	{
+	//		// make move
+	//		auto undoInfo = board.makeMove(currentMove);
 
-			// Recursively evaluate (switch to maximizing player)
-			int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, true, player, stopToken);
+	//		// Recursively evaluate (switch to maximizing player)
+	//		int	 eval	  = alphaBeta(currentMove, board, depth - 1, alpha, beta, true, player, stopToken);
 
-			// unmake move
-			board.unmakeMove(undoInfo);
+	//		// unmake move
+	//		board.unmakeMove(undoInfo);
 
-			if (eval < minEval)
-			{
-				minEval	 = eval;
-				bestMove = currentMove;
-			}
+	//		if (eval < minEval)
+	//		{
+	//			minEval	 = eval;
+	//			bestMove = currentMove;
+	//		}
 
-			beta = std::min(beta, eval);
+	//		beta = std::min(beta, eval);
 
-			// alpha beta prunning
-			if (beta <= alpha)
-			{
-				nodeType = TranspositionEntry::NodeType::Alpha;
-				break; // alpha cutoff
-			}
-		}
+	//		// alpha beta prunning
+	//		if (beta <= alpha)
+	//		{
+	//			nodeType = TranspositionEntry::NodeType::Alpha;
+	//			break; // alpha cutoff
+	//		}
+	//	}
 
-		// Determine node type for transposition table
-		if (minEval <= alpha)
-			nodeType = TranspositionEntry::NodeType::Alpha;
-		else if (minEval >= beta)
-			nodeType = TranspositionEntry::NodeType::Beta;
-		else
-			nodeType = TranspositionEntry::NodeType::Exact;
+	//	// Determine node type for transposition table
+	//	if (minEval <= alpha)
+	//		nodeType = TranspositionEntry::NodeType::Alpha;
+	//	else if (minEval >= beta)
+	//		nodeType = TranspositionEntry::NodeType::Beta;
+	//	else
+	//		nodeType = TranspositionEntry::NodeType::Exact;
 
-		// store transposition table
-		storeTransposition(hashKey, depth, minEval, nodeType, bestMove);
+	//	// store transposition table
+	//	storeTransposition(hashKey, depth, minEval, nodeType, bestMove);
 
-		return minEval;
-	}
+	//	return minEval;
+	//}
+
+	return 0;
 }
 
 
-int CPUPlayer::quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player, std::stop_token stopToken)
+int CPUPlayer::quiescence(int alpha, int beta, PlayerColor player, std::stop_token stopToken)
 {
-	if (cancelled(stopToken)) // Check if thread was asked to quit operation
-		return alpha;
+	// if (cancelled(stopToken)) // Check if thread was asked to quit operation
+	//	return alpha;
 
-	// Stand-pat - just positional evaluation from players perspective
-	int stand = evaluatePlayerPosition(board, player);
+	//// Stand-pat - just positional evaluation from players perspective
+	// int stand = evaluatePlayerPosition(player);
 
-	if (stand >= beta)
-		return stand;
-	if (stand > alpha)
-		alpha = stand;
+	// if (stand >= beta)
+	//	return stand;
+	// if (stand > alpha)
+	//	alpha = stand;
 
-	// Generate legal moves (only consider captures though)
-	auto moves = board.generateLegalMoves(board.getCurrentPlayer());
+	//// Generate legal moves (only consider captures though)
+	// auto moves = board.generateLegalMoves(board.getCurrentPlayer());
 
-	for (const auto &move : moves)
-	{
-		if (cancelled(stopToken)) // Check if thread was asked to quit operation
-			break;
+	// for (const auto &move : moves)
+	//{
+	//	if (cancelled(stopToken)) // Check if thread was asked to quit operation
+	//		break;
 
-		if ((move.type & MoveType::Capture) != MoveType::Capture)
-			continue;
+	//	if ((move.type & MoveType::Capture) != MoveType::Capture)
+	//		continue;
 
-		auto undo  = board.makeMove(move);
+	//	auto undo  = board.makeMove(move);
 
-		int	 score = -quiescence(board, -beta, -alpha, player);
-		board.unmakeMove(undo);
+	//	int	 score = -quiescence(board, -beta, -alpha, player);
+	//	board.unmakeMove(undo);
 
-		if (score >= beta)
-			return score;
-		if (score > alpha)
-			alpha = score;
-	}
+	//	if (score >= beta)
+	//		return score;
+	//	if (score > alpha)
+	//		alpha = score;
+	//}
 
-	return alpha;
+	// return alpha;
+
+	return 0;
 }
 
 

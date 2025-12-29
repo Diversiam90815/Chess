@@ -8,7 +8,6 @@
 #pragma once
 
 #include "Parameters.h"
-#include "LightChessBoard.h"
 #include "Evaluation/MoveEvaluation.h"
 
 
@@ -87,7 +86,7 @@ struct EvaluationWeights
 class PositionalEvaluation
 {
 public:
-	explicit PositionalEvaluation(std::shared_ptr<MoveEvaluation> moveEvaluation);
+	explicit PositionalEvaluation(MoveEvaluation &moveEvaluation);
 	~PositionalEvaluation() = default;
 
 	/**
@@ -96,7 +95,7 @@ public:
 	 * @param	player -> Perspective color.
 	 * @return	Signed score (positive = advantage for player).
 	 */
-	int						   evaluatePosition(const LightChessBoard &board, PlayerColor player);
+	int						   evaluatePosition(PlayerColor player);
 
 	/**
 	 * @brief	Detailed multi-component evaluation.
@@ -104,27 +103,27 @@ public:
 	 * @param	player -> Perspective color.
 	 * @return	Struct capturing each term and final weighted sum.
 	 */
-	PositionalEvaluationResult evaluatePositionDetailed(const LightChessBoard &board, PlayerColor player);
+	PositionalEvaluationResult evaluatePositionDetailed(PlayerColor player);
 
-	int						   evaluateMaterial(const LightChessBoard &board, PlayerColor player);
-	int						   evaluatePositionalAdvantage(const LightChessBoard &board, PlayerColor player);
-	int						   evaluateKingSafety(const LightChessBoard &board, PlayerColor player);
-	int						   evaluateMobility(const LightChessBoard &board, PlayerColor player);
-	int						   evaluateTacticalOpportunities(const LightChessBoard &board, PlayerColor player);
-	int						   evaluatePawnStructure(const LightChessBoard &board, PlayerColor player);
+	int						   evaluateMaterial(PlayerColor player);
+	int						   evaluatePositionalAdvantage(PlayerColor player);
+	int						   evaluateKingSafety(PlayerColor player);
+	int						   evaluateMobility(PlayerColor player);
+	int						   evaluateTacticalOpportunities(PlayerColor player);
+	int						   evaluatePawnStructure(PlayerColor player);
 
 private:
 	/**
 	 * @brief	Determine game phase (impacts weighting heuristics).
 	 */
-	GamePhase						determineGamePhase(const LightChessBoard &board) const;
+	GamePhase		  determineGamePhase() const;
 
-	PlayerColor						getOpponent(PlayerColor player) const;
+	PlayerColor		  getOpponent(PlayerColor player) const;
 
 	/**
 	 * @brief	Retrieve evaluation weight set for specified phase.
 	 */
-	EvaluationWeights				getWeightsForPhase(GamePhase phase) const;
+	EvaluationWeights getWeightsForPhase(GamePhase phase) const;
 
 	/**
 	 * @brief	Evaluate how many top candidate moves (search-limited) exist,
@@ -133,14 +132,14 @@ private:
 	 * @param	player -> Perspective color.
 	 * @param	maxMoves -> Cap on enumerated moves for efficiency.
 	 */
-	int								evaluateBestMovesOpportunity(const LightChessBoard &board, PlayerColor player, int maxMoves);
+	int				  evaluateBestMovesOpportunity(PlayerColor player, int maxMoves);
 
-	bool							hasPawnSupport(const LightChessBoard &board, const Position &pawnPos, PlayerColor player) const;
-	int								evaluatePawnMajority(const LightChessBoard &board, PlayerColor player) const;
-	int								evaluatePawnChains(const LightChessBoard &board, PlayerColor player) const;
+	bool			  hasPawnSupport(const Position &pawnPos, PlayerColor player) const;
+	int				  evaluatePawnMajority(PlayerColor player) const;
+	int				  evaluatePawnChains(PlayerColor player) const;
 
 
-	EvaluationWeights				mEvaluationWeights;
+	EvaluationWeights mEvaluationWeights;
 
-	std::shared_ptr<MoveEvaluation> mMoveEvaluation;
+	MoveEvaluation	 &mMoveEvaluation;
 };

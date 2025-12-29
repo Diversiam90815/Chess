@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include "ChessPiece.h"
 #include "Parameters.h"
 #include "Logging.h"
 
@@ -43,7 +42,7 @@ struct Score
 	bool		operator==(Score other) { return this->value == other.value && this->player == other.player; }
 
 private:
-	PlayerColor player = PlayerColor::NoColor;
+	PlayerColor player = PlayerColor::None;
 	int			value  = 0;
 };
 
@@ -101,13 +100,13 @@ public:
 	void		  setIsLocalPlayer(const bool isLocal) { mIsLocalPlayer = isLocal; }
 
 private:
-	PlayerColor			   mPlayerColor = PlayerColor::NoColor;
+	PlayerColor			   mPlayerColor = PlayerColor::None;
 
 	std::vector<PieceType> mCapturedPieces;
 
 	bool				   mIsCurrentTurn = false;
 
-	Score				   mScore		  = Score(PlayerColor::NoColor, 0);
+	Score				   mScore		  = Score(PlayerColor::None, 0);
 
 	bool				   mIsLocalPlayer{true}; // Default to local player in single-player mode
 };

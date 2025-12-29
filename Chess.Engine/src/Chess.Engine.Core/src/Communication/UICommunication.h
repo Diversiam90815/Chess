@@ -60,7 +60,7 @@ struct MoveHistoryEvent
 struct EndgameStateEvent
 {
 	EndGameState state;
-	PlayerColor	 winner = PlayerColor::NoColor;
+	PlayerColor	 winner = PlayerColor::None;
 };
 
 

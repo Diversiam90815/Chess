@@ -19,7 +19,6 @@
 #include "Evaluation/MoveEvaluation.h"
 #include "ChessBoard.h"
 #include "IObservable.h"
-#include "LightChessBoard.h"
 #include "PositionalEvaluation.h"
 
 
@@ -87,7 +86,7 @@ struct CPUConfiguration
 class CPUPlayer : public ICPUMoveObservable
 {
 public:
-	CPUPlayer(std::shared_ptr<MoveGeneration> moveGeneration, std::shared_ptr<MoveEvaluation> moveEvaluation, std::shared_ptr<ChessBoard> board);
+	CPUPlayer(MoveGeneration &moveGeneration, MoveEvaluation &moveEvaluation, Chessboard &board);
 	~CPUPlayer();
 
 	/**
@@ -162,7 +161,7 @@ public:
 	/**
 	 * @brief	Evaluate static positional score for a player on a lightweight board snapshot.
 	 */
-	int				 evaluatePlayerPosition(const LightChessBoard &board, PlayerColor player);
+	int				 evaluatePlayerPosition(PlayerColor player);
 
 
 private:
@@ -172,24 +171,22 @@ private:
 	 * @param	stopToken -> Cooperative cancellation token.
 	 * @return	Best computed move (or fallback).
 	 */
-	PossibleMove computeBestMove(PlayerColor player, std::stop_token stopToken = {});
+	PossibleMove			   computeBestMove(PlayerColor player, std::stop_token stopToken = {});
 
 	/**
 	 * @brief	Minimax recursive evaluation of a move branch.
 	 * @param	move -> Move leading into this node.
-	 * @param	board -> Mutable light board for fast make/unmake operations.
 	 * @param	depth -> Remaining depth (0 => leaf evaluation).
 	 * @param	maximizing -> True if maximizing player's turn.
 	 * @param	player	-> Root CPU player color.
 	 * @param	stopToken -> Cooperative cancellation token.
 	 * @return	Score relative to root player.
 	 */
-	int			 minimax(const PossibleMove &move, LightChessBoard &board, int depth, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
+	int						   minimax(const PossibleMove &move, int depth, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
 
 	/**
 	 * @brief	Alpha-beta pruned variant of minimax.
 	 * @param	move -> Move leading into this node.
-	 * @param	board -> Mutable light board for fast make/unmake operations.
 	 * @param	depth -> Remaining depth (0 => leaf evaluation).
 	 * @param	alpha -> Best already found lower bound.
 	 * @param	beta  -> Best already found upper bound.
@@ -198,7 +195,7 @@ private:
 	 * @param	stopToken -> Cooperative cancellation token.
 	 * @return	Score relative to root player.
 	 */
-	int			 alphaBeta(const PossibleMove &move, LightChessBoard &board, int depth, int alpha, int beta, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
+	int						   alphaBeta(const PossibleMove &move, int depth, int alpha, int beta, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
 
 	/**
 	 * @brief	Quiescence search extension exploring only capture / tactical volatility
@@ -210,12 +207,12 @@ private:
 	 * @param	stopToken -> Cooperative cancellation token.
 	 * @return	Score relative to root player.
 	 */
-	int			 quiescence(LightChessBoard &board, int alpha, int beta, PlayerColor player, std::stop_token stopToken = {});
+	int						   quiescence(int alpha, int beta, PlayerColor player, std::stop_token stopToken = {});
 
 	/**
 	 * @brief	Choose highest scoring candidate (deterministic).
 	 */
-	PossibleMove selectBestMove(std::vector<MoveCandidate> &moves);
+	PossibleMove			   selectBestMove(std::vector<MoveCandidate> &moves);
 
 	/**
 	 * @brief	Choose a candidate with optional randomness (weighted / uniform)
@@ -223,7 +220,7 @@ private:
 	 * @param	moves -> MoveCandidates to choose from. The moves will be sorted and filtered before selection.
 	 * @return	Chosen move, or empty move on failure
 	 */
-	PossibleMove selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
+	PossibleMove			   selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
 
 	/**
 	 * @brief	Sorts the MoveCandidates depending on their score values and keeps only top-N scoring candidates (pruning breadth).
@@ -268,23 +265,25 @@ private:
 	 * @brief	Generate a cache key combining board hash + move signature + player.
 	 *			Provides stable identity for evaluation memoization.
 	 */
-	inline uint64_t			   makeEvalKey(const PossibleMove &move, PlayerColor player, const LightChessBoard &board) const
+	inline uint64_t			   makeEvalKey(const PossibleMove &move, PlayerColor player) const
 	{
-		uint64_t h = board.getHashKey();
-		uint64_t m = (uint64_t(move.start.x & 7) << 48) | (uint64_t(move.start.y & 7) << 45) | (uint64_t(move.end.x & 7) << 42) | (uint64_t(move.end.y & 7) << 39) |
-					 (uint64_t(move.type) << 16) | (uint64_t(move.promotionPiece) << 8) | uint64_t(player);
-		// mix
-		return h ^ (m + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2));
+		// uint64_t h = board.getHashKey();
+		// uint64_t m = (uint64_t(move.start.x & 7) << 48) | (uint64_t(move.start.y & 7) << 45) | (uint64_t(move.end.x & 7) << 42) | (uint64_t(move.end.y & 7) << 39) |
+		//			 (uint64_t(move.type) << 16) | (uint64_t(move.promotionPiece) << 8) | uint64_t(player);
+		//// mix
+		// return h ^ (m + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2));
+
+		return 0;
 	}
 
 
 
 	CPUConfiguration								 mConfig;
 
-	std::shared_ptr<MoveGeneration>					 mMoveGeneration;
-	std::shared_ptr<MoveEvaluation>					 mMoveEvaluation;
-	std::shared_ptr<ChessBoard>						 mBoard;
-	std::shared_ptr<PositionalEvaluation>			 mPositionalEvaluation;
+	MoveGeneration									&mMoveGeneration;
+	MoveEvaluation									&mMoveEvaluation;
+	Chessboard										&mBoard;
+	PositionalEvaluation							 mPositionalEvaluation;
 
 	std::jthread									 mSearchThread;
 

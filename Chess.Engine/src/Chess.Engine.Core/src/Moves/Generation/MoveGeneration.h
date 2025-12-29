@@ -25,7 +25,7 @@ class MoveGeneration
 {
 public:
 	MoveGeneration(Chessboard &board);
-	~MoveGeneration();
+	~MoveGeneration() = default;
 
 	std::vector<PossibleMove> getMovesForPosition(const Position &position);
 
@@ -33,7 +33,6 @@ public:
 
 
 private:
-
 	bool													isSquareAttacked(int square, Side side) const;
 
 

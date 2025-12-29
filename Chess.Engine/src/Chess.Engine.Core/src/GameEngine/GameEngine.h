@@ -25,7 +25,7 @@
 class GameEngine : public IGameObservable
 {
 public:
-	GameEngine()  = default;
+	GameEngine();
 	~GameEngine() = default;
 
 	void					   init();
@@ -37,7 +37,7 @@ public:
 	void					   executeMove(PossibleMove &tmpMove, bool fromRemote = false);
 	void					   undoMove();
 
-	//PieceType				   getCurrentPieceTypeAtPosition(const Position position);
+	// PieceType				   getCurrentPieceTypeAtPosition(const Position position);
 
 	std::vector<PossibleMove>  getPossibleMoveForPosition();
 
@@ -48,7 +48,7 @@ public:
 
 	std::optional<PlayerColor> getWinner() const;
 
-	void					   endGame(EndGameState state, PlayerColor player = PlayerColor::NoColor) override;
+	void					   endGame(EndGameState state, PlayerColor player = PlayerColor::None) override;
 	void					   changeCurrentPlayer(PlayerColor player) override;
 	PlayerColor				   getCurrentPlayer() const;
 

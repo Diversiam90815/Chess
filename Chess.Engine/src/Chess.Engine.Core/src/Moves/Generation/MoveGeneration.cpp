@@ -7,26 +7,20 @@
 
 #include "MoveGeneration.h"
 
+MoveGeneration::MoveGeneration(Chessboard &board) : mChessBoard(board) {}
 
-MoveGeneration::MoveGeneration(Chessboard& board)
-	: mChessBoard(board)
-{
-}
-
-
-MoveGeneration::~MoveGeneration() {}
 
 
 std::vector<PossibleMove> MoveGeneration::getMovesForPosition(const Position &position)
 {
-	//auto &piece = mChessBoard->getPiece(position);
+	// auto &piece = mChessBoard->getPiece(position);
 
-	//if (!piece)
+	// if (!piece)
 	//	return {};
 
-	//auto					  player = piece->getColor();
+	// auto					  player = piece->getColor();
 
-	//std::vector<PossibleMove> possibleMoves;
+	// std::vector<PossibleMove> possibleMoves;
 
 	//{
 	//	std::lock_guard<std::mutex> lock(mMoveMutex);
@@ -34,34 +28,36 @@ std::vector<PossibleMove> MoveGeneration::getMovesForPosition(const Position &po
 	//}
 
 	//// Add special moves available for this position to the possibleMoves
-	//if (piece->getType() == PieceType::King)
+	// if (piece->getType() == PieceType::King)
 	//{
 	//	auto castlingMoves = generateCastlingMoves(position, player);
 	//	for (auto &move : castlingMoves)
 	//	{
 	//		possibleMoves.push_back(move);
 	//	}
-	//}
+	// }
 
-	//if (piece->getType() == PieceType::Pawn)
+	// if (piece->getType() == PieceType::Pawn)
 	//{
 	//	if (canEnPassant(position, player))
 	//	{
 	//		auto enPasssantMove = generateEnPassantMove(position, player);
 	//		possibleMoves.push_back(enPasssantMove);
 	//	}
-	//}
+	// }
 
-	//if (GENERATION_DEBUG)
+	// if (GENERATION_DEBUG)
 	//	LOG_DEBUG("Position {} has {} possible moves!", LoggingHelper::positionToString(position).c_str(), possibleMoves.size());
 
-	//return possibleMoves;
+	// return possibleMoves;
+
+	return {};
 }
 
 
 bool MoveGeneration::calculateAllLegalBasicMoves(PlayerColor playerColor)
 {
-	//auto playerPieces = mChessBoard->getPiecesFromPlayer(playerColor);
+	// auto playerPieces = mChessBoard->getPiecesFromPlayer(playerColor);
 
 	//// Clear the previous round legal-moves map
 	//{
@@ -70,11 +66,11 @@ bool MoveGeneration::calculateAllLegalBasicMoves(PlayerColor playerColor)
 	//}
 
 	//// Container to hold futures for each piece move generation
-	//std::vector<std::future<std::pair<Position, std::vector<PossibleMove>>>> futures;
-	//futures.reserve(playerPieces.size());
+	// std::vector<std::future<std::pair<Position, std::vector<PossibleMove>>>> futures;
+	// futures.reserve(playerPieces.size());
 
 	//// Launch async task
-	//for (const auto &[startPosition, piece] : playerPieces)
+	// for (const auto &[startPosition, piece] : playerPieces)
 	//{
 	//	futures.push_back(std::async(std::launch::async,
 	//								 [this, playerColor, startPosition, piece]() -> std::pair<Position, std::vector<PossibleMove>>
@@ -99,9 +95,9 @@ bool MoveGeneration::calculateAllLegalBasicMoves(PlayerColor playerColor)
 	//								 }));
 	//}
 
-	//size_t totalValidMoves = 0;
+	// size_t totalValidMoves = 0;
 
-	//for (auto &fut : futures)
+	// for (auto &fut : futures)
 	//{
 	//	auto  result = fut.get();
 	//	auto &pos	 = result.first;
@@ -114,9 +110,9 @@ bool MoveGeneration::calculateAllLegalBasicMoves(PlayerColor playerColor)
 	//	}
 	//}
 
-	//LOG_INFO("Calculating all moves finished, with {} moves!", totalValidMoves);
+	// LOG_INFO("Calculating all moves finished, with {} moves!", totalValidMoves);
 
-	//return totalValidMoves != 0;
+	// return totalValidMoves != 0;
 
 	return false;
 }
@@ -158,43 +154,43 @@ std::vector<PossibleMove> MoveGeneration::generateCastlingMoves(const Position &
 
 bool MoveGeneration::canCastle(const Position &kingposition, PlayerColor player, bool kingside)
 {
-	//auto &king		= mChessBoard->getPiece(kingposition);
-	//int	  direction = kingside ? +1 : -1; // Determine the direction of castling
+	// auto &king		= mChessBoard->getPiece(kingposition);
+	// int	  direction = kingside ? +1 : -1; // Determine the direction of castling
 
-	//if (king->hasMoved())
+	// if (king->hasMoved())
 	//	return false;
 
-	//if (mValidation->isKingInCheck(kingposition, player))
+	// if (mValidation->isKingInCheck(kingposition, player))
 	//	return false;
 
 	//// Define the y-coordinate and king's x-coordinate
-	//int		 y	   = kingposition.y;
-	//int		 kingX = kingposition.x;
+	// int		 y	   = kingposition.y;
+	// int		 kingX = kingposition.x;
 
 	//// Determine the rook's position based on the direction
-	//int		 rookX = (direction == 1) ? 7 : 0; // 7 for kingside (h-file), 0 for queenside (a-file)
-	//Position rookPosition{rookX, y};
-	//auto	&rook = mChessBoard->getPiece(rookPosition);
+	// int		 rookX = (direction == 1) ? 7 : 0; // 7 for kingside (h-file), 0 for queenside (a-file)
+	// Position rookPosition{rookX, y};
+	// auto	&rook = mChessBoard->getPiece(rookPosition);
 
-	//if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->hasMoved())
+	// if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->hasMoved())
 	//	return false;
 
 	//// Check if way is free
-	//for (int x = kingX + direction; x != rookX; x += direction)
+	// for (int x = kingX + direction; x != rookX; x += direction)
 	//{
 	//	Position pos{x, y};
 	//	if (!mChessBoard->isEmpty(pos))
 	//		return false;
-	//}
+	// }
 
 	//// Check if way is under attack
-	//std::vector<Position> positionsToCheck = {{kingX + direction, y}, {kingX + 2 * direction, y}};
-	//for (const auto &pos : positionsToCheck)
+	// std::vector<Position> positionsToCheck = {{kingX + direction, y}, {kingX + 2 * direction, y}};
+	// for (const auto &pos : positionsToCheck)
 	//{
 	//	Move testMove(kingposition, pos, PieceType::King);
 	//	if (mValidation->wouldKingBeInCheckAfterMove(testMove, player))
 	//		return false;
-	//}
+	// }
 
 	return true;
 }
@@ -202,25 +198,25 @@ bool MoveGeneration::canCastle(const Position &kingposition, PlayerColor player,
 
 PossibleMove MoveGeneration::generateEnPassantMove(const Position &position, PlayerColor player)
 {
-	//if (!canEnPassant(position, player))
+	// if (!canEnPassant(position, player))
 	//	return PossibleMove();
 
-	//auto	 lastMove = mExecution->getLastMove();
+	// auto	 lastMove = mExecution->getLastMove();
 
 	//// Calculate target position
-	//Position targetPosition;
-	//if (player == PlayerColor::White)
+	// Position targetPosition;
+	// if (player == PlayerColor::White)
 	//{
 	//	targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y - 1);
-	//}
-	//else
+	// }
+	// else
 	//{
 	//	targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y + 1);
-	//}
+	// }
 
 	PossibleMove enPassantMove;
 	enPassantMove.start = position;
-	//enPassantMove.end	= targetPosition;
+	// enPassantMove.end	= targetPosition;
 	enPassantMove.type	= MoveType::EnPassant | MoveType::Capture;
 
 	return enPassantMove;
@@ -229,35 +225,35 @@ PossibleMove MoveGeneration::generateEnPassantMove(const Position &position, Pla
 
 bool MoveGeneration::canEnPassant(const Position &position, PlayerColor player)
 {
-	//auto lastMove = mExecution->getLastMove();
+	// auto lastMove = mExecution->getLastMove();
 
-	//if (!lastMove)
+	// if (!lastMove)
 	//	return false;
 
 	//// Ensure if the last move was a pawn double push
-	//bool lastMoveWasPawnDoublePush = (lastMove->type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush;
-	//if (!lastMoveWasPawnDoublePush)
+	// bool lastMoveWasPawnDoublePush = (lastMove->type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush;
+	// if (!lastMoveWasPawnDoublePush)
 	//	return false;
 
 	//// Ensure the last move was made by the opponent
-	//if (lastMove->player == player)
+	// if (lastMove->player == player)
 	//	return false;
 
 	//// Ensure that the position match
-	//Position lastMoveEndPosition = lastMove->endingPosition;
+	// Position lastMoveEndPosition = lastMove->endingPosition;
 
 	//// Check if the last moved pawn is on the same rank as the capturing pawn
-	//bool	 sameRank			 = (lastMoveEndPosition.y == position.y);
-	//if (!sameRank)
+	// bool	 sameRank			 = (lastMoveEndPosition.y == position.y);
+	// if (!sameRank)
 	//	return false;
 
 	//// Ensure both pawns are adjacent ranks
-	//bool bothPiecesNextToEachOther = (std::abs(lastMoveEndPosition.x - position.x) == 1);
-	//if (!bothPiecesNextToEachOther)
+	// bool bothPiecesNextToEachOther = (std::abs(lastMoveEndPosition.x - position.x) == 1);
+	// if (!bothPiecesNextToEachOther)
 	//	return false;
 
 	//// Ensure the capturing pawn is on the correct rank for en passant
-	//if ((player == PlayerColor::White && position.y != 3) || (player == PlayerColor::Black && position.y != 4))
+	// if ((player == PlayerColor::White && position.y != 3) || (player == PlayerColor::Black && position.y != 4))
 	//	return false;
 
 	return true;

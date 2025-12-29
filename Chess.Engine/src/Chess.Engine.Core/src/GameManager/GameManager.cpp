@@ -81,7 +81,9 @@ std::vector<PossibleMove> GameManager::getPossibleMoveForPosition()
 
 bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
 {
-	return mEngine->getBoardState(boardState);
+	// return mEngine->getBoardState(boardState);
+
+	return false;
 }
 
 
@@ -318,11 +320,11 @@ void GameManager::initObservers()
 
 	mEngine->mWhitePlayer.attachObserver(mUiCommunicationLayer);
 	mEngine->mBlackPlayer.attachObserver(mUiCommunicationLayer);
-	mEngine->mMoveExecution->attachObserver(mUiCommunicationLayer);
+	mEngine->mMoveExecution.attachObserver(mUiCommunicationLayer);
 
 	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer);
 
-	mEngine->mCPUPlayer->attachObserver(StateMachine::GetInstance());
+	mEngine->mCPUPlayer.attachObserver(StateMachine::GetInstance());
 }
 
 
@@ -334,7 +336,7 @@ void GameManager::initMultiplayerObservers()
 		return;
 	}
 
-	mEngine->mMoveExecution->attachObserver(mMultiplayerManager->mRemoteSender);	   // Moves will be sent to the remote
+	mEngine->mMoveExecution.attachObserver(mMultiplayerManager->mRemoteSender);		   // Moves will be sent to the remote
 	mMultiplayerManager->mRemoteReceiver->attachObserver(StateMachine::GetInstance()); // Received moves will be handled in the state machine
 
 	LOG_DEBUG("Mulitplayer observers set up!");
@@ -347,7 +349,7 @@ void GameManager::deinitObservers()
 
 	mEngine->mWhitePlayer.detachObserver(mUiCommunicationLayer);
 	mEngine->mBlackPlayer.detachObserver(mUiCommunicationLayer);
-	mEngine->mMoveExecution->detachObserver(mUiCommunicationLayer);
+	mEngine->mMoveExecution.detachObserver(mUiCommunicationLayer);
 
 	StateMachine::GetInstance()->detachObserver(mUiCommunicationLayer);
 }

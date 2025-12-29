@@ -118,7 +118,7 @@ void Chessboard::parseFEN(std::string_view fen)
 
 
 //
-//bool Chessboard::isSquareAttacked(int square, Side side) const
+// bool Chessboard::isSquareAttacked(int square, Side side) const
 //{
 //	const auto &at		= AttackTables::instance();
 //	const U64	occBoth = mOccupancyBitboards[to_index(Side::Both)];

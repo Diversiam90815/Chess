@@ -145,7 +145,7 @@ public:
 	PieceType	movedPiece	  = PieceType::DefaultType;
 	PieceType	capturedPiece = PieceType::DefaultType;
 	PieceType	promotionType = PieceType::DefaultType;
-	PlayerColor player		  = PlayerColor::NoColor;
+	PlayerColor player		  = PlayerColor::None;
 
 	MoveType	type		  = MoveType::Normal;
 
