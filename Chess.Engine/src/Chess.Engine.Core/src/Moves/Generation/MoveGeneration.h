@@ -16,6 +16,7 @@
 #include "Logging.h"
 #include "Move.h"
 #include "Execution/MoveExecution.h"
+#include "BitboardTypes.h"
 
 
 #define GENERATION_DEBUG false
@@ -27,28 +28,33 @@ public:
 	MoveGeneration(Chessboard &board);
 	~MoveGeneration() = default;
 
-	std::vector<PossibleMove> getMovesForPosition(const Position &position);
+	// std::vector<PossibleMove> getMovesForPosition(const Position &position);
 
-	bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
+	// bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
 
 
-	bool					  isSquareAttacked(Square square, Side side) const;
-	void					  generateAllMoves();
+	bool isSquareAttacked(Square square, Side side) const;
+	void generateAllMoves();
 
 private:
-	std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PlayerColor player);
+	// std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PlayerColor player);
 
-	bool													canCastle(const Position &kingposition, PlayerColor player, bool kingside);
+	// bool													canCastle(const Position &kingposition, PlayerColor player, bool kingside);
 
-	PossibleMove											generateEnPassantMove(const Position &position, PlayerColor player);
+	// PossibleMove											generateEnPassantMove(const Position &position, PlayerColor player);
 
-	bool													canEnPassant(const Position &position, PlayerColor player);
+	// bool													canEnPassant(const Position &position, PlayerColor player);
 
-	void													loadMoveToMap(Position pos, std::vector<PossibleMove> moves);
+	// void													loadMoveToMap(Position pos, std::vector<PossibleMove> moves);
 
+	void												  addMoveToList(PossibleMove &move);
 
-	Chessboard											   &mChessBoard;
+	void												  generateCastlingMoves(U64 bitboard);
+	void												  generatePawnMoves(U64 bitboard, Side side);
+	void												  generateEnPassantMoves(Side side, Square sourceSquare);
 
-	std::unordered_map<Position, std::vector<PossibleMove>> mAllLegalMovesForCurrentRound;
-	std::mutex												mMoveMutex;
+	Chessboard											 &mChessBoard;
+
+	std::unordered_map<Square, std::vector<PossibleMove>> mAllMoves;
+	std::mutex											  mMoveMutex;
 };
