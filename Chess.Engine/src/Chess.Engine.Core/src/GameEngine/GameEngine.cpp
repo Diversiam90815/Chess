@@ -7,6 +7,7 @@
 
 #include "GameEngine.h"
 
+
 GameEngine::GameEngine()
 	: mMoveGeneration(mChessBoard), mMoveExecution(mChessBoard), mMoveEvaluation(mChessBoard, mMoveGeneration), mCPUPlayer(mMoveGeneration, mMoveEvaluation, mChessBoard)
 {

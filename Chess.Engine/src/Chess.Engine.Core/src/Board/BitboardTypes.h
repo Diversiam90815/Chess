@@ -219,17 +219,17 @@ enum class Castling : uint8_t
 	BQ	 = 1 << 3
 };
 
-constexpr Castling operator|(Castling a, Castling b) noexcept
+constexpr Castling operator |(Castling a, Castling b) noexcept
 {
 	return static_cast<Castling>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
 }
 
-constexpr Castling operator&(Castling a, Castling b) noexcept
+constexpr Castling operator &(Castling a, Castling b) noexcept
 {
 	return static_cast<Castling>(static_cast<uint8_t>(a) & static_cast<uint8_t>(b));
 }
 
-constexpr Castling &operator|=(Castling &a, Castling b) noexcept
+constexpr Castling &operator |=(Castling &a, Castling b) noexcept
 {
 	a = a | b;
 	return a;
