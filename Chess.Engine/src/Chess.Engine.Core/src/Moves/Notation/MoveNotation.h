@@ -10,8 +10,8 @@
 #include <string>
 
 #include "Move.h"
-#include "MoveType.h"
-
+#include "BitboardTypes.h"
+#include "Chessboard.h"
 
 /**
  * @brief	Utility for generating and formatting move notation strings.
@@ -19,36 +19,74 @@
 class MoveNotation
 {
 public:
-	MoveNotation();
-	~MoveNotation();
+	MoveNotation()	= default;
+	~MoveNotation() = default;
 
 	/**
 	 * @brief	Produce SAN (Standard Algebraic Notation) for a move.
 	 */
-	std::string generateStandardAlgebraicNotation(Move &move);
+	std::string toSAN(Move &move, const Chessboard &board, bool isCheck, bool isCheckmate);
 
 	/**
-	 * @brief	Convert a castling move into its SAN form (O-O / O-O-O).
+	 * @brief Generate UCI notation (e.g., "e2e4", "e7e8q").
 	 */
-	std::string castlingToSAN(Move &move);
+	std::string toUCI(Move move) const;
 
-	/**
-	 * @brief	Get coordinate string form (e.g. "e4") for a position.
-	 */
-	std::string getPositionString(Position &pos);
 
-	/**
-	 * @brief	File letter (a-h) from position.
-	 */
-	char		getFileFromPosition(Position &pos);
+private:
+	inline std::string squareToString(Square sq) const noexcept
+	{
+		int idx = to_index(sq);
 
-	/**
-	 * @brief	Rank digit (1-8) from position.
-	 */
-	char		getRankFromPosition(Position &pos);
+		if (idx >= 0 && idx < 64)
+			return square_to_coordinates[idx];
+		
+		return "--";
+	}
 
-	/**
-	 * @brief	Character representing piece type (uppercase except pawn).
-	 */
-	char		getPieceType(PieceType type);
+	inline char getFile(Square sq) noexcept
+	{
+		int idx = to_index(sq);
+		return 'a' + (idx % 8);
+	}
+
+	inline char getRank(Square sq) noexcept
+	{
+		int idx = to_index(sq);
+		return '8' - (idx / 8);
+	}
+
+	inline char pieceToSANChar(int pieceType) noexcept
+	{
+		switch (pieceType)
+		{
+		case WKing:
+		case BKing: return 'K';
+		case WQueen:
+		case BQueen: return 'Q';
+		case WRook:
+		case BRook: return 'R';
+		case WBishop:
+		case BBishop: return 'B';
+		case WKnight:
+		case BKnight: return 'N';
+		default: return '\0'; // Pawns have no letter in SAN
+		}
+	}
+
+	inline char pieceToUCIChar(int pieceType) noexcept
+	{
+		switch (pieceType)
+		{
+		case WKnight:
+		case BKnight: return 'n';
+		case WBishop:
+		case BBishop: return 'b';
+		case WRook:
+		case BRook: return 'r';
+		case WQueen:
+		case BQueen: return 'q';
+		default: return '\0';
+		}
+	}
 };

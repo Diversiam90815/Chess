@@ -8,142 +8,77 @@
 #include "MoveNotation.h"
 
 
-MoveNotation::MoveNotation() {}
-
-
-MoveNotation::~MoveNotation() {}
-
-
-std::string MoveNotation::generateStandardAlgebraicNotation(Move &move)
+std::string MoveNotation::toSAN(Move &move, const Chessboard &board, bool isCheck, bool isCheckmate)
 {
-	// Handle castling
-	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
-	{
-		return castlingToSAN(move);
-	}
+	MoveFlag flags = move.flags();
+
+	// handle castling
+	if (flags == MoveFlag::KingCastle)
+		return "O-O";
+	else if (flags == MoveFlag::QueenCastle)
+		return "O-O-O";
 
 	std::string notation;
 
-	// Get the piece character
-	char		pieceChar = getPieceType(move.movedPiece);
+	Square		from   = move.from();
+	Square		to	   = move.to();
+	PieceTypes	piece  = board.pieceAt(from);
 
-	// Determine if the move is a capture (regular capture OR en passant)
-	bool		isCapture = (move.type & MoveType::Capture) == MoveType::Capture || (move.type & MoveType::EnPassant) == MoveType::EnPassant;
+	bool		isPawn = (piece == WPawn || piece == BPawn);
 
-	// Handle pawn moves
-	if (move.movedPiece == PieceType::Pawn)
+	if (!isPawn)
 	{
-		if (isCapture)
-		{
-			// For pawn captures, include the starting file
-			char startFile = getFileFromPosition(move.startingPosition);
-			notation += startFile;
-			notation += 'x';
-		}
-		// Append the destination square
-		notation += getPositionString(move.endingPosition);
-
-		// Handle En Passant
-		if ((move.type & MoveType::EnPassant) == MoveType::EnPassant)
-		{
-			notation += " e.p.";
-		}
-
-		// Handle promotion
-		if ((move.type & MoveType::PawnPromotion) == MoveType::PawnPromotion)
-		{
-			notation += '=';
-			notation += getPieceType(move.promotionType);
-		}
-	}
-	else
-	{
-		// Include the piece character
-		if (pieceChar != 0)
-		{
+		char pieceChar = pieceToSANChar(piece);
+		if (pieceChar != '\0')
 			notation += pieceChar;
-		}
 
-		// Disambiguation is not implemented in this basic version
-
-		if (isCapture)
-		{
-			notation += 'x';
-		}
-
-		// Append the destination square
-		notation += getPositionString(move.endingPosition);
+		// TODO: Handle disambiguation
 	}
 
-	// Handle check and checkmate indicators
-	if ((move.type & MoveType::Checkmate) == MoveType::Checkmate)
+	// capture notation
+	if (move.isCapture())
 	{
+		if (isPawn)
+			notation += getFile(from); // include starting file for pawn captures
+
+		notation += 'x';
+	}
+
+	// destination square
+	notation += squareToString(to);
+
+	// promotion
+	if (move.isPromotion())
+	{
+		notation += '=';
+		int				  promoOffset  = move.promotionPieceOffset(); // 0 = Knight, 1 = Bishop, 2 = Rook, 3 = Queen
+		static const char promoChars[] = {'N', 'B', 'R', 'Q'};
+		notation += promoChars[promoOffset];
+	}
+
+	// check/mate indicators
+	if (isCheckmate)
 		notation += '#';
-	}
-	else if ((move.type & MoveType::Check) == MoveType::Check)
-	{
+	else if (isCheck)
 		notation += '+';
-	}
 
 	return notation;
 }
 
 
-std::string MoveNotation::castlingToSAN(Move &move)
+std::string MoveNotation::toUCI(Move move) const
 {
-	std::string castlingNotation{};
+	std::string uci;
 
-	if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside)
+	uci += squareToString(move.from());
+	uci += squareToString(move.to());
+
+	if (move.isPromotion())
 	{
-		castlingNotation = "O-O";
-
-		if ((move.type & MoveType::Check) == MoveType::Check)
-			castlingNotation += '+';
+		int				  promoOffset  = move.promotionPieceOffset();
+		static const char promoChars[] = {'n', 'b', 'r', 'q'};
+		uci += promoChars[promoOffset];
 	}
 
-	else if ((move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
-	{
-		castlingNotation = "O-O-O";
-
-		if ((move.type & MoveType::Check) == MoveType::Check)
-			castlingNotation += '+';
-	}
-
-	return castlingNotation;
-}
-
-
-std::string MoveNotation::getPositionString(Position &pos)
-{
-	std::string positionString;
-	positionString += getFileFromPosition(pos);
-	positionString += getRankFromPosition(pos);
-	return positionString;
-}
-
-
-char MoveNotation::getFileFromPosition(Position &pos)
-{
-	return 'a' + pos.x;
-}
-
-
-char MoveNotation::getRankFromPosition(Position &pos)
-{
-	return '8' - pos.y;
-}
-
-
-char MoveNotation::getPieceType(PieceType type)
-{
-	switch (type)
-	{
-	case PieceType::Pawn: return 0; // Pawns don't have a piece letter in SAN
-	case PieceType::Knight: return 'N';
-	case PieceType::Bishop: return 'B';
-	case PieceType::Rook: return 'R';
-	case PieceType::Queen: return 'Q';
-	case PieceType::King: return 'K';
-	default: return 0;
-	}
+	return uci;
 }
