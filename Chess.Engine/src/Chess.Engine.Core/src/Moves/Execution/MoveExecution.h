@@ -7,9 +7,7 @@
 
 #pragma once
 
-#include <memory>
-#include <set>
-#include <mutex>
+#include <vector>
 
 #include "ChessBoard.h"
 #include "Notation/MoveNotation.h"
@@ -18,32 +16,48 @@
 #include "Logging.h"
 
 
-class MoveExecution : public IMoveObservable
+struct MoveHistoryEntry
+{
+	Move	   move;
+	BoardState previousState;
+};
+
+
+class MoveExecution /* : public IMoveObservable*/
 {
 public:
-	MoveExecution(Chessboard &board);
+	explicit MoveExecution(Chessboard &board);
 	~MoveExecution() = default;
 
-	Move		executeMove(PossibleMove &executedMove, bool fromRemote = false) override;
+	// Executes a move on the board, returns false if invalid
+	bool								  makeMove(Move move);
 
-	bool		executeCastlingMove(PossibleMove &move);
+	// Undo the last move
+	bool								  unmakeMove();
 
-	bool		executeEnPassantMove(PossibleMove &move, PlayerColor player);
-
-	bool		executePawnPromotion(const PossibleMove &move, PlayerColor player);
-
-	const Move *getLastMove() const;
-
-	void		addMoveToHistory(Move &move) override;
-
-	void		clearMoveHistory() override;
-
-	void		removeLastMove();
-
+	// History
+	[[nodiscard]] const MoveHistoryEntry *getLastMove() const;
+	[[nodiscard]] size_t				  historySize() const { return mHistory.size(); }
+	void								  clearHistory() { mHistory.clear(); }
 
 private:
-	Chessboard	  &mChessBoard;
-	MoveNotation   mMoveNotation;
-	std::set<Move> mMoveHistory;
-	std::mutex	   mExecutionMutex;
+	Chessboard					 &mChessBoard;
+
+	std::vector<MoveHistoryEntry> mHistory;
+
+
+	// clang-format off
+	// Castling rights update table
+	static constexpr uint8_t	  sCastlingRightsUpdate[64] = 
+	{
+		 13, 15, 15, 15, 12, 15, 15, 14,	// a8-h8
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 7,	 15, 15, 15, 3,	 15, 15, 11		// a1-h1
+	 };
+	// clang-format on
 };

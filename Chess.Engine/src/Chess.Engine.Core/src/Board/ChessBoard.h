@@ -102,6 +102,16 @@
   1  1 1 1 1 1 1 1 1    1  0 0 0 0 0 0 0 0    1  1 1 1 1 1 1 1 1
 */
 
+// State snapshot for unmake move
+struct BoardState
+{
+	Castling   castle		 = Castling::None;
+	Square	   enPassant	 = Square::None;
+	int		   halfMoveClock = 0;
+	PieceTypes capturedPiece = PieceTypes::None;
+};
+
+
 class Chessboard
 {
 public:
@@ -111,30 +121,54 @@ public:
 	using Bitboards	  = std::array<U64, 12>;
 	using Occupancies = std::array<U64, 3>;
 
-	void			   init();
-	void			   clear();
+	void							 init();
+	void							 clear();
+	void							 parseFEN(std::string_view fen);
 
-	void			   parseFEN(std::string_view fen);
+	void							 removePiece(PieceTypes piece, Square sq);
+	void							 addPiece(PieceTypes piece, Square sq);
+	void							 movePiece(PieceTypes piece, Square from, Square to);
+	void							 updateOccupancies();
 
-	//// IS the current given square attacked by the current given side
-	// bool			   isSquareAttacked(int square, Side side) const;
+	// Piece lookup
+	[[nodiscard]] PieceTypes		 pieceAt(Square sq) const;
 
-	const Bitboards	  &pieces() const noexcept { return mBitBoards; }
-	const Occupancies &occ() const noexcept { return mOccupancyBitboards; }
+	[[nodiscard]] const Bitboards	&pieces() const noexcept { return mBitBoards; }
+	[[nodiscard]] Bitboards			&pieces() noexcept { return mBitBoards; }
+	[[nodiscard]] const Occupancies &occ() const noexcept { return mOccupancyBitboards; }
 
-	Side			   getCurrentSide() const noexcept { return side; }
-	Castling		   getCurrentCastlingRights() const noexcept { return castle; }
-	Square			   getCurrentEnPassantSqaure() const noexcept { return enPassant; }
+	[[nodiscard]] Side				 getCurrentSide() const noexcept { return mSide; }
+	[[nodiscard]] Castling			 getCurrentCastlingRights() const noexcept { return mCastlingRights; }
+	[[nodiscard]] Square			 getCurrentEnPassantSqaure() const noexcept { return mEnPassantSquare; }
+	[[nodiscard]] int				 getHalfMoveClock() const noexcept { return mHalfMoveClock; }
+
+	void							 setSide(Side s) noexcept { mSide = s; }
+	void							 flipSide() noexcept { mSide = mSide == Side::White ? Side::Black : Side::White; }
+	void							 setCastlingRights(Castling c) noexcept { mCastlingRights = c; }
+	void							 setEnPassantSquare(Square sq) noexcept { mEnPassantSquare = sq; }
+	void							 setHalfMoveClock(int clock) noexcept { mHalfMoveClock = clock; }
+	void							 incrementMoveCounter() noexcept { ++mMoveCounter; }
+	void							 decrementMoveCounter() noexcept
+	{
+		if (mMoveCounter > 1)
+			--mMoveCounter;
+	}
+
+	[[nodiscard]] BoardState saveState() const;
+	void					 restoreState(const BoardState &state);
 
 private:
-	Bitboards		  mBitBoards{};					   // Array of all bitboards
-	Occupancies		  mOccupancyBitboards{};		   // Occupancies
+	Bitboards		  mBitBoards{};						 // Array of all bitboards
+	Occupancies		  mOccupancyBitboards{};			 // Occupancies
 
-	Side			  side			 = Side::None;	   // side to move
-	Square			  enPassant		 = Square::None;   // enpassant square
-	Castling		  castle		 = Castling::None; // castling rights
+	Side			  mSide			   = Side::None;	 // side to move
+	Square			  mEnPassantSquare = Square::None;	 // enpassant square
+	Castling		  mCastlingRights  = Castling::None; // castling rights
+
+	int				  mHalfMoveClock   = 0;
+	int				  mMoveCounter	   = 1;
 
 	// FEN positions
-	const std::string mEmptyBoard	 = "8/8/8/8/8/8/8/8 w - - ";
-	const std::string mStartPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
+	const std::string mEmptyBoard	   = "8/8/8/8/8/8/8/8 w - - ";
+	const std::string mStartPosition   = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 };

@@ -129,6 +129,7 @@ inline const char* square_to_coordinates[] =
 
 enum PieceTypes
 {
+	None	= -1,
 	WKing	= 0,
 	WQueen	= 1,
 	WPawn	= 2,
@@ -219,17 +220,17 @@ enum class Castling : uint8_t
 	BQ	 = 1 << 3
 };
 
-constexpr Castling operator |(Castling a, Castling b) noexcept
+constexpr Castling operator|(Castling a, Castling b) noexcept
 {
 	return static_cast<Castling>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
 }
 
-constexpr Castling operator &(Castling a, Castling b) noexcept
+constexpr Castling operator&(Castling a, Castling b) noexcept
 {
 	return static_cast<Castling>(static_cast<uint8_t>(a) & static_cast<uint8_t>(b));
 }
 
-constexpr Castling &operator |=(Castling &a, Castling b) noexcept
+constexpr Castling &operator|=(Castling &a, Castling b) noexcept
 {
 	a = a | b;
 	return a;

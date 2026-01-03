@@ -12,7 +12,6 @@
 
 void Chessboard::init()
 {
-	// parse FEN starting position
 	parseFEN(mStartPosition);
 }
 
@@ -21,9 +20,9 @@ void Chessboard::clear()
 {
 	mBitBoards.fill(0);
 	mOccupancyBitboards.fill(0);
-	side	  = Side::None;
-	enPassant = Square::None;
-	castle	  = Castling::None;
+	mSide			 = Side::None;
+	mEnPassantSquare = Square::None;
+	mCastlingRights	 = Castling::None;
 }
 
 
@@ -74,7 +73,7 @@ void Chessboard::parseFEN(std::string_view fen)
 	// 2 Side to move
 	if (i <= fen.size())
 	{
-		side = (fen[i] == 'w') ? Side::White : Side::Black;
+		mSide = (fen[i] == 'w') ? Side::White : Side::Black;
 		++i;
 	}
 
@@ -85,10 +84,10 @@ void Chessboard::parseFEN(std::string_view fen)
 	{
 		switch (fen[i])
 		{
-		case 'K': castle |= Castling::WK; break;
-		case 'Q': castle |= Castling::WQ; break;
-		case 'k': castle |= Castling::BK; break;
-		case 'q': castle |= Castling::BQ; break;
+		case 'K': mCastlingRights |= Castling::WK; break;
+		case 'Q': mCastlingRights |= Castling::WQ; break;
+		case 'k': mCastlingRights |= Castling::BK; break;
+		case 'q': mCastlingRights |= Castling::BQ; break;
 		case '-': break;
 		}
 		++i;
@@ -99,19 +98,70 @@ void Chessboard::parseFEN(std::string_view fen)
 	// 4 En Passant
 	if (i < fen.size() && fen[i] != '-')
 	{
-		int epFile = fen[i + 0] - 'a';
-		int epRank = 8 - (fen[i + 1] - '0');
-		enPassant  = (Square)(epRank * 8 + epFile);
+		int epFile		 = fen[i + 0] - 'a';
+		int epRank		 = 8 - (fen[i + 1] - '0');
+		mEnPassantSquare = (Square)(epRank * 8 + epFile);
 	}
 	else
 	{
-		enPassant = Square::None;
+		mEnPassantSquare = Square::None;
 	}
 
 	// 5 occupancies
+	updateOccupancies();
+}
+
+
+void Chessboard::removePiece(PieceTypes piece, Square sq)
+{
+	BitUtils::popBit(mBitBoards[piece], to_index(sq));
+}
+
+
+void Chessboard::addPiece(PieceTypes piece, Square sq)
+{
+	BitUtils::setBit(mBitBoards[piece], to_index(sq));
+}
+
+
+void Chessboard::movePiece(PieceTypes piece, Square from, Square to)
+{
+	removePiece(piece, from);
+	addPiece(piece, to);
+}
+
+
+void Chessboard::updateOccupancies()
+{
 	mOccupancyBitboards[to_index(Side::White)] = mBitBoards[WKing] | mBitBoards[WQueen] | mBitBoards[WPawn] | mBitBoards[WKnight] | mBitBoards[WBishop] | mBitBoards[WRook];
 	mOccupancyBitboards[to_index(Side::Black)] = mBitBoards[BKing] | mBitBoards[BQueen] | mBitBoards[BPawn] | mBitBoards[BKnight] | mBitBoards[BBishop] | mBitBoards[BRook];
 
 	mOccupancyBitboards[to_index(Side::Both)] |= mOccupancyBitboards[to_index(Side::White)];
 	mOccupancyBitboards[to_index(Side::Both)] |= mOccupancyBitboards[to_index(Side::Black)];
+}
+
+
+PieceTypes Chessboard::pieceAt(Square sq) const
+{
+	int sqIndex = to_index(sq);
+	for (int p = 0; p < 12; ++p)
+	{
+		if (BitUtils::getBit(mBitBoards[p], sqIndex))
+			return (PieceTypes)p;
+	}
+	return PieceTypes::None;
+}
+
+
+BoardState Chessboard::saveState() const
+{
+	return {mCastlingRights, mEnPassantSquare, mHalfMoveClock, -1};
+}
+
+
+void Chessboard::restoreState(const BoardState &state)
+{
+	mCastlingRights	 = state.castle;
+	mEnPassantSquare = state.enPassant;
+	mHalfMoveClock	 = state.halfMoveClock;
 }
