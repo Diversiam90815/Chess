@@ -9,7 +9,6 @@
 
 #include "Chessboard.h"
 #include "Moves/Generation/MoveGeneration.h"
-#include "BitboardHelper.h"
 
 
 static void printBitboard(U64 bitboard)

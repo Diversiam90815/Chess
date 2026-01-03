@@ -7,11 +7,6 @@
 
 #pragma once
 
-#include <string>
-#include <functional>
-
-#include "Parameters.h"
-#include "MoveType.h"
 #include "BitboardTypes.h"
 
 
