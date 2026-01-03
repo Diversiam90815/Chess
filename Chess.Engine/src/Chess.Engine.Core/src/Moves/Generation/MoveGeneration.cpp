@@ -318,16 +318,25 @@ void MoveGeneration::generateAllMoves()
 		else if (piece == BPawn)
 			generatePawnMoves(bitboard, Side::Black);
 
-
 		// generate knight moves
+		if (currentSide == Side::White ? piece == WKnight : piece == BKnight)
+			generateKnightMoves(bitboard, currentSide);
 
 		// generate bishop moves
+		if (currentSide == Side::White ? piece == WBishop : piece == BBishop)
+			generateBishopMoves(bitboard, currentSide);
 
 		// generate rook moves
+		if (currentSide == Side::White ? piece == WRook : piece == BRook)
+			generateRookMoves(bitboard, currentSide);
 
 		// generate queen moves
+		if (currentSide == Side::White ? piece == WQueen : piece == BQueen)
+			generateQueenMoves(bitboard, currentSide);
 
 		// generate king moves
+		if (currentSide == Side::White ? piece == WKing : piece == BKing)
+			generateKingMoves(bitboard, currentSide);
 	}
 }
 
@@ -514,5 +523,160 @@ void MoveGeneration::generateEnPassantMoves(Side side, Square sourceSquare)
 			int targetEnPassant = BitUtils::lsb(enpassantCaptures);
 			// TODO: Add En Passant
 		}
+	}
+}
+
+
+void MoveGeneration::generateKnightMoves(U64 bitboard, Side side)
+{
+	while (bitboard)
+	{
+		int source	 = BitUtils::lsb(bitboard);
+
+		U64 captures = AttackTables::instance().knightAttacks((Square)source) &
+					   ((side == Side::White) ? ~mChessBoard.occ()[to_index(Side::White)] : ~mChessBoard.occ()[to_index(Side::Black)]);
+
+		while (captures)
+		{
+			int target = BitUtils::lsb(captures);
+
+			if (!BitUtils::getBit((side == Side::White) ? mChessBoard.occ()[to_index(Side::White)] : mChessBoard.occ()[to_index(Side::Black)], target))
+			{
+				// TODO: Add quiet move
+			}
+			else
+			{
+				// TODO: Add capture move
+			}
+
+
+			BitUtils::popBit(captures, target);
+		}
+
+		BitUtils::popBit(bitboard, source);
+	}
+}
+
+
+void MoveGeneration::generateRookMoves(U64 bitboard, Side side)
+{
+	while (bitboard)
+	{
+		int source	 = BitUtils::lsb(bitboard);
+
+		U64 captures = AttackTables::instance().rookAttacks((Square)source, mChessBoard.occ()[to_index(Side::Both)]) &
+					   ((side == Side::White) ? ~mChessBoard.occ()[to_index(Side::White)] : ~mChessBoard.occ()[to_index(Side::Black)]);
+
+		while (captures)
+		{
+			int target = BitUtils::lsb(captures);
+
+			if (!BitUtils::getBit((side == Side::White) ? mChessBoard.occ()[to_index(Side::White)] : mChessBoard.occ()[to_index(Side::Black)], target))
+			{
+				// TODO: Add quiet move
+			}
+			else
+			{
+				// TODO: Add capture move
+			}
+
+
+			BitUtils::popBit(captures, target);
+		}
+
+		BitUtils::popBit(bitboard, source);
+	}
+}
+
+
+void MoveGeneration::generateBishopMoves(U64 bitboard, Side side)
+{
+	while (bitboard)
+	{
+		int source	 = BitUtils::lsb(bitboard);
+
+		U64 captures = AttackTables::instance().bishopAttacks((Square)source, mChessBoard.occ()[to_index(Side::Both)]) &
+					   ((side == Side::White) ? ~mChessBoard.occ()[to_index(Side::White)] : ~mChessBoard.occ()[to_index(Side::Black)]);
+
+		while (captures)
+		{
+			int target = BitUtils::lsb(captures);
+
+			if (!BitUtils::getBit((side == Side::White) ? mChessBoard.occ()[to_index(Side::White)] : mChessBoard.occ()[to_index(Side::Black)], target))
+			{
+				// TODO: Add quiet move
+			}
+			else
+			{
+				// TODO: Add capture move
+			}
+
+
+			BitUtils::popBit(captures, target);
+		}
+
+		BitUtils::popBit(bitboard, source);
+	}
+}
+
+
+void MoveGeneration::generateQueenMoves(U64 bitboard, Side side)
+{
+	while (bitboard)
+	{
+		int source	 = BitUtils::lsb(bitboard);
+
+		U64 captures = AttackTables::instance().queenAttacks((Square)source, mChessBoard.occ()[to_index(Side::Both)]) &
+					   ((side == Side::White) ? ~mChessBoard.occ()[to_index(Side::White)] : ~mChessBoard.occ()[to_index(Side::Black)]);
+
+		while (captures)
+		{
+			int target = BitUtils::lsb(captures);
+
+			if (!BitUtils::getBit((side == Side::White) ? mChessBoard.occ()[to_index(Side::White)] : mChessBoard.occ()[to_index(Side::Black)], target))
+			{
+				// TODO: Add quiet move
+			}
+			else
+			{
+				// TODO: Add capture move
+			}
+
+
+			BitUtils::popBit(captures, target);
+		}
+
+		BitUtils::popBit(bitboard, source);
+	}
+}
+
+
+void MoveGeneration::generateKingMoves(U64 bitboard, Side side)
+{
+	while (bitboard)
+	{
+		int source = BitUtils::lsb(bitboard);
+
+		U64 captures =
+			AttackTables::instance().kingAttacks((Square)source) & ((side == Side::White) ? ~mChessBoard.occ()[to_index(Side::White)] : ~mChessBoard.occ()[to_index(Side::Black)]);
+
+		while (captures)
+		{
+			int target = BitUtils::lsb(captures);
+
+			if (!BitUtils::getBit((side == Side::White) ? mChessBoard.occ()[to_index(Side::White)] : mChessBoard.occ()[to_index(Side::Black)], target))
+			{
+				// TODO: Add quiet move
+			}
+			else
+			{
+				// TODO: Add capture move
+			}
+
+
+			BitUtils::popBit(captures, target);
+		}
+
+		BitUtils::popBit(bitboard, source);
 	}
 }

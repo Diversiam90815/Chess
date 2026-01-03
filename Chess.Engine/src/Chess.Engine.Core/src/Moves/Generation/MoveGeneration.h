@@ -52,6 +52,11 @@ private:
 	void												  generateCastlingMoves(U64 bitboard);
 	void												  generatePawnMoves(U64 bitboard, Side side);
 	void												  generateEnPassantMoves(Side side, Square sourceSquare);
+	void												  generateKnightMoves(U64 bitboard, Side side);
+	void												  generateRookMoves(U64 bitboard, Side side);
+	void												  generateBishopMoves(U64 bitboard, Side side);
+	void												  generateQueenMoves(U64 bitboard, Side side);
+	void												  generateKingMoves(U64 bitboard, Side side);
 
 	Chessboard											 &mChessBoard;
 
