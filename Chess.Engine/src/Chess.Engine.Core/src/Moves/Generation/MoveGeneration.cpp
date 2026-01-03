@@ -7,676 +7,309 @@
 
 #include "MoveGeneration.h"
 
+
 MoveGeneration::MoveGeneration(Chessboard &board) : mChessBoard(board) {}
 
 
-//
-// std::vector<PossibleMove> MoveGeneration::getMovesForPosition(const Position &position)
-//{
-//	// auto &piece = mChessBoard->getPiece(position);
-//
-//	// if (!piece)
-//	//	return {};
-//
-//	// auto					  player = piece->getColor();
-//
-//	// std::vector<PossibleMove> possibleMoves;
-//
-//	//{
-//	//	std::lock_guard<std::mutex> lock(mMoveMutex);
-//	//	possibleMoves = mAllLegalMovesForCurrentRound[position];
-//	//}
-//
-//	//// Add special moves available for this position to the possibleMoves
-//	// if (piece->getType() == PieceType::King)
-//	//{
-//	//	auto castlingMoves = generateCastlingMoves(position, player);
-//	//	for (auto &move : castlingMoves)
-//	//	{
-//	//		possibleMoves.push_back(move);
-//	//	}
-//	// }
-//
-//	// if (piece->getType() == PieceType::Pawn)
-//	//{
-//	//	if (canEnPassant(position, player))
-//	//	{
-//	//		auto enPasssantMove = generateEnPassantMove(position, player);
-//	//		possibleMoves.push_back(enPasssantMove);
-//	//	}
-//	// }
-//
-//	// if (GENERATION_DEBUG)
-//	//	LOG_DEBUG("Position {} has {} possible moves!", LoggingHelper::positionToString(position).c_str(), possibleMoves.size());
-//
-//	// return possibleMoves;
-//
-//	return {};
-//}
-//
-//
-// bool MoveGeneration::calculateAllLegalBasicMoves(PlayerColor playerColor)
-//{
-//	// auto playerPieces = mChessBoard->getPiecesFromPlayer(playerColor);
-//
-//	//// Clear the previous round legal-moves map
-//	//{
-//	//	std::lock_guard<std::mutex> lock(mMoveMutex);
-//	//	mAllLegalMovesForCurrentRound.clear();
-//	//}
-//
-//	//// Container to hold futures for each piece move generation
-//	// std::vector<std::future<std::pair<Position, std::vector<PossibleMove>>>> futures;
-//	// futures.reserve(playerPieces.size());
-//
-//	//// Launch async task
-//	// for (const auto &[startPosition, piece] : playerPieces)
-//	//{
-//	//	futures.push_back(std::async(std::launch::async,
-//	//								 [this, playerColor, startPosition, piece]() -> std::pair<Position, std::vector<PossibleMove>>
-//	//								 {
-//	//									 // Generate all pseudo-legal moves for this piece
-//	//									 auto					   possibleMoves = piece->getPossibleMoves(startPosition, *mChessBoard);
-//
-//	//									 // Validate them (i.e., filter out moves that leave the king in check)
-//	//									 std::vector<PossibleMove> validMoves;
-//	//									 validMoves.reserve(possibleMoves.size());
-//
-//	//									 for (const auto &pm : possibleMoves)
-//	//									 {
-//	//										 Move testMove(pm.start, pm.end, piece->getType());
-//	//										 if (mValidation->validateMove(testMove, playerColor))
-//	//										 {
-//	//											 validMoves.push_back(pm);
-//	//										 }
-//	//									 }
-//
-//	//									 return {startPosition, std::move(validMoves)};
-//	//								 }));
-//	//}
-//
-//	// size_t totalValidMoves = 0;
-//
-//	// for (auto &fut : futures)
-//	//{
-//	//	auto  result = fut.get();
-//	//	auto &pos	 = result.first;
-//	//	auto &moves	 = result.second;
-//	//	totalValidMoves += moves.size();
-//
-//	//	if (!moves.empty())
-//	//	{
-//	//		loadMoveToMap(pos, moves);
-//	//	}
-//	//}
-//
-//	// LOG_INFO("Calculating all moves finished, with {} moves!", totalValidMoves);
-//
-//	// return totalValidMoves != 0;
-//
-//	return false;
-//}
-//
-//
-// void MoveGeneration::loadMoveToMap(Position pos, std::vector<PossibleMove> moves)
-//{
-//	std::lock_guard<std::mutex> lock(mMoveMutex);
-//	mAllLegalMovesForCurrentRound.emplace(pos, std::move(moves));
-//}
-//
-//
-// std::vector<PossibleMove> MoveGeneration::generateCastlingMoves(const Position &kingPosition, PlayerColor player)
-//{
-//	std::vector<PossibleMove> castlingMoves;
-//	castlingMoves.reserve(2 * sizeof(castlingMoves)); // There are max. of 2 moves of castling
-//
-//	if (canCastle(kingPosition, player, true))
-//	{
-//		PossibleMove kingsideCastling;
-//		kingsideCastling.start = kingPosition;
-//		kingsideCastling.end   = Position{kingPosition.x + 2, kingPosition.y};
-//		kingsideCastling.type  = MoveType::CastlingKingside;
-//		castlingMoves.push_back(kingsideCastling);
-//	}
-//
-//	if (canCastle(kingPosition, player, false))
-//	{
-//		PossibleMove queensideCastling;
-//		queensideCastling.start = kingPosition;
-//		queensideCastling.end	= Position{kingPosition.x - 2, kingPosition.y};
-//		queensideCastling.type	= MoveType::CastlingQueenside;
-//		castlingMoves.push_back(queensideCastling);
-//	}
-//
-//	return castlingMoves;
-//}
-//
-//
-// bool MoveGeneration::canCastle(const Position &kingposition, PlayerColor player, bool kingside)
-//{
-//	// auto &king		= mChessBoard->getPiece(kingposition);
-//	// int	  direction = kingside ? +1 : -1; // Determine the direction of castling
-//
-//	// if (king->hasMoved())
-//	//	return false;
-//
-//	// if (mValidation->isKingInCheck(kingposition, player))
-//	//	return false;
-//
-//	//// Define the y-coordinate and king's x-coordinate
-//	// int		 y	   = kingposition.y;
-//	// int		 kingX = kingposition.x;
-//
-//	//// Determine the rook's position based on the direction
-//	// int		 rookX = (direction == 1) ? 7 : 0; // 7 for kingside (h-file), 0 for queenside (a-file)
-//	// Position rookPosition{rookX, y};
-//	// auto	&rook = mChessBoard->getPiece(rookPosition);
-//
-//	// if (!rook || rook->getType() != PieceType::Rook || rook->getColor() != player || rook->hasMoved())
-//	//	return false;
-//
-//	//// Check if way is free
-//	// for (int x = kingX + direction; x != rookX; x += direction)
-//	//{
-//	//	Position pos{x, y};
-//	//	if (!mChessBoard->isEmpty(pos))
-//	//		return false;
-//	// }
-//
-//	//// Check if way is under attack
-//	// std::vector<Position> positionsToCheck = {{kingX + direction, y}, {kingX + 2 * direction, y}};
-//	// for (const auto &pos : positionsToCheck)
-//	//{
-//	//	Move testMove(kingposition, pos, PieceType::King);
-//	//	if (mValidation->wouldKingBeInCheckAfterMove(testMove, player))
-//	//		return false;
-//	// }
-//
-//	return true;
-//}
-//
-//
-// PossibleMove MoveGeneration::generateEnPassantMove(const Position &position, PlayerColor player)
-//{
-//	// if (!canEnPassant(position, player))
-//	//	return PossibleMove();
-//
-//	// auto	 lastMove = mExecution->getLastMove();
-//
-//	//// Calculate target position
-//	// Position targetPosition;
-//	// if (player == PlayerColor::White)
-//	//{
-//	//	targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y - 1);
-//	// }
-//	// else
-//	//{
-//	//	targetPosition = Position(lastMove->endingPosition.x, lastMove->endingPosition.y + 1);
-//	// }
-//
-//	PossibleMove enPassantMove;
-//	enPassantMove.start = position;
-//	// enPassantMove.end	= targetPosition;
-//	enPassantMove.type	= MoveType::EnPassant | MoveType::Capture;
-//
-//	return enPassantMove;
-//}
-//
-//
-// bool MoveGeneration::canEnPassant(const Position &position, PlayerColor player)
-//{
-//	// auto lastMove = mExecution->getLastMove();
-//
-//	// if (!lastMove)
-//	//	return false;
-//
-//	//// Ensure if the last move was a pawn double push
-//	// bool lastMoveWasPawnDoublePush = (lastMove->type & MoveType::DoublePawnPush) == MoveType::DoublePawnPush;
-//	// if (!lastMoveWasPawnDoublePush)
-//	//	return false;
-//
-//	//// Ensure the last move was made by the opponent
-//	// if (lastMove->player == player)
-//	//	return false;
-//
-//	//// Ensure that the position match
-//	// Position lastMoveEndPosition = lastMove->endingPosition;
-//
-//	//// Check if the last moved pawn is on the same rank as the capturing pawn
-//	// bool	 sameRank			 = (lastMoveEndPosition.y == position.y);
-//	// if (!sameRank)
-//	//	return false;
-//
-//	//// Ensure both pawns are adjacent ranks
-//	// bool bothPiecesNextToEachOther = (std::abs(lastMoveEndPosition.x - position.x) == 1);
-//	// if (!bothPiecesNextToEachOther)
-//	//	return false;
-//
-//	//// Ensure the capturing pawn is on the correct rank for en passant
-//	// if ((player == PlayerColor::White && position.y != 3) || (player == PlayerColor::Black && position.y != 4))
-//	//	return false;
-//
-//	return true;
-//}
-//
-
-bool MoveGeneration::isSquareAttacked(Square square, Side side) const
+bool MoveGeneration::isSquareAttacked(Square square, Side attacker) const
 {
-	const auto &at		= AttackTables::instance();
-	const U64	occBoth = mChessBoard.occ()[to_index(Side::Both)];
+	const auto &at		 = AttackTables::instance();
+	const U64	occBoth	 = mChessBoard.occ()[to_index(Side::Both)];
+	const auto &pieces	 = mChessBoard.pieces();
 
-	// attacked by white pawns
-	if ((side == Side::White) && (at.pawnAttacks(Side::Black, square) & mChessBoard.pieces()[WPawn]))
+	const int	offset	 = (attacker == Side::White) ? 0 : 6;
+
+	// Pawns attack in reverse direction
+	Side		pawnSide = (attacker == Side::White) ? Side::Black : Side::White;
+	if (at.pawnAttacks(pawnSide, square) & pieces[WPawn + offset])
+		return true;
+	if (at.knightAttacks(square) & pieces[WKnight + offset])
 		return true;
 
-	// attacked by black pawns
-	if ((side == Side::Black) && (at.pawnAttacks(Side::White, square) & mChessBoard.pieces()[BPawn]))
+	if (at.kingAttacks(square) & pieces[WKing + offset])
 		return true;
 
-	// attacked by knights
-	if (at.knightAttacks(square) & ((side == Side::White) ? mChessBoard.pieces()[WKnight] : mChessBoard.pieces()[BKnight]))
+	if (at.bishopAttacks(square, occBoth) & pieces[WBishop + offset])
 		return true;
 
-	// attacked by kings
-	if (at.kingAttacks(square) & ((side == Side::White) ? mChessBoard.pieces()[WKing] : mChessBoard.pieces()[BKing]))
+	if (at.rookAttacks(square, occBoth) & pieces[WRook + offset])
 		return true;
 
-	// attacked by rooks
-	if (at.rookAttacks(square, occBoth) & ((side == Side::White) ? mChessBoard.pieces()[WRook] : mChessBoard.pieces()[BRook]))
-		return true;
-
-	// attacked by bishops
-	if (at.bishopAttacks(square, occBoth) & ((side == Side::White) ? mChessBoard.pieces()[WBishop] : mChessBoard.pieces()[BBishop]))
-		return true;
-
-	// attacked by queens
-	if (at.queenAttacks(square, occBoth) & ((side == Side::White) ? mChessBoard.pieces()[WQueen] : mChessBoard.pieces()[BQueen]))
+	if (at.queenAttacks(square, occBoth) & pieces[WQueen + offset])
 		return true;
 
 	return false;
 }
 
 
-void MoveGeneration::generateAllMoves()
+void MoveGeneration::generateAllMoves(MoveList &moves)
 {
-	Square sourceSquare = Square::None;
-	Square targetSqaure = Square::None;
+	moves.clear();
+	Side currentSide = mChessBoard.getCurrentSide();
 
-	U64	   bitboard		= 0ULL;
-	U64	   captures		= 0ULL;
-
-	Side   currentSide	= mChessBoard.getCurrentSide(); // TODO:: need to refactor
-
-	// loop over all PieceTypes (TODO: Refactor later)
-	for (int piece = WKing; piece <= BRook; piece++)
-	{
-		bitboard = mChessBoard.pieces()[piece]; // Get a copy of the piece's bitboard
-
-		// generate pawn moves
-		if (piece == WPawn)
-			generatePawnMoves(bitboard, Side::White);
-		else if (piece == BPawn)
-			generatePawnMoves(bitboard, Side::Black);
-
-		// generate knight moves
-		if (currentSide == Side::White ? piece == WKnight : piece == BKnight)
-			generateKnightMoves(bitboard, currentSide);
-
-		// generate bishop moves
-		if (currentSide == Side::White ? piece == WBishop : piece == BBishop)
-			generateBishopMoves(bitboard, currentSide);
-
-		// generate rook moves
-		if (currentSide == Side::White ? piece == WRook : piece == BRook)
-			generateRookMoves(bitboard, currentSide);
-
-		// generate queen moves
-		if (currentSide == Side::White ? piece == WQueen : piece == BQueen)
-			generateQueenMoves(bitboard, currentSide);
-
-		// generate king moves
-		if (currentSide == Side::White ? piece == WKing : piece == BKing)
-			generateKingMoves(bitboard, currentSide);
-	}
+	generatePawnMoves(moves, currentSide);
+	generateKnightMoves(moves, currentSide);
+	generateBishopMoves(moves, currentSide);
+	generateRookMoves(moves, currentSide);
+	generateQueenMoves(moves, currentSide);
+	generateKingMoves(moves, currentSide);
+	generateCastlingMoves(moves, currentSide);
 }
 
 
-void MoveGeneration::addMoveToList(PossibleMove &move) {}
-
-
-void MoveGeneration::generateCastlingMoves(U64 bitboard)
+void MoveGeneration::generateCastlingMoves(MoveList &moves, Side side)
 {
-	Castling castlingRights = mChessBoard.getCurrentCastlingRights();
-	U64		 allOccupancies = mChessBoard.occ()[to_index(Side::Both)];
-
-	if ((castlingRights & Castling::WK) != Castling::None)
-	{
-		// make sure squares between king and king's rook are empty
-		if (!BitUtils::getBit(allOccupancies, to_index(Square::f1)) && !BitUtils::getBit(allOccupancies, to_index(Square::g1)))
-		{
-			// Make sure the king and the f1 square are not under attack
-			if (!isSquareAttacked(Square::e1, Side::Black) && !isSquareAttacked(Square::f1, Side::Black))
-			{
-				// TODO: Add King side castling for white
-			}
-		}
-	}
-	if ((castlingRights & Castling::WQ) != Castling::None)
-	{
-		// make sure squares between king and queen's rook are empty
-		if (!BitUtils::getBit(allOccupancies, to_index(Square::d1)) && !BitUtils::getBit(allOccupancies, to_index(Square::c1)))
-		{
-			// Make sure the king and the d1 square are not under attack
-			if (!isSquareAttacked(Square::e1, Side::Black) && !isSquareAttacked(Square::d1, Side::Black))
-			{
-				// TODO: Add Queen side castling for white
-			}
-		}
-	}
-
-	if ((castlingRights & Castling::BK) != Castling::None)
-	{
-		// make sure squares between king and king's rook are empty
-		if (!BitUtils::getBit(allOccupancies, to_index(Square::f8)) && !BitUtils::getBit(allOccupancies, to_index(Square::g8)))
-		{
-			// Make sure the king and the f8 square are not under attack
-			if (!isSquareAttacked(Square::e8, Side::White) && !isSquareAttacked(Square::f8, Side::White))
-			{
-				// TODO: Add King side castling for black
-			}
-		}
-	}
-	if ((castlingRights & Castling::BQ) != Castling::None)
-	{
-		// make sure squares between king and queen's rook are empty
-		if (!BitUtils::getBit(allOccupancies, to_index(Square::d8)) && !BitUtils::getBit(allOccupancies, to_index(Square::c8)))
-		{
-			// Make sure the king and the d8 square are not under attack
-			if (!isSquareAttacked(Square::e8, Side::White) && !isSquareAttacked(Square::d8, Side::White))
-			{
-				// TODO: Add Queen side castling for black
-			}
-		}
-	}
-}
-
-
-void MoveGeneration::generatePawnMoves(U64 bitboard, Side side)
-{
-	Square sourceSquare = Square::None;
-	Square targetSqaure = Square::None;
+	Castling rights = mChessBoard.getCurrentCastlingRights();
+	U64		 occ	= mChessBoard.occ()[to_index(Side::Both)];
+	Side	 enemy	= (side == Side::White) ? Side::Black : Side::White;
 
 	if (side == Side::White)
 	{
-		while (bitboard)
+		// Kingside
+		if ((rights & Castling::WK) != Castling::None)
 		{
-			int source	 = BitUtils::lsb(bitboard);
-			int target	 = source - 8;
-
-			sourceSquare = (Square)source;
-			targetSqaure = (Square)target;
-
-			if (!(target < to_index(Square::a8)) && !BitUtils::getBit(mChessBoard.occ()[to_index(Side::Both)], target))
+			if (!BitUtils::getBit(occ, to_index(Square::f1)) && !BitUtils::getBit(occ, to_index(Square::g1)) && !isSquareAttacked(Square::e1, enemy) &&
+				!isSquareAttacked(Square::f1, enemy))
 			{
-				// pawn promotion
-				if (sourceSquare >= Square::a7 && sourceSquare <= Square::h7)
-				{
-					// TODO: Add pawn promotion to move list
-				}
-				else
-				{
-					// TODO: Add pawn move to move list
-
-					// Double pawn push
-					if (sourceSquare >= Square::a2 && sourceSquare <= Square::h2 && !BitUtils::getBit(mChessBoard.occ()[to_index(Side::Both)], target - 8))
-					{
-						// TODO: Add double pawn push move to list
-					}
-				}
+				moves.push(Move(Square::e1, Square::g1, MoveFlag::KingCastle));
 			}
-
-			// captures
-			U64 captures = AttackTables::instance().pawnAttacks(side, sourceSquare) & mChessBoard.occ()[to_index(Side::Black)];
-
-			while (captures)
-			{
-				target = BitUtils::lsb(captures);
-
-				// TODO: Check for promotion capture
-				if (sourceSquare >= Square::a7 && sourceSquare <= Square::h7)
-				{
-					// Promotion capture
-				}
-
-				// TODO: Add capture move
-
-				BitUtils::popBit(captures, target);
-			}
-
-			BitUtils::popBit(bitboard, source);
 		}
-	}
-	else if (side == Side::Black)
-	{
-
-		while (bitboard)
+		// Queenside
+		if ((rights & Castling::WQ) != Castling::None)
 		{
-			int source = BitUtils::lsb(bitboard);
-			int target = source + 8;
-
-			if (!(target > to_index(Square::h1)) && !BitUtils::getBit(mChessBoard.occ()[to_index(Side::Both)], target))
+			if (!BitUtils::getBit(occ, to_index(Square::d1)) && !BitUtils::getBit(occ, to_index(Square::c1)) && !BitUtils::getBit(occ, to_index(Square::b1)) &&
+				!isSquareAttacked(Square::e1, enemy) && !isSquareAttacked(Square::d1, enemy))
 			{
-				sourceSquare = (Square)source;
-				targetSqaure = (Square)target;
-
-				// pawn promotion
-				if (sourceSquare >= Square::a2 && sourceSquare <= Square::h2)
-				{
-					// TODO: Add pawn promotion to move list
-				}
-				else
-				{
-					// TODO: Add pawn move to move list
-
-					// Double pawn push
-					if (sourceSquare >= Square::a7 && sourceSquare <= Square::h7 && !BitUtils::getBit(mChessBoard.occ()[to_index(Side::Both)], target + 8))
-					{
-						// TODO: Add double pawn push move to list
-					}
-				}
-			}
-
-			// captures
-			U64 captures = AttackTables::instance().pawnAttacks(side, sourceSquare) & mChessBoard.occ()[to_index(Side::White)];
-
-			while (captures)
-			{
-				target = BitUtils::lsb(captures);
-
-				// TODO: Check for promotion capture
-				if (sourceSquare >= Square::a2 && sourceSquare <= Square::h2)
-				{
-					// Promotion capture
-				}
-
-				// TODO: Add capture move
-
-				BitUtils::popBit(captures, target);
+				moves.push(Move(Square::e1, Square::c1, MoveFlag::QueenCastle));
 			}
 		}
 	}
-
-	generateEnPassantMoves(side, sourceSquare);
-}
-
-
-void MoveGeneration::generateEnPassantMoves(Side side, Square sourceSquare)
-{
-	Square currentEnPassantSquare = mChessBoard.getCurrentEnPassantSqaure();
-
-	if (currentEnPassantSquare != Square::None)
+	else
 	{
-		U64 enpassantCaptures = AttackTables::instance().pawnAttacks(side, sourceSquare) & (1ULL << to_index(currentEnPassantSquare));
-
-		if (enpassantCaptures)
+		// Kingside
+		if ((rights & Castling::BK) != Castling::None)
 		{
-			int targetEnPassant = BitUtils::lsb(enpassantCaptures);
-			// TODO: Add En Passant
+			if (!BitUtils::getBit(occ, to_index(Square::f8)) && !BitUtils::getBit(occ, to_index(Square::g8)) && !isSquareAttacked(Square::e8, enemy) &&
+				!isSquareAttacked(Square::f8, enemy))
+			{
+				moves.push(Move(Square::e8, Square::g8, MoveFlag::KingCastle));
+			}
+		}
+		// Queenside
+		if ((rights & Castling::BQ) != Castling::None)
+		{
+			if (!BitUtils::getBit(occ, to_index(Square::d8)) && !BitUtils::getBit(occ, to_index(Square::c8)) && !BitUtils::getBit(occ, to_index(Square::b8)) &&
+				!isSquareAttacked(Square::e8, enemy) && !isSquareAttacked(Square::d8, enemy))
+			{
+				moves.push(Move(Square::e8, Square::c8, MoveFlag::QueenCastle));
+			}
 		}
 	}
 }
 
 
-void MoveGeneration::generateKnightMoves(U64 bitboard, Side side)
+void MoveGeneration::generatePawnMoves(MoveList &moves, Side side)
 {
-	while (bitboard)
+	const auto &at			 = AttackTables::instance();
+	const U64	occBoth		 = mChessBoard.occ()[to_index(Side::Both)];
+	const U64	occEnemy	 = mChessBoard.occ()[to_index(side == Side::White ? Side::Black : Side::White)];
+
+	const int	pawnType	 = (side == Side::White) ? WPawn : BPawn;
+	U64			pawns		 = mChessBoard.pieces()[pawnType];
+
+	const int	pushDir		 = (side == Side::White) ? -8 : 8;
+	const int	startRankMin = (side == Side::White) ? to_index(Square::a2) : to_index(Square::a7);
+	const int	startRankMax = (side == Side::White) ? to_index(Square::h2) : to_index(Square::h7);
+	const int	promoRankMin = (side == Side::White) ? to_index(Square::a7) : to_index(Square::a2);
+	const int	promoRankMax = (side == Side::White) ? to_index(Square::h7) : to_index(Square::h2);
+
+	while (pawns)
 	{
-		int source	 = BitUtils::lsb(bitboard);
+		int	   source	   = BitUtils::lsb(pawns);
+		int	   target	   = source + pushDir;
+		Square from		   = static_cast<Square>(source);
+		Square to		   = static_cast<Square>(target);
 
-		U64 captures = AttackTables::instance().knightAttacks((Square)source) &
-					   ((side == Side::White) ? ~mChessBoard.occ()[to_index(Side::White)] : ~mChessBoard.occ()[to_index(Side::Black)]);
+		bool   isPromoRank = (source >= promoRankMin && source <= promoRankMax);
 
-		while (captures)
+		// Single push
+		if (!BitUtils::getBit(occBoth, target))
 		{
-			int target = BitUtils::lsb(captures);
-
-			if (!BitUtils::getBit((side == Side::White) ? mChessBoard.occ()[to_index(Side::White)] : mChessBoard.occ()[to_index(Side::Black)], target))
+			if (isPromoRank)
 			{
-				// TODO: Add quiet move
+				moves.push(Move(from, to, MoveFlag::QueenPromotion));
+				moves.push(Move(from, to, MoveFlag::BishopPromotion));
+				moves.push(Move(from, to, MoveFlag::RookPromotion));
+				moves.push(Move(from, to, MoveFlag::KnightPromotion));
 			}
 			else
 			{
-				// TODO: Add capture move
+				moves.push(Move(from, to, MoveFlag::Quiet));
+
+				// double push
+				if (source >= startRankMin && source <= startRankMax)
+				{
+					int doublePush = target + pushDir;
+
+					if (!BitUtils::getBit(occBoth, doublePush))
+						moves.push(Move(from, static_cast<Square>(doublePush), MoveFlag::DoublePawnPush));
+				}
 			}
-
-
-			BitUtils::popBit(captures, target);
 		}
 
-		BitUtils::popBit(bitboard, source);
+		// Captures
+		U64 captures = at.pawnAttacks(side, from) & occEnemy;
+		while (captures)
+		{
+			int	   capTarget = BitUtils::lsb(captures);
+			Square capTo	 = static_cast<Square>(capTarget);
+
+			if (isPromoRank)
+			{
+				moves.push(Move(from, capTo, MoveFlag::QueenPromoCapture));
+				moves.push(Move(from, capTo, MoveFlag::BishopPromoCapture));
+				moves.push(Move(from, capTo, MoveFlag::RookPromoCapture));
+				moves.push(Move(from, capTo, MoveFlag::KnightPromoCapture));
+			}
+			else
+				moves.push(Move(from, to, MoveFlag::Capture));
+
+			BitUtils::popBit(captures, capTarget);
+		}
+
+		// En Passant
+		Square epSquare = mChessBoard.getCurrentEnPassantSqaure();
+		if (epSquare != Square::None)
+		{
+			U64 epCapture = at.pawnAttacks(side, from) & (1ULL << to_index(epSquare));
+
+			if (epCapture)
+				moves.push(Move(from, epSquare, MoveFlag::EnPassant));
+		}
+
+		BitUtils::popBit(pawns, source);
 	}
 }
 
 
-void MoveGeneration::generateRookMoves(U64 bitboard, Side side)
+void MoveGeneration::generateKnightMoves(MoveList &moves, Side side)
 {
-	while (bitboard)
+	const auto &at		   = AttackTables::instance();
+	const int	knightType = (side == Side::White) ? WKnight : BKnight;
+	U64			knights	   = mChessBoard.pieces()[knightType];
+	const U64	ownOcc	   = mChessBoard.occ()[to_index(side)];
+	const U64	enemyOcc   = mChessBoard.occ()[to_index(side == Side::White ? Side::Black : Side::White)];
+
+	while (knights)
 	{
-		int source	 = BitUtils::lsb(bitboard);
+		int	   source  = BitUtils::lsb(knights);
+		Square from	   = static_cast<Square>(source);
+		U64	   attacks = at.knightAttacks(from) & ~ownOcc;
 
-		U64 captures = AttackTables::instance().rookAttacks((Square)source, mChessBoard.occ()[to_index(Side::Both)]) &
-					   ((side == Side::White) ? ~mChessBoard.occ()[to_index(Side::White)] : ~mChessBoard.occ()[to_index(Side::Black)]);
+		addSlidingMoves(moves, from, attacks, enemyOcc);
 
-		while (captures)
-		{
-			int target = BitUtils::lsb(captures);
-
-			if (!BitUtils::getBit((side == Side::White) ? mChessBoard.occ()[to_index(Side::White)] : mChessBoard.occ()[to_index(Side::Black)], target))
-			{
-				// TODO: Add quiet move
-			}
-			else
-			{
-				// TODO: Add capture move
-			}
-
-
-			BitUtils::popBit(captures, target);
-		}
-
-		BitUtils::popBit(bitboard, source);
+		BitUtils::popBit(knights, source);
 	}
 }
 
 
-void MoveGeneration::generateBishopMoves(U64 bitboard, Side side)
+void MoveGeneration::generateRookMoves(MoveList &moves, Side side)
 {
-	while (bitboard)
+	const auto &at		 = AttackTables::instance();
+	const int	rookType = (side == Side::White) ? WRook : BRook;
+	U64			rooks	 = mChessBoard.pieces()[rookType];
+	const U64	occBoth	 = mChessBoard.occ()[to_index(Side::Both)];
+	const U64	ownOcc	 = mChessBoard.occ()[to_index(side)];
+	const U64	enemyOcc = mChessBoard.occ()[to_index(side == Side::White ? Side::Black : Side::White)];
+
+	while (rooks)
 	{
-		int source	 = BitUtils::lsb(bitboard);
+		int	   source  = BitUtils::lsb(rooks);
+		Square from	   = static_cast<Square>(source);
+		U64	   attacks = at.rookAttacks(from, occBoth) & ~ownOcc;
 
-		U64 captures = AttackTables::instance().bishopAttacks((Square)source, mChessBoard.occ()[to_index(Side::Both)]) &
-					   ((side == Side::White) ? ~mChessBoard.occ()[to_index(Side::White)] : ~mChessBoard.occ()[to_index(Side::Black)]);
+		addSlidingMoves(moves, from, attacks, enemyOcc);
 
-		while (captures)
-		{
-			int target = BitUtils::lsb(captures);
-
-			if (!BitUtils::getBit((side == Side::White) ? mChessBoard.occ()[to_index(Side::White)] : mChessBoard.occ()[to_index(Side::Black)], target))
-			{
-				// TODO: Add quiet move
-			}
-			else
-			{
-				// TODO: Add capture move
-			}
-
-
-			BitUtils::popBit(captures, target);
-		}
-
-		BitUtils::popBit(bitboard, source);
+		BitUtils::popBit(rooks, source);
 	}
 }
 
 
-void MoveGeneration::generateQueenMoves(U64 bitboard, Side side)
+void MoveGeneration::generateBishopMoves(MoveList &moves, Side side)
 {
-	while (bitboard)
+	const auto &at		   = AttackTables::instance();
+	const int	bishopType = (side == Side::White) ? WBishop : BBishop;
+	U64			bishops	   = mChessBoard.pieces()[bishopType];
+	const U64	occBoth	   = mChessBoard.occ()[to_index(Side::Both)];
+	const U64	ownOcc	   = mChessBoard.occ()[to_index(side)];
+	const U64	enemyOcc   = mChessBoard.occ()[to_index(side == Side::White ? Side::Black : Side::White)];
+
+	while (bishops)
 	{
-		int source	 = BitUtils::lsb(bitboard);
+		int	   source  = BitUtils::lsb(bishops);
+		Square from	   = static_cast<Square>(source);
+		U64	   attacks = at.bishopAttacks(from, occBoth) & ~ownOcc;
 
-		U64 captures = AttackTables::instance().queenAttacks((Square)source, mChessBoard.occ()[to_index(Side::Both)]) &
-					   ((side == Side::White) ? ~mChessBoard.occ()[to_index(Side::White)] : ~mChessBoard.occ()[to_index(Side::Black)]);
+		addSlidingMoves(moves, from, attacks, enemyOcc);
 
-		while (captures)
-		{
-			int target = BitUtils::lsb(captures);
-
-			if (!BitUtils::getBit((side == Side::White) ? mChessBoard.occ()[to_index(Side::White)] : mChessBoard.occ()[to_index(Side::Black)], target))
-			{
-				// TODO: Add quiet move
-			}
-			else
-			{
-				// TODO: Add capture move
-			}
-
-
-			BitUtils::popBit(captures, target);
-		}
-
-		BitUtils::popBit(bitboard, source);
+		BitUtils::popBit(bishops, source);
 	}
 }
 
 
-void MoveGeneration::generateKingMoves(U64 bitboard, Side side)
+void MoveGeneration::generateQueenMoves(MoveList &moves, Side side)
 {
-	while (bitboard)
+	const auto &at		  = AttackTables::instance();
+	const int	queenType = (side == Side::White) ? WQueen : BQueen;
+	U64			queens	  = mChessBoard.pieces()[queenType];
+	const U64	occBoth	  = mChessBoard.occ()[to_index(Side::Both)];
+	const U64	ownOcc	  = mChessBoard.occ()[to_index(side)];
+	const U64	enemyOcc  = mChessBoard.occ()[to_index(side == Side::White ? Side::Black : Side::White)];
+
+	while (queens)
 	{
-		int source = BitUtils::lsb(bitboard);
+		int	   source  = BitUtils::lsb(queens);
+		Square from	   = static_cast<Square>(source);
+		U64	   attacks = at.queenAttacks(from, occBoth) & ~ownOcc;
 
-		U64 captures =
-			AttackTables::instance().kingAttacks((Square)source) & ((side == Side::White) ? ~mChessBoard.occ()[to_index(Side::White)] : ~mChessBoard.occ()[to_index(Side::Black)]);
+		addSlidingMoves(moves, from, attacks, enemyOcc);
 
-		while (captures)
-		{
-			int target = BitUtils::lsb(captures);
-
-			if (!BitUtils::getBit((side == Side::White) ? mChessBoard.occ()[to_index(Side::White)] : mChessBoard.occ()[to_index(Side::Black)], target))
-			{
-				// TODO: Add quiet move
-			}
-			else
-			{
-				// TODO: Add capture move
-			}
+		BitUtils::popBit(queens, source);
+	}
+}
 
 
-			BitUtils::popBit(captures, target);
-		}
+void MoveGeneration::generateKingMoves(MoveList &moves, Side side)
+{
+	const auto &at		 = AttackTables::instance();
+	const int	kingType = (side == Side::White) ? WKing : BKing;
+	U64			king	 = mChessBoard.pieces()[kingType];
+	const U64	ownOcc	 = mChessBoard.occ()[to_index(side)];
+	const U64	enemyOcc = mChessBoard.occ()[to_index(side == Side::White ? Side::Black : Side::White)];
 
-		BitUtils::popBit(bitboard, source);
+	if (king)
+	{
+		int	   source  = BitUtils::lsb(king);
+		Square from	   = static_cast<Square>(source);
+		U64	   attacks = at.kingAttacks(from) & ~ownOcc;
+
+		addSlidingMoves(moves, from, attacks, enemyOcc);
+	}
+}
+
+
+void MoveGeneration::addSlidingMoves(MoveList &moves, Square from, U64 attacks, U64 enemyOcc)
+{
+	while (attacks)
+	{
+		int	   target = BitUtils::lsb(attacks);
+		Square to	  = static_cast<Square>(target);
+
+		if (BitUtils::getBit(enemyOcc, target))
+			moves.push(Move(from, to, MoveFlag::Capture));
+		else
+			moves.push(Move(from, to, MoveFlag::Quiet));
+
+		BitUtils::popBit(attacks, target);
 	}
 }

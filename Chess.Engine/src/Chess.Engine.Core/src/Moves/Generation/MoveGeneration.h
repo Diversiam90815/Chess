@@ -25,41 +25,23 @@
 class MoveGeneration
 {
 public:
-	MoveGeneration(Chessboard &board);
+	explicit MoveGeneration(Chessboard &board);
 	~MoveGeneration() = default;
 
-	// std::vector<PossibleMove> getMovesForPosition(const Position &position);
-
-	// bool					  calculateAllLegalBasicMoves(PlayerColor playerColor);
-
-
-	bool isSquareAttacked(Square square, Side side) const;
-	void generateAllMoves();
+	bool isSquareAttacked(Square square, Side attacker) const;
+	void generateAllMoves(MoveList & moves);
 
 private:
-	// std::vector<PossibleMove>								generateCastlingMoves(const Position &kingPosition, PlayerColor player);
 
-	// bool													canCastle(const Position &kingposition, PlayerColor player, bool kingside);
+	void												  generateCastlingMoves(MoveList &moves, Side side);
+	void												  generatePawnMoves(MoveList &moves, Side side);
+	void												  generateKnightMoves(MoveList &moves, Side side);
+	void												  generateRookMoves(MoveList &moves, Side side);
+	void												  generateBishopMoves(MoveList &moves, Side side);
+	void												  generateQueenMoves(MoveList &moves, Side side);
+	void												  generateKingMoves(MoveList &moves, Side side);
 
-	// PossibleMove											generateEnPassantMove(const Position &position, PlayerColor player);
-
-	// bool													canEnPassant(const Position &position, PlayerColor player);
-
-	// void													loadMoveToMap(Position pos, std::vector<PossibleMove> moves);
-
-	void												  addMoveToList(PossibleMove &move);
-
-	void												  generateCastlingMoves(U64 bitboard);
-	void												  generatePawnMoves(U64 bitboard, Side side);
-	void												  generateEnPassantMoves(Side side, Square sourceSquare);
-	void												  generateKnightMoves(U64 bitboard, Side side);
-	void												  generateRookMoves(U64 bitboard, Side side);
-	void												  generateBishopMoves(U64 bitboard, Side side);
-	void												  generateQueenMoves(U64 bitboard, Side side);
-	void												  generateKingMoves(U64 bitboard, Side side);
+	void												  addSlidingMoves(MoveList &moves, Square from, U64 attacks, U64 enemyOcc);
 
 	Chessboard											 &mChessBoard;
-
-	std::unordered_map<Square, std::vector<PossibleMove>> mAllMoves;
-	std::mutex											  mMoveMutex;
 };
