@@ -8,8 +8,8 @@
 #include "CPUPlayer.h"
 
 
-CPUPlayer::CPUPlayer(MoveGeneration &moveGeneration, MoveEvaluation &moveEvaluation, Chessboard &board)
-	: mMoveGeneration(moveGeneration), mMoveEvaluation(moveEvaluation), mBoard(board), mRandomGenerator(mRandomDevice()), mPositionalEvaluation(mMoveEvaluation)
+CPUPlayer::CPUPlayer(MoveGeneration &moveGeneration, Chessboard &board)
+	: mMoveGeneration(moveGeneration), mBoard(board), mRandomGenerator(mRandomDevice())
 {
 }
 

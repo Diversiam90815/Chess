@@ -9,7 +9,7 @@
 
 
 GameEngine::GameEngine()
-	: mMoveGeneration(mChessBoard), mMoveExecution(mChessBoard), mMoveEvaluation(mChessBoard, mMoveGeneration), mCPUPlayer(mMoveGeneration, mMoveEvaluation, mChessBoard)
+	: mMoveGeneration(mChessBoard), mMoveExecution(mChessBoard), mCPUPlayer(mMoveGeneration, mChessBoard)
 {
 }
 
@@ -246,7 +246,7 @@ bool GameEngine::initiateMove(const Position &startPosition)
 }
 
 
-void GameEngine::executeMove(PossibleMove &tmpMove, bool fromRemote)
+void GameEngine::makeMove(Move move, bool fromRemote)
 {
 	PossibleMove moveToExecute{};
 

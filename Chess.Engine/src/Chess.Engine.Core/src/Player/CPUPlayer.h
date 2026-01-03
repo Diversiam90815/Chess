@@ -16,10 +16,8 @@
 
 #include "Parameters.h"
 #include "Generation/MoveGeneration.h"
-#include "Evaluation/MoveEvaluation.h"
 #include "ChessBoard.h"
 #include "IObservable.h"
-#include "PositionalEvaluation.h"
 
 
 #define DEBUG_MOVES 0
@@ -86,7 +84,7 @@ struct CPUConfiguration
 class CPUPlayer : public ICPUMoveObservable
 {
 public:
-	CPUPlayer(MoveGeneration &moveGeneration, MoveEvaluation &moveEvaluation, Chessboard &board);
+	CPUPlayer(MoveGeneration &moveGeneration, Chessboard &board);
 	~CPUPlayer();
 
 	/**
@@ -281,9 +279,7 @@ private:
 	CPUConfiguration								 mConfig;
 
 	MoveGeneration									&mMoveGeneration;
-	MoveEvaluation									&mMoveEvaluation;
 	Chessboard										&mBoard;
-	PositionalEvaluation							 mPositionalEvaluation;
 
 	std::jthread									 mSearchThread;
 

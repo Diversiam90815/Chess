@@ -12,7 +12,6 @@
 
 #include "Execution/MoveExecution.h"
 #include "Generation/MoveGeneration.h"
-#include "Evaluation/MoveEvaluation.h"
 #include "CPUPlayer.h"
 #include "IObservable.h"
 #include "Parameters.h"
@@ -30,64 +29,80 @@ public:
 
 	void					   init();
 	void					   reset();
-
 	void					   startGame();
 	void					   resetGame();
 
-	void					   executeMove(PossibleMove &tmpMove, bool fromRemote = false);
+	// Move operations
+	void					   makeMove(Move move, bool fromRemote = false);
 	void					   undoMove();
 
-	// PieceType				   getCurrentPieceTypeAtPosition(const Position position);
+	// Move generation
+	void					   generateMoves(MoveList &moves);
+	bool					   isLegalMove(Move move);
+	
+	// Game state
+	bool					   isInCheck() const;
+	bool					   isCheckmate();
+	bool					   isStalemate();
+	bool					   isDraw() const;
 
-	std::vector<PossibleMove>  getPossibleMoveForPosition();
-
-	// bool					   getBoardState(BoardStateArray boardState);
-
-	bool					   checkForValidMoves(const PossibleMove &move);
-	bool					   checkForPawnPromotionMove(const PossibleMove &move);
-
-	std::optional<PlayerColor> getWinner() const;
-
-	void					   endGame(EndGameState state, PlayerColor player = PlayerColor::None) override;
-	void					   changeCurrentPlayer(PlayerColor player) override;
+	// Player management
+	void					   switchTurns();
+	Side					   getCurrentSide() const { return mChessBoard.getCurrentSide(); }
 	PlayerColor				   getCurrentPlayer() const;
+	void					   changeCurrentPlayer(PlayerColor player) override;
 
 	void					   setLocalPlayer(PlayerColor player);
 	PlayerColor				   getLocalPlayer() const;
 
-	void					   switchTurns();
-
-	bool					   calculateAllMovesForPlayer();
-
-	bool					   initiateMove(const Position &startPosition);
-
+	// End game
 	EndGameState			   checkForEndGameConditions();
+	void					   endGame(EndGameState state, PlayerColor player = PlayerColor::None) override;
+	std::optional<PlayerColor> getWinner() const;
 
+	// CPU Player
 	void					   setCPUConfiguration(const CPUConfiguration &config);
-
 	CPUConfiguration		   getCPUConfiguration() const;
-
 	bool					   isCPUPlayer(PlayerColor player) const;
-
 	void					   requestCPUMoveAsync();
+
+	// Accessors
+	const Chessboard		  &getBoard() const { return mChessBoard; }
+	Chessboard				  &getBoard() { return mChessBoard; }
+
+
+	//// PieceType				   getCurrentPieceTypeAtPosition(const Position position);
+
+	//std::vector<PossibleMove>  getPossibleMoveForPosition();
+
+	//// bool					   getBoardState(BoardStateArray boardState);
+
+	//bool					   checkForValidMoves(const PossibleMove &move);
+	//bool					   checkForPawnPromotionMove(const PossibleMove &move);
+
+
+
+
+
+	//bool					   calculateAllMovesForPlayer();
+
+	//bool					   initiateMove(const Position &startPosition);
+
+
 
 
 private:
-	bool					  mMovesGeneratedForCurrentTurn = false;
+	//bool					  mMovesGeneratedForCurrentTurn = false;
 
 	Player					  mWhitePlayer;
 	Player					  mBlackPlayer;
-
 	PlayerColor				  mCurrentPlayer = PlayerColor::None;
 
-	std::vector<PossibleMove> mAllMovesForPosition;
+	//std::vector<PossibleMove> mAllMovesForPosition;
 
 	Chessboard				  mChessBoard;
-
 	MoveGeneration			  mMoveGeneration;
 	MoveExecution			  mMoveExecution;
-	MoveEvaluation			  mMoveEvaluation;
-
 	CPUPlayer				  mCPUPlayer;
 
 	std::mutex				  mMutex;
