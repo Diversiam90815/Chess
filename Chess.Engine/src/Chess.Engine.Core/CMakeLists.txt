@@ -16,7 +16,7 @@ set (COMMUNICATION_DIR				${SOURCE_DIR}/Communication)
 set (NETWORK_DIR					${SOURCE_DIR}/Network)
 set (MULTIPLAYER_DIR				${SOURCE_DIR}/Multiplayer)
 set (STATEMACHINE_DIR				${SOURCE_DIR}/StateMachine)
-set (POSITIONALEVALUATION_DIR       ${SOURCE_DIR}/PositionalEvaluation)
+set (EVALUATION_DIR					${SOURCE_DIR}/Evaluation)
 
 
 set(ALL_PROJECT_DIRS 
@@ -34,7 +34,7 @@ set(ALL_PROJECT_DIRS
 			${NETWORK_DIR}
 			${MULTIPLAYER_DIR}
 			${STATEMACHINE_DIR}
-			${POSITIONALEVALUATION_DIR}
+			${EVALUATION_DIR}
 )
 
 include_directories(${ALL_PROJECT_DIRS})
@@ -60,7 +60,6 @@ set(MOVE_FILES
 	${MOVE_DIR}/Move.h
 	${MOVE_DIR}/Generation/MoveGeneration.h		${MOVE_DIR}/Generation/MoveGeneration.cpp
 	${MOVE_DIR}/Execution/MoveExecution.h		${MOVE_DIR}/Execution/MoveExecution.cpp
-	${MOVE_DIR}/Evaluation/MoveEvaluation.h		${MOVE_DIR}/Evaluation/MoveEvaluation.cpp
 	${MOVE_DIR}/Notation/MoveNotation.h			${MOVE_DIR}/Notation/MoveNotation.cpp
 )
 
@@ -108,8 +107,8 @@ set(COMMUNICATION_FILES
 	${COMMUNICATION_DIR}/UICommunication.h    ${COMMUNICATION_DIR}/UICommunication.cpp
 )
 
-set(POSITIONALEVALUATION_FILES
-	${POSITIONALEVALUATION_DIR}/PositionalEvaluation.h  	${POSITIONALEVALUATION_DIR}/PositionalEvaluation.cpp  
+set(EVALUATION_FILES
+	${EVALUATION_DIR}/Evaluation.h  	${EVALUATION_DIR}/Evaluation.cpp  
 )
 
 set(MULTIPLAYER_FILES
@@ -142,7 +141,7 @@ set(ALL_FILES
 	${NETWORK_FILES}
 	${MULTIPLAYER_FILES}
 	${STATEMACHINE_FILES}
-	${POSITIONALEVALUATION_FILES}
+	${EVALUATION_FILES}
 )
 
 
