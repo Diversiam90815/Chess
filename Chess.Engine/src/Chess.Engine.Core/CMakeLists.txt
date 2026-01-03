@@ -45,11 +45,10 @@ set(STATEMACHINE_FILES
 )
 
 set(GAMEENGINE_FILES
-	${GAME_ENGINE_DIR}/GameEngine.h	${GAME_ENGINE_DIR}/GameEngine.cpp
+	${GAME_ENGINE_DIR}/GameEngine.h		${GAME_ENGINE_DIR}/GameEngine.cpp
 )
 
 set(BOARD_FILES
-	${BOARD_DIR}/BitboardHelper.h
 	${BOARD_DIR}/BitboardUtils.h
 	${BOARD_DIR}/BitboardTypes.h
 	${BOARD_DIR}/MagicGenerator.h
@@ -58,7 +57,6 @@ set(BOARD_FILES
 )
 	
 set(MOVE_FILES
-	${MOVE_DIR}/MoveType.h
 	${MOVE_DIR}/Move.h
 	${MOVE_DIR}/Generation/MoveGeneration.h		${MOVE_DIR}/Generation/MoveGeneration.cpp
 	${MOVE_DIR}/Execution/MoveExecution.h		${MOVE_DIR}/Execution/MoveExecution.cpp
