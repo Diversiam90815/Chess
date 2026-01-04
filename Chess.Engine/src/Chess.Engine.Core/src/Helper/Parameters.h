@@ -24,28 +24,28 @@ constexpr int queenValue		= 9;
 constexpr int BOARD_SIZE		= 8;
 constexpr int PLAYER_PIECES_NUM = 2 * BOARD_SIZE;
 
+//
+// enum class PieceType
+//{
+//	DefaultType,
+//	Pawn,
+//	Knight,
+//	Bishop,
+//	Rook,
+//	Queen,
+//	King
+//};
 
-enum class PieceType
-{
-	DefaultType,
-	Pawn,
-	Knight,
-	Bishop,
-	Rook,
-	Queen,
-	King
-};
-
-
-/// <summary>
-/// Represents the possible colors for a player.
-/// </summary>
-enum class PlayerColor
-{
-	None  = 0,
-	White = 1,
-	Black = 2
-};
+//
+///// <summary>
+///// Represents the possible colors for a player.
+///// </summary>
+// enum class PlayerColor
+//{
+//	None  = 0,
+//	White = 1,
+//	Black = 2
+// };
 
 
 /// <summary>
@@ -56,7 +56,8 @@ enum class EndGameState
 	OnGoing	  = 1,
 	Checkmate = 2,
 	StaleMate = 3,
-	Reset	  = 4
+	Draw	  = 4,
+	Reset	  = 5
 };
 
 
@@ -115,7 +116,7 @@ enum class GameModeSelection
 struct GameConfiguration
 {
 	GameModeSelection mode;
-	PlayerColor		  localPlayer;
+	Side			  localPlayer;
 	int				  difficulty;
 };
 

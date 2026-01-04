@@ -9,7 +9,7 @@
 #include "Player.h"
 
 
-Player::Player(PlayerColor color) : mPlayerColor(color)
+Player::Player(Side color) : mPlayerColor(color)
 {
 	setScore(0);
 }
@@ -32,13 +32,13 @@ void Player::setScore(int value)
 }
 
 
-PlayerColor Player::getPlayerColor() const
+Side Player::getPlayerColor() const
 {
 	return mPlayerColor;
 }
 
 
-void Player::setPlayerColor(PlayerColor value)
+void Player::setPlayerColor(Side value)
 {
 	if (mPlayerColor != value)
 	{

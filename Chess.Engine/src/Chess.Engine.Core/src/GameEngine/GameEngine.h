@@ -5,107 +5,135 @@
   ==============================================================================
 */
 
-
 #pragma once
-
-#include <optional>
 
 #include "Execution/MoveExecution.h"
 #include "Generation/MoveGeneration.h"
+#include "Validation/MoveValidation.h"
 #include "CPUPlayer.h"
 #include "IObservable.h"
 #include "Parameters.h"
 #include "Player.h"
 
-
-/// <summary>
-/// Main engine for managing and controlling the state and logic of a chess game.
-/// </summary>
+/**
+ * @brief	Core chess engine orchestrating board state, move generation,
+ *			validation, execution, and game flow.
+ */
 class GameEngine : public IGameObservable
 {
 public:
 	GameEngine();
 	~GameEngine() = default;
 
-	void					   init();
-	void					   reset();
-	void					   startGame();
-	void					   resetGame();
+	// Lifecycle
+	void								 init();
+	void								 reset();
+	void								 startGame();
+	void								 resetGame();
 
-	// Move operations
-	void					   makeMove(Move move, bool fromRemote = false);
-	void					   undoMove();
+	//=========================================================================
+	// Move Operations
+	//=========================================================================
 
-	// Move generation
-	void					   generateMoves(MoveList &moves);
-	bool					   isLegalMove(Move move);
-	
-	// Game state
-	bool					   isInCheck() const;
-	bool					   isCheckmate();
-	bool					   isStalemate();
-	bool					   isDraw() const;
+	/**
+	 * @brief	Execute a move. Validates, applies, and notifies observers.
+	 * @return	true if move was legal and executed.
+	 */
+	bool								 makeMove(Move move, bool fromRemote = false);
 
-	// Player management
-	void					   switchTurns();
-	Side					   getCurrentSide() const { return mChessBoard.getCurrentSide(); }
-	PlayerColor				   getCurrentPlayer() const;
-	void					   changeCurrentPlayer(PlayerColor player) override;
+	/**
+	 * @brief	Undo the last move. Notifies observers.
+	 * @return	true if a move was undone.
+	 */
+	bool								 undoMove();
 
-	void					   setLocalPlayer(PlayerColor player);
-	PlayerColor				   getLocalPlayer() const;
+	//=========================================================================
+	// Move Generation & Validation
+	//=========================================================================
 
-	// End game
-	EndGameState			   checkForEndGameConditions();
-	void					   endGame(EndGameState state, PlayerColor player = PlayerColor::None) override;
-	std::optional<PlayerColor> getWinner() const;
+	/**
+	 * @brief	Generate all legal moves for current side.
+	 */
+	void								 generateLegalMoves(MoveList &moves);
 
-	// CPU Player
-	void					   setCPUConfiguration(const CPUConfiguration &config);
-	CPUConfiguration		   getCPUConfiguration() const;
-	bool					   isCPUPlayer(PlayerColor player) const;
-	void					   requestCPUMoveAsync();
+	/**
+	 * @brief	Check if a move is legal.
+	 */
+	bool								 isMoveLegal(Move move);
 
-	// Accessors
-	const Chessboard		  &getBoard() const { return mChessBoard; }
-	Chessboard				  &getBoard() { return mChessBoard; }
+	/**
+	 * @brief	Get legal moves from a specific square (for UI).
+	 */
+	void								 getMovesFromSquare(Square from, MoveList &moves);
 
+	//=========================================================================
+	//	Game State Queries
+	//=========================================================================
 
-	//// PieceType				   getCurrentPieceTypeAtPosition(const Position position);
+	bool								 isInCheck() const;
+	bool								 isCheckmate();
+	bool								 isStalemate();
+	bool								 isDraw() const;
+	EndGameState						 checkForEndGameConditions();
 
-	//std::vector<PossibleMove>  getPossibleMoveForPosition();
+	//=========================================================================
+	//	Player Management
+	//=========================================================================
 
-	//// bool					   getBoardState(BoardStateArray boardState);
+	void								 switchTurns();
+	Side								 getCurrentSide() const { return mChessBoard.getCurrentSide(); }
+	Side								 getCurrentPlayer() const { return mCurrentPlayer; }; // TODO: May not be needed
+	void								 changeCurrentPlayer(Side player) override;
+	void								 setLocalPlayer(Side player);
+	Side								 getLocalPlayer() const;
 
-	//bool					   checkForValidMoves(const PossibleMove &move);
-	//bool					   checkForPawnPromotionMove(const PossibleMove &move);
+	//=========================================================================
+	//	End Game
+	//=========================================================================
 
+	void								 endGame(EndGameState state, Side player = Side::None) override;
+	Side								 getWinner() const;
 
+	//=========================================================================
+	//	CPU Player
+	//=========================================================================
 
+	void								 setCPUConfiguration(const CPUConfiguration &config);
+	CPUConfiguration					 getCPUConfiguration() const;
+	bool								 isCPUPlayer(Side player) const;
+	void								 requestCPUMoveAsync();
 
+	//=========================================================================
+	//	Accessors
+	//=========================================================================
 
-	//bool					   calculateAllMovesForPlayer();
+	const Chessboard					&getBoard() const { return mChessBoard; }
+	Chessboard							&getBoard() { return mChessBoard; }
 
-	//bool					   initiateMove(const Position &startPosition);
-
-
+	const std::vector<MoveHistoryEntry> &getMoveHistory() const;
+	std::string							 getMoveNotation(Move move) const;
 
 
 private:
-	//bool					  mMovesGeneratedForCurrentTurn = false;
+	// Notification helpers
+	void		   notifyMoveExecuted(Move move, bool fromRemote) override;
+	void		   notifyMoveUndone() override;
 
-	Player					  mWhitePlayer;
-	Player					  mBlackPlayer;
-	PlayerColor				  mCurrentPlayer = PlayerColor::None;
+	// Core components (order matters for initialization!)
+	Chessboard	   mChessBoard;
+	MoveGeneration mMoveGeneration;
+	MoveExecution  mMoveExecution;
+	MoveValidation mMoveValidation;
+	MoveNotation   mMoveNotation;
+	CPUPlayer	   mCPUPlayer;
 
-	//std::vector<PossibleMove> mAllMovesForPosition;
+	// Players
+	Player		   mWhitePlayer;
+	Player		   mBlackPlayer;
+	Side		   mCurrentPlayer = Side::None;
 
-	Chessboard				  mChessBoard;
-	MoveGeneration			  mMoveGeneration;
-	MoveExecution			  mMoveExecution;
-	CPUPlayer				  mCPUPlayer;
-
-	std::mutex				  mMutex;
+	// Thread safety
+	std::mutex	   mMoveMutex;
 
 	friend class GameManager;
 };

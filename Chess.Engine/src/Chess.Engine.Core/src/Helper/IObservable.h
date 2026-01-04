@@ -53,16 +53,16 @@ public:
 	virtual void removeLastCapturedPiece()					= 0;
 };
 
-
-class IMoveObservable : public ObservableBase<IMoveObserver>
-{
-public:
-	virtual ~IMoveObservable() {};
-
-	virtual Move executeMove(PossibleMove &move, bool fromRemote) = 0;
-	virtual void addMoveToHistory(Move &move)					  = 0;
-	virtual void clearMoveHistory()								  = 0;
-};
+//
+// class IMoveObservable : public ObservableBase<IMoveObserver>
+//{
+// public:
+//	virtual ~IMoveObservable() {};
+//
+//	virtual Move executeMove(PossibleMove &move, bool fromRemote) = 0;
+//	virtual void addMoveToHistory(Move &move)					  = 0;
+//	virtual void clearMoveHistory()								  = 0;
+//};
 
 
 class IGameObservable : public ObservableBase<IGameObserver>
@@ -70,8 +70,10 @@ class IGameObservable : public ObservableBase<IGameObserver>
 public:
 	virtual ~IGameObservable() {};
 
-	virtual void endGame(EndGameState state, PlayerColor winner) = 0;
-	virtual void changeCurrentPlayer(PlayerColor player)		 = 0;
+	virtual void notifyMoveExecuted(Move move, bool fromRemote) = 0;
+	virtual void notifyMoveUndone()								= 0;
+	virtual void changeCurrentPlayer(Side player)				= 0;
+	virtual void endGame(EndGameState state, Side winner)		= 0;
 };
 
 

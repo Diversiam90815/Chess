@@ -33,16 +33,16 @@
  */
 struct Score
 {
-	Score(PlayerColor player, int value) : player(player), value(value) {};
+	Score(Side player, int value) : player(player), value(value) {};
 
 
 	int			getValue() const { return value; }
-	PlayerColor getPlayerColor() const { return player; }
+	Side getPlayerColor() const { return player; }
 
 	bool		operator==(Score other) { return this->value == other.value && this->player == other.player; }
 
 private:
-	PlayerColor player = PlayerColor::None;
+	Side player = Side::None;
 	int			value  = 0;
 };
 
@@ -64,14 +64,14 @@ class Player : public IPlayerObservable
 {
 public:
 	Player() = default;
-	Player(PlayerColor color);
+	Player(Side color);
 	~Player() = default;
 
 	Score		  getScore() const;
 	void		  setScore(int value);
 
-	PlayerColor	  getPlayerColor() const;
-	void		  setPlayerColor(PlayerColor value);
+	Side		  getPlayerColor() const;
+	void		  setPlayerColor(Side value);
 
 	/**
 	 * @brief	Record a newly captured opponent piece.
@@ -100,13 +100,13 @@ public:
 	void		  setIsLocalPlayer(const bool isLocal) { mIsLocalPlayer = isLocal; }
 
 private:
-	PlayerColor			   mPlayerColor = PlayerColor::None;
+	Side				   mPlayerColor = Side::None;
 
 	std::vector<PieceType> mCapturedPieces;
 
 	bool				   mIsCurrentTurn = false;
 
-	Score				   mScore		  = Score(PlayerColor::None, 0);
+	Score				   mScore		  = Score(Side::None, 0);
 
 	bool				   mIsLocalPlayer{true}; // Default to local player in single-player mode
 };

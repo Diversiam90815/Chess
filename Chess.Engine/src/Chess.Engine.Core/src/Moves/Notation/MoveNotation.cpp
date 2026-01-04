@@ -8,7 +8,7 @@
 #include "MoveNotation.h"
 
 
-std::string MoveNotation::toSAN(Move &move, const Chessboard &board, bool isCheck, bool isCheckmate)
+std::string MoveNotation::toSAN(Move &move, const Chessboard &board, bool isCheck, bool isCheckmate) const
 {
 	MoveFlag flags = move.flags();
 

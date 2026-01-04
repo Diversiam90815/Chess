@@ -27,15 +27,15 @@ public:
 };
 
 
-class IMoveObserver
-{
-public:
-	virtual ~IMoveObserver() {};
-
-	virtual void onExecuteMove(const PossibleMove &move, bool fromRemote) = 0;
-	virtual void onAddToMoveHistory(Move &move)							  = 0;
-	virtual void onClearMoveHistory()									  = 0;
-};
+//class IMoveObserver
+//{
+//public:
+//	virtual ~IMoveObserver() {};
+//
+//	virtual void onExecuteMove(const PossibleMove &move, bool fromRemote) = 0;
+//	virtual void onAddToMoveHistory(Move &move)							  = 0;
+//	virtual void onClearMoveHistory()									  = 0;
+//};
 
 
 class IGameObserver
@@ -43,8 +43,10 @@ class IGameObserver
 public:
 	virtual ~IGameObserver() {};
 
-	virtual void onEndGame(EndGameState state, PlayerColor winner) = 0;
-	virtual void onChangeCurrentPlayer(PlayerColor player)		   = 0;
+	virtual void onMoveExecuted(Move move, bool fromRemote) = 0;
+	virtual void onMoveUndone()								= 0;
+	virtual void onChangeCurrentPlayer(Side player)			= 0;
+	virtual void onEndGame(EndGameState state, Side winner) = 0;
 };
 
 

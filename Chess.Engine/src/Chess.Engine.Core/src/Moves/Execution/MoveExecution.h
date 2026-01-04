@@ -30,15 +30,16 @@ public:
 	~MoveExecution() = default;
 
 	// Executes a move on the board, returns false if invalid
-	bool								  makeMove(Move move);
+	bool											   makeMove(Move move);
 
 	// Undo the last move
-	bool								  unmakeMove();
+	bool											   unmakeMove();
 
 	// History
-	[[nodiscard]] const MoveHistoryEntry *getLastMove() const;
-	[[nodiscard]] size_t				  historySize() const { return mHistory.size(); }
-	void								  clearHistory() { mHistory.clear(); }
+	[[nodiscard]] const MoveHistoryEntry			  *getLastMove() const;
+	[[nodiscard]] size_t							   historySize() const { return mHistory.size(); }
+	[[nodiscard]] const std::vector<MoveHistoryEntry> &getHistory() const { return mHistory; }
+	void											   clearHistory() { mHistory.clear(); }
 
 private:
 	Chessboard					 &mChessBoard;

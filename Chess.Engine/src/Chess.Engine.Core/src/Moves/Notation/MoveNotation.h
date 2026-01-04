@@ -25,7 +25,7 @@ public:
 	/**
 	 * @brief	Produce SAN (Standard Algebraic Notation) for a move.
 	 */
-	std::string toSAN(Move &move, const Chessboard &board, bool isCheck, bool isCheckmate);
+	std::string toSAN(Move &move, const Chessboard &board, bool isCheck, bool isCheckmate) const;
 
 	/**
 	 * @brief Generate UCI notation (e.g., "e2e4", "e7e8q").
@@ -44,19 +44,19 @@ private:
 		return "--";
 	}
 
-	inline char getFile(Square sq) noexcept
+	inline char getFile(Square sq) const noexcept
 	{
 		int idx = to_index(sq);
 		return 'a' + (idx % 8);
 	}
 
-	inline char getRank(Square sq) noexcept
+	inline char getRank(Square sq) const noexcept
 	{
 		int idx = to_index(sq);
 		return '8' - (idx / 8);
 	}
 
-	inline char pieceToSANChar(int pieceType) noexcept
+	inline char pieceToSANChar(int pieceType) const noexcept
 	{
 		switch (pieceType)
 		{
@@ -74,7 +74,7 @@ private:
 		}
 	}
 
-	inline char pieceToUCIChar(int pieceType) noexcept
+	inline char pieceToUCIChar(int pieceType) const noexcept
 	{
 		switch (pieceType)
 		{
