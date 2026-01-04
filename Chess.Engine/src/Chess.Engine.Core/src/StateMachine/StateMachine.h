@@ -7,152 +7,126 @@
 
 #pragma once
 
+#include <queue>
 #include <mutex>
 #include <atomic>
 #include <condition_variable>
 
 #include "Parameters.h"
 #include "Move.h"
-#include "IObservable.h"
 #include "ThreadBase.h"
-#include "CPUPLayer.h"
-
-class GameManager;
+#include "IGameController.h"
+#include "IInputSource.h"
+#include "InputEvent.h"
 
 
 /**
- * @brief Drives progression through distinct game states (init, input, validation,
- *        execution, promotion, remote/CPU wait, game over). Mediates UI, engine,
- *        CPU engine, and multiplayer events.
- *
- * Threaded: Inherits ThreadBase to process queued state transitions and asynchronous events.
+ * @brief	Pure state machine - only manages transitions.
+ *			All game logic delegated to IGameController.
+ *			All UI notifications delegated to IInputSource.
  */
-class StateMachine : public IGameStateObservable, public ThreadBase, public IRemoteMessagesObserver, public ICPUMoveObserver, public std::enable_shared_from_this<StateMachine>
+class StateMachine : public ThreadBase
 {
 public:
-	static std::shared_ptr<StateMachine> GetInstance();
-	static void							 ReleaseInstance();
+	StateMachine() = default;
+	~StateMachine() override;
 
-	~StateMachine();
+	// Non-copyable
+	StateMachine(const StateMachine &)			  = delete;
+	StateMachine &operator=(const StateMachine &) = delete;
 
-	/**
-	 * @brief	Begin a new game using supplied configuration (UI trigger).
-	 */
-	void	  onGameStarted(GameConfiguration config);
+	//=========================================================================
+	// Dependency Injection
+	//=========================================================================
 
-	/**
-	 * @brief	Start a multiplayer game session (UI trigger).
-	 */
-	void	  onMultiplayerGameStarted();
+	void		  setGameController(IGameController *controller);
+	void		  setInputSource(IInputSource *source);
 
-	/**
-	 * @brief	UI square selection event (first selects source, second destination).
-	 */
-	void	  onSquareSelected(const Position &pos);
+	//=========================================================================
+	// Configuration
+	//=========================================================================
 
-	/**
-	 * @brief	UI selection of a promotion piece type.
-	 */
-	void	  onPawnPromotionChosen(PieceType promotion);
+	void		  setMultiplayerMode(bool enabled) { mIsMultiplayer.store(enabled); }
+	void		  setVsCPUMode(bool enabled) { mIsVsCPU.store(enabled); }
 
-	/**
-	 * @brief	Observer callback when an external component changes game state.
-	 */
-	void	  gameStateChanged(const GameState state) override;
+	//=========================================================================
+	// Event Input (thread-safe, can be called from any thread)
+	//=========================================================================
 
-	GameState getCurrentGameState() { return mCurrentState.load(); }
-	void	  setCurrrentGameState(const GameState state) { mCurrentState.store(state); }
+	void		  postEvent(InputEvent event);
 
-	void	  onRemoteMoveReceived(const PossibleMove &remoteMove) override;
-	void	  onRemoteChatMessageReceived(const std::string &mesage) override {}
-	void	  onRemoteConnectionStateReceived(const ConnectionState &state) override {}
-	void	  onRemoteInvitationReceived(const InvitationRequest &invite) override {};
-	void	  onRemoteInvitationResponseReceived(const InvitationResponse &response) override {};
-	void	  onRemotePlayerChosenReceived(const PlayerColor player) override {};
-	void	  onRemotePlayerReadyFlagReceived(const bool flag) override {};
+	// Convenience methods
+	void		  onSquareSelected(Square sq);
+	void		  onPromotionChosen(PieceTypes piece);
+	void		  onRemoteMoveReceived(Move move);
+	void		  onCPUMoveCalculated(Move move);
+	void		  onUndoRequested();
+	void		  onGameStart(GameConfiguration config);
+	void		  onGameReset();
 
-	/**
-	 * @brief	CPU engine produced a move. Consumed when entering WaitingForCPUMove -> ExecutingMove.
-	 */
-	void	  onMoveCalculated(PossibleMove cpuMove) override;
+    //=========================================================================
+	// Queries
+	//=========================================================================
 
-	/**
-	 * @brief	Whether initial setup completed.
-	 */
-	bool	  isInitialized() const;
-
-	/**
-	 * @brief	Set initialization flag (internal).
-	 */
-	void	  setInitialized(const bool value);
-
-	/**
-	 * @brief	Reset all runtime state to start a fresh game.
-	 */
-	void	  resetGame();
-
-	/**
-	 * @brief	Handle user request to undo last move (transitions if valid).
-	 */
-	void	  reactToUndoMove();
+	[[nodiscard]] GameState getState() const { return mState.load(); }
 
 private:
-	StateMachine();
+	void run() override;
 
-	/**
-	 * @brief	Thread loop dispatching state handlers until stopped.
-	 */
-	void				   run() override;
+	//=========================================================================
+	// Event Processing
+	//=========================================================================
 
-	bool				   handleInitState() const;
-	bool				   handleWaitingForInputState();
-	bool				   handleMoveInitiatedState() const;
-	bool				   handleWaitingForTargetState();
-	bool				   handleValidatingMoveState();
-	bool				   handleExecutingMoveState();
-	bool				   handlePawnPromotionState();
-	bool				   handleGameOverState();
-	bool				   handleWaitingForRemoteState();
-	bool				   handleWaitingForCPUState();
+	void					processEvent(const InputEvent &event);
 
-	/**
-	 * @brief	Apply pending state transition (if requested).
-	 */
-	void				   switchToNextState();
+    //=========================================================================
+	// State Handlers - return next state
+	//=========================================================================
 
-	bool				   isGameOngoing() const { return mEndgameState == EndGameState::OnGoing; }
+	GameState handleInit(const InputEvent &event);
+	GameState handleWaitingForInput(const InputEvent &event);
+	GameState handleWaitingForTarget(const InputEvent &event);
+	GameState handlePawnPromotion(const InputEvent &event);
+	GameState handleWaitingForRemote(const InputEvent &event);
+	GameState handleWaitingForCPU(const InputEvent &event);
+	GameState handleGameOver(const InputEvent &event);
 
-	/**
-	 * @brief	Clear current in-progress move structure.
-	 */
-	void				   resetCurrentPossibleMove();
+    //=========================================================================
+	// Helpers
+	//=========================================================================
+
+	void					transitionTo(GameState newState);
+	GameState				determineNextTurnState();
+	bool					tryExecuteMove(Move move, bool fromRemote);
 
 
-	std::atomic<bool>	   mInitialized{false};
+	//=========================================================================
+	// State
+	//=========================================================================
 
-	std::atomic<GameState> mCurrentState{GameState::Undefined};
+	std::atomic<GameState>	mState{GameState::Init};
+	MoveIntent				mMoveIntent;
+	EndGameState			mEndgameState{EndGameState::OnGoing};
 
-	PossibleMove		   mCurrentPossibleMove{};
+	//=========================================================================
+	// Mode Flags
+	//=========================================================================
 
-	bool				   mMovesCalulated{false};
+	std::atomic<bool>		mIsMultiplayer{false};
+	std::atomic<bool>		mIsVsCPU{false};
 
-	bool				   mMoveInitiated{false};
-	bool				   mWaitingForTargetStart{false};
-	bool				   mWaitingForTargetEnd{false};
+	//=========================================================================
+	// Dependencies (non-owning)
+	//=========================================================================
 
-	bool				   mIsValidMove{false};
+	IGameController		   *mController{nullptr};
+	IInputSource		   *mInputSource{nullptr};
 
-	bool				   mAwaitingPromotion{false};
-	bool				   mReceivedMoveFromRemote{false};
+	//=========================================================================
+	// Thread-Safe Event Queue
+	//=========================================================================
 
-	EndGameState		   mEndgameState{EndGameState::OnGoing};
-
-	std::atomic<bool>	   mIsMultiplayerGame{false};
-
-	std::atomic<bool>	   mPlayingAgainstPC{false};
-	bool				   mWaitingForCPUMove{false};
-
-	std::mutex			   mStateChangedMutex;
-	bool				   mHasPendingStateChange{false};
-	GameState			   mPendingState{GameState::Undefined};
+	std::queue<InputEvent>	mEventQueue;
+	std::mutex				mQueueMutex;
+	std::condition_variable mQueueCV;
 };
