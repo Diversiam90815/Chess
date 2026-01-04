@@ -23,7 +23,7 @@ struct MoveHistoryEntry
 };
 
 
-class MoveExecution /* : public IMoveObservable*/
+class MoveExecution
 {
 public:
 	explicit MoveExecution(Chessboard &board);
