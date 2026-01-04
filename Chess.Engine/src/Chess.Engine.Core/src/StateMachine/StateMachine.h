@@ -12,6 +12,7 @@
 #include <atomic>
 #include <condition_variable>
 
+#include "Logging.h"
 #include "Parameters.h"
 #include "Move.h"
 #include "ThreadBase.h"
