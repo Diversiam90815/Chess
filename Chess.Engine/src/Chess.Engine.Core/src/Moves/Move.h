@@ -121,3 +121,31 @@ private:
 	size_t mCount;
 };
 
+
+/**
+ * @brief	Represents an in-progress move from user input.
+ *			Replaces multiple boolean flags with a single coherent structure.
+ */
+struct MoveIntent
+{
+	Square	   fromSquare = Square::None;
+	Square	   toSquare	  = Square::None;
+	PieceTypes promotion  = PieceTypes::None;
+	MoveList   legalMoves; // Cached legal moves from selected square
+	bool	   fromRemote = false;
+	bool	   fromCPU	  = false;
+
+	void	   clear()
+	{
+		fromSquare = Square::None;
+		toSquare   = Square::None;
+		promotion  = PieceTypes::None;
+		fromRemote = false;
+		fromCPU	   = false;
+		legalMoves.clear();
+	}
+
+	[[nodiscard]] bool hasSource() const { return fromSquare != Square::None; }
+	[[nodiscard]] bool hasTarget() const { return toSquare != Square::None; }
+	[[nodiscard]] bool isComplete() const { return hasSource() && hasTarget(); }
+};

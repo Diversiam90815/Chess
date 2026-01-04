@@ -41,6 +41,8 @@ include_directories(${ALL_PROJECT_DIRS})
 
 
 set(STATEMACHINE_FILES
+	${STATEMACHINE_DIR}/IInputSource.h
+	${STATEMACHINE_DIR}/InputEvent.h
 	${STATEMACHINE_DIR}/StateMachine.h	${STATEMACHINE_DIR}/StateMachine.cpp
 )
 
@@ -65,7 +67,8 @@ set(MOVE_FILES
 )
 
 set(GAME_MANAGER_FILES
-	${GAME_MANAGER_DIR}/GameManager.h    ${GAME_MANAGER_DIR}/GameManager.cpp
+	${GAME_MANAGER_DIR}/IGameController.h
+	${GAME_MANAGER_DIR}/GameManager.h		${GAME_MANAGER_DIR}/GameManager.cpp
 )
 
 set(PLAYER_FILES
