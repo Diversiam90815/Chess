@@ -15,8 +15,7 @@
 #include <algorithm>
 
 #include "Parameters.h"
-#include "Generation/MoveGeneration.h"
-#include "ChessBoard.h"
+#include "GameEngine.h"
 #include "IObservable.h"
 
 
@@ -84,7 +83,7 @@ struct CPUConfiguration
 class CPUPlayer : public ICPUMoveObservable
 {
 public:
-	CPUPlayer(MoveGeneration &moveGeneration, Chessboard &board);
+	CPUPlayer(GameEngine &engine);
 	~CPUPlayer();
 
 	/**
@@ -96,6 +95,8 @@ public:
 	 * @brief	Current configuration snapshot.
 	 */
 	CPUConfiguration getCPUConfiguration() const { return mConfig; }
+
+	void			 calculateMoveAsync(std::function<void(Move)> callback);	// TODO
 
 	/**
 	 * @brief	Begin asynchronous computation of a move for the configured CPU color.
@@ -278,8 +279,9 @@ private:
 
 	CPUConfiguration								 mConfig;
 
-	MoveGeneration									&mMoveGeneration;
-	Chessboard										&mBoard;
+	GameEngine										&mEngine;
+	// MoveGeneration									&mMoveGeneration;
+	// Chessboard										&mBoard;
 
 	std::jthread									 mSearchThread;
 
