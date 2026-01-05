@@ -108,7 +108,31 @@ void StateMachine::processEvent(const InputEvent &event)
 		return;
 	}
 
-	// TODO: delegate state handling
+	GameState currentState = mState.load();
+	GameState nextState	   = currentState;
+
+	switch (currentState)
+	{
+	case GameState::Init:
+	case GameState::Undefined: nextState = handleInit(event); break;
+
+	case GameState::WaitingForInput: nextState = handleWaitingForInput(event); break;
+
+	case GameState::WaitingForTarget: nextState = handleWaitingForTarget(event); break;
+
+	case GameState::PawnPromotion: nextState = handlePawnPromotion(event); break;
+
+	case GameState::WaitingForRemoteMove: nextState = handleWaitingForRemote(event); break;
+
+	case GameState::WaitingForCPUMove: nextState = handleWaitingForCPU(event); break;
+
+	case GameState::GameOver: nextState = handleGameOver(event); break;
+
+	default: break;
+	}
+
+	if (nextState != currentState)
+		transitionTo(nextState);
 }
 
 
