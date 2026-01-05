@@ -114,56 +114,225 @@ void StateMachine::processEvent(const InputEvent &event)
 
 GameState StateMachine::handleInit(const InputEvent &event)
 {
-	return GameState();
+	if (event.type == InputEvent::Type::GameStart)
+	{
+		mIsMultiplayer.store(event.config.mode == GameModeSelection::Multiplayer);
+		mIsVsCPU.store(event.config.mode == GameModeSelection::VsCPU);
+
+		if (!mController->initializeGame(event.config))
+		{
+			LOG_ERROR("Failed to initialize game!");
+			return GameState::Init;
+		}
+
+		mMoveIntent.clear();
+		mEndgameState = EndGameState::OnGoing;
+
+		return determineNextTurnState();
+	}
+
+	return GameState::Init;
 }
 
 
 GameState StateMachine::handleWaitingForInput(const InputEvent &event)
 {
-	return GameState();
+	switch (event.type)
+	{
+	case InputEvent::Type::SquareSelected:
+	{
+		MoveList moves;
+		mController->getLegalMovesFromSquare(event.square, moves);
+
+		if (moves.size() > 0)
+		{
+			mMoveIntent.clear();
+			mMoveIntent.fromSquare = event.square;
+			mMoveIntent.legalMoves = moves;
+
+			mInputSource->onLegalMovesAvailable(event.square, moves);
+			return GameState::WaitingForTarget;
+		}
+		break;
+	}
+	case InputEvent::Type::UndoRequested:
+	{
+		if (mController->undoLastMove())
+		{
+			mInputSource->onMoveUndone();
+			mInputSource->onBoardStateChanged();
+		}
+		break;
+	}
+	case InputEvent::Type::GameReset:
+	{
+		mController->resetGame();
+		mMoveIntent.clear();
+		return GameState::Init;
+	}
+	default: break;
+	}
+
+	return GameState::WaitingForInput;
 }
 
 
 GameState StateMachine::handleWaitingForTarget(const InputEvent &event)
 {
-	return GameState();
+	if (event.type != InputEvent::Type::SquareSelected)
+		return GameState::WaitingForTarget;
+
+	Square sq = event.square;
+
+	// Deselect if clicked on same square
+	if (sq == mMoveIntent.fromSquare)
+	{
+		mMoveIntent.clear();
+		return GameState::WaitingForInput;
+	}
+
+	// Clicked different own piece -> reselect
+	MoveList newMoves;
+	mController->getLegalMovesFromSquare(sq, newMoves);
+
+	if (newMoves.size() > 0)
+	{
+		mMoveIntent.clear();
+		mMoveIntent.fromSquare = sq;
+		mMoveIntent.legalMoves = newMoves;
+
+		mInputSource->onLegalMovesAvailable(sq, newMoves);
+		return GameState::WaitingForTarget;
+	}
+
+	// try target square
+	mMoveIntent.toSquare = sq;
+
+	// Check if promotion is needed
+	if (mController->isPromotionMove(mMoveIntent.fromSquare, mMoveIntent.toSquare))
+	{
+		mInputSource->onPromotionRequired();
+		return GameState::PawnPromotion;
+	}
+
+	// Find and execute move
+	Move move = mController->findMove(mMoveIntent.fromSquare, mMoveIntent.toSquare);
+
+	if (move.isValid() && tryExecuteMove(move, false))
+		return determineNextTurnState();
+
+	// invalid move
+	mMoveIntent.clear();
+	return GameState::WaitingForInput;
 }
 
 
 GameState StateMachine::handlePawnPromotion(const InputEvent &event)
 {
-	return GameState();
+	if (event.type == InputEvent::Type::PromotionChosen)
+	{
+		mMoveIntent.promotion = event.promotion;
+
+		Move move			  = mController->findMove(mMoveIntent.fromSquare, mMoveIntent.toSquare, mMoveIntent.promotion);
+
+		if (move.isValid() && tryExecuteMove(move, false))
+			return determineNextTurnState();
+
+		mMoveIntent.clear();
+		return GameState::WaitingForInput;
+	}
+
+	return GameState::PawnPromotion;
 }
 
 
 GameState StateMachine::handleWaitingForRemote(const InputEvent &event)
 {
-	return GameState();
+	if (event.type == InputEvent::Type::RemoteMove)
+	{
+		if (tryExecuteMove(event.move, true))
+			return determineNextTurnState();
+	}
+
+	return GameState::WaitingForRemoteMove;
 }
 
 
 GameState StateMachine::handleWaitingForCPU(const InputEvent &event)
 {
-	return GameState();
+	if (event.type == InputEvent::Type::CPUMove)
+	{
+		if (tryExecuteMove(event.move, false))
+			return determineNextTurnState();
+
+		LOG_ERROR("CPU returned invalid move");
+		return GameState::GameOver;
+	}
+
+	mController->requestCPUMoveAsync();
+
+	return GameState::WaitingForCPUMove;
 }
 
 
 GameState StateMachine::handleGameOver(const InputEvent &event)
 {
-	return GameState();
+	if (event.type == InputEvent::Type::GameReset)
+	{
+		mController->resetGame();
+		mMoveIntent.clear();
+		mEndgameState = EndGameState::OnGoing;
+		return GameState::Init;
+	}
+
+	return GameState::GameOver;
 }
 
 
-void	  StateMachine::transitionTo(GameState newState) {}
+void StateMachine::transitionTo(GameState newState)
+{
+	GameState oldState = mState.exchange(newState);
+
+	LOG_INFO("State transition: {} -> {}", LoggingHelper::gameStateToString(oldState), LoggingHelper::gameStateToString(newState));
+
+	if (mInputSource)
+		mInputSource->onGameStateChanged(newState);
+}
 
 
 GameState StateMachine::determineNextTurnState()
 {
-	return GameState();
+	if (mEndgameState != EndGameState::OnGoing)
+	{
+		Side winner = (mEndgameState == EndGameState::Checkmate) ? (mController->getCurrentSide() == Side::White ? Side::Black : Side::White) : Side::None;
+
+		if (mInputSource)
+			mInputSource->onGameEnded(mEndgameState, winner);
+
+		return GameState::GameOver;
+	}
+
+	if (mIsMultiplayer.load() && !mController->isLocalPlayerTurn())
+		return GameState::WaitingForRemoteMove;
+
+	if (mIsVsCPU.load() && mController->isCPUTurn())
+		return GameState::WaitingForCPUMove;
+
+	return GameState::WaitingForInput;
 }
 
 
 bool StateMachine::tryExecuteMove(Move move, bool fromRemote)
 {
-	return false;
+	if (!mController->executeMove(move, fromRemote))
+		return false;
+
+	mInputSource->onMoveExecuted(move, fromRemote);
+	mInputSource->onBoardStateChanged();
+
+	mController->switchTurns();
+	mEndgameState = mController->checkEndGame();
+
+	mMoveIntent.clear();
+	return true;
 }

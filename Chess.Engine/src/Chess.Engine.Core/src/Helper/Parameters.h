@@ -104,9 +104,10 @@ enum class SettingsType
 /// </summary>
 enum class GameModeSelection
 {
-	None	  = 0,
-	LocalCoop = 1,
-	VsCPU	  = 2,
+	None		= 0,
+	LocalCoop	= 1,
+	VsCPU		= 2,
+	Multiplayer = 3
 };
 
 
