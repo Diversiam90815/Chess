@@ -8,10 +8,7 @@
 #include "GameEngine.h"
 
 
-GameEngine::GameEngine()
-	: mMoveGeneration(mChessBoard), mMoveExecution(mChessBoard), mMoveValidation(mChessBoard, mMoveGeneration, mMoveExecution)
-{
-}
+GameEngine::GameEngine() : mMoveGeneration(mChessBoard), mMoveExecution(mChessBoard), mMoveValidation(mChessBoard, mMoveGeneration, mMoveExecution) {}
 
 
 void GameEngine::init()

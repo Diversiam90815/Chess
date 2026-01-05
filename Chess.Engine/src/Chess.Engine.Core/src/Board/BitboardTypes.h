@@ -127,7 +127,7 @@ inline const char* square_to_coordinates[] =
 =========================================
 */
 
-enum PieceTypes
+enum PieceType
 {
 	None	= -1,
 	WKing	= 0,
@@ -155,18 +155,18 @@ inline int			  GetPieceTypeFromChar(char c)
 {
 	switch (c)
 	{
-	case 'K': return PieceTypes::WKing;
-	case 'Q': return PieceTypes::WQueen;
-	case 'P': return PieceTypes::WPawn;
-	case 'N': return PieceTypes::WKnight;
-	case 'B': return PieceTypes::WBishop;
-	case 'R': return PieceTypes::WRook;
-	case 'k': return PieceTypes::BKing;
-	case 'q': return PieceTypes::BQueen;
-	case 'p': return PieceTypes::BPawn;
-	case 'n': return PieceTypes::BKnight;
-	case 'b': return PieceTypes::BBishop;
-	case 'r': return PieceTypes::BRook;
+	case 'K': return PieceType::WKing;
+	case 'Q': return PieceType::WQueen;
+	case 'P': return PieceType::WPawn;
+	case 'N': return PieceType::WKnight;
+	case 'B': return PieceType::WBishop;
+	case 'R': return PieceType::WRook;
+	case 'k': return PieceType::BKing;
+	case 'q': return PieceType::BQueen;
+	case 'p': return PieceType::BPawn;
+	case 'n': return PieceType::BKnight;
+	case 'b': return PieceType::BBishop;
+	case 'r': return PieceType::BRook;
 	default: return 0;
 	}
 }

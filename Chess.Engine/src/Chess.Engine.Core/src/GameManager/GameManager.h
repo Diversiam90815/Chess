@@ -48,7 +48,7 @@ public:
 	//=========================================================================
 
 	void						onSquareSelected(Square sq);
-	void						onPromotionChosen(PieceTypes piece);
+	void						onPromotionChosen(PieceType piece);
 
 	//=========================================================================
 	// UI Integration
@@ -60,9 +60,9 @@ public:
 	// Board State Queries
 	//=========================================================================
 
-	std::array<PieceTypes, 64>	getBoardPieces() const;
+	std::array<PieceType, 64>	getBoardPieces() const;
 	const MoveList			   &getCachedLegalMoves() const;
-	PieceTypes					getPieceAt(Square sq) const;
+	PieceType					getPieceAt(Square sq) const;
 
 	//=========================================================================
 	// Multiplayer

@@ -38,7 +38,7 @@ public:
 	//=========================================================================
 
 	bool								 isPromotionMove(Square from, Square to) const override;
-	Move								 findMove(Square from, Square to, PieceTypes promotion = PieceTypes::None) const override;
+	Move								 findMove(Square from, Square to, PieceType promotion = PieceType::None) const override;
 	EndGameState						 checkEndGame() override;
 
 	//=========================================================================

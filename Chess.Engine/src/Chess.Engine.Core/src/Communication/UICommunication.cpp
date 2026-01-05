@@ -22,7 +22,7 @@ void WinUIInputSource::onScoreUpdate(Side player, int value)
 }
 
 
-void WinUIInputSource::onAddCapturedPiece(Side player, PieceTypes captured)
+void WinUIInputSource::onAddCapturedPiece(Side player, PieceType captured)
 {
 	PlayerCapturedPieceEvent event{};
 	event.playerColor = player;
@@ -32,7 +32,7 @@ void WinUIInputSource::onAddCapturedPiece(Side player, PieceTypes captured)
 }
 
 
-void WinUIInputSource::onRemoveLastCapturedPiece(Side player, PieceTypes captured)
+void WinUIInputSource::onRemoveLastCapturedPiece(Side player, PieceType captured)
 {
 	PlayerCapturedPieceEvent event{};
 	event.playerColor = player;

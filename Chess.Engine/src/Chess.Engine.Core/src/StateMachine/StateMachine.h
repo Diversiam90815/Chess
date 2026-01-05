@@ -33,46 +33,46 @@ public:
 	~StateMachine() override;
 
 	// Non-copyable
-	StateMachine(const StateMachine &)			  = delete;
-	StateMachine &operator=(const StateMachine &) = delete;
+	StateMachine(const StateMachine &)						= delete;
+	StateMachine		   &operator=(const StateMachine &) = delete;
 
 	//=========================================================================
 	// Dependency Injection
 	//=========================================================================
 
-	void		  setGameController(IGameController *controller);
-	void		  setInputSource(IInputSource *source);
+	void					setGameController(IGameController *controller);
+	void					setInputSource(IInputSource *source);
 
 	//=========================================================================
 	// Configuration
 	//=========================================================================
 
-	void		  setMultiplayerMode(bool enabled) { mIsMultiplayer.store(enabled); }
-	void		  setVsCPUMode(bool enabled) { mIsVsCPU.store(enabled); }
+	void					setMultiplayerMode(bool enabled) { mIsMultiplayer.store(enabled); }
+	void					setVsCPUMode(bool enabled) { mIsVsCPU.store(enabled); }
 
 	//=========================================================================
 	// Event Input (thread-safe, can be called from any thread)
 	//=========================================================================
 
-	void		  postEvent(InputEvent event);
+	void					postEvent(InputEvent event);
 
 	// Convenience methods
-	void		  onSquareSelected(Square sq);
-	void		  onPromotionChosen(PieceTypes piece);
-	void		  onRemoteMoveReceived(Move move);
-	void		  onCPUMoveCalculated(Move move);
-	void		  onUndoRequested();
-	void		  onGameStart(GameConfiguration config);
-	void		  onGameReset();
+	void					onSquareSelected(Square sq);
+	void					onPromotionChosen(PieceType piece);
+	void					onRemoteMoveReceived(Move move);
+	void					onCPUMoveCalculated(Move move);
+	void					onUndoRequested();
+	void					onGameStart(GameConfiguration config);
+	void					onGameReset();
 
-    //=========================================================================
+	//=========================================================================
 	// Queries
 	//=========================================================================
 
 	[[nodiscard]] GameState getState() const { return mState.load(); }
 
 private:
-	void run() override;
+	void					run() override;
 
 	//=========================================================================
 	// Event Processing
@@ -80,19 +80,19 @@ private:
 
 	void					processEvent(const InputEvent &event);
 
-    //=========================================================================
+	//=========================================================================
 	// State Handlers - return next state
 	//=========================================================================
 
-	GameState handleInit(const InputEvent &event);
-	GameState handleWaitingForInput(const InputEvent &event);
-	GameState handleWaitingForTarget(const InputEvent &event);
-	GameState handlePawnPromotion(const InputEvent &event);
-	GameState handleWaitingForRemote(const InputEvent &event);
-	GameState handleWaitingForCPU(const InputEvent &event);
-	GameState handleGameOver(const InputEvent &event);
+	GameState				handleInit(const InputEvent &event);
+	GameState				handleWaitingForInput(const InputEvent &event);
+	GameState				handleWaitingForTarget(const InputEvent &event);
+	GameState				handlePawnPromotion(const InputEvent &event);
+	GameState				handleWaitingForRemote(const InputEvent &event);
+	GameState				handleWaitingForCPU(const InputEvent &event);
+	GameState				handleGameOver(const InputEvent &event);
 
-    //=========================================================================
+	//=========================================================================
 	// Helpers
 	//=========================================================================
 

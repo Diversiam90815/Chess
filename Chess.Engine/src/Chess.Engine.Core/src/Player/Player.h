@@ -36,14 +36,14 @@ struct Score
 	Score(Side player, int value) : player(player), value(value) {};
 
 
-	int			getValue() const { return value; }
+	int	 getValue() const { return value; }
 	Side getPlayerColor() const { return player; }
 
-	bool		operator==(Score other) { return this->value == other.value && this->player == other.player; }
+	bool operator==(Score other) { return this->value == other.value && this->player == other.player; }
 
 private:
 	Side player = Side::None;
-	int			value  = 0;
+	int	 value	= 0;
 };
 
 

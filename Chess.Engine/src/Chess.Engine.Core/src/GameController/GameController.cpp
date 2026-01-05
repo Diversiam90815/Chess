@@ -96,7 +96,7 @@ bool GameController::isPromotionMove(Square from, Square to) const
 }
 
 
-Move GameController::findMove(Square from, Square to, PieceTypes promotion) const
+Move GameController::findMove(Square from, Square to, PieceType promotion) const
 {
 	ensureCacheValid();
 
@@ -107,7 +107,7 @@ Move GameController::findMove(Square from, Square to, PieceTypes promotion) cons
 		if (m.from() == from && m.to() == to)
 		{
 			// if promotion specified, matchit
-			if (promotion != PieceTypes::None)
+			if (promotion != PieceType::None)
 			{
 				if (m.isPromotion() && m.promotionPieceOffset() == promotion)
 					return m;

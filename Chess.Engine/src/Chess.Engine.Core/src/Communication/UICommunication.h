@@ -42,9 +42,9 @@ enum class MessageType
 /// </summary>
 struct PlayerCapturedPieceEvent
 {
-	Side playerColor;
-	PieceTypes	pieceType;
-	bool		captured; // False if we undo the move and remove a piece
+	Side	  playerColor;
+	PieceType pieceType;
+	bool	  captured; // False if we undo the move and remove a piece
 };
 
 
@@ -96,8 +96,8 @@ public:
 	//=========================================================================
 
 	void onScoreUpdate(Side player, int value) override;
-	void onAddCapturedPiece(Side player, PieceTypes captured) override;
-	void onRemoveLastCapturedPiece(Side player, PieceTypes captured) override;
+	void onAddCapturedPiece(Side player, PieceType captured) override;
+	void onRemoveLastCapturedPiece(Side player, PieceType captured) override;
 
 	//=========================================================================
 	// IConnectionStatusObserver (multiplayer)

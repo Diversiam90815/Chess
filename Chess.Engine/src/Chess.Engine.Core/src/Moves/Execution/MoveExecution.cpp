@@ -14,11 +14,11 @@ MoveExecution::MoveExecution(Chessboard &board) : mChessBoard(board) {}
 
 bool MoveExecution::makeMove(Move move)
 {
-	Square	   from	 = move.from();
-	Square	   to	 = move.to();
-	PieceTypes piece = mChessBoard.pieceAt(from);
+	Square	  from	= move.from();
+	Square	  to	= move.to();
+	PieceType piece = mChessBoard.pieceAt(from);
 
-	if (piece == PieceTypes::None)
+	if (piece == PieceType::None)
 	{
 		LOG_DEBUG("Could not make move, since there is no piece at {}", square_to_coordinates[to_index(from)]);
 		return false;
@@ -29,13 +29,13 @@ bool MoveExecution::makeMove(Move move)
 
 	// determine side
 	bool	   isWhite	 = (piece < 6);
-	PieceTypes pawnType	 = isWhite ? WPawn : BPawn;
-	PieceTypes rookType	 = isWhite ? WRook : BRook;
+	PieceType  pawnType	 = isWhite ? WPawn : BPawn;
+	PieceType  rookType	 = isWhite ? WRook : BRook;
 
 	// Captures	(En Passant handled later)
 	if (move.isCapture() && !move.isEnPassant())
 	{
-		PieceTypes captured = mChessBoard.pieceAt(to);
+		PieceType captured = mChessBoard.pieceAt(to);
 
 		if (captured != -1)
 		{
@@ -56,9 +56,9 @@ bool MoveExecution::makeMove(Move move)
 	}
 	case MoveFlag::EnPassant:
 	{
-		Square	   capturedSquare = static_cast<Square>(to_index(to) + (isWhite ? 8 : -8));
-		PieceTypes capturedPawn	  = isWhite ? BPawn : WPawn;
-		prevState.capturedPiece	  = capturedPawn;
+		Square	  capturedSquare = static_cast<Square>(to_index(to) + (isWhite ? 8 : -8));
+		PieceType capturedPawn	 = isWhite ? BPawn : WPawn;
+		prevState.capturedPiece	 = capturedPawn;
 		mChessBoard.removePiece(capturedPawn, capturedSquare);
 		mChessBoard.setEnPassantSquare(Square::None);
 		break;
@@ -163,12 +163,12 @@ bool MoveExecution::unmakeMove()
 	// Flip side back frist
 	mChessBoard.flipSide();
 
-	bool	   isWhite	 = (mChessBoard.getCurrentSide() == Side::White);
-	PieceTypes pawnType	 = isWhite ? WPawn : BPawn;
-	PieceTypes rookType	 = isWhite ? WRook : BRook;
+	bool	  isWhite	= (mChessBoard.getCurrentSide() == Side::White);
+	PieceType pawnType	= isWhite ? WPawn : BPawn;
+	PieceType rookType	= isWhite ? WRook : BRook;
 
 	// get piece at dest.
-	PieceTypes pieceAtTo = mChessBoard.pieceAt(to);
+	PieceType pieceAtTo = mChessBoard.pieceAt(to);
 
 	// handle promotions
 	if (move.isPromotion())
@@ -181,7 +181,7 @@ bool MoveExecution::unmakeMove()
 		mChessBoard.movePiece(pieceAtTo, to, from);
 
 	// restore captured piece
-	if (entry.previousState.capturedPiece != PieceTypes::None)
+	if (entry.previousState.capturedPiece != PieceType::None)
 	{
 		if (move.isEnPassant())
 		{

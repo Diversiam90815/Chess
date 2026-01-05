@@ -22,7 +22,7 @@
  *  - Observes local move execution (IMoveObserver) and connection state changes
  *    to broadcast them as needed.
  */
-class RemoteSender : public IRemoteSenderObservable, public IMoveObserver, public IConnectionStatusObserver
+class RemoteSender : public IRemoteSenderObservable, public IConnectionStatusObserver
 {
 public:
 	RemoteSender()	= default;
@@ -35,15 +35,15 @@ public:
 	 */
 	void sendMessage(MultiplayerMessageType type, std::vector<uint8_t> &message) override;
 
-	/**
-	 * @brief	Observer: invoked when a move is executed locally.
-	 * @param	move -> Executed move.
-	 * @param	fromRemote -> True if the move originated remotely (avoid echo).
-	 */
-	void onExecuteMove(const PossibleMove &move, bool fromRemote = false) override;
+	///**
+	// * @brief	Observer: invoked when a move is executed locally.
+	// * @param	move -> Executed move.
+	// * @param	fromRemote -> True if the move originated remotely (avoid echo).
+	// */
+	// void onExecuteMove(const Move &move, bool fromRemote = false) override;
 
-	void onAddToMoveHistory(Move &move) override {}
-	void onClearMoveHistory() override {}
+	// void onAddToMoveHistory(Move &move) override {}
+	// void onClearMoveHistory() override {}
 
 	/**
 	 * @brief	Send host <-> client invitation response (accept / reject).
@@ -63,9 +63,9 @@ public:
 	/**
 	 * @brief	Notify remote of local player's chosen color.
 	 */
-	void onLocalPlayerChosen(const PlayerColor localPlayer) override;
+	void onLocalPlayerChosen(const Side localPlayer) override;
 
-	void onRemotePlayerChosen(const PlayerColor remote) override {}
+	void onRemotePlayerChosen(const Side remote) override {}
 
 	/**
 	 * @brief	Communicate that the local player toggled ready flag.
@@ -82,7 +82,7 @@ private:
 	/**
 	 * @brief	Serialize and send a chess move.
 	 */
-	void				 sendMove(const PossibleMove &move);
+	void				 sendMove(const Move &move);
 
 	/**
 	 * @brief	Serialize and broadcast connection state.

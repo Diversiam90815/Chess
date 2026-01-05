@@ -22,21 +22,10 @@ class IPlayerObserver
 public:
 	virtual ~IPlayerObserver() {};
 
-	virtual void onScoreUpdate(Side player, int value)						 = 0;
-	virtual void onAddCapturedPiece(Side player, PieceTypes captured)		 = 0;
-	virtual void onRemoveLastCapturedPiece(Side player, PieceTypes captured) = 0;
+	virtual void onScoreUpdate(Side player, int value)						= 0;
+	virtual void onAddCapturedPiece(Side player, PieceType captured)		= 0;
+	virtual void onRemoveLastCapturedPiece(Side player, PieceType captured) = 0;
 };
-
-
-// class IMoveObserver
-//{
-// public:
-//	virtual ~IMoveObserver() {};
-//
-//	virtual void onExecuteMove(const PossibleMove &move, bool fromRemote) = 0;
-//	virtual void onAddToMoveHistory(Move &move)							  = 0;
-//	virtual void onClearMoveHistory()									  = 0;
-// };
 
 
 class IGameObserver
@@ -120,13 +109,4 @@ public:
 	virtual void onLocalPlayerChosen(const Side localPlayer)				 = 0;
 	virtual void onRemotePlayerChosen(Side remotePlayer)					 = 0;
 	virtual void onLocalReadyFlagSet(const bool flag)						 = 0;
-};
-
-
-class ICPUMoveObserver
-{
-public:
-	virtual ~ICPUMoveObserver() {};
-
-	virtual void onMoveCalculated(Move move) = 0;
 };

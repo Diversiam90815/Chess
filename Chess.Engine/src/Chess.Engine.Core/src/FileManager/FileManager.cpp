@@ -44,7 +44,7 @@ void FileManager::setAppDataPath(std::string path)
 
 fs::path FileManager::getLoggingPath()
 {
-	fs::path path = getAppDataPath() / LoggingFolder;
+	fs::path path = getAppDataPath() / FileName::LoggingFolder;
 	createDirectoryIfNeeded(path);
 	return path;
 }
@@ -52,7 +52,7 @@ fs::path FileManager::getLoggingPath()
 
 fs::path FileManager::getSettingsPath()
 {
-	fs::path path = getAppDataPath() / SettingsFolder;
+	fs::path path = getAppDataPath() / FileName::SettingsFolder;
 	createDirectoryIfNeeded(path);
 	return path;
 }
@@ -60,7 +60,7 @@ fs::path FileManager::getSettingsPath()
 
 fs::path FileManager::getUserSettingsPath()
 {
-	fs::path path = getSettingsPath() / UserSettingsFile;
+	fs::path path = getSettingsPath() / FileName::UserSettingsFile;
 	return path;
 }
 
@@ -68,7 +68,7 @@ fs::path FileManager::getUserSettingsPath()
 std::optional<NetworkAdapter> FileManager::readSelectedNetworkAdapter()
 {
 	NetworkAdapter adapter{};
-	fs::path	   configPath = getSettingsPath() / UserSettingsFile;
+	fs::path	   configPath = getSettingsPath() / FileName::UserSettingsFile;
 
 	if (fs::exists(configPath))
 	{
@@ -80,9 +80,9 @@ std::optional<NetworkAdapter> FileManager::readSelectedNetworkAdapter()
 			jsonIN >> userConfig;
 
 			// Set the adapter if available
-			if (userConfig.contains(SelectedAdapter))
+			if (userConfig.contains(SettingName::SelectedAdapter))
 			{
-				adapter = userConfig[SelectedAdapter].get<NetworkAdapter>();
+				adapter = userConfig[SettingName::SelectedAdapter].get<NetworkAdapter>();
 				return adapter;
 			}
 		}
@@ -103,7 +103,7 @@ bool FileManager::setSelectedNetworkAdapter(const NetworkAdapter &adapter)
 {
 	try
 	{
-		fs::path configPath = getSettingsPath() / UserSettingsFile;
+		fs::path configPath = getSettingsPath() / FileName::UserSettingsFile;
 		json	 config;
 
 		// Read the file in
@@ -122,7 +122,7 @@ bool FileManager::setSelectedNetworkAdapter(const NetworkAdapter &adapter)
 		}
 
 		// Set the adapter (or add it)
-		config[SelectedAdapter] = adapter;
+		config[SettingName::SelectedAdapter] = adapter;
 
 		// Write the file
 		std::ofstream jsonOUT(configPath);

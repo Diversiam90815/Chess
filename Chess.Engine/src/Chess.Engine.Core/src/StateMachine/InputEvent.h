@@ -30,7 +30,7 @@ struct InputEvent
 
 	Type			  type		= Type::None;
 	Square			  square	= Square::None;
-	PieceTypes		  promotion = PieceTypes::None;
+	PieceType		  promotion = PieceType::None;
 	Move			  move;
 	GameConfiguration config{};
 
@@ -43,7 +43,7 @@ struct InputEvent
 		return e;
 	}
 
-	static InputEvent PromotionChosen(PieceTypes piece)
+	static InputEvent PromotionChosen(PieceType piece)
 	{
 		InputEvent e;
 		e.type		= Type::PromotionChosen;

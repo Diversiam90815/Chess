@@ -105,10 +105,10 @@
 // State snapshot for unmake move
 struct BoardState
 {
-	Castling   castle		 = Castling::None;
-	Square	   enPassant	 = Square::None;
-	int		   halfMoveClock = 0;
-	PieceTypes capturedPiece = PieceTypes::None;
+	Castling  castle		= Castling::None;
+	Square	  enPassant		= Square::None;
+	int		  halfMoveClock = 0;
+	PieceType capturedPiece = PieceType::None;
 };
 
 
@@ -125,13 +125,13 @@ public:
 	void							 clear();
 	void							 parseFEN(std::string_view fen);
 
-	void							 removePiece(PieceTypes piece, Square sq);
-	void							 addPiece(PieceTypes piece, Square sq);
-	void							 movePiece(PieceTypes piece, Square from, Square to);
+	void							 removePiece(PieceType piece, Square sq);
+	void							 addPiece(PieceType piece, Square sq);
+	void							 movePiece(PieceType piece, Square from, Square to);
 	void							 updateOccupancies();
 
 	// Piece lookup
-	[[nodiscard]] PieceTypes		 pieceAt(Square sq) const;
+	[[nodiscard]] PieceType			 pieceAt(Square sq) const;
 
 	[[nodiscard]] const Bitboards	&pieces() const noexcept { return mBitBoards; }
 	[[nodiscard]] Bitboards			&pieces() noexcept { return mBitBoards; }

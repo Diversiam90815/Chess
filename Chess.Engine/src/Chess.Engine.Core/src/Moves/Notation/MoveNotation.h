@@ -40,7 +40,7 @@ private:
 
 		if (idx >= 0 && idx < 64)
 			return square_to_coordinates[idx];
-		
+
 		return "--";
 	}
 

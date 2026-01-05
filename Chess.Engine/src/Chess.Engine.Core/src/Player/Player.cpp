@@ -104,22 +104,25 @@ void Player::updateScore()
 			obs->onScoreUpdate(mScore.getPlayerColor(), mScore.getValue());
 	}
 
-	LOG_INFO("Updated Score for {} : {}", LoggingHelper::playerColourToString(mPlayerColor).c_str(), score);
+	LOG_INFO("Updated Score for {} : {}", LoggingHelper::sideToString(mPlayerColor).c_str(), score);
 }
 
 
 constexpr int Player::getPieceValue(PieceType piece)
 {
-	switch (piece)
-	{
-	case PieceType::Pawn: return pawnValue;
-	case PieceType::Knight: return knightValue;
-	case PieceType::Bishop: return bishopValue;
-	case PieceType::Rook: return rookValue;
-	case PieceType::Queen: return queenValue;
-	case PieceType::King: return kingValue;
-	default: return 0;
-	}
+	// switch (piece)
+	//{
+	// case PieceType::Pawn: return pawnValue;
+	// case PieceType::Knight: return knightValue;
+	// case PieceType::Bishop: return bishopValue;
+	// case PieceType::Rook: return rookValue;
+	// case PieceType::Queen: return queenValue;
+	// case PieceType::King: return kingValue;
+	// default: return 0;
+	// }
+
+	// TODO
+	return 0;
 }
 
 

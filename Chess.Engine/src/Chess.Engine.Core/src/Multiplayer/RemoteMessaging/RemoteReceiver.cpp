@@ -35,7 +35,7 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 
 	case MultiplayerMessageType::ConnectionState:
 	{
-		ConnectionStatusEvent state = tryGetContentFromMessage<ConnectionStatusEvent>(jMessage, ConnectionStateKey);
+		ConnectionStatusEvent state = tryGetContentFromMessage<ConnectionStatusEvent>(jMessage, RemoteControl::ConnectionStateKey);
 
 		remoteConnectionStateReceived(state.state);
 
@@ -45,18 +45,13 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 
 	case MultiplayerMessageType::Move:
 	{
-		PossibleMove remoteMove = tryGetContentFromMessage<PossibleMove>(jMessage, MoveKey);
+		Move remoteMove = tryGetContentFromMessage<Move>(jMessage, RemoteControl::MoveKey);
 
-		if (remoteMove.isEmpty())
+		if (!remoteMove.isValid())
 		{
 			LOG_ERROR("Remote move is empty after decoding! There has been an error!");
 			return;
 		}
-
-		LOG_INFO("Received move from remote:");
-		LOG_INFO("\tStart: {0},{1}", remoteMove.start.x, remoteMove.start.y);
-		LOG_INFO("\tEnd: {0},{1}", remoteMove.end.x, remoteMove.end.y);
-		LOG_INFO("\tType: {0}", LoggingHelper::moveTypeToString(remoteMove.type));
 
 		remoteMoveReceived(remoteMove);
 		break;
@@ -64,7 +59,7 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 
 	case MultiplayerMessageType::Chat:
 	{
-		std::string chatMessage = tryGetContentFromMessage<std::string>(jMessage, ChatMessageKey);
+		std::string chatMessage = tryGetContentFromMessage<std::string>(jMessage, RemoteControl::ChatMessageKey);
 
 		if (chatMessage.empty())
 		{
@@ -80,7 +75,7 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 
 	case MultiplayerMessageType::InvitationRequest:
 	{
-		InvitationRequest invite = tryGetContentFromMessage<InvitationRequest>(jMessage, InvitationMessageKey);
+		InvitationRequest invite = tryGetContentFromMessage<InvitationRequest>(jMessage, RemoteControl::InvitationMessageKey);
 		LOG_INFO("Received invitation request from {}", invite.playerName);
 		remoteInvitationReceived(invite);
 
@@ -89,7 +84,7 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 
 	case MultiplayerMessageType::InvitationResponse:
 	{
-		InvitationResponse invResponse = tryGetContentFromMessage<InvitationResponse>(jMessage, InvitationResponseMessageKey);
+		InvitationResponse invResponse = tryGetContentFromMessage<InvitationResponse>(jMessage, RemoteControl::InvitationResponseMessageKey);
 		LOG_INFO("Received invitation response from {}", invResponse.playerName);
 		remoteInvitationResponseReceived(invResponse);
 
@@ -98,9 +93,9 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 
 	case MultiplayerMessageType::LocalPlayer:
 	{
-		PlayerColor remotePlayer = tryGetContentFromMessage<PlayerColor>(jMessage, PlayerChosenKey);
+		Side remotePlayer = tryGetContentFromMessage<Side>(jMessage, RemoteControl::PlayerChosenKey);
 
-		LOG_INFO("Received player chosen from remote message Remote Player : {}", LoggingHelper::playerColourToString(remotePlayer));
+		LOG_INFO("Received player chosen from remote message Remote Player : {}", LoggingHelper::sideToString(remotePlayer));
 		remotePlayerChosenReceived(remotePlayer);
 
 		break;
@@ -108,7 +103,7 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 
 	case MultiplayerMessageType::PlayerReadyForGameFlag:
 	{
-		bool flag = tryGetContentFromMessage<bool>(jMessage, PlayerReadyFlagKey);
+		bool flag = tryGetContentFromMessage<bool>(jMessage, RemoteControl::PlayerReadyFlagKey);
 
 		LOG_INFO("Received player ready for game flag : {}", LoggingHelper::boolToString(flag));
 		remotePlayerReadyFlagReceived(flag);
@@ -136,7 +131,7 @@ void RemoteReceiver::remoteConnectionStateReceived(const ConnectionState &state)
 }
 
 
-void RemoteReceiver::remoteMoveReceived(const PossibleMove &move)
+void RemoteReceiver::remoteMoveReceived(const Move &move)
 {
 	for (auto &observer : mObservers)
 	{
@@ -176,7 +171,7 @@ void RemoteReceiver::remoteInvitationResponseReceived(const InvitationResponse &
 }
 
 
-void RemoteReceiver::remotePlayerChosenReceived(const PlayerColor player)
+void RemoteReceiver::remotePlayerChosenReceived(const Side player)
 {
 	for (auto &observer : mObservers)
 	{

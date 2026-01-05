@@ -112,19 +112,19 @@ void Chessboard::parseFEN(std::string_view fen)
 }
 
 
-void Chessboard::removePiece(PieceTypes piece, Square sq)
+void Chessboard::removePiece(PieceType piece, Square sq)
 {
 	BitUtils::popBit(mBitBoards[piece], to_index(sq));
 }
 
 
-void Chessboard::addPiece(PieceTypes piece, Square sq)
+void Chessboard::addPiece(PieceType piece, Square sq)
 {
 	BitUtils::setBit(mBitBoards[piece], to_index(sq));
 }
 
 
-void Chessboard::movePiece(PieceTypes piece, Square from, Square to)
+void Chessboard::movePiece(PieceType piece, Square from, Square to)
 {
 	removePiece(piece, from);
 	addPiece(piece, to);
@@ -141,21 +141,21 @@ void Chessboard::updateOccupancies()
 }
 
 
-PieceTypes Chessboard::pieceAt(Square sq) const
+PieceType Chessboard::pieceAt(Square sq) const
 {
 	int sqIndex = to_index(sq);
 	for (int p = 0; p < 12; ++p)
 	{
 		if (BitUtils::getBit(mBitBoards[p], sqIndex))
-			return (PieceTypes)p;
+			return (PieceType)p;
 	}
-	return PieceTypes::None;
+	return PieceType::None;
 }
 
 
 BoardState Chessboard::saveState() const
 {
-	return {mCastlingRights, mEnPassantSquare, mHalfMoveClock, -1};
+	return {mCastlingRights, mEnPassantSquare, mHalfMoveClock};
 }
 
 

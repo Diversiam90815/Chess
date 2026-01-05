@@ -117,8 +117,8 @@ size_t MoveValidation::countLegalMoves()
 
 Square MoveValidation::getKingSquare(Side side) const
 {
-	PieceTypes kingType = (side == Side::White) ? WKing : BKing;
-	U64		   kingBB	= mBoard.pieces()[kingType];
+	PieceType kingType = (side == Side::White) ? WKing : BKing;
+	U64		  kingBB   = mBoard.pieces()[kingType];
 
 	if (!kingBB)
 		return Square::None;

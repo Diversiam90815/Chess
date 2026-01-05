@@ -22,7 +22,7 @@ std::string MoveNotation::toSAN(Move &move, const Chessboard &board, bool isChec
 
 	Square		from   = move.from();
 	Square		to	   = move.to();
-	PieceTypes	piece  = board.pieceAt(from);
+	PieceType	piece  = board.pieceAt(from);
 
 	bool		isPawn = (piece == WPawn || piece == BPawn);
 

@@ -53,17 +53,6 @@ public:
 	virtual void removeLastCapturedPiece()					= 0;
 };
 
-//
-// class IMoveObservable : public ObservableBase<IMoveObserver>
-//{
-// public:
-//	virtual ~IMoveObservable() {};
-//
-//	virtual Move executeMove(PossibleMove &move, bool fromRemote) = 0;
-//	virtual void addMoveToHistory(Move &move)					  = 0;
-//	virtual void clearMoveHistory()								  = 0;
-//};
-
 
 class IGameObservable : public ObservableBase<IGameObserver>
 {
@@ -110,11 +99,11 @@ public:
 	virtual ~IRemoteMessagesObservable() {};
 
 	virtual void remoteConnectionStateReceived(const ConnectionState &state)		  = 0;
-	virtual void remoteMoveReceived(const PossibleMove &move)						  = 0;
+	virtual void remoteMoveReceived(const Move &move)								  = 0;
 	virtual void remoteChatMessageReceived(const std::string &message)				  = 0;
 	virtual void remoteInvitationReceived(const InvitationRequest &invite)			  = 0;
 	virtual void remoteInvitationResponseReceived(const InvitationResponse &response) = 0;
-	virtual void remotePlayerChosenReceived(const PlayerColor player)				  = 0;
+	virtual void remotePlayerChosenReceived(const Side player)						  = 0;
 	virtual void remotePlayerReadyFlagReceived(const bool flag)						  = 0;
 };
 
@@ -143,16 +132,7 @@ public:
 	virtual ~IConnectionStatusObservable() {};
 
 	virtual void connectionStatusChanged(const ConnectionStatusEvent event) = 0;
-	virtual void localPlayerChosen(const PlayerColor localPlayer)			= 0;
-	virtual void remotePlayerChosen(const PlayerColor localPlayer)			= 0;
+	virtual void localPlayerChosen(const Side localPlayer)					= 0;
+	virtual void remotePlayerChosen(const Side localPlayer)					= 0;
 	virtual void localReadyFlagSet(const bool flag)							= 0;
-};
-
-
-class ICPUMoveObservable : public ObservableBase<ICPUMoveObserver>
-{
-public:
-	virtual ~ICPUMoveObservable() {};
-
-	virtual void moveCalculated(PossibleMove move) = 0;
 };

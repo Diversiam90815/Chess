@@ -86,11 +86,11 @@ void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 }
 
 
-std::array<PieceTypes, 64> GameManager::getBoardPieces() const
+std::array<PieceType, 64> GameManager::getBoardPieces() const
 {
-	std::array<PieceTypes, 64> pieces{};
+	std::array<PieceType, 64> pieces{};
 
-	const Chessboard		  &board = mGameController->getBoard();
+	const Chessboard		 &board = mGameController->getBoard();
 
 	for (int i = 0; i < 64; ++i)
 	{
@@ -107,7 +107,7 @@ const MoveList &GameManager::getCachedLegalMoves() const
 }
 
 
-PieceTypes GameManager::getPieceAt(Square sq) const
+PieceType GameManager::getPieceAt(Square sq) const
 {
 	return mGameController->getBoard().pieceAt(sq);
 }
@@ -125,7 +125,7 @@ void GameManager::onSquareSelected(Square sq)
 }
 
 
-void GameManager::onPromotionChosen(PieceTypes piece)
+void GameManager::onPromotionChosen(PieceType piece)
 {
 	mStateMachine->onPromotionChosen(piece);
 }
@@ -181,12 +181,6 @@ void GameManager::stoppedMultiplayer()
 
 	mIsMultiplayerMode = false;
 	resetGame(); // Reset to single player}
-}
-
-
-bool GameManager::isMultiplayerActive() const
-{
-	return mIsMultiplayerMode;
 }
 
 

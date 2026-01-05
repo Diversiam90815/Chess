@@ -42,7 +42,7 @@ void StateMachine::onSquareSelected(Square sq)
 }
 
 
-void StateMachine::onPromotionChosen(PieceTypes piece)
+void StateMachine::onPromotionChosen(PieceType piece)
 {
 	postEvent(InputEvent::PromotionChosen(piece));
 }

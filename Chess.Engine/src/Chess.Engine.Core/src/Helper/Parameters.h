@@ -9,6 +9,8 @@
 
 #include <array>
 
+#include "BitboardTypes.h"
+
 constexpr int BOARD_SIZE		= 8;
 constexpr int PLAYER_PIECES_NUM = 2 * BOARD_SIZE;
 
@@ -91,72 +93,76 @@ struct GameConfiguration
 //			File Manager
 //============================================================
 
-constexpr auto								LoggingFolder					   = "Logs";
-constexpr auto								LogFile							   = "Chess.log";
+namespace FileName
+{
+constexpr auto LoggingFolder	= "Logs";
+constexpr auto LogFile			= "Chess.log";
 
-constexpr auto								UserSettingsFile				   = "Config.json";
-constexpr auto								SettingsFolder					   = "Settings";
+constexpr auto UserSettingsFile = "Config.json";
+constexpr auto SettingsFolder	= "Settings";
+} // namespace FileName
 
 
 //============================================================
 //			Config File Settings
 //============================================================
 
-constexpr auto								BoardStyleSetting				   = "BoardStyle";
-constexpr auto								PieceStyleSetting				   = "PieceStyle";
-constexpr auto								SelectedAdapter					   = "Selected_Adapter";
-constexpr auto								PlayerNameSetting				   = "PlayerName";
-constexpr auto								AudioSFXVolumeSetting			   = "Audio_SFX_Volume";
-constexpr auto								AudioSFXEnabledSetting			   = "Audio_SFX_Enabled";
-constexpr auto								AudioAtmosVolumeSetting			   = "Audio_Atmos_Volume";
-constexpr auto								AudioAtmosEnabledSetting		   = "Audio_Atmos_Enabled";
-constexpr auto								AudioAtmosScenarioSetting		   = "Audio_Atmos_Scenario";
-constexpr auto								AudioMasterVolumeSetting		   = "Audio_Master_Volume";
-constexpr auto								DiscoveryUDPPortSetting			   = "Discovery_UDP_Port";
+namespace SettingName
+{
+constexpr auto BoardStyleSetting		 = "BoardStyle";
+constexpr auto PieceStyleSetting		 = "PieceStyle";
+constexpr auto SelectedAdapter			 = "Selected_Adapter";
+constexpr auto PlayerNameSetting		 = "PlayerName";
+constexpr auto AudioSFXVolumeSetting	 = "Audio_SFX_Volume";
+constexpr auto AudioSFXEnabledSetting	 = "Audio_SFX_Enabled";
+constexpr auto AudioAtmosVolumeSetting	 = "Audio_Atmos_Volume";
+constexpr auto AudioAtmosEnabledSetting	 = "Audio_Atmos_Enabled";
+constexpr auto AudioAtmosScenarioSetting = "Audio_Atmos_Scenario";
+constexpr auto AudioMasterVolumeSetting	 = "Audio_Master_Volume";
+constexpr auto DiscoveryUDPPortSetting	 = "Discovery_UDP_Port";
+} // namespace SettingName
 
 
 //============================================================
 //			Multiplayer - Network Communication
 //============================================================
 
-constexpr int								PackageBufferSize				   = 65536;
-constexpr const char					   *RemoteComSecret					   = "316";
+namespace RemoteControl
+{
+constexpr int		  PackageBufferSize			   = 65536;
+constexpr const char *RemoteComSecret			   = "316";
 
-constexpr auto								ConnectionStateKey				   = "ConnectionState";
-constexpr auto								MoveKey							   = "Move";
-constexpr auto								ChatMessageKey					   = "Chat";
-constexpr auto								InvitationMessageKey			   = "Invitation";
-constexpr auto								InvitationResponseMessageKey	   = "InvResponse";
-constexpr auto								PlayerChosenKey					   = "PlayerChosen";
-constexpr auto								PlayerReadyFlagKey				   = "PlayerReady";
+constexpr auto		  ConnectionStateKey		   = "ConnectionState";
+constexpr auto		  MoveKey					   = "Move";
+constexpr auto		  ChatMessageKey			   = "Chat";
+constexpr auto		  InvitationMessageKey		   = "Invitation";
+constexpr auto		  InvitationResponseMessageKey = "InvResponse";
+constexpr auto		  PlayerChosenKey			   = "PlayerChosen";
+constexpr auto		  PlayerReadyFlagKey		   = "PlayerReady";
+} // namespace RemoteControl
 
 
 //============================================================
 //			JSON Conversion
 //============================================================
 
-constexpr auto								jNetworkAdapterID				   = "ID";
-constexpr auto								jNetworkAdapterDesc				   = "adapterName";
-constexpr auto								jNetworkAdapterIP				   = "IPv4";
-constexpr auto								jNetworkAdapterISubnet			   = "subnet";
+namespace JSONConversion
+{
+constexpr auto NetworkAdapterID		 = "ID";
+constexpr auto NetworkAdapterDesc	 = "adapterName";
+constexpr auto NetworkAdapterIP		 = "IPv4";
+constexpr auto NetworkAdapterISubnet = "subnet";
 
-constexpr auto								jPositionX						   = "x";
-constexpr auto								jPositionY						   = "y";
+constexpr auto DiscoveryIP			 = "IPAddress";
+constexpr auto DiscoveryPort		 = "tcpPort";
+constexpr auto DiscoveryName		 = "player";
 
-constexpr auto								jMoveStart						   = "start";
-constexpr auto								jMoveEnd						   = "end";
-constexpr auto								jMoveType						   = "type";
-constexpr auto								jMovePromotion					   = "promotion";
+constexpr auto InvitationPlayerName	 = "PlayerName";
+constexpr auto InvitationVersion	 = "Version";
+constexpr auto InvitationAccepted	 = "Accepted";
+constexpr auto InvitationReason		 = "Reason";
 
-constexpr auto								jDiscoveryIP					   = "IPAddress";
-constexpr auto								jDiscoveryPort					   = "tcpPort";
-constexpr auto								jDiscoveryName					   = "player";
-
-constexpr auto								jInvitationPlayerName			   = "PlayerName";
-constexpr auto								jInvitationVersion				   = "Version";
-constexpr auto								jInvitationAccepted				   = "Accepted";
-constexpr auto								jInvitationReason				   = "Reason";
-
-constexpr auto								jConnectEventType				   = "Type";
-constexpr auto								jConnectEventError				   = "Error";
-constexpr auto								jConnectEventEndpoint			   = "Endpoint";
+constexpr auto ConnectEventType		 = "Type";
+constexpr auto ConnectEventError	 = "Error";
+constexpr auto ConnectEventEndpoint	 = "Endpoint";
+} // namespace JSONConversion

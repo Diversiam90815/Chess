@@ -148,52 +148,52 @@ inline void UserSettings::storeSetting(SettingsType setting, T value)
 	{
 	case SettingsType::BoardStyle:
 	{
-		fmg->writeSettingToFile<T>(BoardStyleSetting, value);
+		fmg->writeSettingToFile<T>(SettingName::BoardStyleSetting, value);
 		break;
 	}
 	case SettingsType::ChessPieceStyle:
 	{
-		fmg->writeSettingToFile<T>(PieceStyleSetting, value);
+		fmg->writeSettingToFile<T>(SettingName::PieceStyleSetting, value);
 		break;
 	}
 	case SettingsType::PlayerName:
 	{
-		fmg->writeSettingToFile<T>(PlayerNameSetting, value);
+		fmg->writeSettingToFile<T>(SettingName::PlayerNameSetting, value);
 		break;
 	}
 	case SettingsType::AudioSFXEnabled:
 	{
-		fmg->writeSettingToFile<T>(AudioSFXEnabledSetting, value);
+		fmg->writeSettingToFile<T>(SettingName::AudioSFXEnabledSetting, value);
 		break;
 	}
 	case SettingsType::AudioSFXVolume:
 	{
-		fmg->writeSettingToFile<T>(AudioSFXVolumeSetting, value);
+		fmg->writeSettingToFile<T>(SettingName::AudioSFXVolumeSetting, value);
 		break;
 	}
 	case SettingsType::AudioAtmosEnabled:
 	{
-		fmg->writeSettingToFile<T>(AudioAtmosEnabledSetting, value);
+		fmg->writeSettingToFile<T>(SettingName::AudioAtmosEnabledSetting, value);
 		break;
 	}
 	case SettingsType::AudioAtmosVolume:
 	{
-		fmg->writeSettingToFile<T>(AudioAtmosVolumeSetting, value);
+		fmg->writeSettingToFile<T>(SettingName::AudioAtmosVolumeSetting, value);
 		break;
 	}
 	case SettingsType::AudioAtmosScenario:
 	{
-		fmg->writeSettingToFile<T>(AudioAtmosScenarioSetting, value);
+		fmg->writeSettingToFile<T>(SettingName::AudioAtmosScenarioSetting, value);
 		break;
 	}
 	case SettingsType::AudioMasterVolume:
 	{
-		fmg->writeSettingToFile<T>(AudioMasterVolumeSetting, value);
+		fmg->writeSettingToFile<T>(SettingName::AudioMasterVolumeSetting, value);
 		break;
 	}
 	case SettingsType::DiscoveryUDPPort:
 	{
-		fmg->writeSettingToFile<T>(DiscoveryUDPPortSetting, value);
+		fmg->writeSettingToFile<T>(SettingName::DiscoveryUDPPortSetting, value);
 		break;
 	}
 
@@ -213,7 +213,7 @@ inline T UserSettings::readSetting(SettingsType setting)
 	{
 		if constexpr (std::is_same_v<T, std::string>)
 		{
-			value = readOrDefault<std::string>(BoardStyleSetting, mDefaultSettings.BoardStyle, setting, "Board Style");
+			value = readOrDefault<std::string>(SettingName::BoardStyleSetting, mDefaultSettings.BoardStyle, setting, "Board Style");
 		}
 		break;
 	}
@@ -221,7 +221,7 @@ inline T UserSettings::readSetting(SettingsType setting)
 	{
 		if constexpr (std::is_same_v<T, std::string>)
 		{
-			value = readOrDefault<std::string>(PieceStyleSetting, mDefaultSettings.ChessPieceStyle, setting, "Piece Style");
+			value = readOrDefault<std::string>(SettingName::PieceStyleSetting, mDefaultSettings.ChessPieceStyle, setting, "Piece Style");
 		}
 		break;
 	}
@@ -229,46 +229,46 @@ inline T UserSettings::readSetting(SettingsType setting)
 	{
 		if constexpr (std::is_same_v<T, std::string>)
 		{
-			value = readOrDefault<std::string>(PlayerNameSetting, {}, setting, "Local Player Name");
+			value = readOrDefault<std::string>(SettingName::PlayerNameSetting, {}, setting, "Local Player Name");
 		}
 		break;
 	}
 	case SettingsType::AudioSFXEnabled:
 	{
-		value = readOrDefault<bool>(AudioSFXEnabledSetting, mDefaultSettings.SFXEnabled, setting, "Audio SFX Enabled");
+		value = readOrDefault<bool>(SettingName::AudioSFXEnabledSetting, mDefaultSettings.SFXEnabled, setting, "Audio SFX Enabled");
 		break;
 	}
 	case SettingsType::AudioSFXVolume:
 	{
-		value = readOrDefault<float>(AudioSFXVolumeSetting, mDefaultSettings.SFXVolume, setting, "Audio SFX Volume");
+		value = readOrDefault<float>(SettingName::AudioSFXVolumeSetting, mDefaultSettings.SFXVolume, setting, "Audio SFX Volume");
 		break;
 	}
 	case SettingsType::AudioAtmosEnabled:
 	{
-		value = readOrDefault<bool>(AudioAtmosEnabledSetting, mDefaultSettings.AtmosEnabled, setting, "Audio Atmos Enabled");
+		value = readOrDefault<bool>(SettingName::AudioAtmosEnabledSetting, mDefaultSettings.AtmosEnabled, setting, "Audio Atmos Enabled");
 		break;
 	}
 	case SettingsType::AudioAtmosVolume:
 	{
-		value = readOrDefault<float>(AudioAtmosVolumeSetting, mDefaultSettings.AtmosVolume, setting, "Audio Atmos Volume");
+		value = readOrDefault<float>(SettingName::AudioAtmosVolumeSetting, mDefaultSettings.AtmosVolume, setting, "Audio Atmos Volume");
 		break;
 	}
 	case SettingsType::AudioAtmosScenario:
 	{
 		if constexpr (std::is_same_v<T, std::string>)
 		{
-			value = readOrDefault<std::string>(AudioAtmosScenarioSetting, mDefaultSettings.AtmosScenario, setting, "Audio Atmos Scencario");
+			value = readOrDefault<std::string>(SettingName::AudioAtmosScenarioSetting, mDefaultSettings.AtmosScenario, setting, "Audio Atmos Scencario");
 		}
 		break;
 	}
 	case SettingsType::AudioMasterVolume:
 	{
-		value = readOrDefault<float>(AudioMasterVolumeSetting, mDefaultSettings.MasterVolume, setting, "Audio Master Volume");
+		value = readOrDefault<float>(SettingName::AudioMasterVolumeSetting, mDefaultSettings.MasterVolume, setting, "Audio Master Volume");
 		break;
 	}
 	case SettingsType::DiscoveryUDPPort:
 	{
-		value = readOrDefault<int>(DiscoveryUDPPortSetting, mDefaultSettings.DiscoveryUDPPort, setting, "Discovery UDP Port");
+		value = readOrDefault<int>(SettingName::DiscoveryUDPPortSetting, mDefaultSettings.DiscoveryUDPPort, setting, "Discovery UDP Port");
 		break;
 	}
 	default: return value;

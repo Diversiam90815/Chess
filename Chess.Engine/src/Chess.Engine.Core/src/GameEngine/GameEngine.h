@@ -36,7 +36,7 @@ public:
 	/**
 	 * @brief	Execute a move. Validates, applies, and notifies observers.
 	 * @param	move Move to execute
-	 * @param	fromRemote Flag indicating that the move came from the remote endpoint in a 
+	 * @param	fromRemote Flag indicating that the move came from the remote endpoint in a
 							Multiplayer setting to avoid infite loop.
 	 * @return	true if move was legal and executed.
 	 */

@@ -128,18 +128,18 @@ private:
  */
 struct MoveIntent
 {
-	Square	   fromSquare = Square::None;
-	Square	   toSquare	  = Square::None;
-	PieceTypes promotion  = PieceTypes::None;
-	MoveList   legalMoves; // Cached legal moves from selected square
-	bool	   fromRemote = false;
-	bool	   fromCPU	  = false;
+	Square	  fromSquare = Square::None;
+	Square	  toSquare	 = Square::None;
+	PieceType promotion	 = PieceType::None;
+	MoveList  legalMoves; // Cached legal moves from selected square
+	bool	  fromRemote = false;
+	bool	  fromCPU	 = false;
 
-	void	   clear()
+	void	  clear()
 	{
 		fromSquare = Square::None;
 		toSquare   = Square::None;
-		promotion  = PieceTypes::None;
+		promotion  = PieceType::None;
 		fromRemote = false;
 		fromCPU	   = false;
 		legalMoves.clear();
