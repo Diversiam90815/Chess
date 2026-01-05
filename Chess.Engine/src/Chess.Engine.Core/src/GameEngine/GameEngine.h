@@ -83,7 +83,6 @@ public:
 
 	void								 switchTurns();
 	Side								 getCurrentSide() const { return mChessBoard.getCurrentSide(); }
-	Side								 getCurrentPlayer() const { return mCurrentPlayer; }; // TODO: May not be needed
 	void								 changeCurrentPlayer(Side player) override;
 	void								 setLocalPlayer(Side player);
 	Side								 getLocalPlayer() const;
