@@ -10,7 +10,6 @@
 #include "Execution/MoveExecution.h"
 #include "Generation/MoveGeneration.h"
 #include "Validation/MoveValidation.h"
-#include "CPUPlayer.h"
 #include "IObservable.h"
 #include "Parameters.h"
 #include "Player.h"
@@ -27,7 +26,6 @@ public:
 
 	// Lifecycle
 	void								 init();
-	void								 reset();
 	void								 startGame();
 	void								 resetGame();
 
@@ -37,6 +35,9 @@ public:
 
 	/**
 	 * @brief	Execute a move. Validates, applies, and notifies observers.
+	 * @param	move Move to execute
+	 * @param	fromRemote Flag indicating that the move came from the remote endpoint in a 
+							Multiplayer setting to avoid infite loop.
 	 * @return	true if move was legal and executed.
 	 */
 	bool								 makeMove(Move move, bool fromRemote = false);
@@ -98,10 +99,7 @@ public:
 	//	CPU Player
 	//=========================================================================
 
-	void								 setCPUConfiguration(const CPUConfiguration &config);
-	CPUConfiguration					 getCPUConfiguration() const;
-	bool								 isCPUPlayer(Side player) const;
-	void								 requestCPUMoveAsync();
+	uint64_t							 getHash();
 
 	//=========================================================================
 	//	Accessors
@@ -125,7 +123,6 @@ private:
 	MoveExecution  mMoveExecution;
 	MoveValidation mMoveValidation;
 	MoveNotation   mMoveNotation;
-	CPUPlayer	   mCPUPlayer;
 
 	// Players
 	Player		   mWhitePlayer;

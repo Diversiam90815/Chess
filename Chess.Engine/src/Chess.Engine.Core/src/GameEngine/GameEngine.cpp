@@ -9,7 +9,7 @@
 
 
 GameEngine::GameEngine()
-	: mMoveGeneration(mChessBoard), mMoveExecution(mChessBoard), mCPUPlayer(mMoveGeneration, mChessBoard), mMoveValidation(mChessBoard, mMoveGeneration, mMoveExecution)
+	: mMoveGeneration(mChessBoard), mMoveExecution(mChessBoard), mMoveValidation(mChessBoard, mMoveGeneration, mMoveExecution)
 {
 }
 
@@ -19,12 +19,6 @@ void GameEngine::init()
 	mChessBoard.init();
 	mWhitePlayer.setPlayerColor(Side::White);
 	mBlackPlayer.setPlayerColor(Side::Black);
-}
-
-
-void GameEngine::reset()
-{
-	mCurrentPlayer = Side::None;
 }
 
 
@@ -42,7 +36,7 @@ void GameEngine::resetGame()
 	mMoveExecution.clearHistory();
 	mWhitePlayer.reset();
 	mBlackPlayer.reset();
-	reset();
+	mCurrentPlayer = Side::None;
 }
 
 
@@ -151,7 +145,7 @@ EndGameState GameEngine::checkForEndGameConditions()
 	{
 		LOG_INFO("Checkmate!");
 		auto winner = getWinner();
-		endGame(EndGameState::Checkmate, winner.value_or(Side::None));
+		endGame(EndGameState::Checkmate, winner);
 		return EndGameState::Checkmate;
 	}
 
@@ -238,27 +232,9 @@ Side GameEngine::getWinner() const
 }
 
 
-void GameEngine::setCPUConfiguration(const CPUConfiguration &config)
+uint64_t GameEngine::getHash()
 {
-	mCPUPlayer.setCPUConfiguration(config);
-}
-
-
-CPUConfiguration GameEngine::getCPUConfiguration() const
-{
-	return mCPUPlayer.getCPUConfiguration();
-}
-
-
-bool GameEngine::isCPUPlayer(Side player) const
-{
-	return mCPUPlayer.isCPUPlayer(player);
-}
-
-
-void GameEngine::requestCPUMoveAsync()
-{
-	mCPUPlayer.requestMoveAsync();
+	return 0;
 }
 
 

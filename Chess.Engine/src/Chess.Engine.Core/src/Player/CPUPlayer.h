@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <chrono>
-#include <future>
 #include <memory>
 #include <random>
 #include <thread>
@@ -16,283 +14,184 @@
 
 #include "Parameters.h"
 #include "GameEngine.h"
-#include "IObservable.h"
 
 
-#define DEBUG_MOVES 0
-
-/// <summary>
-/// Enumerates the possible difficulty levels for a CPU opponent.
-/// </summary>
+/**
+ * @brief	Representation of CPU difficulty levels
+ */
 enum class CPUDifficulty
 {
-	Random = 0,
 	Easy   = 1,
 	Medium = 2,
 	Hard   = 3
 };
 
-/// <summary>
-/// Represents an entry in a transposition table, storing information about a previously evaluated game state.
-/// </summary>
+
+/**
+ * @brief	Transposition table entry for search optimization.
+ */
 struct TranspositionEntry
 {
-	uint64_t hash{};
-	int		 depth{};
-	int		 score{};
 	enum class NodeType
 	{
 		Exact,
-		Alpha,
-		Beta
-	} type;
-	PossibleMove move{};
+		LowerBound,
+		UpperBound,
+	};
+
+	uint64_t hash{};
+	int		 depth{};
+	int		 score{};
+	NodeType type{NodeType::Exact};
+	Move	 bestMove{};
 };
-
-/// <summary>
-/// Represents a possible move along with its associated score.
-/// </summary>
-struct MoveCandidate
-{
-	PossibleMove move;
-	int			 score;
-};
-
-/// <summary>
-/// Represents the configuration settings for a CPU-controlled player.
-/// </summary>
-struct CPUConfiguration
-{
-	CPUDifficulty			  difficulty = CPUDifficulty::Random;
-	std::chrono::milliseconds thinkingTime{1000};
-	bool					  enabled			  = false;
-	PlayerColor				  cpuColor			  = PlayerColor::Black; // Default to black
-
-	bool					  enableRandomization = true;				// Add some randomness to move selection
-	float					  randomizationFactor = 0.1f;				// How much randomness? Between 0.0 and 1.0
-	int						  candidateMoveCount  = 5;					// Number of top moves to consider
-};
-
 
 
 /**
- * @brief	Manages a computer-controlled chess player capable of generating and evaluating moves using various algorithms such as minimax and alpha-beta pruning.
- *			Provides asynchronous search with cancellation via jthread stop tokens, positional + heuristic evaluation,
- *			transposition table caching and optional randomization for variance.
+ * @brief	Move with associated score for sorting/selection.
  */
-class CPUPlayer : public ICPUMoveObservable
+struct ScoredMove
+{
+	Move move;
+	int	 score;
+};
+
+
+/**
+ * @brief	Configuration for CPU player behavior.
+ */
+struct CPUConfiguration
+{
+	bool		  enabled			  = false;
+	Side		  cpuColor			  = Side::Black; // Default to black
+	CPUDifficulty difficulty		  = CPUDifficulty::Medium;
+	bool		  enableRandomization = true;		 // Add some randomness to move selection
+	int			  maxDepth			  = 6;
+};
+
+
+/**
+ * @brief	AI chess player using minimax with alpha-beta pruning.
+ *			Works directly with bitboard Move type.
+ */
+class CPUPlayer
 {
 public:
-	CPUPlayer(GameEngine &engine);
+	explicit CPUPlayer(GameEngine &engine);
 	~CPUPlayer();
 
-	/**
-	 * @brief	Apply new CPU configuration (difficulty, timing, features).
-	 */
-	void			 setCPUConfiguration(const CPUConfiguration &config);
+	// Non-copyable
+	CPUPlayer(const CPUPlayer &)				  = delete;
+	CPUPlayer		&operator=(const CPUPlayer &) = delete;
 
-	/**
-	 * @brief	Current configuration snapshot.
-	 */
-	CPUConfiguration getCPUConfiguration() const { return mConfig; }
+	//=========================================================================
+	// Configuration
+	//=========================================================================
 
-	void			 calculateMoveAsync(std::function<void(Move)> callback);	// TODO
+	void			 configure(const CPUConfiguration &config);
+	CPUConfiguration getConfiguration() const { return mConfig; }
 
-	/**
-	 * @brief	Begin asynchronous computation of a move for the configured CPU color.
-	 *			Launches a std::jthread; any existing search thread is cancelled.
-	 */
-	void			 requestMoveAsync();
-
-	/**
-	 * @brief	True if specified player color belongs to this CPU instance.
-	 */
-	bool			 isCPUPlayer(PlayerColor player) const;
-
-	/**
-	 * @brief	Query whether CPU participation is enabled.
-	 */
-	bool			 isCPUEnabled() const { return mConfig.enabled; }
-
-	/**
-	 * @brief	Enable / disable CPU participation (does not cancel in-progress search).
-	 */
 	void			 setEnabled(bool enabled) { mConfig.enabled = enabled; }
+	bool			 isEnabled() const { return mConfig.enabled; }
+	bool			 isCPUPlayer(Side side) const { return mConfig.enabled && mConfig.cpuColor == side; }
+
+	//=========================================================================
+	// Move Calculation
+	//=========================================================================
 
 	/**
-	 * @brief	Observer callback when a move has been computed (dispatch to listeners).
+	 * @brief	Calculate best move asynchronously.
+	 * @param	callback Called on completion with the chosen move.
 	 */
-	void			 moveCalculated(PossibleMove calculatedMove) override;
+	void			 calculateMoveAsync(std::function<void(Move)> callback);
 
 	/**
-	 * @brief	Select a random move from provided list.
-	 * @param	moves -> all possible moves
-	 * @return	Chosen move or default constructed / empty move if list empty.
+	 * @brief	Calculate best move synchronously (blocking).
+	 * @return	Best move found, or null move if none available.
 	 */
-	PossibleMove	 getRandomMove(const std::vector<PossibleMove> &moves);
+	Move			 calculateMove();
 
 	/**
-	 * @brief	Evaluate each move and return the one with highest score (static evaluation).
-	 *			Applies some randomization if enabled via the CPUConfig.
-	 * @param	moves -> all possible moves
-	 * @return	Chosen move or default constructed / empty move if list empty.
+	 * @brief	Cancel any ongoing calculation.
 	 */
-	PossibleMove	 getBestEvaluatedMove(const std::vector<PossibleMove> &moves);
+	void			 cancelCalculation();
 
 	/**
-	 * @brief	Execute a minimax search to a fixed depth.
-	 * @param	moves -> Root move candidates.
-	 * @param	depth -> Search depth (plies).
-	 * @param	stopToken -> Cooperative cancellation token.
-	 * @return	Chosen move or default constructed / empty move if list empty.
+	 * @brief	Check if calculation is in progress.
 	 */
-	PossibleMove	 getMiniMaxMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
-
-	/**
-	 * @brief	Execute a alpha-beta search to a fixed depth.
-	 * @param	moves -> Root move candidates.
-	 * @param	depth -> Search depth (plies).
-	 * @param	stopToken -> Cooperative cancellation token.
-	 * @return	Chosen move or default constructed / empty move if list empty.
-	 */
-	PossibleMove	 getAlphaBetaMove(const std::vector<PossibleMove> &moves, int depth, std::stop_token stopToken = {});
-
-	/**
-	 * @brief	Evaluate static positional score for a player on a lightweight board snapshot.
-	 */
-	int				 evaluatePlayerPosition(PlayerColor player);
+	bool			 isCalculating() const { return mIsCalculating.load(); }
 
 
 private:
-	/**
-	 * @brief	High-level dispatcher choosing strategy based on difficulty / config.
-	 * @param	player -> current player color
-	 * @param	stopToken -> Cooperative cancellation token.
-	 * @return	Best computed move (or fallback).
-	 */
-	PossibleMove			   computeBestMove(PlayerColor player, std::stop_token stopToken = {});
+	//=========================================================================
+	// Search Algorithms
+	//=========================================================================
 
 	/**
-	 * @brief	Minimax recursive evaluation of a move branch.
-	 * @param	move -> Move leading into this node.
-	 * @param	depth -> Remaining depth (0 => leaf evaluation).
-	 * @param	maximizing -> True if maximizing player's turn.
-	 * @param	player	-> Root CPU player color.
-	 * @param	stopToken -> Cooperative cancellation token.
-	 * @return	Score relative to root player.
+	 * @brief	Top-level search dispatcher based on difficulty.
 	 */
-	int						   minimax(const PossibleMove &move, int depth, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
+	Move											 computeBestMove(std::stop_token stopToken);
 
 	/**
-	 * @brief	Alpha-beta pruned variant of minimax.
-	 * @param	move -> Move leading into this node.
-	 * @param	depth -> Remaining depth (0 => leaf evaluation).
-	 * @param	alpha -> Best already found lower bound.
-	 * @param	beta  -> Best already found upper bound.
-	 * @param	maximizing -> True if maximizing player's turn.
-	 * @param	player	-> Root CPU player color.
-	 * @param	stopToken -> Cooperative cancellation token.
-	 * @return	Score relative to root player.
+	 * @brief	Minimax search with alpha-beta pruning.
 	 */
-	int						   alphaBeta(const PossibleMove &move, int depth, int alpha, int beta, bool maximizing, PlayerColor player, std::stop_token stopToken = {});
+	Move											 searchAlphaBeta(const MoveList &moves, int depth, std::stop_token stopToken);
 
 	/**
-	 * @brief	Quiescence search extension exploring only capture / tactical volatility
-	 *			to mitigate horizon effect.
-	 * @param	board -> Mutable light board for fast make/unmake operations.
-	 * @param	alpha -> Best already found lower bound.
-	 * @param	beta  -> Best already found upper bound.
-	 * @param	player	-> Root CPU player color.
-	 * @param	stopToken -> Cooperative cancellation token.
-	 * @return	Score relative to root player.
+	 * @brief	Recursive alpha-beta implementation.
 	 */
-	int						   quiescence(int alpha, int beta, PlayerColor player, std::stop_token stopToken = {});
+	int												 alphaBeta(int depth, int alpha, int beta, bool maximizing, std::stop_token stopToken);
 
 	/**
-	 * @brief	Choose highest scoring candidate (deterministic).
+	 * @brief	Quiescence search to avoid horizon effect.
 	 */
-	PossibleMove			   selectBestMove(std::vector<MoveCandidate> &moves);
+	int												 quiescence(int alpha, int beta, std::stop_token stopToken);
 
-	/**
-	 * @brief	Choose a candidate with optional randomness (weighted / uniform)
-	 *			to avoid repetitive play patterns.
-	 * @param	moves -> MoveCandidates to choose from. The moves will be sorted and filtered before selection.
-	 * @return	Chosen move, or empty move on failure
-	 */
-	PossibleMove			   selectMoveWithRandomization(std::vector<MoveCandidate> &moves);
+	//=========================================================================
+	// Move Selection
+	//=========================================================================
 
-	/**
-	 * @brief	Sorts the MoveCandidates depending on their score values and keeps only top-N scoring candidates (pruning breadth).
-	 * @param	allMoves -> All moves available to be filtered
-	 * @return	Top N moves according to their score values in a sorted order.
-	 */
-	std::vector<MoveCandidate> filterTopCandidates(std::vector<MoveCandidate> &allMoves) const;
-
-	/**
-	 * @brief	Insert (or replace) an entry in transposition table (size-limited). Entries are defined via the unique hash.
-	 * @param	hash -> hash value of the current board state
-	 * @param	depth -> current depth
-	 * @param	score -> score value calculated
-	 * @param	type -> TranspositonEntry NodeType
-	 * @param	move -> best move to store
-	 */
-	void					   storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, const PossibleMove &move);
-
-	/**
-	 * @brief	Lookup a hash from the transposition table.
-	 * @param	hash -> hash to look up from the transposition table
-	 * @param	depth -> current depth
-	 * @param	[OUT] score -> if the hash was found, the score value gets set to the cached value
-	 * @param	[OUT] move -> if the hash was found, the move gets set to the cached move
-	 * @return	True if the hash was found; false otherwise
-	 */
-	bool					   lookupTransposition(uint64_t hash, int depth, int &score, PossibleMove &move);
-
-	/**
-	 * @brief	Launch search on background jthread (handles cancellation of previous).
-	 * @param	player -> launches to search a move for that player
-	 */
-	void					   launchSearchAsync(PlayerColor player);
-
-	/**
-	 * @brief	Checks if the alogithms were asked to terminate early. Since the move calculation runs in a detached thread, we have to terminate
-	 *			the thread on eg. closure of the app.
-	 */
-	inline bool				   cancelled(std::stop_token token) const { return token.stop_requested(); }
-
-	/**
-	 * @brief	Generate a cache key combining board hash + move signature + player.
-	 *			Provides stable identity for evaluation memoization.
-	 */
-	inline uint64_t			   makeEvalKey(const PossibleMove &move, PlayerColor player) const
-	{
-		// uint64_t h = board.getHashKey();
-		// uint64_t m = (uint64_t(move.start.x & 7) << 48) | (uint64_t(move.start.y & 7) << 45) | (uint64_t(move.end.x & 7) << 42) | (uint64_t(move.end.y & 7) << 39) |
-		//			 (uint64_t(move.type) << 16) | (uint64_t(move.promotionPiece) << 8) | uint64_t(player);
-		//// mix
-		// return h ^ (m + 0x9e3779b97f4a7c15ULL + (h << 6) + (h >> 2));
-
-		return 0;
-	}
+	Move											 selectBestMove(std::vector<ScoredMove> &scoredMoves);
+	Move											 selectWithRandomization(std::vector<ScoredMove> &scoredMoves);
+	std::vector<ScoredMove>							 filterTopCandidates(std::vector<ScoredMove> &moves, size_t maxCount) const;
 
 
+	//=========================================================================
+	// Transposition Table
+	//=========================================================================
+
+	void											 storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, Move bestMove);
+	bool											 lookupTransposition(uint64_t hash, int depth, int alpha, int beta, int &score, Move &bestMove);
+	void											 clearTranspositionTable();
+
+	//=========================================================================
+	// Helpers
+	//=========================================================================
+
+	int												 evaluate() const;
+	bool											 isCancelled(std::stop_token token) const { return token.stop_requested(); }
+	int												 getSearchDepth() const;
+
+	//=========================================================================
+	// Members
+	//=========================================================================
 
 	CPUConfiguration								 mConfig;
-
 	GameEngine										&mEngine;
-	// MoveGeneration									&mMoveGeneration;
-	// Chessboard										&mBoard;
 
+	// Search thread
 	std::jthread									 mSearchThread;
+	std::atomic<bool>								 mIsCalculating{false};
 
+	// Transposition Table
 	std::unordered_map<uint64_t, TranspositionEntry> mTranspositionTable;
-	static constexpr size_t							 MAX_TRANSPOSITION_ENTRIES = 1000000;
+	static constexpr size_t							 MAX_TRANSPOSITION_ENTRIES = 1'000'000;
+
+	// Statistics
 	int												 mNodesSearched			   = 0;
 	int												 mTranspositionHits		   = 0;
 
+	// Randomization
 	std::random_device								 mRandomDevice;
 	std::mt19937									 mRandomGenerator;
-
-	mutable std::unordered_map<uint64_t, int>		 mEvaluationCache;
-	static constexpr size_t							 MAX_EVAL_CACHE_SIZE = 1000000;
 };
