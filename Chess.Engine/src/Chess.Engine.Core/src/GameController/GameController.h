@@ -17,15 +17,15 @@ class GameController : public IGameController
 public:
 	GameController();
 	~GameController() override = default;
-	
-    //=========================================================================
+
+	//=========================================================================
 	// Game Lifecycle
 	//=========================================================================
 
-	bool initializeGame(GameConfiguration config) override;
-	void resetGame() override;
+	bool								 initializeGame(GameConfiguration config) override;
+	void								 resetGame() override;
 
-    //=========================================================================
+	//=========================================================================
 	// Move Operations
 	//=========================================================================
 
@@ -55,6 +55,7 @@ public:
 
 	bool								 isCPUTurn() const override;
 	void								 requestCPUMoveAsync() override;
+	void								 cancelCPUCalculation();
 
 	//=========================================================================
 	// Accessors (for UI board state queries)
@@ -62,6 +63,7 @@ public:
 
 	const Chessboard					&getBoard() const { return mEngine.getBoard(); }
 	const std::vector<MoveHistoryEntry> &getMoveHistory() const { return mEngine.getMoveHistory(); }
+	const MoveList						&getCachedLegalMoves() { return mCachedLegalMoves; }
 
 	void								 setCPUMoveCallback(std::function<void(Move)> callback);
 

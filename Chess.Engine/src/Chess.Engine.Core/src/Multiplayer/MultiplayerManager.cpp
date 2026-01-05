@@ -210,12 +210,12 @@ void MultiplayerManager::onRemoteInvitationResponseReceived(const InvitationResp
 }
 
 
-void MultiplayerManager::onRemotePlayerChosenReceived(const PlayerColor player)
+void MultiplayerManager::onRemotePlayerChosenReceived(const Side player)
 {
 	LOG_INFO("Received a player chosen message from the remote. Player = {}", LoggingHelper::playerColourToString(player));
 
 	// The remote chose that player, so we switch locally to the corresponding oppsosite playercolor
-	PlayerColor localPlayer = player == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
+	Side localPlayer = player == Side::White ? Side::Black : Side::White;
 
 	LOG_INFO("So we set ourselves to Player {}", LoggingHelper::playerColourToString(localPlayer));
 
@@ -251,6 +251,12 @@ bool MultiplayerManager::checkIfReadyForGame()
 
 	LOG_INFO("Local Ready = {}, Remote Ready = {}", mLocalPlayerReadyForGameFlag.load(), mRemotePlayerReadyForGameFlag.load());
 	return false;
+}
+
+
+void MultiplayerManager::setRemoteMoveCallback(std::function<void(Move)> callback)
+{
+	mRemoteMoveReceivedCallback = callback;
 }
 
 
@@ -378,7 +384,7 @@ void MultiplayerManager::connectionStatusChanged(const ConnectionStatusEvent eve
 }
 
 
-void MultiplayerManager::localPlayerChosen(const PlayerColor localPlayer)
+void MultiplayerManager::localPlayerChosen(const Side localPlayer)
 {
 	if (mLocalPlayerColor == localPlayer)
 		return;
@@ -393,7 +399,7 @@ void MultiplayerManager::localPlayerChosen(const PlayerColor localPlayer)
 }
 
 
-void MultiplayerManager::remotePlayerChosen(const PlayerColor local)
+void MultiplayerManager::remotePlayerChosen(const Side local)
 {
 	for (auto &observer : mObservers)
 	{
@@ -424,4 +430,11 @@ void MultiplayerManager::onRemoteFound(const Endpoint &remote)
 {
 	mRemoteEndpoint = remote;
 	connectionStatusChanged({ConnectionState::ClientFoundHost, remote});
+}
+
+
+void MultiplayerManager::onRemoteMoveReceived(const Move &remoteMove)
+{
+	if (mRemoteMoveReceivedCallback)
+		mRemoteMoveReceivedCallback(remoteMove);
 }

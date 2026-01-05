@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "GameEngine.h"
+#include "GameController.h"
 #include "Player.h"
 #include "Logging.h"
 #include "UserSettings.h"
@@ -17,14 +17,9 @@
 #include "MultiplayerManager.h"
 #include "PlayerName.h"
 #include "SystemInfo.h"
+#include "StateMachine.h"
 
 
-class StateMachine;
-
-/**
- * @brief	Orchestrates overall game lifecycle, player turns, move execution, configuration,
- *			multiplayer bridging, audio/user settings, and CPU assistance. Singleton.
- */
 class GameManager
 {
 public:
@@ -33,249 +28,124 @@ public:
 	static GameManager		   *GetInstance();
 	static void					ReleaseInstance();
 
-	/**
-	 * @brief	Initialize subsystems (engine, settings, networking as needed).
-	 * @return	true if initialization completes successfully.
-	 */
+	//=========================================================================
+	// Lifecycle
+	//=========================================================================
+
 	bool						init();
+	void						shutDown();
 
-	/**
-	 * @brief	Start a new game based on current configuration.
-	 * @return	true if game successfully started.
-	 */
-	bool						startGame();
+	//=========================================================================
+	// Game Control
+	//=========================================================================
 
-	/**
-	 * @brief	Execute a (validated) move. Applies to board, updates history, triggers observers.
-	 * @param	tmpMove -> Move to execute (may be updated with promotion info).
-	 * @param	fromRemote -> True if originating from remote multiplayer peer.
-	 */
-	void						executeMove(PossibleMove &tmpMove, bool fromRemote = false);
-
-	/**
-	 * @brief	Undo the last reversible move (if permitted).
-	 */
+	void						startGame(GameConfiguration config);
+	void						resetGame();
 	void						undoMove();
 
-	/**
-	 * @brief	Reset current game state (board, history, flags) while keeping configuration.
-	 */
-	void						resetGame();
+	//=========================================================================
+	// Input Events
+	//=========================================================================
 
-	/**
-	 * @brief	Return winner color if game ended.
-	 * @return	Winner player color, or nullopt if still ongoing
-	 */
-	std::optional<PlayerColor>	getWinner() const;
+	void						onSquareSelected(Square sq);
+	void						onPromotionChosen(PieceTypes piece);
 
-	/**
-	 * @brief	Register a native callback delegate (interop / UI integration).
-	 */
-	void						setDelegate(PFN_CALLBACK pDelegate);
+	//=========================================================================
+	// UI Integration
+	//=========================================================================
 
-	/**
-	 * @brief	Generate all legal moves for currently selected square (if any).
-	 * @return	Vector of possible moves; empty if none.
-	 */
-	std::vector<PossibleMove>	getPossibleMoveForPosition();
+	void						setDelegate(PFN_CALLBACK delegate);
 
-	/**
-	 * @brief	Copy current board state into provided array.
-	 * @param	boardState -> 2D array [BOARD_SIZE][BOARD_SIZE].
-	 * @return	true if state written.
-	 */
-	bool						getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE]);
+	//=========================================================================
+	// Board State Queries
+	//=========================================================================
 
-	/**
-	 * @brief	Validate move semantics without executing.
-	 */
-	bool						checkForValidMoves(const PossibleMove &move);
+	std::array<PieceTypes, 64>	getBoardPieces() const;
+	const MoveList			   &getCachedLegalMoves() const;
+	PieceTypes					getPieceAt(Square sq) const;
 
-	/**
-	 * @brief	Check if a move is a pawn promotion candidate.
-	 */
-	bool						checkForPawnPromotionMove(const PossibleMove &move);
+	//=========================================================================
+	// Multiplayer
+	//=========================================================================
 
-	/**
-	 * @brief	Enumerate detected network adapters.
-	 */
+	void						startMultiplayerSession();
+	void						stoppedMultiplayer();
+	bool						isMultiplayerActive() const { return mIsMultiplayerMode; }
+
+	void						startRemoteDiscovery(bool isHost);
+	void						answerConnectionInvitation(bool accepted);
+	void						sendConnectionRequestToHost();
+	void						setLocalPlayerInMultiplayer(Side localPlayer);
+	void						setLocalPlayerReady(bool ready);
+
+	//=========================================================================
+	// Network
+	//=========================================================================
+
 	std::vector<NetworkAdapter> getNetworkAdapters();
-
-	/**
-	 * @brief	Switch active network adapter by ID.
-	 * @return	true on success.
-	 */
 	bool						changeCurrentNetworkAdapter(int ID);
-
-	/**
-	 * @brief	Current network adapter ID (or -1 if none).
-	 */
 	int							getCurrentNetworkAdapterID();
 
-	/**
-	 * @brief	Set local player name (stored & propagated to multiplayer if active).
-	 */
-	void						setLocalPlayerName(std::string name);
+	//=========================================================================
+	// User Settings
+	//=========================================================================
 
-	/**
-	 * @brief	Get local player name.
-	 */
-	std::string					getLocalPlayerName();
+	void						setLocalPlayerName(const std::string &name) { mPlayerName.setLocalPlayerName(name); };
+	std::string					getLocalPlayerName() { return mPlayerName.getLocalPlayerName(); };
 
-	void						setBoardTheme(std::string theme) { mUserSettings.setCurrentBoardTheme(theme); }
+	void						setBoardTheme(const std::string &theme) { mUserSettings.setCurrentBoardTheme(theme); }
 	std::string					getBoardTheme() { return mUserSettings.getCurrentBoardTheme(); }
 
-	void						setPieceTheme(std::string theme) { mUserSettings.setCurrentPieceTheme(theme); }
+	void						setPieceTheme(const std::string &theme) { mUserSettings.setCurrentPieceTheme(theme); }
 	std::string					getPieceTheme() { return mUserSettings.getCurrentPieceTheme(); }
 
-	/**
-	 * @brief	Advance turn to next player (handles multiplayer / CPU specifics).
-	 */
-	void						switchTurns();
+	// Audio settings
+	void						setSFXEnabled(const bool enabled) { mUserSettings.setSFXEnabled(enabled); }
+	bool						getSFXEnabled() { return mUserSettings.getSFXEnabled(); }
+	void						setSFXVolume(const float volume) { mUserSettings.setSFXVolume(volume); }
+	float						getSFXVolume() { return mUserSettings.getSFXVolume(); }
 
-	/**
-	 * @brief	Pre-calculate all legal moves for current player (caching).
-	 * @return	true if successful.
-	 */
-	bool						calculateAllMovesForPlayer();
+	void						setAtmosEnabled(const bool enabled) { mUserSettings.setAtmosEnabled(enabled); }
+	bool						getAtmosEnabled() { return mUserSettings.getAtmosEnabled(); }
+	void						setAtmosVolume(const float volume) { mUserSettings.setAtmosVolume(volume); }
+	float						getAtmosVolume() { return mUserSettings.getAtmosVolume(); }
 
-	/**
-	 * @brief	Begin user move by selecting a starting square.
-	 * @return	true if selection is valid and move initiation accepted.
-	 */
-	bool						initiateMove(const Position &startPosition);
+	void						setAtmosScenario(const std::string &scenario) { mUserSettings.setAtmosScenario(scenario); }
+	std::string					getAtmosScenario() { return mUserSettings.getAtmosScenario(); }
 
-	/**
-	 * @brief	Evaluate current board for end-game conditions.
-	 * @return	Returns the EndGameState. If game is ongoing, it iwll return EndGameState::Ongoing.
-	 */
-	EndGameState				checkForEndGameConditions();
-
-	/**
-	 * @brief	Start multiplayer chess game.
-	 * @return	true if session start initiated.
-	 */
-	bool						startMultiplayerGame();
-
-	/**
-	 * @brief	Disconnect active multiplayer session (if any).
-	 */
-	void						disconnectMultiplayerGame();
-
-	/**
-	 * @brief	Starts the flow of the Multiplayer game. The user selected a MP game.
-	 */
-	void						startedMultiplayer();
-
-	/**
-	 * @brief	Stops the flow of the Multiplayer game.
-	 */
-	void						stoppedMultiplayer();
-
-	/**
-	 * @brief	Whether multiplayer mode currently active.
-	 */
-	bool						isMultiplayerActive() const;
-
-	/**
-	 * @brief	Player whose turn it is.
-	 */
-	PlayerColor					getCurrentPlayer() const;
-
-	/**
-	 * @brief	True if it's the local player's turn (handles color mapping in multiplayer).
-	 */
-	bool						isLocalPlayerTurn();
-
-	/**
-	 * @brief	Initiate discovery of remote sessions (host or client perspective).
-	 * @param	isHost -> True if acting as session host.
-	 */
-	void						startRemoteDiscovery(bool isHost);
-
-	/**
-	 * @brief	Respond to an incoming connection invitation.
-	 * @param	accepted -> True to accept, false to reject.
-	 */
-	void						answerConnectionInvitation(bool accepted);
-
-	/**
-	 * @brief	Issue connection request to the detected host.
-	 */
-	void						sendConnectionRequestToHost();
-
-	/**
-	 * @brief	Assign local player's color in multiplayer context.
-	 */
-	void						setLocalPlayerInMultiplayer(PlayerColor localPlayer);
-
-	/**
-	 * @brief	Set ready flag for local player (multiplayer game start gating).
-	 */
-	void						setLocalPlayerReady(const bool flag);
-
-	/**
-	 * @brief	Start game vs CPU opponent.
-	 * @return	true if CPU mode started.
-	 */
-	bool						startCPUGame();
-
-	/**
-	 * @brief	Determine if specified player is CPU-controlled.
-	 */
-	bool						isCPUPlayer(PlayerColor player) const;
-
-	/**
-	 * @brief	Asynchronously request a CPU move (non-blocking).
-	 */
-	void						requestCPUMoveAsync();
-
-
-	void						setSFXEnabled(const bool enabled);
-	bool						getSFXEnabled();
-
-	void						setAtmosEnabled(const bool enabled);
-	bool						getAtmosEnabled();
-
-	void						setSFXVolume(const float volume);
-	float						getSFXVolume();
-
-	void						setAtmosVolume(const float volume);
-	float						getAtmosVolume();
-
-	void						setMasterAudioVolume(const float volume);
-	float						getMasterVolume();
-
-	void						setAtmosScenario(const std::string scenario);
-	std::string					getAtmosScenario();
-
-	/**
-	 * @brief	Apply new game configuration (affects next start / restart).
-	 */
-	void						setGameConfiguration(GameConfiguration config);
+	void						setMasterVolume(const float volume) { mUserSettings.setMasterVolume(volume); }
+	float						getMasterVolume() { return mUserSettings.getMasterVolume(); }
 
 private:
 	GameManager() = default;
 
-	void								initObservers();
-	void								initMultiplayerObservers();
-	void								deinitObservers();
+	void								initializeComponents();
+	void								wireComponents();
+	void								setupMultiplayObservers();
 
+	//=========================================================================
+	// Core Components
+	//=========================================================================
+
+	std::unique_ptr<GameController>		mGameController;
+	std::unique_ptr<StateMachine>		mStateMachine;
+	std::shared_ptr<WinUIInputSource>	mInputSource;
+
+	//=========================================================================
+	// Infrastructure
+	//=========================================================================
 
 	Logging								mLog;
-
 	UserSettings						mUserSettings;
-
 	PlayerName							mPlayerName;
 
-	std::shared_ptr<GameEngine>			mEngine;
-
-	std::shared_ptr<WinUIInputSource>	mUiCommunicationLayer;
-
 	std::shared_ptr<MultiplayerManager> mMultiplayerManager;
-	std::unique_ptr<NetworkManager>		mNetwork;
+	std::unique_ptr<NetworkManager>		mNetworkManager;
 
-	GameConfiguration					mConfig;
+	//=========================================================================
+	// State
+	//=========================================================================
 
 	bool								mIsMultiplayerMode{false};
+	bool								mInitialized{false};
 };

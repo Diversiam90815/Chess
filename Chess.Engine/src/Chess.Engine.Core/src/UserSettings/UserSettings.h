@@ -95,7 +95,7 @@ public:
 	void		   setAtmosVolume(const float volume);
 	float		   getAtmosVolume();
 
-	void		   setMasterAudioVolume(const float volume);
+	void		   setMasterVolume(const float volume);
 	float		   getMasterVolume();
 
 	void		   setAtmosScenario(const std::string scenario);

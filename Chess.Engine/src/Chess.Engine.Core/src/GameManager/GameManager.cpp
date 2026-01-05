@@ -7,12 +7,10 @@
 
 #include "GameManager.h"
 
-#include "StateMachine.h"
-
 
 GameManager::~GameManager()
 {
-	deinitObservers();
+	shutDown();
 }
 
 
@@ -39,227 +37,156 @@ void GameManager::ReleaseInstance()
 
 bool GameManager::init()
 {
+	if (mInitialized)
+		return true;
+
 	mLog.initLogging();
 
 	SystemInfo::logSystemInfo();
 
 	mUserSettings.init();
 
-	mUiCommunicationLayer = std::make_shared<WinUIInputSource>();
+	initializeComponents();
+	wireComponents();
 
-	mEngine				  = std::make_shared<GameEngine>();
-	mEngine->init();
-
-	mNetwork = std::make_unique<NetworkManager>();
-	mNetwork->init();
-
-	initObservers();
+	mInitialized = true;
+	LOG_INFO("GameManager initialized!");
 
 	return true;
 }
 
 
-bool GameManager::startGame()
+void GameManager::shutDown()
 {
-	mEngine->startGame();
+	if (!mInitialized)
+		return;
 
-	return true;
+	LOG_INFO("Shutting down Game Manager!");
+
+	if (mStateMachine)
+		mStateMachine->stop();
+
+	if (mGameController)
+		mGameController->cancelCPUCalculation();
+
+	mInitialized = false;
+}
+
+
+void GameManager::startGame(GameConfiguration config)
+{
+	LOG_INFO("Starting game. Mode : {}", static_cast<int>(config.mode)); // TODO: Add string conversion to LoggingHelper
+	mStateMachine->onGameStart(config);
 }
 
 
 void GameManager::setDelegate(PFN_CALLBACK pDelegate)
 {
-	mUiCommunicationLayer->setDelegate(pDelegate);
+	mInputSource->setDelegate(pDelegate);
 }
 
 
-std::vector<PossibleMove> GameManager::getPossibleMoveForPosition()
+std::array<PieceTypes, 64> GameManager::getBoardPieces() const
 {
-	return mEngine->getPossibleMoveForPosition();
+	std::array<PieceTypes, 64> pieces{};
+
+	const Chessboard		  &board = mGameController->getBoard();
+
+	for (int i = 0; i < 64; ++i)
+	{
+		pieces[i] = board.pieceAt(static_cast<Square>(i));
+	}
+
+	return pieces;
 }
 
 
-bool GameManager::getBoardState(int boardState[BOARD_SIZE][BOARD_SIZE])
+const MoveList &GameManager::getCachedLegalMoves() const
 {
-	// return mEngine->getBoardState(boardState);
-
-	return false;
+	return mGameController->getCachedLegalMoves();
 }
 
 
-void GameManager::switchTurns()
+PieceTypes GameManager::getPieceAt(Square sq) const
 {
-	mEngine->switchTurns();
-}
-
-
-bool GameManager::calculateAllMovesForPlayer()
-{
-	return mEngine->calculateAllMovesForPlayer();
-}
-
-
-bool GameManager::initiateMove(const Position &startPosition)
-{
-	return mEngine->initiateMove(startPosition);
-}
-
-
-void GameManager::executeMove(PossibleMove &tmpMove, bool fromRemote)
-{
-	mEngine->executeMove(tmpMove, fromRemote);
+	return mGameController->getBoard().pieceAt(sq);
 }
 
 
 void GameManager::undoMove()
 {
-	mEngine->undoMove();
+	mStateMachine->onUndoRequested();
 }
+
+
+void GameManager::onSquareSelected(Square sq)
+{
+	mStateMachine->onSquareSelected(sq);
+}
+
+
+void GameManager::onPromotionChosen(PieceTypes piece)
+{
+	mStateMachine->onPromotionChosen(piece);
+}
+
 
 
 void GameManager::resetGame()
 {
-	mEngine->resetGame();
-}
-
-
-std::optional<PlayerColor> GameManager::getWinner() const
-{
-	return mEngine->getWinner();
-}
-
-
-bool GameManager::checkForValidMoves(const PossibleMove &move)
-{
-	return mEngine->checkForValidMoves(move);
-}
-
-
-bool GameManager::checkForPawnPromotionMove(const PossibleMove &move)
-{
-	return mEngine->checkForPawnPromotionMove(move);
+	mStateMachine->onGameReset();
 }
 
 
 std::vector<NetworkAdapter> GameManager::getNetworkAdapters()
 {
-	return mNetwork->getAvailableNetworkAdapters();
+	return mNetworkManager->getAvailableNetworkAdapters();
 }
 
 
 bool GameManager::changeCurrentNetworkAdapter(int ID)
 {
-	return mNetwork->changeCurrentNetworkAdapter(ID);
+	return mNetworkManager->changeCurrentNetworkAdapter(ID);
 }
 
 
 int GameManager::getCurrentNetworkAdapterID()
 {
-	return mNetwork->getCurrentNetworkAdapterID();
+	return mNetworkManager->getCurrentNetworkAdapterID();
 }
 
 
-void GameManager::setLocalPlayerName(std::string name)
-{
-	mPlayerName.setLocalPlayerName(name);
-}
-
-
-std::string GameManager::getLocalPlayerName()
-{
-	return mPlayerName.getLocalPlayerName();
-}
-
-
-EndGameState GameManager::checkForEndGameConditions()
-{
-	return mEngine->checkForEndGameConditions();
-}
-
-
-bool GameManager::startMultiplayerGame()
-{
-	LOG_INFO("Game started in Multiplayer mode..");
-
-	mIsMultiplayerMode = true;
-
-	mEngine->startGame();
-
-	PlayerColor localPlayer = mMultiplayerManager->mLocalPlayerColor;
-	mEngine->setLocalPlayer(localPlayer);
-
-	initMultiplayerObservers();
-
-	return true;
-}
-
-
-void GameManager::disconnectMultiplayerGame()
-{
-	if (mMultiplayerManager)
-		mMultiplayerManager->disconnect();
-
-	mIsMultiplayerMode = false;
-	resetGame(); // Reset to single player
-}
-
-
-void GameManager::startedMultiplayer()
+void GameManager::startMultiplayerSession()
 {
 	// The player clicked on the Multiplayer menu button and started the multiplayer
 
 	LOG_INFO("Multiplayer started..");
 
 	mMultiplayerManager = std::make_shared<MultiplayerManager>(); // Create the multiplayer manager
+	setupMultiplayObservers();
 
-	mMultiplayerManager->attachObserver(mUiCommunicationLayer);	  // Set the UI Communication as a connection observer
-	mNetwork->attachObserver(mMultiplayerManager);				  // Let the MultiplayerManager know of network changes
-
-	mMultiplayerManager->setInternalObservers();
-
-	std::string localIPv4 = mNetwork->getCurrentIPv4();
+	std::string localIPv4 = mNetworkManager->getCurrentIPv4();
 	mMultiplayerManager->init(localIPv4);
 }
 
 
 void GameManager::stoppedMultiplayer()
 {
-	mMultiplayerManager->reset();
+	if (mMultiplayerManager)
+	{
+		mMultiplayerManager->disconnect();
+		mMultiplayerManager.reset();
+	}
+
+
+	mIsMultiplayerMode = false;
+	resetGame(); // Reset to single player}
 }
 
 
 bool GameManager::isMultiplayerActive() const
 {
 	return mIsMultiplayerMode;
-}
-
-
-PlayerColor GameManager::getCurrentPlayer() const
-{
-	return mEngine->getCurrentPlayer();
-}
-
-
-bool GameManager::isLocalPlayerTurn()
-{
-	// If we're in single player mode, it is always our turn
-	if (!isMultiplayerActive())
-		return true;
-
-	PlayerColor currentPlayer	   = mEngine->getCurrentPlayer();
-
-	bool		isWhitePlayerTurn  = currentPlayer == PlayerColor::White;
-	bool		isBlackPlayerTurn  = currentPlayer == PlayerColor::Black;
-	bool		isWhiteLocal	   = mEngine->getLocalPlayer() == PlayerColor::White;
-	bool		isBlackLocal	   = mEngine->getLocalPlayer() == PlayerColor::Black;
-
-	bool		isLocalPlayersTurn = (isWhitePlayerTurn && isWhiteLocal || isBlackPlayerTurn && isBlackLocal);
-
-	LOG_INFO("Local Player's turn: {}", LoggingHelper::boolToString(isLocalPlayersTurn).c_str());
-	LOG_DEBUG("White Player's turn: {}", LoggingHelper::boolToString(isWhitePlayerTurn).c_str());
-	LOG_DEBUG("Black Player's turn: {}", LoggingHelper::boolToString(isBlackPlayerTurn).c_str());
-
-	return isLocalPlayersTurn;
 }
 
 
@@ -302,7 +229,7 @@ void GameManager::sendConnectionRequestToHost()
 }
 
 
-void GameManager::setLocalPlayerInMultiplayer(PlayerColor localPlayer)
+void GameManager::setLocalPlayerInMultiplayer(Side localPlayer)
 {
 	mMultiplayerManager->localPlayerChosen(localPlayer);
 }
@@ -314,21 +241,31 @@ void GameManager::setLocalPlayerReady(const bool flag)
 }
 
 
-void GameManager::initObservers()
+void GameManager::initializeComponents()
 {
-	mEngine->attachObserver(mUiCommunicationLayer);
+	mInputSource	= std::make_shared<WinUIInputSource>();
+	mGameController = std::make_unique<GameController>();
+	mStateMachine	= std::make_unique<StateMachine>();
+	mNetworkManager = std::make_unique<NetworkManager>();
 
-	mEngine->mWhitePlayer.attachObserver(mUiCommunicationLayer);
-	mEngine->mBlackPlayer.attachObserver(mUiCommunicationLayer);
-	mEngine->mMoveExecution.attachObserver(mUiCommunicationLayer);
-
-	StateMachine::GetInstance()->attachObserver(mUiCommunicationLayer);
-
-	mEngine->mCPUPlayer.attachObserver(StateMachine::GetInstance());
+	mNetworkManager->init();
 }
 
 
-void GameManager::initMultiplayerObservers()
+void GameManager::wireComponents()
+{
+	// Wire StateMachine to use GameController and InputSource
+	mStateMachine->setGameController(mGameController.get());
+	mStateMachine->setInputSource(mInputSource.get());
+
+	// CPU moves flow back through StateMachine
+	mGameController->setCPUMoveCallback([this](Move move) { mStateMachine->onCPUMoveCalculated(move); });
+
+	mStateMachine->start();
+}
+
+
+void GameManager::setupMultiplayObservers()
 {
 	if (!mMultiplayerManager)
 	{
@@ -336,133 +273,15 @@ void GameManager::initMultiplayerObservers()
 		return;
 	}
 
-	mEngine->mMoveExecution.attachObserver(mMultiplayerManager->mRemoteSender);		   // Moves will be sent to the remote
-	mMultiplayerManager->mRemoteReceiver->attachObserver(StateMachine::GetInstance()); // Received moves will be handled in the state machine
+	// mEngine->mMoveExecution.attachObserver(mMultiplayerManager->mRemoteSender);		   // TODO: Moves will be sent to the remote
+
+	// Remote moves -> StateMachine
+	mMultiplayerManager->setRemoteMoveCallback([this](Move move) { mStateMachine->onRemoteMoveReceived(move); });
+
+	mMultiplayerManager->attachObserver(mInputSource);	  // Connection status -> UI
+	mNetworkManager->attachObserver(mMultiplayerManager); // Let the MultiplayerManager know of network changes
+
+	mMultiplayerManager->setInternalObservers();
 
 	LOG_DEBUG("Mulitplayer observers set up!");
-}
-
-
-void GameManager::deinitObservers()
-{
-	mEngine->detachObserver(mUiCommunicationLayer);
-
-	mEngine->mWhitePlayer.detachObserver(mUiCommunicationLayer);
-	mEngine->mBlackPlayer.detachObserver(mUiCommunicationLayer);
-	mEngine->mMoveExecution.detachObserver(mUiCommunicationLayer);
-
-	StateMachine::GetInstance()->detachObserver(mUiCommunicationLayer);
-}
-
-
-void GameManager::setSFXEnabled(const bool enabled)
-{
-	mUserSettings.setSFXEnabled(enabled);
-}
-
-
-bool GameManager::getSFXEnabled()
-{
-	return mUserSettings.getSFXEnabled();
-}
-
-
-void GameManager::setAtmosEnabled(const bool enabled)
-{
-	mUserSettings.setAtmosEnabled(enabled);
-}
-
-
-bool GameManager::getAtmosEnabled()
-{
-	return mUserSettings.getAtmosEnabled();
-}
-
-
-void GameManager::setSFXVolume(const float volume)
-{
-	mUserSettings.setSFXVolume(volume);
-}
-
-
-float GameManager::getSFXVolume()
-{
-	return mUserSettings.getSFXVolume();
-}
-
-
-void GameManager::setAtmosVolume(const float volume)
-{
-	mUserSettings.setAtmosVolume(volume);
-}
-
-
-float GameManager::getAtmosVolume()
-{
-	return mUserSettings.getAtmosVolume();
-}
-
-
-void GameManager::setMasterAudioVolume(const float volume)
-{
-	mUserSettings.setMasterAudioVolume(volume);
-}
-
-
-float GameManager::getMasterVolume()
-{
-	return mUserSettings.getMasterVolume();
-}
-
-
-void GameManager::setAtmosScenario(const std::string scenario)
-{
-	mUserSettings.setAtmosScenario(scenario);
-}
-
-
-std::string GameManager::getAtmosScenario()
-{
-	return mUserSettings.getAtmosScenario();
-}
-
-
-void GameManager::setGameConfiguration(GameConfiguration config)
-{
-	mConfig = config;
-}
-
-
-bool GameManager::startCPUGame()
-{
-	LOG_INFO("Game started against CPU - Difficulty: {}", mConfig.difficulty);
-
-	PlayerColor		 cpuColor = mConfig.localPlayer == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
-
-	CPUConfiguration CPUConfig;
-	CPUConfig.difficulty		  = static_cast<CPUDifficulty>(mConfig.difficulty);
-	CPUConfig.enabled			  = true;
-	CPUConfig.cpuColor			  = cpuColor;
-	CPUConfig.thinkingTime		  = std::chrono::milliseconds(1000);
-	CPUConfig.enableRandomization = true;
-	CPUConfig.randomizationFactor = 0.3f;
-	CPUConfig.candidateMoveCount  = 7;
-
-	mEngine->setCPUConfiguration(CPUConfig);
-
-	mEngine->startGame();
-
-	return true;
-}
-
-
-bool GameManager::isCPUPlayer(PlayerColor player) const
-{
-	return mEngine->isCPUPlayer(player);
-}
-
-
-void GameManager::requestCPUMoveAsync()
-{
-	return mEngine->requestCPUMoveAsync();
 }

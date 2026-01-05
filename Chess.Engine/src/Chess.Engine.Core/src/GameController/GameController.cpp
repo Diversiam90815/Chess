@@ -16,7 +16,7 @@ bool GameController::initializeGame(GameConfiguration config)
 	mConfig = config;
 
 	mEngine.init();
-	mEngine.reset();
+	mEngine.resetGame();
 
 	// Set local player based on config
 	if (config.mode == GameModeSelection::VsCPU)
@@ -28,10 +28,7 @@ bool GameController::initializeGame(GameConfiguration config)
 		cpuConfig.difficulty		  = static_cast<CPUDifficulty>(mConfig.difficulty);
 		cpuConfig.enabled			  = true;
 		cpuConfig.cpuColor			  = cpuColor;
-		cpuConfig.thinkingTime		  = std::chrono::milliseconds(1000);
 		cpuConfig.enableRandomization = true;
-		cpuConfig.randomizationFactor = 0.3f;
-		cpuConfig.candidateMoveCount  = 7;
 	}
 	else if (config.mode == GameModeSelection::Multiplayer)
 	{
@@ -166,6 +163,12 @@ void GameController::requestCPUMoveAsync()
 			if (mOnCPUMove)
 				mOnCPUMove(move);
 		});
+}
+
+
+void GameController::cancelCPUCalculation()
+{
+	// TODO
 }
 
 
