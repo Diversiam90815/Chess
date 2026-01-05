@@ -1,6 +1,6 @@
 /*
   ==============================================================================
-	Module:			UICommunication
+	Module:			WinUIInputSource
 	Description:    Communication layer for frontend updates from the backend
   ==============================================================================
 */
@@ -8,135 +8,122 @@
 #include "UICommunication.h"
 
 
-void UICommunication::setDelegate(PFN_CALLBACK pDelegate)
+void WinUIInputSource::setDelegate(PFN_CALLBACK pDelegate)
 {
 	std::lock_guard<std::mutex> lock(mDelegateMutex);
 	mDelegate = pDelegate;
 }
 
 
-void UICommunication::onScoreUpdate(PlayerColor player, int value)
+void WinUIInputSource::onScoreUpdate(Side player, int value)
 {
 	Score score = Score(player, value);
-	communicateToUI(MessageType::PlayerScoreUpdated, &score);
+	sendToUI(MessageType::PlayerScoreUpdated, &score);
 }
 
 
-void UICommunication::onAddCapturedPiece(PlayerColor player, PieceType captured)
+void WinUIInputSource::onAddCapturedPiece(Side player, PieceTypes captured)
 {
 	PlayerCapturedPieceEvent event{};
 	event.playerColor = player;
 	event.pieceType	  = captured;
 	event.captured	  = true; // We captured a piece
-	communicateToUI(MessageType::PlayerCapturedPiece, &event);
+	sendToUI(MessageType::PlayerCapturedPiece, &event);
 }
 
 
-void UICommunication::onRemoveLastCapturedPiece(PlayerColor player, PieceType captured)
+void WinUIInputSource::onRemoveLastCapturedPiece(Side player, PieceTypes captured)
 {
 	PlayerCapturedPieceEvent event{};
 	event.playerColor = player;
 	event.pieceType	  = captured;
 	event.captured	  = false; // we removed the last captured piece
-	communicateToUI(MessageType::PlayerCapturedPiece, &event);
+	sendToUI(MessageType::PlayerCapturedPiece, &event);
 }
 
 
-void UICommunication::onExecuteMove(const PossibleMove &move, bool fromRemote)
+void WinUIInputSource::onLegalMovesAvailable(Square from, const MoveList &moves)
 {
-	PossibleMoveInstance moveInstance{};
-	moveInstance.start.x = move.start.x;
-	moveInstance.start.y = move.start.y;
-	moveInstance.end.x	 = move.end.x;
-	moveInstance.end.y	 = move.end.y;
-
-	moveInstance.type	 = static_cast<MoveTypeInstance>(move.type);
-
-	communicateToUI(MessageType::MoveExecuted, &moveInstance);
+	sendToUI(MessageType::PossibleMovesCalculated, nullptr);
 }
 
 
-void UICommunication::onAddToMoveHistory(Move &move)
+void WinUIInputSource::onMoveExecuted(Move move, bool fromRemote)
 {
 	MoveHistoryEvent event{};
-	event.added					 = true;
+	event.added			 = true;
 
-	std::string numberedNotation = std::to_string(move.number) + ". " + move.notation;
+	std::string notation = ""; // TODO: Get notation
+	HRESULT		hr		 = StringCbCopyA(event.moveNotation, MAX_STRING_LENGTH, notation.c_str());
 
-	HRESULT		hr				 = StringCbCopyA(event.moveNotation, MAX_STRING_LENGTH, numberedNotation.c_str());
-
-	if (!SUCCEEDED(hr))
-		return;
-
-	communicateToUI(MessageType::MoveHistoryUpdated, &event);
+	sendToUI(MessageType::MoveHistoryUpdated, &event);
 }
 
 
-void UICommunication::onClearMoveHistory()
+void WinUIInputSource::onMoveUndone()
 {
 	MoveHistoryEvent event{};
 	event.added = false;
 
-	communicateToUI(MessageType::MoveHistoryUpdated, &event);
+	sendToUI(MessageType::MoveHistoryUpdated, &event);
 }
 
 
-void UICommunication::onGameStateChanged(GameState state)
+void WinUIInputSource::onPromotionRequired()
 {
-	communicateToUI(MessageType::GameStateChanged, &state);
+	sendToUI(MessageType::PawnPromotion, nullptr);
 }
 
 
-void UICommunication::onEndGame(EndGameState state, PlayerColor winner)
+void WinUIInputSource::onGameStateChanged(GameState state)
 {
-	EndgameStateEvent event{};
+	sendToUI(MessageType::GameStateChanged, &state);
+}
+
+
+void WinUIInputSource::onGameEnded(EndGameState state, Side winner)
+{
+	EndgameStateEvent event;
 	event.state	 = state;
 	event.winner = winner;
 
-	communicateToUI(MessageType::EndGameState, &event);
+	sendToUI(MessageType::EndGameState, &event);
 }
 
 
-void UICommunication::onChangeCurrentPlayer(PlayerColor player)
+void WinUIInputSource::onBoardStateChanged()
 {
-	communicateToUI(MessageType::PlayerChanged, &player);
+	sendToUI(MessageType::BoardStateChanged, nullptr);
 }
 
 
-void UICommunication::onConnectionStateChanged(const ConnectionStatusEvent event)
+void WinUIInputSource::onConnectionStateChanged(const ConnectionStatusEvent event)
 {
 	CConnectionEvent tmpEvent = convertToCStyleConnectionStateEvent(event);
 
-	communicateToUI(MessageType::ConnectionStateChanged, &tmpEvent);
+	sendToUI(MessageType::ConnectionStateChanged, &tmpEvent);
 }
 
 
-void UICommunication::onRemotePlayerChosen(PlayerColor local)
+void WinUIInputSource::onRemotePlayerChosen(Side local)
 {
-	communicateToUI(MessageType::MultiplayerPlayerChosen, &local);
+	sendToUI(MessageType::MultiplayerPlayerChosen, &local);
 }
 
 
-bool UICommunication::communicateToUI(MessageType type, void *message) const
+bool WinUIInputSource::sendToUI(MessageType type, void *message) const
 {
-	PFN_CALLBACK delegate = nullptr;
-	{
-		std::lock_guard<std::mutex> lock(mDelegateMutex);
-		delegate = mDelegate;
-	}
+	std::lock_guard lock(mDelegateMutex);
 
-	if (delegate)
-	{
-		delegate(static_cast<int>(type), message);
-		return true;
-	}
+	if (!mDelegate)
+		return false;
 
-	LOG_WARNING("Failed to communicate to UI. Error: Delegate is null");
-	return false;
+	mDelegate(static_cast<int>(type), message);
+	return true;
 }
 
 
-CConnectionEvent UICommunication::convertToCStyleConnectionStateEvent(const ConnectionStatusEvent state)
+CConnectionEvent WinUIInputSource::convertToCStyleConnectionStateEvent(const ConnectionStatusEvent state)
 {
 	CConnectionEvent c_style_state{};
 	c_style_state.state = static_cast<int>(state.state);

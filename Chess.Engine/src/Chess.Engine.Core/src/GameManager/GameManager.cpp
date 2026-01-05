@@ -45,7 +45,7 @@ bool GameManager::init()
 
 	mUserSettings.init();
 
-	mUiCommunicationLayer = std::make_shared<UICommunication>();
+	mUiCommunicationLayer = std::make_shared<WinUIInputSource>();
 
 	mEngine				  = std::make_shared<GameEngine>();
 	mEngine->init();

@@ -270,7 +270,7 @@ private:
 
 	std::shared_ptr<GameEngine>			mEngine;
 
-	std::shared_ptr<UICommunication>	mUiCommunicationLayer;
+	std::shared_ptr<WinUIInputSource>	mUiCommunicationLayer;
 
 	std::shared_ptr<MultiplayerManager> mMultiplayerManager;
 	std::unique_ptr<NetworkManager>		mNetwork;

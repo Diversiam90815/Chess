@@ -25,7 +25,6 @@ public:
 	bool initializeGame(GameConfiguration config) override;
 	void resetGame() override;
 
-	
     //=========================================================================
 	// Move Operations
 	//=========================================================================
