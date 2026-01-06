@@ -21,9 +21,14 @@ void Chessboard::clear()
 {
 	mBitBoards.fill(0);
 	mOccupancyBitboards.fill(0);
+
 	mSide			 = Side::None;
 	mEnPassantSquare = Square::None;
 	mCastlingRights	 = Castling::None;
+
+	mHalfMoveClock	 = 0;
+	mMoveCounter	 = 0;
+	mHash			 = 0;
 }
 
 
@@ -118,13 +123,25 @@ void Chessboard::parseFEN(std::string_view fen)
 
 void Chessboard::removePiece(PieceType piece, Square sq)
 {
+	if (piece == PieceType::None)
+		return;
+
 	BitUtils::popBit(mBitBoards[piece], to_index(sq));
+
+	// Update hash
+	hashPiece(piece, sq);
 }
 
 
 void Chessboard::addPiece(PieceType piece, Square sq)
 {
+	if (piece == PieceType::None)
+		return;
+
 	BitUtils::setBit(mBitBoards[piece], to_index(sq));
+
+	// update hash
+	hashPiece(piece, sq);
 }
 
 
@@ -157,6 +174,56 @@ PieceType Chessboard::pieceAt(Square sq) const
 }
 
 
+void Chessboard::setSide(Side s) noexcept
+{
+	if (mSide == s)
+		return;
+
+	// Remove old hash
+	if (mSide == Side::Black)
+		hashSide();
+
+	mSide = s;
+
+	// update hash
+	if (mSide == Side::Black)
+		hashSide();
+}
+
+
+void Chessboard::flipSide() noexcept
+{
+	Side newSide = getCurrentSide() == Side::White ? Side::Black : Side::White;
+	setSide(newSide);
+}
+
+
+void Chessboard::setCastlingRights(Castling c) noexcept
+{
+	// Remove old hash
+	hashCastling(mCastlingRights);
+
+	// adapt new castling
+	mCastlingRights = c;
+
+	// update hash
+	hashCastling(c);
+}
+
+
+void Chessboard::setEnPassantSquare(Square sq) noexcept
+{
+	// remove old hash
+	hashEnPassant(mEnPassantSquare);
+
+	// update en passant square
+	mEnPassantSquare = sq;
+
+	// update hash
+	hashEnPassant(sq);
+}
+
+
 BoardState Chessboard::saveState() const
 {
 	return {mCastlingRights, mEnPassantSquare, mHalfMoveClock};
@@ -173,5 +240,28 @@ void Chessboard::restoreState(const BoardState &state)
 
 void Chessboard::computeHash()
 {
-	// TODO
+	mHash = 0;
+
+	// hash all pieces
+	for (int piece = 0; piece < 12; piece++)
+	{
+		U64 bb = mBitBoards[piece];
+
+		while (bb)
+		{
+			int sq = BitUtils::lsb(bb);
+			hashPiece((PieceType)piece, (Square)sq);
+			BitUtils::popBit(bb, sq);
+		}
+	}
+
+	// hash side to move
+	if (mSide == Side::Black)
+		hashSide();
+
+	// hash castling rights
+	hashCastling(mCastlingRights);
+
+	// hash enpassant
+	hashEnPassant(mEnPassantSquare);
 }

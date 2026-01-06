@@ -144,10 +144,10 @@ public:
 	[[nodiscard]] Square			 getCurrentEnPassantSqaure() const noexcept { return mEnPassantSquare; }
 	[[nodiscard]] int				 getHalfMoveClock() const noexcept { return mHalfMoveClock; }
 
-	void							 setSide(Side s) noexcept { mSide = s; }
-	void							 flipSide() noexcept { mSide = mSide == Side::White ? Side::Black : Side::White; }
-	void							 setCastlingRights(Castling c) noexcept { mCastlingRights = c; }
-	void							 setEnPassantSquare(Square sq) noexcept { mEnPassantSquare = sq; }
+	void							 setSide(Side s) noexcept;
+	void							 flipSide() noexcept;
+	void							 setCastlingRights(Castling c) noexcept;
+	void							 setEnPassantSquare(Square sq) noexcept;
 	void							 setHalfMoveClock(int clock) noexcept { mHalfMoveClock = clock; }
 	void							 incrementMoveCounter() noexcept { ++mMoveCounter; }
 	void							 decrementMoveCounter() noexcept
