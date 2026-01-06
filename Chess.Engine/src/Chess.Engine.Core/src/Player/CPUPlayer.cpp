@@ -250,7 +250,7 @@ Move CPUPlayer::selectBestMove(std::vector<ScoredMove> &scoredMoves)
 	if (scoredMoves.empty())
 		return Move();
 
-	auto best = std::max_element(scoredMoves.begin(), scoredMoves.end(), [](const ScoredMove &a, const ScoredMove &b) { return a.score < b.score; });
+	auto best = std::max_element(scoredMoves.begin(), scoredMoves.end());
 
 	return best->move;
 }

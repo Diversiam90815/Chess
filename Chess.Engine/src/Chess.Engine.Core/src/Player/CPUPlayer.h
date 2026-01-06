@@ -54,6 +54,8 @@ struct ScoredMove
 {
 	Move move;
 	int	 score;
+
+	bool operator<(const ScoredMove &other) { return score < other.score; }
 };
 
 
