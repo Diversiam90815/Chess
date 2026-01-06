@@ -1,11 +1,9 @@
 ﻿set(MoveTest_Dir            source/MoveTests)
 set(MultiplayerTest_Dir     source/MultiplayerTests)
 set(BoardTest_Dir           source/BoardTests)
-set(GameMechanicTest_Dir    source/GameMechanicTests)
 set(PlayerTest_Dir          source/PlayerTests)
 
 set (Test_Dir						${CMAKE_CURRENT_SOURCE_DIR}/source)
-
 
 set(MoveTest_Files
     ${MoveTest_Dir}/MoveTests.cpp
@@ -20,7 +18,6 @@ set(MoveTest_Files
     ${MoveTest_Dir}/MoveNotationTests.cpp
 )
 
-
 set(MultiplayerTest_Files
     ${MultiplayerTest_Dir}/DiscoveryEndpointTests.cpp
     ${MultiplayerTest_Dir}/MultiplayerMessageTests.cpp
@@ -32,31 +29,20 @@ set(MultiplayerTest_Files
     ${MultiplayerTest_Dir}/MultiplayerIntegrationTests.cpp
 )
 
-
-set(GameMechanicTest_Files
-    ${GameMechanicTest_Dir}/PawnPromotionTests.cpp
-    ${GameMechanicTest_Dir}/EndgameTests.cpp
-    ${GameMechanicTest_Dir}/UndoMoveTests.cpp
-)
-
-
 set(PlayerTest_Files
     ${PlayerTest_Dir}/PlayerTests.cpp
     ${PlayerTest_Dir}/CPUPlayerTests.cpp
 )
 
-
 set(BoardTest_Files
     ${BoardTest_Dir}/ChessboardTests.cpp
 )
-
 
 set(Test_Files
     ${MoveTest_Files}
     ${BoardTest_Files}
     ${PlayerTest_Files}
     ${MultiplayerTest_Files}
-    ${GameMechanicTest_Files}
 )
 
 source_group(TREE ${Test_Dir} FILES ${Test_Files})
