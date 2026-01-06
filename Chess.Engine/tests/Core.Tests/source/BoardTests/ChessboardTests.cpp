@@ -7,502 +7,319 @@
 
 #include <gtest/gtest.h>
 
-#include "ChessBoard.h"
+#include "Chessboard.h"
 
 
 namespace BoardTests
 {
 
-
-class ChessBoardTest : public ::testing::Test
+class ChessboardTest : public ::testing::Test
 {
 protected:
-	void	   SetUp() override { mBoard.initializeBoard(); }
+	void	   SetUp() override { mBoard.init(); }
 
-	ChessBoard mBoard;
+	Chessboard mBoard;
 };
 
 
-TEST_F(ChessBoardTest, ConstructAndInitialization)
+TEST_F(ChessboardTest, ConstructAndInitialization)
 {
-	ChessBoard board;
-	EXPECT_NO_THROW(board.initializeBoard());
+	Chessboard board;
+	EXPECT_NO_THROW(board.init());
 }
 
 
-TEST_F(ChessBoardTest, CopyConstructor)
+TEST_F(ChessboardTest, InitialSideIsWhite)
 {
-	// Set up the original board with some modifications
-	Position pawnPos = {4, 6}; // e2
-	mBoard.removePiece(pawnPos);
-
-	// Create a copy
-	ChessBoard copyBoard(mBoard);
-
-	// Verify the copy has the same state
-	EXPECT_TRUE(copyBoard.isEmpty(pawnPos)) << "Copy should reflect the removed piece";
-
-	// Modify the copy and check that the original is unchanged
-	Position rookPos = {0, 7}; // a1
-	copyBoard.removePiece(rookPos);
-
-	EXPECT_TRUE(copyBoard.isEmpty(rookPos)) << "Piece should be removed from copy";
-	EXPECT_FALSE(mBoard.isEmpty(rookPos)) << "Original board should be unchanged";
+	EXPECT_EQ(mBoard.getCurrentSide(), Side::White) << "White should move first";
 }
 
 
-TEST_F(ChessBoardTest, SetAndGetPiece)
+TEST_F(ChessboardTest, InitialCastlingRightsAllAvailable)
 {
-	Position pos   = {0, 0};
-	auto	 piece = ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::White);
-	mBoard.setPiece(pos, piece);
+	Castling rights = mBoard.getCurrentCastlingRights();
 
-	auto retrieved = mBoard.getPiece(pos);
-
-	ASSERT_NE(retrieved, nullptr) << "Should get a valid chess piece";
-	EXPECT_EQ(retrieved->getType(), PieceType::Rook) << "Retrieved piece should be a Rook";
-	EXPECT_EQ(retrieved->getColor(), PlayerColor::White) << "Retrieved piece should be White";
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::WK)) << "White kingside castling should be available";
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::WQ)) << "White queenside castling should be available";
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::BK)) << "Black kingside castling should be available";
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::BQ)) << "Black queenside castling should be available";
 }
 
 
-TEST_F(ChessBoardTest, MovePiece)
+TEST_F(ChessboardTest, InitialEnPassantSquareIsNone)
 {
-	Position start = {4, 1}; // e2
-	Position end   = {4, 3}; // e4
-
-	bool	 moved = mBoard.movePiece(start, end);
-	EXPECT_TRUE(moved);
-
-	auto piece = mBoard.getPiece(end);
-	ASSERT_NE(piece, nullptr);
-	EXPECT_EQ(piece->getType(), PieceType::Pawn);
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::None) << "No en passant square on initial board";
 }
 
 
-TEST_F(ChessBoardTest, MovePieceInvalidPositions)
+TEST_F(ChessboardTest, InitialHalfMoveClockIsZero)
 {
-	// Try moving from an empty square
-	Position emptyPos = {3, 3}; // d5
-	Position validPos = {3, 4}; // d4
-	EXPECT_FALSE(mBoard.movePiece(emptyPos, validPos)) << "Moving from empty position should fail";
-
-	// Try moving to an out-of-bounds position
-	Position pawnPos		= {4, 6};  // e2
-	Position outOfBoundsPos = {-1, 3}; // out of bounds
-	EXPECT_FALSE(mBoard.movePiece(pawnPos, outOfBoundsPos)) << "Moving to out of bounds should fail";
+	EXPECT_EQ(mBoard.getHalfMoveClock(), 0) << "Half move clock should be 0 on initial board";
 }
 
 
-TEST_F(ChessBoardTest, MovePieceCaptures)
+TEST_F(ChessboardTest, PieceAtReturnsCorrectPiece)
 {
-	// Move a white pawn to a position where we'll place a black piece
-	Position whitePawnPos = {4, 6}; // e2
-	Position targetPos	  = {4, 4}; // e4
-	mBoard.movePiece(whitePawnPos, targetPos);
+	// White pieces on back rank
+	EXPECT_EQ(mBoard.pieceAt(Square::a1), PieceType::WRook) << "a1 should have white rook";
+	EXPECT_EQ(mBoard.pieceAt(Square::b1), PieceType::WKnight) << "b1 should have white knight";
+	EXPECT_EQ(mBoard.pieceAt(Square::c1), PieceType::WBishop) << "c1 should have white bishop";
+	EXPECT_EQ(mBoard.pieceAt(Square::d1), PieceType::WQueen) << "d1 should have white queen";
+	EXPECT_EQ(mBoard.pieceAt(Square::e1), PieceType::WKing) << "e1 should have white king";
+	EXPECT_EQ(mBoard.pieceAt(Square::f1), PieceType::WBishop) << "f1 should have white bishop";
+	EXPECT_EQ(mBoard.pieceAt(Square::g1), PieceType::WKnight) << "g1 should have white knight";
+	EXPECT_EQ(mBoard.pieceAt(Square::h1), PieceType::WRook) << "h1 should have white rook";
 
-	// Place a black pawn at a position to be captured
-	Position blackPawnPos = {3, 4}; // d4
-	auto	 blackPawn	  = ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black);
-	mBoard.setPiece(blackPawnPos, blackPawn);
+	// White pawns on rank 2
+	EXPECT_EQ(mBoard.pieceAt(Square::a2), PieceType::WPawn) << "a2 should have white pawn";
+	EXPECT_EQ(mBoard.pieceAt(Square::e2), PieceType::WPawn) << "e2 should have white pawn";
+	EXPECT_EQ(mBoard.pieceAt(Square::h2), PieceType::WPawn) << "h2 should have white pawn";
 
-	// Execute the capture
-	bool captured = mBoard.movePiece(targetPos, blackPawnPos);
+	// Black pieces on back rank
+	EXPECT_EQ(mBoard.pieceAt(Square::a8), PieceType::BRook) << "a8 should have black rook";
+	EXPECT_EQ(mBoard.pieceAt(Square::b8), PieceType::BKnight) << "b8 should have black knight";
+	EXPECT_EQ(mBoard.pieceAt(Square::c8), PieceType::BBishop) << "c8 should have black bishop";
+	EXPECT_EQ(mBoard.pieceAt(Square::d8), PieceType::BQueen) << "d8 should have black queen";
+	EXPECT_EQ(mBoard.pieceAt(Square::e8), PieceType::BKing) << "e8 should have black king";
+	EXPECT_EQ(mBoard.pieceAt(Square::f8), PieceType::BBishop) << "f8 should have black bishop";
+	EXPECT_EQ(mBoard.pieceAt(Square::g8), PieceType::BKnight) << "g8 should have black knight";
+	EXPECT_EQ(mBoard.pieceAt(Square::h8), PieceType::BRook) << "h8 should have black rook";
 
-	EXPECT_TRUE(captured) << "Capture move should succeed";
-	auto capturer = mBoard.getPiece(blackPawnPos);
-	ASSERT_NE(capturer, nullptr) << "Capturing piece should be at target position";
-	EXPECT_EQ(capturer->getType(), PieceType::Pawn) << "Capturing piece should be a pawn";
-	EXPECT_EQ(capturer->getColor(), PlayerColor::White) << "Capturing piece should be white";
+	// Black pawns on rank 7
+	EXPECT_EQ(mBoard.pieceAt(Square::a7), PieceType::BPawn) << "a7 should have black pawn";
+	EXPECT_EQ(mBoard.pieceAt(Square::e7), PieceType::BPawn) << "e7 should have black pawn";
+	EXPECT_EQ(mBoard.pieceAt(Square::h7), PieceType::BPawn) << "h7 should have black pawn";
 }
 
 
-TEST_F(ChessBoardTest, RemovePiece)
+TEST_F(ChessboardTest, PieceAtReturnsNoneForEmptySquares)
 {
-	Position pos = {0, 1}; // a2
-	mBoard.removePiece(pos);
-
-	EXPECT_TRUE(mBoard.isEmpty(pos));
+	// Middle of the board should be empty
+	EXPECT_EQ(mBoard.pieceAt(Square::e4), PieceType::None) << "e4 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::d5), PieceType::None) << "d5 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::a3), PieceType::None) << "a3 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::h6), PieceType::None) << "h6 should be empty";
 }
 
 
-TEST_F(ChessBoardTest, RemovePieceNonexistent)
+TEST_F(ChessboardTest, AddPieceUpdatesBoard)
 {
-	// Try removing a piece from an already empty position
-	Position emptyPos = {4, 4}; // e4
-	EXPECT_TRUE(mBoard.isEmpty(emptyPos)) << "Position should be empty initially";
+	mBoard.clear();
 
-	// Should not throw or cause issues
-	EXPECT_NO_THROW(mBoard.removePiece(emptyPos));
-	EXPECT_TRUE(mBoard.isEmpty(emptyPos)) << "Position should still be empty after removing from empty spot";
+	mBoard.addPiece(PieceType::WQueen, Square::e4);
+	mBoard.updateOccupancies();
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e4), PieceType::WQueen) << "e4 should have white queen after adding";
 }
 
 
-TEST_F(ChessBoardTest, IsEmpty)
+TEST_F(ChessboardTest, RemovePieceUpdatesBoard)
 {
-	Position occupied = {0, 0}; // a8
-	Position empty	  = {4, 4}; // e4
+	// Remove white pawn from e2
+	mBoard.removePiece(PieceType::WPawn, Square::e2);
+	mBoard.updateOccupancies();
 
-	EXPECT_FALSE(mBoard.isEmpty(occupied)) << "Position with piece should not be empty";
-	EXPECT_TRUE(mBoard.isEmpty(empty)) << "Position without piece should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::e2), PieceType::None) << "e2 should be empty after removal";
 }
 
 
-TEST_F(ChessBoardTest, GetKingsPosition)
+TEST_F(ChessboardTest, MovePieceUpdatesBoard)
 {
-	Position whiteKing = mBoard.getKingsPosition(PlayerColor::White);
-	Position blackKing = mBoard.getKingsPosition(PlayerColor::Black);
+	// Move white pawn e2 to e4
+	mBoard.movePiece(PieceType::WPawn, Square::e2, Square::e4);
+	mBoard.updateOccupancies();
 
-	EXPECT_EQ(whiteKing.x, 4) << "White king's X position should be correct";
-	EXPECT_EQ(whiteKing.y, 7) << "White king's Y position should be correct";
-	EXPECT_EQ(blackKing.x, 4) << "Black king's X position should be correct";
-	EXPECT_EQ(blackKing.y, 0) << "Black king's Y position should be correct";
+	EXPECT_EQ(mBoard.pieceAt(Square::e2), PieceType::None) << "e2 should be empty after move";
+	EXPECT_EQ(mBoard.pieceAt(Square::e4), PieceType::WPawn) << "e4 should have white pawn after move";
 }
 
 
-
-TEST_F(ChessBoardTest, UpdateKingsPosition)
+TEST_F(ChessboardTest, ClearRemovesAllPieces)
 {
-	Position newWhiteKingPos = {4, 5}; // e3
-
-	// Move the king
-	mBoard.updateKingsPosition(newWhiteKingPos, PlayerColor::White);
-
-	Position updatedPos = mBoard.getKingsPosition(PlayerColor::White);
-	EXPECT_EQ(updatedPos.x, newWhiteKingPos.x) << "King's X position should be updated";
-	EXPECT_EQ(updatedPos.y, newWhiteKingPos.y) << "King's Y position should be updated";
-}
-
-
-TEST_F(ChessBoardTest, GetPiecesFromPlayer)
-{
-	// Get all white pieces
-	auto whitePieces = mBoard.getPiecesFromPlayer(PlayerColor::White);
-
-	// A new board should have 16 white pieces
-	EXPECT_EQ(whitePieces.size(), 16) << "Should have 16 white pieces on initial board";
-
-	// Verify we got the correct piece types
-	int pawnCount	= 0;
-	int rookCount	= 0;
-	int knightCount = 0;
-	int bishopCount = 0;
-	int queenCount	= 0;
-	int kingCount	= 0;
-
-	for (const auto &playerPiece : whitePieces)
-	{
-		auto piece = playerPiece.second;
-		switch (piece->getType())
-		{
-		case PieceType::Pawn: pawnCount++; break;
-		case PieceType::Rook: rookCount++; break;
-		case PieceType::Knight: knightCount++; break;
-		case PieceType::Bishop: bishopCount++; break;
-		case PieceType::Queen: queenCount++; break;
-		case PieceType::King: kingCount++; break;
-		default: break;
-		}
-	}
-
-	EXPECT_EQ(pawnCount, 8) << "Should have 8 white pawns";
-	EXPECT_EQ(rookCount, 2) << "Should have 2 white rooks";
-	EXPECT_EQ(knightCount, 2) << "Should have 2 white knights";
-	EXPECT_EQ(bishopCount, 2) << "Should have 2 white bishops";
-	EXPECT_EQ(queenCount, 1) << "Should have 1 white queen";
-	EXPECT_EQ(kingCount, 1) << "Should have 1 white king";
-}
-
-
-TEST_F(ChessBoardTest, GetPiecesAfterRemoval)
-{
-	// Remove a white pawn
-	mBoard.removePiece(Position{0, 6}); // a2
-
-	// Get all white pieces
-	auto whitePieces = mBoard.getPiecesFromPlayer(PlayerColor::White);
-
-	// Should now have 15 white pieces
-	EXPECT_EQ(whitePieces.size(), 15) << "Should have 15 white pieces after removal";
-}
-
-
-TEST_F(ChessBoardTest, GetSquare)
-{
-	// Get a square and check its properties
-	Position pos	= {0, 0}; // a8
-	Square	&square = mBoard.getSquare(pos);
-
-	// On a new board, a8 should have a black rook
-	auto	 piece	= square.piece;
-	ASSERT_NE(piece, nullptr) << "Square should have a piece";
-	EXPECT_EQ(piece->getType(), PieceType::Rook) << "Piece should be a rook";
-	EXPECT_EQ(piece->getColor(), PlayerColor::Black) << "Piece should be black";
-}
-
-
-TEST_F(ChessBoardTest, RemoveAllPieces)
-{
-	// Remove all pieces
-	mBoard.removeAllPiecesFromBoard();
+	mBoard.clear();
 
 	// Check that all squares are empty
-	for (int x = 0; x < 8; x++)
+	for (int sq = 0; sq < 64; ++sq)
 	{
-		for (int y = 0; y < 8; y++)
-		{
-			Position pos{x, y};
-			EXPECT_TRUE(mBoard.isEmpty(pos)) << "Position (" << x << "," << y << ") should be empty";
-		}
-	}
-
-	// Check that no pieces are returned for either player
-	auto whitePieces = mBoard.getPiecesFromPlayer(PlayerColor::White);
-	auto blackPieces = mBoard.getPiecesFromPlayer(PlayerColor::Black);
-
-	EXPECT_EQ(whitePieces.size(), 0) << "No white pieces should remain";
-	EXPECT_EQ(blackPieces.size(), 0) << "No black pieces should remain";
-}
-
-
-TEST_F(ChessBoardTest, InitialBoardSetup)
-{
-	// Test that all the expected pieces are in their correct initial positions
-
-	// Back row pieces for White
-	EXPECT_EQ(mBoard.getPiece(Position{0, 7})->getType(), PieceType::Rook) << "a1 should have a rook";
-	EXPECT_EQ(mBoard.getPiece(Position{1, 7})->getType(), PieceType::Knight) << "b1 should have a knight";
-	EXPECT_EQ(mBoard.getPiece(Position{2, 7})->getType(), PieceType::Bishop) << "c1 should have a bishop";
-	EXPECT_EQ(mBoard.getPiece(Position{3, 7})->getType(), PieceType::Queen) << "d1 should have a queen";
-	EXPECT_EQ(mBoard.getPiece(Position{4, 7})->getType(), PieceType::King) << "e1 should have a king";
-	EXPECT_EQ(mBoard.getPiece(Position{5, 7})->getType(), PieceType::Bishop) << "f1 should have a bishop";
-	EXPECT_EQ(mBoard.getPiece(Position{6, 7})->getType(), PieceType::Knight) << "g1 should have a knight";
-	EXPECT_EQ(mBoard.getPiece(Position{7, 7})->getType(), PieceType::Rook) << "h1 should have a rook";
-
-	// Pawns for White
-	for (int x = 0; x < 8; x++)
-	{
-		EXPECT_EQ(mBoard.getPiece(Position{x, 6})->getType(), PieceType::Pawn) << "White pawn should be at position (" << x << ",6)";
-		EXPECT_EQ(mBoard.getPiece(Position{x, 6})->getColor(), PlayerColor::White) << "Pawn at position (" << x << ",6) should be white";
-	}
-
-	// Back row pieces for Black
-	EXPECT_EQ(mBoard.getPiece(Position{0, 0})->getType(), PieceType::Rook) << "a8 should have a rook";
-	EXPECT_EQ(mBoard.getPiece(Position{1, 0})->getType(), PieceType::Knight) << "b8 should have a knight";
-	EXPECT_EQ(mBoard.getPiece(Position{2, 0})->getType(), PieceType::Bishop) << "c8 should have a bishop";
-	EXPECT_EQ(mBoard.getPiece(Position{3, 0})->getType(), PieceType::Queen) << "d8 should have a queen";
-	EXPECT_EQ(mBoard.getPiece(Position{4, 0})->getType(), PieceType::King) << "e8 should have a king";
-	EXPECT_EQ(mBoard.getPiece(Position{5, 0})->getType(), PieceType::Bishop) << "f8 should have a bishop";
-	EXPECT_EQ(mBoard.getPiece(Position{6, 0})->getType(), PieceType::Knight) << "g8 should have a knight";
-	EXPECT_EQ(mBoard.getPiece(Position{7, 0})->getType(), PieceType::Rook) << "h8 should have a rook";
-
-	// Pawns for Black
-	for (int x = 0; x < 8; x++)
-	{
-		EXPECT_EQ(mBoard.getPiece(Position{x, 1})->getType(), PieceType::Pawn) << "Black pawn should be at position (" << x << ",1)";
-		EXPECT_EQ(mBoard.getPiece(Position{x, 1})->getColor(), PlayerColor::Black) << "Pawn at position (" << x << ",1) should be black";
-	}
-
-	// Middle of the board should be empty
-	for (int x = 0; x < 8; x++)
-	{
-		for (int y = 2; y < 6; y++)
-		{
-			EXPECT_TRUE(mBoard.isEmpty(Position{x, y})) << "Middle position (" << x << "," << y << ") should be empty";
-		}
+		Square square = static_cast<Square>(sq);
+		EXPECT_EQ(mBoard.pieceAt(square), PieceType::None) << "Square " << sq << " should be empty after clear";
 	}
 }
 
 
-TEST_F(ChessBoardTest, GetPieceAtPosition)
+TEST_F(ChessboardTest, FlipSideChangesSide)
 {
-	// Test the getPieceAtPosition method for a few positions
-	auto piece1 = mBoard.getPiece(Position{0, 0});
-	ASSERT_NE(piece1, nullptr) << "Should get a valid piece at a8";
-	EXPECT_EQ(piece1->getType(), PieceType::Rook) << "Should be a rook at a8";
-	EXPECT_EQ(piece1->getColor(), PlayerColor::Black) << "Should be black at a8";
+	EXPECT_EQ(mBoard.getCurrentSide(), Side::White) << "Initial side should be white";
 
-	auto piece2 = mBoard.getPiece(Position{4, 4});
-	EXPECT_EQ(piece2, nullptr) << "Should get nullptr for empty position e4";
+	mBoard.flipSide();
+	EXPECT_EQ(mBoard.getCurrentSide(), Side::Black) << "Side should be black after flip";
 
-	// Test with out-of-bounds position
-	auto piece3 = mBoard.getPiece(Position{8, 8});
-	EXPECT_EQ(piece3, nullptr) << "Should get nullptr for out-of-bounds position";
+	mBoard.flipSide();
+	EXPECT_EQ(mBoard.getCurrentSide(), Side::White) << "Side should be white after second flip";
 }
 
 
-TEST_F(ChessBoardTest, GetBoardStateInitialPosition)
+TEST_F(ChessboardTest, SetSideUpdatesCorrectly)
 {
-	// Test getBoardState with initial board setup
-	BoardStateArray boardState;
-	bool			result = mBoard.getBoardState(boardState);
+	mBoard.setSide(Side::Black);
+	EXPECT_EQ(mBoard.getCurrentSide(), Side::Black) << "Side should be black after setSide";
 
-	EXPECT_TRUE(result) << "getBoardState should return true for successful operation";
-
-	// Test some key positions for initial board setup
-
-	// White pieces (bottom of board)
-	int whiteRookEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Rook);
-	EXPECT_EQ(boardState[7][0], whiteRookEncoded) << "a1 should contain white rook";
-	EXPECT_EQ(boardState[7][7], whiteRookEncoded) << "h1 should contain white rook";
-
-	int whiteKnightEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Knight);
-	EXPECT_EQ(boardState[7][1], whiteKnightEncoded) << "b1 should contain white knight";
-	EXPECT_EQ(boardState[7][6], whiteKnightEncoded) << "g1 should contain white knight";
-
-	int whiteBishopEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Bishop);
-	EXPECT_EQ(boardState[7][2], whiteBishopEncoded) << "c1 should contain white bishop";
-	EXPECT_EQ(boardState[7][5], whiteBishopEncoded) << "f1 should contain white bishop";
-
-	int whiteQueenEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Queen);
-	EXPECT_EQ(boardState[7][3], whiteQueenEncoded) << "d1 should contain white queen";
-
-	int whiteKingEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::King);
-	EXPECT_EQ(boardState[7][4], whiteKingEncoded) << "e1 should contain white king";
-
-	// White pawns
-	int whitePawnEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Pawn);
-	for (int x = 0; x < 8; x++)
-	{
-		EXPECT_EQ(boardState[6][x], whitePawnEncoded) << "White pawn should be at rank 2 (array index 6), file " << x;
-	}
-
-	// Black pieces (top of board)
-	int blackRookEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Rook);
-	EXPECT_EQ(boardState[0][0], blackRookEncoded) << "a8 should contain black rook";
-	EXPECT_EQ(boardState[0][7], blackRookEncoded) << "h8 should contain black rook";
-
-	int blackKnightEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Knight);
-	EXPECT_EQ(boardState[0][1], blackKnightEncoded) << "b8 should contain black knight";
-	EXPECT_EQ(boardState[0][6], blackKnightEncoded) << "g8 should contain black knight";
-
-	int blackBishopEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Bishop);
-	EXPECT_EQ(boardState[0][2], blackBishopEncoded) << "c8 should contain black bishop";
-	EXPECT_EQ(boardState[0][5], blackBishopEncoded) << "f8 should contain black bishop";
-
-	int blackQueenEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Queen);
-	EXPECT_EQ(boardState[0][3], blackQueenEncoded) << "d8 should contain black queen";
-
-	int blackKingEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::King);
-	EXPECT_EQ(boardState[0][4], blackKingEncoded) << "e8 should contain black king";
-
-	// Black pawns
-	int blackPawnEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Pawn);
-	for (int x = 0; x < 8; x++)
-	{
-		EXPECT_EQ(boardState[1][x], blackPawnEncoded) << "Black pawn should be at rank 7 (array index 1), file " << x;
-	}
-
-	// Empty squares in the middle
-	for (int y = 2; y < 6; y++)
-	{
-		for (int x = 0; x < 8; x++)
-		{
-			EXPECT_EQ(boardState[y][x], 0) << "Middle squares should be empty at (" << x << "," << y << ")";
-		}
-	}
+	mBoard.setSide(Side::White);
+	EXPECT_EQ(mBoard.getCurrentSide(), Side::White) << "Side should be white after setSide";
 }
 
 
-TEST_F(ChessBoardTest, GetBoardStateEmptyBoard)
+TEST_F(ChessboardTest, SetCastlingRightsUpdatesCorrectly)
 {
-	// Remove all pieces and test getBoardState
-	mBoard.removeAllPiecesFromBoard();
+	mBoard.setCastlingRights(Castling::WK);
 
-	BoardStateArray boardState;
-	bool			result = mBoard.getBoardState(boardState);
-
-	EXPECT_TRUE(result) << "getBoardState should return true for empty board";
-
-	// All squares should be empty (value 0)
-	for (int y = 0; y < 8; y++)
-	{
-		for (int x = 0; x < 8; x++)
-		{
-			EXPECT_EQ(boardState[y][x], 0) << "Empty board square should be 0 at (" << x << "," << y << ")";
-		}
-	}
+	Castling rights = mBoard.getCurrentCastlingRights();
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::WK)) << "White kingside should be set";
+	EXPECT_FALSE(static_cast<bool>(rights & Castling::WQ)) << "White queenside should not be set";
+	EXPECT_FALSE(static_cast<bool>(rights & Castling::BK)) << "Black kingside should not be set";
+	EXPECT_FALSE(static_cast<bool>(rights & Castling::BQ)) << "Black queenside should not be set";
 }
 
 
-TEST_F(ChessBoardTest, GetBoardStateAfterMoves)
+TEST_F(ChessboardTest, SetEnPassantSquareUpdatesCorrectly)
 {
-	// Make some moves and verify the board state
-	Position pawnStart = {4, 6}; // e2
-	Position pawnEnd   = {4, 4}; // e4
-	mBoard.movePiece(pawnStart, pawnEnd);
+	mBoard.setEnPassantSquare(Square::e3);
 
-	BoardStateArray boardState;
-	bool			result = mBoard.getBoardState(boardState);
-
-	EXPECT_TRUE(result) << "getBoardState should return true after moves";
-
-	// Original position should be empty
-	EXPECT_EQ(boardState[6][4], 0) << "e2 should be empty after pawn move";
-
-	// New position should contain the pawn
-	int whitePawnEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Pawn);
-	EXPECT_EQ(boardState[4][4], whitePawnEncoded) << "e4 should contain white pawn after move";
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::e3) << "En passant square should be e3";
 }
 
 
-TEST_F(ChessBoardTest, GetBoardStateAfterPieceRemoval)
+TEST_F(ChessboardTest, SaveAndRestoreState)
 {
-	// Remove a specific piece and verify the board state
-	Position rookPos = {0, 0}; // a8
-	mBoard.removePiece(rookPos);
+	// Modify the board state
+	mBoard.flipSide();
+	mBoard.setEnPassantSquare(Square::d6);
+	mBoard.setCastlingRights(Castling::WK | Castling::BQ);
+	mBoard.setHalfMoveClock(15);
 
-	BoardStateArray boardState;
-	bool			result = mBoard.getBoardState(boardState);
+	// Save state
+	BoardState state = mBoard.saveState();
 
-	EXPECT_TRUE(result) << "getBoardState should return true after piece removal";
+	// Modify further
+	mBoard.flipSide();
+	mBoard.setEnPassantSquare(Square::None);
+	mBoard.setCastlingRights(Castling::None);
+	mBoard.setHalfMoveClock(0);
 
-	// Removed position should be empty
-	EXPECT_EQ(boardState[0][0], 0) << "a8 should be empty after rook removal";
+	// Restore state
+	mBoard.restoreState(state);
 
-	// Other pieces should remain unchanged
-	int blackKnightEncoded = (static_cast<int>(PlayerColor::Black) << 4) | static_cast<int>(PieceType::Knight);
-	EXPECT_EQ(boardState[0][1], blackKnightEncoded) << "b8 should still contain black knight";
+	// Verify restoration
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::d6) << "En passant should be restored to d6";
+	EXPECT_EQ(mBoard.getCurrentCastlingRights(), Castling::WK | Castling::BQ) << "Castling rights should be restored";
+	EXPECT_EQ(mBoard.getHalfMoveClock(), 15) << "Half move clock should be restored to 15";
 }
 
 
-TEST_F(ChessBoardTest, GetBoardStateAfterPieceAddition)
+TEST_F(ChessboardTest, ParseFENStartPosition)
 {
-	// Add a piece to an empty square and verify the board state
-	Position emptyPos = {4, 4}; // e4
-	auto	 piece	  = ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White);
-	mBoard.setPiece(emptyPos, piece);
+	Chessboard board;
+	board.parseFEN("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
-	BoardStateArray boardState;
-	bool			result = mBoard.getBoardState(boardState);
+	// Verify pieces
+	EXPECT_EQ(board.pieceAt(Square::e1), PieceType::WKing) << "e1 should have white king";
+	EXPECT_EQ(board.pieceAt(Square::e8), PieceType::BKing) << "e8 should have black king";
+	EXPECT_EQ(board.pieceAt(Square::e2), PieceType::WPawn) << "e2 should have white pawn";
+	EXPECT_EQ(board.pieceAt(Square::e7), PieceType::BPawn) << "e7 should have black pawn";
 
-	EXPECT_TRUE(result) << "getBoardState should return true after piece addition";
+	// Verify side
+	EXPECT_EQ(board.getCurrentSide(), Side::White) << "White should move first";
 
-	// Added position should contain the piece
-	int whiteQueenEncoded = (static_cast<int>(PlayerColor::White) << 4) | static_cast<int>(PieceType::Queen);
-	EXPECT_EQ(boardState[4][4], whiteQueenEncoded) << "e4 should contain white queen after addition";
+	// Verify castling
+	Castling rights = board.getCurrentCastlingRights();
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::WK)) << "White kingside castling should be available";
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::WQ)) << "White queenside castling should be available";
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::BK)) << "Black kingside castling should be available";
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::BQ)) << "Black queenside castling should be available";
 }
 
 
-TEST_F(ChessBoardTest, GetBoardStateEncoding)
+TEST_F(ChessboardTest, ParseFENWithEnPassant)
 {
-	// Test the encoding format: color in high nibble, piece type in low nibble
-	mBoard.removeAllPiecesFromBoard();
+	Chessboard board;
+	board.parseFEN("rnbqkbnr/pppp1ppp/8/4pP2/8/8/PPPPP1PP/RNBQKBNR w KQkq e6 0 3");
 
-	// Add a specific piece and test its encoding
-	Position testPos = {3, 3}; // d4
-	auto	 piece	 = ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::Black);
-	mBoard.setPiece(testPos, piece);
-
-	BoardStateArray boardState;
-	mBoard.getBoardState(boardState);
-
-	int encoded	 = boardState[3][3];
-	int colorVal = (encoded >> 4) & 0xF;
-	int typeVal	 = encoded & 0xF;
-
-	EXPECT_EQ(colorVal, static_cast<int>(PlayerColor::Black)) << "Color should be correctly encoded in high nibble";
-	EXPECT_EQ(typeVal, static_cast<int>(PieceType::Bishop)) << "Piece type should be correctly encoded in low nibble";
+	EXPECT_EQ(board.getCurrentEnPassantSqaure(), Square::e6) << "En passant square should be e6";
 }
 
+
+TEST_F(ChessboardTest, ParseFENWithLimitedCastling)
+{
+	Chessboard board;
+	board.parseFEN("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w Kq - 0 1");
+
+	Castling rights = board.getCurrentCastlingRights();
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::WK)) << "White kingside castling should be available";
+	EXPECT_FALSE(static_cast<bool>(rights & Castling::WQ)) << "White queenside castling should not be available";
+	EXPECT_FALSE(static_cast<bool>(rights & Castling::BK)) << "Black kingside castling should not be available";
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::BQ)) << "Black queenside castling should be available";
+}
+
+
+TEST_F(ChessboardTest, ParseFENBlackToMove)
+{
+	Chessboard board;
+	board.parseFEN("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+
+	EXPECT_EQ(board.getCurrentSide(), Side::Black) << "Black should move";
+}
+
+
+TEST_F(ChessboardTest, ZobristHashIsComputed)
+{
+	mBoard.computeHash();
+
+	EXPECT_NE(mBoard.getHash(), 0ULL) << "Zobrist hash should not be zero for initial position";
+}
+
+
+TEST_F(ChessboardTest, ZobristHashChangesAfterMove)
+{
+	mBoard.computeHash();
+	uint64_t initialHash = mBoard.getHash();
+
+	// Make a move
+	mBoard.movePiece(PieceType::WPawn, Square::e2, Square::e4);
+	mBoard.updateOccupancies();
+	mBoard.flipSide();
+	mBoard.computeHash();
+
+	EXPECT_NE(mBoard.getHash(), initialHash) << "Hash should change after a move";
+}
+
+
+TEST_F(ChessboardTest, OccupanciesAreCorrect)
+{
+	const auto &occ		 = mBoard.occ();
+
+	// White occupancy should have 16 bits set (16 pieces)
+	U64			whiteOcc = occ[static_cast<int>(Side::White)];
+	EXPECT_EQ(BitUtils::popCount(whiteOcc), 16) << "White should have 16 pieces";
+
+	// Black occupancy should have 16 bits set
+	U64 blackOcc = occ[static_cast<int>(Side::Black)];
+	EXPECT_EQ(BitUtils::popCount(blackOcc), 16) << "Black should have 16 pieces";
+
+	// Both occupancy should have 32 bits set
+	U64 bothOcc = occ[static_cast<int>(Side::Both)];
+	EXPECT_EQ(BitUtils::popCount(bothOcc), 32) << "Total should be 32 pieces";
+}
+
+
+TEST_F(ChessboardTest, OccupanciesUpdateAfterRemoval)
+{
+	mBoard.removePiece(PieceType::WPawn, Square::e2);
+	mBoard.updateOccupancies();
+
+	const auto &occ		 = mBoard.occ();
+	U64			whiteOcc = occ[static_cast<int>(Side::White)];
+
+	EXPECT_EQ(BitUtils::popCount(whiteOcc), 15) << "White should have 15 pieces after removal";
+}
 
 } // namespace BoardTests
