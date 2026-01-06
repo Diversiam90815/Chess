@@ -111,6 +111,7 @@ struct BoardState
 	Square	  enPassant		= Square::None;
 	int		  halfMoveClock = 0;
 	PieceType capturedPiece = PieceType::None;
+	uint64_t  hash			= 0;
 };
 
 

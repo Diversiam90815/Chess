@@ -226,7 +226,7 @@ void Chessboard::setEnPassantSquare(Square sq) noexcept
 
 BoardState Chessboard::saveState() const
 {
-	return {mCastlingRights, mEnPassantSquare, mHalfMoveClock};
+	return {mCastlingRights, mEnPassantSquare, mHalfMoveClock, PieceType::None, mHash};
 }
 
 
@@ -235,6 +235,7 @@ void Chessboard::restoreState(const BoardState &state)
 	mCastlingRights	 = state.castle;
 	mEnPassantSquare = state.enPassant;
 	mHalfMoveClock	 = state.halfMoveClock;
+	mHash			 = state.hash;
 }
 
 
