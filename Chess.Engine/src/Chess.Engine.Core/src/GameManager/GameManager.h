@@ -12,7 +12,7 @@
 #include "Logging.h"
 #include "UserSettings.h"
 #include "IObservable.h"
-#include "UICommunication.h"
+#include "WinUIInputSource.h"
 #include "NetworkManager.h"
 #include "MultiplayerManager.h"
 #include "PlayerName.h"

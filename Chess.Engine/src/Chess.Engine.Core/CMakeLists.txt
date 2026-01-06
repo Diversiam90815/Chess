@@ -8,12 +8,13 @@ set (GAME_MANAGER_DIR				${SOURCE_DIR}/GameManager)
 set (GAME_ENGINE_DIR				${SOURCE_DIR}/GameEngine)
 set (GAME_CONTROLLER_DIR			${SOURCE_DIR}/GameController)
 set (BOARD_DIR						${SOURCE_DIR}/Board)
+set (ATTACKTABLES_DIR				${SOURCE_DIR}/AttackTables)
 set (PLAYER_DIR						${SOURCE_DIR}/Player)
 set (HELPER_DIR						${SOURCE_DIR}/Helper)
 set (FILEMANAGER_DIR				${SOURCE_DIR}/FileManager)
 set (LOGGER_DIR						${SOURCE_DIR}/Logger)
 set (USERSETTINGS_DIR				${SOURCE_DIR}/UserSettings)
-set (COMMUNICATION_DIR				${SOURCE_DIR}/Communication)
+set (INPUTSOURCE_DIR				${SOURCE_DIR}/InputSource)
 set (NETWORK_DIR					${SOURCE_DIR}/Network)
 set (MULTIPLAYER_DIR				${SOURCE_DIR}/Multiplayer)
 set (STATEMACHINE_DIR				${SOURCE_DIR}/StateMachine)
@@ -26,13 +27,14 @@ set(ALL_PROJECT_DIRS
 			${GAME_ENGINE_DIR}
 			${GAME_CONTROLLER_DIR}
 			${BOARD_DIR}
+			${ATTACKTABLES_DIR}
 			${PLAYER_DIR}
 			${HELPER_DIR}
 			${LOGGER_DIR}
 			${FILEMANAGER_DIR}
 			${SOURCE_DIR}
 			${USERSETTINGS_DIR}
-			${COMMUNICATION_DIR}
+			${INPUTSOURCE_DIR}
 			${NETWORK_DIR}
 			${MULTIPLAYER_DIR}
 			${STATEMACHINE_DIR}
@@ -43,7 +45,6 @@ include_directories(${ALL_PROJECT_DIRS})
 
 
 set(STATEMACHINE_FILES
-	${STATEMACHINE_DIR}/IInputSource.h
 	${STATEMACHINE_DIR}/InputEvent.h
 	${STATEMACHINE_DIR}/StateMachine.h	${STATEMACHINE_DIR}/StateMachine.cpp
 )
@@ -53,15 +54,19 @@ set(GAMEENGINE_FILES
 )
 
 set(GAMECONTROLLER_FILES
+	${GAME_CONTROLLER_DIR}/IGameController.h
 	${GAME_CONTROLLER_DIR}/GameController.h		${GAME_CONTROLLER_DIR}/GameController.cpp
 )
 
 set(BOARD_FILES
 	${BOARD_DIR}/BitboardUtils.h
 	${BOARD_DIR}/BitboardTypes.h
-	${BOARD_DIR}/MagicGenerator.h
 	${BOARD_DIR}/Chessboard.h			${BOARD_DIR}/Chessboard.cpp
-	${BOARD_DIR}/AttackTables.h			${BOARD_DIR}/AttackTables.cpp
+	${BOARD_DIR}/ZobristHash.h			${BOARD_DIR}/ZobristHash.cpp
+)
+
+set(ATTACKTABLES_FILES
+	${ATTACKTABLES_DIR}/AttackTables.h			${ATTACKTABLES_DIR}/AttackTables.cpp
 )
 	
 set(MOVE_FILES
@@ -73,7 +78,6 @@ set(MOVE_FILES
 )
 
 set(GAME_MANAGER_FILES
-	${GAME_MANAGER_DIR}/IGameController.h
 	${GAME_MANAGER_DIR}/GameManager.h		${GAME_MANAGER_DIR}/GameManager.cpp
 )
 
@@ -91,6 +95,7 @@ set(HELPER_FILES
 	${HELPER_DIR}/Conversion.h
 	${HELPER_DIR}/IObserver.h
 	${HELPER_DIR}/IObservable.h
+	${HELPER_DIR}/MagicGenerator.h
 )
 
 set(LOGGER_FILES
@@ -112,9 +117,10 @@ set(NETWORK_FILES
 	${NETWORK_DIR}/NetworkInformation.h     ${NETWORK_DIR}/NetworkInformation.cpp
 )
 
-set(COMMUNICATION_FILES
-	${COMMUNICATION_DIR}/PlainCDefines.h   
-	${COMMUNICATION_DIR}/UICommunication.h    ${COMMUNICATION_DIR}/UICommunication.cpp
+set(INPUTSOURCE_FILES
+	${INPUTSOURCE_DIR}/PlainCDefines.h   
+	${INPUTSOURCE_DIR}/IInputSource.h
+	${INPUTSOURCE_DIR}/WinUIInputSource.h    ${INPUTSOURCE_DIR}/WinUIInputSource.cpp
 )
 
 set(EVALUATION_FILES
@@ -141,6 +147,7 @@ set(ALL_FILES
 	${GAMEENGINE_FILES}
 	${GAMECONTROLLER_FILES}
 	${BOARD_FILES}
+	${ATTACKTABLES_FILES}
 	${MOVE_FILES}
 	${GAME_MANAGER_FILES}
 	${PLAYER_FILES}
@@ -148,7 +155,7 @@ set(ALL_FILES
 	${LOGGER_FILES}
 	${FILEMANAGER_FILES}
 	${USERSETTINGS_FILES}
-	${COMMUNICATION_FILES}
+	${INPUTSOURCE_FILES}
 	${NETWORK_FILES}
 	${MULTIPLAYER_FILES}
 	${STATEMACHINE_FILES}

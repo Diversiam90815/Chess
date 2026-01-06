@@ -5,7 +5,7 @@
   ==============================================================================
 */
 
-#include "UICommunication.h"
+#include "WinUIInputSource.h"
 
 
 void WinUIInputSource::setDelegate(PFN_CALLBACK pDelegate)
