@@ -18,284 +18,385 @@ namespace MoveTests
 class CastlingTests : public ::testing::Test
 {
 protected:
-	std::shared_ptr<ChessBoard>		mBoard;
-	std::shared_ptr<MoveValidation> mValidation;
-	std::shared_ptr<MoveExecution>	mExecution;
-	std::shared_ptr<MoveGeneration> mGeneration;
+	Chessboard	   mBoard;
+	MoveGeneration mGeneration{mBoard};
+	MoveExecution  mExecution{mBoard};
+	MoveValidation mValidation{mBoard, mGeneration, mExecution};
 
-	void							SetUp() override
+	void		   SetUp() override { mBoard.init(); }
+
+	void		   SetupCastlingPosition(Side side)
 	{
-		mBoard = std::make_shared<ChessBoard>();
-		mBoard->initializeBoard();
-		mValidation = std::make_shared<MoveValidation>(mBoard);
-		mExecution	= std::make_shared<MoveExecution>(mBoard, mValidation);
-		mGeneration = std::make_shared<MoveGeneration>(mBoard, mValidation, mExecution);
+		mBoard.clear();
+
+		if (side == Side::White)
+		{
+			mBoard.addPiece(PieceType::WKing, Square::e1);
+			mBoard.addPiece(PieceType::WRook, Square::h1);
+			mBoard.addPiece(PieceType::WRook, Square::a1);
+			mBoard.addPiece(PieceType::BKing, Square::e8);
+			mBoard.setSide(Side::White);
+			mBoard.setCastlingRights(Castling::WK | Castling::WQ);
+		}
+		else
+		{
+			mBoard.addPiece(PieceType::BKing, Square::e8);
+			mBoard.addPiece(PieceType::BRook, Square::h8);
+			mBoard.addPiece(PieceType::BRook, Square::a8);
+			mBoard.addPiece(PieceType::WKing, Square::e1);
+			mBoard.setSide(Side::Black);
+			mBoard.setCastlingRights(Castling::BK | Castling::BQ);
+		}
+		mBoard.updateOccupancies();
 	}
 
-	void SetupCastlingPosition(PlayerColor color)
+	bool hasCastlingMove(const MoveList &moves, MoveFlag flag) const
 	{
-		mBoard->removeAllPiecesFromBoard();
-
-		int		 backRank = (color == PlayerColor::White) ? 7 : 0;
-
-		// Place king and rooks
-		Position kingPos{4, backRank};
-		Position kingsideRookPos{7, backRank};
-		Position queensideRookPos{0, backRank};
-
-		mBoard->setPiece(kingPos, ChessPiece::CreatePiece(PieceType::King, color));
-		mBoard->setPiece(kingsideRookPos, ChessPiece::CreatePiece(PieceType::Rook, color));
-		mBoard->setPiece(queensideRookPos, ChessPiece::CreatePiece(PieceType::Rook, color));
-
-		// Update king position
-		mBoard->updateKingsPosition(kingPos, color);
+		for (size_t i = 0; i < moves.size(); ++i)
+		{
+			if (moves[i].flags() == flag)
+				return true;
+		}
+		return false;
 	}
 };
 
 
-TEST_F(CastlingTests, KingsieCastlingMovesKingAndRook)
+TEST_F(CastlingTests, WhiteKingsideCastlingMovesKingAndRook)
 {
-	SetupCastlingPosition(PlayerColor::White);
+	SetupCastlingPosition(Side::White);
 
-	// Execute kingside castling
-	PossibleMove castlingMove;
-	castlingMove.start = Position{4, 7}; // e1
-	castlingMove.end   = Position{6, 7}; // g1
-	castlingMove.type  = MoveType::CastlingKingside;
+	Move castleMove(Square::e1, Square::g1, MoveFlag::KingCastle);
+	mExecution.makeMove(castleMove);
 
-	mExecution->executeMove(castlingMove);
-
-	// Verify: King has Position g1 (6,7)
-	EXPECT_FALSE(mBoard->isEmpty(Position{6, 7})) << "King should be at g1";
-	auto kingPiece = mBoard->getPiece(Position{6, 7});
-	EXPECT_EQ(kingPiece->getType(), PieceType::King);
-	EXPECT_EQ(kingPiece->getColor(), PlayerColor::White);
-
-	// Verify: Rook has Position f1 (5,7)
-	EXPECT_FALSE(mBoard->isEmpty(Position{5, 7})) << "Rook should be at f1";
-	auto rookPiece = mBoard->getPiece(Position{5, 7});
-	EXPECT_EQ(rookPiece->getColor(), PlayerColor::White);
-	EXPECT_EQ(rookPiece->getType(), PieceType::Rook);
-
-	// Verify: Original positions are empty
-	EXPECT_TRUE(mBoard->isEmpty(Position{4, 7})) << "King's original position (e1) should be empty";
-	EXPECT_TRUE(mBoard->isEmpty(Position{7, 7})) << "Rook's original position (h1) should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::g1), PieceType::WKing) << "King should be at g1";
+	EXPECT_EQ(mBoard.pieceAt(Square::f1), PieceType::WRook) << "Rook should be at f1";
+	EXPECT_EQ(mBoard.pieceAt(Square::e1), PieceType::None) << "e1 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::h1), PieceType::None) << "h1 should be empty";
 }
 
 
-TEST_F(CastlingTests, QueensideCastlingMovesKingAndRook)
+TEST_F(CastlingTests, WhiteQueensideCastlingMovesKingAndRook)
 {
-	SetupCastlingPosition(PlayerColor::White);
+	SetupCastlingPosition(Side::White);
 
-	// Execute queenside castling
-	PossibleMove castlingMove;
-	castlingMove.start = Position{4, 7}; // e1
-	castlingMove.end   = Position{2, 7}; // c1
-	castlingMove.type  = MoveType::CastlingQueenside;
+	Move castleMove(Square::e1, Square::c1, MoveFlag::QueenCastle);
+	mExecution.makeMove(castleMove);
 
-	mExecution->executeMove(castlingMove);
-
-	// Verify: king's new position is c1
-	EXPECT_FALSE(mBoard->isEmpty(Position{2, 7})) << "King should be at c1";
-	auto kingPiece = mBoard->getPiece(Position{2, 7});
-	EXPECT_EQ(kingPiece->getType(), PieceType::King);
-	EXPECT_EQ(kingPiece->getColor(), PlayerColor::White);
-
-	// Verify: rook's new position is d1
-	EXPECT_FALSE(mBoard->isEmpty(Position{3, 7})) << "Rook should be at d1";
-	auto rookPiece = mBoard->getPiece(Position{3, 7});
-	EXPECT_EQ(rookPiece->getType(), PieceType::Rook);
-	EXPECT_EQ(rookPiece->getColor(), PlayerColor::White);
-
-	// Verify: Orignal positions are empty
-	EXPECT_TRUE(mBoard->isEmpty(Position{4, 7})) << "King's original position (e1) should be empty";
-	EXPECT_TRUE(mBoard->isEmpty(Position{0, 7})) << "Rook's original position (a1) should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::c1), PieceType::WKing) << "King should be at c1";
+	EXPECT_EQ(mBoard.pieceAt(Square::d1), PieceType::WRook) << "Rook should be at d1";
+	EXPECT_EQ(mBoard.pieceAt(Square::e1), PieceType::None) << "e1 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::a1), PieceType::None) << "a1 should be empty";
 }
 
 
-TEST_F(CastlingTests, CastlingBlockedByPieces)
+TEST_F(CastlingTests, BlackKingsideCastlingMovesKingAndRook)
 {
-	SetupCastlingPosition(PlayerColor::White);
+	SetupCastlingPosition(Side::Black);
 
-	// Place a piece in between king and kingside rook
-	mBoard->setPiece(Position{5, 7}, ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::White));
+	Move castleMove(Square::e8, Square::g8, MoveFlag::KingCastle);
+	mExecution.makeMove(castleMove);
 
-	// Calculate and get moves for king
-	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
-	auto moves				 = mGeneration->getMovesForPosition(Position{4, 7});
+	EXPECT_EQ(mBoard.pieceAt(Square::g8), PieceType::BKing) << "King should be at g8";
+	EXPECT_EQ(mBoard.pieceAt(Square::f8), PieceType::BRook) << "Rook should be at f8";
+	EXPECT_EQ(mBoard.pieceAt(Square::e8), PieceType::None) << "e8 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::h8), PieceType::None) << "h8 should be empty";
+}
 
-	// Check the moves for kingside castling
-	bool hasKingsideCastling = false;
-	for (const auto &move : moves)
-	{
-		if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside)
-		{
-			hasKingsideCastling = true;
-			break;
-		}
-	}
 
-	// Verify: King has no Kingside castling move
-	EXPECT_FALSE(hasKingsideCastling) << "Kingside castling should not be available when a piece blocks the path";
+TEST_F(CastlingTests, BlackQueensideCastlingMovesKingAndRook)
+{
+	SetupCastlingPosition(Side::Black);
 
-	// Check for queenside castling:
+	Move castleMove(Square::e8, Square::c8, MoveFlag::QueenCastle);
+	mExecution.makeMove(castleMove);
+
+	EXPECT_EQ(mBoard.pieceAt(Square::c8), PieceType::BKing) << "King should be at c8";
+	EXPECT_EQ(mBoard.pieceAt(Square::d8), PieceType::BRook) << "Rook should be at d8";
+	EXPECT_EQ(mBoard.pieceAt(Square::e8), PieceType::None) << "e8 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::a8), PieceType::None) << "a8 should be empty";
+}
+
+
+TEST_F(CastlingTests, CastlingMovesAreGenerated)
+{
+	SetupCastlingPosition(Side::White);
+
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
+
+	EXPECT_TRUE(hasCastlingMove(moves, MoveFlag::KingCastle)) << "Kingside castling should be generated";
+	EXPECT_TRUE(hasCastlingMove(moves, MoveFlag::QueenCastle)) << "Queenside castling should be generated";
+}
+
+
+TEST_F(CastlingTests, KingsideCastlingBlockedByPiece)
+{
+	SetupCastlingPosition(Side::White);
+
+	// Place a piece between king and kingside rook
+	mBoard.addPiece(PieceType::WBishop, Square::f1);
+	mBoard.updateOccupancies();
+
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
+
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::KingCastle)) << "Kingside castling should be blocked";
+	EXPECT_TRUE(hasCastlingMove(moves, MoveFlag::QueenCastle)) << "Queenside castling should still be available";
+}
+
+
+TEST_F(CastlingTests, QueensideCastlingBlockedByPiece)
+{
+	SetupCastlingPosition(Side::White);
 
 	// Place a piece between king and queenside rook
-	mBoard->setPiece(Position{1, 7}, ChessPiece::CreatePiece(PieceType::Knight, PlayerColor::White));
+	mBoard.addPiece(PieceType::WKnight, Square::b1);
+	mBoard.updateOccupancies();
 
-	// Get moves for king position again
-	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
-	moves					  = mGeneration->getMovesForPosition(Position{4, 7});
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
 
-	// Check that queenside castling is not available
-	bool hasQueensideCastling = false;
-	for (const auto &move : moves)
-	{
-		if ((move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
-		{
-			hasQueensideCastling = true;
-			break;
-		}
-	}
-
-	// Verify: King has no queenside castling move available
-	EXPECT_FALSE(hasQueensideCastling) << "Queenside castling should not be available when a piece blocks the path";
+	EXPECT_TRUE(hasCastlingMove(moves, MoveFlag::KingCastle)) << "Kingside castling should still be available";
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::QueenCastle)) << "Queenside castling should be blocked";
 }
 
 
 TEST_F(CastlingTests, CastlingNotAvailableAfterKingMoves)
 {
-	SetupCastlingPosition(PlayerColor::White);
+	SetupCastlingPosition(Side::White);
 
 	// Move the king
-	PossibleMove kingMove;
-	kingMove.start = Position{4, 7}; // e1
-	kingMove.end   = Position{4, 6}; // e2
-	kingMove.type  = MoveType::Normal;
-
-	mExecution->executeMove(kingMove);
+	mExecution.makeMove(Move(Square::e1, Square::f1, MoveFlag::Quiet));
 
 	// Move the king back
-	PossibleMove kingMoveBack;
-	kingMoveBack.start = Position{4, 6}; // e2
-	kingMoveBack.end   = Position{4, 7}; // e1
-	kingMoveBack.type  = MoveType::Normal;
+	mExecution.makeMove(Move(Square::e8, Square::d8, MoveFlag::Quiet)); // Black moves
+	mExecution.makeMove(Move(Square::f1, Square::e1, MoveFlag::Quiet));
 
-	mExecution->executeMove(kingMoveBack);
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
 
-	// Get moves for king position
-	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
-	auto moves		 = mGeneration->getMovesForPosition(Position{4, 7});
-
-	// Check the moves for kingside castling
-	bool hasCastling = false;
-	for (const auto &move : moves)
-	{
-		if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
-		{
-			hasCastling = true;
-			break;
-		}
-	}
-
-	// Verify: Castling not available
-	EXPECT_FALSE(hasCastling) << "Castling should not be available after king has moved";
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::KingCastle)) << "Kingside castling should not be available after king moved";
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::QueenCastle)) << "Queenside castling should not be available after king moved";
 }
 
 
-TEST_F(CastlingTests, CastlingNotAvailableAfterRookMoves)
+TEST_F(CastlingTests, KingsideCastlingNotAvailableAfterRookMoves)
 {
-	SetupCastlingPosition(PlayerColor::White);
+	SetupCastlingPosition(Side::White);
 
 	// Move the kingside rook
-	PossibleMove rookMove;
-	rookMove.start = Position{7, 7}; // h1
-	rookMove.end   = Position{7, 6}; // h2
-	rookMove.type  = MoveType::Normal;
+	mExecution.makeMove(Move(Square::h1, Square::h2, MoveFlag::Quiet));
 
-	mExecution->executeMove(rookMove);
+	// Make a black move and move rook back
+	mExecution.makeMove(Move(Square::e8, Square::d8, MoveFlag::Quiet));
+	mExecution.makeMove(Move(Square::h2, Square::h1, MoveFlag::Quiet));
 
-	// Move the rook back
-	PossibleMove rookMoveBack;
-	rookMoveBack.start = Position{7, 6}; // h2
-	rookMoveBack.end   = Position{7, 7}; // h1
-	rookMoveBack.type  = MoveType::Normal;
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
 
-	mExecution->executeMove(rookMoveBack);
-
-	// Get moves for king position
-	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
-	auto moves				 = mGeneration->getMovesForPosition(Position{4, 7});
-
-	// Check the moves for kingside castling
-	bool hasKingsideCastling = false;
-	for (const auto &move : moves)
-	{
-		if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside)
-		{
-			hasKingsideCastling = true;
-			break;
-		}
-	}
-
-	// Verify: Kingside castling move not available
-	EXPECT_FALSE(hasKingsideCastling) << "Kingside castling should not be available after rook has moved";
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::KingCastle)) << "Kingside castling should not be available after h-rook moved";
+	EXPECT_TRUE(hasCastlingMove(moves, MoveFlag::QueenCastle)) << "Queenside castling should still be available";
 }
 
 
-TEST_F(CastlingTests, CastlingNotAllowedThroughCheck)
+TEST_F(CastlingTests, QueensideCastlingNotAvailableAfterRookMoves)
 {
-	SetupCastlingPosition(PlayerColor::White);
+	SetupCastlingPosition(Side::White);
 
-	// Place an opponent piece that attacks a square the king must pass through
-	// Black rook at f3 which controls f1, preventing kingside castling
-	mBoard->setPiece(Position{5, 5}, ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::Black));
+	// Move the queenside rook
+	mExecution.makeMove(Move(Square::a1, Square::a2, MoveFlag::Quiet));
 
-	// Get moves for king position
-	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
-	auto moves				 = mGeneration->getMovesForPosition(Position{4, 7});
+	// Make a black move and move rook back
+	mExecution.makeMove(Move(Square::e8, Square::d8, MoveFlag::Quiet));
+	mExecution.makeMove(Move(Square::a2, Square::a1, MoveFlag::Quiet));
 
-	// Check that kingside castling is not available
-	bool hasKingsideCastling = false;
-	for (const auto &move : moves)
-	{
-		if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside)
-		{
-			hasKingsideCastling = true;
-			break;
-		}
-	}
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
 
-	// Verify: Castling move not available
-	EXPECT_FALSE(hasKingsideCastling) << "Kingside castling should not be allowed through check";
+	EXPECT_TRUE(hasCastlingMove(moves, MoveFlag::KingCastle)) << "Kingside castling should still be available";
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::QueenCastle)) << "Queenside castling should not be available after a-rook moved";
 }
 
 
 TEST_F(CastlingTests, CastlingNotAllowedWhenKingInCheck)
 {
-	SetupCastlingPosition(PlayerColor::White);
+	SetupCastlingPosition(Side::White);
 
-	// Place an opponent piece that attacks the king
-	// Black rook at e3 which checks the king on e1
-	mBoard->setPiece(Position{4, 5}, ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::Black));
+	// Place black rook attacking the king
+	mBoard.addPiece(PieceType::BRook, Square::e3);
+	mBoard.updateOccupancies();
 
-	// Get moves for king position
-	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
-	auto moves		 = mGeneration->getMovesForPosition(Position{4, 7});
+	MoveList moves;
+	mValidation.generateLegalMoves(moves);
 
-	// Check that no castling is available
-	bool hasCastling = false;
-	for (const auto &move : moves)
-	{
-		if ((move.type & MoveType::CastlingKingside) == MoveType::CastlingKingside || (move.type & MoveType::CastlingQueenside) == MoveType::CastlingQueenside)
-		{
-			hasCastling = true;
-			break;
-		}
-	}
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::KingCastle)) << "Kingside castling should not be allowed when in check";
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::QueenCastle)) << "Queenside castling should not be allowed when in check";
+}
 
-	// Verify: Castling should not be available
-	EXPECT_FALSE(hasCastling) << "Castling should not be allowed when king is in check";
+
+TEST_F(CastlingTests, KingsideCastlingNotAllowedThroughCheck)
+{
+	SetupCastlingPosition(Side::White);
+
+	// Place black rook attacking f1 (square king passes through)
+	mBoard.addPiece(PieceType::BRook, Square::f3);
+	mBoard.updateOccupancies();
+
+	MoveList moves;
+	mValidation.generateLegalMoves(moves);
+
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::KingCastle)) << "Kingside castling should not be allowed through check";
+	EXPECT_TRUE(hasCastlingMove(moves, MoveFlag::QueenCastle)) << "Queenside castling should still be allowed";
+}
+
+
+TEST_F(CastlingTests, QueensideCastlingNotAllowedThroughCheck)
+{
+	SetupCastlingPosition(Side::White);
+
+	// Place black rook attacking d1 (square king passes through)
+	mBoard.addPiece(PieceType::BRook, Square::d3);
+	mBoard.updateOccupancies();
+
+	MoveList moves;
+	mValidation.generateLegalMoves(moves);
+
+	EXPECT_TRUE(hasCastlingMove(moves, MoveFlag::KingCastle)) << "Kingside castling should still be allowed";
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::QueenCastle)) << "Queenside castling should not be allowed through check";
+}
+
+
+TEST_F(CastlingTests, CastlingNotAllowedIntoCheck)
+{
+	SetupCastlingPosition(Side::White);
+
+	// Place black rook attacking g1 (king's destination for kingside)
+	mBoard.addPiece(PieceType::BRook, Square::g3);
+	mBoard.updateOccupancies();
+
+	MoveList moves;
+	mValidation.generateLegalMoves(moves);
+
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::KingCastle)) << "Kingside castling should not be allowed into check";
+}
+
+
+TEST_F(CastlingTests, UnmakeCastlingRestoresPosition)
+{
+	SetupCastlingPosition(Side::White);
+
+	Move castleMove(Square::e1, Square::g1, MoveFlag::KingCastle);
+	mExecution.makeMove(castleMove);
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e1), PieceType::WKing) << "King should be back at e1";
+	EXPECT_EQ(mBoard.pieceAt(Square::h1), PieceType::WRook) << "Rook should be back at h1";
+	EXPECT_EQ(mBoard.pieceAt(Square::g1), PieceType::None) << "g1 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::f1), PieceType::None) << "f1 should be empty";
+}
+
+
+TEST_F(CastlingTests, UnmakeQueensideCastlingRestoresPosition)
+{
+	SetupCastlingPosition(Side::White);
+
+	Move castleMove(Square::e1, Square::c1, MoveFlag::QueenCastle);
+	mExecution.makeMove(castleMove);
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e1), PieceType::WKing) << "King should be back at e1";
+	EXPECT_EQ(mBoard.pieceAt(Square::a1), PieceType::WRook) << "Rook should be back at a1";
+	EXPECT_EQ(mBoard.pieceAt(Square::c1), PieceType::None) << "c1 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::d1), PieceType::None) << "d1 should be empty";
+}
+
+
+TEST_F(CastlingTests, CastlingRightsRestoredOnUnmake)
+{
+	SetupCastlingPosition(Side::White);
+
+	Castling originalRights = mBoard.getCurrentCastlingRights();
+
+	Move	 castleMove(Square::e1, Square::g1, MoveFlag::KingCastle);
+	mExecution.makeMove(castleMove);
+
+	// After castling, rights should be lost
+	EXPECT_FALSE(static_cast<bool>(mBoard.getCurrentCastlingRights() & Castling::WK));
+	EXPECT_FALSE(static_cast<bool>(mBoard.getCurrentCastlingRights() & Castling::WQ));
+
+	mExecution.unmakeMove();
+
+	// Rights should be restored
+	EXPECT_EQ(mBoard.getCurrentCastlingRights(), originalRights) << "Castling rights should be restored on unmake";
+}
+
+
+TEST_F(CastlingTests, CastlingRightsLostWhenRookCaptured)
+{
+	SetupCastlingPosition(Side::White);
+
+	// Place black queen to capture white's h1 rook
+	mBoard.addPiece(PieceType::BQueen, Square::h3);
+	mBoard.updateOccupancies();
+
+	// Simulate black capturing the rook (switch to black's turn first)
+	mBoard.flipSide();
+	Move captureMove(Square::h3, Square::h1, MoveFlag::Capture);
+	mExecution.makeMove(captureMove);
+
+	Castling rights = mBoard.getCurrentCastlingRights();
+	EXPECT_FALSE(static_cast<bool>(rights & Castling::WK)) << "White kingside castling should be lost when h1 rook captured";
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::WQ)) << "White queenside castling should still be available";
+}
+
+
+TEST_F(CastlingTests, QueensideCastlingAllowedWithB1Attacked)
+{
+	SetupCastlingPosition(Side::White);
+
+	// Place black piece attacking b1 (rook passes through, but king doesn't)
+	mBoard.addPiece(PieceType::BRook, Square::b3);
+	mBoard.updateOccupancies();
+
+	MoveList moves;
+	mValidation.generateLegalMoves(moves);
+
+	// b1 being attacked should NOT prevent queenside castling
+	// because the king doesn't pass through b1
+	EXPECT_TRUE(hasCastlingMove(moves, MoveFlag::QueenCastle)) << "Queenside castling should be allowed even with b1 attacked";
+}
+
+
+TEST_F(CastlingTests, CastlingIsLegalMove)
+{
+	SetupCastlingPosition(Side::White);
+
+	Move kingsideCastle(Square::e1, Square::g1, MoveFlag::KingCastle);
+	Move queensideCastle(Square::e1, Square::c1, MoveFlag::QueenCastle);
+
+	EXPECT_TRUE(mValidation.isMoveLegal(kingsideCastle)) << "Kingside castling should be legal";
+	EXPECT_TRUE(mValidation.isMoveLegal(queensideCastle)) << "Queenside castling should be legal";
+}
+
+
+TEST_F(CastlingTests, NoCastlingRightsNoCastlingMoves)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WRook, Square::h1);
+	mBoard.addPiece(PieceType::WRook, Square::a1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setCastlingRights(Castling::None); // No castling rights
+	mBoard.updateOccupancies();
+
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
+
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::KingCastle)) << "No kingside castling without rights";
+	EXPECT_FALSE(hasCastlingMove(moves, MoveFlag::QueenCastle)) << "No queenside castling without rights";
 }
 
 } // namespace MoveTests
