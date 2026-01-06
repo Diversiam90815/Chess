@@ -102,10 +102,9 @@ void RemoteSender::sendMove(const Move &move)
 {
 	json j;
 
-	// // TODO: serialize move
-	// j[RemoteControl::MoveKey] = move;
+	j[RemoteControl::MoveKey] = move.raw();
 
-	auto data = convertDataToByteVector(j);
+	auto data				  = convertDataToByteVector(j);
 
 	sendMessage(MultiplayerMessageType::Move, data);
 }
