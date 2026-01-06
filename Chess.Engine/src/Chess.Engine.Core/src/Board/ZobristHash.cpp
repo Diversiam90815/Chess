@@ -36,7 +36,7 @@ void									 ZobristHash::initialize()
 	mSideKey = rng();
 
 	// castling keys
-	for (int i = 0; i < 16, ++i)
+	for (int i = 0; i < 16; ++i)
 	{
 		mCastlingKeys[i] = rng();
 	}
