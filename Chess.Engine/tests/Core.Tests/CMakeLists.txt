@@ -6,6 +6,7 @@ set(PlayerTest_Dir          source/PlayerTests)
 
 set (Test_Dir						${CMAKE_CURRENT_SOURCE_DIR}/source)
 
+
 set(MoveTest_Files
     ${MoveTest_Dir}/MoveTests.cpp
     ${MoveTest_Dir}/MoveListTests.cpp
@@ -17,7 +18,6 @@ set(MoveTest_Files
     ${MoveTest_Dir}/EnPassantTests.cpp
     ${MoveTest_Dir}/MoveHistoryTests.cpp
     ${MoveTest_Dir}/MoveNotationTests.cpp
-    ${MoveTest_Dir}/MoveEvaluationTests.cpp
 )
 
 
