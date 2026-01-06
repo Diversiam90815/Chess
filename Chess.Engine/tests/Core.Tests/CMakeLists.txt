@@ -4,11 +4,10 @@ set(BoardTest_Dir           source/BoardTests)
 set(GameMechanicTest_Dir    source/GameMechanicTests)
 set(PlayerTest_Dir          source/PlayerTests)
 
+set (Test_Dir						${CMAKE_CURRENT_SOURCE_DIR}/source)
 
 set(MoveTest_Files
     ${MoveTest_Dir}/MoveTests.cpp
-    ${MoveTest_Dir}/PossibleMoveTests.cpp
-    ${MoveTest_Dir}/PositionTests.cpp
     ${MoveTest_Dir}/MoveGenerationTests.cpp
     ${MoveTest_Dir}/MoveValidationTests.cpp
     ${MoveTest_Dir}/MoveExecutionTests.cpp
@@ -47,7 +46,6 @@ set(PlayerTest_Files
 
 set(BoardTest_Files
     ${BoardTest_Dir}/ChessboardTests.cpp
-    ${BoardTest_Dir}/LightChessboardTests.cpp
 )
 
 
@@ -58,6 +56,9 @@ set(Test_Files
     ${MultiplayerTest_Files}
     ${GameMechanicTest_Files}
 )
+
+source_group(TREE ${Test_Dir} FILES ${Test_Files})
+
 
 #==========================================
 #   Setup Test Project
