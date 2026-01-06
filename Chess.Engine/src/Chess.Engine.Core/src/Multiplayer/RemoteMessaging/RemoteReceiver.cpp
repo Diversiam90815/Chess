@@ -45,7 +45,9 @@ void RemoteReceiver::onMessageReceived(MultiplayerMessageType type, std::vector<
 
 	case MultiplayerMessageType::Move:
 	{
-		Move remoteMove = tryGetContentFromMessage<Move>(jMessage, RemoteControl::MoveKey);
+		uint16_t remoteMoveData = tryGetContentFromMessage<uint16_t>(jMessage, RemoteControl::MoveKey);
+
+		Move	 remoteMove		= Move(remoteMoveData);
 
 		if (!remoteMove.isValid())
 		{

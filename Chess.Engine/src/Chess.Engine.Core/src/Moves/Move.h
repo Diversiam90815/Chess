@@ -60,6 +60,7 @@ public:
 		: mData(static_cast<uint16_t>(to_index(from)) | (static_cast<uint16_t>(to_index(to)) << 6) | (static_cast<uint16_t>(flags) << 12))
 	{
 	}
+	constexpr Move(const uint16_t data) : mData(data) {}
 
 	// Accessors
 	[[nodiscard]] constexpr Square	 from() const { return static_cast<Square>(mData & 0x3F); }
