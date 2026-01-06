@@ -12,6 +12,7 @@
 
 void Chessboard::init()
 {
+	ZobristHash::initialize();
 	parseFEN(mStartPosition);
 }
 
@@ -109,6 +110,9 @@ void Chessboard::parseFEN(std::string_view fen)
 
 	// 5 occupancies
 	updateOccupancies();
+
+	// 6 Compute hash
+	computeHash();
 }
 
 
@@ -164,4 +168,10 @@ void Chessboard::restoreState(const BoardState &state)
 	mCastlingRights	 = state.castle;
 	mEnPassantSquare = state.enPassant;
 	mHalfMoveClock	 = state.halfMoveClock;
+}
+
+
+void Chessboard::computeHash()
+{
+	// TODO
 }

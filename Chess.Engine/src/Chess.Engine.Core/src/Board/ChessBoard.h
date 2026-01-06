@@ -14,6 +14,8 @@
 
 #include "BitboardTypes.h"
 #include "AttackTables.h"
+#include "ZobristHash.h"
+
 
 /*
 							ALL TOGETHER
@@ -157,7 +159,17 @@ public:
 	[[nodiscard]] BoardState saveState() const;
 	void					 restoreState(const BoardState &state);
 
+	[[nodiscard]] uint64_t	 getHash() const noexcept { return mHash; }
+	void					 computeHash();
+
 private:
+	// Hash update helpers (called internally when board changes)
+	void			  hashPiece(PieceType piece, Square sq) { mHash ^= ZobristHash::piece(piece, sq); }
+	void			  hashSide() { mHash ^= ZobristHash::sideToMove(); }
+	void			  hashCastling(Castling rights) { mHash ^= ZobristHash::castling(rights); }
+	void			  hashEnPassant(Square sq) { mHash ^= ZobristHash::enPassant(sq); }
+
+
 	Bitboards		  mBitBoards{};						 // Array of all bitboards
 	Occupancies		  mOccupancyBitboards{};			 // Occupancies
 
@@ -167,6 +179,8 @@ private:
 
 	int				  mHalfMoveClock   = 0;
 	int				  mMoveCounter	   = 1;
+
+	uint64_t		  mHash			   = 0; // Zobrist Hash
 
 	// FEN positions
 	const std::string mEmptyBoard	   = "8/8/8/8/8/8/8/8 w - - ";
