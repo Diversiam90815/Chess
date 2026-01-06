@@ -8,6 +8,8 @@ set (Test_Dir						${CMAKE_CURRENT_SOURCE_DIR}/source)
 
 set(MoveTest_Files
     ${MoveTest_Dir}/MoveTests.cpp
+    ${MoveTest_Dir}/MoveListTests.cpp
+    ${MoveTest_Dir}/MoveIntentTests.cpp
     ${MoveTest_Dir}/MoveGenerationTests.cpp
     ${MoveTest_Dir}/MoveValidationTests.cpp
     ${MoveTest_Dir}/MoveExecutionTests.cpp
