@@ -17,326 +17,407 @@ namespace MoveTests
 class MoveValidationTest : public ::testing::Test
 {
 protected:
-	std::shared_ptr<ChessBoard>		mBoard;
-	std::shared_ptr<MoveValidation> mValidation;
+	Chessboard	   mBoard;
+	MoveGeneration mGeneration{mBoard};
+	MoveExecution  mExecution{mBoard};
+	MoveValidation mValidation{mBoard, mGeneration, mExecution};
 
-
-	void							SetUp() override
-	{
-		mBoard = std::make_shared<ChessBoard>();
-		mBoard->initializeBoard();
-		mValidation = std::make_shared<MoveValidation>(mBoard);
-	}
+	void		   SetUp() override { mBoard.init(); }
 };
 
 
-TEST_F(MoveValidationTest, ValidateMoveReturnsTrueForLegalMove)
+TEST_F(MoveValidationTest, InitialSetupNotInCheck)
 {
-	// Move white pawn from e2 to e3
-	Position start = {4, 1};
-	Position end   = {4, 2};
-	Move	 move(start, end, PieceType::Pawn);
-
-	bool	 result = mValidation->validateMove(move, PlayerColor::Black);
-
-	EXPECT_TRUE(result) << "Valid move should return true";
+	EXPECT_FALSE(mValidation.isInCheck()) << "White King should not be in check on initial board";
 }
 
 
-TEST_F(MoveValidationTest, InitialSetupEndgameChecks)
+TEST_F(MoveValidationTest, InitialSetupNotCheckmate)
 {
-	// Set parameters
-	PlayerColor whitePlayer		   = PlayerColor::White;
-	PlayerColor blackPlayer		   = PlayerColor::Black;
+	EXPECT_FALSE(mValidation.isCheckmate()) << "No checkmate on initial board";
+}
 
-	Position	kingPosWhite	   = mBoard->getKingsPosition(whitePlayer);
-	Position	kingPosBlack	   = mBoard->getKingsPosition(blackPlayer);
 
-	bool		isKingInCheckWhite = mValidation->isKingInCheck(kingPosWhite, whitePlayer);
-	bool		isKingInCheckBlack = mValidation->isKingInCheck(kingPosBlack, blackPlayer);
+TEST_F(MoveValidationTest, InitialSetupNotStalemate)
+{
+	EXPECT_FALSE(mValidation.isStalemate()) << "No stalemate on initial board";
+}
 
-	bool		isCheckmateWhite   = mValidation->isCheckmate(whitePlayer);
-	bool		isCheckmateBlack   = mValidation->isCheckmate(blackPlayer);
 
-	bool		isStalemateWhite   = mValidation->isStalemate(whitePlayer);
-	bool		isStalemateBlack   = mValidation->isStalemate(blackPlayer);
+TEST_F(MoveValidationTest, InitialSetupNotDraw)
+{
+	EXPECT_FALSE(mValidation.isDraw()) << "No draw on initial board";
+}
 
-	// Verify: King should not be in check on initial board setup
-	EXPECT_FALSE(isKingInCheckWhite) << "White King should not be in check on initial board";
-	EXPECT_FALSE(isKingInCheckBlack) << "Black King should not be in check on initial board";
 
-	// Verify: Validation should not detect checkmate on initial board setup
-	EXPECT_FALSE(isCheckmateWhite) << "White should not be in checkmate on initial board";
-	EXPECT_FALSE(isCheckmateBlack) << "Black should not be in checkmate on initial board";
+TEST_F(MoveValidationTest, ValidMoveIsLegal)
+{
+	// e2-e4 is a legal move
+	Move move(Square::e2, Square::e4, MoveFlag::DoublePawnPush);
 
-	// Verify: Stalemate returns false on initial board setup
-	EXPECT_FALSE(isStalemateWhite) << "White should not be in stalemate on initial board";
-	EXPECT_FALSE(isStalemateBlack) << "Black should not be in stalemate on initial board";
+	EXPECT_TRUE(mValidation.isMoveLegal(move)) << "e2-e4 should be a legal move";
 }
 
 
 TEST_F(MoveValidationTest, DetectsKingInCheckFromQueen)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Setup white king at e1, black queen at e8 (in check along e-file)
-	Position whiteKingPos  = {4, 7}; // e1
-	Position blackQueenPos = {4, 0}; // e8
+	// White king at e1, black queen at e8 (in check along e-file)
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BQueen, Square::e8);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
 
-	mBoard->setPiece(whiteKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
-	mBoard->setPiece(blackQueenPos, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::Black));
-	mBoard->updateKingsPosition(whiteKingPos, PlayerColor::White);
-
-	// Check for check
-	bool isKingInCheck = mValidation->isKingInCheck(whiteKingPos, PlayerColor::White);
-
-	// Verify: King is in check
-	EXPECT_TRUE(isKingInCheck) << " King should be in check from queen on same file";
+	EXPECT_TRUE(mValidation.isInCheck()) << "King should be in check from queen on same file";
 }
 
 
 TEST_F(MoveValidationTest, DetectsKingInCheckFromKnight)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Setup white king at e1, black knight at c5 (in check)
-	Position whiteKingPos	= {4, 7}; // e1
-	Position blackKnightPos = {2, 6}; // c2
+	// White king at e1, black knight at c2 (checking the king)
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKnight, Square::c2);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
 
-	mBoard->setPiece(whiteKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
-	mBoard->setPiece(blackKnightPos, ChessPiece::CreatePiece(PieceType::Knight, PlayerColor::Black));
-	mBoard->updateKingsPosition(whiteKingPos, PlayerColor::White);
-
-	// Check for check
-	bool isKingInCheck = mValidation->isKingInCheck(whiteKingPos, PlayerColor::White);
-
-	// Verify: King is in check
-	EXPECT_TRUE(isKingInCheck) << " King should be in check from knight's L-shapred move";
+	EXPECT_TRUE(mValidation.isInCheck()) << "King should be in check from knight's L-shaped attack";
 }
 
 
 TEST_F(MoveValidationTest, DetectsKingInCheckFromPawn)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Setup white king at e1, black queen at c5 (in check)
-	Position whiteKingPos = {4, 7}; // e1
-	Position blackPawnPos = {3, 6}; // d2
+	// White king at e1, black pawn at d2 (checking the king diagonally)
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BPawn, Square::d2);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
 
-	mBoard->setPiece(whiteKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
-	mBoard->setPiece(blackPawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
-	mBoard->updateKingsPosition(whiteKingPos, PlayerColor::White);
-
-	// Check for check
-	bool isKingInCheck = mValidation->isKingInCheck(whiteKingPos, PlayerColor::White);
-
-	// Verify: King is in check
-	EXPECT_TRUE(isKingInCheck) << " King should be in check from pawn's diagonal attack";
+	EXPECT_TRUE(mValidation.isInCheck()) << "King should be in check from pawn's diagonal attack";
 }
 
-TEST_F(MoveValidationTest, DetectScholarsMateCheckmate)
+
+TEST_F(MoveValidationTest, DetectsKingInCheckFromBishop)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Setup proper scholar's mate position
-	Position blackKingPos = {4, 0}; // e8
+	// White king at e1, black bishop at h4 (checking diagonally)
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BBishop, Square::h4);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
 
-	// Black pieces
-	mBoard->setPiece(blackKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::Black));
-	mBoard->setPiece({3, 0}, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::Black));  // d8
-	mBoard->setPiece({5, 0}, ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::Black)); // f8
-	mBoard->setPiece({3, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // d7
-	mBoard->setPiece({4, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // e7
-	mBoard->setPiece({6, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));	  // g7
+	EXPECT_TRUE(mValidation.isInCheck()) << "King should be in check from bishop on diagonal";
+}
 
-	// White pieces - queen delivers checkmate at f7
-	mBoard->setPiece({5, 1}, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White));  // f7
-	mBoard->setPiece({2, 4}, ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::White)); // c4 (supports queen)
 
-	mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
+TEST_F(MoveValidationTest, DetectsKingInCheckFromRook)
+{
+	mBoard.clear();
 
-	// Check for checkmate
-	bool isBlackInCheckmate = mValidation->isCheckmate(PlayerColor::Black);
+	// White king at e1, black rook at e8 (checking along file)
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BRook, Square::e8);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
 
-	// Verify: Black king is in checkmate
-	EXPECT_TRUE(isBlackInCheckmate) << "Scholar's mate should be detected as checkmate";
+	EXPECT_TRUE(mValidation.isInCheck()) << "King should be in check from rook on same file";
+}
+
+
+TEST_F(MoveValidationTest, DetectsScholarsMateCheckmate)
+{
+	mBoard.clear();
+
+	// Scholar's mate position
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.addPiece(PieceType::BQueen, Square::d8);
+	mBoard.addPiece(PieceType::BBishop, Square::f8);
+	mBoard.addPiece(PieceType::BPawn, Square::d7);
+	mBoard.addPiece(PieceType::BPawn, Square::e7);
+	mBoard.addPiece(PieceType::BPawn, Square::g7);
+
+	// White queen delivers checkmate at f7
+	mBoard.addPiece(PieceType::WQueen, Square::f7);
+	mBoard.addPiece(PieceType::WBishop, Square::c4); // Supports queen
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+
+	mBoard.setSide(Side::Black);
+	mBoard.updateOccupancies();
+
+	EXPECT_TRUE(mValidation.isCheckmate()) << "Scholar's mate should be detected as checkmate";
 }
 
 
 TEST_F(MoveValidationTest, DetectsSimpleBackRankCheckmate)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Setup simple back rank mate: black king at h8, white rook at h1
-	Position blackKingPos = {7, 0}; // h8
-	Position whiteRookPos = {7, 7}; // h1
+	// Black king at h8, white rook at h1, blocking pawns
+	mBoard.addPiece(PieceType::BKing, Square::h8);
+	mBoard.addPiece(PieceType::WRook, Square::h1);
+	mBoard.addPiece(PieceType::BPawn, Square::g8);
+	mBoard.addPiece(PieceType::BPawn, Square::g7);
+	mBoard.addPiece(PieceType::WKing, Square::a1);
 
-	mBoard->setPiece(blackKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::Black));
-	mBoard->setPiece(whiteRookPos, ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::White));
-	// Add blocking pawns to prevent king escape
-	mBoard->setPiece({6, 0}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black)); // g8
-	mBoard->setPiece({6, 1}, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black)); // g7
-	mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
+	mBoard.setSide(Side::Black);
+	mBoard.updateOccupancies();
 
-	// Check for checkmate
-	bool isBlackInCheckmate = mValidation->isCheckmate(PlayerColor::Black);
-
-	// Verify: Black king is in checkmate
-	EXPECT_TRUE(isBlackInCheckmate) << "Simple back rank mate should be detected as checkmate";
+	EXPECT_TRUE(mValidation.isCheckmate()) << "Back rank mate should be detected as checkmate";
 }
 
 
 TEST_F(MoveValidationTest, DetectsStalemate)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Setup common stalemate position
-	Position blackKingPos  = {7, 0}; // h8
-	Position whiteQueenPos = {6, 2}; // g6
+	// Classic stalemate: black king at h8, white queen at g6
+	mBoard.addPiece(PieceType::BKing, Square::h8);
+	mBoard.addPiece(PieceType::WQueen, Square::g6);
+	mBoard.addPiece(PieceType::WKing, Square::f6);
 
-	mBoard->setPiece(blackKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::Black));
-	mBoard->setPiece(whiteQueenPos, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White));
-	mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
+	mBoard.setSide(Side::Black);
+	mBoard.updateOccupancies();
 
-	// Check for stalemate
-	bool isStalemateForBlack = mValidation->isStalemate(PlayerColor::Black);
-
-	// Verify : Black is in stalemate
-	EXPECT_TRUE(isStalemateForBlack) << "Position should be detected as stalemate - king has no legal moves but is not in check";
+	EXPECT_TRUE(mValidation.isStalemate()) << "Position should be detected as stalemate";
 }
 
 
-TEST_F(MoveValidationTest, DetectsPinnedPiece)
+TEST_F(MoveValidationTest, NotStalemateWhenInCheck)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Setup white king at e1, white bishop at d2, black rook at c3
-	// -> bishop is pinned to the king
+	// Black king at h8, white queen at h6 (in check, not stalemate)
+	mBoard.addPiece(PieceType::BKing, Square::h8);
+	mBoard.addPiece(PieceType::WQueen, Square::h6);
+	mBoard.addPiece(PieceType::WKing, Square::f6);
 
-	Position whiteKingPos	= {4, 7}; // e1
-	Position whiteBishopPos = {3, 6}; // d2
-	Position blackRookPos	= {2, 5}; // c3
+	mBoard.setSide(Side::Black);
+	mBoard.updateOccupancies();
 
-	mBoard->setPiece(whiteKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
-	mBoard->setPiece(whiteBishopPos, ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::White));
-	mBoard->setPiece(blackRookPos, ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::Black));
-	mBoard->updateKingsPosition(whiteKingPos, PlayerColor::White);
-
-	// Setup moves
-
-	Move illegalMove(whiteBishopPos, {1, 4}, PieceType::Bishop); // Illegal move that put the bishop off the pin line
-	Move legalMove(whiteBishopPos, {4, 5}, PieceType::Bishop);	 // Move along the pin line
-
-	bool canMoveOutOfPin = mValidation->validateMove(illegalMove, PlayerColor::White);
-	bool canMoveAlongPin = mValidation->validateMove(legalMove, PlayerColor::White);
-
-	// Verify: Validation detects pinned piece
-	EXPECT_FALSE(canMoveOutOfPin) << "Pinned bishop should not be allowed to move out of the pin line";
-	EXPECT_TRUE(canMoveAlongPin) << "Pinned bishop should be allowed to move along the pin line";
+	EXPECT_FALSE(mValidation.isStalemate()) << "Should not be stalemate when in check";
+	EXPECT_TRUE(mValidation.isInCheck()) << "Should be in check";
 }
 
 
-TEST_F(MoveValidationTest, DetectsMoveIntoCheck)
+TEST_F(MoveValidationTest, PinnedPieceCannotMoveOffPinLine)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Setup: White king at e1, black rook at e8
-	Position kingPos = {4, 7}; // e1
-	Position rookPos = {4, 0}; // e8
+	// White king at e1, white bishop at d2, black rook at c3
+	// Bishop is pinned to the king
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WBishop, Square::d2);
+	mBoard.addPiece(PieceType::BRook, Square::c3);
+	mBoard.addPiece(PieceType::BKing, Square::h8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
 
-	mBoard->setPiece(kingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
-	mBoard->setPiece(rookPos, ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::Black));
-	mBoard->updateKingsPosition(kingPos, PlayerColor::White);
+	// Illegal move that moves bishop off the pin line
+	Move illegalMove(Square::d2, Square::b4, MoveFlag::Quiet);
 
-	// Setup moves
-	Move illegalMove(kingPos, {4, 6}, PieceType::King); // Try to move the king to e2, which would still be in check
-	Move legalMove(kingPos, {3, 7}, PieceType::King);	// Try to move the king to d1, which avoids check
+	EXPECT_FALSE(mValidation.isMoveLegal(illegalMove)) << "Pinned bishop should not be allowed to move off the pin line";
+}
 
-	bool kingCanMoveIntoCheck  = mValidation->validateMove(illegalMove, PlayerColor::White);
-	bool kingCanMoveOutOfCheck = mValidation->validateMove(legalMove, PlayerColor::White);
 
-	// Verify: Cannot move into check, but out of it
-	EXPECT_FALSE(kingCanMoveIntoCheck) << "King should not be allowed to move into check";
-	EXPECT_TRUE(kingCanMoveOutOfCheck) << "King should be allowed to move out of check";
+TEST_F(MoveValidationTest, PinnedPieceCanMoveAlongPinLine)
+{
+	mBoard.clear();
+
+	// White king at e1, white rook at e4, black rook at e8
+	// White rook is pinned but can move along the file
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WRook, Square::e4);
+	mBoard.addPiece(PieceType::BRook, Square::e8);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	// Legal move along the pin line
+	Move legalMove(Square::e4, Square::e5, MoveFlag::Quiet);
+
+	EXPECT_TRUE(mValidation.isMoveLegal(legalMove)) << "Pinned rook should be allowed to move along the pin line";
+}
+
+
+TEST_F(MoveValidationTest, KingCannotMoveIntoCheck)
+{
+	mBoard.clear();
+
+	// White king at e1, black rook at e8
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BRook, Square::e8);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	// Illegal: king moves to e2, still in check
+	Move illegalMove(Square::e1, Square::e2, MoveFlag::Quiet);
+
+	// Legal: king moves to d1, escapes check
+	Move legalMove(Square::e1, Square::d1, MoveFlag::Quiet);
+
+	EXPECT_FALSE(mValidation.isMoveLegal(illegalMove)) << "King should not be allowed to move into check";
+	EXPECT_TRUE(mValidation.isMoveLegal(legalMove)) << "King should be allowed to escape check";
+}
+
+
+TEST_F(MoveValidationTest, MustBlockOrCaptureWhenInCheck)
+{
+	mBoard.clear();
+
+	// White king at e1 in check from black rook at e8
+	// White bishop at d3 can block on e4
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WBishop, Square::d3);
+	mBoard.addPiece(PieceType::BRook, Square::e8);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	// Legal: bishop blocks at e4
+	Move blockMove(Square::d3, Square::e4, MoveFlag::Quiet);
+
+	// Illegal: bishop moves somewhere that doesn't address the check
+	Move illegalMove(Square::d3, Square::c2, MoveFlag::Quiet);
+
+	EXPECT_TRUE(mValidation.isMoveLegal(blockMove)) << "Bishop should be able to block the check";
+	EXPECT_FALSE(mValidation.isMoveLegal(illegalMove)) << "Must address check, cannot make unrelated move";
 }
 
 
 TEST_F(MoveValidationTest, CanCaptureCheckingPiece)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Setup: White king at e1, white bishop at d3, black rook at e8 (checking the king)
-	Position kingPos   = {4, 7}; // e1
-	Position bishopPos = {3, 5}; // d3
-	Position rookPos   = {4, 0}; // e8
+	// White king at e1, white knight at d3, black rook at e3 checking
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WKnight, Square::d5);
+	mBoard.addPiece(PieceType::BRook, Square::e3);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
 
-	mBoard->setPiece(kingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
-	mBoard->setPiece(bishopPos, ChessPiece::CreatePiece(PieceType::Bishop, PlayerColor::White));
-	mBoard->setPiece(rookPos, ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::Black));
-	mBoard->updateKingsPosition(kingPos, PlayerColor::White);
+	// Knight can capture the checking rook
+	Move captureMove(Square::d5, Square::e3, MoveFlag::Capture);
 
-	// Setup moves
-
-	// Try to capture the checking rook with the bishop
-	Move captureMoveByBishop(bishopPos, rookPos, PieceType::Bishop);
-	captureMoveByBishop.type		  = MoveType::Capture;
-	captureMoveByBishop.capturedPiece = PieceType::Rook;
-
-	// Try to block the check with the bishop
-	Move blockMove(bishopPos, {4, 4}, PieceType::Bishop); // f2 to e4
-
-	// Check for capturing checking pieces
-	bool isCaptureMoveValid	 = mValidation->validateMove(captureMoveByBishop, PlayerColor::White);
-	bool isBlockingMoveValid = mValidation->validateMove(blockMove, PlayerColor::White);
-
-	// Verify: Can capture checking piece
-	EXPECT_FALSE(isCaptureMoveValid) << "Bishop shouldn't be able to teleport to capture the rook";
-	EXPECT_TRUE(isBlockingMoveValid) << "Bishop should be able to block the check";
+	EXPECT_TRUE(mValidation.isMoveLegal(captureMove)) << "Knight should be able to capture the checking rook";
 }
 
-TEST_F(MoveValidationTest, CannotLeaveKingInCheck)
+
+TEST_F(MoveValidationTest, GenerateLegalMovesFiltersIllegal)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Setup white king at e1, white queen at d1, black rook 14 e8 (checking the king)
-	Position whiteKingPos  = {4, 7}; // e1
-	Position whiteQueenPos = {3, 7}; // d1
-	Position blackRookPos  = {4, 0}; // e8
+	// Position where king is in check
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WPawn, Square::a2);
+	mBoard.addPiece(PieceType::BRook, Square::e8);
+	mBoard.addPiece(PieceType::BKing, Square::h8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
 
-	mBoard->setPiece(whiteKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
-	mBoard->setPiece(whiteQueenPos, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White));
-	mBoard->setPiece(blackRookPos, ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::Black));
-	mBoard->updateKingsPosition(whiteKingPos, PlayerColor::White);
+	MoveList legalMoves;
+	mValidation.generateLegalMoves(legalMoves);
 
-	// Setup move for the queen, leaving king in check
-	Move moveQueenAway(whiteQueenPos, {3, 0}, PieceType::Queen); // d1->d8
+	// All moves should be legal (escape check)
+	for (size_t i = 0; i < legalMoves.size(); ++i)
+	{
+		EXPECT_TRUE(mValidation.isMoveLegal(legalMoves[i])) << "All generated moves should be legal";
+	}
 
-	bool isMoveValid = mValidation->validateMove(moveQueenAway, PlayerColor::White);
+	// Pawn move should not be in the list (doesn't address check)
+	bool hasPawnMove = false;
+	for (size_t i = 0; i < legalMoves.size(); ++i)
+	{
+		if (legalMoves[i].from() == Square::a2)
+		{
+			hasPawnMove = true;
+			break;
+		}
+	}
 
-	// Verify: Move is invalid since king would be in check afterwards
-	EXPECT_FALSE(isMoveValid) << "Queen should not be alowed to move away, leaving king in check";
+	EXPECT_FALSE(hasPawnMove) << "Pawn move should not be legal when king is in check";
 }
 
 
-TEST_F(MoveValidationTest, BlockingCheckmatePreventsCheckmate)
+TEST_F(MoveValidationTest, CountLegalMovesReturnsCorrectCount)
 {
-	mBoard->removeAllPiecesFromBoard();
+	size_t count = mValidation.countLegalMoves();
 
-	// Setup black king at h8, black rook at h7, white queen at g7 (near checkmate)
-	Position blackKingPos  = {7, 0}; // h8
-	Position blackRookPos  = {7, 1}; // h7
-	Position whiteQueenPos = {6, 1}; // g7
-
-	mBoard->setPiece(blackKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::Black));
-	mBoard->setPiece(blackRookPos, ChessPiece::CreatePiece(PieceType::Rook, PlayerColor::Black));
-	mBoard->setPiece(whiteQueenPos, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White));
-	mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
-
-	// Check for checkmate
-	bool isCheckmate = mValidation->isCheckmate(PlayerColor::Black);
-
-	// Verify: No checkmate, since it can be blocked by the rook
-	EXPECT_FALSE(isCheckmate) << "Position should not be checkmate, because rook can block";
+	// Initial position has 20 legal moves
+	EXPECT_EQ(count, 20) << "Initial position should have 20 legal moves";
 }
+
+
+TEST_F(MoveValidationTest, BlockingPreventsCheckmate)
+{
+	mBoard.clear();
+
+	// Black king at h8, black rook at h7, white queen at g7
+	// Not checkmate because rook can block
+	mBoard.addPiece(PieceType::BKing, Square::h8);
+	mBoard.addPiece(PieceType::BRook, Square::f7);
+	mBoard.addPiece(PieceType::WQueen, Square::g7);
+	mBoard.addPiece(PieceType::WKing, Square::a1);
+	mBoard.setSide(Side::Black);
+	mBoard.updateOccupancies();
+
+	EXPECT_FALSE(mValidation.isCheckmate()) << "Not checkmate when rook can block";
+}
+
+
+TEST_F(MoveValidationTest, InsufficientMaterialDraw)
+{
+	mBoard.clear();
+
+	// King vs King is a draw
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	EXPECT_TRUE(mValidation.isDraw()) << "King vs King should be a draw";
+}
+
+
+TEST_F(MoveValidationTest, KingAndBishopVsKingIsDraw)
+{
+	mBoard.clear();
+
+	// King + Bishop vs King is a draw
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WBishop, Square::c1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	EXPECT_TRUE(mValidation.isDraw()) << "King + Bishop vs King should be a draw";
+}
+
+
+TEST_F(MoveValidationTest, KingAndKnightVsKingIsDraw)
+{
+	mBoard.clear();
+
+	// King + Knight vs King is a draw
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WKnight, Square::b1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	EXPECT_TRUE(mValidation.isDraw()) << "King + Knight vs King should be a draw";
+}
+
 
 } // namespace MoveTests
