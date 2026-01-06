@@ -231,7 +231,7 @@ Side GameEngine::getWinner() const
 
 uint64_t GameEngine::getHash()
 {
-	return 0;
+	return mChessBoard.getHash();
 }
 
 
