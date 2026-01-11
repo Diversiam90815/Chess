@@ -54,6 +54,7 @@ set(GAMEENGINE_FILES
 )
 
 set(GAMECONTROLLER_FILES
+	${GAME_CONTROLLER_DIR}/GameConfiguration.h
 	${GAME_CONTROLLER_DIR}/IGameController.h
 	${GAME_CONTROLLER_DIR}/GameController.h		${GAME_CONTROLLER_DIR}/GameController.cpp
 )

@@ -28,6 +28,17 @@ enum class EndGameState
 };
 
 
+/**
+ * @brief	Representation of CPU difficulty levels
+ */
+enum class CPUDifficulty
+{
+	Easy   = 1,
+	Medium = 2,
+	Hard   = 3
+};
+
+
 /// <summary>
 /// Represents the various states of a game used in the StateMachine.
 /// </summary>
@@ -58,29 +69,6 @@ enum class SettingsType
 	AudioAtmosScenario,
 	AudioMasterVolume,
 	DiscoveryUDPPort,
-};
-
-
-/// <summary>
-/// Enumerates the available game mode selections.
-/// </summary>
-enum class GameModeSelection
-{
-	None		= 0,
-	LocalCoop	= 1,
-	VsCPU		= 2,
-	Multiplayer = 3
-};
-
-
-/// <summary>
-/// Represents the configuration settings for a game session.
-/// </summary>
-struct GameConfiguration
-{
-	GameModeSelection mode;
-	Side			  localPlayer;
-	int				  difficulty;
 };
 
 

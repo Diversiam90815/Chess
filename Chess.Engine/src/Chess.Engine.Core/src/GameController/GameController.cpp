@@ -18,25 +18,45 @@ bool GameController::initializeGame(GameConfiguration config)
 	mEngine.init();
 	mEngine.resetGame();
 
-	// Set local player based on config
-	if (config.mode == GameModeSelection::VsCPU)
+	switch (config.mode)
 	{
-		mLocalPlayer			  = config.localPlayer;
-		Side			 cpuColor = mConfig.localPlayer == Side::White ? Side::Black : Side::White;
+	case GameModeSelection::LocalCoop:
+	{
+		mLocalPlayer = Side::White;
+		LOG_INFO("Game initialized: Local coop mode!");
+		break;
+	}
+	case GameModeSelection::SinglePlayer:
+	{
+		const SinglePlayerConfig &spConfig = config.getSinglePlayer();
+		mLocalPlayer					   = spConfig.humanPlayerColor;
+		Side			 cpuColor		   = (spConfig.humanPlayerColor == Side::White) ? Side::Black : Side::White;
 
 		CPUConfiguration cpuConfig;
-		cpuConfig.difficulty		  = static_cast<CPUDifficulty>(mConfig.difficulty);
+		cpuConfig.difficulty		  = spConfig.aiDifficulty;
 		cpuConfig.enabled			  = true;
 		cpuConfig.cpuColor			  = cpuColor;
 		cpuConfig.enableRandomization = true;
+
+		mCPUPlayer.configure(cpuConfig);
+		mEngine.setLocalPlayer(spConfig.humanPlayerColor);
+
+		LOG_INFO("Game initialized: Single Player mode (Human: {}, CPU: {}, Difficulty: {})", LoggingHelper::sideToString(spConfig.humanPlayerColor),
+				 LoggingHelper::sideToString(cpuColor), LoggingHelper::cpuDifficultyToString(spConfig.aiDifficulty));
+
+		break;
 	}
-	else if (config.mode == GameModeSelection::Multiplayer)
+	case GameModeSelection::Multiplayer:
 	{
 		// TODO: Init Multiplayer Game
+		const MultiplayerConfig &mpConfig = config.getMultiplayer();
+		mLocalPlayer					  = mpConfig.localPlayerColor;
+		mEngine.setLocalPlayer(mpConfig.localPlayerColor);
+
+		LOG_INFO("Game initialized: Multiplayer mode (Local player: {})", LoggingHelper::sideToString(mpConfig.localPlayerColor));
+
+		break;
 	}
-	else
-	{
-		mLocalPlayer = Side::White; // Default for local coop
 	}
 
 	invalidateCache();

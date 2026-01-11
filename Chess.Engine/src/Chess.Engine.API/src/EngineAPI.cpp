@@ -41,6 +41,25 @@ static char *StringToCharPtr(std::string string)
 	return charPtr;
 }
 
+static GameConfiguration ConvertCConfig(CGameConfiguration cConfig)
+{
+	GameModeSelection mode		 = static_cast<GameModeSelection>(cConfig.mode);
+	Side			  playerSide = static_cast<Side>(cConfig.playerColor);
+	CPUDifficulty	  difficulty = static_cast<CPUDifficulty>(cConfig.cpuDifficulty);
+
+	switch (mode)
+	{
+	case GameModeSelection::LocalCoop: return GameConfiguration::createLocalCoop();
+	case GameModeSelection::SinglePlayer: return GameConfiguration::createSinglePlayer(playerSide, difficulty);
+	case GameModeSelection::Multiplayer: return GameConfiguration::createMultiplayer(playerSide);
+	default: LOG_ERROR("Invalid game mode received from C API: {}", cConfig.mode); break;
+	}
+
+	// fallback: local coop
+	return GameConfiguration::createLocalCoop();
+}
+
+
 
 //=============================================
 //			Core Engine Lifecycle
@@ -71,7 +90,8 @@ Engine_API void SetDelegate(PFN_CALLBACK pDelegate)
 
 Engine_API void StartGame(CGameConfiguration config)
 {
-	GameManager::GetInstance()->startGame(config);
+	GameConfiguration cppConfig = ConvertCConfig(config);
+	GameManager::GetInstance()->startGame(cppConfig);
 }
 
 

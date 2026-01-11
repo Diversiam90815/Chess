@@ -22,6 +22,7 @@ class LoggingHelper
 public:
 	static std::string gameStateToString(GameState state);
 	static std::string boolToString(const bool value);
-	static std::string connectionStateToString(const ConnectionState &state);
+	static std::string connectionStateToString(const ConnectionState state);
 	static std::string sideToString(const Side side);
+	static std::string cpuDifficultyToString(const CPUDifficulty diff);
 };

@@ -10,6 +10,7 @@
 #include "IGameController.h"
 #include "GameEngine.h"
 #include "CPUPlayer.h"
+#include "GameConfiguration.h"
 
 
 class GameController : public IGameController

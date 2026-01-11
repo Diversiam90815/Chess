@@ -30,7 +30,7 @@ std::string LoggingHelper::boolToString(const bool value)
 }
 
 
-std::string LoggingHelper::connectionStateToString(const ConnectionState &state)
+std::string LoggingHelper::connectionStateToString(const ConnectionState state)
 {
 	switch (state)
 	{
@@ -59,5 +59,17 @@ std::string LoggingHelper::sideToString(const Side side)
 	case Side::Black: return "Black";
 	case Side::Both: return "Both";
 	default: return "Unknown Side";
+	}
+}
+
+
+std::string LoggingHelper::cpuDifficultyToString(const CPUDifficulty diff)
+{
+	switch (diff)
+	{
+	case CPUDifficulty::Easy: return "Easy";
+	case CPUDifficulty::Medium: return "Medium";
+	case CPUDifficulty::Hard: return "Hard";
+	default: return "Unknown Difficulty";
 	}
 }

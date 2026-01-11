@@ -81,15 +81,14 @@ extern "C"
 
 
 	/**
-	 * @brief	Game configuration
+	 * @brief	Game configuration for C API
+	 *			Simplified flat structure for C#/C interop
 	 */
 	typedef struct
 	{
-		int	 gameMode;		// 1 = SinglePlayer, 2 = Multiplayer, 3 = CPU
-		int	 cpuDifficulty; // 0 = Easy, 1 = Medium, 2 = Hard
-		int	 cpuSide;		// 0 = White, 1 = Black
-		bool cpuEnabled;
-		bool multiplayerMode;
+		int mode;		   // GameModeSelection: 1=LocalCoop, 2=SinglePlayer, 3=Multiplayer
+		int playerColor;   // Side: 0=White, 1=Black (used for SinglePlayer/Multiplayer)
+		int cpuDifficulty; // CPUDifficulty: 1=Easy, 2=Medium, 3=Hard (only for SinglePlayer)
 	} CGameConfiguration;
 
 

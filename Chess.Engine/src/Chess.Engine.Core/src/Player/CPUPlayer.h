@@ -17,17 +17,6 @@
 
 
 /**
- * @brief	Representation of CPU difficulty levels
- */
-enum class CPUDifficulty
-{
-	Easy   = 1,
-	Medium = 2,
-	Hard   = 3
-};
-
-
-/**
  * @brief	Transposition table entry for search optimization.
  */
 struct TranspositionEntry
