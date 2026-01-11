@@ -27,8 +27,8 @@ class MockIntegrationObserver : public IConnectionStatusObserver, public IDiscov
 {
 public:
 	MOCK_METHOD(void, onConnectionStateChanged, (const ConnectionStatusEvent event), (override));
-	MOCK_METHOD(void, onLocalPlayerChosen, (const PlayerColor localPlayer), (override));
-	MOCK_METHOD(void, onRemotePlayerChosen, (PlayerColor remotePlayer), (override));
+	MOCK_METHOD(void, onLocalPlayerChosen, (const Side localPlayer), (override));
+	MOCK_METHOD(void, onRemotePlayerChosen, (Side remotePlayer), (override));
 	MOCK_METHOD(void, onLocalReadyFlagSet, (const bool flag), (override));
 	MOCK_METHOD(void, onRemoteFound, (const Endpoint &remote), (override));
 };
@@ -115,7 +115,7 @@ TEST_F(MultiplayerIntegrationTests, MultiplayerManagerLifecycle)
 	EXPECT_TRUE(hostResult) << "Hosting session should succeed";
 
 	// Set local player and ready state
-	hostManager->localPlayerChosen(PlayerColor::White);
+	hostManager->localPlayerChosen(Side::White);
 	hostManager->localReadyFlagSet(true);
 
 	// Simulate some operations
@@ -189,11 +189,11 @@ TEST_F(MultiplayerIntegrationTests, PlayerReadyStateFlow)
 	hostManager->attachObserver(mockObserver);
 
 	// Test the ready state flow
-	EXPECT_CALL(*mockObserver, onLocalPlayerChosen(PlayerColor::White)).Times(1);
+	EXPECT_CALL(*mockObserver, onLocalPlayerChosen(Side::White)).Times(1);
 	EXPECT_CALL(*mockObserver, onLocalReadyFlagSet(true)).Times(1);
 
 	// Simulate game setup flow
-	hostManager->localPlayerChosen(PlayerColor::White);
+	hostManager->localPlayerChosen(Side::White);
 	hostManager->localReadyFlagSet(true);
 
 	// Test ready state checking
@@ -215,9 +215,9 @@ TEST_F(MultiplayerIntegrationTests, RemotePlayerChosenFlow)
 	hostManager->attachObserver(mockObserver);
 
 	// When remote chooses White, local should become Black
-	EXPECT_CALL(*mockObserver, onRemotePlayerChosen(PlayerColor::Black)).Times(1);
+	EXPECT_CALL(*mockObserver, onRemotePlayerChosen(Side::Black)).Times(1);
 
-	hostManager->onRemotePlayerChosenReceived(PlayerColor::White);
+	hostManager->onRemotePlayerChosenReceived(Side::White);
 }
 
 
@@ -315,7 +315,7 @@ TEST_F(MultiplayerIntegrationTests, ConcurrentOperations)
 		{
 			for (int i = 0; i < 5; ++i)
 			{
-				hostManager->localPlayerChosen(i % 2 == 0 ? PlayerColor::White : PlayerColor::Black);
+				hostManager->localPlayerChosen(i % 2 == 0 ? Side::White : Side::Black);
 				std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			}
 		});
