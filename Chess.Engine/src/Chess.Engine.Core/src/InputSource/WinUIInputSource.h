@@ -112,6 +112,9 @@ private:
 
 	CConnectionEvent   convertToCStyleConnectionStateEvent(const ConnectionStatusEvent state);
 
+	UIGamePhase		   mapToUIPhase(GameState state);
+
+
 	PFN_CALLBACK	   mDelegate = nullptr;
 	mutable std::mutex mDelegateMutex;
 };

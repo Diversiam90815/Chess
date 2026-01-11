@@ -70,7 +70,9 @@ void WinUIInputSource::onPromotionRequired()
 
 void WinUIInputSource::onGameStateChanged(GameState state)
 {
-	sendToUI(MessageType::GameStateChanged, &state);
+	UIGamePhase uiPhase = mapToUIPhase(state);
+
+	sendToUI(MessageType::GameStateChanged, &uiPhase);
 }
 
 
@@ -138,4 +140,25 @@ CConnectionEvent WinUIInputSource::convertToCStyleConnectionStateEvent(const Con
 	}
 
 	return c_style_state;
+}
+
+
+UIGamePhase WinUIInputSource::mapToUIPhase(GameState state)
+{
+	switch (state)
+	{
+	case GameState::Init: return UIGamePhase::Initializing;
+
+	case GameState::WaitingForInput:
+	case GameState::WaitingForTarget: return UIGamePhase::PlayerTurn;
+
+	case GameState::WaitingForRemoteMove:
+	case GameState::WaitingForCPUMove: return UIGamePhase::OpponentTurn;
+
+	case GameState::PawnPromotion: return UIGamePhase::PromotionDialog;
+
+	case GameState::GameOver: return UIGamePhase::GameEnded;
+
+	default: return UIGamePhase::Initializing;
+	}
 }

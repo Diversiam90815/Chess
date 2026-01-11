@@ -66,6 +66,19 @@ extern "C"
 
 	} NetworkAdapterInstance;
 
+	
+	/**
+	 * @brief	Game Phases for UI
+	 */
+	enum UIGamePhase
+	{
+		Initializing	= 0,
+		PlayerTurn		= 1,
+		OpponentTurn	= 2,
+		PromotionDialog = 3,
+		GameEnded		= 4,
+	};
+
 
 	/**
 	 * @brief	Game configuration
