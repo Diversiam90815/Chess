@@ -23,17 +23,16 @@
 enum class MessageType
 {
 	EndGameState			= 1,
-	PlayerScoreUpdated		= 2,
-	PlayerCapturedPiece		= 3,
-	PlayerChanged			= 4,
-	GameStateChanged		= 5,
-	MoveHistoryUpdated		= 6,
-	MoveExecuted			= 7,
-	ConnectionStateChanged	= 8,
-	MultiplayerPlayerChosen = 9,
-	BoardStateChanged		= 10,
-	PawnPromotion			= 11,
-	PossibleMovesCalculated = 12,
+	PlayerCapturedPiece		= 2,
+	PlayerChanged			= 3,
+	GameStateChanged		= 4,
+	MoveHistoryUpdated		= 5,
+	MoveExecuted			= 6,
+	ConnectionStateChanged	= 7,
+	MultiplayerPlayerChosen = 8,
+	BoardStateChanged		= 9,
+	PawnPromotion			= 10,
+	PossibleMovesCalculated = 11,
 };
 
 
@@ -95,7 +94,6 @@ public:
 	// IPlayerObserver (scores, captured pieces)
 	//=========================================================================
 
-	void onScoreUpdate(Side player, int value) override;
 	void onAddCapturedPiece(Side player, PieceType captured) override;
 	void onRemoveLastCapturedPiece(Side player, PieceType captured) override;
 

@@ -6,12 +6,21 @@
 */
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include "Player/Player.h"
+#include "IObserver.h"
 
 
 namespace PlayerTests
 {
+
+class MockPlayerObserver : public IPlayerObserver
+{
+public:
+	MOCK_METHOD(void, onAddCapturedPiece, (Side player, PieceType piece), (override));
+	MOCK_METHOD(void, onRemoveLastCapturedPiece, (Side player, PieceType piece), (override));
+};
 
 
 class PlayerTests : public ::testing::Test
@@ -19,263 +28,228 @@ class PlayerTests : public ::testing::Test
 protected:
 	void SetUp() override
 	{
-		mWhitePlayer = std::make_unique<Player>(PlayerColor::White);
-		mBlackPlayer = std::make_unique<Player>(PlayerColor::Black);
+		mWhitePlayer  = std::make_unique<Player>(Side::White);
+		mBlackPlayer  = std::make_unique<Player>(Side::Black);
+		mMockObserver = std::make_shared<MockPlayerObserver>();
 	}
 
-	std::unique_ptr<Player> mWhitePlayer;
-	std::unique_ptr<Player> mBlackPlayer;
+	std::unique_ptr<Player>				mWhitePlayer;
+	std::unique_ptr<Player>				mBlackPlayer;
+	std::shared_ptr<MockPlayerObserver> mMockObserver;
 };
 
+
+//=============================================================================
+// CONSTRUCTOR TESTS
+//=============================================================================
 
 TEST_F(PlayerTests, DefaultConstructor)
 {
 	Player player;
 
-	EXPECT_EQ(player.getPlayerColor(), PlayerColor::NoColor) << "Default player should have no color";
-	EXPECT_EQ(player.getScore().getValue(), 0) << "Default player should have score of 0";
+	EXPECT_EQ(player.getPlayerColor(), Side::None) << "Default player should have no color";
 	EXPECT_TRUE(player.isLocalPlayer()) << "Default player should be local player";
 }
 
 
 TEST_F(PlayerTests, ParameterizedConstructor)
 {
-	EXPECT_EQ(mWhitePlayer->getPlayerColor(), PlayerColor::White) << "White player should have white color";
-	EXPECT_EQ(mBlackPlayer->getPlayerColor(), PlayerColor::Black) << "Black player should have black color";
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), 0) << "New white player should have score of 0";
-	EXPECT_EQ(mBlackPlayer->getScore().getValue(), 0) << "New black player should have score of 0";
+	EXPECT_EQ(mWhitePlayer->getPlayerColor(), Side::White) << "White player should have white color";
+	EXPECT_EQ(mBlackPlayer->getPlayerColor(), Side::Black) << "Black player should have black color";
 	EXPECT_TRUE(mWhitePlayer->isLocalPlayer()) << "New player should be local by default";
+	EXPECT_TRUE(mBlackPlayer->isLocalPlayer()) << "New player should be local by default";
 }
 
 
-
-// =============================================================================
-// SCORE MANAGEMENT TESTS
-// =============================================================================
-
-
-TEST_F(PlayerTests, ScoreInitialization)
-{
-	Score whiteScore = mWhitePlayer->getScore();
-	Score blackScore = mBlackPlayer->getScore();
-
-	EXPECT_EQ(whiteScore.getPlayerColor(), PlayerColor::White) << "White player score should have white color";
-	EXPECT_EQ(blackScore.getPlayerColor(), PlayerColor::Black) << "Black player score should have black color";
-	EXPECT_EQ(whiteScore.getValue(), 0) << "Initial white score should be 0";
-	EXPECT_EQ(blackScore.getValue(), 0) << "Initial black score should be 0";
-}
-
-
-TEST_F(PlayerTests, SetScore)
-{
-	mWhitePlayer->setScore(150);
-	mBlackPlayer->setScore(200);
-
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), 150) << "White player score should be set to 150";
-	EXPECT_EQ(mBlackPlayer->getScore().getValue(), 200) << "Black player score should be set to 200";
-}
-
-
-TEST_F(PlayerTests, ScoreAfterCaptures)
-{
-	// Add captured pieces and verify score updates
-	mWhitePlayer->addCapturedPiece(PieceType::Pawn);   // +100
-	mWhitePlayer->addCapturedPiece(PieceType::Knight); // +320
-	mWhitePlayer->addCapturedPiece(PieceType::Queen);  // +900
-
-	// Score should automatically update when pieces are captured
-	int expectedScore = mWhitePlayer->getPieceValue(PieceType::Pawn) + mWhitePlayer->getPieceValue(PieceType::Knight) + mWhitePlayer->getPieceValue(PieceType::Queen);
-
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), expectedScore) << "Score should reflect captured pieces value";
-}
-
-
-
-// =============================================================================
+//=============================================================================
 // PLAYER COLOR TESTS
-// =============================================================================
-
+//=============================================================================
 
 TEST_F(PlayerTests, GetPlayerColor)
 {
-	EXPECT_EQ(mWhitePlayer->getPlayerColor(), PlayerColor::White) << "White player should return White color";
-	EXPECT_EQ(mBlackPlayer->getPlayerColor(), PlayerColor::Black) << "Black player should return Black color";
+	EXPECT_EQ(mWhitePlayer->getPlayerColor(), Side::White) << "White player should return White color";
+	EXPECT_EQ(mBlackPlayer->getPlayerColor(), Side::Black) << "Black player should return Black color";
 }
 
 
 TEST_F(PlayerTests, SetPlayerColor)
 {
 	Player player;
-	player.setPlayerColor(PlayerColor::White);
+	player.setPlayerColor(Side::White);
 
-	EXPECT_EQ(player.getPlayerColor(), PlayerColor::White) << "Player color should be set to White";
+	EXPECT_EQ(player.getPlayerColor(), Side::White) << "Player color should be set to White";
 
-	player.setPlayerColor(PlayerColor::Black);
-	EXPECT_EQ(player.getPlayerColor(), PlayerColor::Black) << "Player color should be changed to Black";
+	player.setPlayerColor(Side::Black);
+	EXPECT_EQ(player.getPlayerColor(), Side::Black) << "Player color should be changed to Black";
 }
 
 
-TEST_F(PlayerTests, PlayerColorAffectsScore)
+TEST_F(PlayerTests, SetPlayerColorToSameValue)
 {
-	Player player;
-	player.setScore(100);
-
-	EXPECT_EQ(player.getScore().getPlayerColor(), PlayerColor::NoColor) << "Score should have NoColor initially";
-
-	player.setPlayerColor(PlayerColor::White);
-	player.setScore(100); // Set score again to update color
-
-	EXPECT_EQ(player.getScore().getPlayerColor(), PlayerColor::White) << "Score should have White color after setting player color";
+	mWhitePlayer->setPlayerColor(Side::White);
+	EXPECT_EQ(mWhitePlayer->getPlayerColor(), Side::White) << "Setting same color should work";
 }
 
 
+TEST_F(PlayerTests, SetPlayerColorToNone)
+{
+	mWhitePlayer->setPlayerColor(Side::None);
+	EXPECT_EQ(mWhitePlayer->getPlayerColor(), Side::None) << "Player color can be set to None";
+}
 
-// =============================================================================
+
+//=============================================================================
 // CAPTURED PIECES TESTS
-// =============================================================================
-
+//=============================================================================
 
 TEST_F(PlayerTests, AddCapturedPiece)
 {
-	mWhitePlayer->addCapturedPiece(PieceType::Pawn);
-	mWhitePlayer->addCapturedPiece(PieceType::Knight);
-	mWhitePlayer->addCapturedPiece(PieceType::Pawn); // Add another pawn
+	mWhitePlayer->attachObserver(mMockObserver);
 
-	// Verify score reflects captured pieces
-	int expectedScore = 2 * mWhitePlayer->getPieceValue(PieceType::Pawn) + mWhitePlayer->getPieceValue(PieceType::Knight);
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BPawn)).Times(1);
 
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), expectedScore) << "Score should reflect all captured pieces";
+	mWhitePlayer->addCapturedPiece(PieceType::BPawn);
+}
+
+
+TEST_F(PlayerTests, AddMultipleCapturedPieces)
+{
+	mWhitePlayer->attachObserver(mMockObserver);
+
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BPawn)).Times(1);
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BKnight)).Times(1);
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BRook)).Times(1);
+
+	mWhitePlayer->addCapturedPiece(PieceType::BPawn);
+	mWhitePlayer->addCapturedPiece(PieceType::BKnight);
+	mWhitePlayer->addCapturedPiece(PieceType::BRook);
+}
+
+
+TEST_F(PlayerTests, AddCapturedPieceSameTypeMultipleTimes)
+{
+	mWhitePlayer->attachObserver(mMockObserver);
+
+	// Should notify each time, even for the same piece type
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BPawn)).Times(3);
+
+	mWhitePlayer->addCapturedPiece(PieceType::BPawn);
+	mWhitePlayer->addCapturedPiece(PieceType::BPawn);
+	mWhitePlayer->addCapturedPiece(PieceType::BPawn);
+}
+
+
+TEST_F(PlayerTests, AddCapturedPieceNotifiesAllObservers)
+{
+	auto observer2 = std::make_shared<MockPlayerObserver>();
+
+	mWhitePlayer->attachObserver(mMockObserver);
+	mWhitePlayer->attachObserver(observer2);
+
+	// Both observers should be notified
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BQueen)).Times(1);
+	EXPECT_CALL(*observer2, onAddCapturedPiece(Side::White, PieceType::BQueen)).Times(1);
+
+	mWhitePlayer->addCapturedPiece(PieceType::BQueen);
 }
 
 
 TEST_F(PlayerTests, RemoveLastCapturedPiece)
 {
-	// Add some pieces
-	mWhitePlayer->addCapturedPiece(PieceType::Pawn);
-	mWhitePlayer->addCapturedPiece(PieceType::Knight);
-	mWhitePlayer->addCapturedPiece(PieceType::Rook);
+	mWhitePlayer->attachObserver(mMockObserver);
 
-	int scoreAfterCaptures = mWhitePlayer->getScore().getValue();
+	// Add pieces
+	mWhitePlayer->addCapturedPiece(PieceType::BPawn);
+	mWhitePlayer->addCapturedPiece(PieceType::BKnight);
+	mWhitePlayer->addCapturedPiece(PieceType::BRook);
 
-	// Remove last captured piece (rook)
+	// Remove last piece (rook)
+	EXPECT_CALL(*mMockObserver, onRemoveLastCapturedPiece(Side::White, PieceType::BRook)).Times(1);
+
 	mWhitePlayer->removeLastCapturedPiece();
-
-	int expectedScore = mWhitePlayer->getPieceValue(PieceType::Pawn) + mWhitePlayer->getPieceValue(PieceType::Knight);
-
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), expectedScore) << "Score should be reduced by last captured piece value";
-	EXPECT_LT(mWhitePlayer->getScore().getValue(), scoreAfterCaptures) << "Score should be lower after removing piece";
 }
 
 
 TEST_F(PlayerTests, RemoveLastCapturedPieceFromEmpty)
 {
 	// Try to remove from empty captured pieces list
-	int initialScore = mWhitePlayer->getScore().getValue();
+	// Should log warning but not crash or notify observers
 
+	EXPECT_CALL(*mMockObserver, onRemoveLastCapturedPiece(::testing::_, ::testing::_)).Times(0);
+
+	mWhitePlayer->attachObserver(mMockObserver);
 	EXPECT_NO_THROW(mWhitePlayer->removeLastCapturedPiece()) << "Removing from empty list should not throw";
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), initialScore) << "Score should remain unchanged when removing from empty list";
 }
 
 
-
-// =============================================================================
-// SCORE UPDATE TESTS
-// =============================================================================
-
-
-TEST_F(PlayerTests, UpdateScore)
+TEST_F(PlayerTests, RemoveLastCapturedPieceSequence)
 {
-	// Add some captured pieces
-	mWhitePlayer->addCapturedPiece(PieceType::Pawn);
-	mWhitePlayer->addCapturedPiece(PieceType::Rook);
+	mWhitePlayer->attachObserver(mMockObserver);
 
-	int scoreBeforeUpdate = mWhitePlayer->getScore().getValue();
+	// Add pieces
+	mWhitePlayer->addCapturedPiece(PieceType::BPawn);
+	mWhitePlayer->addCapturedPiece(PieceType::BKnight);
+	mWhitePlayer->addCapturedPiece(PieceType::BRook);
 
-	// Call updateScore explicitly
-	mWhitePlayer->updateScore();
+	// Remove in reverse order
+	EXPECT_CALL(*mMockObserver, onRemoveLastCapturedPiece(Side::White, PieceType::BRook)).Times(1);
+	mWhitePlayer->removeLastCapturedPiece();
 
-	// Score should remain the same since it should already be up to date
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), scoreBeforeUpdate) << "Manual score update should maintain consistency";
+	EXPECT_CALL(*mMockObserver, onRemoveLastCapturedPiece(Side::White, PieceType::BKnight)).Times(1);
+	mWhitePlayer->removeLastCapturedPiece();
+
+	EXPECT_CALL(*mMockObserver, onRemoveLastCapturedPiece(Side::White, PieceType::BPawn)).Times(1);
+	mWhitePlayer->removeLastCapturedPiece();
 }
 
 
-TEST_F(PlayerTests, ScoreUpdateAfterMultipleCaptures)
+TEST_F(PlayerTests, RemoveLastCapturedPieceNotifiesAllObservers)
 {
-	// Simulate capturing all piece types
-	mWhitePlayer->addCapturedPiece(PieceType::Pawn);
-	mWhitePlayer->addCapturedPiece(PieceType::Pawn);
-	mWhitePlayer->addCapturedPiece(PieceType::Knight);
-	mWhitePlayer->addCapturedPiece(PieceType::Bishop);
-	mWhitePlayer->addCapturedPiece(PieceType::Rook);
-	mWhitePlayer->addCapturedPiece(PieceType::Queen);
+	auto observer2 = std::make_shared<MockPlayerObserver>();
 
-	int expectedScore = 2 * mWhitePlayer->getPieceValue(PieceType::Pawn) + mWhitePlayer->getPieceValue(PieceType::Knight) + mWhitePlayer->getPieceValue(PieceType::Bishop) +
-						mWhitePlayer->getPieceValue(PieceType::Rook) + mWhitePlayer->getPieceValue(PieceType::Queen);
+	mWhitePlayer->attachObserver(mMockObserver);
+	mWhitePlayer->attachObserver(observer2);
 
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), expectedScore) << "Score should correctly sum all captured pieces";
+	mWhitePlayer->addCapturedPiece(PieceType::BQueen);
+
+	// Both observers should be notified
+	EXPECT_CALL(*mMockObserver, onRemoveLastCapturedPiece(Side::White, PieceType::BQueen)).Times(1);
+	EXPECT_CALL(*observer2, onRemoveLastCapturedPiece(Side::White, PieceType::BQueen)).Times(1);
+
+	mWhitePlayer->removeLastCapturedPiece();
 }
 
 
-TEST_F(PlayerTests, UpdateScoreOnEmptyList)
-{
-	// Update score with no captured pieces
-	mWhitePlayer->updateScore();
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), 0) << "Score should be 0 when no pieces are captured";
-}
-
-
-
-// =============================================================================
+//=============================================================================
 // RESET FUNCTIONALITY TESTS
-// =============================================================================
-
+//=============================================================================
 
 TEST_F(PlayerTests, Reset)
 {
-	// Set up player with some captured pieces and score
-	mWhitePlayer->addCapturedPiece(PieceType::Queen);
-	mWhitePlayer->addCapturedPiece(PieceType::Rook);
-	mWhitePlayer->setScore(1500);
-
-	EXPECT_GT(mWhitePlayer->getScore().getValue(), 0) << "Player should have non-zero score before reset";
+	// Add some captured pieces
+	mWhitePlayer->addCapturedPiece(PieceType::BQueen);
+	mWhitePlayer->addCapturedPiece(PieceType::BRook);
+	mWhitePlayer->addCapturedPiece(PieceType::BKnight);
 
 	// Reset the player
 	mWhitePlayer->reset();
 
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), 0) << "Score should be 0 after reset";
-	// Note: We can't directly test if captured pieces are cleared without access to the vector,
-	// but the score being 0 indicates they were cleared
+	// Try to remove a piece - should fail since list is empty
+	mWhitePlayer->attachObserver(mMockObserver);
+	EXPECT_CALL(*mMockObserver, onRemoveLastCapturedPiece(::testing::_, ::testing::_)).Times(0);
+
+	EXPECT_NO_THROW(mWhitePlayer->removeLastCapturedPiece()) << "Should not crash when removing from empty list after reset";
 }
 
 
 TEST_F(PlayerTests, ResetPreservesPlayerColor)
 {
-	PlayerColor originalColor = mWhitePlayer->getPlayerColor();
+	Side originalColor = mWhitePlayer->getPlayerColor();
 
-	mWhitePlayer->addCapturedPiece(PieceType::Queen);
+	mWhitePlayer->addCapturedPiece(PieceType::BQueen);
 	mWhitePlayer->reset();
 
 	EXPECT_EQ(mWhitePlayer->getPlayerColor(), originalColor) << "Player color should be preserved after reset";
-}
-
-
-TEST_F(PlayerTests, ResetAfterMultipleOperations)
-{
-	// Perform multiple operations
-	mWhitePlayer->setPlayerColor(PlayerColor::Black);
-	mWhitePlayer->setIsLocalPlayer(false);
-	mWhitePlayer->addCapturedPiece(PieceType::Queen);
-	mWhitePlayer->addCapturedPiece(PieceType::Rook);
-	mWhitePlayer->addCapturedPiece(PieceType::Knight);
-	mWhitePlayer->setScore(2000); // Override calculated score
-
-	// Reset
-	mWhitePlayer->reset();
-
-	// Verify state
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), 0) << "Score should be 0";
-	EXPECT_EQ(mWhitePlayer->getPlayerColor(), PlayerColor::Black) << "Color should be preserved";
-	EXPECT_FALSE(mWhitePlayer->isLocalPlayer()) << "Local status should be preserved";
 }
 
 
@@ -284,18 +258,58 @@ TEST_F(PlayerTests, ResetPreservesLocalPlayerStatus)
 	mWhitePlayer->setIsLocalPlayer(false);
 	bool originalLocalStatus = mWhitePlayer->isLocalPlayer();
 
-	mWhitePlayer->addCapturedPiece(PieceType::Queen);
+	mWhitePlayer->addCapturedPiece(PieceType::BQueen);
 	mWhitePlayer->reset();
 
 	EXPECT_EQ(mWhitePlayer->isLocalPlayer(), originalLocalStatus) << "Local player status should be preserved after reset";
 }
 
 
+TEST_F(PlayerTests, ResetAfterMultipleOperations)
+{
+	// Perform multiple operations
+	mWhitePlayer->setPlayerColor(Side::Black);
+	mWhitePlayer->setIsLocalPlayer(false);
+	mWhitePlayer->addCapturedPiece(PieceType::BQueen);
+	mWhitePlayer->addCapturedPiece(PieceType::BRook);
+	mWhitePlayer->addCapturedPiece(PieceType::BKnight);
 
-// =============================================================================
+	// Reset
+	mWhitePlayer->reset();
+
+	// Verify state
+	EXPECT_EQ(mWhitePlayer->getPlayerColor(), Side::Black) << "Color should be preserved";
+	EXPECT_FALSE(mWhitePlayer->isLocalPlayer()) << "Local status should be preserved";
+
+	// Verify captured pieces are cleared
+	mWhitePlayer->attachObserver(mMockObserver);
+	EXPECT_CALL(*mMockObserver, onRemoveLastCapturedPiece(::testing::_, ::testing::_)).Times(0);
+	EXPECT_NO_THROW(mWhitePlayer->removeLastCapturedPiece());
+}
+
+
+TEST_F(PlayerTests, ResetMultipleTimes)
+{
+	// Reset multiple times should work
+	mWhitePlayer->addCapturedPiece(PieceType::BPawn);
+	mWhitePlayer->reset();
+
+	mWhitePlayer->addCapturedPiece(PieceType::BKnight);
+	mWhitePlayer->reset();
+
+	mWhitePlayer->addCapturedPiece(PieceType::BRook);
+	mWhitePlayer->reset();
+
+	// Should still work after multiple resets
+	mWhitePlayer->attachObserver(mMockObserver);
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BQueen)).Times(1);
+	mWhitePlayer->addCapturedPiece(PieceType::BQueen);
+}
+
+
+//=============================================================================
 // LOCAL PLAYER TESTS
-// =============================================================================
-
+//=============================================================================
 
 TEST_F(PlayerTests, IsLocalPlayerDefault)
 {
@@ -325,6 +339,9 @@ TEST_F(PlayerTests, SetIsLocalPlayerMultipleTimes)
 
 	mWhitePlayer->setIsLocalPlayer(true);
 	EXPECT_TRUE(mWhitePlayer->isLocalPlayer()) << "Should be local again";
+
+	mWhitePlayer->setIsLocalPlayer(true); // Set to same value
+	EXPECT_TRUE(mWhitePlayer->isLocalPlayer()) << "Should remain local";
 }
 
 
@@ -332,54 +349,142 @@ TEST_F(PlayerTests, LocalPlayerStatusIndependentOfOtherProperties)
 {
 	// Test that local player status is independent of other properties
 	mWhitePlayer->setIsLocalPlayer(false);
-	mWhitePlayer->addCapturedPiece(PieceType::Queen);
-	mWhitePlayer->setPlayerColor(PlayerColor::Black);
+	mWhitePlayer->addCapturedPiece(PieceType::BQueen);
+	mWhitePlayer->setPlayerColor(Side::Black);
 
 	EXPECT_FALSE(mWhitePlayer->isLocalPlayer()) << "Local status should be independent of other operations";
 }
 
 
-
-// =============================================================================
-// EDGE CASES AND ERROR CONDITIONS
-// =============================================================================
-
-
-TEST_F(PlayerTests, HandleDefaultPieceType)
+TEST_F(PlayerTests, LocalPlayerStatusForBothPlayers)
 {
-	// Test with DefaultType piece
-	int defaultValue = mWhitePlayer->getPieceValue(PieceType::DefaultType);
-	EXPECT_EQ(defaultValue, 0) << "DefaultType piece should have value 0";
+	// Test that both players can have different local status
+	mWhitePlayer->setIsLocalPlayer(true);
+	mBlackPlayer->setIsLocalPlayer(false);
 
-	mWhitePlayer->addCapturedPiece(PieceType::DefaultType);
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), 0) << "Score should remain 0 after capturing DefaultType piece";
+	EXPECT_TRUE(mWhitePlayer->isLocalPlayer()) << "White should be local";
+	EXPECT_FALSE(mBlackPlayer->isLocalPlayer()) << "Black should be remote";
+}
+
+
+//=============================================================================
+// OBSERVER PATTERN TESTS
+//=============================================================================
+
+TEST_F(PlayerTests, AttachObserver)
+{
+	mWhitePlayer->attachObserver(mMockObserver);
+
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BPawn)).Times(1);
+
+	mWhitePlayer->addCapturedPiece(PieceType::BPawn);
+}
+
+
+TEST_F(PlayerTests, DetachObserver)
+{
+	mWhitePlayer->attachObserver(mMockObserver);
+	mWhitePlayer->addCapturedPiece(PieceType::BPawn); // Should notify
+
+	mWhitePlayer->detachObserver(mMockObserver);
+
+	// Should not notify after detach
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(::testing::_, ::testing::_)).Times(0);
+
+	mWhitePlayer->addCapturedPiece(PieceType::BKnight);
+}
+
+
+TEST_F(PlayerTests, MultipleObservers)
+{
+	auto observer2 = std::make_shared<MockPlayerObserver>();
+	auto observer3 = std::make_shared<MockPlayerObserver>();
+
+	mWhitePlayer->attachObserver(mMockObserver);
+	mWhitePlayer->attachObserver(observer2);
+	mWhitePlayer->attachObserver(observer3);
+
+	// All should be notified
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BQueen)).Times(1);
+	EXPECT_CALL(*observer2, onAddCapturedPiece(Side::White, PieceType::BQueen)).Times(1);
+	EXPECT_CALL(*observer3, onAddCapturedPiece(Side::White, PieceType::BQueen)).Times(1);
+
+	mWhitePlayer->addCapturedPiece(PieceType::BQueen);
+}
+
+
+TEST_F(PlayerTests, WeakPtrObserverCleanup)
+{
+	{
+		auto tempObserver = std::make_shared<MockPlayerObserver>();
+		mWhitePlayer->attachObserver(tempObserver);
+
+		EXPECT_CALL(*tempObserver, onAddCapturedPiece(Side::White, PieceType::BPawn)).Times(1);
+		mWhitePlayer->addCapturedPiece(PieceType::BPawn);
+	} // tempObserver goes out of scope
+
+	// Should not crash even though observer was destroyed
+	EXPECT_NO_THROW(mWhitePlayer->addCapturedPiece(PieceType::BKnight));
+}
+
+
+//=============================================================================
+// EDGE CASES
+//=============================================================================
+
+TEST_F(PlayerTests, AddCapturedPieceNone)
+{
+	mWhitePlayer->attachObserver(mMockObserver);
+
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::None)).Times(1);
+
+	mWhitePlayer->addCapturedPiece(PieceType::None);
 }
 
 
 TEST_F(PlayerTests, LargeNumberOfCapturedPieces)
 {
 	// Test with many captured pieces
+	mWhitePlayer->attachObserver(mMockObserver);
+
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BPawn)).Times(100);
+
 	for (int i = 0; i < 100; ++i)
 	{
-		mWhitePlayer->addCapturedPiece(PieceType::Pawn);
+		mWhitePlayer->addCapturedPiece(PieceType::BPawn);
 	}
-
-	int expectedScore = 100 * mWhitePlayer->getPieceValue(PieceType::Pawn);
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), expectedScore) << "Should handle large number of captured pieces";
 }
 
 
-TEST_F(PlayerTests, ScoreWithMixedPositiveAndZeroValuePieces)
+TEST_F(PlayerTests, AddAndRemoveSequence)
 {
-	mWhitePlayer->addCapturedPiece(PieceType::Queen); // Positive value
-	mWhitePlayer->addCapturedPiece(PieceType::King);  // Zero value
-	mWhitePlayer->addCapturedPiece(PieceType::Rook);  // Positive value
+	mWhitePlayer->attachObserver(mMockObserver);
 
-	int expectedScore = mWhitePlayer->getPieceValue(PieceType::Queen) + mWhitePlayer->getPieceValue(PieceType::King) + mWhitePlayer->getPieceValue(PieceType::Rook);
+	// Add and remove sequence
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BPawn)).Times(1);
+	mWhitePlayer->addCapturedPiece(PieceType::BPawn);
 
-	EXPECT_EQ(mWhitePlayer->getScore().getValue(), expectedScore) << "Should correctly handle mix of valuable and zero-value pieces";
+	EXPECT_CALL(*mMockObserver, onRemoveLastCapturedPiece(Side::White, PieceType::BPawn)).Times(1);
+	mWhitePlayer->removeLastCapturedPiece();
+
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::White, PieceType::BKnight)).Times(1);
+	mWhitePlayer->addCapturedPiece(PieceType::BKnight);
+
+	EXPECT_CALL(*mMockObserver, onRemoveLastCapturedPiece(Side::White, PieceType::BKnight)).Times(1);
+	mWhitePlayer->removeLastCapturedPiece();
 }
 
+
+TEST_F(PlayerTests, BlackPlayerOperations)
+{
+	// Test that black player works the same way
+	mBlackPlayer->attachObserver(mMockObserver);
+
+	EXPECT_CALL(*mMockObserver, onAddCapturedPiece(Side::Black, PieceType::WPawn)).Times(1);
+	mBlackPlayer->addCapturedPiece(PieceType::WPawn);
+
+	EXPECT_CALL(*mMockObserver, onRemoveLastCapturedPiece(Side::Black, PieceType::WPawn)).Times(1);
+	mBlackPlayer->removeLastCapturedPiece();
+}
 
 } // namespace PlayerTests
-

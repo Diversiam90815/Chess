@@ -15,13 +15,6 @@ void WinUIInputSource::setDelegate(PFN_CALLBACK pDelegate)
 }
 
 
-void WinUIInputSource::onScoreUpdate(Side player, int value)
-{
-	Score score = Score(player, value);
-	sendToUI(MessageType::PlayerScoreUpdated, &score);
-}
-
-
 void WinUIInputSource::onAddCapturedPiece(Side player, PieceType captured)
 {
 	PlayerCapturedPieceEvent event{};

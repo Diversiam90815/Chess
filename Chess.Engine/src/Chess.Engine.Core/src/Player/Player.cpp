@@ -9,40 +9,20 @@
 #include "Player.h"
 
 
-Player::Player(Side color) : mPlayerColor(color)
-{
-	setScore(0);
-}
-
-
-Score Player::getScore() const
-{
-	return mScore;
-}
-
-
-void Player::setScore(int value)
-{
-	Score newScore = Score(this->getPlayerColor(), value);
-
-	if (mScore != newScore)
-	{
-		mScore = newScore;
-	}
-}
+Player::Player(Side color) : mSide(color) {}
 
 
 Side Player::getPlayerColor() const
 {
-	return mPlayerColor;
+	return mSide;
 }
 
 
 void Player::setPlayerColor(Side value)
 {
-	if (mPlayerColor != value)
+	if (mSide != value)
 	{
-		mPlayerColor = value;
+		mSide = value;
 	}
 }
 
@@ -50,7 +30,6 @@ void Player::setPlayerColor(Side value)
 void Player::addCapturedPiece(const PieceType piece)
 {
 	mCapturedPieces.push_back(piece);
-	updateScore();
 
 	for (auto &observer : mObservers)
 	{
@@ -75,8 +54,6 @@ void Player::removeLastCapturedPiece()
 	PieceType lastCapture = mCapturedPieces.back();
 	mCapturedPieces.pop_back();
 
-	updateScore();
-
 	for (auto &observer : mObservers)
 	{
 		auto obs = observer.lock();
@@ -87,47 +64,7 @@ void Player::removeLastCapturedPiece()
 }
 
 
-void Player::updateScore()
-{
-	int score = 0;
-	for (auto piece : mCapturedPieces)
-	{
-		score += getPieceValue(piece);
-	}
-	setScore(score);
-
-	for (auto &observer : mObservers)
-	{
-		auto obs = observer.lock();
-
-		if (obs)
-			obs->onScoreUpdate(mScore.getPlayerColor(), mScore.getValue());
-	}
-
-	LOG_INFO("Updated Score for {} : {}", LoggingHelper::sideToString(mPlayerColor).c_str(), score);
-}
-
-
-constexpr int Player::getPieceValue(PieceType piece)
-{
-	// switch (piece)
-	//{
-	// case PieceType::Pawn: return pawnValue;
-	// case PieceType::Knight: return knightValue;
-	// case PieceType::Bishop: return bishopValue;
-	// case PieceType::Rook: return rookValue;
-	// case PieceType::Queen: return queenValue;
-	// case PieceType::King: return kingValue;
-	// default: return 0;
-	// }
-
-	// TODO
-	return 0;
-}
-
-
 void Player::reset()
 {
-	setScore(0);
 	mCapturedPieces.clear();
 }

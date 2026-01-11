@@ -22,7 +22,6 @@ class IPlayerObserver
 public:
 	virtual ~IPlayerObserver() {};
 
-	virtual void onScoreUpdate(Side player, int value)						= 0;
 	virtual void onAddCapturedPiece(Side player, PieceType captured)		= 0;
 	virtual void onRemoveLastCapturedPiece(Side player, PieceType captured) = 0;
 };

@@ -48,7 +48,6 @@ class IPlayerObservable : public ObservableBase<IPlayerObserver>
 public:
 	virtual ~IPlayerObservable() {};
 
-	virtual void updateScore()								= 0;
 	virtual void addCapturedPiece(const PieceType captured) = 0;
 	virtual void removeLastCapturedPiece()					= 0;
 };
