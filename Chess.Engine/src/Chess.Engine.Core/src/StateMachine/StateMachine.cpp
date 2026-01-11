@@ -113,21 +113,13 @@ void StateMachine::processEvent(const InputEvent &event)
 
 	switch (currentState)
 	{
-	case GameState::Init:
-	case GameState::Undefined: nextState = handleInit(event); break;
-
+	case GameState::Init: nextState = handleInit(event); break;
 	case GameState::WaitingForInput: nextState = handleWaitingForInput(event); break;
-
 	case GameState::WaitingForTarget: nextState = handleWaitingForTarget(event); break;
-
 	case GameState::PawnPromotion: nextState = handlePawnPromotion(event); break;
-
 	case GameState::WaitingForRemoteMove: nextState = handleWaitingForRemote(event); break;
-
 	case GameState::WaitingForCPUMove: nextState = handleWaitingForCPU(event); break;
-
 	case GameState::GameOver: nextState = handleGameOver(event); break;
-
 	default: break;
 	}
 
