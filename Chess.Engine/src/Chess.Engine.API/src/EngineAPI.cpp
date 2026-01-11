@@ -69,7 +69,7 @@ Engine_API void SetDelegate(PFN_CALLBACK pDelegate)
 //			Game Management
 //=============================================
 
-Engine_API void StartGame(GameConfiguration config)
+Engine_API void StartGame(CGameConfiguration config)
 {
 	GameManager::GetInstance()->startGame(config);
 }

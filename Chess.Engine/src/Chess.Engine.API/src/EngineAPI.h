@@ -29,7 +29,7 @@ extern "C"
 	// Game Management
 	//=========================================================================
 
-	Engine_API void	 StartGame(GameConfiguration config);
+	Engine_API void	 StartGame(CGameConfiguration config);
 	Engine_API void	 ResetGame();
 	Engine_API void	 UndoMove();
 	Engine_API bool	 GetBoardState(int *boardstate);
@@ -57,7 +57,7 @@ extern "C"
 	Engine_API void	 SetLocalPlayer(int iLocalPlayer);
 	Engine_API void	 SetLocalPlayerReady(bool ready);
 
-		
+
 	//=========================================================================
 	// Logging
 	//=========================================================================
@@ -91,16 +91,16 @@ extern "C"
 	Engine_API void	 SetMasterVolume(float volume);
 	Engine_API float GetMasterVolume();
 
-	
+
 	//=========================================================================
 	// Network
 	//=========================================================================
-	
+
 	Engine_API int	 GetNetworkAdapterCount();
 	Engine_API bool	 GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInstance *adapter);
 	Engine_API bool	 ChangeCurrentAdapter(int ID);
 
-	
+
 	//=========================================================================
 	// Utilities
 	//=========================================================================

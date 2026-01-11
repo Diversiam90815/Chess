@@ -72,12 +72,12 @@ extern "C"
 	 */
 	typedef struct
 	{
-		int	 gameMode;		// 0 = SinglePlayer, 1 = Multiplayer, 2 = CPU
+		int	 gameMode;		// 1 = SinglePlayer, 2 = Multiplayer, 3 = CPU
 		int	 cpuDifficulty; // 0 = Easy, 1 = Medium, 2 = Hard
 		int	 cpuSide;		// 0 = White, 1 = Black
 		bool cpuEnabled;
 		bool multiplayerMode;
-	} GameConfiguration;
+	} CGameConfiguration;
 
 
 	/**
