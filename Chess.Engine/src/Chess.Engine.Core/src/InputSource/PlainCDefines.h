@@ -7,89 +7,89 @@
 
 #pragma once
 
-#include <Windows.h>
+#include <stdint.h>
 
-
-typedef void(CALLBACK *PFN_CALLBACK)(int messageId, void *pContext);
-
-
+#define BOARD_SIZE		  8
 #define MAX_STRING_LENGTH 250
 
-/// <summary>
-/// Defines a plain C structure representing a position with x and y coordinates.
-/// </summary>
-typedef struct PositionInstance
+
+#ifdef __cplusplus
+extern "C"
 {
-	int x;
-	int y;
-} PositionInstance;
+#endif
+
+	//=========================================================================
+	// Callback Delegates
+	//=========================================================================
+
+	typedef void(CALLBACK *PFN_CALLBACK)(int messageId, void *pContext);
 
 
-/// <summary>
-/// Defines the possible types of moves in a chess game as an enumeration.
-/// </summary>
-typedef enum MoveTypeInstance
-{
-	MoveType_None			   = 0,
-	MoveType_Normal			   = 1 << 0, // 1
-	MoveType_DoublePawnPush	   = 1 << 1, // 2
-	MoveType_PawnPromotion	   = 1 << 2, // 4
-	MoveType_Capture		   = 1 << 3, // 8
-	MoveType_EnPassant		   = 1 << 4, // 16
-	MoveType_CastlingKingside  = 1 << 5, // 32
-	MoveType_CastlingQueenside = 1 << 6, // 64
-	MoveType_Check			   = 1 << 7, // 128
-	MoveType_Checkmate		   = 1 << 8, // 256
-} MoveTypeInstance;
+	//=========================================================================
+	// Structures
+	//=========================================================================
+
+	/**
+	 * @brief	Compact move representation (16-bit encoded)
+	 *			Matches C++ Move class: from (6 bits) | to (6 bits) | flags (4 bits)
+	 */
+	typedef struct
+	{
+		uint16_t data;
+	} MoveInstance;
 
 
-/// <summary>
-/// Defines the different types of chess pieces.
-/// </summary>
-typedef enum PieceTypeInstance
-{
-	DefaultType,
-	PawnType,
-	KnightType,
-	BishopType,
-	RookType,
-	QueenType,
-	KingType
-} PieceTypeInstance;
+	/**
+	 * @brief	Extended move information for UI
+	 */
+	typedef struct
+	{
+		int	 from;			// Square index 0-63
+		int	 to;			// Square index 0-63
+		int	 flags;			// MoveFlag value
+		int	 movedPiece;	// PieceType value
+		int	 capturedPiece; // PieceType value or -1
+		char notation[16];	// SAN notation string
+	} MoveInfoInstance;
 
 
-/// <summary>
-/// Represents a possible move in a game, including start and end positions, move type, and optional promotion piece.
-/// </summary>
-typedef struct PossibleMoveInstance
-{
-	PositionInstance  start;
-	PositionInstance  end;
-	MoveTypeInstance  type;
-	PieceTypeInstance promotionPiece;
-} PossibleMoveInstance;
+	/**
+	 * @brief	Network adapter information
+	 */
+	typedef struct
+	{
+		int	 ID;
+		int	 type;
+		int	 visibility;
+		char adapterName[MAX_STRING_LENGTH];
+		char networkName[MAX_STRING_LENGTH];
+
+	} NetworkAdapterInstance;
 
 
-/// <summary>
-/// Represents a plain C instance of a network adapter with associated properties.
-/// </summary>
-typedef struct NetworkAdapterInstance
-{
-	char		 adapterName[MAX_STRING_LENGTH];
-	char		 networkName[MAX_STRING_LENGTH];
-	unsigned int ID;
-	int			 visibility;
-	int			 type;
+	/**
+	 * @brief	Game configuration
+	 */
+	typedef struct
+	{
+		int	 gameMode;		// 0 = SinglePlayer, 1 = Multiplayer, 2 = CPU
+		int	 cpuDifficulty; // 0 = Easy, 1 = Medium, 2 = Hard
+		int	 cpuSide;		// 0 = White, 1 = Black
+		bool cpuEnabled;
+		bool multiplayerMode;
+	} GameConfiguration;
 
-} NetworkAdapterInstance;
 
+	/**
+	 * @brief	Plain C connection event, including its state, the remote name, and an error message
+	 */
+	typedef struct
+	{
+		int	 state;
+		char remoteName[MAX_STRING_LENGTH];
+		char errorMessage[MAX_STRING_LENGTH];
+	} CConnectionEvent;
 
-/// <summary>
-/// Represents a plain C connection event, including its state, the remote name, and an error message.
-/// </summary>
-typedef struct CConnectionEvent
-{
-	int	 state;
-	char remoteName[MAX_STRING_LENGTH];
-	char errorMessage[MAX_STRING_LENGTH];
-} CConnectionEvent;
+#ifdef __cplusplus
+}
+#endif
