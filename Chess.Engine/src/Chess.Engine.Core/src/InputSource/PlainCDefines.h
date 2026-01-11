@@ -66,7 +66,7 @@ extern "C"
 
 	} NetworkAdapterInstance;
 
-	
+
 	/**
 	 * @brief	Game Phases for UI
 	 */

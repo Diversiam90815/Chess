@@ -42,7 +42,7 @@ extern "C"
 	Engine_API void	 OnSquareSelected(int square);
 	Engine_API void	 OnPawnPromotionChosen(int pieceType);
 	Engine_API int	 GetNumLegalMoves();
-	Engine_API bool	 GetLegalMoveAtIndex(int index, Move *move);
+	Engine_API bool	 GetLegalMoveAtIndex(int index, MoveInstance *move);
 
 
 	//=========================================================================

@@ -10,6 +10,7 @@
 #include "BitboardTypes.h"
 #include "Move.h"
 #include "Parameters.h"
+#include "GameConfiguration.h"
 
 /**
  * @brief	Interface for game logic operations.

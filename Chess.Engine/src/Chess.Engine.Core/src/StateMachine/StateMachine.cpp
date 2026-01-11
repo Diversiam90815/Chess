@@ -133,7 +133,7 @@ GameState StateMachine::handleInit(const InputEvent &event)
 	if (event.type == InputEvent::Type::GameStart)
 	{
 		mIsMultiplayer.store(event.config.mode == GameModeSelection::Multiplayer);
-		mIsVsCPU.store(event.config.mode == GameModeSelection::VsCPU);
+		mIsVsCPU.store(event.config.mode == GameModeSelection::SinglePlayer);
 
 		if (!mController->initializeGame(event.config))
 		{

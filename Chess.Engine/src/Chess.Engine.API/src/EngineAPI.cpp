@@ -155,14 +155,14 @@ Engine_API int GetNumLegalMoves()
 }
 
 
-Engine_API bool GetLegalMoveAtIndex(int index, Move *move)
+Engine_API bool GetLegalMoveAtIndex(int index, MoveInstance *move)
 {
 	const MoveList &moves = GameManager::GetInstance()->getCachedLegalMoves();
 
 	if (index < 0 || index >= static_cast<int>(moves.size()))
 		return false;
 
-	*move = moves[index];
+	move->data = moves[index].raw();
 	return true;
 }
 

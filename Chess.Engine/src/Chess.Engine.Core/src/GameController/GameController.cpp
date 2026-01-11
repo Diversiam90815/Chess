@@ -168,7 +168,7 @@ void GameController::switchTurns()
 
 bool GameController::isCPUTurn() const
 {
-	if (mConfig.mode != GameModeSelection::VsCPU)
+	if (mConfig.mode != GameModeSelection::SinglePlayer)
 		return false;
 
 	return !isLocalPlayerTurn();
