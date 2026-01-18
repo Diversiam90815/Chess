@@ -99,6 +99,7 @@ extern "C"
 	Engine_API int	 GetNetworkAdapterCount();
 	Engine_API bool	 GetNetworkAdapterAtIndex(unsigned int index, NetworkAdapterInstance *adapter);
 	Engine_API bool	 ChangeCurrentAdapter(int ID);
+	Engine_API int	 GetCurrentNetworkAdapterID();
 
 
 	//=========================================================================

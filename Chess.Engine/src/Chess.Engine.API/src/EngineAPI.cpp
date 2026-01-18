@@ -285,7 +285,7 @@ Engine_API void SetSFXEnabled(bool enabled)
 
 Engine_API bool GetAtmosEnabled()
 {
-	GameManager::GetInstance()->getAtmosEnabled();
+	return GameManager::GetInstance()->getAtmosEnabled();
 }
 
 Engine_API void SetAtmosEnabled(bool enabled)
@@ -368,6 +368,13 @@ Engine_API bool ChangeCurrentAdapter(int ID)
 {
 	bool result = GameManager::GetInstance()->changeCurrentNetworkAdapter(ID);
 	return result;
+}
+
+
+Engine_API int GetCurrentNetworkAdapterID()
+{
+	// TODO:
+	return 0;
 }
 
 
