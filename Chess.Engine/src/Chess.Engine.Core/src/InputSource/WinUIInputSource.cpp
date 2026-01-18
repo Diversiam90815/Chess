@@ -37,28 +37,24 @@ void WinUIInputSource::onRemoveLastCapturedPiece(Side player, PieceType captured
 
 void WinUIInputSource::onLegalMovesAvailable(Square from, const MoveList &moves)
 {
-	sendToUI(MessageType::PossibleMovesCalculated, nullptr);
+	sendToUI(MessageType::LegalMovesCalculated, nullptr);
 }
 
 
 void WinUIInputSource::onMoveExecuted(Move move, bool fromRemote)
 {
-	MoveHistoryEvent event{};
-	event.added			 = true;
-
+	MoveEvent event{};
+	event.data			 = move.raw();
 	std::string notation = ""; // TODO: Get notation
 	HRESULT		hr		 = StringCbCopyA(event.moveNotation, MAX_STRING_LENGTH, notation.c_str());
 
-	sendToUI(MessageType::MoveHistoryUpdated, &event);
+	sendToUI(MessageType::MoveExecuted, &event);
 }
 
 
 void WinUIInputSource::onMoveUndone()
 {
-	MoveHistoryEvent event{};
-	event.added = false;
-
-	sendToUI(MessageType::MoveHistoryUpdated, &event);
+	sendToUI(MessageType::MoveUndone, nullptr);
 }
 
 

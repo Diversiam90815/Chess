@@ -26,13 +26,13 @@ enum class MessageType
 	PlayerCapturedPiece		= 2,
 	PlayerChanged			= 3,
 	GameStateChanged		= 4,
-	MoveHistoryUpdated		= 5,
-	MoveExecuted			= 6,
+	MoveExecuted			= 5,
+	MoveUndone				= 6,
 	ConnectionStateChanged	= 7,
 	MultiplayerPlayerChosen = 8,
 	BoardStateChanged		= 9,
 	PawnPromotion			= 10,
-	PossibleMovesCalculated = 11,
+	LegalMovesCalculated	= 11,
 };
 
 
@@ -50,10 +50,10 @@ struct PlayerCapturedPieceEvent
 /// <summary>
 /// Represents an event in the move history, indicating whether a move was added or the history was cleared.
 /// </summary>
-struct MoveHistoryEvent
+struct MoveEvent
 {
-	bool added;							  // false if cleared
-	char moveNotation[MAX_STRING_LENGTH]; // If move is being added, this is the move notation
+	uint16_t data;
+	char	 moveNotation[MAX_STRING_LENGTH]; // If move is being added, this is the move notation
 };
 
 

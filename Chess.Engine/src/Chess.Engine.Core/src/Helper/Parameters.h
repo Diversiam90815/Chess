@@ -11,9 +11,6 @@
 
 #include "BitboardTypes.h"
 
-constexpr int BOARD_SIZE		= 8;
-constexpr int PLAYER_PIECES_NUM = 2 * BOARD_SIZE;
-
 
 /// <summary>
 /// Represents the possible end states of a chess game.
