@@ -116,11 +116,12 @@ int main()
 {
 	std::cout << "Console app starting..\n";
 
-	Chessboard *board = new Chessboard();
+	Chessboard	   *board	   = new Chessboard();
+	MoveGeneration *generation = new MoveGeneration(*board);
 
 	board->init();
 
-	printAttackedSquares(*board, Side::White);
+	printAttackedSquares(*generation, Side::White);
 
 	delete board;
 
