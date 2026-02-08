@@ -91,7 +91,7 @@ public:
 	 *
 	 * @note	Must NOT be invoked from inside the worker thread (would deadlock).
 	 */
-	void stop()
+	virtual void stop()
 	{
 		if (!isRunning())
 			return;

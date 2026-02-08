@@ -72,62 +72,61 @@ public:
 	[[nodiscard]] GameState getState() const { return mState.load(); }
 
 private:
-	void					run() override;
+	void				   run() override;
 
 	//=========================================================================
 	// Event Processing
 	//=========================================================================
 
-	void					processEvent(const InputEvent &event);
+	void				   processEvent(const InputEvent &event);
 
 	//=========================================================================
 	// State Handlers - return next state
 	//=========================================================================
 
-	GameState				handleInit(const InputEvent &event);
-	GameState				handleWaitingForInput(const InputEvent &event);
-	GameState				handleWaitingForTarget(const InputEvent &event);
-	GameState				handlePawnPromotion(const InputEvent &event);
-	GameState				handleWaitingForRemote(const InputEvent &event);
-	GameState				handleWaitingForCPU(const InputEvent &event);
-	GameState				handleGameOver(const InputEvent &event);
+	GameState			   handleInit(const InputEvent &event);
+	GameState			   handleWaitingForInput(const InputEvent &event);
+	GameState			   handleWaitingForTarget(const InputEvent &event);
+	GameState			   handlePawnPromotion(const InputEvent &event);
+	GameState			   handleWaitingForRemote(const InputEvent &event);
+	GameState			   handleWaitingForCPU(const InputEvent &event);
+	GameState			   handleGameOver(const InputEvent &event);
 
 	//=========================================================================
 	// Helpers
 	//=========================================================================
 
-	void					transitionTo(GameState newState);
-	GameState				determineNextTurnState();
-	bool					tryExecuteMove(Move move, bool fromRemote);
+	void				   transitionTo(GameState newState);
+	GameState			   determineNextTurnState();
+	bool				   tryExecuteMove(Move move, bool fromRemote);
 
 
 	//=========================================================================
 	// State
 	//=========================================================================
 
-	std::atomic<GameState>	mState{GameState::Init};
-	MoveIntent				mMoveIntent;
-	EndGameState			mEndgameState{EndGameState::OnGoing};
+	std::atomic<GameState> mState{GameState::Init};
+	MoveIntent			   mMoveIntent;
+	EndGameState		   mEndgameState{EndGameState::OnGoing};
 
 	//=========================================================================
 	// Mode Flags
 	//=========================================================================
 
-	std::atomic<bool>		mIsMultiplayer{false};
-	std::atomic<bool>		mIsVsCPU{false};
+	std::atomic<bool>	   mIsMultiplayer{false};
+	std::atomic<bool>	   mIsVsCPU{false};
 
 	//=========================================================================
 	// Dependencies (non-owning)
 	//=========================================================================
 
-	IGameController		   *mController{nullptr};
-	IInputSource		   *mInputSource{nullptr};
+	IGameController		  *mController{nullptr};
+	IInputSource		  *mInputSource{nullptr};
 
 	//=========================================================================
 	// Thread-Safe Event Queue
 	//=========================================================================
 
-	std::queue<InputEvent>	mEventQueue;
-	std::mutex				mQueueMutex;
-	std::condition_variable mQueueCV;
+	std::queue<InputEvent> mEventQueue;
+	std::mutex			   mQueueMutex;
 };

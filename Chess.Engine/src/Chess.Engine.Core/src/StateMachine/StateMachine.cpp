@@ -32,7 +32,7 @@ void StateMachine::postEvent(InputEvent event)
 		std::lock_guard<std::mutex> lock(mQueueMutex);
 		mEventQueue.push(std::move(event));
 	}
-	mQueueCV.notify_one();
+	triggerEvent();
 }
 
 
@@ -86,7 +86,9 @@ void StateMachine::run()
 
 		{
 			std::unique_lock lock(mQueueMutex);
-			mQueueCV.wait(lock, [this]() { return !mEventQueue.empty() || !isRunning(); });
+
+			if (!waitForEvent(0))
+				break; // Thread was stopped
 
 			if (!isRunning())
 				break;
