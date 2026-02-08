@@ -76,6 +76,12 @@ void GameController::resetGame()
 void GameController::getLegalMovesFromSquare(Square sq, MoveList &moves)
 {
 	mEngine.getMovesFromSquare(sq, moves);
+
+	if (moves.size() > 0)
+	{
+		mCachedLegalMoves = moves;
+		mCacheValid		  = true;
+	}
 }
 
 

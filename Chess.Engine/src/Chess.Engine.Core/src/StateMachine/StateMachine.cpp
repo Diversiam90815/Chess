@@ -82,17 +82,15 @@ void StateMachine::run()
 {
 	while (isRunning())
 	{
-		InputEvent event;
+		if (!waitForEvent(0))
+			break; // Thread was stopped
 
+		if (!isRunning())
+			break;
+
+		InputEvent event;
 		{
 			std::unique_lock lock(mQueueMutex);
-
-			if (!waitForEvent(0))
-				break; // Thread was stopped
-
-			if (!isRunning())
-				break;
-
 			event = std::move(mEventQueue.front());
 			mEventQueue.pop();
 		}

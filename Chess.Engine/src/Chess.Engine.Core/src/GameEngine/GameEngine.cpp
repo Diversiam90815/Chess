@@ -106,6 +106,10 @@ void GameEngine::getMovesFromSquare(Square from, MoveList &moves)
 	moves.clear();
 	for (size_t i = 0; i < allMoves.size(); ++i)
 	{
+		Square fromVariable = allMoves[i].from();
+		LOG_INFO("FromVariable: {}", to_index(fromVariable));
+		LOG_INFO("From: {}", to_index(from));
+
 		if (allMoves[i].from() == from)
 			moves.push(allMoves[i]);
 	}

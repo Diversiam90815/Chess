@@ -121,6 +121,9 @@ void GameManager::undoMove()
 
 void GameManager::onSquareSelected(Square sq)
 {
+	LOG_INFO("Square {} selected", to_index(sq));
+	LOG_INFO("Square {} selected", square_to_coordinates[to_index(sq)]);
+
 	mStateMachine->onSquareSelected(sq);
 }
 
