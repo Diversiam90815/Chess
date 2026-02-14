@@ -85,14 +85,14 @@ void GameController::getLegalMovesFromSquare(Square sq, MoveList &moves)
 }
 
 
-bool GameController::executeMove(Move move, bool fromRemote)
+MoveExecutionResult GameController::executeMove(Move move)
 {
-	bool success = mEngine.makeMove(move, fromRemote);
+	MoveExecutionResult result = mEngine.makeMove(move);
 
-	if (success)
+	if (result)
 		invalidateCache();
 
-	return success;
+	return result;
 }
 
 

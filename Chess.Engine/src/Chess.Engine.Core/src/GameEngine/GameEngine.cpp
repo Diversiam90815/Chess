@@ -37,28 +37,30 @@ void GameEngine::resetGame()
 }
 
 
-bool GameEngine::makeMove(Move move, bool fromRemote)
+MoveExecutionResult GameEngine::makeMove(Move move)
 {
 	std::lock_guard<std::mutex> lock(mMoveMutex);
+
+	MoveExecutionResult			result;
+
+	result.notation = getMoveNotation(move);
 
 	if (!mMoveValidation.isMoveLegal(move))
 	{
 		LOG_WARNING("Illegal move attemted: {}", MoveNotation::toUCI(move));
-		return false;
+		result.success = false;
+		return result;
 	}
 
 	if (!mMoveExecution.makeMove(move))
 	{
 		LOG_ERROR("Move execution failed: {}", MoveNotation::toUCI(move));
-		return false;
+		result.success = false;
+		return result;
 	}
 
-	std::string notation = getMoveNotation(move);
-	LOG_INFO("Move: {}", notation);
-
-	auto gameState = checkForEndGameConditions();
-
-	return true;
+	result.success = true;
+	return result;
 }
 
 

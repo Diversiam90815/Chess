@@ -84,7 +84,7 @@ public:
 	//=========================================================================
 
 	void onLegalMovesAvailable(Square from, const MoveList &moves) override;
-	void onMoveExecuted(Move move, bool fromRemote) override;
+	void onMoveExecuted(Move move, const std::string &notation) override;
 	void onMoveUndone() override;
 	void onPromotionRequired() override;
 	void onGameStateChanged(GameState state) override;

@@ -98,7 +98,7 @@ private:
 
 	void				   transitionTo(GameState newState);
 	GameState			   determineNextTurnState();
-	bool				   tryExecuteMove(Move move, bool fromRemote);
+	bool				   tryExecuteMove(Move move);
 
 
 	//=========================================================================

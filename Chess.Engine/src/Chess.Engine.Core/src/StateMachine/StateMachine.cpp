@@ -234,7 +234,7 @@ GameState StateMachine::handleWaitingForTarget(const InputEvent &event)
 	// Find and execute move
 	Move move = mController->findMove(mMoveIntent.fromSquare, mMoveIntent.toSquare);
 
-	if (move.isValid() && tryExecuteMove(move, false))
+	if (move.isValid() && tryExecuteMove(move))
 		return determineNextTurnState();
 
 	// invalid move
@@ -251,7 +251,7 @@ GameState StateMachine::handlePawnPromotion(const InputEvent &event)
 
 		Move move			  = mController->findMove(mMoveIntent.fromSquare, mMoveIntent.toSquare, mMoveIntent.promotion);
 
-		if (move.isValid() && tryExecuteMove(move, false))
+		if (move.isValid() && tryExecuteMove(move))
 			return determineNextTurnState();
 
 		mMoveIntent.clear();
@@ -266,7 +266,7 @@ GameState StateMachine::handleWaitingForRemote(const InputEvent &event)
 {
 	if (event.type == InputEvent::Type::RemoteMove)
 	{
-		if (tryExecuteMove(event.move, true))
+		if (tryExecuteMove(event.move))
 			return determineNextTurnState();
 	}
 
@@ -278,7 +278,7 @@ GameState StateMachine::handleWaitingForCPU(const InputEvent &event)
 {
 	if (event.type == InputEvent::Type::CPUMove)
 	{
-		if (tryExecuteMove(event.move, false))
+		if (tryExecuteMove(event.move))
 			return determineNextTurnState();
 
 		LOG_ERROR("CPU returned invalid move");
@@ -338,12 +338,14 @@ GameState StateMachine::determineNextTurnState()
 }
 
 
-bool StateMachine::tryExecuteMove(Move move, bool fromRemote)
+bool StateMachine::tryExecuteMove(Move move)
 {
-	if (!mController->executeMove(move, fromRemote))
+	auto executionResult = mController->executeMove(move);
+
+	if (!executionResult)
 		return false;
 
-	mInputSource->onMoveExecuted(move, fromRemote);
+	mInputSource->onMoveExecuted(move, executionResult.notation);
 	mInputSource->onBoardStateChanged();
 
 	mController->switchTurns();

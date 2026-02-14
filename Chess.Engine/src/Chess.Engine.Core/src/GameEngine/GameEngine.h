@@ -35,12 +35,12 @@ public:
 
 	/**
 	 * @brief	Execute a move. Validates, applies, and notifies observers.
-	 * @param	move Move to execute
-	 * @param	fromRemote Flag indicating that the move came from the remote endpoint in a
+	 * @param	move	Move to execute
+	 * @param	fromRemote	Flag indicating that the move came from the remote endpoint in a
 							Multiplayer setting to avoid infite loop.
-	 * @return	true if move was legal and executed.
+	 * @return	MoveExecutionResult		Success indicator and notation on success
 	 */
-	bool								 makeMove(Move move, bool fromRemote = false);
+	MoveExecutionResult					 makeMove(Move move);
 
 	/**
 	 * @brief	Undo the last move. Notifies observers.
@@ -111,7 +111,6 @@ public:
 
 
 private:
-
 	// Core components (order matters for initialization!)
 	Chessboard	   mChessBoard;
 	MoveGeneration mMoveGeneration;

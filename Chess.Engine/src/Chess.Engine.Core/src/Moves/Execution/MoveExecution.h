@@ -23,6 +23,15 @@ struct MoveHistoryEntry
 };
 
 
+struct MoveExecutionResult
+{
+	bool		success{false};
+	std::string notation;
+
+	explicit	operator bool() { return success; }
+};
+
+
 class MoveExecution
 {
 public:

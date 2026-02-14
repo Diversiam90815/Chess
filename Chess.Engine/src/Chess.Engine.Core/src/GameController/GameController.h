@@ -31,7 +31,7 @@ public:
 	//=========================================================================
 
 	void								 getLegalMovesFromSquare(Square sq, MoveList &moves) override;
-	bool								 executeMove(Move move, bool fromRemote) override;
+	MoveExecutionResult					 executeMove(Move move) override;
 	bool								 undoLastMove() override;
 
 	//=========================================================================

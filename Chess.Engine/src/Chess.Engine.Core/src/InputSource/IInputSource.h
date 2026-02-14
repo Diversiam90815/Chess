@@ -30,7 +30,7 @@ public:
 	/**
 	 * @brief	Called when a move has been executed.
 	 */
-	virtual void onMoveExecuted(Move move, bool fromRemote)				   = 0;
+	virtual void onMoveExecuted(Move move, const std::string &notation)	   = 0;
 
 	/**
 	 * @brief	Called when move was undone.
