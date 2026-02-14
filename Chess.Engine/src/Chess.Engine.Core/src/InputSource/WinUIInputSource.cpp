@@ -44,8 +44,10 @@ void WinUIInputSource::onLegalMovesAvailable(Square from, const MoveList &moves)
 void WinUIInputSource::onMoveExecuted(Move move, bool fromRemote)
 {
 	MoveEvent event{};
+
 	event.data			 = move.raw();
-	std::string notation = ""; // TODO: Get notation
+
+	std::string notation = "";
 	HRESULT		hr		 = StringCbCopyA(event.moveNotation, MAX_STRING_LENGTH, notation.c_str());
 
 	sendToUI(MessageType::MoveExecuted, &event);

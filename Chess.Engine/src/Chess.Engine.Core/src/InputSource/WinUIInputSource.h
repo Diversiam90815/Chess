@@ -15,6 +15,7 @@
 #include "PlainCDefines.h"
 #include "Player.h"
 #include "IInputSource.h"
+#include "Notation/MoveNotation.h"
 
 
 /// <summary>

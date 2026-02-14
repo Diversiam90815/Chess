@@ -19,22 +19,19 @@
 class MoveNotation
 {
 public:
-	MoveNotation()	= default;
-	~MoveNotation() = default;
-
 	/**
 	 * @brief	Produce SAN (Standard Algebraic Notation) for a move.
 	 */
-	std::string toSAN(Move &move, const Chessboard &board, bool isCheck, bool isCheckmate) const;
+	static std::string toSAN(Move &move, const Chessboard &board, bool isCheck, bool isCheckmate);
 
 	/**
 	 * @brief Generate UCI notation (e.g., "e2e4", "e7e8q").
 	 */
-	std::string toUCI(Move move) const;
+	static std::string toUCI(Move move);
 
 
 private:
-	inline std::string squareToString(Square sq) const noexcept
+	static inline std::string squareToString(Square sq) noexcept
 	{
 		int idx = to_index(sq);
 
@@ -44,19 +41,19 @@ private:
 		return "--";
 	}
 
-	inline char getFile(Square sq) const noexcept
+	static inline char getFile(Square sq) noexcept
 	{
 		int idx = to_index(sq);
 		return 'a' + (idx % 8);
 	}
 
-	inline char getRank(Square sq) const noexcept
+	static inline char getRank(Square sq) noexcept
 	{
 		int idx = to_index(sq);
 		return '8' - (idx / 8);
 	}
 
-	inline char pieceToSANChar(int pieceType) const noexcept
+	static inline char pieceToSANChar(int pieceType) noexcept
 	{
 		switch (pieceType)
 		{
@@ -74,7 +71,7 @@ private:
 		}
 	}
 
-	inline char pieceToUCIChar(int pieceType) const noexcept
+	static inline char pieceToUCIChar(int pieceType) noexcept
 	{
 		switch (pieceType)
 		{
