@@ -43,26 +43,20 @@ bool GameEngine::makeMove(Move move, bool fromRemote)
 
 	if (!mMoveValidation.isMoveLegal(move))
 	{
-		LOG_WARNING("Illegal move attemted: {}", mMoveNotation.toUCI(move));
+		LOG_WARNING("Illegal move attemted: {}", MoveNotation::toUCI(move));
 		return false;
 	}
 
 	if (!mMoveExecution.makeMove(move))
 	{
-		LOG_ERROR("Move execution failed: {}", mMoveNotation.toUCI(move));
+		LOG_ERROR("Move execution failed: {}", MoveNotation::toUCI(move));
 		return false;
 	}
 
-	// generate notation
-	bool		inCheck	 = mMoveValidation.isInCheck();
-	bool		isMate	 = inCheck && mMoveValidation.isCheckmate();
-	std::string notation = mMoveNotation.toSAN(move, mChessBoard, inCheck, isMate);
+	std::string notation = getMoveNotation(move);
 	LOG_INFO("Move: {}", notation);
 
-	// notify observers
-	notifyMoveExecuted(move, fromRemote);
-
-	checkForEndGameConditions();
+	auto gameState = checkForEndGameConditions();
 
 	return true;
 }
@@ -79,8 +73,6 @@ bool GameEngine::undoMove()
 	}
 
 	LOG_INFO("Move undone");
-
-	notifyMoveUndone();
 
 	return true;
 }
@@ -107,8 +99,8 @@ void GameEngine::getMovesFromSquare(Square from, MoveList &moves)
 	for (size_t i = 0; i < allMoves.size(); ++i)
 	{
 		Square fromVariable = allMoves[i].from();
-		LOG_INFO("FromVariable: {}", to_index(fromVariable));
-		LOG_INFO("From: {}", to_index(from));
+		LOG_DEBUG("FromVariable: {}", to_index(fromVariable));
+		LOG_DEBUG("From: {}", to_index(from));
 
 		if (allMoves[i].from() == from)
 			moves.push(allMoves[i]);
@@ -146,21 +138,18 @@ EndGameState GameEngine::checkForEndGameConditions()
 	{
 		LOG_INFO("Checkmate!");
 		auto winner = getWinner();
-		endGame(EndGameState::Checkmate, winner);
 		return EndGameState::Checkmate;
 	}
 
 	if (mMoveValidation.isStalemate())
 	{
 		LOG_INFO("Stalemate!");
-		endGame(EndGameState::StaleMate);
 		return EndGameState::StaleMate;
 	}
 
 	if (mMoveValidation.isDraw())
 	{
 		LOG_INFO("Draw!");
-		endGame(EndGameState::Draw);
 		return EndGameState::Draw;
 	}
 
@@ -188,12 +177,6 @@ void GameEngine::changeCurrentPlayer(Side player)
 		return;
 
 	mCurrentPlayer = player;
-
-	for (auto &observer : mObservers)
-	{
-		if (auto obs = observer.lock())
-			obs->onChangeCurrentPlayer(mCurrentPlayer);
-	}
 }
 
 
@@ -213,16 +196,6 @@ Side GameEngine::getLocalPlayer() const
 		return Side::Black;
 
 	return Side::None;
-}
-
-
-void GameEngine::endGame(EndGameState state, Side player)
-{
-	for (auto &observer : mObservers)
-	{
-		if (auto obs = observer.lock())
-			obs->onEndGame(state, player);
-	}
 }
 
 
@@ -247,25 +220,5 @@ const std::vector<MoveHistoryEntry> &GameEngine::getMoveHistory() const
 
 std::string GameEngine::getMoveNotation(Move move) const
 {
-	return mMoveNotation.toSAN(move, mChessBoard, false, false);
-}
-
-
-void GameEngine::notifyMoveExecuted(Move move, bool fromRemote)
-{
-	for (auto &observer : mObservers)
-	{
-		if (auto obs = observer.lock())
-			obs->onMoveExecuted(move, fromRemote);
-	}
-}
-
-
-void GameEngine::notifyMoveUndone()
-{
-	for (auto &observer : mObservers)
-	{
-		if (auto obs = observer.lock())
-			obs->onMoveUndone();
-	}
+	return MoveNotation::toSAN(move, mChessBoard, false, false);
 }

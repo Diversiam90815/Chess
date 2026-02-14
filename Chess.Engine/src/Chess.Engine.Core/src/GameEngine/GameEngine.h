@@ -18,7 +18,7 @@
  * @brief	Core chess engine orchestrating board state, move generation,
  *			validation, execution, and game flow.
  */
-class GameEngine : public IGameObservable
+class GameEngine
 {
 public:
 	GameEngine();
@@ -83,7 +83,7 @@ public:
 
 	void								 switchTurns();
 	Side								 getCurrentSide() const { return mChessBoard.getCurrentSide(); }
-	void								 changeCurrentPlayer(Side player) override;
+	void								 changeCurrentPlayer(Side player);
 	void								 setLocalPlayer(Side player);
 	Side								 getLocalPlayer() const;
 
@@ -91,7 +91,6 @@ public:
 	//	End Game
 	//=========================================================================
 
-	void								 endGame(EndGameState state, Side player = Side::None) override;
 	Side								 getWinner() const;
 
 	//=========================================================================
@@ -112,16 +111,12 @@ public:
 
 
 private:
-	// Notification helpers
-	void		   notifyMoveExecuted(Move move, bool fromRemote) override;
-	void		   notifyMoveUndone() override;
 
 	// Core components (order matters for initialization!)
 	Chessboard	   mChessBoard;
 	MoveGeneration mMoveGeneration;
 	MoveExecution  mMoveExecution;
 	MoveValidation mMoveValidation;
-	MoveNotation   mMoveNotation;
 
 	// Players
 	Player		   mWhitePlayer;
