@@ -90,6 +90,7 @@ public:
 	void onGameStateChanged(GameState state) override;
 	void onGameEnded(EndGameState state, Side winner) override;
 	void onBoardStateChanged() override;
+	void onPlayerChanged(Side playersTurn) override;
 
 	//=========================================================================
 	// IPlayerObserver (scores, captured pieces)

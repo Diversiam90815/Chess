@@ -88,6 +88,14 @@ void WinUIInputSource::onBoardStateChanged()
 }
 
 
+void WinUIInputSource::onPlayerChanged(Side playersTurn)
+{
+	int currentPlayer = (int)playersTurn;
+
+	sendToUI(MessageType::PlayerChanged, &currentPlayer);
+}
+
+
 void WinUIInputSource::onConnectionStateChanged(const ConnectionStatusEvent event)
 {
 	CConnectionEvent tmpEvent = convertToCStyleConnectionStateEvent(event);

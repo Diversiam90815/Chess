@@ -56,4 +56,9 @@ public:
 	 * @brief	Called to request board state update in UI.
 	 */
 	virtual void onBoardStateChanged()									   = 0;
+
+	/**
+	 * @brief	Called when current player changes.
+	 */
+	virtual void onPlayerChanged(Side playersTurn)						   = 0;
 };

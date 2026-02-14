@@ -349,6 +349,9 @@ bool StateMachine::tryExecuteMove(Move move)
 	mInputSource->onBoardStateChanged();
 
 	mController->switchTurns();
+	Side currentSide = mController->getCurrentSide();
+	mInputSource->onPlayerChanged(currentSide);
+
 	mEndgameState = mController->checkEndGame();
 
 	mMoveIntent.clear();
