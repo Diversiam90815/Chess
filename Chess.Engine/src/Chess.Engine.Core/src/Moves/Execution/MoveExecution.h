@@ -50,6 +50,8 @@ public:
 	[[nodiscard]] const std::vector<MoveHistoryEntry> &getHistory() const { return mHistory; }
 	void											   clearHistory() { mHistory.clear(); }
 
+	PieceType										   getLastCapturedPiece();
+
 private:
 	Chessboard					 &mChessBoard;
 

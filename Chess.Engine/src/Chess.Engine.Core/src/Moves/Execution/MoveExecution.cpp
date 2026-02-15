@@ -134,8 +134,8 @@ bool MoveExecution::makeMove(Move move)
 	if (!isWhite)
 		mChessBoard.incrementMoveCounter();
 
-	// flip side to move
-	mChessBoard.flipSide();
+	// // flip side to move
+	// mChessBoard.flipSide();
 
 	// Update occupancies
 	mChessBoard.updateOccupancies();
@@ -226,4 +226,15 @@ const MoveHistoryEntry *MoveExecution::getLastMove() const
 		return nullptr;
 
 	return &mHistory.back();
+}
+
+
+PieceType MoveExecution::getLastCapturedPiece()
+{
+	auto &lastState = mHistory.back();
+
+	if (lastState.move.isCapture())
+		return lastState.previousState.capturedPiece;
+
+	return PieceType::None;
 }

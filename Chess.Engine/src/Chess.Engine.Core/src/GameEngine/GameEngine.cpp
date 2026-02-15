@@ -59,6 +59,19 @@ MoveExecutionResult GameEngine::makeMove(Move move)
 		return result;
 	}
 
+	if (move.isCapture())
+	{
+		PieceType capturedPiece = mMoveExecution.getLastCapturedPiece();
+
+		if (capturedPiece >= WKing && capturedPiece <= WRook) // White piece
+			mBlackPlayer.addCapturedPiece(capturedPiece);
+		else												  // Black piece
+			mWhitePlayer.addCapturedPiece(capturedPiece);
+	}
+
+	// flip side to move
+	mChessBoard.flipSide();
+
 	result.success = true;
 	return result;
 }
@@ -68,10 +81,21 @@ bool GameEngine::undoMove()
 {
 	std::lock_guard<std::mutex> lock(mMoveMutex);
 
+	// Get the captured piece before undoing
+	PieceType					capturedPiece = mMoveExecution.getLastCapturedPiece();
+
 	if (!mMoveExecution.unmakeMove())
 	{
 		LOG_WARNING("No move to undo!");
 		return false;
+	}
+
+	if (capturedPiece != PieceType::None)
+	{
+		if (capturedPiece >= WKing && capturedPiece <= WRook)
+			mBlackPlayer.removeLastCapturedPiece();
+		else
+			mWhitePlayer.removeLastCapturedPiece();
 	}
 
 	LOG_INFO("Move undone");

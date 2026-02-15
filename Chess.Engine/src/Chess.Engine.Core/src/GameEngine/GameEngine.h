@@ -86,6 +86,8 @@ public:
 	void								 changeCurrentPlayer(Side player);
 	void								 setLocalPlayer(Side player);
 	Side								 getLocalPlayer() const;
+	Player								&getWhitePlayer() { return mWhitePlayer; }
+	Player								&getBlackPlayer() { return mBlackPlayer; }
 
 	//=========================================================================
 	//	End Game
