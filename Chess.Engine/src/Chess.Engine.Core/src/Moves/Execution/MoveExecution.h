@@ -26,7 +26,8 @@ struct MoveHistoryEntry
 struct MoveExecutionResult
 {
 	bool		success{false};
-	std::string notation;
+	std::string notation{};
+	PieceType	capturedPiece{PieceType::None};
 
 	explicit	operator bool() { return success; }
 };

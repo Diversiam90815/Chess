@@ -255,7 +255,11 @@ void GameManager::wireComponents()
 	mStateMachine->setGameController(mGameController.get());
 	mStateMachine->setInputSource(mInputSource.get());
 
+	auto &whitePlayer = mGameController->getWhitePlayer();
+	whitePlayer.attachObserver(mInputSource);
 
+	auto &blackPlayer = mGameController->getBlackPlayer();
+	blackPlayer.attachObserver(mInputSource);
 
 	// CPU moves flow back through StateMachine
 	mGameController->setCPUMoveCallback([this](Move move) { mStateMachine->onCPUMoveCalculated(move); });

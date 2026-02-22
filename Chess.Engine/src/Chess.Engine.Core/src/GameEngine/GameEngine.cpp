@@ -53,15 +53,8 @@ MoveExecutionResult GameEngine::makeMove(Move move)
 		return result;
 	}
 
-	// if (move.isCapture())
-	//{
-	//	PieceType capturedPiece = mMoveExecution.getLastCapturedPiece();
-
-	//	if (capturedPiece >= WKing && capturedPiece <= WRook) // White piece
-	//		mBlackPlayer.addCapturedPiece(capturedPiece);
-	//	else												  // Black piece
-	//		mWhitePlayer.addCapturedPiece(capturedPiece);
-	//}
+	if (move.isCapture())
+		result.capturedPiece = mMoveExecution.getLastCapturedPiece();
 
 	result.success = true;
 	return result;
@@ -80,14 +73,6 @@ bool GameEngine::undoMove()
 		LOG_WARNING("No move to undo!");
 		return false;
 	}
-
-	// if (capturedPiece != PieceType::None)
-	//{
-	//	if (capturedPiece >= WKing && capturedPiece <= WRook)
-	//		mBlackPlayer.removeLastCapturedPiece();
-	//	else
-	//		mWhitePlayer.removeLastCapturedPiece();
-	// }
 
 	LOG_INFO("Move undone");
 

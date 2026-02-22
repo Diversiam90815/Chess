@@ -67,6 +67,8 @@ public:
 	const Chessboard					&getBoard() const { return mEngine.getBoard(); }
 	const std::vector<MoveHistoryEntry> &getMoveHistory() const { return mEngine.getMoveHistory(); }
 	const MoveList						&getCachedLegalMoves() { return mCachedLegalMoves; }
+	Player								&getWhitePlayer() { return mWhitePlayer; }
+	Player								&getBlackPlayer() { return mBlackPlayer; }
 
 	void								 setCPUMoveCallback(std::function<void(Move)> callback);
 

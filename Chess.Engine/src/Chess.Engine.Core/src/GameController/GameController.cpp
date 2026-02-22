@@ -100,6 +100,16 @@ MoveExecutionResult GameController::executeMove(Move move)
 	if (result)
 		invalidateCache();
 
+	if (result.capturedPiece != PieceType::None)
+	{
+		Side currentSide = getCurrentSide();
+
+		if (currentSide == Side::White)
+			mWhitePlayer.addCapturedPiece(result.capturedPiece);
+		else if (currentSide == Side::Black)
+			mBlackPlayer.addCapturedPiece(result.capturedPiece);
+	}
+
 	return result;
 }
 
