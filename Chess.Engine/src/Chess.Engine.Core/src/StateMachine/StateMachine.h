@@ -79,7 +79,6 @@ private:
 	//=========================================================================
 
 	void				   processEvent(const InputEvent &event);
-
 	//=========================================================================
 	// State Handlers - return next state
 	//=========================================================================
@@ -97,6 +96,7 @@ private:
 	//=========================================================================
 
 	void				   transitionTo(GameState newState);
+	void				   onStateEnter(GameState enteringState);
 	GameState			   determineNextTurnState();
 	bool				   tryExecuteMove(Move move);
 

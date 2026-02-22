@@ -285,8 +285,6 @@ GameState StateMachine::handleWaitingForCPU(const InputEvent &event)
 		return GameState::GameOver;
 	}
 
-	mController->requestCPUMoveAsync();
-
 	return GameState::WaitingForCPUMove;
 }
 
@@ -313,6 +311,22 @@ void StateMachine::transitionTo(GameState newState)
 
 	if (mInputSource)
 		mInputSource->onGameStateChanged(newState);
+
+	onStateEnter(newState);
+}
+
+
+void StateMachine::onStateEnter(GameState enteringState)
+{
+	switch (enteringState)
+	{
+	case GameState::WaitingForCPUMove:
+	{
+		mController->requestCPUMoveAsync();
+		break;
+	}
+	default: break;
+	}
 }
 
 
