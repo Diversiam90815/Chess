@@ -35,6 +35,7 @@ bool GameController::initializeGame(GameConfiguration config)
 	{
 		const SinglePlayerConfig &spConfig = config.getSinglePlayer();
 		mLocalPlayer					   = spConfig.humanPlayerColor;
+		mCurrentPlayer					   = Side::White; // White always starts
 		Side			 cpuColor		   = (spConfig.humanPlayerColor == Side::White) ? Side::Black : Side::White;
 
 		CPUConfiguration cpuConfig;
@@ -55,6 +56,7 @@ bool GameController::initializeGame(GameConfiguration config)
 		// TODO: Init Multiplayer Game
 		const MultiplayerConfig &mpConfig = config.getMultiplayer();
 		mLocalPlayer					  = mpConfig.localPlayerColor;
+		mCurrentPlayer					  = Side::White; // White always starts
 
 		LOG_INFO("Game initialized: Multiplayer mode (Local player: {})", LoggingHelper::sideToString(mpConfig.localPlayerColor));
 
