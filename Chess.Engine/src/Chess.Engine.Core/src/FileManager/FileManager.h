@@ -23,12 +23,6 @@ namespace fs = std::filesystem;
 /**
  * @brief	Manages application file paths and settings. Singleton accessor pattern.
 			AppData path needs to be set once via the Engine.API due to the virtualization inside WinUi apps.
- *
- * Responsibilities:
- *  - Resolve and persist application data root path.
- *  - Provide well-known sub paths (logging, settings, user settings).
- *  - Read / write strongly typed settings stored in a settings file.
- *  - Persist selected network adapter information.
  */
 class FileManager
 {
@@ -59,7 +53,7 @@ public:
 	/**
 	 * @brief	Path of the main settings storage (e.g. JSON / config file).
 	 */
-	fs::path			getSettingsPath();
+	fs::path			getSettingsFolder();
 
 	/**
 	 * @brief	Path of user specific (mutable) settings file.

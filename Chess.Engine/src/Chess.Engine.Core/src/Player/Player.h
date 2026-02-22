@@ -17,10 +17,6 @@
 /**
  * @brief	Lightweight aggregation of per-player state (material score, captured pieces,
  *			color assignment, local/remote designation).
- *
- * Responsibilities:
- *  - Track captured opponent pieces for UI / analytics.
- *  - Distinguish local vs remote (used by multiplayer logic / input gating).
  */
 class Player : public IPlayerObservable
 {

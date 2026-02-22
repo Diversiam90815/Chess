@@ -50,7 +50,7 @@ fs::path FileManager::getLoggingPath()
 }
 
 
-fs::path FileManager::getSettingsPath()
+fs::path FileManager::getSettingsFolder()
 {
 	fs::path path = getAppDataPath() / FileName::SettingsFolder;
 	createDirectoryIfNeeded(path);
@@ -60,7 +60,7 @@ fs::path FileManager::getSettingsPath()
 
 fs::path FileManager::getUserSettingsPath()
 {
-	fs::path path = getSettingsPath() / FileName::UserSettingsFile;
+	fs::path path = getSettingsFolder() / FileName::UserSettingsFile;
 	return path;
 }
 
@@ -68,7 +68,7 @@ fs::path FileManager::getUserSettingsPath()
 std::optional<NetworkAdapter> FileManager::readSelectedNetworkAdapter()
 {
 	NetworkAdapter adapter{};
-	fs::path	   configPath = getSettingsPath() / FileName::UserSettingsFile;
+	fs::path	   configPath = getUserSettingsPath();
 
 	if (fs::exists(configPath))
 	{
@@ -103,7 +103,7 @@ bool FileManager::setSelectedNetworkAdapter(const NetworkAdapter &adapter)
 {
 	try
 	{
-		fs::path configPath = getSettingsPath() / FileName::UserSettingsFile;
+		fs::path configPath = getUserSettingsPath();
 		json	 config;
 
 		// Read the file in
