@@ -19,6 +19,7 @@ std::string LoggingHelper::gameStateToString(GameState state)
 	case GameState::GameOver: return "Game Over";
 	case GameState::PawnPromotion: return "Pawn Promotion";
 	case GameState::WaitingForRemoteMove: return "Waiting for remote move";
+	case GameState::WaitingForCPUMove: return "Waiting for CPU move";
 	default: return "Unknown GameState";
 	}
 }
