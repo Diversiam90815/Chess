@@ -27,27 +27,6 @@ public:
 };
 
 
-class IGameObserver
-{
-public:
-	virtual ~IGameObserver() {};
-
-	virtual void onMoveExecuted(Move move, bool fromRemote) = 0;
-	virtual void onMoveUndone()								= 0;
-	virtual void onChangeCurrentPlayer(Side player)			= 0;
-	virtual void onEndGame(EndGameState state, Side winner) = 0;
-};
-
-
-class IGameStateObserver
-{
-public:
-	virtual ~IGameStateObserver() {};
-
-	virtual void onGameStateChanged(GameState state) = 0;
-};
-
-
 class IRemoteReceiverObserver
 {
 public:

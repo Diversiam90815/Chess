@@ -53,27 +53,6 @@ public:
 };
 
 
-class IGameObservable : public ObservableBase<IGameObserver>
-{
-public:
-	virtual ~IGameObservable() {};
-
-	virtual void notifyMoveExecuted(Move move, bool fromRemote) = 0;
-	virtual void notifyMoveUndone()								= 0;
-	virtual void changeCurrentPlayer(Side player)				= 0;
-	virtual void endGame(EndGameState state, Side winner)		= 0;
-};
-
-
-class IGameStateObservable : public ObservableBase<IGameStateObserver>
-{
-public:
-	virtual ~IGameStateObservable() {};
-
-	virtual void gameStateChanged(const GameState state) = 0;
-};
-
-
 class IRemoteReceiverObservable : public ObservableBase<IRemoteReceiverObserver>
 {
 public:
