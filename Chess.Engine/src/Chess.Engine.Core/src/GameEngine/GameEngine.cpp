@@ -74,8 +74,6 @@ bool GameEngine::undoMove()
 		return false;
 	}
 
-	LOG_INFO("Move undone");
-
 	return true;
 }
 
