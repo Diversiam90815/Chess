@@ -11,6 +11,7 @@
 #include "GameEngine.h"
 #include "CPUPlayer.h"
 #include "GameConfiguration.h"
+#include "Player.h"
 
 
 class GameController : public IGameController
@@ -49,6 +50,7 @@ public:
 	Side								 getCurrentSide() const override;
 	bool								 isLocalPlayerTurn() const override;
 	void								 switchTurns() override;
+	void								 changeCurrentPlayer(Side player);
 
 	//=========================================================================
 	// CPU
@@ -78,6 +80,11 @@ private:
 	// Cached legal moves for current position (for findMove)
 	mutable MoveList		  mCachedLegalMoves;
 	mutable bool			  mCacheValid{false};
+
+	// Players
+	Player					  mWhitePlayer;
+	Player					  mBlackPlayer;
+	Side					  mCurrentPlayer = Side::None;
 
 	std::function<void(Move)> mOnCPUMove;
 

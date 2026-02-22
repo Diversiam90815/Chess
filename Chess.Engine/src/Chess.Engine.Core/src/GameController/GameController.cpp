@@ -18,11 +18,16 @@ bool GameController::initializeGame(GameConfiguration config)
 	mEngine.init();
 	mEngine.resetGame();
 
+	mWhitePlayer.setPlayerColor(Side::White);
+	mBlackPlayer.setPlayerColor(Side::Black);
+
 	switch (config.mode)
 	{
 	case GameModeSelection::LocalCoop:
 	{
-		mLocalPlayer = Side::White;
+		mLocalPlayer   = Side::White;
+		mCurrentPlayer = Side::White;
+
 		LOG_INFO("Game initialized: Local coop mode!");
 		break;
 	}
@@ -39,7 +44,6 @@ bool GameController::initializeGame(GameConfiguration config)
 		cpuConfig.enableRandomization = true;
 
 		mCPUPlayer.configure(cpuConfig);
-		mEngine.setLocalPlayer(spConfig.humanPlayerColor);
 
 		LOG_INFO("Game initialized: Single Player mode (Human: {}, CPU: {}, Difficulty: {})", LoggingHelper::sideToString(spConfig.humanPlayerColor),
 				 LoggingHelper::sideToString(cpuColor), LoggingHelper::cpuDifficultyToString(spConfig.aiDifficulty));
@@ -51,7 +55,6 @@ bool GameController::initializeGame(GameConfiguration config)
 		// TODO: Init Multiplayer Game
 		const MultiplayerConfig &mpConfig = config.getMultiplayer();
 		mLocalPlayer					  = mpConfig.localPlayerColor;
-		mEngine.setLocalPlayer(mpConfig.localPlayerColor);
 
 		LOG_INFO("Game initialized: Multiplayer mode (Local player: {})", LoggingHelper::sideToString(mpConfig.localPlayerColor));
 
@@ -69,6 +72,11 @@ bool GameController::initializeGame(GameConfiguration config)
 void GameController::resetGame()
 {
 	mEngine.resetGame();
+
+	mWhitePlayer.reset();
+	mBlackPlayer.reset();
+	mCurrentPlayer = Side::None;
+
 	invalidateCache();
 }
 
@@ -155,20 +163,38 @@ EndGameState GameController::checkEndGame()
 
 Side GameController::getCurrentSide() const
 {
-	return mEngine.getCurrentSide();
+	return mCurrentPlayer;
 }
 
 
 bool GameController::isLocalPlayerTurn() const
 {
-	return mEngine.getCurrentSide() == mLocalPlayer;
+	return mCurrentPlayer == mLocalPlayer;
 }
 
 
 void GameController::switchTurns()
 {
-	mEngine.switchTurns();
+	if (mCurrentPlayer == Side::None)
+	{
+		changeCurrentPlayer(Side::White);
+		return;
+	}
+
+	Side next = (mCurrentPlayer == Side::White) ? Side::Black : Side::White;
+
+	changeCurrentPlayer(next);
+
 	invalidateCache();
+}
+
+
+void GameController::changeCurrentPlayer(Side player)
+{
+	if (mCurrentPlayer == player)
+		return;
+
+	mCurrentPlayer = player;
 }
 
 

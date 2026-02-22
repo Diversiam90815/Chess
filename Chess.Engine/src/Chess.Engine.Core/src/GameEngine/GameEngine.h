@@ -78,18 +78,6 @@ public:
 	EndGameState						 checkForEndGameConditions();
 
 	//=========================================================================
-	//	Player Management
-	//=========================================================================
-
-	void								 switchTurns();
-	Side								 getCurrentSide() const { return mChessBoard.getCurrentSide(); }
-	void								 changeCurrentPlayer(Side player);
-	void								 setLocalPlayer(Side player);
-	Side								 getLocalPlayer() const;
-	Player								&getWhitePlayer() { return mWhitePlayer; }
-	Player								&getBlackPlayer() { return mBlackPlayer; }
-
-	//=========================================================================
 	//	End Game
 	//=========================================================================
 
@@ -119,13 +107,6 @@ private:
 	MoveExecution  mMoveExecution;
 	MoveValidation mMoveValidation;
 
-	// Players
-	Player		   mWhitePlayer;
-	Player		   mBlackPlayer;
-	Side		   mCurrentPlayer = Side::None;
-
 	// Thread safety
 	std::mutex	   mMoveMutex;
-
-	friend class GameManager;
 };

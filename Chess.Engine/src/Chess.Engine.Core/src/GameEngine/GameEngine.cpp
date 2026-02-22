@@ -14,15 +14,12 @@ GameEngine::GameEngine() : mMoveGeneration(mChessBoard), mMoveExecution(mChessBo
 void GameEngine::init()
 {
 	mChessBoard.init();
-	mWhitePlayer.setPlayerColor(Side::White);
-	mBlackPlayer.setPlayerColor(Side::Black);
 }
 
 
 void GameEngine::startGame()
 {
 	resetGame();
-	switchTurns();
 	LOG_INFO("Game started..");
 }
 
@@ -31,9 +28,6 @@ void GameEngine::resetGame()
 {
 	mChessBoard.init();
 	mMoveExecution.clearHistory();
-	mWhitePlayer.reset();
-	mBlackPlayer.reset();
-	mCurrentPlayer = Side::None;
 }
 
 
@@ -59,18 +53,15 @@ MoveExecutionResult GameEngine::makeMove(Move move)
 		return result;
 	}
 
-	if (move.isCapture())
-	{
-		PieceType capturedPiece = mMoveExecution.getLastCapturedPiece();
+	// if (move.isCapture())
+	//{
+	//	PieceType capturedPiece = mMoveExecution.getLastCapturedPiece();
 
-		if (capturedPiece >= WKing && capturedPiece <= WRook) // White piece
-			mBlackPlayer.addCapturedPiece(capturedPiece);
-		else												  // Black piece
-			mWhitePlayer.addCapturedPiece(capturedPiece);
-	}
-
-	// flip side to move
-	mChessBoard.flipSide();
+	//	if (capturedPiece >= WKing && capturedPiece <= WRook) // White piece
+	//		mBlackPlayer.addCapturedPiece(capturedPiece);
+	//	else												  // Black piece
+	//		mWhitePlayer.addCapturedPiece(capturedPiece);
+	//}
 
 	result.success = true;
 	return result;
@@ -90,13 +81,13 @@ bool GameEngine::undoMove()
 		return false;
 	}
 
-	if (capturedPiece != PieceType::None)
-	{
-		if (capturedPiece >= WKing && capturedPiece <= WRook)
-			mBlackPlayer.removeLastCapturedPiece();
-		else
-			mWhitePlayer.removeLastCapturedPiece();
-	}
+	// if (capturedPiece != PieceType::None)
+	//{
+	//	if (capturedPiece >= WKing && capturedPiece <= WRook)
+	//		mBlackPlayer.removeLastCapturedPiece();
+	//	else
+	//		mWhitePlayer.removeLastCapturedPiece();
+	// }
 
 	LOG_INFO("Move undone");
 
@@ -180,48 +171,6 @@ EndGameState GameEngine::checkForEndGameConditions()
 	}
 
 	return EndGameState::OnGoing;
-}
-
-
-void GameEngine::switchTurns()
-{
-	if (mCurrentPlayer == Side::None)
-	{
-		changeCurrentPlayer(Side::White);
-		return;
-	}
-
-	Side next = (mCurrentPlayer == Side::White) ? Side::Black : Side::White;
-
-	changeCurrentPlayer(next);
-}
-
-
-void GameEngine::changeCurrentPlayer(Side player)
-{
-	if (mCurrentPlayer == player)
-		return;
-
-	mCurrentPlayer = player;
-}
-
-
-void GameEngine::setLocalPlayer(Side player)
-{
-	mWhitePlayer.setIsLocalPlayer(player == Side::White);
-	mBlackPlayer.setIsLocalPlayer(player == Side::Black);
-}
-
-
-Side GameEngine::getLocalPlayer() const
-{
-	if (mWhitePlayer.isLocalPlayer())
-		return Side::White;
-
-	if (mBlackPlayer.isLocalPlayer())
-		return Side::Black;
-
-	return Side::None;
 }
 
 

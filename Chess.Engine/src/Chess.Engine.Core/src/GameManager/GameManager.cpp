@@ -255,6 +255,8 @@ void GameManager::wireComponents()
 	mStateMachine->setGameController(mGameController.get());
 	mStateMachine->setInputSource(mInputSource.get());
 
+
+
 	// CPU moves flow back through StateMachine
 	mGameController->setCPUMoveCallback([this](Move move) { mStateMachine->onCPUMoveCalculated(move); });
 
