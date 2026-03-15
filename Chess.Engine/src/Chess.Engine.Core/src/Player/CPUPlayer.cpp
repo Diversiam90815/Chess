@@ -209,7 +209,7 @@ int CPUPlayer::quiescence(int alpha, int beta, std::stop_token stopToken)
 
 	++mNodesSearched;
 
-	int standPat = evaluate();
+	int standPat = Evaluation::evaluate(mEngine.getBoard());
 
 	if (standPat >= beta)
 		return beta;
@@ -354,13 +354,6 @@ void CPUPlayer::clearTranspositionTable()
 	mTranspositionTable.clear();
 	mNodesSearched	   = 0;
 	mTranspositionHits = 0;
-}
-
-
-int CPUPlayer::evaluate() const
-{
-	// TODO: Implement evaluation
-	return 0;
 }
 
 

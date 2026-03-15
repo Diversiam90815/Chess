@@ -14,6 +14,7 @@
 
 #include "Parameters.h"
 #include "GameEngine.h"
+#include "Evaluation.h"
 
 
 /**
@@ -159,7 +160,6 @@ private:
 	// Helpers
 	//=========================================================================
 
-	int												 evaluate() const;
 	bool											 isCancelled(std::stop_token token) const { return token.stop_requested(); }
 	int												 getSearchDepth() const;
 
