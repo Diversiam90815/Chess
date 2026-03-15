@@ -204,6 +204,7 @@ GameState StateMachine::handleWaitingForTarget(const InputEvent &event)
 	if (sq == mMoveIntent.fromSquare)
 	{
 		mMoveIntent.clear();
+		mInputSource->onBoardStateChanged(); // Notify UI to render a new board
 		return GameState::WaitingForInput;
 	}
 
@@ -239,6 +240,7 @@ GameState StateMachine::handleWaitingForTarget(const InputEvent &event)
 
 	// invalid move
 	mMoveIntent.clear();
+	mInputSource->onBoardStateChanged(); // Notify UI to render a new board
 	return GameState::WaitingForInput;
 }
 
