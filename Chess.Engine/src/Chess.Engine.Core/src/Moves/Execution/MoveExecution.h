@@ -62,24 +62,24 @@ private:
 	/*
 				Castling rights update table
 
-	a1	(white queenside rook)		7		0111	Clears WQ bit 
-	h1	(white kingside rook)		11		1011	Clears WK bit 
-	e1	(white king)				3		0011	Clears both WK and WQ
-	a8	(black queenside rook)		13		1101	Clears BQ bit 
-	h8	(black kingside rook)		14		1110	Clears BK bit 
-	e8	(black king)				12		1100	Clears both BK and BQ 
+	a8	(black queenside rook)		 7		0111	Clears BQ bit
+	h8	(black kingside rook)		11		1011	Clears BK bit
+	e8	(black king)				 3		0011	Clears both BK and BQ
+	a1	(white queenside rook)		13		1101	Clears WQ bit
+	h1	(white kingside rook)		14		1110	Clears WK bit
+	e1	(white king)				12		1100	Clears both WK and WQ
 	All other squares				15		1111	No change
 	*/
 	static constexpr uint8_t	  sCastlingRightsUpdate[64] = 
 	{
-		 13, 15, 15, 15, 12, 15, 15, 14,	// a8-h8
+		  7, 15, 15, 15,  3, 15, 15, 11,	// a8-h8
 		 15, 15, 15, 15, 15, 15, 15, 15, 
 		 15, 15, 15, 15, 15, 15, 15, 15, 
 		 15, 15, 15, 15, 15, 15, 15, 15, 
 		 15, 15, 15, 15, 15, 15, 15, 15, 
 		 15, 15, 15, 15, 15, 15, 15, 15, 
 		 15, 15, 15, 15, 15, 15, 15, 15, 
-		 7,	 15, 15, 15, 3,	 15, 15, 11		// a1-h1
+		 13, 15, 15, 15, 12, 15, 15, 14		// a1-h1
 	 };
 	// clang-format on
 };
