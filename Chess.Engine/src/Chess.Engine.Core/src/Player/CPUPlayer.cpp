@@ -112,11 +112,11 @@ Move CPUPlayer::searchAlphaBeta(const MoveList &moves, int depth, std::stop_toke
 
 		Move move = moves[i];
 
-		if (!mEngine.makeMove(move))
+		if (!mEngine.makeMoveUnchecked(move))
 			continue;
 
 		int score = -alphaBeta(depth - 1, -beta, -alpha, false, stopToken);
-		mEngine.undoMove();
+		mEngine.undoMoveUnchecked();
 
 		scoredMoves.push_back({move, score});
 
@@ -177,11 +177,11 @@ int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::s
 
 		Move move = moves[i];
 
-		if (!mEngine.makeMove(move))
+		if (!mEngine.makeMoveUnchecked(move))
 			continue;
 
 		int score = -alphaBeta(depth - 1, -beta, -alpha, !maximizing, stopToken);
-		mEngine.undoMove();
+		mEngine.undoMoveUnchecked();
 
 		if (score >= beta)
 		{
@@ -228,11 +228,11 @@ int CPUPlayer::quiescence(int alpha, int beta, std::stop_token stopToken)
 		if (!move.isCapture())
 			continue;
 
-		if (!mEngine.makeMove(move))
+		if (!mEngine.makeMoveUnchecked(move))
 			continue;
 
 		int score = -quiescence(-beta, -alpha, stopToken);
-		mEngine.undoMove();
+		mEngine.undoMoveUnchecked();
 
 		if (score >= beta)
 			return beta;

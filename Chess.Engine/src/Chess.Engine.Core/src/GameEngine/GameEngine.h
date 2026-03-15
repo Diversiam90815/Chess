@@ -48,6 +48,27 @@ public:
 	 */
 	bool								 undoMove();
 
+	
+	//=========================================================================
+	// Search-Optimized Operations (no validation, notation, or locking)
+	//=========================================================================
+
+	/**
+	 * @brief	Execute a move without validation or notation.
+	 *			Use only during search where moves come from generateLegalMoves().
+	 * @param	move	Move to execute (must be legal)
+	 * @return	true if move was applied successfully.
+	 */
+	bool								 makeMoveUnchecked(Move move);
+
+	/**
+	 * @brief	Undo the last move without locking.
+	 *			Use only during search.
+	 * @return	true if a move was undone.
+	 */
+	bool								 undoMoveUnchecked();
+
+
 	//=========================================================================
 	// Move Generation & Validation
 	//=========================================================================

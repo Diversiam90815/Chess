@@ -41,7 +41,7 @@ MoveExecutionResult GameEngine::makeMove(Move move)
 
 	if (!mMoveValidation.isMoveLegal(move))
 	{
-		LOG_WARNING("Illegal move attemted: {}", MoveNotation::toUCI(move));
+		LOG_WARNING("Illegal move attempted: {}", MoveNotation::toUCI(move));
 		result.success = false;
 		return result;
 	}
@@ -75,6 +75,18 @@ bool GameEngine::undoMove()
 	}
 
 	return true;
+}
+
+
+bool GameEngine::makeMoveUnchecked(Move move)
+{
+	return mMoveExecution.makeMove(move);
+}
+
+
+bool GameEngine::undoMoveUnchecked()
+{
+	return mMoveExecution.unmakeMove();
 }
 
 
