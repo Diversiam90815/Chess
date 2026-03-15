@@ -168,7 +168,8 @@ private:
 	//=========================================================================
 
 	CPUConfiguration								 mConfig;
-	GameEngine										&mEngine;
+	GameEngine										&mEngine;		// main engine (for reading initial state)
+	GameEngine										 mSearchEngine; // isolated copy for search
 
 	// Search thread
 	std::jthread									 mSearchThread;

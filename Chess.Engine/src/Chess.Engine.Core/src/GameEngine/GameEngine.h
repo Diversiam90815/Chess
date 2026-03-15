@@ -29,6 +29,12 @@ public:
 	void								 startGame();
 	void								 resetGame();
 
+	/**
+	 * @brief	Copy board state from another engine (for search isolation).
+	 *			Clears move history so the search starts with a clean slate.
+	 */
+	void								 snapshotFrom(const GameEngine &other);
+
 	//=========================================================================
 	// Move Operations
 	//=========================================================================

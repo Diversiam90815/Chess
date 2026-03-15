@@ -165,25 +165,25 @@ public:
 
 private:
 	// Hash update helpers (called internally when board changes)
-	void			  hashPiece(PieceType piece, Square sq) { mHash ^= ZobristHash::piece(piece, sq); }
-	void			  hashSide() { mHash ^= ZobristHash::sideToMove(); }
-	void			  hashCastling(Castling rights) { mHash ^= ZobristHash::castling(rights); }
-	void			  hashEnPassant(Square sq) { mHash ^= ZobristHash::enPassant(sq); }
+	void							  hashPiece(PieceType piece, Square sq) { mHash ^= ZobristHash::piece(piece, sq); }
+	void							  hashSide() { mHash ^= ZobristHash::sideToMove(); }
+	void							  hashCastling(Castling rights) { mHash ^= ZobristHash::castling(rights); }
+	void							  hashEnPassant(Square sq) { mHash ^= ZobristHash::enPassant(sq); }
 
 
-	Bitboards		  mBitBoards{};						 // Array of all bitboards
-	Occupancies		  mOccupancyBitboards{};			 // Occupancies
+	Bitboards						  mBitBoards{};						 // Array of all bitboards
+	Occupancies						  mOccupancyBitboards{};			 // Occupancies
 
-	Side			  mSide			   = Side::None;	 // side to move
-	Square			  mEnPassantSquare = Square::None;	 // enpassant square
-	Castling		  mCastlingRights  = Castling::None; // castling rights
+	Side							  mSide			   = Side::None;	 // side to move
+	Square							  mEnPassantSquare = Square::None;	 // enpassant square
+	Castling						  mCastlingRights  = Castling::None; // castling rights
 
-	int				  mHalfMoveClock   = 0;
-	int				  mMoveCounter	   = 1;
+	int								  mHalfMoveClock   = 0;
+	int								  mMoveCounter	   = 1;
 
-	uint64_t		  mHash			   = 0; // Zobrist Hash
+	uint64_t						  mHash			   = 0; // Zobrist Hash
 
 	// FEN positions
-	const std::string mEmptyBoard	   = "8/8/8/8/8/8/8/8 w - - ";
-	const std::string mStartPosition   = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
+	static constexpr std::string_view mEmptyBoard	   = "8/8/8/8/8/8/8/8 w - - ";
+	static constexpr std::string_view mStartPosition   = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 };

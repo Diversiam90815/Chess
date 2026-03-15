@@ -70,8 +70,11 @@ void CPUPlayer::cancelCalculation()
 
 Move CPUPlayer::computeBestMove(std::stop_token stopToken)
 {
+	// Snapshot the board so the search operates on an independent copy
+	mSearchEngine.snapshotFrom(mEngine);
+
 	MoveList legalMoves;
-	mEngine.generateLegalMoves(legalMoves);
+	mSearchEngine.generateLegalMoves(legalMoves);
 
 	if (legalMoves.size() == 0)
 	{
@@ -112,11 +115,11 @@ Move CPUPlayer::searchAlphaBeta(const MoveList &moves, int depth, std::stop_toke
 
 		Move move = moves[i];
 
-		if (!mEngine.makeMoveUnchecked(move))
+		if (!mSearchEngine.makeMoveUnchecked(move))
 			continue;
 
 		int score = -alphaBeta(depth - 1, -beta, -alpha, false, stopToken);
-		mEngine.undoMoveUnchecked();
+		mSearchEngine.undoMoveUnchecked();
 
 		scoredMoves.push_back({move, score});
 
@@ -142,7 +145,7 @@ int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::s
 	++mNodesSearched;
 
 	// Check transposition table
-	uint64_t hash = mEngine.getHash();
+	uint64_t hash = mSearchEngine.getHash();
 	int		 ttScore;
 	Move	 ttMove;
 
@@ -156,12 +159,12 @@ int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::s
 		return quiescence(alpha, beta, stopToken);
 
 	MoveList moves;
-	mEngine.generateLegalMoves(moves);
+	mSearchEngine.generateLegalMoves(moves);
 
 	// Checkmate/Stalemate
 	if (moves.size() == 0)
 	{
-		if (mEngine.isInCheck())
+		if (mSearchEngine.isInCheck())
 			return NEG_INF - ((mConfig.maxDepth - depth)); // prefer faster checkmate
 
 		return 0;										   // stalemate
@@ -177,11 +180,11 @@ int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::s
 
 		Move move = moves[i];
 
-		if (!mEngine.makeMoveUnchecked(move))
+		if (!mSearchEngine.makeMoveUnchecked(move))
 			continue;
 
 		int score = -alphaBeta(depth - 1, -beta, -alpha, !maximizing, stopToken);
-		mEngine.undoMoveUnchecked();
+		mSearchEngine.undoMoveUnchecked();
 
 		if (score >= beta)
 		{
@@ -209,7 +212,7 @@ int CPUPlayer::quiescence(int alpha, int beta, std::stop_token stopToken)
 
 	++mNodesSearched;
 
-	int standPat = Evaluation::evaluate(mEngine.getBoard());
+	int standPat = Evaluation::evaluate(mSearchEngine.getBoard());
 
 	if (standPat >= beta)
 		return beta;
@@ -219,7 +222,7 @@ int CPUPlayer::quiescence(int alpha, int beta, std::stop_token stopToken)
 
 	// generate only capture moves
 	MoveList moves;
-	mEngine.generateLegalMoves(moves);
+	mSearchEngine.generateLegalMoves(moves);
 
 	for (size_t i = 0; i < moves.size(); ++i)
 	{
@@ -228,11 +231,11 @@ int CPUPlayer::quiescence(int alpha, int beta, std::stop_token stopToken)
 		if (!move.isCapture())
 			continue;
 
-		if (!mEngine.makeMoveUnchecked(move))
+		if (!mSearchEngine.makeMoveUnchecked(move))
 			continue;
 
 		int score = -quiescence(-beta, -alpha, stopToken);
-		mEngine.undoMoveUnchecked();
+		mSearchEngine.undoMoveUnchecked();
 
 		if (score >= beta)
 			return beta;

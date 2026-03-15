@@ -31,6 +31,13 @@ void GameEngine::resetGame()
 }
 
 
+void GameEngine::snapshotFrom(const GameEngine &other)
+{
+	mChessBoard = other.mChessBoard;
+	mMoveExecution.clearHistory();
+}
+
+
 MoveExecutionResult GameEngine::makeMove(Move move)
 {
 	std::lock_guard<std::mutex> lock(mMoveMutex);
