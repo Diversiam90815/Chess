@@ -118,10 +118,27 @@ MoveExecutionResult GameController::executeMove(Move move)
 
 bool GameController::undoLastMove()
 {
-	bool success = mEngine.undoMove();
+	// Check if last move was a capture before undoing
+	const auto &history	   = mEngine.getMoveHistory();
+	bool		wasCapture = !history.empty() && history.back().move.isCapture();
+
+	bool		success	   = mEngine.undoMove();
 
 	if (success)
+	{
 		invalidateCache();
+
+		if (wasCapture)
+		{
+			// Last move was made by the opponent of mCurrentPlayer
+			Side lastMover = (mCurrentPlayer == Side::White) ? Side::Black : Side::White;
+
+			if (lastMover == Side::White)
+				mWhitePlayer.removeLastCapturedPiece();
+			else if (lastMover == Side::Black)
+				mBlackPlayer.removeLastCapturedPiece();
+		}
+	}
 
 	return success;
 }
