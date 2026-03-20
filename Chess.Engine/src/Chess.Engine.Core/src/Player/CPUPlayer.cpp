@@ -146,8 +146,8 @@ int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::s
 
 	// Check transposition table
 	uint64_t hash = mSearchEngine.getHash();
-	int		 ttScore;
-	Move	 ttMove;
+	int		 ttScore{0};
+	Move	 ttMove{};
 
 	if (lookupTransposition(hash, depth, alpha, beta, ttScore, ttMove))
 	{
@@ -170,7 +170,7 @@ int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::s
 		return 0;										   // stalemate
 	}
 
-	Move						 bestMove;
+	Move						 bestMove{};
 	TranspositionEntry::NodeType nodeType = TranspositionEntry::NodeType::UpperBound;
 
 	for (size_t i = 0; i < moves.size(); ++i)
@@ -221,12 +221,12 @@ int CPUPlayer::quiescence(int alpha, int beta, std::stop_token stopToken)
 		alpha = standPat;
 
 	// generate only capture moves
-	MoveList moves;
+	MoveList moves{};
 	mSearchEngine.generateLegalMoves(moves);
 
 	for (size_t i = 0; i < moves.size(); ++i)
 	{
-		Move move = moves[i];
+		Move &move = moves[i];
 
 		if (!move.isCapture())
 			continue;
