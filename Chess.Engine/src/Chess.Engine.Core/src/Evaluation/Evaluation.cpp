@@ -30,17 +30,17 @@ int Evaluation::evaluateMaterial(const Chessboard &board)
 	int			white  = 0;
 	int			black  = 0;
 
-	white += BitUtils::popCount(pieces[PieceType::WPawn]) * PAWN_VALUE;
-	white += BitUtils::popCount(pieces[PieceType::WKnight]) * KNIGHT_VALUE;
-	white += BitUtils::popCount(pieces[PieceType::WBishop]) * BISHOP_VALUE;
-	white += BitUtils::popCount(pieces[PieceType::WRook]) * ROOK_VALUE;
-	white += BitUtils::popCount(pieces[PieceType::WQueen]) * QUEEN_VALUE;
+	white += BitUtils::popCount(pieces[PieceType::WPawn]) * PieceValues::PAWN;
+	white += BitUtils::popCount(pieces[PieceType::WKnight]) * PieceValues::KNIGHT;
+	white += BitUtils::popCount(pieces[PieceType::WBishop]) * PieceValues::BISHOP;
+	white += BitUtils::popCount(pieces[PieceType::WRook]) * PieceValues::ROOK;
+	white += BitUtils::popCount(pieces[PieceType::WQueen]) * PieceValues::QUEEN;
 
-	black += BitUtils::popCount(pieces[PieceType::BPawn]) * PAWN_VALUE;
-	black += BitUtils::popCount(pieces[PieceType::BKnight]) * KNIGHT_VALUE;
-	black += BitUtils::popCount(pieces[PieceType::BBishop]) * BISHOP_VALUE;
-	black += BitUtils::popCount(pieces[PieceType::BRook]) * ROOK_VALUE;
-	black += BitUtils::popCount(pieces[PieceType::BQueen]) * QUEEN_VALUE;
+	black += BitUtils::popCount(pieces[PieceType::BPawn]) * PieceValues::PAWN;
+	black += BitUtils::popCount(pieces[PieceType::BKnight]) * PieceValues::KNIGHT;
+	black += BitUtils::popCount(pieces[PieceType::BBishop]) * PieceValues::BISHOP;
+	black += BitUtils::popCount(pieces[PieceType::BRook]) * PieceValues::ROOK;
+	black += BitUtils::popCount(pieces[PieceType::BQueen]) * PieceValues::QUEEN;
 
 	return white - black;
 }

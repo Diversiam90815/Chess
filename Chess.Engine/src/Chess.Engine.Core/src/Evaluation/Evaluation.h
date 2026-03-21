@@ -10,6 +10,7 @@
 
 #include "Chessboard.h"
 #include "BitboardUtils.h"
+#include "PieceValues.h"
 
 
 /**
@@ -78,18 +79,6 @@ private:
 	 */
 	[[nodiscard]] static constexpr int mirrorSquare(int sq) { return sq ^ 56; }
 
-
-
-	//=========================================================================
-	// Material Values (centipawns)
-	//=========================================================================
-
-	static constexpr int			   PAWN_VALUE	= 100;
-	static constexpr int			   KNIGHT_VALUE = 320;
-	static constexpr int			   BISHOP_VALUE = 330;
-	static constexpr int			   ROOK_VALUE	= 500;
-	static constexpr int			   QUEEN_VALUE	= 900;
-	static constexpr int			   KING_VALUE	= 20000;
 
 	//=========================================================================
 	// Piece-Square Tables (from white's perspective, a8 = index 0)
