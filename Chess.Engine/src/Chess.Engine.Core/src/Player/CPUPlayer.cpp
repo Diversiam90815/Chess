@@ -165,7 +165,7 @@ int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::s
 	if (moves.size() == 0)
 	{
 		if (mSearchEngine.isInCheck())
-			return NEG_INF - ((mConfig.maxDepth - depth)); // prefer faster checkmate
+			return NEG_INF + ((mConfig.maxDepth - depth)); // prefer faster checkmate
 
 		return 0;										   // stalemate
 	}
@@ -333,7 +333,10 @@ bool CPUPlayer::lookupTransposition(uint64_t hash, int depth, int alpha, int bet
 	case TranspositionEntry::NodeType::LowerBound:
 	{
 		if (entry.score >= beta)
+		{
+			score = entry.score;
 			return true;
+		}
 
 		break;
 	}
