@@ -72,9 +72,10 @@ set(ATTACKTABLES_FILES
 	
 set(MOVE_FILES
 	${MOVE_DIR}/Move.h
+	${MOVE_DIR}/Evaluation/MoveEvaluation.h		${MOVE_DIR}/Evaluation/MoveEvaluation.cpp
 	${MOVE_DIR}/Generation/MoveGeneration.h		${MOVE_DIR}/Generation/MoveGeneration.cpp
 	${MOVE_DIR}/Validation/MoveValidation.h		${MOVE_DIR}/Validation/MoveValidation.cpp
-	${MOVE_DIR}/Execution/MoveExecution.h		${MOVE_DIR}/Execution/MoveExecution.cpp
+	${MOVE_DIR}/Execution/MoveExecution.h			${MOVE_DIR}/Execution/MoveExecution.cpp
 	${MOVE_DIR}/Notation/MoveNotation.h			${MOVE_DIR}/Notation/MoveNotation.cpp
 )
 
@@ -83,13 +84,14 @@ set(GAME_MANAGER_FILES
 )
 
 set(PLAYER_FILES
-	${PLAYER_DIR}/Player.h      	${PLAYER_DIR}/Player.cpp
-	${PLAYER_DIR}/PlayerName.h      ${PLAYER_DIR}/PlayerName.cpp
+	${PLAYER_DIR}/Player.h      		${PLAYER_DIR}/Player.cpp
+	${PLAYER_DIR}/PlayerName.h			${PLAYER_DIR}/PlayerName.cpp
 	${PLAYER_DIR}/CPUPlayer.h      	${PLAYER_DIR}/CPUPlayer.cpp
 )
 
 set(HELPER_FILES
 	${HELPER_DIR}/SystemInfo.h
+	${HELPER_DIR}/PieceValues.h
 	${HELPER_DIR}/JsonConversion.h
 	${HELPER_DIR}/Parameters.h
 	${HELPER_DIR}/ThreadBase.h
@@ -132,16 +134,16 @@ set(MULTIPLAYER_FILES
 	${MULTIPLAYER_DIR}/ConnectionStatus.h
 	${MULTIPLAYER_DIR}/Discovery/DiscoveryEndpoint.h
 	${MULTIPLAYER_DIR}/RemoteMessaging/MultiplayerMessageStruct.h
-	${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.h		${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.h			${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.cpp
 	${MULTIPLAYER_DIR}/MultiplayerManager.h							${MULTIPLAYER_DIR}/MultiplayerManager.cpp
 	${MULTIPLAYER_DIR}/Discovery/DiscoveryService.h					${MULTIPLAYER_DIR}/Discovery/DiscoveryService.cpp
 	${MULTIPLAYER_DIR}/TCPConnection/TCPInterfaces.h
-	${MULTIPLAYER_DIR}/TCPConnection/TCPSession.h					${MULTIPLAYER_DIR}/TCPConnection/TCPSession.cpp
-	${MULTIPLAYER_DIR}/TCPConnection/TCPServer.h					${MULTIPLAYER_DIR}/TCPConnection/TCPServer.cpp
-	${MULTIPLAYER_DIR}/TCPConnection/TCPClient.h					${MULTIPLAYER_DIR}/TCPConnection/TCPClient.cpp
-	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.h				${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPSession.h						${MULTIPLAYER_DIR}/TCPConnection/TCPSession.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPServer.h						${MULTIPLAYER_DIR}/TCPConnection/TCPServer.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPClient.h						${MULTIPLAYER_DIR}/TCPConnection/TCPClient.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.h					${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.cpp
 	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.h				${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.cpp
-	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.h		${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.h			${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.cpp
 )
 
 set(ALL_FILES
