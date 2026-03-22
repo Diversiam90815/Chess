@@ -14,7 +14,7 @@ void Logging::initLogging()
 	FileManager *fmg	  = FileManager::GetInstance();
 
 	auto		 logPath  = fmg->getLoggingPath();
-	auto		 log	  = logPath / LogFile;
+	auto		 log	  = logPath / FileName::LogFile;
 
 	std::string	 fileName = log.string();
 

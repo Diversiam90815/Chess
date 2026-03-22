@@ -5,29 +5,7 @@
   ==============================================================================
 */
 
-
 #include "StateMachine.h"
-#include "GameManager.h"
-
-
-std::shared_ptr<StateMachine> StateMachine::GetInstance()
-{
-	static std::shared_ptr<StateMachine> sInstance(new StateMachine());
-	return sInstance;
-}
-
-
-void StateMachine::ReleaseInstance()
-{
-	auto sInstance = GetInstance();
-	if (sInstance)
-	{
-		sInstance = nullptr;
-	}
-}
-
-
-StateMachine::StateMachine() {}
 
 
 StateMachine::~StateMachine()
@@ -36,171 +14,67 @@ StateMachine::~StateMachine()
 }
 
 
-void StateMachine::onGameStarted(GameConfiguration config)
+void StateMachine::setGameController(IGameController *controller)
 {
-	GameManager::GetInstance()->setGameConfiguration(config);
-
-	if (config.mode == GameModeSelection::VsCPU)
-	{
-		LOG_INFO("Starting a game against the CPU!");
-		mPlayingAgainstPC.store(true);
-	}
-	else
-	{
-		mPlayingAgainstPC.store(false);
-	}
-
-	GameState currentState = getCurrentGameState();
-
-	if (currentState == GameState::Undefined)
-	{
-		gameStateChanged(GameState::Init);
-		start();
-		triggerEvent();
-	}
-	else
-	{
-		int iCurrentState = static_cast<int>(currentState);
-
-		LOG_WARNING("Game Start called, but our state is wrong/not set up! Our current state is {0} ({1})", LoggingHelper::gameStateToString(currentState).c_str(), iCurrentState);
-	}
+	mController = controller;
 }
 
 
-void StateMachine::onMultiplayerGameStarted()
+void StateMachine::setInputSource(IInputSource *source)
 {
-	LOG_INFO("Starting a Multiplayer Game!");
-	mIsMultiplayerGame.store(true);
-
-	onGameStarted({});
+	mInputSource = source;
 }
 
 
-void StateMachine::onSquareSelected(const Position &pos)
+void StateMachine::postEvent(InputEvent event)
 {
-	if (getCurrentGameState() == GameState::WaitingForInput) // Selected Start Position
 	{
-		mCurrentPossibleMove.start = pos;
-		gameStateChanged(GameState::MoveInitiated);
-	}
-	else if (getCurrentGameState() == GameState::WaitingForTarget) // Selected End Position
-	{
-		mCurrentPossibleMove.end = pos;
-		gameStateChanged(GameState::ValidatingMove);
-	}
-}
-
-
-void StateMachine::onPawnPromotionChosen(PieceType promotion)
-{
-	if (getCurrentGameState() == GameState::PawnPromotion)
-	{
-		mCurrentPossibleMove.promotionPiece = promotion;
-		mAwaitingPromotion					= false;
-	}
-	gameStateChanged(GameState::ExecutingMove);
-}
-
-
-void StateMachine::gameStateChanged(const GameState state)
-{
-	setCurrrentGameState(state);
-
-	LOG_INFO("Game State changed to : {}", LoggingHelper::gameStateToString(state).c_str());
-
-	for (auto &observer : mObservers)
-	{
-		auto obs = observer.lock();
-
-		if (obs)
-			obs->onGameStateChanged(state);
+		std::lock_guard<std::mutex> lock(mQueueMutex);
+		mEventQueue.push(std::move(event));
 	}
 	triggerEvent();
 }
 
 
-void StateMachine::onRemoteMoveReceived(const PossibleMove &remoteMove)
+void StateMachine::onSquareSelected(Square sq)
 {
-	if (getCurrentGameState() == GameState::WaitingForRemoteMove)
-	{
-		LOG_INFO("Remote move received!");
-
-		// Setting the current move
-		mCurrentPossibleMove	= remoteMove;
-
-		mReceivedMoveFromRemote = true; // Set flag to true to avoid echo effect
-
-		// Check if a pawn promotion is needed!
-		bool isPawnPromotion	= GameManager::GetInstance()->checkForPawnPromotionMove(mCurrentPossibleMove);
-
-		if (isPawnPromotion && mCurrentPossibleMove.promotionPiece == PieceType::DefaultType)
-		{
-			LOG_ERROR("Remote move requires promotion, however no promotion piece has been specified!");
-			return;
-		}
-
-		// We will enter the execute move state!
-
-		{
-			std::lock_guard<std::mutex> lock(mStateChangedMutex);
-			mHasPendingStateChange = true;
-			mPendingState		   = GameState::ExecutingMove;
-		}
-		triggerEvent();
-	}
-
-	else
-	{
-		LOG_WARNING("Received a move from the remote endpoint, but we are not in the wrong state! Our state is {}",
-					LoggingHelper::gameStateToString(getCurrentGameState()).c_str());
-	}
+	postEvent(InputEvent::SquareSelected(sq));
 }
 
 
-void StateMachine::onMoveCalculated(PossibleMove cpuMove)
+void StateMachine::onPromotionChosen(PieceType piece)
 {
-	if (!cpuMove.isEmpty())
-	{
-		LOG_INFO("CPU selcted move from {} to {}", LoggingHelper::positionToString(cpuMove.start).c_str(), LoggingHelper::positionToString(cpuMove.end).c_str());
-
-		mReceivedMoveFromRemote = true; // treat CPU as remote so the move will be initiated correctly before execution
-		// Set move and transition to validation
-		mCurrentPossibleMove	= cpuMove;
-		mWaitingForCPUMove		= false;
-		gameStateChanged(GameState::ExecutingMove);
-	}
-	else
-	{
-		LOG_ERROR("CPU returned invalid move");
-		mWaitingForCPUMove = false;
-		gameStateChanged(GameState::GameOver);
-	}
+	postEvent(InputEvent::PromotionChosen(piece));
 }
 
 
-bool StateMachine::isInitialized() const
+void StateMachine::onRemoteMoveReceived(Move move)
 {
-	return mInitialized.load();
+	postEvent(InputEvent::RemoteMove(move));
 }
 
 
-void StateMachine::setInitialized(const bool value)
+void StateMachine::onCPUMoveCalculated(Move move)
 {
-	if (mInitialized.load() != value)
-	{
-		mInitialized.store(value);
-	}
+	postEvent(InputEvent::CPUMove(move));
 }
 
 
-void StateMachine::resetGame()
+void StateMachine::onUndoRequested()
 {
-	mWaitingForTargetStart = false;
-	mWaitingForTargetEnd   = false;
-	resetCurrentPossibleMove();
-	setCurrrentGameState(GameState::Undefined);
-	setInitialized(false);
-	GameManager::GetInstance()->resetGame();
+	postEvent(InputEvent::Undo());
+}
+
+
+void StateMachine::onGameStart(GameConfiguration config)
+{
+	postEvent(InputEvent::Start(config));
+}
+
+
+void StateMachine::onGameReset()
+{
+	postEvent(InputEvent::Reset());
 }
 
 
@@ -208,279 +82,249 @@ void StateMachine::run()
 {
 	while (isRunning())
 	{
-		waitForEvent();
+		if (!waitForEvent(0))
+			break; // Thread was stopped
 
-		LOG_INFO("Processing state: {}", LoggingHelper::gameStateToString(getCurrentGameState()).c_str());
+		if (!isRunning())
+			break;
 
-		// Check for pending state changes
-		GameState pendingState;
-		bool	  hasStateChange = false;
-
+		InputEvent event;
 		{
-			std::lock_guard<std::mutex> stateLock(mStateChangedMutex);
-			if (mHasPendingStateChange)
-			{
-				pendingState		   = mPendingState;
-				mHasPendingStateChange = false;
-				hasStateChange		   = true;
-			}
+			std::unique_lock lock(mQueueMutex);
+			event = std::move(mEventQueue.front());
+			mEventQueue.pop();
 		}
 
-		if (hasStateChange)
-		{
-			// Process the state change, call stateChanged
-			gameStateChanged(pendingState);
-		}
-
-		// Process the current state
-		switch (getCurrentGameState())
-		{
-		case GameState::Undefined:
-		{
-			switchToNextState();
-			break;
-		}
-		case GameState::Init:
-		{
-			if (!isInitialized())
-			{
-				bool result = handleInitState();
-				setInitialized(result);
-			}
-
-			switchToNextState();
-
-			break;
-		}
-		case GameState::InitSucceeded:
-		{
-			switchToNextState();
-			break;
-		}
-		case GameState::WaitingForInput:
-		{
-			// Set the player
-			// Calculate moves and wait for input
-
-			if (!mWaitingForTargetStart)
-			{
-				mWaitingForTargetStart = handleWaitingForInputState();
-			}
-
-			// Switch to next state happening in onSquareSelected
-			break;
-		}
-		case GameState::MoveInitiated:
-		{
-			// Display possible moves to UI
-			mMoveInitiated = handleMoveInitiatedState();
-			switchToNextState();
-			break;
-		}
-		case GameState::WaitingForTarget:
-		{
-			// Waiting for move end / Target
-			// Start validating the move
-			if (!mWaitingForTargetEnd)
-			{
-				bool result			 = handleWaitingForTargetState();
-				mWaitingForTargetEnd = result;
-			}
-
-			// Change to ValidatingMove happening in onSquareSelected
-			break;
-		}
-		case GameState::ValidatingMove:
-		{
-			// Check whether the move is valid -> jump to move execution
-			// Check whether the move is not a valid move (target square it same as start or not a valid square) -> jump to waiting for input
-			handleValidatingMoveState();
-			switchToNextState();
-			break;
-		}
-		case GameState::ExecutingMove:
-		{
-			// Execute the move
-			handleExecutingMoveState();
-			switchToNextState();
-			break;
-		}
-		case GameState::PawnPromotion:
-		{
-			// Wait for pawn promotion piece to be received from UI and then execute
-			handlePawnPromotionState();
-			break;
-		}
-		case GameState::WaitingForRemoteMove:
-		{
-			handleWaitingForRemoteState();
-			break;
-		}
-		case GameState::WaitingForCPUMove:
-		{
-			handleWaitingForCPUState();
-			break;
-		}
-		case GameState::GameOver:
-		{
-			// Determine the EndGameState and send message to UI
-			handleGameOverState();
-			break;
-		}
-		default: break;
-		}
+		processEvent(event);
 	}
 }
 
 
-void StateMachine::switchToNextState()
+void StateMachine::processEvent(const InputEvent &event)
 {
-	switch (getCurrentGameState())
+	if (!mController || !mInputSource)
 	{
-	case GameState::Undefined:
-	{
-		gameStateChanged(GameState::Init);
-		break;
+		LOG_ERROR("Controller or InputSource not set!");
+		return;
 	}
-	case GameState::Init:
-	{
-		if (isInitialized())
-		{
-			gameStateChanged(GameState::InitSucceeded);
-		}
-		break;
-	}
-	case GameState::InitSucceeded:
-	{
-		if (mIsMultiplayerGame.load())
-		{
-			bool isLocalPlayerTurn = GameManager::GetInstance()->isLocalPlayerTurn();
-			if (isLocalPlayerTurn)
-			{
-				LOG_INFO("Initial State: Local Player's turn");
-				gameStateChanged(GameState::WaitingForInput);
-			}
-			else
-			{
-				LOG_INFO("Initial State: Remote Player's turn, waiting for remote move");
-				gameStateChanged(GameState::WaitingForRemoteMove);
-			}
-		}
-		else if (mPlayingAgainstPC.load())
-		{
-			bool isCPUTurn = GameManager::GetInstance()->isCPUPlayer(PlayerColor::White); // White always goes first
-			if (isCPUTurn)
-			{
 
-				LOG_INFO("Initial state: CPU's turn");
-				gameStateChanged(GameState::WaitingForCPUMove);
-			}
-			else
-			{
-				LOG_INFO("Initial state: Local Player's turn");
-				gameStateChanged(GameState::WaitingForInput);
-			}
-		}
-		else
+	GameState currentState = mState.load();
+	GameState nextState	   = currentState;
+
+	switch (currentState)
+	{
+	case GameState::Init: nextState = handleInit(event); break;
+	case GameState::WaitingForInput: nextState = handleWaitingForInput(event); break;
+	case GameState::WaitingForTarget: nextState = handleWaitingForTarget(event); break;
+	case GameState::PawnPromotion: nextState = handlePawnPromotion(event); break;
+	case GameState::WaitingForRemoteMove: nextState = handleWaitingForRemote(event); break;
+	case GameState::WaitingForCPUMove: nextState = handleWaitingForCPU(event); break;
+	case GameState::GameOver: nextState = handleGameOver(event); break;
+	default: break;
+	}
+
+	if (nextState != currentState)
+		transitionTo(nextState);
+}
+
+
+GameState StateMachine::handleInit(const InputEvent &event)
+{
+	if (event.type == InputEvent::Type::GameStart)
+	{
+		mIsMultiplayer.store(event.config.mode == GameModeSelection::Multiplayer);
+		mIsVsCPU.store(event.config.mode == GameModeSelection::SinglePlayer);
+
+		if (!mController->initializeGame(event.config))
 		{
-			LOG_INFO("Single Player mode. We switch to WaitingForInput");
-			gameStateChanged(GameState::WaitingForInput);
+			LOG_ERROR("Failed to initialize game!");
+			return GameState::Init;
 		}
-		break;
-	}
-	case GameState::WaitingForInput:
-	{
-		break;
-	}
-	case GameState::MoveInitiated:
-	{
-		if (mMoveInitiated)
-			gameStateChanged(GameState::WaitingForTarget);
-		else
-			gameStateChanged(GameState::WaitingForInput);
 
-		break;
+		mMoveIntent.clear();
+		mEndgameState = EndGameState::OnGoing;
+
+		return determineNextTurnState();
 	}
-	case GameState::WaitingForTarget:
+
+	return GameState::Init;
+}
+
+
+GameState StateMachine::handleWaitingForInput(const InputEvent &event)
+{
+	switch (event.type)
 	{
-		// Change to ValidatingMove happening in onSquareSelected
-		break;
-	}
-	case GameState::ValidatingMove:
+	case InputEvent::Type::SquareSelected:
 	{
-		if (mIsValidMove)
+		MoveList moves;
+		mController->getLegalMovesFromSquare(event.square, moves);
+
+		if (moves.size() > 0)
 		{
-			bool isPawnPromotion = GameManager::GetInstance()->checkForPawnPromotionMove(mCurrentPossibleMove);
+			mMoveIntent.clear();
+			mMoveIntent.fromSquare = event.square;
+			mMoveIntent.legalMoves = moves;
 
-			if (isPawnPromotion)
-				gameStateChanged(GameState::PawnPromotion);
-			else
-				gameStateChanged(GameState::ExecutingMove);
-		}
-		else
-		{
-			resetCurrentPossibleMove();
-			mWaitingForTargetEnd = false;
-			gameStateChanged(GameState::WaitingForInput);
+			mInputSource->onLegalMovesAvailable(event.square, moves);
+			return GameState::WaitingForTarget;
 		}
 		break;
 	}
-	case GameState::ExecutingMove:
+	case InputEvent::Type::UndoRequested:
 	{
-		mEndgameState = GameManager::GetInstance()->checkForEndGameConditions();
-
-		if (isGameOngoing())
+		if (mController->undoLastMove())
 		{
-			GameManager::GetInstance()->switchTurns();
-
-			resetCurrentPossibleMove();
-			mMovesCalulated			  = false;
-			mWaitingForTargetStart	  = false;
-			mWaitingForTargetEnd	  = false;
-
-			PlayerColor currentPlayer = GameManager::GetInstance()->getCurrentPlayer();
-			bool		isCPUTurn	  = GameManager::GetInstance()->isCPUPlayer(currentPlayer);
-
-			// If we're in multiplayer mode, check who's turn it is
-			if (mIsMultiplayerGame.load())
-			{
-				bool isLocalPlayerTurn = GameManager::GetInstance()->isLocalPlayerTurn();
-				if (isLocalPlayerTurn)
-				{
-					LOG_INFO("Local Player's turn, so we wait for the input!");
-					gameStateChanged(GameState::WaitingForInput);
-				}
-				else
-				{
-					LOG_INFO("Remote Player's turn, so we wait until we get a move from the remote!");
-					// If it's not local player's turn, switch to WaitForRemoteMove state!
-					gameStateChanged(GameState::WaitingForRemoteMove);
-				}
-			}
-			else if (mPlayingAgainstPC.load() && isCPUTurn)
-			{
-				LOG_INFO("CPU PLayer's turn, waiting for CPU move");
-				gameStateChanged(GameState::WaitingForCPUMove);
-			}
-			else
-			{
-				LOG_INFO("Human player's turn, waiting for input");
-				gameStateChanged(GameState::WaitingForInput);
-			}
-		}
-		else
-		{
-			gameStateChanged(GameState::GameOver);
+			mInputSource->onMoveUndone();
+			mInputSource->onBoardStateChanged();
 		}
 		break;
 	}
-	case GameState::PawnPromotion:
+	case InputEvent::Type::GameReset:
 	{
-		// Change to Execute Move happening in onPawnPromotionChosen
-		break;
+		mController->resetGame();
+		mMoveIntent.clear();
+		return GameState::Init;
 	}
-	case GameState::GameOver:
+	default: break;
+	}
+
+	return GameState::WaitingForInput;
+}
+
+
+GameState StateMachine::handleWaitingForTarget(const InputEvent &event)
+{
+	if (event.type != InputEvent::Type::SquareSelected)
+		return GameState::WaitingForTarget;
+
+	Square sq = event.square;
+
+	// Deselect if clicked on same square
+	if (sq == mMoveIntent.fromSquare)
 	{
+		mMoveIntent.clear();
+		mInputSource->onBoardStateChanged(); // Notify UI to render a new board
+		return GameState::WaitingForInput;
+	}
+
+	// Clicked different own piece -> reselect
+	MoveList newMoves;
+	mController->getLegalMovesFromSquare(sq, newMoves);
+
+	if (newMoves.size() > 0)
+	{
+		mMoveIntent.clear();
+		mMoveIntent.fromSquare = sq;
+		mMoveIntent.legalMoves = newMoves;
+
+		mInputSource->onLegalMovesAvailable(sq, newMoves);
+		return GameState::WaitingForTarget;
+	}
+
+	// try target square
+	mMoveIntent.toSquare = sq;
+
+	// Check if promotion is needed
+	if (mController->isPromotionMove(mMoveIntent.fromSquare, mMoveIntent.toSquare))
+	{
+		mInputSource->onPromotionRequired();
+		return GameState::PawnPromotion;
+	}
+
+	// Find and execute move
+	Move move = mController->findMove(mMoveIntent.fromSquare, mMoveIntent.toSquare);
+
+	if (move.isValid() && tryExecuteMove(move))
+		return determineNextTurnState();
+
+	// invalid move
+	mMoveIntent.clear();
+	mInputSource->onBoardStateChanged(); // Notify UI to render a new board
+	return GameState::WaitingForInput;
+}
+
+
+GameState StateMachine::handlePawnPromotion(const InputEvent &event)
+{
+	if (event.type == InputEvent::Type::PromotionChosen)
+	{
+		mMoveIntent.promotion = event.promotion;
+
+		Move move			  = mController->findMove(mMoveIntent.fromSquare, mMoveIntent.toSquare, mMoveIntent.promotion);
+
+		if (move.isValid() && tryExecuteMove(move))
+			return determineNextTurnState();
+
+		mMoveIntent.clear();
+		return GameState::WaitingForInput;
+	}
+
+	return GameState::PawnPromotion;
+}
+
+
+GameState StateMachine::handleWaitingForRemote(const InputEvent &event)
+{
+	if (event.type == InputEvent::Type::RemoteMove)
+	{
+		if (tryExecuteMove(event.move))
+			return determineNextTurnState();
+	}
+
+	return GameState::WaitingForRemoteMove;
+}
+
+
+GameState StateMachine::handleWaitingForCPU(const InputEvent &event)
+{
+	if (event.type == InputEvent::Type::CPUMove)
+	{
+		if (tryExecuteMove(event.move))
+			return determineNextTurnState();
+
+		LOG_ERROR("CPU returned invalid move");
+		return GameState::GameOver;
+	}
+
+	return GameState::WaitingForCPUMove;
+}
+
+
+GameState StateMachine::handleGameOver(const InputEvent &event)
+{
+	if (event.type == InputEvent::Type::GameReset)
+	{
+		mController->resetGame();
+		mMoveIntent.clear();
+		mEndgameState = EndGameState::OnGoing;
+		return GameState::Init;
+	}
+
+	return GameState::GameOver;
+}
+
+
+void StateMachine::transitionTo(GameState newState)
+{
+	GameState oldState = mState.exchange(newState);
+
+	LOG_INFO("State transition: {} -> {}", LoggingHelper::gameStateToString(oldState), LoggingHelper::gameStateToString(newState));
+
+	if (mInputSource)
+		mInputSource->onGameStateChanged(newState);
+
+	onStateEnter(newState);
+}
+
+
+void StateMachine::onStateEnter(GameState enteringState)
+{
+	switch (enteringState)
+	{
+	case GameState::WaitingForCPUMove:
+	{
+		mController->requestCPUMoveAsync();
 		break;
 	}
 	default: break;
@@ -488,120 +332,44 @@ void StateMachine::switchToNextState()
 }
 
 
-void StateMachine::resetCurrentPossibleMove()
+GameState StateMachine::determineNextTurnState()
 {
-	LOG_INFO("Resetting the temporary saved possible move");
-	mCurrentPossibleMove.start = {};
-	mCurrentPossibleMove.end   = {};
-	mCurrentPossibleMove.type  = MoveType::Normal;
-}
-
-
-void StateMachine::reactToUndoMove()
-{
-	// Remove the last move from the history and board
-	GameManager::GetInstance()->undoMove();
-	GameManager::GetInstance()->switchTurns(); // Switch back to the old player
-
-	// Recalculate the new state (Changing player happening in WaitingForInputState)
-	mWaitingForTargetStart = false;
-	gameStateChanged(GameState::WaitingForInput);
-}
-
-
-bool StateMachine::handleInitState() const
-{
-	LOG_INFO("Handling init state");
-
-	if (mIsMultiplayerGame)
-		return GameManager::GetInstance()->startMultiplayerGame();
-
-	else if (mPlayingAgainstPC)
-		return GameManager::GetInstance()->startCPUGame();
-
-	else
-		return GameManager::GetInstance()->startGame();
-}
-
-
-bool StateMachine::handleWaitingForInputState()
-{
-	LOG_INFO("Handling waiting for input state");
-
-	resetCurrentPossibleMove();
-
-	mMovesCalulated = GameManager::GetInstance()->calculateAllMovesForPlayer();
-	return mMovesCalulated;
-}
-
-
-bool StateMachine::handleMoveInitiatedState() const
-{
-	LOG_INFO("Handling move initiated state");
-	bool result = GameManager::GetInstance()->initiateMove(mCurrentPossibleMove.start);
-	return result;
-}
-
-
-bool StateMachine::handleWaitingForTargetState()
-{
-	return true;
-}
-
-
-bool StateMachine::handleValidatingMoveState()
-{
-	LOG_INFO("Validating move");
-	mIsValidMove = GameManager::GetInstance()->checkForValidMoves(mCurrentPossibleMove);
-	return mIsValidMove;
-}
-
-
-bool StateMachine::handleExecutingMoveState()
-{
-	GameManager::GetInstance()->executeMove(mCurrentPossibleMove, mReceivedMoveFromRemote);
-	mReceivedMoveFromRemote = false; // Reset remote flag
-	return true;
-}
-
-
-bool StateMachine::handlePawnPromotionState()
-{
-	mAwaitingPromotion = true;
-	return true;
-}
-
-
-bool StateMachine::handleGameOverState()
-{
-	// Endgame state sent to UI via GameManager::checkForEndGameConditions
-	// We should reset and close the StateMachine
-
-	// resetGame();
-	// this->stop();
-	return true;
-}
-
-
-bool StateMachine::handleWaitingForRemoteState()
-{
-	// State change will happen in onRemoteMoveReceived()
-	// but to validate the remote's move, we want to calculate the possible moves for the remote
-
-	return GameManager::GetInstance()->calculateAllMovesForPlayer();
-}
-
-
-bool StateMachine::handleWaitingForCPUState()
-{
-	if (!mWaitingForCPUMove)
+	if (mEndgameState != EndGameState::OnGoing)
 	{
-		// Start CPU Move calculation async
-		GameManager::GetInstance()->requestCPUMoveAsync();
-		mWaitingForCPUMove = true;
+		Side winner = (mEndgameState == EndGameState::Checkmate) ? (mController->getCurrentSide() == Side::White ? Side::Black : Side::White) : Side::None;
 
-		LOG_INFO("Started CPU move calculation for player");
+		if (mInputSource)
+			mInputSource->onGameEnded(mEndgameState, winner);
+
+		return GameState::GameOver;
 	}
 
+	if (mIsMultiplayer.load() && !mController->isLocalPlayerTurn())
+		return GameState::WaitingForRemoteMove;
+
+	if (mIsVsCPU.load() && mController->isCPUTurn())
+		return GameState::WaitingForCPUMove;
+
+	return GameState::WaitingForInput;
+}
+
+
+bool StateMachine::tryExecuteMove(Move move)
+{
+	auto executionResult = mController->executeMove(move);
+
+	if (!executionResult)
+		return false;
+
+	mInputSource->onMoveExecuted(move, executionResult.notation);
+	mInputSource->onBoardStateChanged();
+
+	mController->switchTurns();
+	Side currentSide = mController->getCurrentSide();
+	mInputSource->onPlayerChanged(currentSide);
+
+	mEndgameState = mController->checkEndGame();
+
+	mMoveIntent.clear();
 	return true;
 }

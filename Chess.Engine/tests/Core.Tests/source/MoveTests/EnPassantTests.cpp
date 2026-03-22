@@ -18,184 +18,268 @@ namespace MoveTests
 class EnPassantTests : public ::testing::Test
 {
 protected:
-	std::shared_ptr<ChessBoard>		mBoard;
-	std::shared_ptr<MoveValidation> mValidation;
-	std::shared_ptr<MoveExecution>	mExecution;
-	std::shared_ptr<MoveGeneration> mGeneration;
+	Chessboard	   mBoard;
+	MoveGeneration mGeneration{mBoard};
+	MoveExecution  mExecution{mBoard};
+	MoveValidation mValidation{mBoard, mGeneration, mExecution};
 
-	void							SetUp() override
+	void		   SetUp() override { mBoard.init(); }
+
+	bool		   hasEnPassantMove(const MoveList &moves) const
 	{
-		// Generate modules
-		mBoard = std::make_shared<ChessBoard>();
-		mBoard->initializeBoard();
-		mValidation = std::make_shared<MoveValidation>(mBoard);
-		mExecution	= std::make_shared<MoveExecution>(mBoard, mValidation);
-		mGeneration = std::make_shared<MoveGeneration>(mBoard, mValidation, mExecution);
+		for (size_t i = 0; i < moves.size(); ++i)
+		{
+			if (moves[i].isEnPassant())
+				return true;
+		}
+		return false;
+	}
+
+	bool hasEnPassantTo(const MoveList &moves, Square target) const
+	{
+		for (size_t i = 0; i < moves.size(); ++i)
+		{
+			if (moves[i].isEnPassant() && moves[i].to() == target)
+				return true;
+		}
+		return false;
 	}
 };
 
 
-TEST_F(EnPassantTests, EnPassantAvailableAfterDoublePawnMove)
+TEST_F(EnPassantTests, EnPassantSquareSetAfterDoublePawnPush)
 {
-	// Prepare board for en passant move
-	// Clear board to setup a position for en passant
-	mBoard->removeAllPiecesFromBoard();
+	Move doublePush(Square::e2, Square::e4, MoveFlag::DoublePawnPush);
+	mExecution.makeMove(doublePush);
 
-	// White Pawn at e5 (4,3) and black pawn at d7 (3,1)
-	Position whitePawnPos = {4, 3};
-	Position blackPawnPos = {3, 1};
-	mBoard->setPiece(whitePawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::White));
-	mBoard->setPiece(blackPawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
-
-	// Execute double pawn push with black pawn from d7 to d5
-	PossibleMove doublePawnMove;
-	doublePawnMove.start = blackPawnPos;
-	doublePawnMove.end	 = {3, 3}; // d5
-	doublePawnMove.type	 = MoveType::DoublePawnPush;
-
-	mExecution->executeMove(doublePawnMove);
-
-	// Check if white pawn at e5 has en passant move available
-	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
-	auto moves			  = mGeneration->getMovesForPosition(whitePawnPos);
-
-	bool hasEnPassantMove = false;
-	for (const auto &move : moves)
-	{
-		if ((move.type & MoveType::EnPassant) == MoveType::EnPassant)
-		{
-			hasEnPassantMove = true;
-
-			// Check if the move is to d6
-			EXPECT_EQ(move.end.x, 3);
-			EXPECT_EQ(move.end.y, 2);
-			break;
-		}
-	}
-
-	EXPECT_TRUE(hasEnPassantMove);
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::e3) << "En passant square should be e3 after e2-e4";
 }
 
 
-TEST_F(EnPassantTests, EnPassantCapturesCorrectly)
+TEST_F(EnPassantTests, EnPassantSquareResetAfterOtherMove)
 {
-	// Prepare board for en passant move
-	// Clear board to setup a position for en passant
-	mBoard->removeAllPiecesFromBoard();
+	// Make double pawn push
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::e3);
 
-	// White Pawn at e5 (4,3) and black pawn at d7 (3,1)
-	Position whitePawnPos = {4, 3};
-	Position blackPawnPos = {3, 1};
-	mBoard->setPiece(whitePawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::White));
-	mBoard->setPiece(blackPawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
+	// Make another move
+	mExecution.makeMove(Move(Square::b8, Square::c6, MoveFlag::Quiet));
 
-	// Execute Double pawn push
-	PossibleMove doublePawnMove;
-	doublePawnMove.start = blackPawnPos;
-	doublePawnMove.end	 = Position{3, 3}; // d5
-	doublePawnMove.type	 = MoveType::DoublePawnPush;
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::None) << "En passant square should reset after non-double-push move";
+}
 
-	mExecution->executeMove(doublePawnMove);
 
-	// Execute EnPassant capture
-	PossibleMove enPassantMove;
-	enPassantMove.start = whitePawnPos;
-	enPassantMove.end	= Position{3, 2}; // d6
-	enPassantMove.type	= MoveType::EnPassant;
+TEST_F(EnPassantTests, EnPassantMoveGeneratedAfterDoublePush)
+{
+	mBoard.clear();
 
-	mExecution->executeMove(enPassantMove);
+	// White pawn on e5, black pawn about to double push d7-d5
+	mBoard.addPiece(PieceType::WPawn, Square::e5);
+	mBoard.addPiece(PieceType::BPawn, Square::d7);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::Black);
+	mBoard.updateOccupancies();
 
-	// Verify: White pawn has moved to d6
-	EXPECT_FALSE(mBoard->isEmpty(Position{3, 2}));
-	auto pieceAtD6 = mBoard->getPiece(Position{3, 2});
-	EXPECT_EQ(pieceAtD6->getColor(), PlayerColor::White);
-	EXPECT_EQ(pieceAtD6->getType(), PieceType::Pawn);
+	// Black plays d7-d5
+	mExecution.makeMove(Move(Square::d7, Square::d5, MoveFlag::DoublePawnPush));
 
-	// Verify: Black pawn at D5 has been captured (removed)
-	EXPECT_TRUE(mBoard->isEmpty(Position{3, 3}));
+	// Now white should have en passant available
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
 
-	// Verify: Original white pawn position is empty
-	EXPECT_TRUE(mBoard->isEmpty(whitePawnPos));
+	EXPECT_TRUE(hasEnPassantTo(moves, Square::d6)) << "En passant to d6 should be available";
+}
+
+
+TEST_F(EnPassantTests, EnPassantCaptureRemovesPawn)
+{
+	mBoard.clear();
+
+	// Set up en passant position
+	mBoard.addPiece(PieceType::WPawn, Square::e5);
+	mBoard.addPiece(PieceType::BPawn, Square::d5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setEnPassantSquare(Square::d6);
+	mBoard.updateOccupancies();
+
+	// Execute en passant
+	Move enPassant(Square::e5, Square::d6, MoveFlag::EnPassant);
+	mExecution.makeMove(enPassant);
+
+	EXPECT_EQ(mBoard.pieceAt(Square::d6), PieceType::WPawn) << "White pawn should be at d6";
+	EXPECT_EQ(mBoard.pieceAt(Square::e5), PieceType::None) << "e5 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::d5), PieceType::None) << "Captured pawn at d5 should be removed";
+}
+
+
+TEST_F(EnPassantTests, EnPassantUnmakeRestoresPawn)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WPawn, Square::e5);
+	mBoard.addPiece(PieceType::BPawn, Square::d5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setEnPassantSquare(Square::d6);
+	mBoard.updateOccupancies();
+
+	Move enPassant(Square::e5, Square::d6, MoveFlag::EnPassant);
+	mExecution.makeMove(enPassant);
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e5), PieceType::WPawn) << "White pawn should be back at e5";
+	EXPECT_EQ(mBoard.pieceAt(Square::d5), PieceType::BPawn) << "Black pawn should be restored at d5";
+	EXPECT_EQ(mBoard.pieceAt(Square::d6), PieceType::None) << "d6 should be empty";
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::d6) << "En passant square should be restored";
 }
 
 
 TEST_F(EnPassantTests, EnPassantOnlyAvailableImmediately)
 {
-	// Prepare board for en passant move
-	// Clear board to setup a position for en passant
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// White Pawn at e5 (4,3), h5 (7,3) and black pawn at d7 (3,1)
-	Position whitePawnPos = {4, 3};
-	Position otherWhitePawnPos{7, 3};
-	Position blackPawnPos = {3, 1};
-	mBoard->setPiece(whitePawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::White));
-	mBoard->setPiece(blackPawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
-	mBoard->setPiece(otherWhitePawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::White));
+	// White pawns on e5 and h5, black pawn at d7
+	mBoard.addPiece(PieceType::WPawn, Square::e5);
+	mBoard.addPiece(PieceType::WPawn, Square::h5);
+	mBoard.addPiece(PieceType::BPawn, Square::d7);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::Black);
+	mBoard.updateOccupancies();
 
-	// Execute double pawn move with black pawn (d7 to d5)
-	PossibleMove doublePawnMove;
-	doublePawnMove.start = blackPawnPos;
-	doublePawnMove.end	 = Position{3, 3}; // d5
-	doublePawnMove.type	 = MoveType::DoublePawnPush;
+	// Black plays d7-d5
+	mExecution.makeMove(Move(Square::d7, Square::d5, MoveFlag::DoublePawnPush));
 
-	mExecution->executeMove(doublePawnMove);
+	// White plays h5-h6 (not taking en passant)
+	mExecution.makeMove(Move(Square::h5, Square::h6, MoveFlag::Quiet));
 
-	// Make a different move (not capturing en passant)
-	PossibleMove otherMove;
-	otherMove.start = otherWhitePawnPos;
-	otherMove.end	= Position{7, 2}; // h6
-	otherMove.type	= MoveType::Normal;
+	// Black makes a random move
+	mExecution.makeMove(Move(Square::e8, Square::d7, MoveFlag::Quiet));
 
-	mExecution->executeMove(otherMove);
+	// Now white should NOT have en passant available
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
 
-	// Verify: White pawn at e5 has no en passant available
-	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
-
-	auto moves			  = mGeneration->getMovesForPosition(whitePawnPos);
-
-	bool hasEnPassantMove = false;
-	for (const auto &move : moves)
-	{
-		if ((move.type & MoveType::EnPassant) == MoveType::EnPassant)
-		{
-			hasEnPassantMove = true;
-			break;
-		}
-	}
-
-	EXPECT_FALSE(hasEnPassantMove);
+	EXPECT_FALSE(hasEnPassantMove(moves)) << "En passant should not be available after intervening moves";
 }
 
 
-TEST_F(EnPassantTests, EnPassantNotAvailableWithoutDoublePawnMove)
+TEST_F(EnPassantTests, EnPassantNotAvailableWithoutDoublePush)
 {
-	// Clear board and set up position where en passant would not be possible
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Place white pawn at e5 (4,3), black pawn at d5 (3,3) directly
-	Position whitePawnPos = {4, 3};
-	Position blackPawnPos = {3, 3};
-	mBoard->setPiece(whitePawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::White));
-	mBoard->setPiece(blackPawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
+	// White pawn on e5, black pawn directly placed on d5 (no double push)
+	mBoard.addPiece(PieceType::WPawn, Square::e5);
+	mBoard.addPiece(PieceType::BPawn, Square::d5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	// No en passant square set
+	mBoard.updateOccupancies();
 
-	// Black pawn is already at d5 -> no double push happened
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
 
-	// Verify: white pawn at e5 has no en passant move available
-	mGeneration->calculateAllLegalBasicMoves(PlayerColor::White);
-	auto moves			  = mGeneration->getMovesForPosition(whitePawnPos);
+	EXPECT_FALSE(hasEnPassantMove(moves)) << "En passant should not be available without prior double pawn push";
+}
 
-	bool hasEnPassantMove = false;
-	for (const auto &move : moves)
+
+TEST_F(EnPassantTests, EnPassantFromBothSides)
+{
+	mBoard.clear();
+
+	// White pawns on c5 and e5, black pawn double pushes d7-d5
+	mBoard.addPiece(PieceType::WPawn, Square::c5);
+	mBoard.addPiece(PieceType::WPawn, Square::e5);
+	mBoard.addPiece(PieceType::BPawn, Square::d7);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::Black);
+	mBoard.updateOccupancies();
+
+	// Black plays d7-d5
+	mExecution.makeMove(Move(Square::d7, Square::d5, MoveFlag::DoublePawnPush));
+
+	// Both white pawns should be able to capture en passant
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
+
+	int enPassantCount = 0;
+	for (size_t i = 0; i < moves.size(); ++i)
 	{
-		if ((move.type & MoveType::EnPassant) == MoveType::EnPassant)
-		{
-			hasEnPassantMove = true;
-			break;
-		}
+		if (moves[i].isEnPassant() && moves[i].to() == Square::d6)
+			++enPassantCount;
 	}
 
-	EXPECT_FALSE(hasEnPassantMove);
+	EXPECT_EQ(enPassantCount, 2) << "Both white pawns should be able to capture en passant";
 }
+
+
+TEST_F(EnPassantTests, BlackEnPassantCapture)
+{
+	mBoard.clear();
+
+	// Black pawn on e4, white pawn double pushes d2-d4
+	mBoard.addPiece(PieceType::BPawn, Square::e4);
+	mBoard.addPiece(PieceType::WPawn, Square::d2);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	// White plays d2-d4
+	mExecution.makeMove(Move(Square::d2, Square::d4, MoveFlag::DoublePawnPush));
+
+	// Black should have en passant available
+	MoveList moves;
+	mGeneration.generateAllMoves(moves);
+
+	EXPECT_TRUE(hasEnPassantTo(moves, Square::d3)) << "Black en passant to d3 should be available";
+}
+
+
+TEST_F(EnPassantTests, EnPassantIsLegalMove)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WPawn, Square::e5);
+	mBoard.addPiece(PieceType::BPawn, Square::d5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setEnPassantSquare(Square::d6);
+	mBoard.updateOccupancies();
+
+	Move enPassant(Square::e5, Square::d6, MoveFlag::EnPassant);
+
+	EXPECT_TRUE(mValidation.isMoveLegal(enPassant)) << "En passant should be a legal move";
+}
+
+
+TEST_F(EnPassantTests, EnPassantBlockedByPin)
+{
+	mBoard.clear();
+
+	// White king on a5, white pawn on e5, black pawn on d5 (just double pushed)
+	// Black rook on h5 pins the white pawn horizontally
+	mBoard.addPiece(PieceType::WKing, Square::a5);
+	mBoard.addPiece(PieceType::WPawn, Square::e5);
+	mBoard.addPiece(PieceType::BPawn, Square::d5);
+	mBoard.addPiece(PieceType::BRook, Square::h5);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setEnPassantSquare(Square::d6);
+	mBoard.updateOccupancies();
+
+	Move enPassant(Square::e5, Square::d6, MoveFlag::EnPassant);
+
+	// En passant would leave king in check (both pawns removed from 5th rank)
+	EXPECT_FALSE(mValidation.isMoveLegal(enPassant)) << "En passant should be illegal when it exposes king to check";
+}
+
 
 } // namespace MoveTests

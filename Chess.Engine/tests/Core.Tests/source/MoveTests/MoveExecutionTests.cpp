@@ -17,286 +17,472 @@ namespace MoveTests
 class MoveExecutionTest : public ::testing::Test
 {
 protected:
-	std::shared_ptr<ChessBoard>		mBoard;
-	std::shared_ptr<MoveValidation> mValidation;
-	std::shared_ptr<MoveExecution>	mExecution;
+	Chessboard	  mBoard;
+	MoveExecution mExecution{mBoard};
 
-	void							SetUp() override
-	{
-		mBoard = std::make_shared<ChessBoard>();
-		mBoard->initializeBoard();
-		mValidation = std::make_shared<MoveValidation>(mBoard);
-		mExecution	= std::make_shared<MoveExecution>(mBoard, mValidation);
-	}
+	void		  SetUp() override { mBoard.init(); }
 };
 
 
 TEST_F(MoveExecutionTest, ExecuteMoveUpdatesBoard)
 {
 	// Move white pawn e2 to e4
-	Position	 start = {4, 6};
-	Position	 end   = {4, 4};
-	PossibleMove move{start, end, MoveType::Normal, PieceType::DefaultType};
+	Move move(Square::e2, Square::e4, MoveFlag::DoublePawnPush);
 
-	auto		 result = mExecution->executeMove(move);
+	bool result = mExecution.makeMove(move);
 
-	// The pawn should now be at e4
-	auto		 piece	= mBoard->getPiece(end);
+	EXPECT_TRUE(result) << "Move should succeed";
+	EXPECT_EQ(mBoard.pieceAt(Square::e2), PieceType::None) << "e2 should be empty after move";
+	EXPECT_EQ(mBoard.pieceAt(Square::e4), PieceType::WPawn) << "e4 should have white pawn after move";
+}
 
-	ASSERT_NE(piece, nullptr) << "Expected a piece at the destination";
-	EXPECT_EQ(piece->getType(), PieceType::Pawn) << "Expected a pawn at the destination";
-	EXPECT_EQ(piece->getColor(), PlayerColor::White) << "Expected a white piece at the destination";
+
+TEST_F(MoveExecutionTest, ExecuteMoveSwitchesSide)
+{
+	EXPECT_EQ(mBoard.getCurrentSide(), Side::White) << "Initial side should be white";
+
+	Move move(Square::e2, Square::e4, MoveFlag::DoublePawnPush);
+	mExecution.makeMove(move);
+
+	EXPECT_EQ(mBoard.getCurrentSide(), Side::Black) << "Side should be black after white's move";
 }
 
 
 TEST_F(MoveExecutionTest, ExecuteCaptureMove)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
 	// Place white knight at e4, black pawn at f5
-	Position whiteKnightPos = {4, 4}; // e4
-	Position blackPawnPos	= {5, 3}; // f5
-
-	mBoard->setPiece(whiteKnightPos, ChessPiece::CreatePiece(PieceType::Knight, PlayerColor::White));
-	mBoard->setPiece(blackPawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
+	mBoard.addPiece(PieceType::WKnight, Square::e4);
+	mBoard.addPiece(PieceType::BPawn, Square::f5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
 
 	// Execute capture move
-	PossibleMove captureMove{whiteKnightPos, blackPawnPos, MoveType::Capture, PieceType::DefaultType};
-	auto		 result	   = mExecution->executeMove(captureMove);
+	Move captureMove(Square::e4, Square::f5, MoveFlag::Capture);
+	bool result = mExecution.makeMove(captureMove);
 
-	// Verify: White knight now at f5, no piece at e4
-	auto		 pieceAtF5 = mBoard->getPiece(blackPawnPos);
-	ASSERT_NE(pieceAtF5, nullptr) << "Expected the capturing knight at destination";
-	EXPECT_EQ(pieceAtF5->getType(), PieceType::Knight) << "Expected a knight at the destination";
-	EXPECT_EQ(pieceAtF5->getColor(), PlayerColor::White) << "Expected a white piece at the destination";
-	EXPECT_TRUE(mBoard->isEmpty(whiteKnightPos)) << "Original position should be empty after capture";
-
-	// Verify: capture was recorded in the move
-	const Move *lastMove = mExecution->getLastMove();
-	ASSERT_NE(lastMove, nullptr) << "Expected a move in the history";
-	EXPECT_EQ(lastMove->capturedPiece, PieceType::Pawn) << "Move should record the captured pawn";
+	EXPECT_TRUE(result) << "Capture move should succeed";
+	EXPECT_EQ(mBoard.pieceAt(Square::f5), PieceType::WKnight) << "f5 should have white knight after capture";
+	EXPECT_EQ(mBoard.pieceAt(Square::e4), PieceType::None) << "e4 should be empty after move";
 }
 
 
-TEST_F(MoveExecutionTest, AddAndRemoveFromMoveHistory)
+TEST_F(MoveExecutionTest, MoveHistoryIsRecorded)
 {
-	// Execute the move
-	Position	 start = {4, 1}; // e7
-	Position	 end   = {4, 3}; // e5
-	PossibleMove move{start, end, MoveType::Normal, PieceType::DefaultType};
-	Move		 executedMove(move);
+	Move move(Square::e2, Square::e4, MoveFlag::DoublePawnPush);
+	mExecution.makeMove(move);
 
-	// Check for move added to move history
-	mExecution->addMoveToHistory(executedMove);
-	EXPECT_NE(mExecution->getLastMove(), nullptr) << "Last move should not be null after adding to history";
+	EXPECT_EQ(mExecution.historySize(), 1) << "History should have one entry";
 
-	// Check for removing the move
-	mExecution->removeLastMove();
-	EXPECT_EQ(mExecution->getLastMove(), nullptr) << "Last move should be null after removing from history";
+	const MoveHistoryEntry *lastMove = mExecution.getLastMove();
+	ASSERT_NE(lastMove, nullptr) << "Last move should not be null";
+	EXPECT_EQ(lastMove->move.from(), Square::e2) << "Last move should be from e2";
+	EXPECT_EQ(lastMove->move.to(), Square::e4) << "Last move should be to e4";
 }
 
 
-TEST_F(MoveExecutionTest, MoveIncrementsPieceCounter)
+TEST_F(MoveExecutionTest, UnmakeMoveRestoresPosition)
 {
-	// Get the white pawn at e2
-	Position	 start			  = {4, 6}; // e2
-	auto		 pawn			  = mBoard->getPiece(start);
-	int			 initialMoveCount = pawn->getMoveCounter();
+	// Make a move
+	Move move(Square::e2, Square::e4, MoveFlag::DoublePawnPush);
+	mExecution.makeMove(move);
 
-	// Execute pawn move
-	Position	 end			  = {4, 4}; // e4
-	PossibleMove move{start, end, MoveType::Normal, PieceType::DefaultType};
+	// Unmake the move
+	bool result = mExecution.unmakeMove();
 
-	mExecution->executeMove(move);
-
-	// Verify: the move counter was incremented
-	auto movedPawn		= mBoard->getPiece(end);
-	int	 newMoveCounter = movedPawn->getMoveCounter();
-
-	EXPECT_EQ(newMoveCounter, initialMoveCount + 1) << "Piece move counter should be incremented after a move";
+	EXPECT_TRUE(result) << "Unmake should succeed";
+	EXPECT_EQ(mBoard.pieceAt(Square::e2), PieceType::WPawn) << "e2 should have pawn after unmake";
+	EXPECT_EQ(mBoard.pieceAt(Square::e4), PieceType::None) << "e4 should be empty after unmake";
+	EXPECT_EQ(mBoard.getCurrentSide(), Side::White) << "Side should be white after unmake";
 }
 
-TEST_F(MoveExecutionTest, HalfMoveClockIncreaseForNonPawnNonCaptureMove)
+
+TEST_F(MoveExecutionTest, UnmakeCaptureRestoresCapturedPiece)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Setup white king at e1 und white knight at b1
-	Position kingPos   = {4, 7}; // e1
-	Position knightPos = {1, 7}; // b1
+	// Place white knight at e4, black pawn at f5
+	mBoard.addPiece(PieceType::WKnight, Square::e4);
+	mBoard.addPiece(PieceType::BPawn, Square::f5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
 
-	mBoard->setPiece(kingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
-	mBoard->setPiece(knightPos, ChessPiece::CreatePiece(PieceType::Knight, PlayerColor::White));
-	mBoard->updateKingsPosition(kingPos, PlayerColor::White);
+	// Execute and unmake capture
+	Move captureMove(Square::e4, Square::f5, MoveFlag::Capture);
+	mExecution.makeMove(captureMove);
+	mExecution.unmakeMove();
 
-	// Execute knight move
-	PossibleMove knightMove{knightPos, {2, 5}, MoveType::Normal, PieceType::DefaultType}; // b1 to c3
-	auto		 result = mExecution->executeMove(knightMove);
-
-	// Verify: half move clock increased
-	EXPECT_GT(result.halfMoveClock, 0) << "Half-move clock should be incremented for non-pawn, non-capture move";
+	EXPECT_EQ(mBoard.pieceAt(Square::e4), PieceType::WKnight) << "Knight should be back at e4";
+	EXPECT_EQ(mBoard.pieceAt(Square::f5), PieceType::BPawn) << "Black pawn should be restored at f5";
 }
 
 
-TEST_F(MoveExecutionTest, HalfMoveClockResetsForPawnMove)
+TEST_F(MoveExecutionTest, UnmakeWithEmptyHistoryReturnsFalse)
 {
-	mBoard->removeAllPiecesFromBoard();
+	bool result = mExecution.unmakeMove();
 
-	// Setup white knight at e1, white pawn at e2 and white knight at b1
-	Position kingPos   = {4, 7}; // e1
-	Position knightPos = {1, 7}; // b1
-	Position pawnPos   = {4, 6}; // e2
-
-	mBoard->setPiece(kingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
-	mBoard->setPiece(knightPos, ChessPiece::CreatePiece(PieceType::Knight, PlayerColor::White));
-	mBoard->setPiece(pawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::White));
-	mBoard->updateKingsPosition(kingPos, PlayerColor::White);
-
-	// First move knight (increase half move clock)
-	PossibleMove knightMove{knightPos, {2, 5}, MoveType::Normal, PieceType::DefaultType}; // b1 to c3
-	mExecution->executeMove(knightMove);
-
-	// Then move pawn
-	PossibleMove pawnMove{pawnPos, {4, 4}, MoveType::Normal, PieceType::DefaultType}; // e2 to e4
-	auto		 result = mExecution->executeMove(pawnMove);
-
-	// Verify: half move clock was reset
-	EXPECT_EQ(result.halfMoveClock, 0) << "Half-move clock should be reset to 0 for pawn move";
+	EXPECT_FALSE(result) << "Unmake with empty history should return false";
 }
 
 
-TEST_F(MoveExecutionTest, HalfMoveClockResetsForCaptureMove)
+TEST_F(MoveExecutionTest, ClearHistoryRemovesAllEntries)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::e7, Square::e5, MoveFlag::DoublePawnPush));
 
-	// Setup a position for a capture
-	Position kingPos		= {4, 7}; // e1
-	Position whiteKnightPos = {1, 7}; // b1
-	Position blackPawnPos	= {2, 5}; // c3
+	mExecution.clearHistory();
 
-	mBoard->setPiece(kingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::White));
-	mBoard->setPiece(whiteKnightPos, ChessPiece::CreatePiece(PieceType::Knight, PlayerColor::White));
-	mBoard->setPiece(blackPawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
-	mBoard->updateKingsPosition(kingPos, PlayerColor::White);
-
-	// Knight captures pawn
-	PossibleMove captureMove{whiteKnightPos, blackPawnPos, MoveType::Capture, PieceType::DefaultType};
-	auto		 result = mExecution->executeMove(captureMove);
-
-	// Verify: half move clock was reset
-	EXPECT_EQ(result.halfMoveClock, 0) << "Half-move clock should reset to 0 for capture move";
+	EXPECT_EQ(mExecution.historySize(), 0) << "History should be empty after clear";
+	EXPECT_EQ(mExecution.getLastMove(), nullptr) << "Last move should be null after clear";
 }
 
 
-TEST_F(MoveExecutionTest, MoveNumberIncrements)
+TEST_F(MoveExecutionTest, DoublePawnPushSetsEnPassantSquare)
 {
-	// Execute two moves
-	Position	 start1 = {4, 6}; // e2
-	Position	 end1	= {4, 4}; // e4
-	PossibleMove move1{start1, end1, MoveType::Normal, PieceType::DefaultType};
-	auto		 result1 = mExecution->executeMove(move1);
+	Move move(Square::e2, Square::e4, MoveFlag::DoublePawnPush);
+	mExecution.makeMove(move);
 
-	Position	 start2	 = {5, 1}; // f7
-	Position	 end2	 = {5, 3}; // f5
-	PossibleMove move2{start2, end2, MoveType::Normal, PieceType::DefaultType};
-	auto		 result2 = mExecution->executeMove(move2);
-
-	// Verify: move numbers were incremented correctly
-	EXPECT_EQ(result1.number, 1) << "First move should have number 1";
-	EXPECT_EQ(result2.number, 2) << "Second move should have number 2";
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::e3) << "En passant square should be e3 after e2-e4";
 }
 
 
-TEST_F(MoveExecutionTest, CheckFlagAddedWhenMovingIntoCheck)
+TEST_F(MoveExecutionTest, QuietMoveResetsEnPassantSquare)
 {
-	mBoard->removeAllPiecesFromBoard();
+	// First, make a double pawn push to set en passant
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
 
-	// Setup: White queen about to check black king
-	Position whiteQueenPos = {3, 7}; // d1
-	Position blackKingPos  = {3, 0}; // d8
+	// Make a quiet move
+	mExecution.makeMove(Move(Square::b8, Square::c6, MoveFlag::Quiet));
 
-	mBoard->setPiece(whiteQueenPos, ChessPiece::CreatePiece(PieceType::Queen, PlayerColor::White));
-	mBoard->setPiece(blackKingPos, ChessPiece::CreatePiece(PieceType::King, PlayerColor::Black));
-	mBoard->updateKingsPosition(blackKingPos, PlayerColor::Black);
-
-	// Execute move that puts king in check
-	PossibleMove checkMove{whiteQueenPos, {3, 4}, MoveType::Normal, PieceType::DefaultType}; // d1 to d4
-	auto		 result	   = mExecution->executeMove(checkMove);
-
-	bool		 checkFlag = (result.type & MoveType::Check) == MoveType::Check;
-
-	// Verify: check flag was added
-	EXPECT_TRUE(checkFlag) << "Move should include Check flag when putting opponent's king in check";
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::None) << "En passant should be reset after quiet move";
 }
 
 
-TEST_F(MoveExecutionTest, PlayerColorIsCorrectlyRecorded)
+TEST_F(MoveExecutionTest, KingsideCastlingMovesKingAndRook)
 {
-	// Move a white pawn
-	Position	 startWhite = {4, 6}; // e2
-	Position	 endWhite	= {4, 4}; // e4
-	PossibleMove moveWhite{startWhite, endWhite, MoveType::Normal, PieceType::DefaultType};
-	auto		 resultWhite = mExecution->executeMove(moveWhite);
+	mBoard.clear();
 
-	// Move a black pawn
-	Position	 startBlack	 = {4, 1}; // e7
-	Position	 endBlack	 = {4, 3}; // e5
-	PossibleMove moveBlack{startBlack, endBlack, MoveType::Normal, PieceType::DefaultType};
-	auto		 resultBlack = mExecution->executeMove(moveBlack);
+	// Set up castling position
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WRook, Square::h1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setCastlingRights(Castling::WK);
+	mBoard.updateOccupancies();
 
-	// Verify: player color was correctly recorded
-	EXPECT_EQ(resultWhite.player, PlayerColor::White) << "White move should record White player";
-	EXPECT_EQ(resultBlack.player, PlayerColor::Black) << "Black move should record Black player";
+	Move castleMove(Square::e1, Square::g1, MoveFlag::KingCastle);
+	mExecution.makeMove(castleMove);
+
+	EXPECT_EQ(mBoard.pieceAt(Square::g1), PieceType::WKing) << "King should be at g1";
+	EXPECT_EQ(mBoard.pieceAt(Square::f1), PieceType::WRook) << "Rook should be at f1";
+	EXPECT_EQ(mBoard.pieceAt(Square::e1), PieceType::None) << "e1 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::h1), PieceType::None) << "h1 should be empty";
 }
 
 
-TEST_F(MoveExecutionTest, MovedAndCapturedPieceTypesAreRecorded)
+TEST_F(MoveExecutionTest, QueensideCastlingMovesKingAndRook)
 {
-	mBoard->removeAllPiecesFromBoard();
+	mBoard.clear();
 
-	// Place white knight and black pawn
-	Position knightPos = {4, 4}; // e4
-	Position pawnPos   = {5, 3}; // f5
+	// Set up castling position
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WRook, Square::a1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setCastlingRights(Castling::WQ);
+	mBoard.updateOccupancies();
 
-	mBoard->setPiece(knightPos, ChessPiece::CreatePiece(PieceType::Knight, PlayerColor::White));
-	mBoard->setPiece(pawnPos, ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black));
+	Move castleMove(Square::e1, Square::c1, MoveFlag::QueenCastle);
+	mExecution.makeMove(castleMove);
 
-	// Execute capture
-	PossibleMove captureMove{knightPos, pawnPos, MoveType::Capture, PieceType::DefaultType};
-	auto		 result = mExecution->executeMove(captureMove);
-
-	// Verify: piece types were correctly recorded
-	EXPECT_EQ(result.movedPiece, PieceType::Knight) << "Moved piece should be recorded as Knight";
-	EXPECT_EQ(result.capturedPiece, PieceType::Pawn) << "Captured piece should be recorded as Pawn";
+	EXPECT_EQ(mBoard.pieceAt(Square::c1), PieceType::WKing) << "King should be at c1";
+	EXPECT_EQ(mBoard.pieceAt(Square::d1), PieceType::WRook) << "Rook should be at d1";
+	EXPECT_EQ(mBoard.pieceAt(Square::e1), PieceType::None) << "e1 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::a1), PieceType::None) << "a1 should be empty";
 }
 
 
-TEST_F(MoveExecutionTest, MoveTypeIsPreservedInMove)
+TEST_F(MoveExecutionTest, UnmakeCastlingRestoresPosition)
 {
-	// Setup a normal move
-	Position	 start = {4, 6}; // e2
-	Position	 end   = {4, 4}; // e4
-	PossibleMove possibleMove{start, end, MoveType::Normal, PieceType::DefaultType};
+	mBoard.clear();
 
-	// Execute the move
-	auto		 result = mExecution->executeMove(possibleMove);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WRook, Square::h1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setCastlingRights(Castling::WK);
+	mBoard.updateOccupancies();
 
-	// Verify the move type was preserved
-	EXPECT_EQ(result.type, MoveType::Normal) << "Move type should be preserved in executed move";
+	Move castleMove(Square::e1, Square::g1, MoveFlag::KingCastle);
+	mExecution.makeMove(castleMove);
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e1), PieceType::WKing) << "King should be back at e1";
+	EXPECT_EQ(mBoard.pieceAt(Square::h1), PieceType::WRook) << "Rook should be back at h1";
+	EXPECT_EQ(mBoard.pieceAt(Square::g1), PieceType::None) << "g1 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::f1), PieceType::None) << "f1 should be empty";
 }
 
 
-TEST_F(MoveExecutionTest, ExecutingMoveGeneratesNotation)
+TEST_F(MoveExecutionTest, EnPassantCapturesCorrectPawn)
 {
-	// Make a standard opening move (e2->e4)
-	Position	 start = {4, 6}; // e2
-	Position	 end   = {4, 4}; // e4
-	PossibleMove move{start, end, MoveType::Normal, PieceType::DefaultType};
+	mBoard.clear();
 
-	auto		 result = mExecution->executeMove(move);
+	// Set up en passant position
+	mBoard.addPiece(PieceType::WPawn, Square::e5);
+	mBoard.addPiece(PieceType::BPawn, Square::d5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setEnPassantSquare(Square::d6);
+	mBoard.updateOccupancies();
 
-	// Verify the notation is generated
-	EXPECT_FALSE(result.notation.empty()) << "Move notation should be generated";
+	Move enPassantMove(Square::e5, Square::d6, MoveFlag::EnPassant);
+	mExecution.makeMove(enPassantMove);
+
+	EXPECT_EQ(mBoard.pieceAt(Square::d6), PieceType::WPawn) << "White pawn should be at d6";
+	EXPECT_EQ(mBoard.pieceAt(Square::e5), PieceType::None) << "e5 should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::d5), PieceType::None) << "Captured pawn at d5 should be removed";
 }
 
+
+TEST_F(MoveExecutionTest, UnmakeEnPassantRestoresCapturedPawn)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WPawn, Square::e5);
+	mBoard.addPiece(PieceType::BPawn, Square::d5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setEnPassantSquare(Square::d6);
+	mBoard.updateOccupancies();
+
+	Move enPassantMove(Square::e5, Square::d6, MoveFlag::EnPassant);
+	mExecution.makeMove(enPassantMove);
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e5), PieceType::WPawn) << "White pawn should be back at e5";
+	EXPECT_EQ(mBoard.pieceAt(Square::d5), PieceType::BPawn) << "Black pawn should be restored at d5";
+	EXPECT_EQ(mBoard.pieceAt(Square::d6), PieceType::None) << "d6 should be empty";
+}
+
+
+TEST_F(MoveExecutionTest, PawnPromotionToQueen)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WPawn, Square::e7);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	Move promoMove(Square::e7, Square::e8, MoveFlag::QueenPromotion);
+	mExecution.makeMove(promoMove);
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e8), PieceType::WQueen) << "e8 should have white queen after promotion";
+	EXPECT_EQ(mBoard.pieceAt(Square::e7), PieceType::None) << "e7 should be empty";
+}
+
+
+TEST_F(MoveExecutionTest, PawnPromotionToKnight)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WPawn, Square::e7);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	Move promoMove(Square::e7, Square::e8, MoveFlag::KnightPromotion);
+	mExecution.makeMove(promoMove);
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e8), PieceType::WKnight) << "e8 should have white knight after promotion";
+}
+
+
+TEST_F(MoveExecutionTest, PromotionCaptureWorks)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WPawn, Square::e7);
+	mBoard.addPiece(PieceType::BRook, Square::d8);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	Move promoCapture(Square::e7, Square::d8, MoveFlag::QueenPromoCapture);
+	mExecution.makeMove(promoCapture);
+
+	EXPECT_EQ(mBoard.pieceAt(Square::d8), PieceType::WQueen) << "d8 should have white queen";
+	EXPECT_EQ(mBoard.pieceAt(Square::e7), PieceType::None) << "e7 should be empty";
+}
+
+
+TEST_F(MoveExecutionTest, UnmakePromotionRestoresPawn)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WPawn, Square::e7);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	Move promoMove(Square::e7, Square::e8, MoveFlag::QueenPromotion);
+	mExecution.makeMove(promoMove);
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e7), PieceType::WPawn) << "Pawn should be back at e7";
+	EXPECT_EQ(mBoard.pieceAt(Square::e8), PieceType::None) << "e8 should be empty";
+}
+
+
+TEST_F(MoveExecutionTest, CastlingRightsLostAfterKingMove)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WRook, Square::h1);
+	mBoard.addPiece(PieceType::WRook, Square::a1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setCastlingRights(Castling::WK | Castling::WQ);
+	mBoard.updateOccupancies();
+
+	// Move king
+	mExecution.makeMove(Move(Square::e1, Square::f1, MoveFlag::Quiet));
+
+	Castling rights = mBoard.getCurrentCastlingRights();
+	EXPECT_FALSE(static_cast<bool>(rights & Castling::WK)) << "White kingside castling should be lost";
+	EXPECT_FALSE(static_cast<bool>(rights & Castling::WQ)) << "White queenside castling should be lost";
+}
+
+
+TEST_F(MoveExecutionTest, CastlingRightsLostAfterRookMove)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WRook, Square::h1);
+	mBoard.addPiece(PieceType::WRook, Square::a1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setCastlingRights(Castling::WK | Castling::WQ);
+	mBoard.updateOccupancies();
+
+	// Move kingside rook
+	mExecution.makeMove(Move(Square::h1, Square::h2, MoveFlag::Quiet));
+
+	Castling rights = mBoard.getCurrentCastlingRights();
+	EXPECT_FALSE(static_cast<bool>(rights & Castling::WK)) << "White kingside castling should be lost";
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::WQ)) << "White queenside castling should still be available";
+}
+
+
+TEST_F(MoveExecutionTest, CastlingRightsRestoredOnUnmake)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WRook, Square::h1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setCastlingRights(Castling::WK);
+	mBoard.updateOccupancies();
+
+	mExecution.makeMove(Move(Square::e1, Square::f1, MoveFlag::Quiet));
+	mExecution.unmakeMove();
+
+	Castling rights = mBoard.getCurrentCastlingRights();
+	EXPECT_TRUE(static_cast<bool>(rights & Castling::WK)) << "White kingside castling should be restored";
+}
+
+
+TEST_F(MoveExecutionTest, HalfMoveClockIncrementsOnQuietMove)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WKnight, Square::b1);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setHalfMoveClock(0);
+	mBoard.updateOccupancies();
+
+	mExecution.makeMove(Move(Square::b1, Square::c3, MoveFlag::Quiet));
+
+	EXPECT_EQ(mBoard.getHalfMoveClock(), 1) << "Half move clock should increment on quiet move";
+}
+
+
+TEST_F(MoveExecutionTest, HalfMoveClockResetsOnPawnMove)
+{
+	mBoard.setHalfMoveClock(10);
+
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+
+	EXPECT_EQ(mBoard.getHalfMoveClock(), 0) << "Half move clock should reset on pawn move";
+}
+
+
+TEST_F(MoveExecutionTest, HalfMoveClockResetsOnCapture)
+{
+	mBoard.clear();
+
+	mBoard.addPiece(PieceType::WKnight, Square::e4);
+	mBoard.addPiece(PieceType::BPawn, Square::f5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setHalfMoveClock(15);
+	mBoard.updateOccupancies();
+
+	mExecution.makeMove(Move(Square::e4, Square::f5, MoveFlag::Capture));
+
+	EXPECT_EQ(mBoard.getHalfMoveClock(), 0) << "Half move clock should reset on capture";
+}
+
+
+TEST_F(MoveExecutionTest, MultipleMovesAndUnmakes)
+{
+	// Play several moves and unmake them all
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::e7, Square::e5, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::g1, Square::f3, MoveFlag::Quiet));
+
+	EXPECT_EQ(mExecution.historySize(), 3) << "Should have 3 moves in history";
+
+	mExecution.unmakeMove();
+	mExecution.unmakeMove();
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mExecution.historySize(), 0) << "History should be empty";
+	EXPECT_EQ(mBoard.pieceAt(Square::e2), PieceType::WPawn) << "e2 should have white pawn";
+	EXPECT_EQ(mBoard.pieceAt(Square::e7), PieceType::BPawn) << "e7 should have black pawn";
+	EXPECT_EQ(mBoard.pieceAt(Square::g1), PieceType::WKnight) << "g1 should have white knight";
+	EXPECT_EQ(mBoard.getCurrentSide(), Side::White) << "Side should be white";
+}
+
+
+TEST_F(MoveExecutionTest, GetHistoryReturnsAllMoves)
+{
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::e7, Square::e5, MoveFlag::DoublePawnPush));
+
+	const auto &history = mExecution.getHistory();
+
+	EXPECT_EQ(history.size(), 2) << "History should have 2 entries";
+	EXPECT_EQ(history[0].move.from(), Square::e2) << "First move should be from e2";
+	EXPECT_EQ(history[1].move.from(), Square::e7) << "Second move should be from e7";
+}
 
 } // namespace MoveTests

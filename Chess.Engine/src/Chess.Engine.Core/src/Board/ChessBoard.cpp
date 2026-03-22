@@ -1,224 +1,267 @@
 /*
   ==============================================================================
-	Module:         ChessBoard
-	Description:    Class characterizing a virtual chess board
+	Module:         Bitboard
+	Description:    A bitboard representing a chess board
   ==============================================================================
 */
 
-#include "ChessBoard.h"
-#include "ChessPiece.h"
+#include "Chessboard.h"
+#include <stdio.h>
+#include <string.h>
 
 
-ChessBoard::ChessBoard()
+void Chessboard::init()
 {
-	squares.resize(BOARD_SIZE);
-	for (int y = 0; y < BOARD_SIZE; ++y)
+	ZobristHash::initialize();
+	parseFEN(mStartPosition);
+}
+
+
+void Chessboard::clear()
+{
+	mBitBoards.fill(0);
+	mOccupancyBitboards.fill(0);
+
+	mSide			 = Side::None;
+	mEnPassantSquare = Square::None;
+	mCastlingRights	 = Castling::None;
+
+	mHalfMoveClock	 = 0;
+	mMoveCounter	 = 0;
+	mHash			 = 0;
+}
+
+
+void Chessboard::parseFEN(std::string_view fen)
+{
+	clear();
+
+	size_t i		  = 0;
+
+	auto   skipSpaces = [&]()
 	{
-		for (int x = 0; x < BOARD_SIZE; ++x)
+		while (i < fen.size() && fen[i] == ' ')
+			++i;
+	};
+
+	// 1 Piece placement
+	int rank = 0;
+	int file = 0;
+
+	while (i < fen.size() && fen[i] != ' ')
+	{
+		char c = fen[i++];
+
+		if (c == '/')
 		{
-			squares[y].emplace_back(x, y);
+			++rank;
+			file = 0;
+			continue;
 		}
-	}
-}
 
-ChessBoard::ChessBoard(const ChessBoard &other)
-{
-	squares.resize(BOARD_SIZE);
-	for (int y = 0; y < BOARD_SIZE; ++y)
-	{
-		squares[y].resize(BOARD_SIZE);
-		for (int x = 0; x < BOARD_SIZE; ++x)
+		if (c >= '1' && c <= '8')
 		{
-			// Copy over the Square data
-			squares[y][x] = other.squares[y][x];
+			file += (c - '0');
+			continue;
 		}
-	}
 
-	// Also copy king positions
-	mWhiteKingPosition = other.mWhiteKingPosition;
-	mBlackKingPosition = other.mBlackKingPosition;
-}
-
-
-ChessBoard::~ChessBoard() {}
-
-
-Square &ChessBoard::getSquare(Position pos)
-{
-	return squares[pos.y][pos.x];
-}
-
-
-void ChessBoard::setPiece(Position pos, std::shared_ptr<ChessPiece> piece)
-{
-	squares[pos.y][pos.x].piece = piece;
-}
-
-
-std::shared_ptr<ChessPiece> &ChessBoard::getPiece(Position pos)
-{
-	static std::shared_ptr<ChessPiece> nullPiece = nullptr;
-
-	if (!pos.isValid())
-		return nullPiece;
-
-	return squares[pos.y][pos.x].piece;
-}
-
-
-std::vector<PlayerPiece> ChessBoard::getPiecesFromPlayer(PlayerColor playerColor)
-{
-	std::vector<PlayerPiece> playerPieces;
-	playerPieces.reserve(PLAYER_PIECES_NUM);
-
-	for (int y = 0; y < BOARD_SIZE; ++y)
-	{
-		for (int x = 0; x < BOARD_SIZE; ++x)
+		if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))
 		{
-			Position pos{x, y};
-			auto	&piece = getPiece(pos);
-			if (piece && piece->getColor() == playerColor)
-			{
-				playerPieces.emplace_back(pos, piece);
-			}
+			int piece  = GetPieceTypeFromChar(c);
+			int square = rank * 8 + file;
+			BitUtils::setBit(mBitBoards[piece], square);
+			++file;
 		}
 	}
 
-	return playerPieces;
+	skipSpaces();
+
+	// 2 Side to move
+	if (i <= fen.size())
+	{
+		mSide = (fen[i] == 'w') ? Side::White : Side::Black;
+		++i;
+	}
+
+	skipSpaces();
+
+	// 3 Castling
+	while (i < fen.size() && fen[i] != ' ')
+	{
+		switch (fen[i])
+		{
+		case 'K': mCastlingRights |= Castling::WK; break;
+		case 'Q': mCastlingRights |= Castling::WQ; break;
+		case 'k': mCastlingRights |= Castling::BK; break;
+		case 'q': mCastlingRights |= Castling::BQ; break;
+		case '-': break;
+		}
+		++i;
+	}
+
+	skipSpaces();
+
+	// 4 En Passant
+	if (i < fen.size() && fen[i] != '-')
+	{
+		int epFile		 = fen[i + 0] - 'a';
+		int epRank		 = 8 - (fen[i + 1] - '0');
+		mEnPassantSquare = (Square)(epRank * 8 + epFile);
+	}
+	else
+	{
+		mEnPassantSquare = Square::None;
+	}
+
+	// 5 occupancies
+	updateOccupancies();
+
+	// 6 Compute hash
+	computeHash();
 }
 
 
-void ChessBoard::removePiece(Position pos)
+void Chessboard::removePiece(PieceType piece, Square sq)
 {
-	if (CHESSBOARD_DEBUG)
-		LOG_DEBUG("removePiece called at {}", LoggingHelper::positionToString(pos).c_str());
-
-	if (!pos.isValid())
+	if (piece == PieceType::None)
 		return;
 
-	squares[pos.y][pos.x].piece = nullptr;
+	BitUtils::popBit(mBitBoards[piece], to_index(sq));
+
+	// Update hash
+	hashPiece(piece, sq);
 }
 
 
-bool ChessBoard::movePiece(Position start, Position end)
+void Chessboard::addPiece(PieceType piece, Square sq)
 {
-	if (CHESSBOARD_DEBUG)
-		LOG_DEBUG("Moved piece from {} to {}", LoggingHelper::positionToString(start).c_str(), LoggingHelper::positionToString(end).c_str());
+	if (piece == PieceType::None)
+		return;
 
-	if (!start.isValid() || !end.isValid())
-		return false;
+	BitUtils::setBit(mBitBoards[piece], to_index(sq));
 
-	auto &piece = getPiece(start);
-	if (!piece)
-		return false;
-
-	setPiece(end, piece);
-	removePiece(start);
-	return true;
+	// update hash
+	hashPiece(piece, sq);
 }
 
 
-bool ChessBoard::isEmpty(Position pos) const
+void Chessboard::movePiece(PieceType piece, Square from, Square to)
 {
-	if (!pos.isValid())
-		return true;
-
-	return squares[pos.y][pos.x].piece == nullptr;
+	removePiece(piece, from);
+	addPiece(piece, to);
 }
 
 
-void ChessBoard::updateKingsPosition(Position &pos, PlayerColor player)
+void Chessboard::updateOccupancies()
 {
-	player == PlayerColor::White ? mWhiteKingPosition = pos : mBlackKingPosition = pos;
+	mOccupancyBitboards[to_index(Side::White)] = mBitBoards[WKing] | mBitBoards[WQueen] | mBitBoards[WPawn] | mBitBoards[WKnight] | mBitBoards[WBishop] | mBitBoards[WRook];
+	mOccupancyBitboards[to_index(Side::Black)] = mBitBoards[BKing] | mBitBoards[BQueen] | mBitBoards[BPawn] | mBitBoards[BKnight] | mBitBoards[BBishop] | mBitBoards[BRook];
+
+	mOccupancyBitboards[to_index(Side::Both)]  = mOccupancyBitboards[to_index(Side::White)] | mOccupancyBitboards[to_index(Side::Black)];
 }
 
 
-Position ChessBoard::getKingsPosition(PlayerColor player) const
+PieceType Chessboard::pieceAt(Square sq) const
 {
-	return player == PlayerColor::White ? mWhiteKingPosition : mBlackKingPosition;
-}
-
-
-void ChessBoard::removeAllPiecesFromBoard()
-{
-	for (int y = 0; y < BOARD_SIZE; ++y)
+	int sqIndex = to_index(sq);
+	for (int p = 0; p < 12; ++p)
 	{
-		for (int x = 0; x < BOARD_SIZE; ++x)
+		if (BitUtils::getBit(mBitBoards[p], sqIndex))
+			return (PieceType)p;
+	}
+	return PieceType::None;
+}
+
+
+void Chessboard::setSide(Side s) noexcept
+{
+	if (mSide == s)
+		return;
+
+	// Remove old hash
+	if (mSide == Side::Black)
+		hashSide();
+
+	mSide = s;
+
+	// update hash
+	if (mSide == Side::Black)
+		hashSide();
+}
+
+
+void Chessboard::flipSide() noexcept
+{
+	Side newSide = getCurrentSide() == Side::White ? Side::Black : Side::White;
+	setSide(newSide);
+}
+
+
+void Chessboard::setCastlingRights(Castling c) noexcept
+{
+	// Remove old hash
+	hashCastling(mCastlingRights);
+
+	// adapt new castling
+	mCastlingRights = c;
+
+	// update hash
+	hashCastling(c);
+}
+
+
+void Chessboard::setEnPassantSquare(Square sq) noexcept
+{
+	// remove old hash
+	hashEnPassant(mEnPassantSquare);
+
+	// update en passant square
+	mEnPassantSquare = sq;
+
+	// update hash
+	hashEnPassant(sq);
+}
+
+
+BoardState Chessboard::saveState() const
+{
+	return {mCastlingRights, mEnPassantSquare, mHalfMoveClock, PieceType::None, mHash};
+}
+
+
+void Chessboard::restoreState(const BoardState &state)
+{
+	mCastlingRights	 = state.castle;
+	mEnPassantSquare = state.enPassant;
+	mHalfMoveClock	 = state.halfMoveClock;
+	mHash			 = state.hash;
+}
+
+
+void Chessboard::computeHash()
+{
+	mHash = 0;
+
+	// hash all pieces
+	for (int piece = 0; piece < 12; piece++)
+	{
+		U64 bb = mBitBoards[piece];
+
+		while (bb)
 		{
-			squares[y][x].piece = nullptr;
+			int sq = BitUtils::lsb(bb);
+			hashPiece((PieceType)piece, (Square)sq);
+			BitUtils::popBit(bb, sq);
 		}
 	}
 
-	mWhiteKingPosition = Position{-1, -1}; // invalid position
-	mBlackKingPosition = Position{-1, -1}; // invalid position
-}
+	// hash side to move
+	if (mSide == Side::Black)
+		hashSide();
 
+	// hash castling rights
+	hashCastling(mCastlingRights);
 
-bool ChessBoard::getBoardState(BoardStateArray boardState)
-{
-	for (int y = 0; y < BOARD_SIZE; ++y)
-	{
-		for (int x = 0; x < BOARD_SIZE; ++x)
-		{
-			Position pos	  = {x, y};
-			auto	&piece	  = getPiece(pos);
-
-			int		 colorVal = 0; // 0 = no color
-			int		 typeVal  = 0; // 0 = PieceType::DefaultType
-
-			if (piece)
-			{
-				colorVal = static_cast<int>(piece->getColor()) & 0xF;
-				typeVal	 = static_cast<int>(piece->getType()) & 0xF;
-			}
-
-			// Pack color in high nibble, type in low nibble:
-			// bits [4..7] = color, bits [0..3] = piece type
-			int encoded		 = (colorVal << 4) | (typeVal & 0xF);
-
-			boardState[y][x] = encoded;
-		}
-	}
-	return true;
-}
-
-
-void ChessBoard::initializeBoard()
-{
-	if (!mInitialized)
-		removeAllPiecesFromBoard();
-
-	// Place pieces for White
-	setPiece(Position(0, 0), std::make_shared<Rook>(PlayerColor::Black));
-	setPiece(Position(1, 0), std::make_shared<Knight>(PlayerColor::Black));
-	setPiece(Position(2, 0), std::make_shared<Bishop>(PlayerColor::Black));
-	setPiece(Position(3, 0), std::make_shared<Queen>(PlayerColor::Black));
-	setPiece(Position(4, 0), std::make_shared<King>(PlayerColor::Black));
-	setPiece(Position(5, 0), std::make_shared<Bishop>(PlayerColor::Black));
-	setPiece(Position(6, 0), std::make_shared<Knight>(PlayerColor::Black));
-	setPiece(Position(7, 0), std::make_shared<Rook>(PlayerColor::Black));
-	for (int x = 0; x < BOARD_SIZE; ++x)
-	{
-		setPiece(Position(x, 1), std::make_shared<Pawn>(PlayerColor::Black));
-	}
-
-	// Place pieces for Black
-	setPiece(Position(0, 7), std::make_shared<Rook>(PlayerColor::White));
-	setPiece(Position(1, 7), std::make_shared<Knight>(PlayerColor::White));
-	setPiece(Position(2, 7), std::make_shared<Bishop>(PlayerColor::White));
-	setPiece(Position(3, 7), std::make_shared<Queen>(PlayerColor::White));
-	setPiece(Position(4, 7), std::make_shared<King>(PlayerColor::White));
-	setPiece(Position(5, 7), std::make_shared<Bishop>(PlayerColor::White));
-	setPiece(Position(6, 7), std::make_shared<Knight>(PlayerColor::White));
-	setPiece(Position(7, 7), std::make_shared<Rook>(PlayerColor::White));
-	for (int x = 0; x < BOARD_SIZE; ++x)
-	{
-		setPiece(Position(x, 6), std::make_shared<Pawn>(PlayerColor::White));
-	}
-
-	// Update King's Position
-	mWhiteKingPosition = Position(4, 7);
-	mBlackKingPosition = Position(4, 0);
-
-	mInitialized	   = true;
+	// hash enpassant
+	hashEnPassant(mEnPassantSquare);
 }

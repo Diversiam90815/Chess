@@ -14,15 +14,15 @@ TCPSession::TCPSession(asio::io_context &ioContext) : mSocket(ioContext)
 	mSocket.bind(tcp::endpoint(tcp::v4(), 0));		  // Bind to a OS assigned port
 	mBoundPort	   = mSocket.local_endpoint().port(); // Get the port number it is bound to
 
-	mSendBuffer	   = new uint8_t[PackageBufferSize];
-	mReceiveBuffer = new uint8_t[PackageBufferSize];
+	mSendBuffer	   = new uint8_t[RemoteControl::PackageBufferSize];
+	mReceiveBuffer = new uint8_t[RemoteControl::PackageBufferSize];
 }
 
 
 TCPSession::TCPSession(tcp::socket &&socket) : mSocket(std::move(socket))
 {
-	mSendBuffer	   = new uint8_t[PackageBufferSize];
-	mReceiveBuffer = new uint8_t[PackageBufferSize];
+	mSendBuffer	   = new uint8_t[RemoteControl::PackageBufferSize];
+	mReceiveBuffer = new uint8_t[RemoteControl::PackageBufferSize];
 }
 
 
@@ -62,7 +62,7 @@ void TCPSession::readMessageAsync()
 		return;
 
 	// Read full package of fixed size
-	asio::async_read(mSocket, asio::buffer(mReceiveBuffer, PackageBufferSize), asio::transfer_at_least(sizeof(MultiplayerMessageType) + sizeof(size_t)),
+	asio::async_read(mSocket, asio::buffer(mReceiveBuffer, RemoteControl::PackageBufferSize), asio::transfer_at_least(sizeof(MultiplayerMessageType) + sizeof(size_t)),
 					 [this](const asio::error_code &ec, size_t bytes_transfered)
 					 {
 						 if (!mAsyncReadActive)
@@ -96,7 +96,7 @@ void TCPSession::readMessageAsync()
 						 memcpy(&dataSize, mReceiveBuffer + sizeof(MultiplayerMessageType), sizeof(size_t));
 
 						 // Validate and limit data size to prevent buffer overflow
-						 if (dataSize > PackageBufferSize - sizeof(MultiplayerMessageType) - sizeof(size_t))
+						 if (dataSize > RemoteControl::PackageBufferSize - sizeof(MultiplayerMessageType) - sizeof(size_t))
 						 {
 							 LOG_ERROR("Received data size ({} bytes) exceeds maximum allowed!", dataSize);
 							 readMessageAsync(); // Continue reading next message
@@ -134,7 +134,7 @@ bool TCPSession::sendMessage(MultiplayerMessageStruct &message)
 
 	size_t		 offset				   = 0;
 
-	memset(mSendBuffer, 0, PackageBufferSize); // Clear the buffer
+	memset(mSendBuffer, 0, RemoteControl::PackageBufferSize); // Clear the buffer
 
 	// Copy the message type
 	memcpy(&mSendBuffer[offset], &message.type, messageTypeSize);

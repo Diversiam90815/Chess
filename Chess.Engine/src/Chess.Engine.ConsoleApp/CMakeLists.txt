@@ -1,0 +1,18 @@
+set(TARGET_NAME Chess.Engine.ConsoleApp)
+
+add_executable(${TARGET_NAME}
+    src/main.cpp
+)
+
+target_link_libraries(${TARGET_NAME} PRIVATE Chess.Engine.Core)
+
+target_compile_definitions(${TARGET_NAME} PRIVATE
+    _CRT_SECURE_NO_WARNINGS
+    _SILENCE_STDEXT_ARR_ITERS_DEPRECATION_WARNING
+    _WINDOWS
+    WIN32_LEAN_AND_MEAN
+    _WINSOCK_DEPRECATED_NO_WARNING
+    _WIN32_WINNT=0x0A00
+    WINVER=0x0A00
+    NTDDI_VERSION=NTDDI_WIN10
+)

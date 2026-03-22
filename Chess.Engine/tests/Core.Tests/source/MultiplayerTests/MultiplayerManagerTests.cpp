@@ -22,8 +22,8 @@ class MockConnectionStatusObserver : public IConnectionStatusObserver
 {
 public:
 	MOCK_METHOD(void, onConnectionStateChanged, (const ConnectionStatusEvent event), (override));
-	MOCK_METHOD(void, onLocalPlayerChosen, (const PlayerColor localPlayer), (override));
-	MOCK_METHOD(void, onRemotePlayerChosen, (PlayerColor remotePlayer), (override));
+	MOCK_METHOD(void, onLocalPlayerChosen, (const Side localPlayer), (override));
+	MOCK_METHOD(void, onRemotePlayerChosen, (Side remotePlayer), (override));
 	MOCK_METHOD(void, onLocalReadyFlagSet, (const bool flag), (override));
 };
 
@@ -117,9 +117,9 @@ TEST_F(MultiplayerManagerTests, LocalPlayerChosen)
 {
 	multiplayerManager->attachObserver(mockObserver);
 
-	EXPECT_CALL(*mockObserver, onLocalPlayerChosen(PlayerColor::White)).Times(1);
+	EXPECT_CALL(*mockObserver, onLocalPlayerChosen(Side::White)).Times(1);
 
-	multiplayerManager->localPlayerChosen(PlayerColor::White);
+	multiplayerManager->localPlayerChosen(Side::White);
 }
 
 
@@ -128,10 +128,10 @@ TEST_F(MultiplayerManagerTests, LocalPlayerChosenSamePlayerTwice)
 	multiplayerManager->attachObserver(mockObserver);
 
 	// Should only be called once, not on the second identical call
-	EXPECT_CALL(*mockObserver, onLocalPlayerChosen(PlayerColor::White)).Times(1);
+	EXPECT_CALL(*mockObserver, onLocalPlayerChosen(Side::White)).Times(1);
 
-	multiplayerManager->localPlayerChosen(PlayerColor::White);
-	multiplayerManager->localPlayerChosen(PlayerColor::White); // Should be ignored
+	multiplayerManager->localPlayerChosen(Side::White);
+	multiplayerManager->localPlayerChosen(Side::White); // Should be ignored
 }
 
 
@@ -198,9 +198,9 @@ TEST_F(MultiplayerManagerTests, OnRemotePlayerChosenReceived)
 	multiplayerManager->attachObserver(mockObserver);
 
 	// When remote chooses White, local should become Black
-	EXPECT_CALL(*mockObserver, onRemotePlayerChosen(PlayerColor::Black)).Times(1);
+	EXPECT_CALL(*mockObserver, onRemotePlayerChosen(Side::Black)).Times(1);
 
-	multiplayerManager->onRemotePlayerChosenReceived(PlayerColor::White);
+	multiplayerManager->onRemotePlayerChosenReceived(Side::White);
 }
 
 

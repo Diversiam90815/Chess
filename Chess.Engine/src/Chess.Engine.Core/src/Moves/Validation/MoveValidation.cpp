@@ -1,223 +1,141 @@
 /*
   ==============================================================================
-	Module:			MoveValidation
-	Description:    Manages the validation of moves in chess
+	Module:         MoveValidation
+	Description:    Move legality validation
   ==============================================================================
 */
-
 
 #include "MoveValidation.h"
 
 
-MoveValidation::MoveValidation(std::shared_ptr<ChessBoard> board) : mChessBoard(board) {}
+MoveValidation::MoveValidation(Chessboard &board, MoveGeneration &generation, MoveExecution &execution) : mBoard(board), mGeneration(generation), mExecution(execution) {}
 
 
-MoveValidation::~MoveValidation() {}
-
-
-void MoveValidation::init(std::shared_ptr<ChessBoard> board)
+bool MoveValidation::isInCheck() const
 {
-	this->mChessBoard = board;
+	return isKingAttacked(mBoard.getCurrentSide());
 }
 
 
-bool MoveValidation::validateMove(Move &move, PlayerColor playerColor)
+bool MoveValidation::isKingAttacked(Side side) const
 {
-	// 1. Verify the piece exists and belongs to the player
-	auto &piece = mChessBoard->getPiece(move.startingPosition);
-	if (!piece || piece->getColor() != playerColor)
+	Square kingPos = getKingSquare(side);
+
+	if (kingPos == Square::None)
 		return false;
 
-	// 2. Verify the move is valid for the piece type
-	bool moveIsValid = false;
-	auto validMoves	 = piece->getPossibleMoves(move.startingPosition, *mChessBoard);
-	for (const auto &validMove : validMoves)
-	{
-		if (validMove.end == move.endingPosition)
-		{
-			moveIsValid = true;
-			break;
-		}
-	}
+	Side attacker = (side == Side::White) ? Side::Black : Side::White;
+	return mGeneration.isSquareAttacked(kingPos, attacker);
+}
 
-	if (!moveIsValid)
+
+bool MoveValidation::isMoveLegal(Move move)
+{
+	// Make move
+	if (!mExecution.makeMove(move))
 		return false;
 
-	// 3. Check if king would be in check after move
-	if (wouldKingBeInCheckAfterMove(move, playerColor))
-	{
-		if (VALIDATION_DEBUG)
-			LOG_DEBUG("Move could not be validated, since the king would be in check after this move!");
+	// Check if the side that just moved left king in check
+	// Note: makeMove flips the side, so we use the opposite side
+	Side movedSide	 = (mBoard.getCurrentSide() == Side::White) ? Side::Black : Side::White;
 
-		return false;
-	}
+	bool kingInCheck = isKingAttacked(movedSide);
 
-	return true;
+	mExecution.unmakeMove();
+
+	return !kingInCheck;
 }
 
 
-bool MoveValidation::isKingInCheck(const Position &ourKing, PlayerColor playerColor)
+bool MoveValidation::isCheckmate()
 {
-	PlayerColor opponentColor = playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
-	return isSquareAttacked(ourKing, opponentColor);
-}
-
-
-bool MoveValidation::isCheckmate(PlayerColor player)
-{
-	Position kingPosition = mChessBoard->getKingsPosition(player);
-
-	if (!isKingInCheck(kingPosition, player))
-		return false; // If the king is not in check, it's not checkmate
-
-	// If the king is in check, check if there are any moves that can escape check
-	auto playerPieces = mChessBoard->getPiecesFromPlayer(player);
-	for (const auto &[startPosition, piece] : playerPieces)
-	{
-		auto possibleMoves = piece->getPossibleMoves(startPosition, *mChessBoard);
-
-		for (const auto &move : possibleMoves)
-		{
-			Move testMove(startPosition, move.end, piece->getType());
-
-			if (!wouldKingBeInCheckAfterMove(testMove, player))
-			{
-				return false; // If there's a legal move that stops check, it's not checkmate
-			}
-		}
-	}
-
-	// No legal move can stop the check; it's checkmate
-	return true;
-}
-
-
-bool MoveValidation::isStalemate(PlayerColor player)
-{
-	Position kingPosition = mChessBoard->getKingsPosition(player);
-	if (isKingInCheck(kingPosition, player))
+	if (!isInCheck())
 		return false;
 
-
-	// Assume calculateAllLegalMoves() from MoveGeneration has been called before
-	auto playerPieces = mChessBoard->getPiecesFromPlayer(player);
-	for (const auto &[startPosition, piece] : playerPieces)
-	{
-		auto moves = piece->getPossibleMoves(startPosition, *mChessBoard);
-
-		for (const auto &moveCandidate : moves)
-		{
-			Move testMove(startPosition, moveCandidate.end, piece->getType());
-			if (!wouldKingBeInCheckAfterMove(testMove, player))
-				return false;
-		}
-	}
-	return true;
+	return countLegalMoves() == 0;
 }
 
 
-bool MoveValidation::wouldKingBeInCheckAfterMove(Move &move, PlayerColor playerColor)
+bool MoveValidation::isStalemate()
 {
-	bool		kingInCheck	   = false;
+	if (isInCheck())
+		return false;
 
-	// Make a local copy of the board
-	ChessBoard	boardCopy	   = *mChessBoard; // copies the chessboard to a local copy
-
-	// Save the current state
-	auto	   &movingPiece	   = boardCopy.getPiece(move.startingPosition);
-	auto	   &capturingPiece = boardCopy.getPiece(move.endingPosition); // If there is no piece being captured in this move, this will be nullptr
-	bool		isKing		   = movingPiece->getType() == PieceType::King;
-	PlayerColor opponentColour = playerColor == PlayerColor::White ? PlayerColor::Black : PlayerColor::White;
-
-	if (VALIDATION_DEBUG)
-	{
-		LOG_DEBUG("Simulating move: {} -> {} with piece {}", LoggingHelper::positionToString(move.startingPosition).c_str(),
-				  LoggingHelper::positionToString(move.endingPosition).c_str(), LoggingHelper::pieceTypeToString(movingPiece->getType()).c_str());
-	}
-
-	if (capturingPiece)
-	{
-		auto type = capturingPiece->getType();
-		boardCopy.removePiece(move.endingPosition);
-
-		if (VALIDATION_DEBUG)
-		{
-			LOG_DEBUG("After placing, occupant of endSquare = {}", LoggingHelper::pieceTypeToString(type).c_str());
-		}
-	}
-
-	// Simulate the move
-	boardCopy.movePiece(move.startingPosition, move.endingPosition);
-
-	// Update King's position if it's the king
-	Position kingPosition;
-	if (isKing)
-	{
-		kingPosition = move.endingPosition;
-		boardCopy.updateKingsPosition(kingPosition, playerColor); // Ensure board copy knows where the king is
-	}
-	else
-	{
-		kingPosition = boardCopy.getKingsPosition(playerColor);
-	}
-
-	// Check if King is under attack (isSquareUnderAttack)
-	PlayerColor opponentColor = (playerColor == PlayerColor::White) ? PlayerColor::Black : PlayerColor::White;
-	kingInCheck				  = isSquareAttacked(kingPosition, opponentColor, boardCopy);
-
-	if (VALIDATION_DEBUG)
-	{
-		LOG_DEBUG("King is at {}", LoggingHelper::positionToString(kingPosition).c_str());
-		LOG_DEBUG("isSquareAttacked(...) = {}", kingInCheck ? "true" : "false");
-	}
-
-	return kingInCheck;
+	return countLegalMoves() == 0;
 }
 
 
-bool MoveValidation::isSquareAttacked(const Position &square, PlayerColor attackerColor)
+bool MoveValidation::isDraw() const
 {
-	// Iterate over all opponent pieces
-	auto opponentPieces = mChessBoard->getPiecesFromPlayer(attackerColor);
+	// 50-move rule
+	if (mBoard.getHalfMoveClock() >= 100)
+		return true;
 
-	for (const auto &[pos, piece] : opponentPieces)
-	{
-		// Get possible moves for the opponent's piece
-		auto moves = piece->getPossibleMoves(pos, *mChessBoard, true); // Attack only since we need to differentiate attack and just move moves from pawns
+	// Insufficient material
+	if (hasInsufficientMaterial())
+		return true;
 
-		for (const auto &move : moves)
-		{
-			if (move.end == square)
-				return true;
-		}
-	}
+	// TODO: Threefold repetition (Zobrist hashing)
 
 	return false;
 }
 
 
-bool MoveValidation::isSquareAttacked(const Position &square, PlayerColor attackerColor, ChessBoard &chessboard)
+void MoveValidation::generateLegalMoves(MoveList &legalMoves)
 {
-	// Iterate over all opponent pieces
-	auto opponentPieces = chessboard.getPiecesFromPlayer(attackerColor);
+	MoveList pseudoMoves;
+	mGeneration.generateAllMoves(pseudoMoves);
 
-	for (const auto &[pos, piece] : opponentPieces)
+	legalMoves.clear();
+
+	for (size_t i = 0; i < pseudoMoves.size(); ++i)
 	{
-		// Get possible moves for the opponent's piece
-		auto moves = piece->getPossibleMoves(pos, chessboard, true); // Attack only since we need to differentiate attack and just move moves from pawns
+		if (isMoveLegal(pseudoMoves[i]))
+			legalMoves.push(pseudoMoves[i]);
+	}
+}
 
-		for (const auto &move : moves)
+
+size_t MoveValidation::countLegalMoves()
+{
+	MoveList pseudoMoves;
+	mGeneration.generateAllMoves(pseudoMoves);
+
+	size_t count = 0;
+	for (size_t i = 0; i < pseudoMoves.size(); ++i)
+	{
+		if (isMoveLegal(pseudoMoves[i]))
 		{
-			if (move.end == square)
-			{
-				if (VALIDATION_DEBUG)
-				{
-					LOG_DEBUG("Square ({}, {}) is attacked by {} at ({}, {})", square.x, square.y, LoggingHelper::pieceTypeToString(piece->getType()).c_str(), pos.x, pos.y);
-				}
-				return true;
-			}
+			count++;
+			// return count;	// TODO: Early exit for optimization
 		}
 	}
+
+	return count;
+}
+
+
+Square MoveValidation::getKingSquare(Side side) const
+{
+	PieceType kingType = (side == Side::White) ? WKing : BKing;
+	U64		  kingBB   = mBoard.pieces()[kingType];
+
+	if (!kingBB)
+		return Square::None;
+
+	return static_cast<Square>(BitUtils::lsb(kingBB));
+}
+
+
+bool MoveValidation::hasInsufficientMaterial() const
+{
+	const auto &pieces = mBoard.pieces();
+
+	// Any pawns, rooks or queens -> sufficient material
+	if (pieces[WPawn] || pieces[BPawn] || pieces[WRook] || pieces[BRook] || pieces[WQueen] || pieces[BQueen])
+		return false;
+
+	// TODO: Check for insufficient material
 
 	return false;
 }

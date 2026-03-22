@@ -80,20 +80,20 @@ void RemoteCommunication::start()
 		[this](MultiplayerMessageStruct message)
 		{
 			// Validate and process the received message body
-			if (message.data.size() < sizeof(RemoteComSecret))
+			if (message.data.size() < sizeof(RemoteControl::RemoteComSecret))
 			{
 				LOG_ERROR("Received message is too small to contain secret identifier.");
 				return;
 			}
 
 			// Get the secret length (excluding null terminator)
-			const size_t secretLength = strlen(RemoteComSecret);
+			const size_t secretLength = strlen(RemoteControl::RemoteComSecret);
 
-			if (memcmp(message.data.data(), RemoteComSecret, secretLength) != 0)
+			if (memcmp(message.data.data(), RemoteControl::RemoteComSecret, secretLength) != 0)
 			{
 				LOG_ERROR("Invalid message format: Secret identifier mismatch in body.");
 
-				std::string expected(RemoteComSecret, secretLength);
+				std::string expected(RemoteControl::RemoteComSecret, secretLength);
 				std::string received(message.data.begin(), message.data.begin() + std::min(secretLength, message.data.size()));
 				LOG_ERROR("Expected secret: '{}' (length: {})", expected, secretLength);
 				LOG_ERROR("Received secret: '{}' (length: {})", received, message.data.size());
@@ -101,7 +101,7 @@ void RemoteCommunication::start()
 			}
 
 			// The secret is valid. Strip it from the data.
-			message.data.erase(message.data.begin(), message.data.begin() + sizeof(RemoteComSecret));
+			message.data.erase(message.data.begin(), message.data.begin() + sizeof(RemoteControl::RemoteComSecret));
 
 			// Queue the message
 			{
@@ -166,11 +166,11 @@ void RemoteCommunication::write(MultiplayerMessageType type, std::vector<uint8_t
 	message.type			  = type;
 
 	// Get the secret length (excluding null terminator)
-	const size_t secretLength = strlen(RemoteComSecret);
+	const size_t secretLength = strlen(RemoteControl::RemoteComSecret);
 
 	// Prepend the secret to the message data
 	message.data.reserve(secretLength + data.size());
-	message.data.insert(message.data.end(), RemoteComSecret, RemoteComSecret + sizeof(RemoteComSecret));
+	message.data.insert(message.data.end(), RemoteControl::RemoteComSecret, RemoteControl::RemoteComSecret + sizeof(RemoteControl::RemoteComSecret));
 	message.data.insert(message.data.end(), data.begin(), data.end());
 
 	mOutgoingMessages.push_back(message);

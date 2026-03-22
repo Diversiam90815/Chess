@@ -14,6 +14,7 @@
 #include "NetworkAdapter.h"
 #include "Multiplayer/RemoteMessaging/MultiplayerMessageStruct.h"
 #include "Multiplayer/ConnectionStatus.h"
+#include "BitboardTypes.h"
 
 
 class IPlayerObserver
@@ -21,39 +22,8 @@ class IPlayerObserver
 public:
 	virtual ~IPlayerObserver() {};
 
-	virtual void onScoreUpdate(PlayerColor player, int value)					   = 0;
-	virtual void onAddCapturedPiece(PlayerColor player, PieceType captured)		   = 0;
-	virtual void onRemoveLastCapturedPiece(PlayerColor player, PieceType captured) = 0;
-};
-
-
-class IMoveObserver
-{
-public:
-	virtual ~IMoveObserver() {};
-
-	virtual void onExecuteMove(const PossibleMove &move, bool fromRemote) = 0;
-	virtual void onAddToMoveHistory(Move &move)							  = 0;
-	virtual void onClearMoveHistory()									  = 0;
-};
-
-
-class IGameObserver
-{
-public:
-	virtual ~IGameObserver() {};
-
-	virtual void onEndGame(EndGameState state, PlayerColor winner) = 0;
-	virtual void onChangeCurrentPlayer(PlayerColor player)		   = 0;
-};
-
-
-class IGameStateObserver
-{
-public:
-	virtual ~IGameStateObserver() {};
-
-	virtual void onGameStateChanged(GameState state) = 0;
+	virtual void onAddCapturedPiece(Side player, PieceType captured)		= 0;
+	virtual void onRemoveLastCapturedPiece(Side player, PieceType captured) = 0;
 };
 
 
@@ -81,11 +51,11 @@ public:
 	virtual ~IRemoteMessagesObserver() {};
 
 	virtual void onRemoteConnectionStateReceived(const ConnectionState &state)			= 0;
-	virtual void onRemoteMoveReceived(const PossibleMove &remoteMove)					= 0;
+	virtual void onRemoteMoveReceived(const Move &remoteMove)							= 0;
 	virtual void onRemoteChatMessageReceived(const std::string &mesage)					= 0;
 	virtual void onRemoteInvitationReceived(const InvitationRequest &invite)			= 0;
 	virtual void onRemoteInvitationResponseReceived(const InvitationResponse &response) = 0;
-	virtual void onRemotePlayerChosenReceived(const PlayerColor player)					= 0;
+	virtual void onRemotePlayerChosenReceived(const Side player)						= 0;
 	virtual void onRemotePlayerReadyFlagReceived(const bool flag)						= 0;
 };
 
@@ -114,16 +84,7 @@ public:
 	virtual ~IConnectionStatusObserver() {};
 
 	virtual void onConnectionStateChanged(const ConnectionStatusEvent event) = 0;
-	virtual void onLocalPlayerChosen(const PlayerColor localPlayer)			 = 0;
-	virtual void onRemotePlayerChosen(PlayerColor remotePlayer)				 = 0;
+	virtual void onLocalPlayerChosen(const Side localPlayer)				 = 0;
+	virtual void onRemotePlayerChosen(Side remotePlayer)					 = 0;
 	virtual void onLocalReadyFlagSet(const bool flag)						 = 0;
-};
-
-
-class ICPUMoveObserver
-{
-public:
-	virtual ~ICPUMoveObserver() {};
-
-	virtual void onMoveCalculated(PossibleMove move) = 0;
 };

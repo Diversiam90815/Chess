@@ -5,93 +5,135 @@
   ==============================================================================
 */
 
-
 #pragma once
-
-#include <optional>
 
 #include "Execution/MoveExecution.h"
 #include "Generation/MoveGeneration.h"
 #include "Validation/MoveValidation.h"
-#include "Evaluation/MoveEvaluation.h"
-#include "CPUPlayer.h"
 #include "IObservable.h"
 #include "Parameters.h"
+#include "Player.h"
 
-
-/// <summary>
-/// Main engine for managing and controlling the state and logic of a chess game.
-/// </summary>
-class GameEngine : public IGameObservable
+/**
+ * @brief	Core chess engine orchestrating board state, move generation,
+ *			validation, execution, and game flow.
+ */
+class GameEngine
 {
 public:
-	GameEngine()  = default;
+	GameEngine();
 	~GameEngine() = default;
 
-	void					   init();
-	void					   reset();
+	// Lifecycle
+	void								 init();
+	void								 startGame();
+	void								 resetGame();
 
-	void					   startGame();
-	void					   resetGame();
+	/**
+	 * @brief	Copy board state from another engine (for search isolation).
+	 *			Clears move history so the search starts with a clean slate.
+	 */
+	void								 snapshotFrom(const GameEngine &other);
 
-	void					   executeMove(PossibleMove &tmpMove, bool fromRemote = false);
-	void					   undoMove();
+	//=========================================================================
+	// Move Operations
+	//=========================================================================
 
-	PieceType				   getCurrentPieceTypeAtPosition(const Position position);
+	/**
+	 * @brief	Execute a move. Validates, applies, and notifies observers.
+	 * @param	move	Move to execute
+	 * @param	fromRemote	Flag indicating that the move came from the remote endpoint in a
+							Multiplayer setting to avoid infite loop.
+	 * @return	MoveExecutionResult		Success indicator and notation on success
+	 */
+	MoveExecutionResult					 makeMove(Move move);
 
-	std::vector<PossibleMove>  getPossibleMoveForPosition();
+	/**
+	 * @brief	Undo the last move. Notifies observers.
+	 * @return	true if a move was undone.
+	 */
+	bool								 undoMove();
 
-	bool					   getBoardState(BoardStateArray boardState);
 
-	bool					   checkForValidMoves(const PossibleMove &move);
-	bool					   checkForPawnPromotionMove(const PossibleMove &move);
+	//=========================================================================
+	// Search-Optimized Operations (no validation, notation, or locking)
+	//=========================================================================
 
-	std::optional<PlayerColor> getWinner() const;
+	/**
+	 * @brief	Execute a move without validation or notation.
+	 *			Use only during search where moves come from generateLegalMoves().
+	 * @param	move	Move to execute (must be legal)
+	 * @return	true if move was applied successfully.
+	 */
+	bool								 makeMoveUnchecked(Move move);
 
-	void					   endGame(EndGameState state, PlayerColor player = PlayerColor::NoColor) override;
-	void					   changeCurrentPlayer(PlayerColor player) override;
-	PlayerColor				   getCurrentPlayer() const;
+	/**
+	 * @brief	Undo the last move without locking.
+	 *			Use only during search.
+	 * @return	true if a move was undone.
+	 */
+	bool								 undoMoveUnchecked();
 
-	void					   setLocalPlayer(PlayerColor player);
-	PlayerColor				   getLocalPlayer() const;
 
-	void					   switchTurns();
+	//=========================================================================
+	// Move Generation & Validation
+	//=========================================================================
 
-	bool					   calculateAllMovesForPlayer();
+	/**
+	 * @brief	Generate all legal moves for current side.
+	 */
+	void								 generateLegalMoves(MoveList &moves);
 
-	bool					   initiateMove(const Position &startPosition);
+	/**
+	 * @brief	Check if a move is legal.
+	 */
+	bool								 isMoveLegal(Move move);
 
-	EndGameState			   checkForEndGameConditions();
+	/**
+	 * @brief	Get legal moves from a specific square (for UI).
+	 */
+	void								 getMovesFromSquare(Square from, MoveList &moves);
 
-	void					   setCPUConfiguration(const CPUConfiguration &config);
+	//=========================================================================
+	//	Game State Queries
+	//=========================================================================
 
-	CPUConfiguration		   getCPUConfiguration() const;
+	bool								 isInCheck() const;
+	bool								 isCheckmate();
+	bool								 isStalemate();
+	bool								 isDraw() const;
+	EndGameState						 checkForEndGameConditions();
 
-	bool					   isCPUPlayer(PlayerColor player) const;
+	//=========================================================================
+	//	End Game
+	//=========================================================================
 
-	void					   requestCPUMoveAsync();
+	Side								 getWinner() const;
+
+	//=========================================================================
+	//	CPU Player
+	//=========================================================================
+
+	uint64_t							 getHash();
+
+	//=========================================================================
+	//	Accessors
+	//=========================================================================
+
+	const Chessboard					&getBoard() const { return mChessBoard; }
+	Chessboard							&getBoard() { return mChessBoard; }
+
+	const std::vector<MoveHistoryEntry> &getMoveHistory() const;
+	std::string							 getMoveNotation(Move move) const;
 
 
 private:
-	bool							mMovesGeneratedForCurrentTurn = false;
+	// Core components (order matters for initialization!)
+	Chessboard	   mChessBoard;
+	MoveGeneration mMoveGeneration;
+	MoveExecution  mMoveExecution;
+	MoveValidation mMoveValidation;
 
-	Player							mWhitePlayer;
-	Player							mBlackPlayer;
-
-	PlayerColor						mCurrentPlayer = PlayerColor::NoColor;
-
-	std::vector<PossibleMove>		mAllMovesForPosition;
-
-	std::shared_ptr<ChessBoard>		mChessBoard;
-
-	std::shared_ptr<MoveGeneration> mMoveGeneration;
-	std::shared_ptr<MoveValidation> mMoveValidation;
-	std::shared_ptr<MoveExecution>	mMoveExecution;
-	std::shared_ptr<MoveEvaluation> mMoveEvaluation;
-
-	std::shared_ptr<CPUPlayer>		mCPUPlayer;
-
-	std::mutex						mMutex;
-
-	friend class GameManager;
+	// Thread safety
+	std::mutex	   mMoveMutex;
 };

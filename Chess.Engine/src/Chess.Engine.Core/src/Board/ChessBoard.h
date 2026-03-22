@@ -1,82 +1,189 @@
-/*
+﻿/*
   ==============================================================================
-	Module:         ChessBoard
-	Description:    Class characterizing a virtual chess board
+	Module:         Bitboard
+	Description:    A bitboard representing a chess board
   ==============================================================================
 */
 
 #pragma once
 
+#include <string>
+#include <algorithm>
+#include <cctype>
 #include <array>
-#include <memory>
 
-#include "Move.h"
-#include "Pawn.h"
-#include "Knight.h"
-#include "Bishop.h"
-#include "Rook.h"
-#include "Queen.h"
-#include "King.h"
+#include "BitboardTypes.h"
+#include "AttackTables.h"
+#include "ZobristHash.h"
 
 
-#define CHESSBOARD_DEBUG false
+/*
+							ALL TOGETHER
+
+						8  ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜
+						7  ♟︎ ♟︎ ♟︎ ♟︎ ♟︎ ♟︎ ♟︎ ♟︎
+						6  . . . . . . . .
+						5  . . . . . . . .
+						4  . . . . . . . .
+						3  . . . . . . . .
+						2  ♙ ♙ ♙ ♙ ♙ ♙ ♙ ♙
+						1  ♖ ♘ ♗ ♕ ♔ ♗ ♘ ♖
+
+						   a b c d e f g h
 
 
-using PlayerPiece	  = std::pair<Position, std::shared_ptr<ChessPiece>>;
-using BoardStateArray = int[BOARD_SIZE][BOARD_SIZE];
+							WHITE PIECES
+
+		Pawns                  Knights              Bishops
+
+  8  0 0 0 0 0 0 0 0    8  0 0 0 0 0 0 0 0    8  0 0 0 0 0 0 0 0
+  7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0
+  6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0
+  5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0
+  4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0
+  3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0
+  2  1 1 1 1 1 1 1 1    2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0
+  1  0 0 0 0 0 0 0 0    1  0 1 0 0 0 0 1 0    1  0 0 1 0 0 1 0 0
+
+	 a b c d e f g h       a b c d e f g h       a b c d e f g h
+
+		 Rooks                 Queens                 King
+
+  8  0 0 0 0 0 0 0 0    8  0 0 0 0 0 0 0 0    8  0 0 0 0 0 0 0 0
+  7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0
+  6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0
+  5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0
+  4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0
+  3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0
+  2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0
+  1  1 0 0 0 0 0 0 1    1  0 0 0 1 0 0 0 0    1  0 0 0 0 1 0 0 0
+
+	 a b c d e f g h       a b c d e f g h       a b c d e f g h
 
 
-/// <summary>
-/// Represents a square on a chessboard, including its position and an optional chess piece.
-/// </summary>
-struct Square
+							BLACK PIECES
+
+		Pawns                  Knights              Bishops
+
+  8  0 0 0 0 0 0 0 0    8  0 1 0 0 0 0 1 0    8  0 0 1 0 0 1 0 0
+  7  1 1 1 1 1 1 1 1    7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0
+  6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0
+  5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0
+  4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0
+  3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0
+  2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0
+  1  0 0 0 0 0 0 0 0    1  0 0 0 0 0 0 0 0    1  0 0 0 0 0 0 0 0
+
+	 a b c d e f g h       a b c d e f g h       a b c d e f g h
+
+		 Rooks                 Queens                 King
+
+  8  1 0 0 0 0 0 0 1    8  0 0 0 1 0 0 0 0    8  0 0 0 0 1 0 0 0
+  7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0    7  0 0 0 0 0 0 0 0
+  6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0
+  5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0
+  4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0
+  3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0
+  2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0    2  0 0 0 0 0 0 0 0
+  1  0 0 0 0 0 0 0 0    1  0 0 0 0 0 0 0 0    1  0 0 0 0 0 0 0 0
+
+	 a b c d e f g h       a b c d e f g h       a b c d e f g h
+
+
+							 OCCUPANCIES
+
+	 White occupancy       Black occupancy       All occupancies
+
+  8  0 0 0 0 0 0 0 0    8  1 1 1 1 1 1 1 1    8  1 1 1 1 1 1 1 1
+  7  0 0 0 0 0 0 0 0    7  1 1 1 1 1 1 1 1    7  1 1 1 1 1 1 1 1
+  6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0    6  0 0 0 0 0 0 0 0
+  5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0    5  0 0 0 0 0 0 0 0
+  4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0    4  0 0 0 0 0 0 0 0
+  3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0    3  0 0 0 0 0 0 0 0
+  2  1 1 1 1 1 1 1 1    2  0 0 0 0 0 0 0 0    2  1 1 1 1 1 1 1 1
+  1  1 1 1 1 1 1 1 1    1  0 0 0 0 0 0 0 0    1  1 1 1 1 1 1 1 1
+*/
+
+// State snapshot for unmake move
+struct BoardState
 {
-	Position					pos;
-	std::shared_ptr<ChessPiece> piece;
-
-	Square(int x, int y) : pos{x, y}, piece(nullptr) {}
-
-	Square() : pos{0, 0}, piece(nullptr) {}
+	Castling  castle		= Castling::None;
+	Square	  enPassant		= Square::None;
+	int		  halfMoveClock = 0;
+	PieceType capturedPiece = PieceType::None;
+	uint64_t  hash			= 0;
 };
 
 
-/// <summary>
-/// Represents a chessboard and provides methods to manage and query its state, including piece placement, movement, and board initialization.
-/// </summary>
-class ChessBoard
+class Chessboard
 {
 public:
-	ChessBoard();
-	ChessBoard(const ChessBoard &other);
-	~ChessBoard();
+	Chessboard()	  = default;
+	~Chessboard()	  = default;
 
-	void						 initializeBoard();
+	using Bitboards	  = std::array<U64, 12>;
+	using Occupancies = std::array<U64, 3>;
 
-	Square						&getSquare(Position pos);
+	void							 init();
+	void							 clear();
+	void							 parseFEN(std::string_view fen);
 
-	void						 setPiece(Position pos, std::shared_ptr<ChessPiece> piece);
-	std::shared_ptr<ChessPiece> &getPiece(Position pos);
+	void							 removePiece(PieceType piece, Square sq);
+	void							 addPiece(PieceType piece, Square sq);
+	void							 movePiece(PieceType piece, Square from, Square to);
+	void							 updateOccupancies();
 
-	std::vector<PlayerPiece>	 getPiecesFromPlayer(PlayerColor playerColor);
+	// Piece lookup
+	[[nodiscard]] PieceType			 pieceAt(Square sq) const;
 
-	bool						 movePiece(Position start, Position end);
-	void						 removePiece(Position pos);
+	[[nodiscard]] const Bitboards	&pieces() const noexcept { return mBitBoards; }
+	[[nodiscard]] Bitboards			&pieces() noexcept { return mBitBoards; }
+	[[nodiscard]] const Occupancies &occ() const noexcept { return mOccupancyBitboards; }
 
-	bool						 isEmpty(Position pos) const;
+	[[nodiscard]] Side				 getCurrentSide() const noexcept { return mSide; }
+	[[nodiscard]] Castling			 getCurrentCastlingRights() const noexcept { return mCastlingRights; }
+	[[nodiscard]] Square			 getCurrentEnPassantSqaure() const noexcept { return mEnPassantSquare; }
+	[[nodiscard]] int				 getHalfMoveClock() const noexcept { return mHalfMoveClock; }
 
-	void						 updateKingsPosition(Position &pos, PlayerColor player);
-	Position					 getKingsPosition(PlayerColor player) const;
+	void							 setSide(Side s) noexcept;
+	void							 flipSide() noexcept;
+	void							 setCastlingRights(Castling c) noexcept;
+	void							 setEnPassantSquare(Square sq) noexcept;
+	void							 setHalfMoveClock(int clock) noexcept { mHalfMoveClock = clock; }
+	void							 incrementMoveCounter() noexcept { ++mMoveCounter; }
+	void							 decrementMoveCounter() noexcept
+	{
+		if (mMoveCounter > 1)
+			--mMoveCounter;
+	}
 
-	void						 removeAllPiecesFromBoard();
+	[[nodiscard]] BoardState saveState() const;
+	void					 restoreState(const BoardState &state);
 
-	bool						 getBoardState(BoardStateArray boardState);
+	[[nodiscard]] uint64_t	 getHash() const noexcept { return mHash; }
+	void					 computeHash();
 
 private:
-	std::vector<std::vector<Square>> squares;
+	// Hash update helpers (called internally when board changes)
+	void							  hashPiece(PieceType piece, Square sq) { mHash ^= ZobristHash::piece(piece, sq); }
+	void							  hashSide() { mHash ^= ZobristHash::sideToMove(); }
+	void							  hashCastling(Castling rights) { mHash ^= ZobristHash::castling(rights); }
+	void							  hashEnPassant(Square sq) { mHash ^= ZobristHash::enPassant(sq); }
 
-	Position						 mWhiteKingPosition = Position{-1, -1};
 
-	Position						 mBlackKingPosition = Position{-1, -1};
+	Bitboards						  mBitBoards{};						 // Array of all bitboards
+	Occupancies						  mOccupancyBitboards{};			 // Occupancies
 
-	bool							 mInitialized		= false;
+	Side							  mSide			   = Side::None;	 // side to move
+	Square							  mEnPassantSquare = Square::None;	 // enpassant square
+	Castling						  mCastlingRights  = Castling::None; // castling rights
+
+	int								  mHalfMoveClock   = 0;
+	int								  mMoveCounter	   = 1;
+
+	uint64_t						  mHash			   = 0; // Zobrist Hash
+
+	// FEN positions
+	static constexpr std::string_view mEmptyBoard	   = "8/8/8/8/8/8/8/8 w - - ";
+	static constexpr std::string_view mStartPosition   = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ";
 };

@@ -3,97 +3,102 @@ set(TARGET_NAME Chess.Engine.Core)
 set (SOURCE_DIR						${CMAKE_CURRENT_SOURCE_DIR}/src)
 set (SUBMODULES_DIR					${CMAKE_CURRENT_SOURCE_DIR}/submodule)
 	
-set (PIECE_DIR						${SOURCE_DIR}/Piece)
 set (MOVE_DIR						${SOURCE_DIR}/Moves)
 set (GAME_MANAGER_DIR				${SOURCE_DIR}/GameManager)
 set (GAME_ENGINE_DIR				${SOURCE_DIR}/GameEngine)
+set (GAME_CONTROLLER_DIR			${SOURCE_DIR}/GameController)
 set (BOARD_DIR						${SOURCE_DIR}/Board)
+set (ATTACKTABLES_DIR				${SOURCE_DIR}/AttackTables)
 set (PLAYER_DIR						${SOURCE_DIR}/Player)
 set (HELPER_DIR						${SOURCE_DIR}/Helper)
 set (FILEMANAGER_DIR				${SOURCE_DIR}/FileManager)
 set (LOGGER_DIR						${SOURCE_DIR}/Logger)
 set (USERSETTINGS_DIR				${SOURCE_DIR}/UserSettings)
-set (COMMUNICATION_DIR				${SOURCE_DIR}/Communication)
+set (INPUTSOURCE_DIR				${SOURCE_DIR}/InputSource)
 set (NETWORK_DIR					${SOURCE_DIR}/Network)
 set (MULTIPLAYER_DIR				${SOURCE_DIR}/Multiplayer)
 set (STATEMACHINE_DIR				${SOURCE_DIR}/StateMachine)
-set (POSITIONALEVALUATION_DIR       ${SOURCE_DIR}/PositionalEvaluation)
+set (EVALUATION_DIR					${SOURCE_DIR}/Evaluation)
 
 
 set(ALL_PROJECT_DIRS 
-			${PIECE_DIR}
 			${MOVE_DIR}
 			${GAME_MANAGER_DIR}
 			${GAME_ENGINE_DIR}
+			${GAME_CONTROLLER_DIR}
 			${BOARD_DIR}
+			${ATTACKTABLES_DIR}
 			${PLAYER_DIR}
 			${HELPER_DIR}
 			${LOGGER_DIR}
 			${FILEMANAGER_DIR}
 			${SOURCE_DIR}
 			${USERSETTINGS_DIR}
-			${COMMUNICATION_DIR}
+			${INPUTSOURCE_DIR}
 			${NETWORK_DIR}
 			${MULTIPLAYER_DIR}
 			${STATEMACHINE_DIR}
-			${POSITIONALEVALUATION_DIR}
+			${EVALUATION_DIR}
 )
 
 include_directories(${ALL_PROJECT_DIRS})
 
 
 set(STATEMACHINE_FILES
+	${STATEMACHINE_DIR}/InputEvent.h
 	${STATEMACHINE_DIR}/StateMachine.h	${STATEMACHINE_DIR}/StateMachine.cpp
 )
 
 set(GAMEENGINE_FILES
-	${GAME_ENGINE_DIR}/GameEngine.h	${GAME_ENGINE_DIR}/GameEngine.cpp
+	${GAME_ENGINE_DIR}/GameEngine.h		${GAME_ENGINE_DIR}/GameEngine.cpp
 )
 
-set(PIECE_FILES
-	${PIECE_DIR}/ChessPiece.h   ${PIECE_DIR}/ChessPiece.cpp
-	${PIECE_DIR}/Pawn.h         ${PIECE_DIR}/Pawn.cpp
-	${PIECE_DIR}/Knight.h       ${PIECE_DIR}/Knight.cpp
-	${PIECE_DIR}/Bishop.h       ${PIECE_DIR}/Bishop.cpp
-	${PIECE_DIR}/Rook.h         ${PIECE_DIR}/Rook.cpp
-	${PIECE_DIR}/Queen.h        ${PIECE_DIR}/Queen.cpp
-	${PIECE_DIR}/King.h         ${PIECE_DIR}/King.cpp
+set(GAMECONTROLLER_FILES
+	${GAME_CONTROLLER_DIR}/GameConfiguration.h
+	${GAME_CONTROLLER_DIR}/IGameController.h
+	${GAME_CONTROLLER_DIR}/GameController.h		${GAME_CONTROLLER_DIR}/GameController.cpp
 )
 
 set(BOARD_FILES
-	${BOARD_DIR}/ChessBoard.h			${BOARD_DIR}/ChessBoard.cpp
-	${BOARD_DIR}/LightChessBoard.h		${BOARD_DIR}/LightChessBoard.cpp
+	${BOARD_DIR}/BitboardUtils.h
+	${BOARD_DIR}/BitboardTypes.h
+	${BOARD_DIR}/Chessboard.h			${BOARD_DIR}/Chessboard.cpp
+	${BOARD_DIR}/ZobristHash.h			${BOARD_DIR}/ZobristHash.cpp
+)
+
+set(ATTACKTABLES_FILES
+	${ATTACKTABLES_DIR}/AttackTables.h			${ATTACKTABLES_DIR}/AttackTables.cpp
 )
 	
 set(MOVE_FILES
-	${MOVE_DIR}/MoveType.h
 	${MOVE_DIR}/Move.h
-	${MOVE_DIR}/MoveHelper.h					${MOVE_DIR}/MoveHelper.cpp
-	${MOVE_DIR}/generation/MoveGeneration.h		${MOVE_DIR}/Generation/MoveGeneration.cpp
-	${MOVE_DIR}/Validation/MoveValidation.h		${MOVE_DIR}/Validation/MoveValidation.cpp
-	${MOVE_DIR}/Execution/MoveExecution.h		${MOVE_DIR}/Execution/MoveExecution.cpp
 	${MOVE_DIR}/Evaluation/MoveEvaluation.h		${MOVE_DIR}/Evaluation/MoveEvaluation.cpp
+	${MOVE_DIR}/Generation/MoveGeneration.h		${MOVE_DIR}/Generation/MoveGeneration.cpp
+	${MOVE_DIR}/Validation/MoveValidation.h		${MOVE_DIR}/Validation/MoveValidation.cpp
+	${MOVE_DIR}/Execution/MoveExecution.h			${MOVE_DIR}/Execution/MoveExecution.cpp
 	${MOVE_DIR}/Notation/MoveNotation.h			${MOVE_DIR}/Notation/MoveNotation.cpp
 )
 
 set(GAME_MANAGER_FILES
-	${GAME_MANAGER_DIR}/GameManager.h    ${GAME_MANAGER_DIR}/GameManager.cpp
+	${GAME_MANAGER_DIR}/GameManager.h		${GAME_MANAGER_DIR}/GameManager.cpp
 )
 
 set(PLAYER_FILES
-	${PLAYER_DIR}/Player.h      	${PLAYER_DIR}/Player.cpp
-	${PLAYER_DIR}/PlayerName.h      ${PLAYER_DIR}/PlayerName.cpp
+	${PLAYER_DIR}/Player.h      		${PLAYER_DIR}/Player.cpp
+	${PLAYER_DIR}/PlayerName.h			${PLAYER_DIR}/PlayerName.cpp
 	${PLAYER_DIR}/CPUPlayer.h      	${PLAYER_DIR}/CPUPlayer.cpp
 )
 
 set(HELPER_FILES
 	${HELPER_DIR}/SystemInfo.h
+	${HELPER_DIR}/PieceValues.h
 	${HELPER_DIR}/JsonConversion.h
 	${HELPER_DIR}/Parameters.h
 	${HELPER_DIR}/ThreadBase.h
 	${HELPER_DIR}/Conversion.h
 	${HELPER_DIR}/IObserver.h
 	${HELPER_DIR}/IObservable.h
+	${HELPER_DIR}/MagicGenerator.h
 )
 
 set(LOGGER_FILES
@@ -115,35 +120,37 @@ set(NETWORK_FILES
 	${NETWORK_DIR}/NetworkInformation.h     ${NETWORK_DIR}/NetworkInformation.cpp
 )
 
-set(COMMUNICATION_FILES
-	${COMMUNICATION_DIR}/PlainCDefines.h   
-	${COMMUNICATION_DIR}/UICommunication.h    ${COMMUNICATION_DIR}/UICommunication.cpp
+set(INPUTSOURCE_FILES
+	${INPUTSOURCE_DIR}/PlainCDefines.h   
+	${INPUTSOURCE_DIR}/IInputSource.h
+	${INPUTSOURCE_DIR}/WinUIInputSource.h    ${INPUTSOURCE_DIR}/WinUIInputSource.cpp
 )
 
-set(POSITIONALEVALUATION_FILES
-	${POSITIONALEVALUATION_DIR}/PositionalEvaluation.h  	${POSITIONALEVALUATION_DIR}/PositionalEvaluation.cpp  
+set(EVALUATION_FILES
+	${EVALUATION_DIR}/Evaluation.h  	${EVALUATION_DIR}/Evaluation.cpp  
 )
 
 set(MULTIPLAYER_FILES
 	${MULTIPLAYER_DIR}/ConnectionStatus.h
 	${MULTIPLAYER_DIR}/Discovery/DiscoveryEndpoint.h
 	${MULTIPLAYER_DIR}/RemoteMessaging/MultiplayerMessageStruct.h
-	${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.h		${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.h			${MULTIPLAYER_DIR}/RemoteMessaging/CommunicationThreads.cpp
 	${MULTIPLAYER_DIR}/MultiplayerManager.h							${MULTIPLAYER_DIR}/MultiplayerManager.cpp
 	${MULTIPLAYER_DIR}/Discovery/DiscoveryService.h					${MULTIPLAYER_DIR}/Discovery/DiscoveryService.cpp
 	${MULTIPLAYER_DIR}/TCPConnection/TCPInterfaces.h
-	${MULTIPLAYER_DIR}/TCPConnection/TCPSession.h					${MULTIPLAYER_DIR}/TCPConnection/TCPSession.cpp
-	${MULTIPLAYER_DIR}/TCPConnection/TCPServer.h					${MULTIPLAYER_DIR}/TCPConnection/TCPServer.cpp
-	${MULTIPLAYER_DIR}/TCPConnection/TCPClient.h					${MULTIPLAYER_DIR}/TCPConnection/TCPClient.cpp
-	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.h				${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPSession.h						${MULTIPLAYER_DIR}/TCPConnection/TCPSession.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPServer.h						${MULTIPLAYER_DIR}/TCPConnection/TCPServer.cpp
+	${MULTIPLAYER_DIR}/TCPConnection/TCPClient.h						${MULTIPLAYER_DIR}/TCPConnection/TCPClient.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.h					${MULTIPLAYER_DIR}/RemoteMessaging/RemoteSender.cpp
 	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.h				${MULTIPLAYER_DIR}/RemoteMessaging/RemoteReceiver.cpp
-	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.h		${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.cpp
+	${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.h			${MULTIPLAYER_DIR}/RemoteMessaging/RemoteCommunication.cpp
 )
 
 set(ALL_FILES
-	${PIECE_FILES}
 	${GAMEENGINE_FILES}
+	${GAMECONTROLLER_FILES}
 	${BOARD_FILES}
+	${ATTACKTABLES_FILES}
 	${MOVE_FILES}
 	${GAME_MANAGER_FILES}
 	${PLAYER_FILES}
@@ -151,11 +158,11 @@ set(ALL_FILES
 	${LOGGER_FILES}
 	${FILEMANAGER_FILES}
 	${USERSETTINGS_FILES}
-	${COMMUNICATION_FILES}
+	${INPUTSOURCE_FILES}
 	${NETWORK_FILES}
 	${MULTIPLAYER_FILES}
 	${STATEMACHINE_FILES}
-	${POSITIONALEVALUATION_FILES}
+	${EVALUATION_FILES}
 )
 
 

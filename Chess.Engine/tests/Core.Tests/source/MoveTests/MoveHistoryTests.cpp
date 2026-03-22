@@ -10,259 +10,353 @@
 #include "GameEngine.h"
 #include "Execution/MoveExecution.h"
 
+
 namespace MoveTests
 {
 
 class MoveHistoryTests : public ::testing::Test
 {
 protected:
-	std::shared_ptr<ChessBoard>		mBoard;
-	std::shared_ptr<MoveValidation> mValidation;
-	std::shared_ptr<MoveExecution>	mExecution;
+	Chessboard	  mBoard;
+	MoveExecution mExecution{mBoard};
 
-	void							SetUp() override
-	{
-		mBoard = std::make_shared<ChessBoard>();
-		mBoard->initializeBoard();
-		mValidation = std::make_shared<MoveValidation>(mBoard);
-		mExecution	= std::make_shared<MoveExecution>(mBoard, mValidation);
-	}
+	void		  SetUp() override { mBoard.init(); }
 
-	void TearDown() override
-	{
-		mExecution->clearMoveHistory();
-		mBoard.reset();
-		mValidation.reset();
-		mExecution.reset();
-	}
-
-	// Helper to create a basic move
-	PossibleMove CreateMove(Position start, Position end, MoveType type = MoveType::Normal, PieceType promotion = PieceType::DefaultType)
-	{
-		PossibleMove move;
-		move.start			= start;
-		move.end			= end;
-		move.type			= type;
-		move.promotionPiece = promotion;
-		return move;
-	}
-
-	// Helper to create a Move object directly
-	Move CreateMoveObject(Position start, Position end, PieceType movedPiece, PieceType capturedPiece = PieceType::DefaultType, PlayerColor player = PlayerColor::White)
-	{
-		Move move(start, end, movedPiece, capturedPiece);
-		move.player = player;
-		return move;
-	}
+	void		  TearDown() override { mExecution.clearHistory(); }
 };
 
 
 TEST_F(MoveHistoryTests, InitiallyEmptyHistory)
 {
-	// Move history should be empty initially
-	const Move *lastMove = mExecution->getLastMove();
+	const MoveHistoryEntry *lastMove = mExecution.getLastMove();
 	EXPECT_EQ(lastMove, nullptr) << "Move history should be empty initially";
+	EXPECT_EQ(mExecution.historySize(), 0) << "History size should be 0";
 }
 
 
-TEST_F(MoveHistoryTests, AddMoveToHistoryBasic)
+TEST_F(MoveHistoryTests, MakeMoveAddsToHistory)
 {
-	// Create and add a move to history
-	Move testMove = CreateMoveObject({4, 6}, {4, 4}, PieceType::Pawn, PieceType::DefaultType, PlayerColor::White);
-	mExecution->addMoveToHistory(testMove);
+	Move move(Square::e2, Square::e4, MoveFlag::DoublePawnPush);
+	mExecution.makeMove(move);
 
-	// Verify move was added
-	const Move *lastMove = mExecution->getLastMove();
-	ASSERT_NE(lastMove, nullptr) << "Last move should not be null after adding move";
-	EXPECT_EQ(lastMove->startingPosition, Position({4, 6})) << "Starting position should match";
-	EXPECT_EQ(lastMove->endingPosition, Position({4, 4})) << "Ending position should match";
-	EXPECT_EQ(lastMove->movedPiece, PieceType::Pawn) << "Moved piece should be pawn";
-	EXPECT_EQ(lastMove->player, PlayerColor::White) << "Player should be white";
-	EXPECT_EQ(lastMove->number, 1) << "First move should have number 1";
-}
+	EXPECT_EQ(mExecution.historySize(), 1) << "History should have one entry";
 
-
-TEST_F(MoveHistoryTests, AddMultipleMovesToHistory)
-{
-	// Add multiple moves
-	Move move1 = CreateMoveObject({4, 6}, {4, 4}, PieceType::Pawn, PieceType::DefaultType, PlayerColor::White);
-	Move move2 = CreateMoveObject({4, 1}, {4, 3}, PieceType::Pawn, PieceType::DefaultType, PlayerColor::Black);
-	Move move3 = CreateMoveObject({6, 7}, {5, 5}, PieceType::Knight, PieceType::DefaultType, PlayerColor::White);
-
-	mExecution->addMoveToHistory(move1);
-	mExecution->addMoveToHistory(move2);
-	mExecution->addMoveToHistory(move3);
-
-	// Verify the last move is correct
-	const Move *lastMove = mExecution->getLastMove();
+	const MoveHistoryEntry *lastMove = mExecution.getLastMove();
 	ASSERT_NE(lastMove, nullptr) << "Last move should not be null";
-	EXPECT_EQ(lastMove->movedPiece, PieceType::Knight) << "Last move should be knight";
-	EXPECT_EQ(lastMove->player, PlayerColor::White) << "Last move should be by white";
-	EXPECT_EQ(lastMove->number, 3) << "Third move should have number 3";
+	EXPECT_EQ(lastMove->move.from(), Square::e2) << "Move from should be e2";
+	EXPECT_EQ(lastMove->move.to(), Square::e4) << "Move to should be e4";
 }
 
 
-TEST_F(MoveHistoryTests, MoveNumberingSequential)
+TEST_F(MoveHistoryTests, MultipleMovesInHistory)
 {
-	// Add several moves and verify numbering
-	for (int i = 0; i < 5; ++i)
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::e7, Square::e5, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::g1, Square::f3, MoveFlag::Quiet));
+
+	EXPECT_EQ(mExecution.historySize(), 3) << "History should have 3 entries";
+
+	const MoveHistoryEntry *lastMove = mExecution.getLastMove();
+	ASSERT_NE(lastMove, nullptr);
+	EXPECT_EQ(lastMove->move.from(), Square::g1) << "Last move should be Nf3";
+	EXPECT_EQ(lastMove->move.to(), Square::f3);
+}
+
+
+TEST_F(MoveHistoryTests, UnmakeMoveRemovesFromHistory)
+{
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::e7, Square::e5, MoveFlag::DoublePawnPush));
+
+	EXPECT_EQ(mExecution.historySize(), 2);
+
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mExecution.historySize(), 1) << "History should have 1 entry after unmake";
+
+	const MoveHistoryEntry *lastMove = mExecution.getLastMove();
+	ASSERT_NE(lastMove, nullptr);
+	EXPECT_EQ(lastMove->move.from(), Square::e2) << "Last move should now be e2-e4";
+}
+
+
+TEST_F(MoveHistoryTests, UnmakeAllMoves)
+{
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::e7, Square::e5, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::g1, Square::f3, MoveFlag::Quiet));
+
+	mExecution.unmakeMove();
+	mExecution.unmakeMove();
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mExecution.historySize(), 0) << "History should be empty";
+	EXPECT_EQ(mExecution.getLastMove(), nullptr) << "No last move";
+}
+
+
+TEST_F(MoveHistoryTests, UnmakeFromEmptyHistoryReturnsFalse)
+{
+	bool result = mExecution.unmakeMove();
+	EXPECT_FALSE(result) << "Unmake from empty history should return false";
+}
+
+
+TEST_F(MoveHistoryTests, ClearHistoryRemovesAllEntries)
+{
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::e7, Square::e5, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::g1, Square::f3, MoveFlag::Quiet));
+
+	mExecution.clearHistory();
+
+	EXPECT_EQ(mExecution.historySize(), 0) << "History should be empty after clear";
+	EXPECT_EQ(mExecution.getLastMove(), nullptr) << "No last move after clear";
+}
+
+
+TEST_F(MoveHistoryTests, HistoryPreservesBoardState)
+{
+	// Make a move that changes board state
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+
+	const MoveHistoryEntry *entry = mExecution.getLastMove();
+	ASSERT_NE(entry, nullptr);
+
+	// Previous state should have no en passant square
+	EXPECT_EQ(entry->previousState.enPassant, Square::None) << "Previous state should have no en passant";
+}
+
+
+TEST_F(MoveHistoryTests, UnmakeRestoresCastlingRights)
+{
+	mBoard.clear();
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WRook, Square::h1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setCastlingRights(Castling::WK);
+	mBoard.updateOccupancies();
+
+	Castling originalRights = mBoard.getCurrentCastlingRights();
+
+	// Move king (loses castling rights)
+	mExecution.makeMove(Move(Square::e1, Square::f1, MoveFlag::Quiet));
+
+	EXPECT_NE(mBoard.getCurrentCastlingRights(), originalRights) << "Castling rights should change";
+
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.getCurrentCastlingRights(), originalRights) << "Castling rights should be restored";
+}
+
+
+TEST_F(MoveHistoryTests, UnmakeRestoresEnPassantSquare)
+{
+	// After double pawn push, en passant square is set
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::e3) << "En passant should be e3";
+
+	// Make another move (resets en passant)
+	mExecution.makeMove(Move(Square::b8, Square::c6, MoveFlag::Quiet));
+
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::None) << "En passant should be None";
+
+	// Unmake should restore en passant
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.getCurrentEnPassantSqaure(), Square::e3) << "En passant should be restored to e3";
+}
+
+
+TEST_F(MoveHistoryTests, UnmakeRestoresCapturedPiece)
+{
+	mBoard.clear();
+	mBoard.addPiece(PieceType::WKnight, Square::f3);
+	mBoard.addPiece(PieceType::BPawn, Square::e5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	// Capture the pawn
+	mExecution.makeMove(Move(Square::f3, Square::e5, MoveFlag::Capture));
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e5), PieceType::WKnight);
+	EXPECT_EQ(mBoard.pieceAt(Square::f3), PieceType::None);
+
+	// Unmake
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.pieceAt(Square::f3), PieceType::WKnight) << "Knight should be back";
+	EXPECT_EQ(mBoard.pieceAt(Square::e5), PieceType::BPawn) << "Captured pawn should be restored";
+}
+
+
+TEST_F(MoveHistoryTests, UnmakeRestoresHalfMoveClock)
+{
+	mBoard.setHalfMoveClock(10);
+
+	// Pawn move resets half move clock
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+
+	EXPECT_EQ(mBoard.getHalfMoveClock(), 0) << "Half move clock should reset on pawn move";
+
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.getHalfMoveClock(), 10) << "Half move clock should be restored";
+}
+
+
+TEST_F(MoveHistoryTests, GetHistoryReturnsAllMoves)
+{
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::e7, Square::e5, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::g1, Square::f3, MoveFlag::Quiet));
+
+	const auto &history = mExecution.getHistory();
+
+	EXPECT_EQ(history.size(), 3) << "History should have 3 entries";
+	EXPECT_EQ(history[0].move.from(), Square::e2);
+	EXPECT_EQ(history[1].move.from(), Square::e7);
+	EXPECT_EQ(history[2].move.from(), Square::g1);
+}
+
+
+TEST_F(MoveHistoryTests, CaptureRecordsCapturedPieceInState)
+{
+	mBoard.clear();
+	mBoard.addPiece(PieceType::WKnight, Square::f3);
+	mBoard.addPiece(PieceType::BPawn, Square::e5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	mExecution.makeMove(Move(Square::f3, Square::e5, MoveFlag::Capture));
+
+	const MoveHistoryEntry *entry = mExecution.getLastMove();
+	ASSERT_NE(entry, nullptr);
+	EXPECT_EQ(entry->previousState.capturedPiece, PieceType::BPawn) << "Should record captured pawn";
+}
+
+
+TEST_F(MoveHistoryTests, EnPassantCaptureRecordedCorrectly)
+{
+	mBoard.clear();
+	mBoard.addPiece(PieceType::WPawn, Square::e5);
+	mBoard.addPiece(PieceType::BPawn, Square::d5);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setEnPassantSquare(Square::d6);
+	mBoard.updateOccupancies();
+
+	mExecution.makeMove(Move(Square::e5, Square::d6, MoveFlag::EnPassant));
+
+	// En passant captures a pawn
+	const MoveHistoryEntry *entry = mExecution.getLastMove();
+	ASSERT_NE(entry, nullptr);
+	EXPECT_EQ(entry->previousState.capturedPiece, PieceType::BPawn) << "En passant should record captured pawn";
+}
+
+
+TEST_F(MoveHistoryTests, PromotionRecordedInHistory)
+{
+	mBoard.clear();
+	mBoard.addPiece(PieceType::WPawn, Square::e7);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	mExecution.makeMove(Move(Square::e7, Square::e8, MoveFlag::QueenPromotion));
+
+	const MoveHistoryEntry *entry = mExecution.getLastMove();
+	ASSERT_NE(entry, nullptr);
+	EXPECT_TRUE(entry->move.isPromotion()) << "Move should be marked as promotion";
+}
+
+
+TEST_F(MoveHistoryTests, UnmakePromotionRestoresPawn)
+{
+	mBoard.clear();
+	mBoard.addPiece(PieceType::WPawn, Square::e7);
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::BKing, Square::a8);
+	mBoard.setSide(Side::White);
+	mBoard.updateOccupancies();
+
+	mExecution.makeMove(Move(Square::e7, Square::e8, MoveFlag::QueenPromotion));
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e8), PieceType::WQueen) << "Should be queen after promotion";
+
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.pieceAt(Square::e7), PieceType::WPawn) << "Pawn should be restored";
+	EXPECT_EQ(mBoard.pieceAt(Square::e8), PieceType::None) << "e8 should be empty";
+}
+
+
+TEST_F(MoveHistoryTests, CastlingRecordedInHistory)
+{
+	mBoard.clear();
+	mBoard.addPiece(PieceType::WKing, Square::e1);
+	mBoard.addPiece(PieceType::WRook, Square::h1);
+	mBoard.addPiece(PieceType::BKing, Square::e8);
+	mBoard.setSide(Side::White);
+	mBoard.setCastlingRights(Castling::WK);
+	mBoard.updateOccupancies();
+
+	mExecution.makeMove(Move(Square::e1, Square::g1, MoveFlag::KingCastle));
+
+	const MoveHistoryEntry *entry = mExecution.getLastMove();
+	ASSERT_NE(entry, nullptr);
+	EXPECT_TRUE(entry->move.isCastle()) << "Move should be marked as castle";
+}
+
+
+TEST_F(MoveHistoryTests, ZobristHashRestoredOnUnmake)
+{
+	mBoard.computeHash();
+	uint64_t originalHash = mBoard.getHash();
+
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+
+	EXPECT_NE(mBoard.getHash(), originalHash) << "Hash should change after move";
+
+	mExecution.unmakeMove();
+
+	EXPECT_EQ(mBoard.getHash(), originalHash) << "Hash should be restored after unmake";
+}
+
+
+TEST_F(MoveHistoryTests, MultipleMakesAndUnmakesPreserveState)
+{
+	// Save initial state
+	mBoard.computeHash();
+	uint64_t initialHash	 = mBoard.getHash();
+	Castling initialCastling = mBoard.getCurrentCastlingRights();
+
+	// Play several moves
+	mExecution.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::e7, Square::e5, MoveFlag::DoublePawnPush));
+	mExecution.makeMove(Move(Square::g1, Square::f3, MoveFlag::Quiet));
+	mExecution.makeMove(Move(Square::b8, Square::c6, MoveFlag::Quiet));
+	mExecution.makeMove(Move(Square::f1, Square::c4, MoveFlag::Quiet));
+
+	// Unmake all
+	while (mExecution.historySize() > 0)
 	{
-		Move move = CreateMoveObject({i, 6}, {i, 4}, PieceType::Pawn);
-		mExecution->addMoveToHistory(move);
-
-		const Move *lastMove = mExecution->getLastMove();
-		ASSERT_NE(lastMove, nullptr) << "Move should be added to history";
-		EXPECT_EQ(lastMove->number, i + 1) << "Move number should be sequential";
-	}
-}
-
-
-TEST_F(MoveHistoryTests, RemoveLastMoveFromHistory)
-{
-	// Add two moves
-	Move move1 = CreateMoveObject({4, 6}, {4, 4}, PieceType::Pawn, PieceType::DefaultType, PlayerColor::White);
-	Move move2 = CreateMoveObject({4, 1}, {4, 3}, PieceType::Pawn, PieceType::DefaultType, PlayerColor::Black);
-
-	mExecution->addMoveToHistory(move1);
-	mExecution->addMoveToHistory(move2);
-
-	// Verify we have the second move as last
-	const Move *lastMove = mExecution->getLastMove();
-	ASSERT_NE(lastMove, nullptr) << "Should have a last move";
-	EXPECT_EQ(lastMove->player, PlayerColor::Black) << "Last move should be by black";
-
-	// Remove last move
-	mExecution->removeLastMove();
-
-	// Verify the first move is now the last move
-	lastMove = mExecution->getLastMove();
-	ASSERT_NE(lastMove, nullptr) << "Should still have a move after removal";
-	EXPECT_EQ(lastMove->player, PlayerColor::White) << "Last move should now be by white";
-	EXPECT_EQ(lastMove->number, 1) << "Last move should be the first move";
-}
-
-
-TEST_F(MoveHistoryTests, RemoveLastMoveFromEmptyHistory)
-{
-	// Try to remove from empty history - should not crash
-	EXPECT_NO_THROW(mExecution->removeLastMove()) << "Removing from empty history should not throw";
-
-	const Move *lastMove = mExecution->getLastMove();
-	EXPECT_EQ(lastMove, nullptr) << "History should still be empty";
-}
-
-
-TEST_F(MoveHistoryTests, RemoveAllMovesFromHistory)
-{
-	// Add several moves
-	for (int i = 0; i < 3; ++i)
-	{
-		Move move = CreateMoveObject({i, 6}, {i, 4}, PieceType::Pawn);
-		mExecution->addMoveToHistory(move);
+		mExecution.unmakeMove();
 	}
 
-	// Remove all moves one by one
-	mExecution->removeLastMove();
-	mExecution->removeLastMove();
-	mExecution->removeLastMove();
-
-	// History should be empty
-	const Move *lastMove = mExecution->getLastMove();
-	EXPECT_EQ(lastMove, nullptr) << "History should be empty after removing all moves";
-
-	// Try to remove one more - should not crash
-	EXPECT_NO_THROW(mExecution->removeLastMove()) << "Removing from empty history should not throw";
+	EXPECT_EQ(mBoard.getHash(), initialHash) << "Hash should match initial state";
+	EXPECT_EQ(mBoard.getCurrentCastlingRights(), initialCastling) << "Castling rights should match";
+	EXPECT_EQ(mBoard.pieceAt(Square::e2), PieceType::WPawn) << "Pieces should be in initial positions";
+	EXPECT_EQ(mBoard.pieceAt(Square::g1), PieceType::WKnight);
 }
 
 
-TEST_F(MoveHistoryTests, ClearMoveHistory)
-{
-	// Add several moves
-	for (int i = 0; i < 5; ++i)
-	{
-		Move move = CreateMoveObject({i, 6}, {i, 4}, PieceType::Pawn);
-		mExecution->addMoveToHistory(move);
-	}
-
-	// Verify we have moves
-	const Move *lastMove = mExecution->getLastMove();
-	ASSERT_NE(lastMove, nullptr) << "Should have moves before clearing";
-
-	// Clear history
-	mExecution->clearMoveHistory();
-
-	// Verify history is empty
-	lastMove = mExecution->getLastMove();
-	EXPECT_EQ(lastMove, nullptr) << "History should be empty after clearing";
-}
-
-
-TEST_F(MoveHistoryTests, ClearEmptyHistory)
-{
-	// Clear already empty history - should not crash
-	EXPECT_NO_THROW(mExecution->clearMoveHistory()) << "Clearing empty history should not throw";
-
-	const Move *lastMove = mExecution->getLastMove();
-	EXPECT_EQ(lastMove, nullptr) << "History should remain empty";
-}
-
-
-TEST_F(MoveHistoryTests, ExecuteMoveAddsToHistory)
-{
-	// Execute a valid pawn move
-	PossibleMove pawnMove	  = CreateMove({4, 6}, {4, 4}, MoveType::Normal); // e2-e4
-
-	Move		 executedMove = mExecution->executeMove(pawnMove);
-
-	// Verify move was added to history
-	const Move	*lastMove	  = mExecution->getLastMove();
-	ASSERT_NE(lastMove, nullptr) << "Executed move should be added to history";
-	EXPECT_EQ(lastMove->startingPosition, pawnMove.start) << "Starting position should match";
-	EXPECT_EQ(lastMove->endingPosition, pawnMove.end) << "Ending position should match";
-	EXPECT_EQ(lastMove->movedPiece, PieceType::Pawn) << "Moved piece should be pawn";
-	EXPECT_EQ(lastMove->number, 1) << "First executed move should have number 1";
-}
-
-
-TEST_F(MoveHistoryTests, ExecuteMultipleMovesWithHistory)
-{
-	// Execute multiple moves
-	PossibleMove move1 = CreateMove({4, 6}, {4, 4}, MoveType::Normal); // e2-e4
-	PossibleMove move2 = CreateMove({4, 1}, {4, 3}, MoveType::Normal); // e7-e5
-
-	mExecution->executeMove(move1);
-	mExecution->executeMove(move2);
-
-	// Verify both moves are in history with correct numbering
-	const Move *lastMove = mExecution->getLastMove();
-	ASSERT_NE(lastMove, nullptr) << "Should have last move";
-	EXPECT_EQ(lastMove->number, 2) << "Second move should have number 2";
-	EXPECT_EQ(lastMove->startingPosition, move2.start) << "Last move should be second move";
-}
-
-
-TEST_F(MoveHistoryTests, ExecuteCaptureMoveSetsCorrectType)
-{
-	// Set up a capture scenario by placing an opponent piece
-	// First move white pawn to e4
-	PossibleMove move1 = CreateMove({4, 6}, {4, 4}, MoveType::Normal);
-	mExecution->executeMove(move1);
-
-	// Manually place black pawn at d5 for capture
-	auto blackPawn = ChessPiece::CreatePiece(PieceType::Pawn, PlayerColor::Black);
-	mBoard->setPiece({3, 3}, blackPawn); // d5
-
-	// Execute capture move exd5
-	PossibleMove captureMove = CreateMove({4, 4}, {3, 3}, MoveType::Capture);
-	mExecution->executeMove(captureMove);
-
-	// Verify capture is recorded in history
-	const Move *lastMove = mExecution->getLastMove();
-	ASSERT_NE(lastMove, nullptr) << "Capture move should be in history";
-	EXPECT_EQ(lastMove->capturedPiece, PieceType::Pawn) << "Should record captured pawn";
-	EXPECT_TRUE((lastMove->type & MoveType::Capture) == MoveType::Capture) << "Move type should include capture";
-}
-
-
-
-} // namespace GameMechanicsTests
+} // namespace MoveTests

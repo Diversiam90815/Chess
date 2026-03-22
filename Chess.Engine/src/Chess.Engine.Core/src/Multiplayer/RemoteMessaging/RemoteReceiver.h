@@ -38,11 +38,11 @@ public:
 	void onMessageReceived(MultiplayerMessageType type, std::vector<uint8_t> &message) override;
 
 	void remoteConnectionStateReceived(const ConnectionState &state) override;
-	void remoteMoveReceived(const PossibleMove &move) override;
+	void remoteMoveReceived(const Move &move) override;
 	void remoteChatMessageReceived(const std::string &message) override;
 	void remoteInvitationReceived(const InvitationRequest &invite) override;
 	void remoteInvitationResponseReceived(const InvitationResponse &response) override;
-	void remotePlayerChosenReceived(const PlayerColor player) override;
+	void remotePlayerChosenReceived(const Side player) override;
 	void remotePlayerReadyFlagReceived(const bool flag) override;
 
 private:

@@ -115,13 +115,13 @@ public:
 	/**
 	 * @brief	Local player color decision.
 	 */
-	void		localPlayerChosen(const PlayerColor localPlayer) override;
+	void		localPlayerChosen(const Side localPlayer) override;
 
 	/**
 	 * @brief	Remote player has chosen his/her color. Observer contract.
 	 * @param	localPlayer -> already converted remote's color to the local player (Remote selects white, local is black,..).
 	 */
-	void		remotePlayerChosen(const PlayerColor local) override;
+	void		remotePlayerChosen(const Side local) override;
 
 	/**
 	 * @brief	Local ready flag toggled (used for synchronized game start). Observer contract.
@@ -134,7 +134,11 @@ public:
 	 */
 	void		onRemoteFound(const Endpoint &remote) override;
 
-	void		onRemoteMoveReceived(const PossibleMove &remoteMove) override {}
+	/**
+	 * @brief	We received a move from the remote endpoint
+	 */
+	void		onRemoteMoveReceived(const Move &remoteMove) override;
+
 	void		onRemoteChatMessageReceived(const std::string &mesage) override {}
 
 	/**
@@ -155,7 +159,7 @@ public:
 	/**
 	 * @brief	Remote player's color selection arrived. Observer contract.
 	 */
-	void		onRemotePlayerChosenReceived(const PlayerColor player) override;
+	void		onRemotePlayerChosenReceived(const Side player) override;
 
 	/**
 	 * @brief	Remote player's readiness flag changed. Observer contract.
@@ -175,6 +179,7 @@ public:
 	 */
 	bool		checkIfReadyForGame();
 
+	void		setRemoteMoveCallback(std::function<void(Move)> callback);
 
 private:
 	/**
@@ -207,7 +212,7 @@ private:
 	asio::executor_work_guard<asio::io_context::executor_type> mWorkGuard;
 	std::thread												   mWorkerThread;
 
-	PlayerColor												   mLocalPlayerColor{};
+	Side													   mLocalPlayerColor{};
 	std::string												   mLocalIPv4{};
 
 	Endpoint												   mRemoteEndpoint;
@@ -221,6 +226,8 @@ private:
 	std::atomic<bool>										   mRemotePlayerReadyForGameFlag{false};
 
 	PlayerName												   mPlayerName;
+
+	std::function<void(Move)>								   mRemoteMoveReceivedCallback;
 
 	friend class GameManager;
 };

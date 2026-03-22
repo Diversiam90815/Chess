@@ -9,40 +9,20 @@
 #include "Player.h"
 
 
-Player::Player(PlayerColor color) : mPlayerColor(color)
+Player::Player(Side color) : mSide(color) {}
+
+
+Side Player::getPlayerColor() const
 {
-	setScore(0);
+	return mSide;
 }
 
 
-Score Player::getScore() const
+void Player::setPlayerColor(Side value)
 {
-	return mScore;
-}
-
-
-void Player::setScore(int value)
-{
-	Score newScore = Score(this->getPlayerColor(), value);
-
-	if (mScore != newScore)
+	if (mSide != value)
 	{
-		mScore = newScore;
-	}
-}
-
-
-PlayerColor Player::getPlayerColor() const
-{
-	return mPlayerColor;
-}
-
-
-void Player::setPlayerColor(PlayerColor value)
-{
-	if (mPlayerColor != value)
-	{
-		mPlayerColor = value;
+		mSide = value;
 	}
 }
 
@@ -50,7 +30,6 @@ void Player::setPlayerColor(PlayerColor value)
 void Player::addCapturedPiece(const PieceType piece)
 {
 	mCapturedPieces.push_back(piece);
-	updateScore();
 
 	for (auto &observer : mObservers)
 	{
@@ -75,8 +54,6 @@ void Player::removeLastCapturedPiece()
 	PieceType lastCapture = mCapturedPieces.back();
 	mCapturedPieces.pop_back();
 
-	updateScore();
-
 	for (auto &observer : mObservers)
 	{
 		auto obs = observer.lock();
@@ -87,44 +64,7 @@ void Player::removeLastCapturedPiece()
 }
 
 
-void Player::updateScore()
-{
-	int score = 0;
-	for (auto piece : mCapturedPieces)
-	{
-		score += getPieceValue(piece);
-	}
-	setScore(score);
-
-	for (auto &observer : mObservers)
-	{
-		auto obs = observer.lock();
-
-		if (obs)
-			obs->onScoreUpdate(mScore.getPlayerColor(), mScore.getValue());
-	}
-
-	LOG_INFO("Updated Score for {} : {}", LoggingHelper::playerColourToString(mPlayerColor).c_str(), score);
-}
-
-
-constexpr int Player::getPieceValue(PieceType piece)
-{
-	switch (piece)
-	{
-	case PieceType::Pawn: return pawnValue;
-	case PieceType::Knight: return knightValue;
-	case PieceType::Bishop: return bishopValue;
-	case PieceType::Rook: return rookValue;
-	case PieceType::Queen: return queenValue;
-	case PieceType::King: return kingValue;
-	default: return 0;
-	}
-}
-
-
 void Player::reset()
 {
-	setScore(0);
 	mCapturedPieces.clear();
 }

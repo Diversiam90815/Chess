@@ -125,7 +125,7 @@ float UserSettings::getAtmosVolume()
 }
 
 
-void UserSettings::setMasterAudioVolume(const float volume)
+void UserSettings::setMasterVolume(const float volume)
 {
 	float roundedVolume = std::round(volume * 10.0f) / 10.0f;
 	storeSetting<float>(SettingsType::AudioMasterVolume, roundedVolume);

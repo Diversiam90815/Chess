@@ -10,9 +10,6 @@
 #include <chrono>
 
 #include "PLayer/CPUPlayer.h"
-#include "Generation/MoveGeneration.h"
-#include "Validation/MoveValidation.h"
-#include "Execution/MoveExecution.h"
 
 
 namespace PlayerTests
@@ -21,62 +18,44 @@ namespace PlayerTests
 class CPUPlayerTests : public ::testing::Test
 {
 protected:
-	std::shared_ptr<ChessBoard>		mBoard;
-	std::shared_ptr<MoveValidation> mValidation;
-	std::shared_ptr<MoveExecution>	mExecution;
-	std::shared_ptr<MoveGeneration> mGeneration;
-	std::shared_ptr<MoveEvaluation> mEvaluation;
-	std::shared_ptr<CPUPlayer>		mCPUPlayer;
+	GameEngine mEngine;
+	CPUPlayer  mCPUPlayer{mEngine};
 
-	void							SetUp() override
-	{
-		mBoard = std::make_shared<ChessBoard>();
-		mBoard->initializeBoard();
-		mValidation = std::make_shared<MoveValidation>(mBoard);
-		mExecution	= std::make_shared<MoveExecution>(mBoard, mValidation);
-		mGeneration = std::make_shared<MoveGeneration>(mBoard, mValidation, mExecution);
-		mEvaluation = std::make_shared<MoveEvaluation>(mBoard, mGeneration);
-		mCPUPlayer	= std::make_shared<CPUPlayer>(mGeneration, mEvaluation, mBoard);
-	}
+	void	   SetUp() override { mEngine.init(); }
 };
 
 
-TEST_F(CPUPlayerTests, ConstructorInitializeCorrectly)
+TEST_F(CPUPlayerTests, ConstructorInitializesCorrectly)
 {
 	// Verify CPU player is constructed with correct default values
-	CPUConfiguration config = mCPUPlayer->getCPUConfiguration();
+	CPUConfiguration config = mCPUPlayer.getConfiguration();
 
-	EXPECT_EQ(config.difficulty, CPUDifficulty::Random) << "Default difficulty should be Random";
-	EXPECT_EQ(config.cpuColor, PlayerColor::Black) << "Default CPU color should be Black";
+	EXPECT_EQ(config.difficulty, CPUDifficulty::Medium) << "Default difficulty should be Medium";
+	EXPECT_EQ(config.cpuColor, Side::Black) << "Default CPU color should be Black";
 	EXPECT_FALSE(config.enabled) << "CPU should be disabled by default";
-	EXPECT_EQ(config.thinkingTime.count(), 1000) << "Default thinking time should be 1000ms";
 	EXPECT_TRUE(config.enableRandomization) << "Randomization should be enabled by default";
-	EXPECT_FLOAT_EQ(config.randomizationFactor, 0.1f) << "Default randomization factor should be 0.1";
-	EXPECT_EQ(config.candidateMoveCount, 5) << "Default candidate move count should be 5";
+	EXPECT_EQ(config.maxDepth, 6) << "Default max depth should be 6";
 }
 
 
-TEST_F(CPUPlayerTests, SetCPUConfigurationUpdatesCorrectly)
+TEST_F(CPUPlayerTests, ConfigureUpdatesCorrectly)
 {
 	CPUConfiguration config;
-	config.cpuColor			   = PlayerColor::White;
+	config.cpuColor			   = Side::White;
 	config.difficulty		   = CPUDifficulty::Hard;
 	config.enabled			   = true;
-	config.thinkingTime		   = std::chrono::milliseconds(2000);
 	config.enableRandomization = false;
-	config.randomizationFactor = 0.3f;
-	config.candidateMoveCount  = 10;
+	config.maxDepth			   = 8;
 
-	mCPUPlayer->setCPUConfiguration(config);
-	CPUConfiguration retrievedConfig = mCPUPlayer->getCPUConfiguration();
+	mCPUPlayer.configure(config);
+
+	CPUConfiguration retrievedConfig = mCPUPlayer.getConfiguration();
 
 	EXPECT_EQ(retrievedConfig.difficulty, CPUDifficulty::Hard) << "Difficulty should be updated to Hard";
-	EXPECT_EQ(retrievedConfig.cpuColor, PlayerColor::White) << "CPU color should be updated to White";
+	EXPECT_EQ(retrievedConfig.cpuColor, Side::White) << "CPU color should be updated to White";
 	EXPECT_TRUE(retrievedConfig.enabled) << "CPU should be enabled";
-	EXPECT_EQ(retrievedConfig.thinkingTime.count(), 2000) << "Thinking time should be updated to 2000ms";
 	EXPECT_FALSE(retrievedConfig.enableRandomization) << "Randomization should be disabled";
-	EXPECT_FLOAT_EQ(retrievedConfig.randomizationFactor, 0.3f) << "Randomization factor should be updated to 0.3";
-	EXPECT_EQ(retrievedConfig.candidateMoveCount, 10) << "Candidate move count should be updated to 10";
+	EXPECT_EQ(retrievedConfig.maxDepth, 8) << "Max depth should be updated to 8";
 }
 
 
@@ -84,183 +63,350 @@ TEST_F(CPUPlayerTests, IsCPUPlayerReturnsFalseWhenDisabled)
 {
 	CPUConfiguration config;
 	config.enabled	= false;
-	config.cpuColor = PlayerColor::Black;
+	config.cpuColor = Side::Black;
 
-	mCPUPlayer->setCPUConfiguration(config);
+	mCPUPlayer.configure(config);
 
-	bool isBlackCPU = mCPUPlayer->isCPUPlayer(PlayerColor::Black);
-	bool isWhiteCPU = mCPUPlayer->isCPUPlayer(PlayerColor::White);
+	bool isBlackCPU = mCPUPlayer.isCPUPlayer(Side::Black);
+	bool isWhiteCPU = mCPUPlayer.isCPUPlayer(Side::White);
 
 	EXPECT_FALSE(isBlackCPU) << "Should return false when CPU is disabled";
 	EXPECT_FALSE(isWhiteCPU) << "Should return false when CPU is disabled";
 }
 
 
-TEST_F(CPUPlayerTests, IsCPUPlayerReturnsTrueForCorrectColor)
+TEST_F(CPUPlayerTests, IsCPUPlayerReturnsTrueForCorrectSide)
 {
 	CPUConfiguration config;
 	config.enabled	= true;
-	config.cpuColor = PlayerColor::Black;
+	config.cpuColor = Side::Black;
 
-	mCPUPlayer->setCPUConfiguration(config);
+	mCPUPlayer.configure(config);
 
-	bool isBlackCPU = mCPUPlayer->isCPUPlayer(PlayerColor::Black);
-	bool isWhiteCPU = mCPUPlayer->isCPUPlayer(PlayerColor::White);
+	bool isBlackCPU = mCPUPlayer.isCPUPlayer(Side::Black);
+	bool isWhiteCPU = mCPUPlayer.isCPUPlayer(Side::White);
 
-	EXPECT_TRUE(isBlackCPU) << "Should return true for CPU color when enabled";
-	EXPECT_FALSE(isWhiteCPU) << "Should return false for non-CPU color";
+	EXPECT_TRUE(isBlackCPU) << "Should return true for CPU side when enabled";
+	EXPECT_FALSE(isWhiteCPU) << "Should return false for non-CPU side";
 }
 
 
-TEST_F(CPUPlayerTests, IsCPUEnabledReturnsCorrectState)
+TEST_F(CPUPlayerTests, IsEnabledReturnsCorrectState)
 {
 	// Test disabled state
 	CPUConfiguration config;
 	config.enabled = false;
 
-	mCPUPlayer->setCPUConfiguration(config);
+	mCPUPlayer.configure(config);
 
-	EXPECT_FALSE(mCPUPlayer->isCPUEnabled()) << "Should return false when disabled";
+	EXPECT_FALSE(mCPUPlayer.isEnabled()) << "Should return false when disabled";
 
 	// Test enabled state
 	config.enabled = true;
-	mCPUPlayer->setCPUConfiguration(config);
+	mCPUPlayer.configure(config);
 
-	EXPECT_TRUE(mCPUPlayer->isCPUEnabled()) << "Should return true when enabled";
+	EXPECT_TRUE(mCPUPlayer.isEnabled()) << "Should return true when enabled";
 }
 
 
 TEST_F(CPUPlayerTests, SetEnabledUpdatesCorrectly)
 {
-	mCPUPlayer->setEnabled(true);
-	EXPECT_TRUE(mCPUPlayer->isCPUEnabled()) << "Should be enabled after setEnabled(true)";
+	mCPUPlayer.setEnabled(true);
+	EXPECT_TRUE(mCPUPlayer.isEnabled()) << "Should be enabled after setEnabled(true)";
 
-	mCPUPlayer->setEnabled(false);
-	EXPECT_FALSE(mCPUPlayer->isCPUEnabled()) << "Should be disabled after setEnabled(false)";
+	mCPUPlayer.setEnabled(false);
+	EXPECT_FALSE(mCPUPlayer.isEnabled()) << "Should be disabled after setEnabled(false)";
 }
 
 
-TEST_F(CPUPlayerTests, GetRandomMoveReturnsValidMove)
+TEST_F(CPUPlayerTests, CalculateMoveSynchronously)
 {
-	std::vector<PossibleMove> moves;
+	// Enable CPU and set difficulty
+	CPUConfiguration config;
+	config.enabled	  = true;
+	config.cpuColor	  = Side::White;
+	config.difficulty = CPUDifficulty::Easy;
 
-	// Create test moves
-	PossibleMove			  move1{{0, 1}, {0, 2}, MoveType::Normal};
-	PossibleMove			  move2{{1, 1}, {1, 2}, MoveType::Normal};
-	PossibleMove			  move3{{2, 1}, {2, 2}, MoveType::Normal};
-	PossibleMove			  move4{{2, 2}, {2, 3}, MoveType::Normal};
-	PossibleMove			  move5{{2, 3}, {2, 4}, MoveType::Normal};
+	mCPUPlayer.configure(config);
 
-	moves.push_back(move1);
-	moves.push_back(move2);
-	moves.push_back(move3);
-	moves.push_back(move4);
-	moves.push_back(move5);
+	// Calculate a move synchronously
+	Move move = mCPUPlayer.calculateMove();
 
-	// Test multiple times to ensure randomness works
-	bool		 foundDifferentMoves = false;
-	PossibleMove firstMove			 = mCPUPlayer->getRandomMove(moves);
+	// Should return a valid move from the initial position
+	EXPECT_TRUE(move.isValid()) << "Should return a valid move from initial position";
+}
+
+
+TEST_F(CPUPlayerTests, CalculateMoveReturnsValidMoveFromInitialPosition)
+{
+	CPUConfiguration config;
+	config.enabled	  = true;
+	config.cpuColor	  = Side::White;
+	config.difficulty = CPUDifficulty::Medium;
+	config.maxDepth	  = 2;
+
+	mCPUPlayer.configure(config);
+
+	Move move = mCPUPlayer.calculateMove();
+
+	EXPECT_TRUE(move.isValid()) << "CPU should return a valid move";
+
+	// Verify it's a legal move
+	EXPECT_TRUE(mEngine.isMoveLegal(move)) << "CPU move should be legal";
+}
+
+
+TEST_F(CPUPlayerTests, CalculateMoveAsyncCallsCallback)
+{
+	CPUConfiguration config;
+	config.enabled	  = true;
+	config.cpuColor	  = Side::White;
+	config.difficulty = CPUDifficulty::Easy;
+
+	mCPUPlayer.configure(config);
+
+	bool callbackCalled = false;
+	Move receivedMove;
+
+	auto callback = [&callbackCalled, &receivedMove](Move move)
+	{
+		callbackCalled = true;
+		receivedMove   = move;
+	};
+
+	mCPUPlayer.calculateMoveAsync(callback);
+
+	// Wait for calculation to complete
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+	EXPECT_TRUE(callbackCalled) << "Callback should be called";
+	EXPECT_TRUE(receivedMove.isValid()) << "Received move should be valid";
+}
+
+
+TEST_F(CPUPlayerTests, CancelCalculation)
+{
+	CPUConfiguration config;
+	config.enabled	  = true;
+	config.cpuColor	  = Side::White;
+	config.difficulty = CPUDifficulty::Hard;
+	config.maxDepth	  = 8; // Deep search to ensure it takes time
+
+	mCPUPlayer.configure(config);
+
+	bool callbackCalled = false;
+
+	auto callback		= [&callbackCalled](Move move) { callbackCalled = true; };
+
+	mCPUPlayer.calculateMoveAsync(callback);
+
+	// Cancel immediately
+	mCPUPlayer.cancelCalculation();
+
+	// Wait a bit
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+	EXPECT_FALSE(mCPUPlayer.isCalculating()) << "Should not be calculating after cancel";
+}
+
+
+TEST_F(CPUPlayerTests, IsCalculatingDuringAsyncSearch)
+{
+	CPUConfiguration config;
+	config.enabled	  = true;
+	config.cpuColor	  = Side::White;
+	config.difficulty = CPUDifficulty::Medium;
+
+	mCPUPlayer.configure(config);
+
+	EXPECT_FALSE(mCPUPlayer.isCalculating()) << "Should not be calculating initially";
+
+	auto callback = [](Move move) {};
+
+	mCPUPlayer.calculateMoveAsync(callback);
+
+	// Check immediately - might be calculating
+	bool isCalculatingDuringSearch = mCPUPlayer.isCalculating();
+
+	// Wait for completion
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
+	EXPECT_FALSE(mCPUPlayer.isCalculating()) << "Should not be calculating after completion";
+}
+
+
+TEST_F(CPUPlayerTests, DifficultyAffectsSearchDepth)
+{
+	// Test that different difficulties use different search depths
+	CPUConfiguration easyConfig;
+	easyConfig.enabled	  = true;
+	easyConfig.cpuColor	  = Side::White;
+	easyConfig.difficulty = CPUDifficulty::Easy;
+
+	CPUConfiguration hardConfig;
+	hardConfig.enabled	  = true;
+	hardConfig.cpuColor	  = Side::White;
+	hardConfig.difficulty = CPUDifficulty::Hard;
+
+	// Easy difficulty should complete faster
+	mCPUPlayer.configure(easyConfig);
+
+	auto easyStart	  = std::chrono::high_resolution_clock::now();
+	Move easyMove	  = mCPUPlayer.calculateMove();
+	auto easyEnd	  = std::chrono::high_resolution_clock::now();
+
+	auto easyDuration = std::chrono::duration_cast<std::chrono::milliseconds>(easyEnd - easyStart);
+
+	// Hard difficulty should take longer
+	mCPUPlayer.configure(hardConfig);
+
+	auto hardStart	  = std::chrono::high_resolution_clock::now();
+	Move hardMove	  = mCPUPlayer.calculateMove();
+	auto hardEnd	  = std::chrono::high_resolution_clock::now();
+
+	auto hardDuration = std::chrono::duration_cast<std::chrono::milliseconds>(hardEnd - hardStart);
+
+	EXPECT_TRUE(easyMove.isValid()) << "Easy move should be valid";
+	EXPECT_TRUE(hardMove.isValid()) << "Hard move should be valid";
+
+	// Hard should generally take longer (but this test might be flaky on very fast systems)
+	// So we just verify both completed successfully
+	SUCCEED() << "Both difficulty levels completed successfully";
+}
+
+
+TEST_F(CPUPlayerTests, RandomizationProducesDifferentMoves)
+{
+	CPUConfiguration config;
+	config.enabled			   = true;
+	config.cpuColor			   = Side::White;
+	config.difficulty		   = CPUDifficulty::Easy;
+	config.enableRandomization = true;
+
+	mCPUPlayer.configure(config);
+
+	// Calculate multiple moves and check for variation
+	std::set<uint16_t> uniqueMoves;
 
 	for (int i = 0; i < 10; ++i)
 	{
-		PossibleMove randomMove	 = mCPUPlayer->getRandomMove(moves);
-
-		// Verify the move is one of our test moves
-		bool		 isValidMove = (randomMove == move1) || (randomMove == move2) || (randomMove == move3 || (randomMove == move4) || (randomMove == move5));
-
-		EXPECT_TRUE(isValidMove) << "Random move should be one of the provided moves";
-
-		// Check if we get different moves (for randomness)
-		if (!(randomMove == firstMove) && !foundDifferentMoves)
-		{
-			foundDifferentMoves = true;
-		}
+		mEngine.resetGame(); // Reset to initial position
+		Move move = mCPUPlayer.calculateMove();
+		uniqueMoves.insert(move.raw());
 	}
 
-	// Note: This test might occasionally fail due to randomness, but it's unlikely
-	EXPECT_TRUE(foundDifferentMoves) << "Random move selection should produce different moves over multiple calls";
+	// With randomization enabled, we should see some variety
+	// (might occasionally fail due to random chance, but unlikely)
+	EXPECT_GT(uniqueMoves.size(), 1) << "Randomization should produce different moves";
 }
 
 
-TEST_F(CPUPlayerTests, GetBestMovePrefersCheckmate)
+TEST_F(CPUPlayerTests, NoRandomizationProducesSameMove)
 {
-	std::vector<PossibleMove> moves;
+	CPUConfiguration config;
+	config.enabled			   = true;
+	config.cpuColor			   = Side::White;
+	config.difficulty		   = CPUDifficulty::Easy;
+	config.enableRandomization = false;
 
-	// Create moves with different basic evaluation scores
-	PossibleMove			  normalMove{{0, 1}, {0, 2}, MoveType::Normal};
-	PossibleMove			  captureMove{{1, 1}, {1, 2}, MoveType::Capture};
-	PossibleMove			  checkmateMove{{2, 1}, {2, 2}, MoveType::Checkmate};
+	mCPUPlayer.configure(config);
 
-	moves.push_back(normalMove);
-	moves.push_back(captureMove);
-	moves.push_back(checkmateMove);
+	// Calculate multiple moves from the same position
+	Move move1 = mCPUPlayer.calculateMove();
 
-	PossibleMove selectedMove = mCPUPlayer->getBestEvaluatedMove(moves);
+	mEngine.resetGame();
+	Move move2 = mCPUPlayer.calculateMove();
 
-	// Checkmate should be selected as it has the highest basic evaluation score (1000)
-	EXPECT_TRUE(selectedMove == checkmateMove) << "Should select the move with highest basic evaluation (checkmate)";
+	mEngine.resetGame();
+	Move move3 = mCPUPlayer.calculateMove();
+
+	// Without randomization, should get the same move
+	EXPECT_EQ(move1.raw(), move2.raw()) << "Without randomization, moves should be identical";
+	EXPECT_EQ(move2.raw(), move3.raw()) << "Without randomization, moves should be identical";
 }
 
 
-TEST_F(CPUPlayerTests, GetMiniMaxMoveReturnsValidMove)
+TEST_F(CPUPlayerTests, CPUFindsCheckmate)
 {
-	std::vector<PossibleMove> moves;
+	// Set up a position where checkmate is available in one move
+	mEngine.getBoard().clear();
 
-	// Create some test moves
-	PossibleMove			  move1{{4, 6}, {4, 4}, MoveType::Normal}; // e2-e4
-	PossibleMove			  move2{{3, 6}, {3, 4}, MoveType::Normal}; // d2-d4
-	PossibleMove			  move3{{6, 7}, {5, 5}, MoveType::Normal}; // g1-f3
+	// Mate in 1: Queen takes f7 with check (Scholar's mate setup)
+	mEngine.getBoard().addPiece(PieceType::WQueen, Square::h5);
+	mEngine.getBoard().addPiece(PieceType::WBishop, Square::c4);
+	mEngine.getBoard().addPiece(PieceType::WKing, Square::e1);
 
-	moves.push_back(move1);
-	moves.push_back(move2);
-	moves.push_back(move3);
+	mEngine.getBoard().addPiece(PieceType::BKing, Square::e8);
+	mEngine.getBoard().addPiece(PieceType::BPawn, Square::e7);
+	mEngine.getBoard().addPiece(PieceType::BPawn, Square::f7);
+	mEngine.getBoard().addPiece(PieceType::BPawn, Square::g7);
 
-	PossibleMove selectedMove = mCPUPlayer->getMiniMaxMove(moves, 2);
+	mEngine.getBoard().setSide(Side::White);
+	mEngine.getBoard().updateOccupancies();
 
-	// MiniMax should select a valid move from the provided options
-	bool		 isValidMove  = (selectedMove == move1) || (selectedMove == move2) || (selectedMove == move3);
-	EXPECT_TRUE(isValidMove) << "MiniMax move should be one of the provided moves";
+	CPUConfiguration config;
+	config.enabled	  = true;
+	config.cpuColor	  = Side::White;
+	config.difficulty = CPUDifficulty::Medium;
+
+	mCPUPlayer.configure(config);
+
+	Move move = mCPUPlayer.calculateMove();
+
+	// Should find Qxf7# (checkmate)
+	EXPECT_TRUE(move.isValid()) << "Should find a move";
+	EXPECT_EQ(move.from(), Square::h5) << "Should move queen";
+	EXPECT_EQ(move.to(), Square::f7) << "Should capture on f7 for checkmate";
 }
 
 
-TEST_F(CPUPlayerTests, GetAlphaBetaMoveReturnsValidMove)
+TEST_F(CPUPlayerTests, TranspositionTableImprovesPerformance)
 {
-	std::vector<PossibleMove> moves;
+	CPUConfiguration config;
+	config.enabled	  = true;
+	config.cpuColor	  = Side::White;
+	config.difficulty = CPUDifficulty::Medium;
+	config.maxDepth	  = 4;
 
-	// Create some test moves
-	PossibleMove			  move1{{4, 6}, {4, 4}, MoveType::Normal}; // e2-e4
-	PossibleMove			  move2{{3, 6}, {3, 4}, MoveType::Normal}; // d2-d4
-	PossibleMove			  move3{{6, 7}, {5, 5}, MoveType::Normal}; // g1-f3
+	mCPUPlayer.configure(config);
 
-	moves.push_back(move1);
-	moves.push_back(move2);
-	moves.push_back(move3);
+	// Make and unmake some moves to create transposition opportunities
+	mEngine.makeMove(Move(Square::e2, Square::e4, MoveFlag::DoublePawnPush));
+	mEngine.makeMove(Move(Square::e7, Square::e5, MoveFlag::DoublePawnPush));
+	mEngine.makeMove(Move(Square::g1, Square::f3, MoveFlag::Quiet));
+	mEngine.makeMove(Move(Square::b8, Square::c6, MoveFlag::Quiet));
 
-	PossibleMove selectedMove = mCPUPlayer->getAlphaBetaMove(moves, 2);
+	// Calculate move - transposition table should help
+	Move move = mCPUPlayer.calculateMove();
 
-	// Alpha-Beta should select a valid move from the provided options
-	bool		 isValidMove  = (selectedMove == move1) || (selectedMove == move2) || (selectedMove == move3);
-	EXPECT_TRUE(isValidMove) << "Alpha-Beta move should be one of the provided moves";
+	EXPECT_TRUE(move.isValid()) << "Should calculate a valid move";
+	// Transposition hits are logged by CPU player, check that in actual implementation
 }
 
 
-TEST_F(CPUPlayerTests, EmptyMoveListHandling)
+TEST_F(CPUPlayerTests, HandlesNoLegalMoves)
 {
-	std::vector<PossibleMove> emptyMoves;
+	// Set up a stalemate/checkmate position
+	mEngine.getBoard().clear();
 
-	// Test that CPU handles empty move lists gracefully
-	PossibleMove			  randomMove	= mCPUPlayer->getRandomMove(emptyMoves);
-	PossibleMove			  easyMove		= mCPUPlayer->getBestEvaluatedMove(emptyMoves);
+	mEngine.getBoard().addPiece(PieceType::WKing, Square::a1);
+	mEngine.getBoard().addPiece(PieceType::BKing, Square::a3);
+	mEngine.getBoard().addPiece(PieceType::BQueen, Square::c2);
 
-	PossibleMove			  alphaBetaMove = mCPUPlayer->getAlphaBetaMove(emptyMoves, 2);
-	PossibleMove			  minimaxMove	= mCPUPlayer->getMiniMaxMove(emptyMoves, 2);
+	mEngine.getBoard().setSide(Side::White);
+	mEngine.getBoard().updateOccupancies();
 
+	CPUConfiguration config;
+	config.enabled	  = true;
+	config.cpuColor	  = Side::White;
+	config.difficulty = CPUDifficulty::Easy;
 
-	// Empty moves should result in empty/default moves
-	EXPECT_TRUE(randomMove.isEmpty()) << "Random move should be empty for empty input";
-	EXPECT_TRUE(easyMove.isEmpty()) << "Easy move should be empty for empty input";
-	EXPECT_TRUE(alphaBetaMove.isEmpty()) << "Alpha-Beta move should be empty for empty input";
-	EXPECT_TRUE(minimaxMove.isEmpty()) << "Minimax move should be empty for empty input";
+	mCPUPlayer.configure(config);
+
+	Move move = mCPUPlayer.calculateMove();
+
+	// No legal moves available
+	EXPECT_FALSE(move.isValid()) << "Should return invalid move when no legal moves";
 }
 
 

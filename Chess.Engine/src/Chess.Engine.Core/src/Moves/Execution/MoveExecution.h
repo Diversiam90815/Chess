@@ -7,77 +7,79 @@
 
 #pragma once
 
-#include <memory>
-#include <set>
-#include <mutex>
+#include <vector>
 
 #include "ChessBoard.h"
-#include "Validation/MoveValidation.h"
 #include "Notation/MoveNotation.h"
 #include "Move.h"
 #include "IObservable.h"
+#include "Logging.h"
 
 
-/**
- * @brief	Manages execution of moves on a chessboard, including special cases
- *			(castling, en passant, promotion) and history maintenance.
- */
-class MoveExecution : public IMoveObservable
+struct MoveHistoryEntry
+{
+	Move	   move;
+	BoardState previousState;
+};
+
+
+struct MoveExecutionResult
+{
+	bool		success{false};
+	std::string notation{};
+	PieceType	capturedPiece{PieceType::None};
+
+	explicit	operator bool() { return success; }
+};
+
+
+class MoveExecution
 {
 public:
-	MoveExecution(std::shared_ptr<ChessBoard> board, std::shared_ptr<MoveValidation> validation);
+	explicit MoveExecution(Chessboard &board);
 	~MoveExecution() = default;
 
-	/**
-	 * @brief	Execute a possible move (validity assumed pre-checked) and notify observers.
-	 * @param	executedMove -> Move descriptor (may be enriched).
-	 * @param	fromRemote -> True if originated from remote peer (affects notifications).
-	 * @return	Concrete Move committed to history.
-	 */
-	Move		executeMove(PossibleMove &executedMove, bool fromRemote = false) override;
+	// Executes a move on the board, returns false if invalid
+	bool											   makeMove(Move move);
 
-	/**
-	 * @brief	Execute castling (updates king & rook positions).
-	 * @return	true if successful.
-	 */
-	bool		executeCastlingMove(PossibleMove &move);
+	// Undo the last move
+	bool											   unmakeMove();
 
-	/**
-	 * @brief	Execute an en passant capture if legal.
-	 */
-	bool		executeEnPassantMove(PossibleMove &move, PlayerColor player);
+	// History
+	[[nodiscard]] const MoveHistoryEntry			  *getLastMove() const;
+	[[nodiscard]] size_t							   historySize() const { return mHistory.size(); }
+	[[nodiscard]] const std::vector<MoveHistoryEntry> &getHistory() const { return mHistory; }
+	void											   clearHistory() { mHistory.clear(); }
 
-	/**
-	 * @brief	Promote a pawn to another piece type.
-	 */
-	bool		executePawnPromotion(const PossibleMove &move, PlayerColor player);
-
-	/**
-	 * @brief	Gets the last executed move in history.
-	 * @return	const pointer to the move, or nullptr is none
-	 */
-	const Move *getLastMove();
-
-	/**
-	 * @brief	Add move to internal history (observer callback contract).
-	 */
-	void		addMoveToHistory(Move &move) override;
-
-	/**
-	 * @brief	Clear complete move history.
-	 */
-	void		clearMoveHistory() override;
-
-	/**
-	 * @brief	Remove last move (used for undo).
-	 */
-	void		removeLastMove();
-
+	PieceType										   getLastCapturedPiece();
 
 private:
-	std::shared_ptr<ChessBoard>		mChessBoard;
-	std::shared_ptr<MoveValidation> mValidation;
-	std::shared_ptr<MoveNotation>	mMoveNotation;
-	std::set<Move>					mMoveHistory;
-	std::mutex						mExecutionMutex;
+	Chessboard					 &mChessBoard;
+
+	std::vector<MoveHistoryEntry> mHistory;
+
+	// clang-format off
+	/*
+				Castling rights update table
+
+	a8	(black queenside rook)		 7		0111	Clears BQ bit
+	h8	(black kingside rook)		11		1011	Clears BK bit
+	e8	(black king)				 3		0011	Clears both BK and BQ
+	a1	(white queenside rook)		13		1101	Clears WQ bit
+	h1	(white kingside rook)		14		1110	Clears WK bit
+	e1	(white king)				12		1100	Clears both WK and WQ
+	All other squares				15		1111	No change
+	*/
+	static constexpr uint8_t	  sCastlingRightsUpdate[64] = 
+	{
+		  7, 15, 15, 15,  3, 15, 15, 11,	// a8-h8
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 15, 15, 15, 15, 15, 15, 15, 15, 
+		 13, 15, 15, 15, 12, 15, 15, 14		// a1-h1
+	 };
+	// clang-format on
 };
