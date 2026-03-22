@@ -144,6 +144,23 @@ bool GameController::undoLastMove()
 }
 
 
+constexpr int GameController::promotionPieceToOffset(PieceType pt)
+{
+	switch (pt)
+	{
+	case WKnight:
+	case BKnight: return 0;
+	case WBishop:
+	case BBishop: return 1;
+	case WRook:
+	case BRook: return 2;
+	case WQueen:
+	case BQueen: return 3;
+	default: return -1;
+	}
+}
+
+
 bool GameController::isPromotionMove(Square from, Square to) const
 {
 	ensureCacheValid();
@@ -172,7 +189,7 @@ Move GameController::findMove(Square from, Square to, PieceType promotion) const
 			// if promotion specified, matchit
 			if (promotion != PieceType::None)
 			{
-				if (m.isPromotion() && m.promotionPieceOffset() == promotion)
+				if (m.isPromotion() && m.promotionPieceOffset() == promotionPieceToOffset(promotion))
 					return m;
 			}
 			else if (!m.isPromotion())
