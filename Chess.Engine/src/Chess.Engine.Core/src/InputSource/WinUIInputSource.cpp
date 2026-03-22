@@ -76,7 +76,7 @@ void WinUIInputSource::onGameEnded(EndGameState state, Side winner)
 {
 	EndgameStateEvent event;
 	event.state	 = state;
-	event.winner = winner;
+	event.winner = static_cast<int>(winner);
 
 	sendToUI(MessageType::EndGameState, &event);
 }

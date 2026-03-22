@@ -64,7 +64,7 @@ struct MoveEvent
 struct EndgameStateEvent
 {
 	EndGameState state;
-	Side		 winner = Side::None;
+	int			 winner = static_cast<int>(Side::None);
 };
 
 
