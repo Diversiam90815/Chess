@@ -7,9 +7,9 @@
 
 #include "CPUPlayer.h"
 
-constexpr int INF	  = std::numeric_limits<int>::max();
-constexpr int NEG_INF = std::numeric_limits<int>::min() + 1;
-
+constexpr int INF				  = std::numeric_limits<int>::max();
+constexpr int NEG_INF			  = std::numeric_limits<int>::min() + 1;
+constexpr int MAX_QUIESENCE_DEPTH = 8;
 
 CPUPlayer::CPUPlayer(GameEngine &engine) : mEngine(engine), mRandomGenerator(mRandomDevice()) {}
 
@@ -90,8 +90,9 @@ Move CPUPlayer::computeBestMove(std::stop_token stopToken)
 
 	mNodesSearched	   = 0;
 	mTranspositionHits = 0;
-	Move bestMove;
+	mMoveEvaluation.clearSearchState();
 
+	Move bestMove;
 	bestMove = searchAlphaBeta(legalMoves, getSearchDepth(), stopToken);
 
 	LOG_INFO("CPU searched {} nodes, {} TranspositionHits", mNodesSearched, mTranspositionHits);
@@ -105,20 +106,33 @@ Move CPUPlayer::searchAlphaBeta(const MoveList &moves, int depth, std::stop_toke
 	std::vector<ScoredMove> scoredMoves;
 	scoredMoves.reserve(moves.size());
 
+	// Check TT for a best-move hint for root ordering
+	uint64_t hash = mSearchEngine.getHash();
+	int		 ttScoreUnused{0};
+	Move	 ttMove{};
+	lookupTransposition(hash, 0, NEG_INF, INF, ttScoreUnused, ttMove);
+
+	// Copy and order moves
+	MoveList orderedMoves;
+	for (size_t i = 0; i < moves.size(); ++i)
+		orderedMoves.push(moves[i]);
+
+	mMoveEvaluation.orderMoves(orderedMoves, mSearchEngine.getBoard(), ttMove, 0);
+
 	int alpha = NEG_INF;
 	int beta  = INF;
 
-	for (size_t i = 0; i < moves.size(); ++i)
+	for (size_t i = 0; i < orderedMoves.size(); ++i)
 	{
 		if (isCancelled(stopToken))
 			break;
 
-		Move move = moves[i];
+		Move move = orderedMoves[i];
 
 		if (!mSearchEngine.makeMoveUnchecked(move))
 			continue;
 
-		int score = -alphaBeta(depth - 1, -beta, -alpha, false, stopToken);
+		int score = -alphaBeta(depth - 1, -beta, -alpha, 1, stopToken);
 		mSearchEngine.undoMoveUnchecked();
 
 		scoredMoves.push_back({move, score});
@@ -137,7 +151,7 @@ Move CPUPlayer::searchAlphaBeta(const MoveList &moves, int depth, std::stop_toke
 }
 
 
-int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::stop_token stopToken)
+int CPUPlayer::alphaBeta(int depth, int alpha, int beta, int ply, std::stop_token stopToken)
 {
 	if (isCancelled(stopToken))
 		return 0;
@@ -156,7 +170,7 @@ int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::s
 	}
 
 	if (depth <= 0)
-		return quiescence(alpha, beta, stopToken);
+		return quiescence(alpha, beta, stopToken, 0);
 
 	MoveList moves;
 	mSearchEngine.generateLegalMoves(moves);
@@ -165,10 +179,13 @@ int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::s
 	if (moves.size() == 0)
 	{
 		if (mSearchEngine.isInCheck())
-			return NEG_INF + ((mConfig.maxDepth - depth)); // prefer faster checkmate
+			return NEG_INF + ply; // prefer faster checkmate
 
-		return 0;										   // stalemate
+		return 0;				  // stalemate
 	}
+
+	// order moves
+	mMoveEvaluation.orderMoves(moves, mSearchEngine.getBoard(), ttMove, ply);
 
 	Move						 bestMove{};
 	TranspositionEntry::NodeType nodeType = TranspositionEntry::NodeType::UpperBound;
@@ -183,11 +200,15 @@ int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::s
 		if (!mSearchEngine.makeMoveUnchecked(move))
 			continue;
 
-		int score = -alphaBeta(depth - 1, -beta, -alpha, !maximizing, stopToken);
+		int score = -alphaBeta(depth - 1, -beta, -alpha, ply + 1, stopToken);
 		mSearchEngine.undoMoveUnchecked();
 
 		if (score >= beta)
 		{
+			// notify MoveEvaluation of the cutoff for killer/history updates
+			mMoveEvaluation.updateHistory(move, depth);
+			mMoveEvaluation.updateKillerMove(move, depth);
+
 			storeTransposition(hash, depth, beta, TranspositionEntry::NodeType::LowerBound, move);
 			return beta; // beta cutoff
 		}
@@ -205,7 +226,7 @@ int CPUPlayer::alphaBeta(int depth, int alpha, int beta, bool maximizing, std::s
 }
 
 
-int CPUPlayer::quiescence(int alpha, int beta, std::stop_token stopToken)
+int CPUPlayer::quiescence(int alpha, int beta, std::stop_token stopToken, int qDepth)
 {
 	if (isCancelled(stopToken))
 		return 0;
@@ -220,21 +241,32 @@ int CPUPlayer::quiescence(int alpha, int beta, std::stop_token stopToken)
 	if (standPat > alpha)
 		alpha = standPat;
 
+	// depth limit prevents quiesence explosion
+	if (qDepth >= MAX_QUIESENCE_DEPTH)
+		return alpha;
+
 	// generate only capture moves
 	MoveList moves{};
 	mSearchEngine.generateLegalMoves(moves);
 
+	MoveList captures{};
 	for (size_t i = 0; i < moves.size(); ++i)
 	{
-		Move &move = moves[i];
+		if (moves[i].isCapture())
+			captures.push(moves[i]);
+	}
 
-		if (!move.isCapture())
-			continue;
+	// Order captures by MVV-LVA
+	mMoveEvaluation.orderCaptures(captures, mSearchEngine.getBoard());
+
+	for (size_t i = 0; i < moves.size(); ++i)
+	{
+		Move &move = captures[i];
 
 		if (!mSearchEngine.makeMoveUnchecked(move))
 			continue;
 
-		int score = -quiescence(-beta, -alpha, stopToken);
+		int score = -quiescence(-beta, -alpha, stopToken, qDepth + 1);
 		mSearchEngine.undoMoveUnchecked();
 
 		if (score >= beta)
@@ -303,8 +335,22 @@ std::vector<ScoredMove> CPUPlayer::filterTopCandidates(std::vector<ScoredMove> &
 
 void CPUPlayer::storeTransposition(uint64_t hash, int depth, int score, TranspositionEntry::NodeType type, Move bestMove)
 {
+	auto it = mTranspositionTable.find(hash);
+
+	if (it != mTranspositionTable.end() && it->second.depth > depth)
+		return; // keep deeper entry
+
 	if (mTranspositionTable.size() >= MAX_TRANSPOSITION_ENTRIES)
-		mTranspositionTable.clear(); // TODO: May need refactoring
+	{
+		size_t toRemove = MAX_TRANSPOSITION_ENTRIES / 4;
+		auto   eraseIt	= mTranspositionTable.begin();
+
+		while (toRemove > 0 && eraseIt != mTranspositionTable.end())
+		{
+			eraseIt = mTranspositionTable.erase(eraseIt);
+			--toRemove;
+		}
+	}
 
 	mTranspositionTable[hash] = {hash, depth, score, type, bestMove};
 }
@@ -317,6 +363,9 @@ bool CPUPlayer::lookupTransposition(uint64_t hash, int depth, int alpha, int bet
 		return false;
 
 	const auto &entry = it->second;
+
+	// Always extract best move for ordering, even if score isn't usable
+	bestMove		  = entry.bestMove;
 
 	if (entry.depth < depth)
 		return false;

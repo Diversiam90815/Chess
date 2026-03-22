@@ -15,6 +15,7 @@
 #include "Parameters.h"
 #include "GameEngine.h"
 #include "Evaluation.h"
+#include "Evaluation/MoveEvaluation.h"
 
 
 /**
@@ -132,12 +133,12 @@ private:
 	/**
 	 * @brief	Recursive alpha-beta implementation.
 	 */
-	int												 alphaBeta(int depth, int alpha, int beta, bool maximizing, std::stop_token stopToken);
+	int												 alphaBeta(int depth, int alpha, int beta, int ply, std::stop_token stopToken);
 
 	/**
 	 * @brief	Quiescence search to avoid horizon effect.
 	 */
-	int												 quiescence(int alpha, int beta, std::stop_token stopToken);
+	int												 quiescence(int alpha, int beta, std::stop_token stopToken, int qDepth);
 
 	//=========================================================================
 	// Move Selection
@@ -168,8 +169,9 @@ private:
 	//=========================================================================
 
 	CPUConfiguration								 mConfig;
-	GameEngine										&mEngine;		// main engine (for reading initial state)
-	GameEngine										 mSearchEngine; // isolated copy for search
+	GameEngine										&mEngine;		  // main engine (for reading initial state)
+	GameEngine										 mSearchEngine;	  // isolated copy for search
+	MoveEvaluation									 mMoveEvaluation; // Move ordering (stateful per search - owns killer/history tables)
 
 	// Search thread
 	std::jthread									 mSearchThread;
