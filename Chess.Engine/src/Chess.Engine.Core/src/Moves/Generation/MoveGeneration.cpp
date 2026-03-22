@@ -123,9 +123,6 @@ void MoveGeneration::generatePawnMoves(MoveList &moves, Side side)
 	const int	promoRankMin = (side == Side::White) ? to_index(Square::a7) : to_index(Square::a2);
 	const int	promoRankMax = (side == Side::White) ? to_index(Square::h7) : to_index(Square::h2);
 
-	// Pawns attack in reverse direction
-	Side		attackSide	 = (side == Side::White) ? Side::Black : Side::White;
-
 	while (pawns)
 	{
 		int	   source	   = BitUtils::lsb(pawns);
@@ -160,8 +157,8 @@ void MoveGeneration::generatePawnMoves(MoveList &moves, Side side)
 			}
 		}
 
-		// Captures
-		U64 captures = at.pawnAttacks(attackSide, from) & occEnemy;
+		// Captures (use 'side' directly)
+		U64 captures = at.pawnAttacks(side, from) & occEnemy;
 		while (captures)
 		{
 			int	   capTarget = BitUtils::lsb(captures);
@@ -184,7 +181,7 @@ void MoveGeneration::generatePawnMoves(MoveList &moves, Side side)
 		Square epSquare = mChessBoard.getCurrentEnPassantSqaure();
 		if (epSquare != Square::None)
 		{
-			U64 epCapture = at.pawnAttacks(attackSide, from) & (1ULL << to_index(epSquare));
+			U64 epCapture = at.pawnAttacks(side, from) & (1ULL << to_index(epSquare));
 
 			if (epCapture)
 				moves.push(Move(from, epSquare, MoveFlag::EnPassant));

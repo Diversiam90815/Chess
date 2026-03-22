@@ -34,8 +34,8 @@ U64 AttackTables::maskPawnAttacks(Side side, int square)
 	BitUtils::setBit(bitboard, square);
 
 	// Generate attacks for
-	// white pawns
-	if (!(side == Side::White))
+	// white pawns (>> = toward rank 8)
+	if (side == Side::White)
 	{
 		if ((bitboard >> 7) & not_A_file)
 			attacks |= (bitboard >> 7);
@@ -43,13 +43,13 @@ U64 AttackTables::maskPawnAttacks(Side side, int square)
 		if ((bitboard >> 9) & not_H_file)
 			attacks |= (bitboard >> 9);
 	}
-	// black pawns
+	// black pawns (<< = toward rank 1)
 	else
 	{
-		if ((bitboard << 7) & not_A_file)
+		if ((bitboard << 7) & not_H_file)
 			attacks |= (bitboard << 7);
 
-		if ((bitboard << 9) & not_H_file)
+		if ((bitboard << 9) & not_A_file)
 			attacks |= (bitboard << 9);
 	}
 
