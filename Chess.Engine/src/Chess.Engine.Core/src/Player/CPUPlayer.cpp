@@ -259,7 +259,7 @@ int CPUPlayer::quiescence(int alpha, int beta, std::stop_token stopToken, int qD
 	// Order captures by MVV-LVA
 	mMoveEvaluation.orderCaptures(captures, mSearchEngine.getBoard());
 
-	for (size_t i = 0; i < moves.size(); ++i)
+	for (size_t i = 0; i < captures.size(); ++i)
 	{
 		Move &move = captures[i];
 
